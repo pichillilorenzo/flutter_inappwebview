@@ -275,7 +275,9 @@ inAppBrowser.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3
 ## Screenshots:
 
 iOS:
+
 ![ios](https://user-images.githubusercontent.com/5956938/45523056-52c7c980-b7c7-11e8-8bf1-488c9c8033bf.gif)
 
 Android:
+
 ![android](https://user-images.githubusercontent.com/5956938/45523058-55c2ba00-b7c7-11e8-869c-c1738711933f.gif)

@@ -21,37 +21,72 @@ First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](ht
 Create a Class that extends the `InAppBrowser` Class in order to override the callbacks to manage the browser events.
 Example:
 ```dart
+import 'package:flutter/material.dart';
+
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyInAppBrowser extends InAppBrowser {
-  
+
   @override
   void onLoadStart(String url) {
     super.onLoadStart(url);
     print("\n\nStarted $url\n\n");
   }
-  
+
   @override
   void onLoadStop(String url) {
     super.onLoadStop(url);
     print("\n\nStopped $url\n\n");
   }
-  
+
   @override
   void onLoadError(String url, String code, String message) {
     super.onLoadStop(url);
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
-  
+
   @override
   void onExit() {
     super.onExit();
     print("\n\nBrowser closed!\n\n");
   }
-  
+
 }
 
 MyInAppBrowser inAppBrowser = new MyInAppBrowser();
+
+void main() => runApp(new MyApp());
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => new _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: const Text('Flutter InAppBrowser Plugin example app'),
+        ),
+        body: new Center(
+          child: new RaisedButton(onPressed: () {
+            inAppBrowser.open("https://flutter.io/");
+          },
+          child: Text("Open InAppBrowser")
+          ),
+        ),
+      ),
+    );
+  }
+}
 ```
 
 ### InAppBrowser.open
@@ -199,7 +234,7 @@ Injects JavaScript code into the `InAppBrowser` window. (Only available when the
 Example:
 ```dart
 inAppBrowser.injectScriptCode("""
-alert("JavaScript injected");
+  alert("JavaScript injected");
 """);
 ``` 
 
@@ -222,9 +257,9 @@ Injects CSS into the `InAppBrowser` window. (Only available when the target is s
 Example:
 ```dart
 inAppBrowser.injectStyleCode("""
-body {
-  background-color: #3c3c3c;
-}
+    body {
+      background-color: #3c3c3c;
+    }
 """);
 ``` 
 
@@ -237,3 +272,10 @@ Example:
 inAppBrowser.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
 ``` 
 
+## Screenshots:
+
+iOS:
+![ios](https://user-images.githubusercontent.com/5956938/45523056-52c7c980-b7c7-11e8-8bf1-488c9c8033bf.gif)
+
+Android:
+![android](https://user-images.githubusercontent.com/5956938/45523058-55c2ba00-b7c7-11e8-869c-c1738711933f.gif)

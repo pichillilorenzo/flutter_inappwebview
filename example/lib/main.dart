@@ -61,7 +61,7 @@ class _MyAppState extends State<MyApp> {
     return new MaterialApp(
       home: new Scaffold(
         appBar: new AppBar(
-          title: const Text('Plugin example app'),
+          title: const Text('Flutter InAppBrowser Plugin example app'),
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {

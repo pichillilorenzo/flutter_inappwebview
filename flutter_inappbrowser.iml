@@ -11,6 +11,9 @@
       <excludeFolder url="file://$MODULE_DIR$/example/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/example/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/example/build" />
+      <excludeFolder url="file://$MODULE_DIR$/example/flutter_plugin/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/example/flutter_plugin/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/example/flutter_plugin/build" />
       <excludeFolder url="file://$MODULE_DIR$/example/ios/Flutter/flutter_assets/packages" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

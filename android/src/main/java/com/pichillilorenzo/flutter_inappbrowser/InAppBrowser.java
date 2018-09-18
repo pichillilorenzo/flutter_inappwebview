@@ -155,6 +155,7 @@ public class InAppBrowser implements MethodCallHandler {
     switch (call.method) {
       case "open":
         final String url = call.argument("url").toString();
+
         String t = call.argument("target").toString();
         if (t == null || t.equals("") || t.equals(NULL)) {
           t = SELF;

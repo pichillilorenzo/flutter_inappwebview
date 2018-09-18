@@ -91,7 +91,7 @@ class _MyAppState extends State<MyApp> {
 
 ### InAppBrowser.open
 
-Opens a URL in a new InAppBrowser instance, the current browser instance, or the system browser.
+Opens a URL in a new InAppBrowser instance or the system browser.
 
 ```dart
 inAppBrowser.open(url, target, options);

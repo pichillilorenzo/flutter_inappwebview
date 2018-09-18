@@ -121,7 +121,7 @@ class InAppBrowser {
   ///   - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
   ///   - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
   ///   - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
-  Future<void> open(String url, {String target = "_self", String options = "location=yes"}) async {
+  Future<void> open(String url, {String target = "_self", Map<String, dynamic> options = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('target', () => target);

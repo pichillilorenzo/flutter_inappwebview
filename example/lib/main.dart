@@ -14,16 +14,16 @@ class MyInAppBrowser extends InAppBrowser {
   void onLoadStop(String url) {
     super.onLoadStop(url);
     print("\n\nStopped $url\n\n");
-    this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
-    /*this.injectScriptCode("""
+    /*this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
+    this.injectScriptCode("""
       \$( "body" ).html( "Next Step..." )
-    """);*/
+    """);
     this.injectStyleCode("""
     body {
       background-color: #3c3c3c !important;
     }
     """);
-    this.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
+    this.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");*/
   }
 
   @override
@@ -65,7 +65,10 @@ class _MyAppState extends State<MyApp> {
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {
-            inAppBrowser.open("https://flutter.io/");
+            inAppBrowser.open("https://flutter.io/", options: {
+              //"toolbarTop": false,
+              //"toolbarBottom": false
+            });
           },
           child: Text("Open InAppBrowser")
           ),

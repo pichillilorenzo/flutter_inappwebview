@@ -144,6 +144,31 @@ class InAppBrowser {
     return await _channel.invokeMethod('close');
   }
 
+  ///Reloads the [InAppBrowser] window.
+  Future<void> reload() async {
+    return await _channel.invokeMethod('reload');
+  }
+
+  ///Goes back in the history of the [InAppBrowser] window.
+  Future<void> goBack() async {
+    return await _channel.invokeMethod('goBack');
+  }
+
+  ///Goes forward in the history of the [InAppBrowser] window.
+  Future<void> goForward() async {
+    return await _channel.invokeMethod('goForward');
+  }
+
+  ///Check if the Web View of the [InAppBrowser] instance is in a loading state.
+  Future<bool> isLoading() async {
+    return await _channel.invokeMethod('isLoading');
+  }
+
+  ///Stops the Web View of the [InAppBrowser] instance from loading.
+  Future<void> stopLoading() async {
+    return await _channel.invokeMethod('stopLoading');
+  }
+
   ///Injects JavaScript code into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectScriptCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};

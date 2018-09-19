@@ -131,6 +131,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     
     func prepareWebView() {
         
+        self.webView.configuration.userContentController = WKUserContentController()
+        self.webView.configuration.preferences = WKPreferences()
+        
         if (browserOptions?.hideUrlBar)! {
             self.urlField.isHidden = true
             self.urlField.isEnabled = false
@@ -191,9 +194,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             }
         }
         
-        let wkUController = WKUserContentController()
-        self.webView.configuration.userContentController = wkUController
-        
         if (browserOptions?.enableViewportScale)! {
             let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
             let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
@@ -204,18 +204,50 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         self.webView.configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
-        if (browserOptions?.mediaPlaybackRequiresUserAction)! {
+        if (browserOptions?.mediaTypesRequiringUserActionForPlayback)! != "" {
             if #available(iOS 10.0, *) {
-                self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .all
+                switch (browserOptions?.mediaTypesRequiringUserActionForPlayback)! {
+                    case "all":
+                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .all
+                        break
+                    case "audio":
+                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .audio
+                        break
+                    case "video":
+                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .video
+                        break
+                    default:
+                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = []
+                        break
+                }
+                
             } else {
                 // Fallback on earlier versions
             }
         }
         
-        self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowInlineMediaPlayback)!
-        
+        self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowsInlineMediaPlayback)!
         self.webView.keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
         self.webView.configuration.suppressesIncrementalRendering = (browserOptions?.suppressesIncrementalRendering)!
+        self.webView.allowsBackForwardNavigationGestures = (browserOptions?.allowsBackForwardNavigationGestures)!
+        if #available(iOS 9.0, *) {
+            self.webView.allowsLinkPreview = (browserOptions?.allowsLinkPreview)!
+        } else {
+            // Fallback on earlier versions
+        }
+        if #available(iOS 10.0, *) {
+            self.webView.configuration.ignoresViewportScaleLimits = (browserOptions?.ignoresViewportScaleLimits)!
+        } else {
+            // Fallback on earlier versions
+        }
+        self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowsInlineMediaPlayback)!
+        if #available(iOS 9.0, *) {
+            self.webView.configuration.allowsPictureInPictureMediaPlayback = (browserOptions?.allowsPictureInPictureMediaPlayback)!
+        } else {
+            // Fallback on earlier versions
+        }
+        self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = (browserOptions?.javaScriptCanOpenWindowsAutomatically)!
+        self.webView.configuration.preferences.javaScriptEnabled = (browserOptions?.javaScriptEnabled)!
     }
     
     // Load user requested url
@@ -233,188 +265,10 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         return false
     }
     
-    //    func createViews() {
-    //        // We create the views in code for primarily for ease of upgrades and not requiring an external .xib to be included
-    ////        let screenSize: CGRect = view.bounds
-    ////        let myView = UIView(frame: CGRect(x: 0, y: 0, width: screenSize.width, height: screenSize.height-44-CGFloat((browserOptions?.location)! ? FOOTER_HEIGHT : TOOLBAR_HEIGHT)))
-    ////
-    //
-    ////
-    ////        let webViewFrame = CGRect(x: 0, y: urlField.frame.height, width: screenSize.width, height: screenSize.height-44-CGFloat((browserOptions?.location)! ? FOOTER_HEIGHT : TOOLBAR_HEIGHT))
-    ////
-    ////        let webConfiguration = WKWebViewConfiguration()
-    ////        webView = WKWebView(frame: webViewFrame, configuration: webConfiguration)
-    ////        webView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    //
-    //        let toolbarIsAtBottom: Bool = browserOptions!.toolbarposition == kInAppBrowserToolbarBarPositionBottom
-    //
-    //        var webViewBounds: CGRect = view.bounds
-    //        webViewBounds.origin.y += (toolbarIsAtBottom) ? 0 : CGFloat(TOOLBAR_HEIGHT+getStatusBarOffset())
-    //        webViewBounds.size.height -= (browserOptions?.location)! ? CGFloat(TOOLBAR_HEIGHT+getStatusBarOffset()) : 0
-    //        let webConfiguration = WKWebViewConfiguration()
-    //        webView = WKWebView(frame: webViewBounds, configuration: webConfiguration)
-    //        webView?.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    //        view.addSubview(webView!)
-    //        //view.sendSubview(toBack: webView!)
-    //
-    //        webView?.uiDelegate = self
-    //        webView?.navigationDelegate = self
-    //        webView?.backgroundColor = UIColor.white
-    //        webView?.clearsContextBeforeDrawing = true
-    //        webView?.clipsToBounds = true
-    //        webView?.contentMode = .scaleToFill
-    //        webView?.isMultipleTouchEnabled = true
-    //        webView?.isOpaque = true
-    //        //webView?.scalesPageToFit = false
-    //        webView?.isUserInteractionEnabled = true
-    //
-    //        spinner = UIActivityIndicatorView(activityIndicatorStyle: .gray)
-    //        spinner.alpha = 1.000
-    //        spinner.autoresizesSubviews = true
-    //        spinner.autoresizingMask = [.flexibleLeftMargin, .flexibleTopMargin, .flexibleBottomMargin, .flexibleRightMargin]
-    //        spinner.clearsContextBeforeDrawing = false
-    //        spinner.clipsToBounds = false
-    //        spinner.contentMode = .scaleToFill
-    //        spinner.frame = CGRect(x: (webView?.frame.midX)!, y: (webView?.frame.midY)!, width: 20.0, height: 20.0)
-    //        spinner.isHidden = false
-    //        spinner.hidesWhenStopped = true
-    //        spinner.isMultipleTouchEnabled = false
-    //        spinner.isOpaque = false
-    //        spinner.isUserInteractionEnabled = false
-    //        spinner.stopAnimating()
-    //
-    //        closeButton = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(self.close))
-    //        closeButton.isEnabled = true
-    //        let flexibleSpaceButton = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-    //        let fixedSpaceButton = UIBarButtonItem(barButtonSystemItem: .fixedSpace, target: nil, action: nil)
-    //        fixedSpaceButton.width = 20
-    //
-    //
-    //        let toolbarY: Float = toolbarIsAtBottom ? Float(view.bounds.size.height) - TOOLBAR_HEIGHT : 0.0
-    //        let toolbarFrame = CGRect(x: 0.0, y: CGFloat(toolbarY), width: view.bounds.size.width, height: CGFloat(TOOLBAR_HEIGHT))
-    //
-    //        toolbar = UIToolbar(frame: toolbarFrame)
-    //        toolbar.alpha = 1.000
-    //        toolbar.autoresizesSubviews = true
-    //        toolbar.autoresizingMask = toolbarIsAtBottom ? ([.flexibleWidth, .flexibleTopMargin]) : .flexibleWidth
-    //        toolbar.barStyle = .blackOpaque
-    //        toolbar.clearsContextBeforeDrawing = false
-    //        toolbar.clipsToBounds = false
-    //        toolbar.contentMode = .scaleToFill
-    //        toolbar.isHidden = false
-    //        toolbar.isMultipleTouchEnabled = false
-    //        toolbar.isOpaque = false
-    //        toolbar.isUserInteractionEnabled = true
-    //        if browserOptions?.toolbarcolor != nil {
-    //            // Set toolbar color if user sets it in options
-    //            toolbar.barTintColor = color(fromHexString: (browserOptions?.toolbarcolor)!)
-    //        }
-    //        if !(browserOptions?.toolbartranslucent)! {
-    //            // Set toolbar translucent to no if user sets it in options
-    //            toolbar.isTranslucent = false
-    //        }
-    //        let labelInset: CGFloat = 5.0
-    //        let locationBarY: Float = toolbarIsAtBottom ? Float(view.bounds.size.height) - FOOTER_HEIGHT : Float(view.bounds.size.height) - LOCATIONBAR_HEIGHT
-    //
-    //
-    //        let frontArrowString = NSLocalizedString("►", comment: "")
-    //        // create arrow from Unicode char
-    //        forwardButton = UIBarButtonItem(title: frontArrowString, style: .plain, target: self, action: #selector(self.goForward))
-    //
-    //        //forwardButton = UIBarButtonItem(barButtonSystemItem: .fastForward, target: self, action: #selector(self.goForward))
-    //        forwardButton.isEnabled = true
-    //        forwardButton.imageInsets = UIEdgeInsets.zero as? UIEdgeInsets ?? UIEdgeInsets()
-    //        if browserOptions?.navigationbuttoncolor != nil {
-    //            // Set button color if user sets it in options
-    //            forwardButton.tintColor = color(fromHexString: (browserOptions?.navigationbuttoncolor)!)
-    //        }
-    //
-    //        let backArrowString = NSLocalizedString("◄", comment: "")
-    //        // create arrow from Unicode char
-    //        backButton = UIBarButtonItem(title: backArrowString, style: .plain, target: self, action: #selector(self.goBack))
-    //        backButton.isEnabled = true
-    //        backButton.imageInsets = UIEdgeInsets.zero as? UIEdgeInsets ?? UIEdgeInsets()
-    //        if browserOptions?.navigationbuttoncolor != nil {
-    //            // Set button color if user sets it in options
-    //            backButton.tintColor = color(fromHexString: (browserOptions?.navigationbuttoncolor)!)
-    //        }
-    //
-    //        reloadButton = UIBarButtonItem(barButtonSystemItem: .refresh, target: self, action: #selector(self.reload))
-    //        reloadButton.isEnabled = true
-    //        reloadButton.imageInsets = UIEdgeInsetsMake(0, 0, 0, 15)
-    //
-    //        urlField = UITextField()
-    //        urlField.bounds.size.width = toolbar.bounds.width - 150
-    //        urlField.bounds.size.height = CGFloat(TOOLBAR_HEIGHT-15)
-    //        urlField.backgroundColor = color(fromHexString: "#ECECED")
-    //        urlField.center.y = toolbar.center.y
-    //        urlField.autoresizesSubviews = true
-    //        urlField.autoresizingMask = [.flexibleWidth, .flexibleHeight]
-    //        urlField.text = currentURL?.absoluteString
-    //        urlField.textAlignment = NSTextAlignment.center
-    //        urlField.font = UIFont.systemFont(ofSize: 15)
-    //        urlField.borderStyle = UITextBorderStyle.roundedRect
-    //        urlField.autocorrectionType = UITextAutocorrectionType.no
-    //        urlField.keyboardType = UIKeyboardType.default
-    //        urlField.returnKeyType = UIReturnKeyType.done
-    //        urlField.clearButtonMode = UITextFieldViewMode.whileEditing;
-    //        urlField.contentVerticalAlignment = UIControlContentVerticalAlignment.center
-    //        urlField.delegate = self
-    //        urlFieldBarButton = UIBarButtonItem.init(customView: urlField)
-    //
-    //        // Filter out Navigation Buttons if user requests so
-    //        if (browserOptions?.hidenavigationbuttons)! {
-    //            toolbar.items = [closeButton, flexibleSpaceButton, urlFieldBarButton]
-    //        }
-    //        else {
-    //            //toolbar.items = [urlFieldBarButton, closeButton, flexibleSpaceButton, backButton, fixedSpaceButton, forwardButton]
-    //            toolbar.items = [urlFieldBarButton, flexibleSpaceButton, reloadButton, closeButton]
-    //        }
-    //
-    //        view.backgroundColor = UIColor.gray
-    //        view.addSubview(toolbar)
-    //        view.addSubview(spinner)
-    //    }
-    
     func setWebViewFrame(_ frame: CGRect) {
         print("Setting the WebView's frame to \(NSStringFromCGRect(frame))")
         webView.frame = frame
     }
-    
-    //    func showToolBar(_ show: Bool, toolbarPosition: String) {
-    //        var toolbarFrame: CGRect = toolbar.frame
-    //        // prevent double show/hide
-    //        if show == !toolbar.isHidden {
-    //            return
-    //        }
-    //        if show {
-    //            toolbar.isHidden = false
-    //            var webViewBounds: CGRect = view.bounds
-    //
-    //            webViewBounds.size.height -= CGFloat(TOOLBAR_HEIGHT)
-    //            toolbar.frame = toolbarFrame
-    //
-    //            if (toolbarPosition == kInAppBrowserToolbarBarPositionTop) {
-    //                toolbarFrame.origin.y = 0
-    //                webViewBounds.origin.y += toolbarFrame.size.height
-    //                setWebViewFrame(webViewBounds)
-    //            }
-    //            else {
-    //                toolbarFrame.origin.y = webViewBounds.size.height + CGFloat(LOCATIONBAR_HEIGHT)
-    //            }
-    //            setWebViewFrame(webViewBounds)
-    //        }
-    //        else {
-    //            toolbar.isHidden = true
-    //            setWebViewFrame(view.bounds)
-    //        }
-    //    }
-    
-    //    override func viewDidUnload() {
-    //        webView?.loadHTMLString(nil, baseURL: nil)
-    //        CDVUserAgentUtil.releaseLock(userAgentLockToken)
-    //        super.viewDidUnload()
-    //    }
     
     @objc func reload () {
         webView.reload()
@@ -431,9 +285,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         if (navigationDelegate != nil) {
             navigationDelegate?.browserExit()
         }
-        //        if (navigationDelegate != nil) && navigationDelegate?.responds(to: #selector(self.browserExit)) {
-        //            navigationDelegate?.browserExit()
-        //        }
+        
         weak var weakSelf = self
         
         // Run later to avoid the "took a long time" log message.
@@ -460,14 +312,18 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         webView.load(request)
     }
     
-    @objc func goBack(_ sender: Any) {
-        webView.goBack()
-        updateUrlTextField(url: (webView?.url?.absoluteString)!)
+    @objc func goBack() {
+        if webView.canGoBack {
+            webView.goBack()
+            updateUrlTextField(url: (webView?.url?.absoluteString)!)
+        }
     }
     
-    @objc func goForward(_ sender: Any) {
-        webView.goForward()
-        updateUrlTextField(url: (webView?.url?.absoluteString)!)
+    @objc func goForward() {
+        if webView.canGoForward {
+            webView.goForward()
+            updateUrlTextField(url: (webView?.url?.absoluteString)!)
+        }
     }
     
     func updateUrlTextField(url: String) {
@@ -485,13 +341,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let statusBarOffset: Float = Float(min(statusBarFrame.size.width, statusBarFrame.size.height))
         return statusBarOffset
     }
-    
-    //    func rePositionViews() {
-    //        if (browserOptions?.toolbarposition == kInAppBrowserToolbarBarPositionTop) {
-    //            webView?.frame = CGRect(x: (webView?.frame.origin.x)!, y: CGFloat(TOOLBAR_HEIGHT+getStatusBarOffset()), width: (webView?.frame.size.width)!, height: (webView?.frame.size.height)!)
-    //            toolbar.frame = CGRect(x: toolbar.frame.origin.x, y: CGFloat(getStatusBarOffset()), width: toolbar.frame.size.width, height: toolbar.frame.size.height)
-    //        }
-    //    }
     
     // Helper function to convert hex color string to UIColor
     // Assumes input like "#00FF00" (#RRGGBB).
@@ -522,26 +371,31 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         return hexInt
     }
     
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        
+        let url = navigationAction.request.url
+        
+        if url != nil && (navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .backForward) {
+            currentURL = url
+            updateUrlTextField(url: (url?.absoluteString)!)
+        }
+        
+        decisionHandler(.allow)
+    }
+    
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // loading url, start spinner, update back/forward
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
-        
+
         if (browserOptions?.spinner)! {
             spinner.startAnimating()
         }
         
         return (navigationDelegate?.webViewDidStartLoad(webView))!
     }
-    
-    //    func webView(_ theWebView: WKWebView, shouldStartLoadWith request: URLRequest, navigationType: UIWebViewNavigationType) -> Bool {
-    //        let isTopLevelNavigation: Bool? = request.url == request.mainDocumentURL
-    //        if isTopLevelNavigation ?? false {
-    //            currentURL = request.url
-    //        }
-    //
-    //        return (navigationDelegate?.webView(theWebView, shouldStartLoadWith: request, navigationType: navigationType))!
-    //    }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         //func webViewDidFinishLoad(_ theWebView: WKWebView) {

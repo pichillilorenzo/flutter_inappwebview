@@ -18,6 +18,7 @@ class MyInAppBrowser extends InAppBrowser {
     this.injectScriptCode("""
       \$( "body" ).html( "Next Step..." )
     """);
+
     this.injectStyleCode("""
     body {
       background-color: #3c3c3c !important;

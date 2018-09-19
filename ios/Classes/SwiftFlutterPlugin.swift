@@ -59,6 +59,25 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             self.hide()
             result(true)
             break
+        case "reload":
+            self.webViewController?.reload()
+            result(true)
+            break
+        case "goBack":
+            self.webViewController?.goBack()
+            result(true)
+            break
+        case "goForward":
+            self.webViewController?.goForward()
+            result(true)
+            break
+        case "isLoading":
+            result(self.webViewController?.webView.isLoading == true)
+            break
+        case "stopLoading":
+            self.webViewController?.webView.stopLoading()
+            result(true)
+            break
         case "injectScriptCode":
             self.injectScriptCode(arguments: arguments!)
             result(true)

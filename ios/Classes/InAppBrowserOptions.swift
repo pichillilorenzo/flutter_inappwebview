@@ -14,11 +14,6 @@ public class InAppBrowserOptions: NSObject {
     var clearCache = false
     var clearSessionCache = false
     var spinner = true
-    var enableViewportScale = false
-    var mediaPlaybackRequiresUserAction = false
-    var allowInlineMediaPlayback = false
-    var keyboardDisplayRequiresUserAction = true
-    var suppressesIncrementalRendering = false
     var hidden = false
     var disallowOverScroll = false
     var toolbarTop = true
@@ -30,6 +25,18 @@ public class InAppBrowserOptions: NSObject {
     var hideUrlBar = false
     var presentationStyle = 0 //fullscreen
     var transitionStyle = 0 //crossDissolve
+    var enableViewportScale = false
+    var keyboardDisplayRequiresUserAction = true
+    var suppressesIncrementalRendering = false
+    var allowsAirPlayForMediaPlayback = true
+    var mediaTypesRequiringUserActionForPlayback = "none"
+    var allowsBackForwardNavigationGestures = true
+    var allowsLinkPreview = true
+    var ignoresViewportScaleLimits = false
+    var allowsInlineMediaPlayback = false
+    var allowsPictureInPictureMediaPlayback = true
+    var javaScriptCanOpenWindowsAutomatically = false
+    var javaScriptEnabled = true
     
     public func parse(options: [String: Any]) {
         for (key, value) in options {

@@ -102,6 +102,14 @@ public class WebViewActivity extends AppCompatActivity {
         settings.setUseWideViewPort(options.useWideViewPort);
         settings.setSupportZoom(options.supportZoom);
 
+        // fix webview scaling
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
+        }
+        else {
+            settings.setTextZoom(100);
+        }
+
     }
 
     @Override

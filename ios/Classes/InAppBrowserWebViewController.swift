@@ -78,6 +78,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     var currentURL: URL?
     var tmpWindow: UIWindow?
     var browserOptions: InAppBrowserOptions?
+    var initHeaders: [String: String]?
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
@@ -117,7 +118,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         spinner.isHidden = false
         spinner.stopAnimating()
         
-        navigate(to: self.currentURL!)
+        loadUrl(url: self.currentURL!, headers: self.initHeaders)
     }
     
     // Prevent crashes on closing windows
@@ -223,6 +224,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                 
             } else {
                 // Fallback on earlier versions
+                self.webView.configuration.mediaPlaybackRequiresUserAction = true
             }
         }
         
@@ -248,6 +250,33 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         }
         self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = (browserOptions?.javaScriptCanOpenWindowsAutomatically)!
         self.webView.configuration.preferences.javaScriptEnabled = (browserOptions?.javaScriptEnabled)!
+        
+        if ((browserOptions?.userAgent)! != "") {
+            if #available(iOS 9.0, *) {
+                self.webView.customUserAgent = (browserOptions?.userAgent)!
+            } else {
+                // Fallback on earlier versions
+            }
+        }
+        
+        if (browserOptions?.clearCache)! {
+            clearCache()
+        }
+        
+    }
+    
+    func loadUrl(url: URL, headers: [String: String]?) {
+        var request = URLRequest(url: url)
+        currentURL = url
+        updateUrlTextField(url: (currentURL?.absoluteString)!)
+        
+        if headers != nil {
+            for (key, value) in headers! {
+                request.setValue(value, forHTTPHeaderField: key)
+            }
+        }
+        
+        webView.load(request)
     }
     
     // Load user requested url
@@ -268,6 +297,24 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     func setWebViewFrame(_ frame: CGRect) {
         print("Setting the WebView's frame to \(NSStringFromCGRect(frame))")
         webView.frame = frame
+    }
+    
+    func clearCache() {
+        if #available(iOS 9.0, *) {
+            //let websiteDataTypes = NSSet(array: [WKWebsiteDataTypeDiskCache, WKWebsiteDataTypeMemoryCache])
+            let date = NSDate(timeIntervalSince1970: 0)
+            WKWebsiteDataStore.default().removeData(ofTypes: WKWebsiteDataStore.allWebsiteDataTypes(), modifiedSince: date as Date, completionHandler:{ })
+        } else {
+            var libraryPath = NSSearchPathForDirectoriesInDomains(FileManager.SearchPathDirectory.libraryDirectory, FileManager.SearchPathDomainMask.userDomainMask, false).first!
+            libraryPath += "/Cookies"
+            
+            do {
+                try FileManager.default.removeItem(atPath: libraryPath)
+            } catch {
+                print("can't clear cache")
+            }
+            URLCache.shared.removeAllCachedResponses()
+        }
     }
     
     @objc func reload () {
@@ -305,22 +352,23 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         })
     }
     
-    func navigate(to url: URL) {
-        let request = URLRequest(url: url)
-        currentURL = url
-        updateUrlTextField(url: (currentURL?.absoluteString)!)
-        webView.load(request)
+    func canGoBack() -> Bool {
+        return webView.canGoBack
     }
     
     @objc func goBack() {
-        if webView.canGoBack {
+        if canGoBack() {
             webView.goBack()
             updateUrlTextField(url: (webView?.url?.absoluteString)!)
         }
     }
     
+    func canGoForward() -> Bool {
+        return webView.canGoForward
+    }
+    
     @objc func goForward() {
-        if webView.canGoForward {
+        if canGoForward() {
             webView.goForward()
             updateUrlTextField(url: (webView?.url?.absoluteString)!)
         }

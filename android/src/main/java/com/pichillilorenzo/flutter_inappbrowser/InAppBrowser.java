@@ -24,54 +24,21 @@ package com.pichillilorenzo.flutter_inappbrowser;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.annotation.SuppressLint;
-import android.content.Context;
 import android.content.Intent;
-import android.os.Parcelable;
 import android.provider.Browser;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.drawable.Drawable;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
-import android.text.InputType;
-import android.util.TypedValue;
-import android.view.Gravity;
-import android.view.KeyEvent;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.Window;
-import android.view.WindowManager;
-import android.view.WindowManager.LayoutParams;
-import android.view.inputmethod.EditorInfo;
-import android.view.inputmethod.InputMethodManager;
-import android.webkit.CookieManager;
 import android.webkit.MimeTypeMap;
-import android.webkit.ValueCallback;
-import android.webkit.WebChromeClient;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
-import android.widget.ImageButton;
-import android.widget.ImageView;
-import android.widget.LinearLayout;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.util.Log;
-import android.support.v7.app.AppCompatActivity;
+import android.widget.Toast;
 
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
+import java.time.Duration;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -90,60 +57,12 @@ public class InAppBrowser implements MethodCallHandler {
 
   private static final String NULL = "null";
   protected static final String LOG_TAG = "InAppBrowser";
-  private static final String SELF = "_self";
-  private static final String SYSTEM = "_system";
-  private static final String EXIT_EVENT = "exit";
-  private static final String LOCATION = "location";
-  private static final String ZOOM = "zoom";
-  private static final String HIDDEN = "hidden";
-  private static final String CLEAR_ALL_CACHE = "clearcache";
-  private static final String CLEAR_SESSION_CACHE = "clearsessioncache";
-  private static final String HARDWARE_BACK_BUTTON = "hardwareback";
-  private static final String MEDIA_PLAYBACK_REQUIRES_USER_ACTION = "mediaPlaybackRequiresUserAction";
-  private static final String SHOULD_PAUSE = "shouldPauseOnSuspend";
-  private static final Boolean DEFAULT_HARDWARE_BACK = true;
-  private static final String USER_WIDE_VIEW_PORT = "useWideViewPort";
-  private static final String TOOLBAR_COLOR = "toolbarcolor";
-  private static final String CLOSE_BUTTON_CAPTION = "closebuttoncaption";
-  private static final String CLOSE_BUTTON_COLOR = "closebuttoncolor";
-  private static final String HIDE_NAVIGATION = "hidenavigationbuttons";
-  private static final String NAVIGATION_COLOR = "navigationbuttoncolor";
-  private static final String HIDE_URL = "hideurlbar";
-  private static final String FOOTER = "footer";
-  private static final String FOOTER_COLOR = "footercolor";
 
-  private static final List customizableOptions = Arrays.asList(CLOSE_BUTTON_CAPTION, TOOLBAR_COLOR, NAVIGATION_COLOR, CLOSE_BUTTON_COLOR, FOOTER_COLOR);
 
-  private InAppBrowserDialog dialog;
-  private WebView inAppWebView;
-  private EditText edittext;
-  private boolean showLocationBar = true;
-  private boolean showZoomControls = true;
-  private boolean openWindowHidden = false;
-  private boolean clearAllCache = false;
-  private boolean clearSessionCache = false;
-  private boolean hadwareBackButton = true;
-  private boolean mediaPlaybackRequiresUserGesture = false;
-  private boolean shouldPauseInAppBrowser = false;
-  private boolean useWideViewPort = true;
-  private ValueCallback<Uri> mUploadCallback;
-  private ValueCallback<Uri[]> mUploadCallbackLollipop;
-  private final static int FILECHOOSER_REQUESTCODE = 1;
-  private final static int FILECHOOSER_REQUESTCODE_LOLLIPOP = 2;
-  private String closeButtonCaption = "";
-  private String closeButtonColor = "";
-  private int toolbarColor = android.graphics.Color.LTGRAY;
-  private boolean hideNavigationButtons = false;
-  private String navigationButtonColor = "";
-  private boolean hideUrlBar = false;
-  private boolean showFooter = false;
-  private String footerColor = "";
-  private String[] allowedSchemes;
-
-  public InAppBrowser(Registrar registrar, Activity activity) {
-    this.registrar = registrar;
+  public InAppBrowser(Registrar r, Activity activity) {
+    registrar = r;
     this.activity = activity;
-    this.channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
+    channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
   }
 
   /** Plugin registration. */
@@ -165,9 +84,10 @@ public class InAppBrowser implements MethodCallHandler {
 
         String t = call.argument("target").toString();
         if (t == null || t.equals("") || t.equals(NULL)) {
-          t = SELF;
+          t = "_self";
         }
         final String target = t;
+
         final InAppBrowserOptions options = new InAppBrowserOptions();
         options.parse((HashMap<String, Object>) call.argument("options"));
 
@@ -176,9 +96,7 @@ public class InAppBrowser implements MethodCallHandler {
         this.activity.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            String r = "";
-            // SELF
-            if (SELF.equals(target)) {
+            if ("_self".equals(target)) {
               Log.d(LOG_TAG, "in self");
 
               //Load the dialer
@@ -196,26 +114,29 @@ public class InAppBrowser implements MethodCallHandler {
               // load in InAppBrowser
               else {
                 Log.d(LOG_TAG, "loading in InAppBrowser");
-                r = showWebPage(url, options);
+                open(url, options);
               }
             }
             // SYSTEM
-            else if (SYSTEM.equals(target)) {
+            else if ("_system".equals(target)) {
               Log.d(LOG_TAG, "in system");
-              r = openExternal(url);
+              openExternal(url, result);
             }
             // BLANK - or anything else
             else {
               Log.d(LOG_TAG, "in blank");
-              r = showWebPage(url, options);
+              open(url, options);
             }
 
-            result.success(r);
+            result.success(true);
           }
         });
         break;
+      case "loadUrl":
+        loadUrl(call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+        break;
       case "close":
-        closeDialog();
+        close();
         result.success(true);
         break;
       case "injectScriptCode":
@@ -243,21 +164,36 @@ public class InAppBrowser implements MethodCallHandler {
         result.success(true);
         break;
       case "show":
-        activity.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            dialog.show();
-          }
-        });
+        show();
         result.success(true);
         break;
       case "hide":
-        activity.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
-            dialog.hide();
-          }
-        });
+        hide();
+        result.success(true);
+        break;
+      case "reload":
+        reload();
+        result.success(true);
+        break;
+      case "goBack":
+        goBack();
+        result.success(true);
+        break;
+      case "canGoBack":
+        result.success(canGoBack());
+        break;
+      case "goForward":
+        goForward();
+        result.success(true);
+        break;
+      case "canGoForward":
+        result.success(canGoForward());
+        break;
+      case "isLoading":
+        result.success(isLoading());
+        break;
+      case "stopLoading":
+        stopLoading();
         result.success(true);
         break;
       default:
@@ -283,7 +219,7 @@ public class InAppBrowser implements MethodCallHandler {
    *                    which should be executed directly.
    */
   private void injectDeferredObject(String source, String jsWrapper) {
-    if (inAppWebView!=null) {
+    if (webViewActivity!=null) {
       String scriptToInject;
       if (jsWrapper != null) {
         org.json.JSONArray jsonEsc = new org.json.JSONArray();
@@ -301,9 +237,9 @@ public class InAppBrowser implements MethodCallHandler {
         public void run() {
           if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             // This action will have the side-effect of blurring the currently focused element
-            inAppWebView.loadUrl("javascript:" + finalScriptToInject);
+            webViewActivity.webView.loadUrl("javascript:" + finalScriptToInject);
           } else {
-            inAppWebView.evaluateJavascript(finalScriptToInject, null);
+            webViewActivity.webView.evaluateJavascript(finalScriptToInject, null);
           }
         }
       });
@@ -327,9 +263,9 @@ public class InAppBrowser implements MethodCallHandler {
    * @param url the url to load.
    * @return "" if ok, or error message.
    */
-  public String openExternal(String url) {
+  public void openExternal(String url, Result result) {
     try {
-      Intent intent = null;
+      Intent intent;
       intent = new Intent(Intent.ACTION_VIEW);
       // Omitting the MIME type for file: URLs causes "No Activity found to handle Intent".
       // Adding the MIME type to http: URLs causes them to not be handled by the downloader.
@@ -341,16 +277,14 @@ public class InAppBrowser implements MethodCallHandler {
       }
       intent.putExtra(Browser.EXTRA_APPLICATION_ID, activity.getPackageName());
       activity.startActivity(intent);
-      return "";
       // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
     } catch (java.lang.RuntimeException e) {
       Log.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
-      return e.toString();
     }
   }
 
   @TargetApi(8)
-  private String showWebPage(final String url, InAppBrowserOptions options) {
+  private void open(final String url, InAppBrowserOptions options) {
     Intent intent = new Intent(activity, WebViewActivity.class);
 
     Bundle extras = new Bundle();
@@ -361,11 +295,7 @@ public class InAppBrowser implements MethodCallHandler {
 
     activity.startActivity(intent);
 
-    //webViewActivity.loadUrl(url);
-
-    return "";
-
-      // Determine if we should hide the location bar.
+    // Determine if we should hide the location bar.
 //    showLocationBar = true;
 //    showZoomControls = true;
 //    openWindowHidden = false;
@@ -802,162 +732,87 @@ public class InAppBrowser implements MethodCallHandler {
     //return "";
   }
 
-  /**
-   * Put the list of features into a hash map
-   *
-   * @param optString
-   * @return
-   */
-  private HashMap<String, String> parseFeature(String optString) {
-    if (optString.equals(NULL)) {
-      return null;
-    } else {
-      HashMap<String, String> map = new HashMap<String, String>();
-      StringTokenizer features = new StringTokenizer(optString, ",");
-      StringTokenizer option;
-      while(features.hasMoreElements()) {
-        option = new StringTokenizer(features.nextToken(), "=");
-        if (option.hasMoreElements()) {
-          String key = option.nextToken();
-          String value = option.nextToken();
-          if (!customizableOptions.contains(key)){
-            value = value.equals("yes") || value.equals("no") ? value : "yes";
-          }
-          map.put(key, value);
-        }
-      }
-      return map;
+  public void loadUrl(String url, Map<String, String> headers, Result result) {
+    if (webViewActivity != null) {
+      if (headers != null)
+        webViewActivity.loadUrl(url, headers, result);
+      else
+        webViewActivity.loadUrl(url, result);
     }
   }
 
+  public void show() {
+    if (webViewActivity != null)
+      webViewActivity.show();
+  }
 
+  public void hide() {
+    if (webViewActivity != null)
+      webViewActivity.hide();
+  }
 
+  public void reload() {
+    if (webViewActivity != null)
+      webViewActivity.reload();
+  }
 
+  public boolean isLoading() {
+    if (webViewActivity != null)
+      return webViewActivity.isLoading();
+    return false;
+  }
 
+  public void stopLoading() {
+    if (webViewActivity != null)
+      webViewActivity.stopLoading();
+  }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * Checks to see if it is possible to go back one page in history, then does so.
-   */
   public void goBack() {
-    if (this.inAppWebView.canGoBack()) {
-      this.inAppWebView.goBack();
-    }
+    if (webViewActivity != null)
+      webViewActivity.goBack();
   }
 
-  /**
-   * Can the web browser go back?
-   * @return boolean
-   */
   public boolean canGoBack() {
-    return this.inAppWebView.canGoBack();
+    if (webViewActivity != null)
+      return webViewActivity.canGoBack();
+    return false;
   }
 
-  /**
-   * Has the user set the hardware back button to go back
-   * @return boolean
-   */
-  public boolean hardwareBack() {
-    return hadwareBackButton;
+  public void goForward() {
+    if (webViewActivity != null)
+      webViewActivity.goForward();
   }
 
-  /**
-   * Checks to see if it is possible to go forward one page in history, then does so.
-   */
-  private void goForward() {
-    if (this.inAppWebView.canGoForward()) {
-      this.inAppWebView.goForward();
-    }
-  }
-
-  /**
-   * Navigate to the new page
-   *
-   * @param url to load
-   */
-  @TargetApi(3)
-  private void navigate(String url) {
-    InputMethodManager imm = (InputMethodManager)this.activity.getSystemService(Context.INPUT_METHOD_SERVICE);
-    imm.hideSoftInputFromWindow(edittext.getWindowToken(), 0);
-
-    if (!url.startsWith("http") && !url.startsWith("file:")) {
-      this.inAppWebView.loadUrl("http://" + url);
-    } else {
-      this.inAppWebView.loadUrl(url);
-    }
-    this.inAppWebView.requestFocus();
+  public boolean canGoForward() {
+    if (webViewActivity != null)
+      return webViewActivity.canGoForward();
+    return false;
   }
 
 
-  /**
-   * Should we show the location bar?
-   *
-   * @return boolean
-   */
-  private boolean getShowLocationBar() {
-    return this.showLocationBar;
-  }
-
-  private InAppBrowser getInAppBrowser(){
-    return this;
-  }
-
-  /**
-   * Closes the dialog
-   */
-  public void closeDialog() {
+  public void close() {
     this.activity.runOnUiThread(new Runnable() {
       @Override
       public void run() {
-        final WebView childView = inAppWebView;
         // The JS protects against multiple calls, so this should happen only when
-        // closeDialog() is called by other native code.
-        if (childView == null) {
+        // close() is called by other native code.
+        if (webViewActivity == null)
           return;
-        }
 
-        childView.setWebViewClient(new WebViewClient() {
+        webViewActivity.webView.setWebViewClient(new WebViewClient() {
           // NB: wait for about:blank before dismissing
           public void onPageFinished(WebView view, String url) {
-            if (dialog != null) {
-              dialog.dismiss();
-              dialog = null;
-            }
+            webViewActivity.close();
           }
         });
         // NB: From SDK 19: "If you call methods on WebView from any thread
         // other than your app's UI thread, it can cause unexpected results."
         // http://developer.android.com/guide/webapps/migrating.html#Threads
-        childView.loadUrl("about:blank");
+        webViewActivity.webView.loadUrl("about:blank");
 
         Map<String, Object> obj = new HashMap<>();
-        obj.put("type", EXIT_EVENT);
-        channel.invokeMethod(EXIT_EVENT, obj);
+        channel.invokeMethod("exit", obj);
       }
     });
   }
-
-  /**
-   * Called by AccelBroker when listener is to be shut down.
-   * Stop listener.
-   */
-  public void onDestroy() {
-    closeDialog();
-  }
-
 }

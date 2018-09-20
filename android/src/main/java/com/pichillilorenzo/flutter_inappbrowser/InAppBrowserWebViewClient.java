@@ -1,84 +1,31 @@
-/*
- *
- * Licensed to the Apache Software Foundation (ASF) under one
- * or more contributor license agreements.  See the NOTICE file
- * distributed with this work for additional information
- * regarding copyright ownership.  The ASF licenses this file
- * to you under the Apache License, Version 2.0 (the
- * "License"); you may not use this file except in compliance
- * with the License.  You may obtain a copy of the License at
- *
- *   http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing,
- * software distributed under the License is distributed on an
- * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
- * KIND, either express or implied.  See the License for the
- * specific language governing permissions and limitations
- * under the License.
- *
- */
-
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.widget.EditText;
-import android.util.Log;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.plugin.common.MethodChannel;
+public class InAppBrowserWebViewClient extends WebViewClient {
 
-/**
- * The webview client receives notifications about appView
- */
-public class InAppBrowserClient extends WebViewClient {
+    protected static final String LOG_TAG = "IABWebViewClient";
+    private WebViewActivity activity;
 
-    protected static final String LOG_TAG = "InAppBrowser";
-    private static final String LOAD_START_EVENT = "loadstart";
-    private static final String LOAD_STOP_EVENT = "loadstop";
-    private static final String LOAD_ERROR_EVENT = "loaderror";
-
-    private String[] allowedSchemes;
-    
-    private EditText edittext;
-    private Activity activity;
-    private final MethodChannel channel;
-
-    /**
-     * Constructor.
-     *
-     * @param mEditText
-     * @param activity
-     */
-    public InAppBrowserClient(EditText mEditText, Activity activity, MethodChannel channel) {
-        this.edittext = mEditText;
+    public InAppBrowserWebViewClient(WebViewActivity activity) {
+        super();
         this.activity = activity;
-        this.channel = channel;
     }
 
-    /**
-     * Override the URL that should be loaded
-     *
-     * This handles a small subset of all the URIs that would be encountered.
-     *
-     * @param webView
-     * @param url
-     */
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+
         if (url.startsWith(WebView.SCHEME_TEL)) {
             try {
                 Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -88,7 +35,8 @@ public class InAppBrowserClient extends WebViewClient {
             } catch (android.content.ActivityNotFoundException e) {
                 Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
             }
-        } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+        }
+        else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
             try {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
@@ -104,7 +52,7 @@ public class InAppBrowserClient extends WebViewClient {
                 Intent intent = new Intent(Intent.ACTION_VIEW);
 
                 // Get address
-                String address = null;
+                String address;
                 int parmIndex = url.indexOf('?');
                 if (parmIndex == -1) {
                     address = url.substring(4);
@@ -129,25 +77,8 @@ public class InAppBrowserClient extends WebViewClient {
                 Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
             }
         }
-        // Test for whitelisted custom scheme names like mycoolapp:// or twitteroauthresponse:// (Twitter Oauth Response)
-        else if (!url.startsWith("http:") && !url.startsWith("https:") && url.matches("^[A-Za-z0-9+.-]*://.*?$")) {
-            if (allowedSchemes == null) {
-                String allowed = activity.getPreferences(0).getString("AllowedSchemes", null);
-                if(allowed != null) {
-                    allowedSchemes = allowed.split(",");
-                }
-            }
-            if (allowedSchemes != null) {
-                for (String scheme : allowedSchemes) {
-                    if (url.startsWith(scheme)) {
-                        Map<String, Object> obj = new HashMap<>();
-                        obj.put("type", "customscheme");
-                        obj.put("url", url);
-                        channel.invokeMethod("customscheme", obj);
-                        return true;
-                    }
-                }
-            }
+        else {
+            return super.shouldOverrideUrlLoading(webView, url);
         }
 
         return false;
@@ -164,33 +95,24 @@ public class InAppBrowserClient extends WebViewClient {
     @Override
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
-        String newloc = "";
-        if (url.startsWith("http:") || url.startsWith("https:") || url.startsWith("file:")) {
-            newloc = url;
-        }
-        else
-        {
-            // Assume that everything is HTTP at this point, because if we don't specify,
-            // it really should be.  Complain loudly about this!!!
-            Log.e(LOG_TAG, "Possible Uncaught/Unknown URI");
-            newloc = "http://" + url;
-        }
 
-        // Update the UI if we haven't already
-        if (!newloc.equals(edittext.getText().toString())) {
-            edittext.setText(newloc);
+        activity.isLoading = true;
+
+        if (activity.searchView != null && !url.equals(activity.searchView.getQuery().toString())) {
+            activity.searchView.setQuery(url, false);
         }
 
         Map<String, Object> obj = new HashMap<>();
-        obj.put("type", LOAD_START_EVENT);
-        obj.put("url", newloc);
-        channel.invokeMethod(LOAD_START_EVENT, obj);
+        obj.put("url", url);
+        InAppBrowser.channel.invokeMethod("loadstart", obj);
     }
 
 
 
     public void onPageFinished(WebView view, String url) {
         super.onPageFinished(view, url);
+
+        activity.isLoading = false;
 
         // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
@@ -204,20 +126,20 @@ public class InAppBrowserClient extends WebViewClient {
         view.requestFocus();
 
         Map<String, Object> obj = new HashMap<>();
-        obj.put("type", LOAD_STOP_EVENT);
         obj.put("url", url);
-        channel.invokeMethod(LOAD_STOP_EVENT, obj);
+        InAppBrowser.channel.invokeMethod("loadstop", obj);
     }
 
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
         super.onReceivedError(view, errorCode, description, failingUrl);
 
+        activity.isLoading = false;
+
         Map<String, Object> obj = new HashMap<>();
-        obj.put("type", LOAD_ERROR_EVENT);
         obj.put("url", failingUrl);
         obj.put("code", errorCode);
         obj.put("message", description);
-        channel.invokeMethod(LOAD_ERROR_EVENT, obj);
+        InAppBrowser.channel.invokeMethod("loaderror", obj);
     }
 
     /**

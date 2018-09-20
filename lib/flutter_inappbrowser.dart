@@ -51,10 +51,6 @@ class InAppBrowser {
       case "exit":
         onExit();
         break;
-      case "customscheme":
-        String url = call.arguments["url"];
-        onCustomScheme(url);
-        break;
     }
     return new Future.value("");
   }
@@ -121,12 +117,20 @@ class InAppBrowser {
   ///   - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
   ///   - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
   ///   - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
-  Future<void> open(String url, {String target = "_self", Map<String, dynamic> options = const {}}) async {
+  Future<void> open(String url, {Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
+    args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('target', () => target);
     args.putIfAbsent('options', () => options);
     return await _channel.invokeMethod('open', args);
+  }
+
+  Future<void> loadUrl(String url, {Map<String, String> headers = const {}}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('headers', () => headers);
+    return await _channel.invokeMethod('loadUrl', args);
   }
 
   ///Displays an [InAppBrowser] window that was opened hidden. Calling this has no effect if the [InAppBrowser] was already visible.

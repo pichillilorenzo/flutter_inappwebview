@@ -9,10 +9,11 @@ import Foundation
 
 @objcMembers
 public class InAppBrowserOptions: NSObject {
+    
     var closeButtonCaption = ""
     var closeButtonColor = ""
     var clearCache = false
-    var clearSessionCache = false
+    var userAgent = ""
     var spinner = true
     var hidden = false
     var disallowOverScroll = false
@@ -37,6 +38,10 @@ public class InAppBrowserOptions: NSObject {
     var allowsPictureInPictureMediaPlayback = true
     var javaScriptCanOpenWindowsAutomatically = false
     var javaScriptEnabled = true
+    
+    override init(){
+        super.init()
+    }
     
     public func parse(options: [String: Any]) {
         for (key, value) in options {

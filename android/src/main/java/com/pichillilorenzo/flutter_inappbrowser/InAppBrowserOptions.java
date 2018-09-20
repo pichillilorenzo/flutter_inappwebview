@@ -13,23 +13,21 @@ public class InAppBrowserOptions {
 
     boolean clearCache = false;
     boolean clearSessionCache = false;
+    String userAgent = "";
     boolean spinner = true;
     boolean hidden = false;
     boolean toolbarTop = true;
     String toolbarTopColor = "toolbarTopColor";
     boolean hideUrlBar = false;
-    boolean enableViewportScale = false;
-    boolean keyboardDisplayRequiresUserAction = true;
-    boolean suppressesIncrementalRendering = false;
-    boolean allowsAirPlayForMediaPlayback = true;
-    boolean mediaTypesRequiringUserActionForPlayback = true;
-    boolean allowsBackForwardNavigationGestures = true;
-    boolean allowsLinkPreview = true;
-    boolean ignoresViewportScaleLimits = false;
-    boolean allowsInlineMediaPlayback = false;
-    boolean allowsPictureInPictureMediaPlayback = true;
+    boolean mediaPlaybackRequiresUserGesture = true;
     boolean javaScriptCanOpenWindowsAutomatically = false;
     boolean javaScriptEnabled = true;
+    boolean builtInZoomControls = false;
+    boolean supportZoom = true;
+    boolean databaseEnabled = true;
+    boolean domStorageEnabled = true;
+    boolean useWideViewPort = true;
+    boolean safeBrowsingEnabled = true;
 
     @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void parse(HashMap<String, Object> options) {
@@ -42,7 +40,6 @@ public class InAppBrowserOptions {
                 // silent
             }
         }
-
     }
 
     public HashMap<String, Object> getHashMap() {

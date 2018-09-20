@@ -47,6 +47,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         case "open":
             self.open(arguments: arguments!, result: result)
             break
+        case "loadUrl":
+            self.loadUrl(arguments: arguments!, result: result)
+            break
         case "close":
             self.close()
             result(true)
@@ -67,12 +70,18 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             self.webViewController?.goBack()
             result(true)
             break
+        case "canGoBack":
+            result(self.webViewController?.canGoBack() ?? false)
+            break
         case "goForward":
             self.webViewController?.goForward()
             result(true)
             break
+        case "canGoForward":
+            result(self.webViewController?.canGoForward() ?? false)
+            break
         case "isLoading":
-            result(self.webViewController?.webView.isLoading == true)
+            result((self.webViewController?.webView.isLoading ?? false) == true)
             break
         case "stopLoading":
             self.webViewController?.webView.stopLoading()
@@ -117,6 +126,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     public func open(arguments: NSDictionary, result: @escaping FlutterResult) {
         let url: String? = (arguments["url"] as? String)!
+        let headers = (arguments["headers"] as? [String: String])!
         var target: String? = (arguments["target"] as? String)!
         target = target != nil ? target : "_self"
         let options = (arguments["options"] as? [String: Any])!
@@ -129,45 +139,42 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             }
             
             if (target == "_self" || target == "_target") {
-                openIn(inAppBrowser: absoluteUrl!, withOptions: options)
+                open(inAppBrowser: absoluteUrl!, headers: headers, withOptions: options)
             }
             else if (target == "_system") {
                 open(inSystem: absoluteUrl!)
             }
             else {
                 // anything else
-                openIn(inAppBrowser: absoluteUrl!, withOptions: options)
+                open(inAppBrowser: absoluteUrl!, headers: headers,withOptions: options)
             }
         }
         else {
+            print("url is empty")
             result(false)
         }
         result(true)
     }
     
-    func openIn(inAppBrowser url: URL, withOptions options: [String: Any]) {
+    public func loadUrl(arguments: NSDictionary, result: @escaping FlutterResult) {
+        let url: String? = (arguments["url"] as? String)!
+        let headers = (arguments["headers"] as? [String: String])!
+        
+        if url != nil {
+            let absoluteUrl = URL(string: url!)!.absoluteURL
+            webViewController?.loadUrl(url: absoluteUrl, headers: headers)
+        }
+        else {
+            print("url is empty")
+            result(false)
+        }
+        result(true)
+    }
+    
+    func open(inAppBrowser url: URL, headers: [String: String], withOptions options: [String: Any]) {
         
         let browserOptions = InAppBrowserOptions()
         browserOptions.parse(options: options)
-
-        if browserOptions.clearCache {
-            let _: HTTPCookie?
-            let storage = HTTPCookieStorage.shared
-            for cookie in storage.cookies! {
-                if !(cookie.domain.isEqual(".^filecookies^") ) {
-                    storage.deleteCookie(cookie)
-                }
-            }
-        }
-        
-        if browserOptions.clearSessionCache {
-            let storage = HTTPCookieStorage.shared
-            for cookie in storage.cookies! {
-                if !(cookie.domain.isEqual(".^filecookies^") && cookie.isSessionOnly) {
-                    storage.deleteCookie(cookie)
-                }
-            }
-        }
         
         if webViewController == nil {
 
@@ -182,6 +189,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             webViewController?.browserOptions = browserOptions
             webViewController?.tmpWindow = tmpWindow
             webViewController?.currentURL = url
+            webViewController?.initHeaders = headers
             webViewController?.navigationDelegate = self
         }
         
@@ -258,18 +266,18 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     //
     // If no wrapper is supplied, then the source string is executed directly.
     func injectDeferredObject(_ source: String, withWrapper jsWrapper: String) {
-        if jsWrapper != nil {
-            let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
-            let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
-            if sourceArrayString != nil {
-                let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.characters.count ?? 0) - 2))
-                let jsToInject = String(format: jsWrapper, sourceString!)
-                webViewController?.webView?.evaluateJavaScript(jsToInject)
-            }
+        //if jsWrapper != nil {
+        let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
+        let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
+        if sourceArrayString != nil {
+            let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.characters.count ?? 0) - 2))
+            let jsToInject = String(format: jsWrapper, sourceString!)
+            webViewController?.webView?.evaluateJavaScript(jsToInject)
         }
-        else {
-            webViewController?.webView?.evaluateJavaScript(source)
-        }
+        //}
+        //else {
+        //    webViewController?.webView?.evaluateJavaScript(source)
+        //}
     }
     
     public func injectScriptCode(arguments: NSDictionary) {
@@ -294,23 +302,23 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func webViewDidStartLoad(_ webView: WKWebView) {
         let url: String = webViewController!.currentURL!.absoluteString
-        channel.invokeMethod("loadstart", arguments: ["type": "loadstart", "url": url])
+        channel.invokeMethod("loadstart", arguments: ["url": url])
     }
     
     func webViewDidFinishLoad(_ webView: WKWebView) {
         let url: String = webViewController!.currentURL!.absoluteString
-        channel.invokeMethod("loadstop", arguments: ["type": "loadstop", "url": url])
+        channel.invokeMethod("loadstop", arguments: ["url": url])
     }
     
     func webView(_ webView: WKWebView, didFailLoadWithError error: Error) {
         let url: String = webViewController!.currentURL!.absoluteString
-        let arguments = ["type": "loaderror", "url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
+        let arguments = ["url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
         channel.invokeMethod("loaderror", arguments: arguments)
     }
     
     func browserExit() {
         
-        channel.invokeMethod("exit", arguments: ["type": "exit"])
+        channel.invokeMethod("exit", arguments: [])
         
         // Set navigationDelegate to nil to ensure no callbacks are received from it.
         webViewController?.navigationDelegate = nil

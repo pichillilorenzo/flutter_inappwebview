@@ -1,7 +1,5 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.os.Build;
-import android.support.annotation.RequiresApi;
 import android.util.Log;
 
 import java.lang.reflect.Field;
@@ -14,11 +12,14 @@ public class InAppBrowserOptions {
     boolean clearCache = false;
     boolean clearSessionCache = false;
     String userAgent = "";
-    boolean spinner = true;
+    boolean progressBar = true;
     boolean hidden = false;
     boolean toolbarTop = true;
-    String toolbarTopColor = "toolbarTopColor";
+    String toolbarTopBackgroundColor = "";
+    String toolbarTopFixedTitle = "";
     boolean hideUrlBar = false;
+    boolean hideTitleBar = false;
+    boolean closeOnCannotGoBack = true;
     boolean mediaPlaybackRequiresUserGesture = true;
     boolean javaScriptCanOpenWindowsAutomatically = false;
     boolean javaScriptEnabled = true;
@@ -29,15 +30,16 @@ public class InAppBrowserOptions {
     boolean useWideViewPort = true;
     boolean safeBrowsingEnabled = true;
 
-    @RequiresApi(api = Build.VERSION_CODES.KITKAT)
     public void parse(HashMap<String, Object> options) {
         Iterator it = options.entrySet().iterator();
         while (it.hasNext()) {
             Map.Entry<String, Object> pair = (Map.Entry<String, Object>)it.next();
             try {
-                this.getClass().getField(pair.getKey()).set(this, pair.getValue());
-            } catch (NoSuchFieldException | IllegalAccessException  e) {
-                // silent
+                this.getClass().getDeclaredField(pair.getKey()).set(this, pair.getValue());
+            } catch (NoSuchFieldException e) {
+                Log.d("InAppBrowserOptions", e.getMessage());
+            } catch (IllegalAccessException  e) {
+                Log.d("InAppBrowserOptions", e.getMessage());
             }
         }
     }
@@ -48,7 +50,7 @@ public class InAppBrowserOptions {
             try {
                 options.put(f.getName(), f.get(this));
             } catch (IllegalAccessException e) {
-                // silent
+                Log.d("InAppBrowserOptions", e.getMessage());
             }
         }
         return options;

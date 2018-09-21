@@ -44,6 +44,6 @@
         android:id="@+id/menu_search"
         android:title="@string/menu_search"
         appcompat:actionViewClass="android.widget.SearchView"
-        appcompat:showAsAction="ifRoom" />
+        appcompat:showAsAction="ifRoom|withText" />
 
 </menu>

@@ -4,8 +4,6 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.support.annotation.RequiresApi;
-import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -44,8 +42,8 @@ public class InAppBrowserWebChromeClient extends WebChromeClient {
     @Override
     public void onReceivedTitle(WebView view, String title) {
         super.onReceivedTitle(view, title);
-        if (activity.getSupportActionBar() != null)
-            activity.getSupportActionBar().setTitle(title);
+        if (activity.actionBar != null && activity.options.toolbarTopFixedTitle.isEmpty())
+            activity.actionBar.setTitle(title);
     }
 
     @Override

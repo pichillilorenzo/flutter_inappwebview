@@ -67,6 +67,8 @@ class _MyAppState extends State<MyApp> {
         body: new Center(
           child: new RaisedButton(onPressed: () {
             inAppBrowser.open("https://flutter.io/", options: {
+              //"toolbarTopFixedTitle": "Fixed title",
+              "hideUrlBar": true,
               //"toolbarTop": false,
               //"toolbarBottom": false
             });

@@ -141,8 +141,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         }
         
         if (browserOptions?.toolbarTop)! {
-            if browserOptions?.toolbarTopColor != "" {
-                self.toolbarTop.backgroundColor = color(fromHexString: (browserOptions?.toolbarTopColor)!)
+            if browserOptions?.toolbarTopBackgroundColor != "" {
+                self.toolbarTop.backgroundColor = color(fromHexString: (browserOptions?.toolbarTopBackgroundColor)!)
             }
         }
         else {
@@ -156,8 +156,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         }
         
         if (browserOptions?.toolbarBottom)! {
-            if browserOptions?.toolbarBottomColor != "" {
-                self.toolbarBottom.backgroundColor = color(fromHexString: (browserOptions?.toolbarBottomColor)!)
+            if browserOptions?.toolbarBottomBackgroundColor != "" {
+                self.toolbarBottom.backgroundColor = color(fromHexString: (browserOptions?.toolbarBottomBackgroundColor)!)
             }
             self.toolbarBottom.isTranslucent = (browserOptions?.toolbarBottomTranslucent)!
         }

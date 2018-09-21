@@ -18,10 +18,10 @@ public class InAppBrowserOptions: NSObject {
     var hidden = false
     var disallowOverScroll = false
     var toolbarTop = true
-    var toolbarTopColor = ""
+    var toolbarTopBackgroundColor = ""
     var toolbarTopTranslucent = true
     var toolbarBottom = true
-    var toolbarBottomColor = ""
+    var toolbarBottomBackgroundColor = ""
     var toolbarBottomTranslucent = true
     var hideUrlBar = false
     var presentationStyle = 0 //fullscreen

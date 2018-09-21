@@ -150,4 +150,5 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         // By default handle 401 like we'd normally do!
         super.onReceivedHttpAuthRequest(view, handler, host, realm);
     }
+
 }

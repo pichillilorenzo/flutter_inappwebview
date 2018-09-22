@@ -25,6 +25,9 @@ import android.annotation.TargetApi;
 import android.app.Activity;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.content.pm.ResolveInfo;
+import android.os.Parcelable;
 import android.provider.Browser;
 import android.net.Uri;
 import android.os.Build;
@@ -40,7 +43,9 @@ import android.util.Log;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -308,14 +313,51 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         intent.setData(uri);
       }
       intent.putExtra(Browser.EXTRA_APPLICATION_ID, activity.getPackageName());
-      activity.startActivity(intent);
+      // CB-10795: Avoid circular loops by preventing it from opening in the current app
+      this.openExternalExcludeCurrentApp(intent);
       // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
     } catch (java.lang.RuntimeException e) {
       Log.d(LOG_TAG, "InAppBrowserFlutterPlugin: Error loading url "+url+":"+ e.toString());
     }
   }
 
-  @TargetApi(8)
+  /**
+   * Opens the intent, providing a chooser that excludes the current app to avoid
+   * circular loops.
+   */
+  private void openExternalExcludeCurrentApp(Intent intent) {
+    String currentPackage = activity.getPackageName();
+    boolean hasCurrentPackage = false;
+    PackageManager pm = activity.getPackageManager();
+    List<ResolveInfo> activities = pm.queryIntentActivities(intent, 0);
+    ArrayList<Intent> targetIntents = new ArrayList<Intent>();
+    for (ResolveInfo ri : activities) {
+      if (!currentPackage.equals(ri.activityInfo.packageName)) {
+        Intent targetIntent = (Intent)intent.clone();
+        targetIntent.setPackage(ri.activityInfo.packageName);
+        targetIntents.add(targetIntent);
+      }
+      else {
+        hasCurrentPackage = true;
+      }
+    }
+    // If the current app package isn't a target for this URL, then use
+    // the normal launch behavior
+    if (hasCurrentPackage == false || targetIntents.size() == 0) {
+      activity.startActivity(intent);
+    }
+    // If there's only one possible intent, launch it directly
+    else if (targetIntents.size() == 1) {
+      activity.startActivity(targetIntents.get(0));
+    }
+    // Otherwise, show a custom chooser without the current app listed
+    else if (targetIntents.size() > 0) {
+      Intent chooser = Intent.createChooser(targetIntents.remove(targetIntents.size()-1), null);
+      chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetIntents.toArray(new Parcelable[] {}));
+      activity.startActivity(chooser);
+    }
+  }
+
   private void open(final String url, InAppBrowserOptions options) {
     Intent intent = new Intent(activity, WebViewActivity.class);
 

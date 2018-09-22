@@ -3,10 +3,12 @@ package com.pichillilorenzo.flutter_inappbrowser;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
+import android.net.http.SslError;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
+import android.webkit.SslErrorHandler;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -140,6 +142,41 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         obj.put("code", errorCode);
         obj.put("message", description);
         InAppBrowserFlutterPlugin.channel.invokeMethod("loaderror", obj);
+    }
+
+    public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error) {
+        super.onReceivedSslError(view, handler, error);
+
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("url", error.getUrl());
+        obj.put("code", 0);
+        obj.put("sslerror", error.getPrimaryError());
+        String message;
+        switch (error.getPrimaryError()) {
+            case SslError.SSL_DATE_INVALID:
+                message = "The date of the certificate is invalid";
+                break;
+            case SslError.SSL_EXPIRED:
+                message = "The certificate has expired";
+                break;
+            case SslError.SSL_IDMISMATCH:
+                message = "Hostname mismatch";
+                break;
+            default:
+            case SslError.SSL_INVALID:
+                message = "A generic error occurred";
+                break;
+            case SslError.SSL_NOTYETVALID:
+                message = "The certificate is not yet valid";
+                break;
+            case SslError.SSL_UNTRUSTED:
+                message = "The certificate authority is not trusted";
+                break;
+        }
+        obj.put("message", message);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("loaderror", obj);
+
+        handler.cancel();
     }
 
     /**

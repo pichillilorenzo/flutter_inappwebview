@@ -480,7 +480,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        //func webViewDidFinishLoad(_ theWebView: WKWebView) {
         // update url, stop spinner, update back/forward
         currentURL = webView.url
         updateUrlTextField(url: (currentURL?.absoluteString)!)
@@ -490,10 +489,18 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         navigationDelegate?.webViewDidFinishLoad(webView)
     }
     
+    func webView(_ webView: WKWebView,
+                 didFailProvisionalNavigation navigation: WKNavigation!,
+                 withError error: Error) {
+        print("webView:didFailProvisionalNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
+        backButton.isEnabled = webView.canGoBack
+        forwardButton.isEnabled = webView.canGoForward
+        spinner.stopAnimating()
+        navigationDelegate?.webView(webView, didFailLoadWithError: error)
+    }
+    
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        //func webView(_ theWebView: WKWebView, didFailLoadWithError error: Error) {
-        // log fail message, stop spinner, update back/forward
-        print("webView:didFailLoadWithError - \(Int(error._code)): \(error.localizedDescription)")
+        print("webView:didFailNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()

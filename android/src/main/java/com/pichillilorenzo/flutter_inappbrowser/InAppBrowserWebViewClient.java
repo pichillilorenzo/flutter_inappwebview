@@ -149,8 +149,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         Map<String, Object> obj = new HashMap<>();
         obj.put("url", error.getUrl());
-        obj.put("code", 0);
-        obj.put("sslerror", error.getPrimaryError());
+        obj.put("code", error.getPrimaryError());
         String message;
         switch (error.getPrimaryError()) {
             case SslError.SSL_DATE_INVALID:
@@ -173,7 +172,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
                 message = "The certificate authority is not trusted";
                 break;
         }
-        obj.put("message", message);
+        obj.put("message", "SslError: " + message);
         InAppBrowserFlutterPlugin.channel.invokeMethod("loaderror", obj);
 
         handler.cancel();

@@ -325,7 +325,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         channel.invokeMethod("loadstop", arguments: ["url": url])
     }
     
-    func webView(_ webView: WKWebView, didFailLoadWithError error: Error) {
+    func webViewDidFailLoadWithError(_ webView: WKWebView, error: Error) {
         let url: String = webViewController!.currentURL!.absoluteString
         let arguments = ["url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
         channel.invokeMethod("loaderror", arguments: arguments)

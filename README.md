@@ -40,8 +40,8 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onLoadError(String url, String code, String message) {
-    super.onLoadStop(url);
+  void onLoadError(String url, int code, String message) {
+    super.onLoadError(url, code, message);
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
 

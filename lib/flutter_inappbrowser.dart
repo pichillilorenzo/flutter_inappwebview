@@ -44,7 +44,7 @@ class InAppBrowser {
         break;
       case "loaderror":
         String url = call.arguments["url"];
-        String code = call.arguments["code"];
+        int code = call.arguments["code"];
         String message = call.arguments["message"];
         onLoadError(url, code, message);
         break;
@@ -212,7 +212,7 @@ class InAppBrowser {
   }
 
   ///Event fires when the [InAppBrowser] encounters an error loading an [url].
-  void onLoadError(String url, String code, String message) {
+  void onLoadError(String url, int code, String message) {
 
   }
 

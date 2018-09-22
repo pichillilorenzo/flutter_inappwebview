@@ -489,21 +489,21 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         navigationDelegate?.webViewDidFinishLoad(webView)
     }
     
-    func webView(_ webView: WKWebView,
-                 didFailProvisionalNavigation navigation: WKNavigation!,
-                 withError error: Error) {
-        print("webView:didFailProvisionalNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
-        backButton.isEnabled = webView.canGoBack
-        forwardButton.isEnabled = webView.canGoForward
-        spinner.stopAnimating()
-        navigationDelegate?.webView(webView, didFailLoadWithError: error)
-    }
+//    func webView(_ webView: WKWebView,
+//                 didFailProvisionalNavigation navigation: WKNavigation!,
+//                 withError error: Error) {
+//        print("webView:didFailProvisionalNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
+//        backButton.isEnabled = webView.canGoBack
+//        forwardButton.isEnabled = webView.canGoForward
+//        spinner.stopAnimating()
+//        navigationDelegate?.webView(webView, didFailLoadWithError: error)
+//    }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         print("webView:didFailNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()
-        navigationDelegate?.webView(webView, didFailLoadWithError: error)
+        navigationDelegate?.webViewDidFailLoadWithError(webView, error: error)
     }
 }

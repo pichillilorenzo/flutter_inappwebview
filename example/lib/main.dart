@@ -11,9 +11,24 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onLoadStop(String url) {
+  void onLoadStop(String url) async {
     super.onLoadStop(url);
     print("\n\nStopped $url\n\n");
+    print(await this.injectScriptCode("document.body.innerHTML"));
+    print(await this.injectScriptCode("3"));
+    print(await this.injectScriptCode("""
+      function asd (a,b) {
+        return a+b;
+       };
+       asd(3,5);
+    """));
+    print(await this.injectScriptCode("""
+      ["3",56,"sdf"];
+    """));
+    print(await this.injectScriptCode("""
+      var x = {"as":4, "dfdfg": 6};
+      x;
+    """));
     /*this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
     this.injectScriptCode("""
       \$( "body" ).html( "Next Step..." )
@@ -68,7 +83,7 @@ class _MyAppState extends State<MyApp> {
           child: new RaisedButton(onPressed: () {
             inAppBrowser.open("https://flutter.io/", options: {
               //"toolbarTopFixedTitle": "Fixed title",
-              "hideUrlBar": true,
+              //"hideUrlBar": true,
               //"toolbarTop": false,
               //"toolbarBottom": false
             });

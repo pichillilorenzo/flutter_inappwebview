@@ -88,22 +88,22 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             result(true)
             break
         case "injectScriptCode":
-            self.injectScriptCode(arguments: arguments!)
-            result(true)
+            self.injectScriptCode(arguments: arguments!, result: result)
             break
         case "injectScriptFile":
-            self.injectScriptFile(arguments: arguments!)
+            self.injectScriptFile(arguments: arguments!, result: nil)
             result(true)
             break
         case "injectStyleCode":
-            self.injectStyleCode(arguments: arguments!)
+            self.injectStyleCode(arguments: arguments!, result: nil)
             result(true)
             break
         case "injectStyleFile":
-            self.injectStyleFile(arguments: arguments!)
+            self.injectStyleFile(arguments: arguments!, result: nil)
             result(true)
             break
         default:
+            result(FlutterMethodNotImplemented)
             break
         }
     }
@@ -151,7 +151,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             print("url is empty")
-            result(false)
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
         }
         result(true)
     }
@@ -166,7 +166,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             print("url is empty")
-            result(false)
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
         }
         result(true)
     }
@@ -265,39 +265,54 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     // '%@' marker).
     //
     // If no wrapper is supplied, then the source string is executed directly.
-    func injectDeferredObject(_ source: String, withWrapper jsWrapper: String) {
-        //if jsWrapper != nil {
+    func injectDeferredObject(_ source: String, withWrapper jsWrapper: String, result: FlutterResult?) {
         let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
         let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
         if sourceArrayString != nil {
             let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.characters.count ?? 0) - 2))
             let jsToInject = String(format: jsWrapper, sourceString!)
-            webViewController?.webView?.evaluateJavaScript(jsToInject)
+            
+            webViewController?.webView?.evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
+                if result == nil {
+                    return
+                }
+                
+                do {
+                    let data: Data = ("[" + String(describing: value!) + "]").data(using: String.Encoding.utf8, allowLossyConversion: false)!
+                    let json: Array<Any> = try JSONSerialization.jsonObject(with: data, options: []) as! Array<Any>
+                    if json[0] is String {
+                        result!(json[0])
+                    }
+                    else {
+                        result!(value)
+                    }
+                } catch let error as NSError {
+                    print("Failed to load: \(error.localizedDescription)")
+                    result!(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Failed to load: \(error.localizedDescription)", details: error))
+                }
+                
+            })
         }
-        //}
-        //else {
-        //    webViewController?.webView?.evaluateJavaScript(source)
-        //}
     }
     
-    public func injectScriptCode(arguments: NSDictionary) {
-        let jsWrapper = "(function(){JSON.stringify([eval(%@)])})()"
-        injectDeferredObject(arguments["source"] as! String, withWrapper: jsWrapper)
+    public func injectScriptCode(arguments: NSDictionary, result: FlutterResult?) {
+        let jsWrapper = "(function(){return JSON.stringify(eval(%@));})();"
+        injectDeferredObject(arguments["source"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectScriptFile(arguments: NSDictionary) {
-        let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document)"
-        injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper)
+    public func injectScriptFile(arguments: NSDictionary, result: FlutterResult?) {
+        let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
+        injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectStyleCode(arguments: NSDictionary) {
-        let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document)"
-        injectDeferredObject(arguments["source"] as! String, withWrapper: jsWrapper)
+    public func injectStyleCode(arguments: NSDictionary, result: FlutterResult?) {
+        let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
+        injectDeferredObject(arguments["source"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectStyleFile(arguments: NSDictionary) {
-        let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document)"
-        injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper)
+    public func injectStyleFile(arguments: NSDictionary, result: FlutterResult?) {
+        let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
+        injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
     }
     
     func webViewDidStartLoad(_ webView: WKWebView) {

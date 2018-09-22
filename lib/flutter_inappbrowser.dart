@@ -174,7 +174,7 @@ class InAppBrowser {
   }
 
   ///Injects JavaScript code into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
-  Future<void> injectScriptCode(String source) async {
+  Future<dynamic> injectScriptCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     return await _channel.invokeMethod('injectScriptCode', args);
@@ -218,11 +218,6 @@ class InAppBrowser {
 
   ///Event fires when the [InAppBrowser] window is closed.
   void onExit() {
-
-  }
-
-  ///
-  void onCustomScheme(String url) {
 
   }
 

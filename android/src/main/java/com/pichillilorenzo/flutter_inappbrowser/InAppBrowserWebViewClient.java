@@ -104,7 +104,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         Map<String, Object> obj = new HashMap<>();
         obj.put("url", url);
-        InAppBrowser.channel.invokeMethod("loadstart", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("loadstart", obj);
     }
 
 
@@ -114,7 +114,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         activity.isLoading = false;
 
-        // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
+        // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().flush();
         } else {
@@ -127,7 +127,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         Map<String, Object> obj = new HashMap<>();
         obj.put("url", url);
-        InAppBrowser.channel.invokeMethod("loadstop", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("loadstop", obj);
     }
 
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
@@ -139,7 +139,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         obj.put("url", failingUrl);
         obj.put("code", errorCode);
         obj.put("message", description);
-        InAppBrowser.channel.invokeMethod("loaderror", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("loaderror", obj);
     }
 
     /**

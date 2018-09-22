@@ -15,10 +15,10 @@
  under the License.
  */
 
-#import "InAppBrowser.h"
+#import "InAppBrowserFlutterPlugin.h"
 #import <flutter_inappbrowser/flutter_inappbrowser-Swift.h>
 
-@implementation InAppBrowser : NSObject
+@implementation InAppBrowserFlutterPlugin : NSObject
 + (void)registerWithRegistrar:(NSObject<FlutterPluginRegistrar>*)registrar {
     [SwiftFlutterPlugin registerWithRegistrar:registrar];
 }

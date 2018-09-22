@@ -13,8 +13,6 @@ import java.util.Map;
 
 public abstract class RequestPermissionHandler implements ActivityCompat.OnRequestPermissionsResultCallback {
 
-    public static int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 0;
-
     private static Map<Integer, List<Runnable>> actionDictionary = new HashMap<>();
 
     public static void checkAndRun(Activity activity, String permission, int requestCode, Runnable runnable) {

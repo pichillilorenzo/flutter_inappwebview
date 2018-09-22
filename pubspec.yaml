@@ -18,7 +18,7 @@ dependencies:
 flutter:
   plugin:
     androidPackage: com.pichillilorenzo.flutter_inappbrowser
-    pluginClass: InAppBrowser
+    pluginClass: InAppBrowserFlutterPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

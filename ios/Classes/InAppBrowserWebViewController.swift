@@ -433,6 +433,40 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         decisionHandler(.allow)
     }
     
+//    func webView(_ webView: WKWebView,
+//                 decidePolicyFor navigationResponse: WKNavigationResponse,
+//                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+//        let mimeType = navigationResponse.response.mimeType
+//        if mimeType != nil && !mimeType!.starts(with: "text/") {
+//            download(url: webView.url)
+//            decisionHandler(.cancel)
+//            return
+//        }
+//        decisionHandler(.allow)
+//    }
+//
+//    func download (url: URL?) {
+//        let filename = url?.lastPathComponent
+//
+//        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+//            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+//            let fileURL = documentsURL.appendingPathComponent(filename!)
+//
+//            return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
+//        }
+//
+//        Alamofire.download((url?.absoluteString)!, to: destination).downloadProgress { progress in
+//            print("Download Progress: \(progress.fractionCompleted)")
+//            }.response { response in
+//                if response.error == nil, let path = response.destinationURL?.path {
+//                    UIAlertView(title: nil, message: "File saved to " + path, delegate: nil, cancelButtonTitle: nil).show()
+//                }
+//                else {
+//                   UIAlertView(title: nil, message: "Cannot save " + filename!, delegate: nil, cancelButtonTitle: nil).show()
+//                }
+//            }
+//    }
+    
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         // loading url, start spinner, update back/forward
         backButton.isEnabled = webView.canGoBack

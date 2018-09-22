@@ -1,39 +1,23 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.Manifest;
-import android.app.Activity;
-import android.app.DownloadManager;
-import android.content.Context;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
-import android.support.annotation.RequiresApi;
-import android.support.v4.app.ActivityCompat;
-import android.support.v4.content.ContextCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.webkit.CookieManager;
-import android.webkit.DownloadListener;
-import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
-import android.widget.AutoCompleteTextView;
-import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
-import android.widget.Toast;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -64,7 +48,7 @@ public class WebViewActivity extends AppCompatActivity {
         options = new InAppBrowserOptions();
         options.parse((HashMap<String, Object>) b.getSerializable("options"));
 
-        InAppBrowser.webViewActivity = this;
+        InAppBrowserFlutterPlugin.webViewActivity = this;
 
         actionBar = getSupportActionBar();
 
@@ -82,39 +66,39 @@ public class WebViewActivity extends AppCompatActivity {
         inAppBrowserWebViewClient = new InAppBrowserWebViewClient(this);
         webView.setWebViewClient(inAppBrowserWebViewClient);
 
-        final Activity activity = this;
-
-        webView.setDownloadListener(new DownloadListener() {
-            @Override
-            public void onDownloadStart(final String url, final String userAgent,
-                                        final String contentDisposition, final String mimetype,
-                                        final long contentLength) {
-
-                RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable(){
-                    @Override
-                    public void run(){
-                        DownloadManager.Request request = new DownloadManager.Request(
-                                Uri.parse(url));
-
-                        final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-                        request.allowScanningByMediaScanner();
-                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-                        request.setVisibleInDownloadsUi(true);
-                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-                        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-                        if (dm != null) {
-                            dm.enqueue(request);
-                            Toast.makeText(getApplicationContext(), "Downloading File: " + filename, //To notify the Client that the file is being downloaded
-                                    Toast.LENGTH_LONG).show();
-                        }
-                        else {
-                            Toast.makeText(getApplicationContext(), "Cannot Download File: " + filename, //To notify the Client that the file cannot be downloaded
-                                    Toast.LENGTH_LONG).show();
-                        }
-                    }
-                });
-            }
-        });
+//        final Activity activity = this;
+//
+//        webView.setDownloadListener(new DownloadListener() {
+//            @Override
+//            public void onDownloadStart(final String url, final String userAgent,
+//                                        final String contentDisposition, final String mimetype,
+//                                        final long contentLength) {
+//
+//                RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable(){
+//                    @Override
+//                    public void run(){
+//                        DownloadManager.Request request = new DownloadManager.Request(
+//                                Uri.parse(url));
+//
+//                        final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+//                        request.allowScanningByMediaScanner();
+//                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
+//                        request.setVisibleInDownloadsUi(true);
+//                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+//                        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
+//                        if (dm != null) {
+//                            dm.enqueue(request);
+//                            Toast.makeText(getApplicationContext(), "Downloading File: " + filename, //To notify the Client that the file is being downloaded
+//                                    Toast.LENGTH_LONG).show();
+//                        }
+//                        else {
+//                            Toast.makeText(getApplicationContext(), "Cannot Download File: " + filename, //To notify the Client that the file cannot be downloaded
+//                                    Toast.LENGTH_LONG).show();
+//                        }
+//                    }
+//                });
+//            }
+//        });
 
         WebSettings settings = webView.getSettings();
 
@@ -260,18 +244,6 @@ public class WebViewActivity extends AppCompatActivity {
         }
         return super.onKeyDown(keyCode, event);
     }
-
-//    @TargetApi(Build.VERSION_CODES.KITKAT)
-//    void eval(MethodCall call, final MethodChannel.Result result) {
-//        String code = call.argument("code");
-//
-//        webView.evaluateJavascript(code, new ValueCallback<String>() {
-//            @Override
-//            public void onReceiveValue(String value) {
-//                result.success(value);
-//            }
-//        });
-//    }
 
     public void close() {
         finish();

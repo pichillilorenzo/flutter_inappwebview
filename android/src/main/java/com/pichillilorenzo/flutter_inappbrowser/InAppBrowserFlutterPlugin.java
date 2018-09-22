@@ -30,13 +30,16 @@ import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.support.annotation.RequiresApi;
+import android.util.JsonReader;
+import android.util.JsonToken;
 import android.webkit.MimeTypeMap;
+import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
-import android.widget.Toast;
 
-import java.time.Duration;
+import java.io.IOException;
+import java.io.StringReader;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -44,11 +47,10 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
-import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-/** InAppBrowser */
-public class InAppBrowser implements MethodCallHandler {
+/** InAppBrowserFlutterPlugin */
+public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
   public static Registrar registrar;
   public Activity activity;
@@ -56,10 +58,10 @@ public class InAppBrowser implements MethodCallHandler {
   public static WebViewActivity webViewActivity;
 
   private static final String NULL = "null";
-  protected static final String LOG_TAG = "InAppBrowser";
+  protected static final String LOG_TAG = "InAppBrowserFlutterP";
 
 
-  public InAppBrowser(Registrar r, Activity activity) {
+  public InAppBrowserFlutterPlugin(Registrar r, Activity activity) {
     registrar = r;
     this.activity = activity;
     channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
@@ -68,7 +70,7 @@ public class InAppBrowser implements MethodCallHandler {
   /** Plugin registration. */
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
-    channel.setMethodCallHandler(new InAppBrowser(registrar, registrar.activity()));
+    channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar, registrar.activity()));
   }
 
   @RequiresApi(api = Build.VERSION_CODES.KITKAT)
@@ -111,9 +113,9 @@ public class InAppBrowser implements MethodCallHandler {
                   Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                 }
               }
-              // load in InAppBrowser
+              // load in InAppBrowserFlutterPlugin
               else {
-                Log.d(LOG_TAG, "loading in InAppBrowser");
+                Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
                 open(url, options);
               }
             }
@@ -141,26 +143,25 @@ public class InAppBrowser implements MethodCallHandler {
         break;
       case "injectScriptCode":
         source = call.argument("source").toString();
-        jsWrapper = "(function(){JSON.stringify([eval(%s)])})()";
-        injectDeferredObject(source, jsWrapper);
-        result.success(true);
+        jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
+        injectDeferredObject(source, jsWrapper, result);
         break;
       case "injectScriptFile":
         urlFile = call.argument("urlFile").toString();
-        jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document)";
-        injectDeferredObject(urlFile, jsWrapper);
+        jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
+        injectDeferredObject(urlFile, jsWrapper, null);
         result.success(true);
         break;
       case "injectStyleCode":
         source = call.argument("source").toString();
-        jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document)";
-        injectDeferredObject(source, jsWrapper);
+        jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
+        injectDeferredObject(source, jsWrapper, null);
         result.success(true);
         break;
       case "injectStyleFile":
         urlFile = call.argument("urlFile").toString();
-        jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document)";
-        injectDeferredObject(urlFile, jsWrapper);
+        jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
+        injectDeferredObject(urlFile, jsWrapper, null);
         result.success(true);
         break;
       case "show":
@@ -203,7 +204,7 @@ public class InAppBrowser implements MethodCallHandler {
   }
 
   /**
-   * Inject an object (script or style) into the InAppBrowser WebView.
+   * Inject an object (script or style) into the InAppBrowserFlutterPlugin WebView.
    *
    * This is a helper method for the inject{Script|Style}{Code|File} API calls, which
    * provides a consistent method for injecting JavaScript code into the document.
@@ -211,15 +212,14 @@ public class InAppBrowser implements MethodCallHandler {
    * If a wrapper string is supplied, then the source string will be JSON-encoded (adding
    * quotes) and wrapped using string formatting. (The wrapper string should have a single
    * '%s' marker)
-   *
-   * @param source      The source object (filename or script/style text) to inject into
+   *  @param source      The source object (filename or script/style text) to inject into
    *                    the document.
    * @param jsWrapper   A JavaScript string to wrap the source string in, so that the object
    *                    is properly injected, or null if the source string is JavaScript text
-   *                    which should be executed directly.
+   * @param result
    */
-  private void injectDeferredObject(String source, String jsWrapper) {
-    if (webViewActivity!=null) {
+  private void injectDeferredObject(String source, String jsWrapper, final Result result) {
+    if (webViewActivity != null) {
       String scriptToInject;
       if (jsWrapper != null) {
         org.json.JSONArray jsonEsc = new org.json.JSONArray();
@@ -232,14 +232,46 @@ public class InAppBrowser implements MethodCallHandler {
       }
       final String finalScriptToInject = scriptToInject;
       activity.runOnUiThread(new Runnable() {
-        @SuppressLint("NewApi")
         @Override
         public void run() {
           if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
             // This action will have the side-effect of blurring the currently focused element
             webViewActivity.webView.loadUrl("javascript:" + finalScriptToInject);
           } else {
-            webViewActivity.webView.evaluateJavascript(finalScriptToInject, null);
+            webViewActivity.webView.evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
+              @Override
+              public void onReceiveValue(String s) {
+                if (result == null)
+                  return;
+
+                JsonReader reader = new JsonReader(new StringReader(s));
+
+                // Must set lenient to parse single values
+                reader.setLenient(true);
+
+                try {
+                  String msg;
+                  msg = reader.nextString();
+
+                  JsonReader reader2 = new JsonReader(new StringReader(msg));
+                  reader2.setLenient(true);
+
+                  if (reader2.peek() == JsonToken.STRING)
+                    msg = reader2.nextString();
+
+                  result.success(msg);
+
+                } catch (IOException e) {
+                  Log.e(LOG_TAG, "IOException", e);
+                } finally {
+                  try {
+                    reader.close();
+                  } catch (IOException e) {
+                    // NOOP
+                  }
+                }
+              }
+            });
           }
         }
       });
@@ -279,7 +311,7 @@ public class InAppBrowser implements MethodCallHandler {
       activity.startActivity(intent);
       // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
     } catch (java.lang.RuntimeException e) {
-      Log.d(LOG_TAG, "InAppBrowser: Error loading url "+url+":"+ e.toString());
+      Log.d(LOG_TAG, "InAppBrowserFlutterPlugin: Error loading url "+url+":"+ e.toString());
     }
   }
 

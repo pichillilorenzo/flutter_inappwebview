@@ -17,7 +17,7 @@
 
 #import <Flutter/Flutter.h>
 
-@interface InAppBrowser : NSObject<FlutterPlugin>
+@interface InAppBrowserFlutterPlugin : NSObject<FlutterPlugin>
 + (void)registerWithRegistrar:(nonnull NSObject<FlutterPluginRegistrar> *)registrar;
 
 @end

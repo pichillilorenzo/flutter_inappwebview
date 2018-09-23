@@ -10,35 +10,35 @@ import Foundation
 @objcMembers
 public class InAppBrowserOptions: NSObject {
     
-    var closeButtonCaption = ""
-    var closeButtonColor = ""
+    var useShouldOverrideUrlLoading = false
     var clearCache = false
     var userAgent = ""
-    var spinner = true
+    var javaScriptEnabled = true
+    var javaScriptCanOpenWindowsAutomatically = false
     var hidden = false
-    var disallowOverScroll = false
     var toolbarTop = true
     var toolbarTopBackgroundColor = ""
-    var toolbarTopTranslucent = true
+    var hideUrlBar = false
+    var mediaPlaybackRequiresUserGesture = true
+    
+    var disallowOverScroll = false
     var toolbarBottom = true
     var toolbarBottomBackgroundColor = ""
     var toolbarBottomTranslucent = true
-    var hideUrlBar = false
+    var closeButtonCaption = ""
+    var closeButtonColor = ""
     var presentationStyle = 0 //fullscreen
     var transitionStyle = 0 //crossDissolve
     var enableViewportScale = false
     var keyboardDisplayRequiresUserAction = true
     var suppressesIncrementalRendering = false
     var allowsAirPlayForMediaPlayback = true
-    var mediaTypesRequiringUserActionForPlayback = "none"
     var allowsBackForwardNavigationGestures = true
     var allowsLinkPreview = true
     var ignoresViewportScaleLimits = false
     var allowsInlineMediaPlayback = false
     var allowsPictureInPictureMediaPlayback = true
-    var javaScriptCanOpenWindowsAutomatically = false
-    var javaScriptEnabled = true
-    var useShouldOverrideUrlLoading = false
+    var spinner = true
     
     override init(){
         super.init()

@@ -9,27 +9,28 @@ import java.util.HashMap;
 
 public class InAppBrowserOptions {
 
+    boolean useShouldOverrideUrlLoading = false;
     boolean clearCache = false;
-    boolean clearSessionCache = false;
     String userAgent = "";
-    boolean progressBar = true;
+    boolean javaScriptEnabled = true;
+    boolean javaScriptCanOpenWindowsAutomatically = false;
     boolean hidden = false;
     boolean toolbarTop = true;
     String toolbarTopBackgroundColor = "";
     String toolbarTopFixedTitle = "";
     boolean hideUrlBar = false;
+    boolean mediaPlaybackRequiresUserGesture = true;
+
     boolean hideTitleBar = false;
     boolean closeOnCannotGoBack = true;
-    boolean mediaPlaybackRequiresUserGesture = true;
-    boolean javaScriptCanOpenWindowsAutomatically = false;
-    boolean javaScriptEnabled = true;
+    boolean clearSessionCache = false;
     boolean builtInZoomControls = false;
     boolean supportZoom = true;
-    boolean databaseEnabled = true;
-    boolean domStorageEnabled = true;
+    boolean databaseEnabled = false;
+    boolean domStorageEnabled = false;
     boolean useWideViewPort = true;
     boolean safeBrowsingEnabled = true;
-    boolean useShouldOverrideUrlLoading = false;
+    boolean progressBar = true;
 
     public void parse(HashMap<String, Object> options) {
         Iterator it = options.entrySet().iterator();

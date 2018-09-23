@@ -29,17 +29,19 @@ class MyInAppBrowser extends InAppBrowser {
 //      x;
 //    """));
     //print("\n\n ${await this.isHidden()} \n\n");
-    /*this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
-    this.injectScriptCode("""
-      \$( "body" ).html( "Next Step..." )
-    """);
 
-    this.injectStyleCode("""
-    body {
-      background-color: #3c3c3c !important;
-    }
-    """);
-    this.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");*/
+//    await this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
+//    this.injectScriptCode("""
+//      \$( "body" ).html( "Next Step..." )
+//    """);
+//
+//    // add custom css
+//    this.injectStyleCode("""
+//    body {
+//      background-color: #3c3c3c !important;
+//    }
+//    """);
+//    this.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
   }
 
   @override

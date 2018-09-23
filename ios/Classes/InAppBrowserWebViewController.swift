@@ -206,28 +206,19 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         self.webView.configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
-        if (browserOptions?.mediaTypesRequiringUserActionForPlayback)! != "" {
-            if #available(iOS 10.0, *) {
-                switch (browserOptions?.mediaTypesRequiringUserActionForPlayback)! {
-                    case "all":
-                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .all
-                        break
-                    case "audio":
-                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .audio
-                        break
-                    case "video":
-                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .video
-                        break
-                    default:
-                        self.webView.configuration.mediaTypesRequiringUserActionForPlayback = []
-                        break
-                }
-                
-            } else {
-                // Fallback on earlier versions
-                self.webView.configuration.mediaPlaybackRequiresUserAction = true
+        
+        if #available(iOS 10.0, *) {
+            if (browserOptions?.mediaPlaybackRequiresUserGesture)! {
+                self.webView.configuration.mediaTypesRequiringUserActionForPlayback = .all
             }
+            else {
+                self.webView.configuration.mediaTypesRequiringUserActionForPlayback = []
+            }
+        } else {
+            // Fallback on earlier versions
+            self.webView.configuration.mediaPlaybackRequiresUserAction = (browserOptions?.mediaPlaybackRequiresUserGesture)!
         }
+        
         
         self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowsInlineMediaPlayback)!
         self.webView.keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction

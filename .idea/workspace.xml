@@ -11,14 +11,17 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" afterPath="$PROJECT_DIR$/CHANGELOG.md" />
+      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserWebViewClient.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserWebViewClient.java" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" afterPath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" afterPath="$PROJECT_DIR$/example/lib/main.dart" />
       <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" />
       <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" />
       <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" afterPath="$PROJECT_DIR$/pubspec.yaml" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -38,8 +41,8 @@
       <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="397">
-              <caret line="53" column="36" lean-forward="false" selection-start-line="53" selection-start-column="12" selection-end-line="53" selection-end-column="36" />
+            <state relative-caret-position="376">
+              <caret line="48" column="40" lean-forward="true" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
               <folding>
                 <element signature="e#814#834#0" expanded="true" />
               </folding>
@@ -47,12 +50,49 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="523">
-              <caret line="95" column="12" lean-forward="false" selection-start-line="95" selection-start-column="12" selection-end-line="95" selection-end-column="12" />
+            <state relative-caret-position="293">
+              <caret line="23" column="43" lean-forward="false" selection-start-line="23" selection-start-column="43" selection-end-line="23" selection-end-column="43" />
               <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+            <state split_layout="SPLIT">
+              <first_editor relative-caret-position="441">
+                <caret line="343" column="0" lean-forward="true" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
+                <folding>
+                  <marker date="1537746768594" expanded="false" signature="863:961" ph="..." />
+                  <marker date="1537746768594" expanded="true" signature="1005:1113" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="1005:2052" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="1051:1091" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="1790:1851" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="1881:1924" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="1984:2049" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="2179:2244" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="2285:2874" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="2319:2347" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="2398:2872" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="2426:2867" ph="(...)" />
+                  <marker date="1537746768594" expanded="true" signature="2452:2860" ph="(...)" />
+                  <marker date="1537746768594" expanded="true" signature="2480:2563" ph="(...)" />
+                  <marker date="1537746768594" expanded="true" signature="2509:2552" ph="(...)" />
+                  <marker date="1537746768594" expanded="true" signature="2589:2851" ph="(...)" />
+                  <marker date="1537746768594" expanded="true" signature="2624:2840" ph="(...)" />
+                  <marker date="1537746768594" expanded="true" signature="2703:2770" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="10455:10463" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="10582:10590" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="10750:10758" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="10854:10862" ph="{...}" />
+                  <marker date="1537746768594" expanded="true" signature="11040:11046" ph="{...}" />
+                </folding>
+              </first_editor>
+              <second_editor />
             </state>
           </provider>
         </entry>
@@ -129,7 +169,6 @@
         <option value="$PROJECT_DIR$/example/pubspec.yaml" />
         <option value="$PROJECT_DIR$/ios/Classes/InAppBrowser.m" />
         <option value="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" />
-        <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/LICENSE" />
         <option value="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserDialog.java" />
         <option value="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserClient.java" />
@@ -138,9 +177,10 @@
         <option value="$PROJECT_DIR$/ios/flutter_inappbrowser.podspec" />
         <option value="$PROJECT_DIR$/android/build.gradle" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
-        <option value="$PROJECT_DIR$/README.md" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
+        <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -391,13 +431,13 @@
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31735888" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.18956336" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.36208734" sideWeight="0.4973545" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.22151224" sideWeight="0.4973545" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.3258786" sideWeight="0.4973545" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3258786" sideWeight="0.4973545" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936507" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.17798743" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
@@ -629,16 +669,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="45">
-            <caret line="3" column="0" lean-forward="true" selection-start-line="3" selection-start-column="0" selection-end-line="3" selection-end-column="0" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/LICENSE">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="15">
@@ -765,14 +795,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="115">
-          <caret line="8" column="0" lean-forward="false" selection-start-line="8" selection-start-column="0" selection-end-line="8" selection-end-column="0" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/android/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="585">
@@ -781,53 +803,75 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
+    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="280">
-            <caret line="45" column="17" lean-forward="true" selection-start-line="45" selection-start-column="17" selection-end-line="45" selection-end-column="17" />
-            <folding>
-              <marker date="1537705565637" expanded="false" signature="933:1031" ph="..." />
-              <marker date="1537705565637" expanded="true" signature="1075:1453" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1121:1161" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1205:1245" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1316:1377" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1407:1450" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1580:1645" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1686:2197" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1720:1748" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1799:2195" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="1827:2190" ph="(...)" />
-              <marker date="1537705565637" expanded="true" signature="1853:2183" ph="(...)" />
-              <marker date="1537705565637" expanded="true" signature="1881:1964" ph="(...)" />
-              <marker date="1537705565637" expanded="true" signature="1910:1953" ph="(...)" />
-              <marker date="1537705565637" expanded="true" signature="1990:2174" ph="(...)" />
-              <marker date="1537705565637" expanded="true" signature="2025:2163" ph="(...)" />
-              <marker date="1537705565637" expanded="true" signature="10356:10389" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="10508:10540" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="10700:10732" ph="{...}" />
-              <marker date="1537705565637" expanded="true" signature="10828:10853" ph="{...}" />
-            </folding>
+          <first_editor relative-caret-position="75">
+            <caret line="5" column="36" lean-forward="false" selection-start-line="5" selection-start-column="36" selection-end-line="5" selection-end-column="36" />
+            <folding />
           </first_editor>
           <second_editor />
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-330">
+          <caret line="1" column="89" lean-forward="false" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="89" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="293">
+          <caret line="23" column="43" lean-forward="false" selection-start-line="23" selection-start-column="43" selection-end-line="23" selection-end-column="43" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="397">
-          <caret line="53" column="36" lean-forward="false" selection-start-line="53" selection-start-column="12" selection-end-line="53" selection-end-column="36" />
+        <state relative-caret-position="376">
+          <caret line="48" column="40" lean-forward="true" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
           <folding>
             <element signature="e#814#834#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="523">
-          <caret line="95" column="12" lean-forward="false" selection-start-line="95" selection-start-column="12" selection-end-line="95" selection-end-column="12" />
-          <folding />
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="441">
+            <caret line="343" column="0" lean-forward="true" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
+            <folding>
+              <marker date="1537746768594" expanded="false" signature="863:961" ph="..." />
+              <marker date="1537746768594" expanded="true" signature="1005:1113" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="1005:2052" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="1051:1091" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="1790:1851" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="1881:1924" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="1984:2049" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="2179:2244" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="2285:2874" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="2319:2347" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="2398:2872" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="2426:2867" ph="(...)" />
+              <marker date="1537746768594" expanded="true" signature="2452:2860" ph="(...)" />
+              <marker date="1537746768594" expanded="true" signature="2480:2563" ph="(...)" />
+              <marker date="1537746768594" expanded="true" signature="2509:2552" ph="(...)" />
+              <marker date="1537746768594" expanded="true" signature="2589:2851" ph="(...)" />
+              <marker date="1537746768594" expanded="true" signature="2624:2840" ph="(...)" />
+              <marker date="1537746768594" expanded="true" signature="2703:2770" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="10455:10463" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="10582:10590" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="10750:10758" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="10854:10862" ph="{...}" />
+              <marker date="1537746768594" expanded="true" signature="11040:11046" ph="{...}" />
+            </folding>
+          </first_editor>
+          <second_editor />
         </state>
       </provider>
     </entry>

@@ -143,10 +143,8 @@ public class WebViewActivity extends AppCompatActivity {
         else
             settings.setTextZoom(100);
 
-        if (options.progressBar) {
+        if (options.progressBar)
             progressBar = findViewById(R.id.progressBar);
-            progressBar.setMax(100);
-        }
 
         actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
 
@@ -242,13 +240,14 @@ public class WebViewActivity extends AppCompatActivity {
             if (canGoBack())
                 goBack();
             else if (options.closeOnCannotGoBack)
-                close();
+                InAppBrowserFlutterPlugin.close();
             return true;
         }
         return super.onKeyDown(keyCode, event);
     }
 
     public void close() {
+        hide();
         finish();
     }
 
@@ -277,15 +276,15 @@ public class WebViewActivity extends AppCompatActivity {
 
     public void hide() {
         isHidden = true;
-        Intent openMainActivity= new Intent(this, InAppBrowserFlutterPlugin.registrar.activity().getClass());
-        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivityIfNeeded(openMainActivity, 0);
+        Intent openActivity = new Intent(this, InAppBrowserFlutterPlugin.registrar.activity().getClass());
+        openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivityIfNeeded(openActivity, 0);
     }
     public void show() {
         isHidden = false;
-        Intent openMainActivity= new Intent(InAppBrowserFlutterPlugin.registrar.activity(), WebViewActivity.class);
-        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivityIfNeeded(openMainActivity, 0);
+        Intent openActivity = new Intent(InAppBrowserFlutterPlugin.registrar.activity(), WebViewActivity.class);
+        openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivityIfNeeded(openActivity, 0);
     }
 
     public void stopLoading(){
@@ -338,7 +337,7 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     public void closeButtonClicked(MenuItem item) {
-        close();
+        InAppBrowserFlutterPlugin.close();
     }
 
 }

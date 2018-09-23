@@ -3,9 +3,7 @@
 [![Pub](https://img.shields.io/pub/v/flutter_inappbrowser.svg)](https://pub.dartlang.org/packages/flutter_inappbrowser)
 
 A Flutter plugin that allows you to open an in-app browser window.
-This plugin is a porting of the popular [cordova-plugin-inappbrowser](https://github.com/apache/cordova-plugin-inappbrowser)!
-
-The Java/Swift code has been reshaped to work with the Flutter API.
+This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://github.com/apache/cordova-plugin-inappbrowser)!
 
 ## Getting Started
 
@@ -33,8 +31,24 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onLoadStop(String url) {
+  Future\ onLoadStop\(String url) async {
     print("\n\nStopped $url\n\n");
+    // print body html
+    print(await this.injectScriptCode("document.body.innerHTML"));
+    
+    // add jquery library and custom javascript
+    await this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
+    this.injectScriptCode("""
+      \$( "body" ).html( "Next Step..." )
+    """);
+    
+    // add custom css
+    this.injectStyleCode("""
+    body {
+      background-color: #3c3c3c !important;
+    }
+    """);
+    this.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
   }
 
   @override
@@ -45,6 +59,12 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   void onExit() {
     print("\n\nBrowser closed!\n\n");
+  }
+  
+  @override
+  void shouldOverrideUrlLoading(String url) {
+    print("\n\n override $url\n\n");
+    this.loadUrl(url);
   }
 
 }
@@ -74,7 +94,9 @@ class _MyAppState extends State<MyApp> {
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {
-            inAppBrowser.open("https://flutter.io/");
+            inAppBrowser.open("https://flutter.io/", options: {
+               "useShouldOverrideUrlLoading": true
+             });
           },
           child: Text("Open InAppBrowser")
           ),
@@ -85,81 +107,85 @@ class _MyAppState extends State<MyApp> {
 }
 ```
 
-### InAppBrowser.open
+### Future\<void\> InAppBrowser.open
 
 Opens a URL in a new InAppBrowser instance or the system browser.
 
 ```dart
-inAppBrowser.open(url, target, options);
+inAppBrowser.open(String url, {Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}});
 ```
 
 Opens an `url` in a new `InAppBrowser` instance or the system browser.
 
-- `url`: The `url` to load __(String)__. Call [encodeUriComponent()] on this if the `url` contains Unicode characters.
+- `url`: The `url` to load. Call `encodeUriComponent()` on this if the `url` contains Unicode characters.
 
-- `target`: The target in which to load the `url`, an optional parameter that defaults to `_self`. __(String)__
+- `headers`: The additional headers to be used in the HTTP request for this URL, specified as a map from name to value.
+
+- `target`: The target in which to load the `url`, an optional parameter that defaults to `_self`.
 
   - `_self`: Opens in the `InAppBrowser`.
   - `_blank`: Opens in the `InAppBrowser`.
   - `_system`: Opens in the system's web browser.
 
-- `options`: Options for the `InAppBrowser`. Optional, defaulting to: `location=yes`. _(String)_
-
-  The `options` string must not contain any blank space, and each feature's name/value pairs must be separated by a comma. Feature names are case insensitive.
+- `options`: Options for the `InAppBrowser`.
 
   All platforms support:
- 
-  - __location__: Set to `yes` or `no` to turn the `InAppBrowser`'s location bar on or off.
- 
+  - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the `shouldOverrideUrlLoading` event. The default value is `false`.
+  - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
+  - __userAgent___: Set the custom WebView's user-agent.
+  - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
+  - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
+  - __hidden__: Set to `true` to create the browser and load the page, but not show it. The `onLoadStop` event fires when loading is complete. Omit or set to `false` (default) to have the browser open and load normally.
+  - __toolbarTop__: Set to `false` to hide the toolbar at the top of the WebView. The default value is `true`.
+  - __toolbarTopBackgroundColor__: Set the custom background color of the toolbat at the top.
+  - __hideUrlBar__: Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
+  - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
+  
   **Android** supports these additional options:
- 
-  - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
-  - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
-  - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
-  - __closebuttoncaption__: set to a string to use as the close button's caption instead of a X. Note that you need to localize this value yourself.
-  - __closebuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the
-  close button color from default, regardless of being a text or default X. Only has effect if user has location set to `yes`.
-  - __footer__: set to `yes` to show a close button in the footer similar to the iOS __Done__ button.
-  The close button will appear the same as for the header hence use __closebuttoncaption__ and __closebuttoncolor__ to set its properties.
-  - __footercolor__: set to a valid hex color string, for example `#00ff00` or `#CC00ff00` (`#aarrggbb`) , and it will change the footer color from default.
-  Only has effect if user has __footer__ set to `yes`.
-  - __hardwareback__: set to `yes` to use the hardware back button to navigate backwards through the `InAppBrowser`'s history. If there is no previous page, the `InAppBrowser` will close.  The default value is `yes`, so you must set it to `no` if you want the back button to simply close the InAppBrowser.
-  - __hidenavigationbuttons__: set to `yes` to hide the navigation buttons on the location toolbar, only has effect if user has location set to `yes`. The default value is `no`.
-  - __hideurlbar__: set to `yes` to hide the url bar on the location toolbar, only has effect if user has location set to `yes`. The default value is `no`.
-  - __navigationbuttoncolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the color of both navigation buttons from default. Only has effect if user has location set to `yes` and not hidenavigationbuttons set to `yes`.
-  - __toolbarcolor__: set to a valid hex color string, for example: `#00ff00`, and it will change the color the toolbar from default. Only has effect if user has location set to `yes`.
-  - __zoom__: set to `yes` to show Android browser's zoom controls, set to `no` to hide them.  Default value is `yes`.
-  - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
-  - __shouldPauseOnSuspend__: Set to `yes` to make InAppBrowser WebView to pause/resume with the app to stop background audio (this may be required to avoid Google Play issues like described in [CB-11013](https://issues.apache.org/jira/browse/CB-11013)).
-  - __useWideViewPort__: Sets whether the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport. When the value of the setting is `no`, the layout width is always set to the width of the WebView control in device-independent (CSS) pixels. When the value is `yes` and the page contains the viewport meta tag, the value of the width specified in the tag is used. If the page does not contain the tag or does not provide a width, then a wide viewport will be used. (defaults to `yes`).
- 
+  
+  - __hideTitleBar__: Set to `true` if you want the title should be displayed. The default value is `false`.
+  - __closeOnCannotGoBack__: Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
+  - __clearSessionCache__: Set to `true` to have the session cookie cache cleared before the new window is opened.
+  - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+  - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
+  - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
+  - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
+  - __useWideViewPort__: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport. When the value of the setting is false, the layout width is always set to the width of the WebView control in device-independent (CSS) pixels. When the value is true and the page contains the viewport meta tag, the value of the width specified in the tag is used. If the page does not contain the tag or does not provide a width, then a wide viewport will be used. The default value is `true`.
+  - __safeBrowsingEnabled__: Set to `true` if you want the Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links. The default value is `true`.
+  - __progressBar__: Set to `false` to hide the progress bar at the bottom of the toolbar at the top. The default value is `true`.
+
   **iOS** supports these additional options:
  
-  - __hidden__: set to `yes` to create the browser and load the page, but not show it. The loadstop event fires when loading is complete. Omit or set to `no` (default) to have the browser open and load normally.
-  - __clearcache__: set to `yes` to have the browser's cookie cache cleared before the new window is opened
-  - __clearsessioncache__: set to `yes` to have the session cookie cache cleared before the new window is opened
-  - __closebuttoncolor__: set as a valid hex color string, for example: `#00ff00`, to change from the default __Done__ button's color. Only applicable if toolbar is not disabled.
-  - __closebuttoncaption__: set to a string to use as the __Done__ button's caption. Note that you need to localize this value yourself.
-  - __disallowoverscroll__: Set to `yes` or `no` (default is `no`). Turns on/off the UIWebViewBounce property.
-  - __hidenavigationbuttons__:  set to `yes` or `no` to turn the toolbar navigation buttons on or off (defaults to `no`). Only applicable if toolbar is not disabled.
-  - __navigationbuttoncolor__:  set as a valid hex color string, for example: `#00ff00`, to change from the default color. Only applicable if navigation buttons are visible.
-  - __toolbar__:  set to `yes` or `no` to turn the toolbar on or off for the InAppBrowser (defaults to `yes`)
-  - __toolbarcolor__: set as a valid hex color string, for example: `#00ff00`, to change from the default color of the toolbar. Only applicable if toolbar is not disabled.
-  - __toolbartranslucent__:  set to `yes` or `no` to make the toolbar translucent(semi-transparent)  (defaults to `yes`). Only applicable if toolbar is not disabled.
-  - __enableViewportScale__:  Set to `yes` or `no` to prevent viewport scaling through a meta tag (defaults to `no`).
-  - __mediaPlaybackRequiresUserAction__: Set to `yes` to prevent HTML5 audio or video from autoplaying (defaults to `no`).
-  - __allowInlineMediaPlayback__: Set to `yes` or `no` to allow in-line HTML5 media playback, displaying within the browser window rather than a device-specific playback interface. The HTML's `video` element must also include the `webkit-playsinline` attribute (defaults to `no`)
-  - __keyboardDisplayRequiresUserAction__: Set to `yes` or `no` to open the keyboard when form elements receive focus via JavaScript's `focus()` call (defaults to `yes`).
-  - __suppressesIncrementalRendering__: Set to `yes` or `no` to wait until all new view content is received before being rendered (defaults to `no`).
-  - __presentationstyle__:  Set to `pagesheet`, `formsheet` or `fullscreen` to set the [presentation style](http://developer.apple.com/library/ios/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle) (defaults to `fullscreen`).
-  - __transitionstyle__: Set to `fliphorizontal`, `crossdissolve` or `coververtical` to set the [transition style](http://developer.apple.com/library/ios/#documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle) (defaults to `coververtical`).
-  - __toolbarposition__: Set to `top` or `bottom` (default is `bottom`). Causes the toolbar to be at the top or bottom of the window.
-  - __hidespinner__: Set to `yes` or `no` to change the visibility of the loading indicator (defaults to `no`).
+  - __disallowOverScroll__: Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
+  - __toolbarBottom__: Set to `false` to hide the toolbar at the bottom of the WebView. The default value is `true`.
+  - __toolbarBottomBackgroundColor__: Set the custom background color of the toolbat at the bottom.
+  - __toolbarBottomTranslucent__: Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
+  - __closeButtonCaption__: Set the custom text for the close button.
+  - __closeButtonColor__: Set the custom color for the close button.
+  - __presentationStyle__: Set the custom modal presentation style when presenting the WebView. The default value is `0 //fullscreen`. See [UIModalPresentationStyle](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) for all the available styles. 
+  - __transitionStyle__: Set to the custom transition style when presenting the WebView. The default value is `0 //crossDissolve`. See [UIModalTransitionStyle](https://developer.apple.com/documentation/uikit/uimodaltransitionStyle) for all the available styles.
+  - __enableViewportScale__: Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
+  - __keyboardDisplayRequiresUserAction__: Set to `true` if you want the user must explicitly tap the elements in the WebView to display the keyboard (or other relevant input view) for that element. When set to `false`, a focus event on an element causes the input view to be displayed and associated with that element automatically. The default value is `true`.
+  - __suppressesIncrementalRendering__: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory.. The default value is `false`.
+  - __allowsAirPlayForMediaPlayback__: Set to `true` to allow AirPlay. The default value is `true`.
+  - __allowsBackForwardNavigationGestures__: Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
+  - __allowsLinkPreview__: Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
+  - __ignoresViewportScaleLimits__: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent. The ignoresViewportScaleLimits property overrides the `user-scalable` HTML property in a webpage. The default value is `false`.
+  - __allowsInlineMediaPlayback__: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls. For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
+  - __allowsPictureInPictureMediaPlayback__: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
+  - __spinner__: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
   
 Example:
 ```dart
-inAppBrowser.open('https://flutter.io/', '_blank', 'location=yes,hideurlbar=yes');
-inAppBrowser.open('https://www.google.com/', '_blank', 'location=yes,toolbarposition=top,disallowoverscroll=yes');
+inAppBrowser.open('https://flutter.io/', options: {
+  "useShouldOverrideUrlLoading": true,
+  "clearCache": true,
+  "disallowOverScroll": true,
+  "domStorageEnabled": true,
+  "supportZoom": false,
+  "toolbarBottomTranslucent": false,
+  "allowsLinkPreview": false
+});
 ``` 
 
 ### Events
@@ -168,7 +194,7 @@ Event fires when the `InAppBrowser` starts to load an `url`.
 ```dart
   @override
   void onLoadStart(String url) {
-    super.onLoadStart(url);
+  
   }
 ```
 
@@ -176,7 +202,7 @@ Event fires when the `InAppBrowser` finishes loading an `url`.
 ```dart
   @override
   void onLoadStop(String url) {
-    super.onLoadStop(url);
+  
   }
 ```
 
@@ -184,7 +210,7 @@ Event fires when the `InAppBrowser` encounters an error loading an `url`.
 ```dart
   @override
   void onLoadError(String url, String code, String message) {
-    super.onLoadStop(url);
+  
   }
 ```
 
@@ -192,88 +218,136 @@ Event fires when the `InAppBrowser` window is closed.
 ```dart
   @override
   void onExit() {
-    super.onExit();
+  
   }
 ```
 
-### InAppBrowser.show
+Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
+```dart
+  @override
+  void shouldOverrideUrlLoading(String url) {
+
+  }
+```
+
+### Future\<void\> InAppBrowser.loadUrl
+
+Loads the given `url` with optional `headers` specified as a map from name to value.
+
+```dart
+inAppBrowser.loadUrl(String url, {Map<String, String> headers = const {}});
+```
+
+### Future\<void\> InAppBrowser.show
 
 Displays an `InAppBrowser` window that was opened hidden. Calling this has no effect if the `InAppBrowser` was already visible.
 
-Example:
 ```dart
 inAppBrowser.show();
 ``` 
 
-### InAppBrowser.hide
+### Future\<void\> InAppBrowser.hide
 
 Hides the `InAppBrowser` window. Calling this has no effect if the `InAppBrowser` was already hidden.
 
-Example:
 ```dart
 inAppBrowser.hide();
 ``` 
 
-### InAppBrowser.close
+### Future\<void\> InAppBrowser.close
 
-Closes the`InAppBrowser` window.
+Closes the `InAppBrowser` window.
 
-Example:
 ```dart
 inAppBrowser.close();
 ``` 
 
-### InAppBrowser.injectScriptCode
+### Future\<void\> InAppBrowser.reload
 
-Injects JavaScript code into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
+Reloads the `InAppBrowser` window.
 
-Example:
 ```dart
-inAppBrowser.injectScriptCode("""
-  alert("JavaScript injected");
-""");
+inAppBrowser.reload();
 ``` 
 
-### InAppBrowser.injectScriptFile
+### Future\<void\> InAppBrowser.goBack
+
+Goes back in the history of the `InAppBrowser` window.
+
+```dart
+inAppBrowser.goBack();
+``` 
+
+### Future\<void\> InAppBrowser.goForward
+
+Goes forward in the history of the `InAppBrowser` window.
+
+```dart
+inAppBrowser.goForward();
+``` 
+
+### Future\<bool\> InAppBrowser.isLoading
+
+Check if the Web View of the `InAppBrowser` instance is in a loading state.
+
+```dart
+inAppBrowser.isLoading();
+``` 
+
+### Future\<void\> InAppBrowser.stopLoading
+
+Stops the Web View of the `InAppBrowser` instance from loading.
+
+```dart
+inAppBrowser.stopLoading();
+``` 
+
+### Future\<bool\> InAppBrowser.isHidden
+
+Check if the Web View of the `InAppBrowser` instance is hidden.
+
+```dart
+inAppBrowser.isHidden();
+``` 
+
+### Future\<String\> InAppBrowser.injectScriptCode
+
+Injects JavaScript code into the `InAppBrowser` window and returns the result of the evaluation. (Only available when the target is set to `_blank` or to `_self`)
+
+```dart
+inAppBrowser.injectScriptCode(String source);
+``` 
+
+### Future\<void\> InAppBrowser.injectScriptFile
 
 Injects a JavaScript file into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
 
-Example:
 ```dart
-inAppBrowser.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
-inAppBrowser.injectScriptCode("""
-  \$( "body" ).html( "Next Step..." )
-""");
+inAppBrowser.injectScriptFile(String urlFile);
 ``` 
 
-### InAppBrowser.injectStyleCode
+### Future\<void\> InAppBrowser.injectStyleCode
 
 Injects CSS into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
 
-Example:
 ```dart
-inAppBrowser.injectStyleCode("""
-    body {
-      background-color: #3c3c3c;
-    }
-""");
+inAppBrowser.injectStyleCode(String source);
 ``` 
 
-### InAppBrowser.injectStyleFile
+### Future\<void\> InAppBrowser.injectStyleFile
 
 Injects a CSS file into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
 
-Example:
 ```dart
-inAppBrowser.injectStyleFile("https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css");
+inAppBrowser.injectStyleFile(String urlFile);
 ``` 
 
 ## Screenshots:
 
 iOS:
 
-![ios](https://user-images.githubusercontent.com/5956938/45523056-52c7c980-b7c7-11e8-8bf1-488c9c8033bf.gif)
+![ios](https://user-images.githubusercontent.com/5956938/45934084-2a935400-bf99-11e8-9d71-9e1758b5b8c6.gif)
 
 Android:
 
-![android](https://user-images.githubusercontent.com/5956938/45523058-55c2ba00-b7c7-11e8-869c-c1738711933f.gif)
+![android](https://user-images.githubusercontent.com/5956938/45934080-26ffcd00-bf99-11e8-8136-d39a81bd83e7.gif)

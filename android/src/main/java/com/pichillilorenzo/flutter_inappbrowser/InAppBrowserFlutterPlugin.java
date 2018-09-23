@@ -436,8 +436,8 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   }
 
 
-  public void close() {
-    this.activity.runOnUiThread(new Runnable() {
+  public static void close() {
+    registrar.activity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
 

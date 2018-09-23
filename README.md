@@ -29,25 +29,21 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   void onLoadStart(String url) {
-    super.onLoadStart(url);
     print("\n\nStarted $url\n\n");
   }
 
   @override
   void onLoadStop(String url) {
-    super.onLoadStop(url);
     print("\n\nStopped $url\n\n");
   }
 
   @override
   void onLoadError(String url, int code, String message) {
-    super.onLoadError(url, code, message);
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
 
   @override
   void onExit() {
-    super.onExit();
     print("\n\nBrowser closed!\n\n");
   }
 

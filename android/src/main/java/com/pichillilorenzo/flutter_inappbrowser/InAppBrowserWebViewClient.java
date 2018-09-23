@@ -28,6 +28,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
 
+        //return true;
+
         if (url.startsWith(WebView.SCHEME_TEL)) {
             try {
                 Intent intent = new Intent(Intent.ACTION_DIAL);

@@ -7,6 +7,7 @@ import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,10 +35,12 @@ public class WebViewActivity extends AppCompatActivity {
     InAppBrowserOptions options;
     ProgressBar progressBar;
     public boolean isLoading = false;
+    public boolean isHidden = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         setContentView(R.layout.activity_web_view);
 
         webView = findViewById(R.id.webView);
@@ -273,23 +276,27 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     public void hide() {
-        if (webView != null)
-            webView.setVisibility(View.INVISIBLE);
+        isHidden = true;
+        Intent openMainActivity= new Intent(this, InAppBrowserFlutterPlugin.registrar.activity().getClass());
+        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivityIfNeeded(openMainActivity, 0);
     }
     public void show() {
+        isHidden = false;
+        Intent openMainActivity= new Intent(InAppBrowserFlutterPlugin.registrar.activity(), WebViewActivity.class);
+        openMainActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+        startActivityIfNeeded(openMainActivity, 0);
+    }
+
+    public void stopLoading(){
         if (webView != null)
-            webView.setVisibility(View.VISIBLE);
+            webView.stopLoading();
     }
 
     public boolean isLoading() {
         if (webView != null)
             return isLoading;
         return false;
-    }
-
-    public void stopLoading(){
-        if (webView != null)
-            webView.stopLoading();
     }
 
     private void clearCookies() {

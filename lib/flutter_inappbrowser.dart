@@ -173,8 +173,13 @@ class InAppBrowser {
     return await _channel.invokeMethod('stopLoading');
   }
 
+  ///Check if the Web View of the [InAppBrowser] instance is hidden.
+  Future<bool> isHidden() async {
+    return await _channel.invokeMethod('isHidden');
+  }
+
   ///Injects JavaScript code into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
-  Future<dynamic> injectScriptCode(String source) async {
+  Future<String> injectScriptCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     return await _channel.invokeMethod('injectScriptCode', args);

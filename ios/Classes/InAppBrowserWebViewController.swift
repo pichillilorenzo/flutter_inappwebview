@@ -79,6 +79,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     var tmpWindow: UIWindow?
     var browserOptions: InAppBrowserOptions?
     var initHeaders: [String: String]?
+    var isHidden = false
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!

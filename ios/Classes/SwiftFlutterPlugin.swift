@@ -87,6 +87,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             self.webViewController?.webView.stopLoading()
             result(true)
             break
+        case "isHidden":
+            result((self.webViewController?.isHidden ?? false) == true)
+            break
         case "injectScriptCode":
             self.injectScriptCode(arguments: arguments!, result: result)
             break
@@ -176,76 +179,97 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let browserOptions = InAppBrowserOptions()
         browserOptions.parse(options: options)
         
-        if webViewController == nil {
-
-            if !(self.tmpWindow != nil) {
-                let frame: CGRect = UIScreen.main.bounds
-                self.tmpWindow = UIWindow(frame: frame)
-            }
-            
-            let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: nil)
-            let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
-            webViewController = vc as? InAppBrowserWebViewController
-            webViewController?.browserOptions = browserOptions
-            webViewController?.tmpWindow = tmpWindow
-            webViewController?.currentURL = url
-            webViewController?.initHeaders = headers
-            webViewController?.navigationDelegate = self
+        if webViewController != nil {
+            close()
+        }
+        else if self.previousStatusBarStyle == -1 {
+            self.previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         }
         
-        if !browserOptions.hidden {
-            show()
+        if !(self.tmpWindow != nil) {
+            let frame: CGRect = UIScreen.main.bounds
+            self.tmpWindow = UIWindow(frame: frame)
+        }
+        
+        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: nil)
+        let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
+        webViewController = vc as? InAppBrowserWebViewController
+        webViewController?.browserOptions = browserOptions
+        webViewController?.isHidden = browserOptions.hidden
+        webViewController?.tmpWindow = tmpWindow
+        webViewController?.currentURL = url
+        webViewController?.initHeaders = headers
+        webViewController?.navigationDelegate = self
+
+        let tmpController = UIViewController()
+        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
+        self.tmpWindow?.rootViewController = tmpController
+        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+        self.tmpWindow?.makeKeyAndVisible()
+        if browserOptions.hidden {
+            webViewController!.view.isHidden = true
+            tmpController.present(self.webViewController!, animated: false, completion: {() -> Void in
+                if self.previousStatusBarStyle != -1 {
+                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+                }
+            })
+            if self.previousStatusBarStyle != -1 {
+                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+            }
+            webViewController?.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
+                self.tmpWindow?.windowLevel = 0.0
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                if self.previousStatusBarStyle != -1 {
+                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+                }
+            })
+        }
+        else {
+            tmpController.present(webViewController!, animated: true, completion: nil)
         }
     }
     
     public func show() {
+        
         if webViewController == nil {
-            print("Tried to show IAB after it was closed.")
-            return
-        }
-        if previousStatusBarStyle != -1 {
-            print("Tried to show IAB while already shown")
+            print("Tried to hide IAB after it was closed.")
             return
         }
         
-        weak var weakSelf: SwiftFlutterPlugin? = self
+        self.webViewController?.isHidden = false
+        self.webViewController!.view.isHidden = false
         
         // Run later to avoid the "took a long time" log message.
         DispatchQueue.main.async(execute: {() -> Void in
-            if weakSelf?.webViewController != nil {
-                if !(self.tmpWindow != nil) {
-                    let frame: CGRect = UIScreen.main.bounds
-                    self.tmpWindow = UIWindow(frame: frame)
-                }
-                let tmpController = UIViewController()
+            if self.webViewController != nil {
                 let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-                self.tmpWindow?.rootViewController = tmpController
                 self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
                 self.tmpWindow?.makeKeyAndVisible()
-                
-                tmpController.present(self.webViewController!, animated: true, completion: nil)
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                self.tmpWindow?.rootViewController?.present(self.webViewController!, animated: true, completion: nil)
             }
         })
     }
-    
+
     public func hide() {
         if webViewController == nil {
             print("Tried to hide IAB after it was closed.")
             return
         }
-        if previousStatusBarStyle == -1 {
-            print("Tried to hide IAB while already hidden")
-            return
+        
+        if self.webViewController != nil {
+            self.webViewController?.isHidden = true
         }
         
-        previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         // Run later to avoid the "took a long time" log message.
         DispatchQueue.main.async(execute: {() -> Void in
             if self.webViewController != nil {
-                self.previousStatusBarStyle = -1
                 self.webViewController?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
                     self.tmpWindow?.windowLevel = 0.0
                     UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                    if self.previousStatusBarStyle != -1 {
+                        UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+                    }
                 })
             }
         })
@@ -345,8 +369,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)!
         }
         
-        previousStatusBarStyle = -1
-        // this value was reset before reapplying it. caused statusbar to stay black on ios7
     }
     
 }

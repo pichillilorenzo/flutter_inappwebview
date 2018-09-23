@@ -5,30 +5,30 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 class MyInAppBrowser extends InAppBrowser {
 
   @override
-  void onLoadStart(String url) {
-    super.onLoadStart(url);
+  Future onLoadStart(String url) async {
     print("\n\nStarted $url\n\n");
+    //print("\n\n ${await this.isHidden()} \n\n");
   }
 
   @override
-  void onLoadStop(String url) async {
-    super.onLoadStop(url);
+  Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
-    print(await this.injectScriptCode("document.body.innerHTML"));
-    print(await this.injectScriptCode("3"));
-    print(await this.injectScriptCode("""
-      function asd (a,b) {
-        return a+b;
-       };
-       asd(3,5);
-    """));
-    print(await this.injectScriptCode("""
-      ["3",56,"sdf"];
-    """));
-    print(await this.injectScriptCode("""
-      var x = {"as":4, "dfdfg": 6};
-      x;
-    """));
+//    print(await this.injectScriptCode("document.body.innerHTML"));
+//    print(await this.injectScriptCode("3"));
+//    print(await this.injectScriptCode("""
+//      function asd (a,b) {
+//        return a+b;
+//       };
+//       asd(3,5);
+//    """));
+//    print(await this.injectScriptCode("""
+//      ["3",56,"sdf"];
+//    """));
+//    print(await this.injectScriptCode("""
+//      var x = {"as":4, "dfdfg": 6};
+//      x;
+//    """));
+    //print("\n\n ${await this.isHidden()} \n\n");
     /*this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
     this.injectScriptCode("""
       \$( "body" ).html( "Next Step..." )
@@ -44,13 +44,11 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   void onLoadError(String url, int code, String message) {
-    super.onLoadError(url, code, message);
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
 
   @override
   void onExit() {
-    super.onExit();
     print("\n\nBrowser closed!\n\n");
   }
 
@@ -81,12 +79,14 @@ class _MyAppState extends State<MyApp> {
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {
-            inAppBrowser.open("https://flutter.io/", options: {
-              //"toolbarTopFixedTitle": "Fixed title",
-              //"hideUrlBar": true,
-              //"toolbarTop": false,
-              //"toolbarBottom": false
-            });
+              inAppBrowser.open("https://flutter.io/", options: {
+                //"hidden": true
+                //"toolbarTopFixedTitle": "Fixed title",
+                //"hideUrlBar": true,
+                //"toolbarTop": false,
+                //"toolbarBottom": false
+              });
+
           },
           child: Text("Open InAppBrowser")
           ),

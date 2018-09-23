@@ -195,12 +195,15 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       case "canGoForward":
         result.success(canGoForward());
         break;
-      case "isLoading":
-        result.success(isLoading());
-        break;
       case "stopLoading":
         stopLoading();
         result.success(true);
+        break;
+      case "isLoading":
+        result.success(isLoading());
+        break;
+      case "isHidden":
+        result.success(isHidden());
         break;
       default:
         result.notImplemented();
@@ -343,7 +346,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
     // If the current app package isn't a target for this URL, then use
     // the normal launch behavior
-    if (hasCurrentPackage == false || targetIntents.size() == 0) {
+    if (!hasCurrentPackage || targetIntents.size() == 0) {
       activity.startActivity(intent);
     }
     // If there's only one possible intent, launch it directly
@@ -397,6 +400,12 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   public boolean isLoading() {
     if (webViewActivity != null)
       return webViewActivity.isLoading();
+    return false;
+  }
+
+  public boolean isHidden() {
+    if (webViewActivity != null)
+      return webViewActivity.isHidden;
     return false;
   }
 

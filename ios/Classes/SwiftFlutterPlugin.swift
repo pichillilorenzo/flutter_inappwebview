@@ -339,25 +339,29 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    func webViewDidStartLoad(_ webView: WKWebView) {
+    func onLoadStart(_ webView: WKWebView) {
         let url: String = webViewController!.currentURL!.absoluteString
-        channel.invokeMethod("loadstart", arguments: ["url": url])
+        channel.invokeMethod("onLoadStart", arguments: ["url": url])
     }
     
-    func webViewDidFinishLoad(_ webView: WKWebView) {
+    func onLoadStop(_ webView: WKWebView) {
         let url: String = webViewController!.currentURL!.absoluteString
-        channel.invokeMethod("loadstop", arguments: ["url": url])
+        channel.invokeMethod("onLoadStop", arguments: ["url": url])
     }
     
-    func webViewDidFailLoadWithError(_ webView: WKWebView, error: Error) {
+    func onLoadError(_ webView: WKWebView, error: Error) {
         let url: String = webViewController!.currentURL!.absoluteString
         let arguments = ["url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
-        channel.invokeMethod("loaderror", arguments: arguments)
+        channel.invokeMethod("onLoadError", arguments: arguments)
+    }
+    
+    func shouldOverrideUrlLoading(_ webView: WKWebView, url: URL) {
+        channel.invokeMethod("shouldOverrideUrlLoading", arguments: ["url": url.absoluteString])
     }
     
     func browserExit() {
         
-        channel.invokeMethod("exit", arguments: [])
+        channel.invokeMethod("onExit", arguments: [])
         
         // Set navigationDelegate to nil to ensure no callbacks are received from it.
         webViewController?.navigationDelegate = nil

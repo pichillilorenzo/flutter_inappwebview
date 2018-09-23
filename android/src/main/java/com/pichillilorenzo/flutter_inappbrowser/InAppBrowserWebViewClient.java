@@ -28,7 +28,12 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     @Override
     public boolean shouldOverrideUrlLoading(WebView webView, String url) {
 
-        //return true;
+        if (activity.options.useShouldOverrideUrlLoading) {
+            Map<String, Object> obj = new HashMap<>();
+            obj.put("url", url);
+            InAppBrowserFlutterPlugin.channel.invokeMethod("shouldOverrideUrlLoading", obj);
+            return true;
+        }
 
         if (url.startsWith(WebView.SCHEME_TEL)) {
             try {
@@ -81,11 +86,9 @@ public class InAppBrowserWebViewClient extends WebViewClient {
                 Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
             }
         }
-        else {
-            return super.shouldOverrideUrlLoading(webView, url);
-        }
 
-        return false;
+        return super.shouldOverrideUrlLoading(webView, url);
+
     }
 
 
@@ -108,7 +111,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         Map<String, Object> obj = new HashMap<>();
         obj.put("url", url);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("loadstart", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStart", obj);
     }
 
 
@@ -131,7 +134,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         Map<String, Object> obj = new HashMap<>();
         obj.put("url", url);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("loadstop", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStop", obj);
     }
 
     public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
@@ -143,7 +146,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         obj.put("url", failingUrl);
         obj.put("code", errorCode);
         obj.put("message", description);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("loaderror", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
     }
 
     public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error) {
@@ -175,7 +178,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
                 break;
         }
         obj.put("message", "SslError: " + message);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("loaderror", obj);
+        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
 
         handler.cancel();
     }

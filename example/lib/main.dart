@@ -52,6 +52,11 @@ class MyInAppBrowser extends InAppBrowser {
     print("\n\nBrowser closed!\n\n");
   }
 
+  @override
+  void shouldOverrideUrlLoading(String url) {
+    print("\n\n override $url\n\n");
+    this.loadUrl(url);
+  }
 }
 
 MyInAppBrowser inAppBrowser = new MyInAppBrowser();
@@ -80,8 +85,9 @@ class _MyAppState extends State<MyApp> {
         body: new Center(
           child: new RaisedButton(onPressed: () {
               inAppBrowser.open("https://flutter.io/", options: {
-                //"hidden": true
+                //"hidden": true,
                 //"toolbarTopFixedTitle": "Fixed title",
+                "useShouldOverrideUrlLoading": true
                 //"hideUrlBar": true,
                 //"toolbarTop": false,
                 //"toolbarBottom": false

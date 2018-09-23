@@ -38,6 +38,7 @@ public class InAppBrowserOptions: NSObject {
     var allowsPictureInPictureMediaPlayback = true
     var javaScriptCanOpenWindowsAutomatically = false
     var javaScriptEnabled = true
+    var useShouldOverrideUrlLoading = false
     
     override init(){
         super.init()
@@ -45,7 +46,7 @@ public class InAppBrowserOptions: NSObject {
     
     public func parse(options: [String: Any]) {
         for (key, value) in options {
-            if self.value(forKey: key) != nil {
+            if self.responds(to: Selector(key)) {
                 self.setValue(value, forKey: key)
             }
         }

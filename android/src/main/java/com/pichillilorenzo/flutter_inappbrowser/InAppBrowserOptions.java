@@ -29,6 +29,7 @@ public class InAppBrowserOptions {
     boolean domStorageEnabled = true;
     boolean useWideViewPort = true;
     boolean safeBrowsingEnabled = true;
+    boolean useShouldOverrideUrlLoading = false;
 
     public void parse(HashMap<String, Object> options) {
         Iterator it = options.entrySet().iterator();

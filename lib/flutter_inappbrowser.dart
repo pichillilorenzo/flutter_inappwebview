@@ -34,22 +34,26 @@ class InAppBrowser {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch(call.method) {
-      case "loadstart":
+      case "onLoadStart":
         String url = call.arguments["url"];
         onLoadStart(url);
         break;
-      case "loadstop":
+      case "onLoadStop":
         String url = call.arguments["url"];
         onLoadStop(url);
         break;
-      case "loaderror":
+      case "onLoadError":
         String url = call.arguments["url"];
         int code = call.arguments["code"];
         String message = call.arguments["message"];
         onLoadError(url, code, message);
         break;
-      case "exit":
+      case "onExit":
         onExit();
+        break;
+      case "shouldOverrideUrlLoading":
+        String url = call.arguments["url"];
+        shouldOverrideUrlLoading(url);
         break;
     }
     return new Future.value("");
@@ -223,6 +227,10 @@ class InAppBrowser {
 
   ///Event fires when the [InAppBrowser] window is closed.
   void onExit() {
+
+  }
+
+  void shouldOverrideUrlLoading(String url) {
 
   }
 

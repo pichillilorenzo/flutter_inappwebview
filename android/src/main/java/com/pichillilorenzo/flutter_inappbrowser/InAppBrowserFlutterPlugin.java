@@ -78,7 +78,6 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar, registrar.activity()));
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
   @Override
   public void onMethodCall(MethodCall call, final Result result) {
     String source;
@@ -443,7 +442,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       public void run() {
 
       Map<String, Object> obj = new HashMap<>();
-      channel.invokeMethod("exit", obj);
+      channel.invokeMethod("onExit", obj);
 
       // The JS protects against multiple calls, so this should happen only when
       // close() is called by other native code.

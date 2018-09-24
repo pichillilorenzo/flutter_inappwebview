@@ -11,17 +11,82 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" afterPath="$PROJECT_DIR$/CHANGELOG.md" />
-      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" afterPath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" afterPath="$PROJECT_DIR$/example/lib/main.dart" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" />
-      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" afterPath="$PROJECT_DIR$/pubspec.yaml" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/.gitignore" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/CHANGELOG.md" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/LICENSE" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/README.md" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/android/.gitignore" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/android/build.gradle" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/android/gradle.properties" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/android/settings.gradle" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/android/src/main/AndroidManifest.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/android/src/main/java/com/pichillilorenzo/flutterplugin/FlutterPlugin.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/.gitignore" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/.metadata" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/README.md" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/build.gradle" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/AndroidManifest.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/java/com/pichillilorenzo/flutterpluginexample/MainActivity.java" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/drawable/launch_background.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/mipmap-hdpi/ic_launcher.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/mipmap-mdpi/ic_launcher.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/mipmap-xhdpi/ic_launcher.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/mipmap-xxhdpi/ic_launcher.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/mipmap-xxxhdpi/ic_launcher.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/app/src/main/res/values/styles.xml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/build.gradle" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/gradle.properties" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/gradle/wrapper/gradle-wrapper.properties" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/android/settings.gradle" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Flutter/AppFrameworkInfo.plist" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Flutter/Debug.xcconfig" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Flutter/Release.xcconfig" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Podfile" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner.xcodeproj/project.pbxproj" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner.xcodeproj/project.xcworkspace/contents.xcworkspacedata" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner.xcodeproj/xcshareddata/xcschemes/Runner.xcscheme" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner.xcworkspace/contents.xcworkspacedata" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner.xcworkspace/xcshareddata/IDEWorkspaceChecks.plist" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/AppDelegate.swift" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Contents.json" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-1024x1024@1x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@1x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-20x20@3x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@1x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-29x29@3x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@1x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-40x40@3x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-60x60@3x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@1x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-76x76@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/AppIcon.appiconset/Icon-App-83.5x83.5@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/Contents.json" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@2x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/LaunchImage@3x.png" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Assets.xcassets/LaunchImage.imageset/README.md" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Base.lproj/LaunchScreen.storyboard" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Base.lproj/Main.storyboard" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Info.plist" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Runner-Bridging-Header.h" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/ios/Runner/Storyboard.storyboard" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/lib/main.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/pubspec.yaml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/example/test/widget_test.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/ios/.gitignore" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/ios/Assets/.gitkeep" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/ios/Classes/FlutterPlugin.h" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/ios/Classes/FlutterPlugin.m" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/ios/Classes/SwiftFlutterPlugin.swift" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/ios/flutter_plugin.podspec" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/lib/flutter_plugin.dart" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/flutter_plugin/pubspec.yaml" afterPath="" />
+      <change beforePath="$PROJECT_DIR$/example/ios/Runner.xcodeproj/project.pbxproj" afterPath="$PROJECT_DIR$/example/ios/Runner.xcodeproj/project.pbxproj" />
+      <change beforePath="$PROJECT_DIR$/flutter_inappbrowser.iml" afterPath="$PROJECT_DIR$/flutter_inappbrowser.iml" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -42,7 +107,7 @@
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="376">
-              <caret line="48" column="40" lean-forward="true" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
+              <caret line="48" column="40" lean-forward="false" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
               <folding>
                 <element signature="e#814#834#0" expanded="true" />
               </folding>
@@ -53,19 +118,29 @@
       <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="293">
-              <caret line="23" column="43" lean-forward="false" selection-start-line="23" selection-start-column="43" selection-end-line="23" selection-end-column="43" />
+            <state relative-caret-position="113">
+              <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
               <folding />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="pubspec.yaml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="1" column="89" lean-forward="false" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="89" />
+              <folding />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="441">
-                <caret line="343" column="0" lean-forward="true" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
+              <first_editor relative-caret-position="649">
+                <caret line="343" column="0" lean-forward="false" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
                 <folding>
                   <marker date="1537746768594" expanded="false" signature="863:961" ph="..." />
                   <marker date="1537746768594" expanded="true" signature="1005:1113" ph="{...}" />
@@ -215,6 +290,11 @@
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
+              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
+              <item name="example" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
@@ -496,13 +576,6 @@
     <watches-manager />
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/example/android/app/src/main/AndroidManifest.xml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="65" lean-forward="false" selection-start-line="7" selection-start-column="65" selection-end-line="7" selection-end-column="65" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/android/src/main/AndroidManifest.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="90">
@@ -814,26 +887,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-330">
-          <caret line="1" column="89" lean-forward="false" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="89" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="293">
-          <caret line="23" column="43" lean-forward="false" selection-start-line="23" selection-start-column="43" selection-end-line="23" selection-end-column="43" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="376">
-          <caret line="48" column="40" lean-forward="true" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
+          <caret line="48" column="40" lean-forward="false" selection-start-line="48" selection-start-column="40" selection-end-line="48" selection-end-column="40" />
           <folding>
             <element signature="e#814#834#0" expanded="true" />
           </folding>
@@ -843,8 +900,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="441">
-            <caret line="343" column="0" lean-forward="true" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
+          <first_editor relative-caret-position="649">
+            <caret line="343" column="0" lean-forward="false" selection-start-line="343" selection-start-column="0" selection-end-line="343" selection-end-column="0" />
             <folding>
               <marker date="1537746768594" expanded="false" signature="863:961" ph="..." />
               <marker date="1537746768594" expanded="true" signature="1005:1113" ph="{...}" />
@@ -872,6 +929,30 @@
             </folding>
           </first_editor>
           <second_editor />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/flutter_plugin/lib/flutter_plugin.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="0" lean-forward="false" selection-start-line="0" selection-start-column="0" selection-end-line="0" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="113">
+          <caret line="11" column="0" lean-forward="false" selection-start-line="11" selection-start-column="0" selection-end-line="11" selection-end-column="0" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="89" lean-forward="false" selection-start-line="1" selection-start-column="81" selection-end-line="1" selection-end-column="89" />
+          <folding />
         </state>
       </provider>
     </entry>

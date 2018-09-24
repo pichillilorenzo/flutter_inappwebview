@@ -31,7 +31,7 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future\ onLoadStop\(String url) async {
+  Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
     // print body html
     print(await this.injectScriptCode("document.body.innerHTML"));

@@ -9,28 +9,35 @@ import java.util.HashMap;
 
 public class InAppBrowserOptions {
 
-    boolean useShouldOverrideUrlLoading = false;
-    boolean clearCache = false;
-    String userAgent = "";
-    boolean javaScriptEnabled = true;
-    boolean javaScriptCanOpenWindowsAutomatically = false;
-    boolean hidden = false;
-    boolean toolbarTop = true;
-    String toolbarTopBackgroundColor = "";
-    String toolbarTopFixedTitle = "";
-    boolean hideUrlBar = false;
-    boolean mediaPlaybackRequiresUserGesture = true;
+    public boolean useShouldOverrideUrlLoading = false;
+    public boolean clearCache = false;
+    public String userAgent = "";
+    public boolean javaScriptEnabled = true;
+    public boolean javaScriptCanOpenWindowsAutomatically = false;
+    public boolean hidden = false;
+    public boolean toolbarTop = true;
+    public String toolbarTopBackgroundColor = "";
+    public String toolbarTopFixedTitle = "";
+    public boolean hideUrlBar = false;
+    public boolean mediaPlaybackRequiresUserGesture = true;
 
-    boolean hideTitleBar = false;
-    boolean closeOnCannotGoBack = true;
-    boolean clearSessionCache = false;
-    boolean builtInZoomControls = false;
-    boolean supportZoom = true;
-    boolean databaseEnabled = false;
-    boolean domStorageEnabled = false;
-    boolean useWideViewPort = true;
-    boolean safeBrowsingEnabled = true;
-    boolean progressBar = true;
+    public boolean hideTitleBar = false;
+    public boolean closeOnCannotGoBack = true;
+    public boolean clearSessionCache = false;
+    public boolean builtInZoomControls = false;
+    public boolean supportZoom = true;
+    public boolean databaseEnabled = false;
+    public boolean domStorageEnabled = false;
+    public boolean useWideViewPort = true;
+    public boolean safeBrowsingEnabled = true;
+    public boolean progressBar = true;
+
+    public boolean useChromeCustomTabs = false;
+    public boolean CCT_addShareButton = true;
+    public boolean CCT_showTitle = true;
+    public String CCT_toolbarColor = "";
+    public boolean CCT_enableUrlBarHiding = false;
+    public boolean CCT_instantAppsEnabled = false;
 
     public void parse(HashMap<String, Object> options) {
         Iterator it = options.entrySet().iterator();

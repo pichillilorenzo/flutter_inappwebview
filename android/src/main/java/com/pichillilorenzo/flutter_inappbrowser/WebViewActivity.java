@@ -61,7 +61,7 @@ public class WebViewActivity extends AppCompatActivity {
 
     }
 
-    public void prepareWebView() {
+    private void prepareWebView() {
 
         inAppBrowserWebChromeClient = new InAppBrowserWebChromeClient(this);
         webView.setWebChromeClient(inAppBrowserWebChromeClient);

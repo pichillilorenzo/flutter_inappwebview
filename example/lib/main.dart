@@ -87,9 +87,10 @@ class _MyAppState extends State<MyApp> {
         body: new Center(
           child: new RaisedButton(onPressed: () {
               inAppBrowser.open("https://flutter.io/", options: {
+                "useChromeCustomTabs": true,
                 //"hidden": true,
                 //"toolbarTopFixedTitle": "Fixed title",
-                "useShouldOverrideUrlLoading": true
+                //"useShouldOverrideUrlLoading": true
                 //"hideUrlBar": true,
                 //"toolbarTop": false,
                 //"toolbarBottom": false

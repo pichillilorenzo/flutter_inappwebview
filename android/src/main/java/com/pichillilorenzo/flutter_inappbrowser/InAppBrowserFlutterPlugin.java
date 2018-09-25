@@ -21,9 +21,7 @@
 
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.annotation.TargetApi;
 import android.app.Activity;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -32,7 +30,6 @@ import android.provider.Browser;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.support.annotation.RequiresApi;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.webkit.MimeTypeMap;
@@ -40,6 +37,8 @@ import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
+
+import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsActivity;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -61,6 +60,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   public Activity activity;
   public static MethodChannel channel;
   public static WebViewActivity webViewActivity;
+  public static ChromeCustomTabsActivity chromeCustomTabsActivity;
 
   private static final String NULL = "null";
   protected static final String LOG_TAG = "InAppBrowserFlutterP";
@@ -102,38 +102,43 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         this.activity.runOnUiThread(new Runnable() {
           @Override
           public void run() {
-            if ("_self".equals(target)) {
-              Log.d(LOG_TAG, "in self");
 
-              //Load the dialer
-              if (url.startsWith(WebView.SCHEME_TEL))
-              {
-                try {
-                  Log.d(LOG_TAG, "loading in dialer");
-                  Intent intent = new Intent(Intent.ACTION_DIAL);
-                  intent.setData(Uri.parse(url));
-                  activity.startActivity(intent);
-                } catch (android.content.ActivityNotFoundException e) {
-                  Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+            if (options.useChromeCustomTabs) {
+              open(url, options);
+            }
+            else {
+              if ("_self".equals(target)) {
+                Log.d(LOG_TAG, "in self");
+
+                //Load the dialer
+                if (url.startsWith(WebView.SCHEME_TEL))
+                {
+                  try {
+                    Log.d(LOG_TAG, "loading in dialer");
+                    Intent intent = new Intent(Intent.ACTION_DIAL);
+                    intent.setData(Uri.parse(url));
+                    activity.startActivity(intent);
+                  } catch (android.content.ActivityNotFoundException e) {
+                    Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                  }
+                }
+                // load in InAppBrowserFlutterPlugin
+                else {
+                  Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
+                  open(url, options);
                 }
               }
-              // load in InAppBrowserFlutterPlugin
+              // SYSTEM
+              else if ("_system".equals(target)) {
+                Log.d(LOG_TAG, "in system");
+                openExternal(url, result);
+              }
+              // BLANK - or anything else
               else {
-                Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
+                Log.d(LOG_TAG, "in blank");
                 open(url, options);
               }
             }
-            // SYSTEM
-            else if ("_system".equals(target)) {
-              Log.d(LOG_TAG, "in system");
-              openExternal(url, result);
-            }
-            // BLANK - or anything else
-            else {
-              Log.d(LOG_TAG, "in blank");
-              open(url, options);
-            }
-
             result.success(true);
           }
         });
@@ -360,8 +365,8 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
   }
 
-  private void open(final String url, InAppBrowserOptions options) {
-    Intent intent = new Intent(activity, WebViewActivity.class);
+  public static void open(final String url, InAppBrowserOptions options) {
+    Intent intent = new Intent(registrar.activity(), (options.useChromeCustomTabs) ? ChromeCustomTabsActivity.class : WebViewActivity.class);
 
     Bundle extras = new Bundle();
     extras.putString("url", url);
@@ -369,7 +374,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
     intent.putExtras(extras);
 
-    activity.startActivity(intent);
+    registrar.activity().startActivity(intent);
   }
 
   public void loadUrl(String url, Map<String, String> headers, Result result) {

@@ -4,9 +4,9 @@
 
     <uses-permission android:name="android.permission.INTERNET" />
 
-    <application
-        android:theme="@style/AppTheme" >
-        <activity android:name=".WebViewActivity" android:configChanges="orientation|screenSize"></activity>
+    <application>
+        <activity android:theme="@style/AppTheme" android:name=".WebViewActivity" android:configChanges="orientation|screenSize"></activity>
+        <activity android:theme="@style/ThemeTransparent" android:name=".chrome_custom_tabs.ChromeCustomTabsActivity" android:configChanges="orientation|screenSize"></activity>
     </application>
 
 </manifest>

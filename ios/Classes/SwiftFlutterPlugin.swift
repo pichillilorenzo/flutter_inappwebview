@@ -20,12 +20,14 @@ import UIKit
 import WebKit
 import Foundation
 import AVFoundation
+import SafariServices
 
 let WEBVIEW_STORYBOARD = "WebView"
 let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
 
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var webViewController: InAppBrowserWebViewController?
+    var safariViewController: Any?
     
     var tmpWindow: UIWindow?
     var channel: FlutterMethodChannel
@@ -128,33 +130,37 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func open(arguments: NSDictionary, result: @escaping FlutterResult) {
-        let url: String? = (arguments["url"] as? String)!
+        let url: String = (arguments["url"] as? String)!
+
         let headers = (arguments["headers"] as? [String: String])!
         var target: String? = (arguments["target"] as? String)!
         target = target != nil ? target : "_self"
-        let options = (arguments["options"] as? [String: Any])!
+        let absoluteUrl = URL(string: url)?.absoluteURL
         
-        if url != nil {
-            let absoluteUrl = URL(string: url!)?.absoluteURL
+        let useChromeSafariBrowser = (arguments["useChromeSafariBrowser"] as? Bool)
+        
+        if useChromeSafariBrowser! {
+            let options = (arguments["options"] as? [String: Any])!
+            let optionsFallback = (arguments["optionsFallback"] as? [String: Any])!
             
+            open(inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback);
+        }
+        else {
+            let options = (arguments["options"] as? [String: Any])!
             if isSystemUrl(absoluteUrl!) {
                 target = "_system"
             }
             
             if (target == "_self" || target == "_target") {
-                open(inAppBrowser: absoluteUrl!, headers: headers, withOptions: options)
+                open(inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
             }
             else if (target == "_system") {
                 open(inSystem: absoluteUrl!)
             }
             else {
                 // anything else
-                open(inAppBrowser: absoluteUrl!, headers: headers,withOptions: options)
+                open(inAppBrowser: absoluteUrl!, headers: headers,withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
             }
-        }
-        else {
-            print("url is empty")
-            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
         }
         result(true)
     }
@@ -174,21 +180,76 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         result(true)
     }
     
-    func open(inAppBrowser url: URL, headers: [String: String], withOptions options: [String: Any]) {
-        
-        let browserOptions = InAppBrowserOptions()
-        browserOptions.parse(options: options)
+    func open(inAppBrowser url: URL, headers: [String: String], withOptions options: [String: Any], useChromeSafariBrowser: Bool, withOptionsFallback optionsFallback: [String: Any]?) {
         
         if webViewController != nil {
             close()
         }
-        else if self.previousStatusBarStyle == -1 {
+        
+        if safariViewController != nil {
+            if #available(iOS 9.0, *) {
+                (safariViewController! as! SafariViewController).close()
+                safariViewController = nil
+            } else {
+                // Fallback on earlier versions
+            }
+        }
+        
+        if self.previousStatusBarStyle == -1 {
             self.previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         }
         
         if !(self.tmpWindow != nil) {
             let frame: CGRect = UIScreen.main.bounds
             self.tmpWindow = UIWindow(frame: frame)
+        }
+        
+        let tmpController = UIViewController()
+        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
+        self.tmpWindow?.rootViewController = tmpController
+        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+        self.tmpWindow?.makeKeyAndVisible()
+        
+        let browserOptions: InAppBrowserOptions
+        
+        if useChromeSafariBrowser == true {
+            if #available(iOS 9.0, *) {
+                let safariOptions = SafariBrowserOptions()
+                safariOptions.parse(options: options)
+                
+                let safari: SafariViewController
+                
+                if #available(iOS 11.0, *) {
+                    let config = SFSafariViewController.Configuration()
+                    config.entersReaderIfAvailable = safariOptions.entersReaderIfAvailable
+                    config.barCollapsingEnabled = safariOptions.barCollapsingEnabled
+                    
+                    safari = SafariViewController(url: url, configuration: config)
+                } else {
+                    // Fallback on earlier versions
+                    safari = SafariViewController(url: url)
+                }
+                
+                safari.delegate = safari
+                safari.statusDelegate = self
+                safari.tmpWindow = tmpWindow
+                safari.safariOptions = safariOptions
+                
+                safariViewController = safari
+                
+                tmpController.present(safariViewController! as! SFSafariViewController, animated: true)
+                onChromeSafariBrowserOpened()
+                
+                return
+            }
+            else {
+                browserOptions = InAppBrowserOptions()
+                browserOptions.parse(options: optionsFallback!)
+            }
+        }
+        else {
+            browserOptions = InAppBrowserOptions()
+            browserOptions.parse(options: options)
         }
         
         let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: nil)
@@ -200,28 +261,20 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         webViewController?.currentURL = url
         webViewController?.initHeaders = headers
         webViewController?.navigationDelegate = self
-
-        let tmpController = UIViewController()
-        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-        self.tmpWindow?.rootViewController = tmpController
-        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
-        self.tmpWindow?.makeKeyAndVisible()
+        
         if browserOptions.hidden {
             webViewController!.view.isHidden = true
             tmpController.present(self.webViewController!, animated: false, completion: {() -> Void in
-                if self.previousStatusBarStyle != -1 {
-                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
-                }
+//                if self.previousStatusBarStyle != -1 {
+//                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+//                }
             })
-            if self.previousStatusBarStyle != -1 {
-                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
-            }
+//            if self.previousStatusBarStyle != -1 {
+//                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+//            }
             webViewController?.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
                 self.tmpWindow?.windowLevel = 0.0
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-                if self.previousStatusBarStyle != -1 {
-                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
-                }
             })
         }
         else {
@@ -355,14 +408,36 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         channel.invokeMethod("onLoadError", arguments: arguments)
     }
     
+    func onExit() {
+        channel.invokeMethod("onExit", arguments: [])
+    }
+    
     func shouldOverrideUrlLoading(_ webView: WKWebView, url: URL) {
         channel.invokeMethod("shouldOverrideUrlLoading", arguments: ["url": url.absoluteString])
     }
     
+    func onChromeSafariBrowserOpened() {
+        channel.invokeMethod("onChromeSafariBrowserOpened", arguments: [])
+    }
+    
+    func onChromeSafariBrowserLoaded() {
+        channel.invokeMethod("onChromeSafariBrowserLoaded", arguments: [])
+    }
+    
+    func onChromeSafariBrowserClosed() {
+        channel.invokeMethod("onChromeSafariBrowserClosed", arguments: [])
+    }
+    
+    func safariExit() {
+        if #available(iOS 9.0, *) {
+            (safariViewController as! SafariViewController).statusDelegate = nil
+            (safariViewController as! SafariViewController).delegate = nil
+        }
+        safariViewController = nil
+        onChromeSafariBrowserClosed()
+    }
+    
     func browserExit() {
-        
-        channel.invokeMethod("onExit", arguments: [])
-        
         // Set navigationDelegate to nil to ensure no callbacks are received from it.
         webViewController?.navigationDelegate = nil
         // Don't recycle the ViewController since it may be consuming a lot of memory.
@@ -373,6 +448,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)!
         }
         
+        onExit()
     }
     
 }

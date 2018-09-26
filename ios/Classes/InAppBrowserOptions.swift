@@ -8,7 +8,7 @@
 import Foundation
 
 @objcMembers
-public class InAppBrowserOptions: NSObject {
+public class InAppBrowserOptions: Options {
     
     var useShouldOverrideUrlLoading = false
     var clearCache = false
@@ -44,12 +44,5 @@ public class InAppBrowserOptions: NSObject {
         super.init()
     }
     
-    public func parse(options: [String: Any]) {
-        for (key, value) in options {
-            if self.responds(to: Selector(key)) {
-                self.setValue(value, forKey: key)
-            }
-        }
-    }
 }
 

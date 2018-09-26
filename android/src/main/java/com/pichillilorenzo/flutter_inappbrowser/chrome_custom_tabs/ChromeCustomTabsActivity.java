@@ -6,19 +6,20 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
-import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserOptions;
 import com.pichillilorenzo.flutter_inappbrowser.R;
 
 import java.util.HashMap;
+import java.util.Map;
 
 public class ChromeCustomTabsActivity extends Activity {
 
     CustomTabsIntent.Builder builder;
-    InAppBrowserOptions options;
+    ChromeCustomTabsOptions options;
+    Map<String, String> headersFallback;
+    InAppBrowserOptions optionsFallback;
     private CustomTabActivityHelper customTabActivityHelper;
     private final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
 
@@ -31,8 +32,13 @@ public class ChromeCustomTabsActivity extends Activity {
         Bundle b = getIntent().getExtras();
         String url = b.getString("url");
 
-        options = new InAppBrowserOptions();
+        options = new ChromeCustomTabsOptions();
         options.parse((HashMap<String, Object>) b.getSerializable("options"));
+
+        headersFallback = (HashMap<String, String>) b.getSerializable("headers");
+
+        optionsFallback = new InAppBrowserOptions();
+        optionsFallback.parse((HashMap<String, Object>) b.getSerializable("optionsFallback"));
 
         customTabActivityHelper = new CustomTabActivityHelper();
 
@@ -42,28 +48,33 @@ public class ChromeCustomTabsActivity extends Activity {
 
         CustomTabsIntent customTabsIntent = builder.build();
 
-        customTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), CHROME_CUSTOM_TAB_REQUEST_CODE,
+        boolean chromeCustomTabsOpened = customTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), CHROME_CUSTOM_TAB_REQUEST_CODE,
                 new CustomTabActivityHelper.CustomTabFallback() {
                     @Override
                     public void openUri(Activity activity, Uri uri) {
-                        InAppBrowserFlutterPlugin.open(uri.toString(), options);
+                        InAppBrowserFlutterPlugin.open(uri.toString(), optionsFallback, headersFallback, false, null);
                     }
                 });
+
+        if (chromeCustomTabsOpened) {
+            InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserOpened", null);
+            InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserLoaded", null);
+        }
     }
 
     private void prepareCustomTabs() {
-        if (options.CCT_addShareButton)
+        if (options.addShareButton)
             builder.addDefaultShareMenuItem();
 
-        if (!options.CCT_toolbarColor.isEmpty())
-            builder.setToolbarColor(Color.parseColor(options.CCT_toolbarColor));
+        if (!options.toolbarBackgroundColor.isEmpty())
+            builder.setToolbarColor(Color.parseColor(options.toolbarBackgroundColor));
 
-        builder.setShowTitle(options.CCT_showTitle);
+        builder.setShowTitle(options.showTitle);
 
-        if (options.CCT_enableUrlBarHiding)
+        if (options.enableUrlBarHiding)
             builder.enableUrlBarHiding();
 
-        builder.setInstantAppsEnabled(options.CCT_instantAppsEnabled);
+        builder.setInstantAppsEnabled(options.instantAppsEnabled);
     }
 
     @Override
@@ -82,6 +93,7 @@ public class ChromeCustomTabsActivity extends Activity {
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
             finish();
+            InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserClosed", null);
         }
     }
 }

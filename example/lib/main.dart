@@ -61,7 +61,28 @@ class MyInAppBrowser extends InAppBrowser {
   }
 }
 
-MyInAppBrowser inAppBrowser = new MyInAppBrowser();
+MyInAppBrowser inAppBrowserFallback = new MyInAppBrowser();
+
+class MyChromeSafariBrowser extends ChromeSafariBrowser {
+  MyChromeSafariBrowser(browserFallback) : super(browserFallback);
+
+  @override
+  void onOpened() {
+    print("ChromeSafari browser opened");
+  }
+
+  @override
+  void onLoaded() {
+    print("ChromeSafari browser loaded");
+  }
+
+  @override
+  void onClosed() {
+    print("ChromeSafari browser closed");
+  }
+}
+
+MyChromeSafariBrowser chromeSafariBrowser = new MyChromeSafariBrowser(inAppBrowserFallback);
 
 void main() => runApp(new MyApp());
 
@@ -86,15 +107,28 @@ class _MyAppState extends State<MyApp> {
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {
-              inAppBrowser.open("https://flutter.io/", options: {
-                "useChromeCustomTabs": true,
-                //"hidden": true,
+            chromeSafariBrowser.open("https://flutter.io/", options: {
+                  "addShareButton": false,
+                  "toolbarBackgroundColor": "#000000",
+                  "dismissButtonStyle": 1,
+                  "preferredBarTintColor": "#000000",
+                },
+              optionsFallback: {
+                "hidden": true,
                 //"toolbarTopFixedTitle": "Fixed title",
                 //"useShouldOverrideUrlLoading": true
                 //"hideUrlBar": true,
                 //"toolbarTop": false,
                 //"toolbarBottom": false
               });
+//              inAppBrowserFallback.open("https://flutter.io/", options: {
+//                //"hidden": true,
+//                //"toolbarTopFixedTitle": "Fixed title",
+//                //"useShouldOverrideUrlLoading": true
+//                //"hideUrlBar": true,
+//                //"toolbarTop": false,
+//                //"toolbarBottom": false
+//              });
 
           },
           child: Text("Open InAppBrowser")

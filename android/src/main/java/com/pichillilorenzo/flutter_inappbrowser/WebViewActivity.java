@@ -33,6 +33,7 @@ public class WebViewActivity extends AppCompatActivity {
     InAppBrowserWebChromeClient inAppBrowserWebChromeClient;
     SearchView searchView;
     InAppBrowserOptions options;
+    Map<String, String> headers;
     ProgressBar progressBar;
     public boolean isLoading = false;
     public boolean isHidden = false;
@@ -51,13 +52,15 @@ public class WebViewActivity extends AppCompatActivity {
         options = new InAppBrowserOptions();
         options.parse((HashMap<String, Object>) b.getSerializable("options"));
 
+        headers = (HashMap<String, String>) b.getSerializable("headers");
+
         InAppBrowserFlutterPlugin.webViewActivity = this;
 
         actionBar = getSupportActionBar();
 
         prepareWebView();
 
-        webView.loadUrl(url);
+        webView.loadUrl(url, headers);
 
     }
 

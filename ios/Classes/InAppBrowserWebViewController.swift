@@ -86,9 +86,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        UIApplication.shared.statusBarStyle = preferredStatusBarStyle
-        super.viewWillAppear(animated)
         prepareWebView()
+        super.viewWillAppear(animated)
     }
     
     override func viewDidLoad() {
@@ -132,6 +131,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     func prepareWebView() {
+        
+        //UIApplication.shared.statusBarStyle = preferredStatusBarStyle
         
         self.webView.configuration.userContentController = WKUserContentController()
         self.webView.configuration.preferences = WKPreferences()

@@ -23,13 +23,37 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-///Main class of the plugin.
+class _ChannelManager {
+  static const MethodChannel channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
+  static final initialized = false;
+  static final listeners = <Function>[];
+
+  static Future<dynamic> _handleMethod(MethodCall call) async {
+    for (var listener in listeners) {
+      listener(call);
+    }
+    return new Future.value("");
+  }
+
+  static void addListener (Function callback) {
+    if (!initialized)
+      init();
+    listeners.add(callback);
+  }
+
+  static void init () {
+    channel.setMethodCallHandler(_handleMethod);
+  }
+}
+
+///InAppBrowser class.
+///
+/// This class uses the native WebView of the platform.
 class InAppBrowser {
-  static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
   ///
   InAppBrowser () {
-    _channel.setMethodCallHandler(_handleMethod);
+    _ChannelManager.addListener(_handleMethod);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -124,7 +148,8 @@ class InAppBrowser {
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('target', () => target);
     args.putIfAbsent('options', () => options);
-    return await _channel.invokeMethod('open', args);
+    args.putIfAbsent('useChromeSafariBrowser', () => false);
+    return await _ChannelManager.channel.invokeMethod('open', args);
   }
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
@@ -132,80 +157,80 @@ class InAppBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
-    return await _channel.invokeMethod('loadUrl', args);
+    return await _ChannelManager.channel.invokeMethod('loadUrl', args);
   }
 
   ///Displays an [InAppBrowser] window that was opened hidden. Calling this has no effect if the [InAppBrowser] was already visible.
   Future<void> show() async {
-    return await _channel.invokeMethod('show');
+    return await _ChannelManager.channel.invokeMethod('show');
   }
 
   ///Hides the [InAppBrowser] window. Calling this has no effect if the [InAppBrowser] was already hidden.
   Future<void> hide() async {
-    return await _channel.invokeMethod('hide');
+    return await _ChannelManager.channel.invokeMethod('hide');
   }
 
   ///Closes the [InAppBrowser] window.
   Future<void> close() async {
-    return await _channel.invokeMethod('close');
+    return await _ChannelManager.channel.invokeMethod('close');
   }
 
   ///Reloads the [InAppBrowser] window.
   Future<void> reload() async {
-    return await _channel.invokeMethod('reload');
+    return await _ChannelManager.channel.invokeMethod('reload');
   }
 
   ///Goes back in the history of the [InAppBrowser] window.
   Future<void> goBack() async {
-    return await _channel.invokeMethod('goBack');
+    return await _ChannelManager.channel.invokeMethod('goBack');
   }
 
   ///Goes forward in the history of the [InAppBrowser] window.
   Future<void> goForward() async {
-    return await _channel.invokeMethod('goForward');
+    return await _ChannelManager.channel.invokeMethod('goForward');
   }
 
   ///Check if the Web View of the [InAppBrowser] instance is in a loading state.
   Future<bool> isLoading() async {
-    return await _channel.invokeMethod('isLoading');
+    return await _ChannelManager.channel.invokeMethod('isLoading');
   }
 
   ///Stops the Web View of the [InAppBrowser] instance from loading.
   Future<void> stopLoading() async {
-    return await _channel.invokeMethod('stopLoading');
+    return await _ChannelManager.channel.invokeMethod('stopLoading');
   }
 
   ///Check if the Web View of the [InAppBrowser] instance is hidden.
   Future<bool> isHidden() async {
-    return await _channel.invokeMethod('isHidden');
+    return await _ChannelManager.channel.invokeMethod('isHidden');
   }
 
   ///Injects JavaScript code into the [InAppBrowser] window and returns the result of the evaluation. (Only available when the target is set to `_blank` or to `_self`)
   Future<String> injectScriptCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
-    return await _channel.invokeMethod('injectScriptCode', args);
+    return await _ChannelManager.channel.invokeMethod('injectScriptCode', args);
   }
 
   ///Injects a JavaScript file into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectScriptFile(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
-    return await _channel.invokeMethod('injectScriptFile', args);
+    return await _ChannelManager.channel.invokeMethod('injectScriptFile', args);
   }
 
   ///Injects CSS into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectStyleCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
-    return await _channel.invokeMethod('injectStyleCode', args);
+    return await _ChannelManager.channel.invokeMethod('injectStyleCode', args);
   }
 
   ///Injects a CSS file into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectStyleFile(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
-    return await _channel.invokeMethod('injectStyleFile', args);
+    return await _ChannelManager.channel.invokeMethod('injectStyleFile', args);
   }
 
   ///Event fires when the [InAppBrowser] starts to load an [url].
@@ -229,8 +254,67 @@ class InAppBrowser {
   }
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
+  ///In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
   void shouldOverrideUrlLoading(String url) {
 
   }
 
+}
+
+///ChromeSafariBrowser class.
+///
+///This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android
+///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
+///
+///[browserFallback] represents the [InAppBrowser] instance fallback in case [Chrome Custom Tabs]/[SFSafariViewController] is not available.
+class ChromeSafariBrowser {
+  InAppBrowser browserFallback;
+
+  ///
+  ChromeSafariBrowser (browserFallback) {
+    this.browserFallback = browserFallback;
+    _ChannelManager.addListener(_handleMethod);
+  }
+
+  Future<dynamic> _handleMethod(MethodCall call) async {
+    switch(call.method) {
+      case "onChromeSafariBrowserOpened":
+        onOpened();
+        break;
+      case "onChromeSafariBrowserLoaded":
+        onLoaded();
+        break;
+      case "onChromeSafariBrowserClosed":
+        onClosed();
+        break;
+    }
+    return new Future.value("");
+  }
+
+  ///
+  Future<void> open(String url, {Map<String, dynamic> options = const {}, Map<String, String> headersFallback = const {}, Map<String, dynamic> optionsFallback = const {}}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('headers', () => headersFallback);
+    args.putIfAbsent('target', () => "");
+    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('optionsFallback', () => optionsFallback);
+    args.putIfAbsent('useChromeSafariBrowser', () => true);
+    return await _ChannelManager.channel.invokeMethod('open', args);
+  }
+
+  ///Event fires when the [ChromeSafariBrowser] is opened.
+  void onOpened() {
+
+  }
+
+  ///Event fires when the [ChromeSafariBrowser] is loaded.
+  void onLoaded() {
+
+  }
+
+  ///Event fires when the [ChromeSafariBrowser] is closed.
+  void onClosed() {
+
+  }
 }

@@ -39,8 +39,10 @@ import android.webkit.WebViewClient;
 import android.util.Log;
 
 import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsActivity;
+import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsOptions;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -79,7 +81,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   }
 
   @Override
-  public void onMethodCall(MethodCall call, final Result result) {
+  public void onMethodCall(final MethodCall call, final Result result) {
     String source;
     String jsWrapper;
     String urlFile;
@@ -94,19 +96,33 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         }
         final String target = t;
 
-        final InAppBrowserOptions options = new InAppBrowserOptions();
-        options.parse((HashMap<String, Object>) call.argument("options"));
-
         Log.d(LOG_TAG, "target = " + target);
+
+        final boolean useChromeSafariBrowser = (boolean) call.argument("useChromeSafariBrowser");
+
+        final Map<String, String> headers = (Map<String, String>) call.argument("headers");
+
+        Log.d(LOG_TAG, "use Chrome Custom Tabs = " + useChromeSafariBrowser);
 
         this.activity.runOnUiThread(new Runnable() {
           @Override
           public void run() {
 
-            if (options.useChromeCustomTabs) {
-              open(url, options);
+            if (useChromeSafariBrowser) {
+
+              final ChromeCustomTabsOptions options = new ChromeCustomTabsOptions();
+              options.parse((HashMap<String, Object>) call.argument("options"));
+
+              final InAppBrowserOptions optionsFallback = new InAppBrowserOptions();
+              optionsFallback.parse((HashMap<String, Object>) call.argument("optionsFallback"));
+
+              open(url, options, headers,true, optionsFallback);
             }
             else {
+
+              final InAppBrowserOptions options = new InAppBrowserOptions();
+              options.parse((HashMap<String, Object>) call.argument("options"));
+
               if ("_self".equals(target)) {
                 Log.d(LOG_TAG, "in self");
 
@@ -125,7 +141,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
                 // load in InAppBrowserFlutterPlugin
                 else {
                   Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
-                  open(url, options);
+                  open(url, options, headers, false, null);
                 }
               }
               // SYSTEM
@@ -136,7 +152,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
               // BLANK - or anything else
               else {
                 Log.d(LOG_TAG, "in blank");
-                open(url, options);
+                open(url, options, headers, false, null);
               }
             }
             result.success(true);
@@ -365,12 +381,17 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
   }
 
-  public static void open(final String url, InAppBrowserOptions options) {
-    Intent intent = new Intent(registrar.activity(), (options.useChromeCustomTabs) ? ChromeCustomTabsActivity.class : WebViewActivity.class);
+  public static void open(final String url, Options options, Map<String, String> headers, boolean useChromeSafariBrowser, InAppBrowserOptions optionsFallback) {
+    Intent intent = new Intent(registrar.activity(), (useChromeSafariBrowser) ? ChromeCustomTabsActivity.class : WebViewActivity.class);
 
     Bundle extras = new Bundle();
     extras.putString("url", url);
     extras.putSerializable("options", options.getHashMap());
+    extras.putSerializable("headers", (Serializable) headers);
+    if (useChromeSafariBrowser && optionsFallback != null)
+      extras.putSerializable("optionsFallback", optionsFallback.getHashMap());
+    else
+      extras.putSerializable("optionsFallback", (new InAppBrowserOptions()).getHashMap());
 
     intent.putExtras(extras);
 

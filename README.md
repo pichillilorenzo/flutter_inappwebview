@@ -223,6 +223,7 @@ Event fires when the `InAppBrowser` window is closed.
 ```
 
 Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
+In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
 ```dart
   @override
   void shouldOverrideUrlLoading(String url) {

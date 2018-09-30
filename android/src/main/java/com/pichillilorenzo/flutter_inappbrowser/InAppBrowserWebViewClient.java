@@ -30,6 +30,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
         if (activity.options.useShouldOverrideUrlLoading) {
             Map<String, Object> obj = new HashMap<>();
+            obj.put("uuid", activity.uuid);
             obj.put("url", url);
             InAppBrowserFlutterPlugin.channel.invokeMethod("shouldOverrideUrlLoading", obj);
             return true;
@@ -110,6 +111,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         }
 
         Map<String, Object> obj = new HashMap<>();
+        obj.put("uuid", activity.uuid);
         obj.put("url", url);
         InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStart", obj);
     }
@@ -133,6 +135,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         view.requestFocus();
 
         Map<String, Object> obj = new HashMap<>();
+        obj.put("uuid", activity.uuid);
         obj.put("url", url);
         InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStop", obj);
     }
@@ -143,6 +146,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         activity.isLoading = false;
 
         Map<String, Object> obj = new HashMap<>();
+        obj.put("uuid", activity.uuid);
         obj.put("url", failingUrl);
         obj.put("code", errorCode);
         obj.put("message", description);
@@ -153,6 +157,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         super.onReceivedSslError(view, handler, error);
 
         Map<String, Object> obj = new HashMap<>();
+        obj.put("uuid", activity.uuid);
         obj.put("url", error.getUrl());
         obj.put("code", error.getPrimaryError());
         String message;

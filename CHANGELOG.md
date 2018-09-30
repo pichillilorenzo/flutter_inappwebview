@@ -1,4 +1,10 @@
-## 0.1.0
+## 0.2.0
+
+- added support of Chrome CustomTabs for android
+- added support of SFSafariViewController for iOS
+- added the ability to create multiple instances of browsers
+
+## 0.1.1
 
 - updated/added new methods
 - updated UI of android/iOS in-app browser

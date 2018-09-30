@@ -20,25 +20,30 @@
 */
 
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/services.dart';
+import 'package:uuid/uuid.dart';
+
+typedef Future<dynamic> ListenerCallback(MethodCall call);
+
+var uuidGenerator = new Uuid();
 
 class _ChannelManager {
   static const MethodChannel channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
   static final initialized = false;
-  static final listeners = <Function>[];
+  static final listeners = HashMap<String, ListenerCallback>();
 
   static Future<dynamic> _handleMethod(MethodCall call) async {
-    for (var listener in listeners) {
-      listener(call);
-    }
+    String uuid = call.arguments["uuid"];
+    listeners[uuid](call);
     return new Future.value("");
   }
 
-  static void addListener (Function callback) {
+  static void addListener (String key, ListenerCallback callback) {
     if (!initialized)
       init();
-    listeners.add(callback);
+    listeners.putIfAbsent(key, () => callback);
   }
 
   static void init () {
@@ -51,9 +56,12 @@ class _ChannelManager {
 /// This class uses the native WebView of the platform.
 class InAppBrowser {
 
+  String uuid;
+
   ///
   InAppBrowser () {
-    _ChannelManager.addListener(_handleMethod);
+    uuid = uuidGenerator.v4();
+    _ChannelManager.addListener(uuid, _handleMethod);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -144,6 +152,7 @@ class InAppBrowser {
   ///  - __spinner__: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
   Future<void> open(String url, {Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('target', () => target);
@@ -155,6 +164,7 @@ class InAppBrowser {
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
   Future<void> loadUrl(String url, {Map<String, String> headers = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
     return await _ChannelManager.channel.invokeMethod('loadUrl', args);
@@ -162,52 +172,71 @@ class InAppBrowser {
 
   ///Displays an [InAppBrowser] window that was opened hidden. Calling this has no effect if the [InAppBrowser] was already visible.
   Future<void> show() async {
-    return await _ChannelManager.channel.invokeMethod('show');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('show', args);
   }
 
   ///Hides the [InAppBrowser] window. Calling this has no effect if the [InAppBrowser] was already hidden.
   Future<void> hide() async {
-    return await _ChannelManager.channel.invokeMethod('hide');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('hide', args);
   }
 
   ///Closes the [InAppBrowser] window.
   Future<void> close() async {
-    return await _ChannelManager.channel.invokeMethod('close');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('close', args);
   }
 
   ///Reloads the [InAppBrowser] window.
   Future<void> reload() async {
-    return await _ChannelManager.channel.invokeMethod('reload');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('reload', args);
   }
 
   ///Goes back in the history of the [InAppBrowser] window.
   Future<void> goBack() async {
-    return await _ChannelManager.channel.invokeMethod('goBack');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('goBack', args);
   }
 
   ///Goes forward in the history of the [InAppBrowser] window.
   Future<void> goForward() async {
-    return await _ChannelManager.channel.invokeMethod('goForward');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('goForward', args);
   }
 
   ///Check if the Web View of the [InAppBrowser] instance is in a loading state.
   Future<bool> isLoading() async {
-    return await _ChannelManager.channel.invokeMethod('isLoading');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('isLoading', args);
   }
 
   ///Stops the Web View of the [InAppBrowser] instance from loading.
   Future<void> stopLoading() async {
-    return await _ChannelManager.channel.invokeMethod('stopLoading');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('stopLoading', args);
   }
 
   ///Check if the Web View of the [InAppBrowser] instance is hidden.
   Future<bool> isHidden() async {
-    return await _ChannelManager.channel.invokeMethod('isHidden');
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('isHidden', args);
   }
 
   ///Injects JavaScript code into the [InAppBrowser] window and returns the result of the evaluation. (Only available when the target is set to `_blank` or to `_self`)
   Future<String> injectScriptCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('source', () => source);
     return await _ChannelManager.channel.invokeMethod('injectScriptCode', args);
   }
@@ -215,6 +244,7 @@ class InAppBrowser {
   ///Injects a JavaScript file into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectScriptFile(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('urlFile', () => urlFile);
     return await _ChannelManager.channel.invokeMethod('injectScriptFile', args);
   }
@@ -222,6 +252,7 @@ class InAppBrowser {
   ///Injects CSS into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectStyleCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('source', () => source);
     return await _ChannelManager.channel.invokeMethod('injectStyleCode', args);
   }
@@ -229,6 +260,7 @@ class InAppBrowser {
   ///Injects a CSS file into the [InAppBrowser] window. (Only available when the target is set to `_blank` or to `_self`)
   Future<void> injectStyleFile(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('urlFile', () => urlFile);
     return await _ChannelManager.channel.invokeMethod('injectStyleFile', args);
   }
@@ -268,12 +300,14 @@ class InAppBrowser {
 ///
 ///[browserFallback] represents the [InAppBrowser] instance fallback in case [Chrome Custom Tabs]/[SFSafariViewController] is not available.
 class ChromeSafariBrowser {
+  String uuid;
   InAppBrowser browserFallback;
 
   ///
-  ChromeSafariBrowser (browserFallback) {
-    this.browserFallback = browserFallback;
-    _ChannelManager.addListener(_handleMethod);
+  ChromeSafariBrowser (bf) {
+    uuid = uuidGenerator.v4();
+    browserFallback = bf;
+    _ChannelManager.addListener(uuid, _handleMethod);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -294,6 +328,9 @@ class ChromeSafariBrowser {
   ///
   Future<void> open(String url, {Map<String, dynamic> options = const {}, Map<String, String> headersFallback = const {}, Map<String, dynamic> optionsFallback = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    print(browserFallback.uuid);
+    args.putIfAbsent('uuidFallback', () => (browserFallback != null) ? browserFallback.uuid : '');
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headersFallback);
     args.putIfAbsent('target', () => "");

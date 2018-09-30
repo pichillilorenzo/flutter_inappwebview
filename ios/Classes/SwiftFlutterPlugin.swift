@@ -26,8 +26,8 @@ let WEBVIEW_STORYBOARD = "WebView"
 let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
 
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
-    var webViewController: InAppBrowserWebViewController?
-    var safariViewController: Any?
+    var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
+    var safariViewControllers: [String: Any?] = [:]
     
     var tmpWindow: UIWindow?
     var channel: FlutterMethodChannel
@@ -45,66 +45,96 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
+        let uuid: String = (arguments!["uuid"] as? String)!
+        
         switch call.method {
         case "open":
-            self.open(arguments: arguments!, result: result)
+            self.open(uuid: uuid, arguments: arguments!, result: result)
             break
         case "loadUrl":
-            self.loadUrl(arguments: arguments!, result: result)
+            self.loadUrl(uuid: uuid, arguments: arguments!, result: result)
             break
         case "close":
-            self.close()
+            self.close(uuid: uuid)
             result(true)
             break
         case "show":
-            self.show()
+            self.show(uuid: uuid)
             result(true)
             break
         case "hide":
-            self.hide()
+            self.hide(uuid: uuid)
             result(true)
             break
         case "reload":
-            self.webViewController?.reload()
+            if let webViewController = self.webViewControllers[uuid] {
+                webViewController?.reload()
+            }
             result(true)
             break
         case "goBack":
-            self.webViewController?.goBack()
+            if let webViewController = self.webViewControllers[uuid] {
+                webViewController?.goBack()
+            }
             result(true)
             break
         case "canGoBack":
-            result(self.webViewController?.canGoBack() ?? false)
+            if let webViewController = self.webViewControllers[uuid] {
+                result(webViewController?.canGoBack() ?? false)
+            }
+            else {
+                result(false)
+            }
             break
         case "goForward":
-            self.webViewController?.goForward()
+            if let webViewController = self.webViewControllers[uuid] {
+                webViewController?.goForward()
+            }
             result(true)
             break
         case "canGoForward":
-            result(self.webViewController?.canGoForward() ?? false)
+            if let webViewController = self.webViewControllers[uuid] {
+                result(webViewController?.canGoForward() ?? false)
+            }
+            else {
+                result(false)
+            }
             break
         case "isLoading":
-            result((self.webViewController?.webView.isLoading ?? false) == true)
+            if let webViewController = self.webViewControllers[uuid] {
+                result((webViewController?.webView.isLoading ?? false) == true)
+            }
+            else {
+                result(false)
+            }
             break
         case "stopLoading":
-            self.webViewController?.webView.stopLoading()
+            if let webViewController = self.webViewControllers[uuid] {
+                webViewController?.webView.stopLoading()
+            }
             result(true)
             break
         case "isHidden":
-            result((self.webViewController?.isHidden ?? false) == true)
+            if let webViewController = self.webViewControllers[uuid] {
+                result((webViewController?.isHidden ?? false) == true)
+            }
+            else {
+                result(false)
+            }
             break
         case "injectScriptCode":
-            self.injectScriptCode(arguments: arguments!, result: result)
+            self.injectScriptCode(uuid: uuid, arguments: arguments!, result: result)
             break
         case "injectScriptFile":
-            self.injectScriptFile(arguments: arguments!, result: nil)
+            self.injectScriptFile(uuid: uuid, arguments: arguments!, result: nil)
             result(true)
             break
         case "injectStyleCode":
-            self.injectStyleCode(arguments: arguments!, result: nil)
+            self.injectStyleCode(uuid: uuid, arguments: arguments!, result: nil)
             result(true)
             break
         case "injectStyleFile":
-            self.injectStyleFile(arguments: arguments!, result: nil)
+            self.injectStyleFile(uuid: uuid, arguments: arguments!, result: nil)
             result(true)
             break
         default:
@@ -113,13 +143,15 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func close() {
-        if webViewController == nil {
+    func close(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            // Things are cleaned up in browserExit.
+            webViewController?.close()
+        }
+        else {
             print("IAB.close() called but it was already closed.")
             return
         }
-        // Things are cleaned up in browserExit.
-        webViewController?.close()
     }
     
     func isSystemUrl(_ url: URL) -> Bool {
@@ -129,7 +161,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         return false
     }
     
-    public func open(arguments: NSDictionary, result: @escaping FlutterResult) {
+    public func open(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
         let url: String = (arguments["url"] as? String)!
 
         let headers = (arguments["headers"] as? [String: String])!
@@ -140,56 +172,47 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let useChromeSafariBrowser = (arguments["useChromeSafariBrowser"] as? Bool)
         
         if useChromeSafariBrowser! {
+            let uuidFallback = (arguments["uuidFallback"] as? String)!
             let options = (arguments["options"] as? [String: Any])!
             let optionsFallback = (arguments["optionsFallback"] as? [String: Any])!
             
-            open(inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback);
+            open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback);
         }
         else {
             let options = (arguments["options"] as? [String: Any])!
+            
             if isSystemUrl(absoluteUrl!) {
                 target = "_system"
             }
             
             if (target == "_self" || target == "_target") {
-                open(inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
+                open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
             }
             else if (target == "_system") {
                 open(inSystem: absoluteUrl!)
             }
             else {
                 // anything else
-                open(inAppBrowser: absoluteUrl!, headers: headers,withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
+                open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers,withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
             }
         }
         result(true)
     }
     
-    public func loadUrl(arguments: NSDictionary, result: @escaping FlutterResult) {
-        let url: String? = (arguments["url"] as? String)!
-        let headers = (arguments["headers"] as? [String: String])!
+    func open(uuid: String, uuidFallback: String?, inAppBrowser url: URL, headers: [String: String], withOptions options: [String: Any], useChromeSafariBrowser: Bool, withOptionsFallback optionsFallback: [String: Any]?) {
         
-        if url != nil {
-            let absoluteUrl = URL(string: url!)!.absoluteURL
-            webViewController?.loadUrl(url: absoluteUrl, headers: headers)
-        }
-        else {
-            print("url is empty")
-            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
-        }
-        result(true)
-    }
-    
-    func open(inAppBrowser url: URL, headers: [String: String], withOptions options: [String: Any], useChromeSafariBrowser: Bool, withOptionsFallback optionsFallback: [String: Any]?) {
+        var uuid = uuid
         
-        if webViewController != nil {
-            close()
+        if self.webViewControllers[uuid] != nil {
+            close(uuid: uuid)
         }
+        
+        let safariViewController = self.safariViewControllers[uuid]
         
         if safariViewController != nil {
             if #available(iOS 9.0, *) {
                 (safariViewController! as! SafariViewController).close()
-                safariViewController = nil
+                self.safariViewControllers[uuid] = nil
             } else {
                 // Fallback on earlier versions
             }
@@ -230,19 +253,25 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     safari = SafariViewController(url: url)
                 }
                 
+                safari.uuid = uuid
                 safari.delegate = safari
                 safari.statusDelegate = self
                 safari.tmpWindow = tmpWindow
                 safari.safariOptions = safariOptions
                 
-                safariViewController = safari
+                self.safariViewControllers[uuid] = safari
                 
-                tmpController.present(safariViewController! as! SFSafariViewController, animated: true)
-                onChromeSafariBrowserOpened()
+                tmpController.present(self.safariViewControllers[uuid]! as! SFSafariViewController, animated: true)
+                onChromeSafariBrowserOpened(uuid: uuid)
                 
                 return
             }
             else {
+                if uuidFallback == nil {
+                    print("No WebView fallback declared.")
+                    return
+                }
+                uuid = uuidFallback!
                 browserOptions = InAppBrowserOptions()
                 browserOptions.parse(options: optionsFallback!)
             }
@@ -254,17 +283,19 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         
         let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: nil)
         let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
-        webViewController = vc as? InAppBrowserWebViewController
-        webViewController?.browserOptions = browserOptions
-        webViewController?.isHidden = browserOptions.hidden
-        webViewController?.tmpWindow = tmpWindow
-        webViewController?.currentURL = url
-        webViewController?.initHeaders = headers
-        webViewController?.navigationDelegate = self
+        self.webViewControllers[uuid] = vc as? InAppBrowserWebViewController
+        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
+        webViewController.uuid = uuid
+        webViewController.browserOptions = browserOptions
+        webViewController.isHidden = browserOptions.hidden
+        webViewController.tmpWindow = tmpWindow
+        webViewController.currentURL = url
+        webViewController.initHeaders = headers
+        webViewController.navigationDelegate = self
         
         if browserOptions.hidden {
-            webViewController!.view.isHidden = true
-            tmpController.present(self.webViewController!, animated: false, completion: {() -> Void in
+            webViewController.view.isHidden = true
+            tmpController.present(webViewController, animated: false, completion: {() -> Void in
 //                if self.previousStatusBarStyle != -1 {
 //                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
 //                }
@@ -272,65 +303,89 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
 //            if self.previousStatusBarStyle != -1 {
 //                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
 //            }
-            webViewController?.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
+            webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
                 self.tmpWindow?.windowLevel = 0.0
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }
         else {
-            tmpController.present(webViewController!, animated: true, completion: nil)
+            tmpController.present(webViewController, animated: true, completion: nil)
         }
     }
     
-    public func show() {
+    public func loadUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
+        let url: String? = (arguments["url"] as? String)!
+        let headers = (arguments["headers"] as? [String: String])!
         
-        if webViewController == nil {
-            print("Tried to hide IAB after it was closed.")
-            return
+        if url != nil {
+            let absoluteUrl = URL(string: url!)!.absoluteURL
+            webViewController.loadUrl(url: absoluteUrl, headers: headers)
         }
-        
-        self.webViewController?.isHidden = false
-        self.webViewController!.view.isHidden = false
-        
-        // Run later to avoid the "took a long time" log message.
-        DispatchQueue.main.async(execute: {() -> Void in
-            if self.webViewController != nil {
-                let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-                self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
-                self.tmpWindow?.makeKeyAndVisible()
-                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-                self.tmpWindow?.rootViewController?.present(self.webViewController!, animated: true, completion: nil)
-            }
-        })
+        else {
+            print("url is empty")
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+        }
+        result(true)
     }
-
-    public func hide() {
-        if webViewController == nil {
-            print("Tried to hide IAB after it was closed.")
-            return
-        }
-        
-        if self.webViewController != nil {
-            self.webViewController?.isHidden = true
-        }
-        
-        // Run later to avoid the "took a long time" log message.
-        DispatchQueue.main.async(execute: {() -> Void in
-            if self.webViewController != nil {
-                self.webViewController?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
-                    self.tmpWindow?.windowLevel = 0.0
-                    UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-                    if self.previousStatusBarStyle != -1 {
-                        UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+    
+    public func show(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            if webViewController != nil {
+                webViewController?.isHidden = false
+                webViewController?.view.isHidden = false
+                
+                // Run later to avoid the "took a long time" log message.
+                DispatchQueue.main.async(execute: {() -> Void in
+                    if webViewController != nil {
+                        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
+                        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+                        self.tmpWindow?.makeKeyAndVisible()
+                        UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                        self.tmpWindow?.rootViewController?.present(webViewController!, animated: true, completion: nil)
                     }
                 })
             }
-        })
+            else {
+                print("Tried to hide IAB after it was closed.")
+            }
+        }
+    }
+
+    public func hide(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            if webViewController != nil {
+                webViewController?.isHidden = true
+                
+                // Run later to avoid the "took a long time" log message.
+                DispatchQueue.main.async(execute: {() -> Void in
+                    if webViewController != nil {
+                        webViewController?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
+                            self.tmpWindow?.windowLevel = 0.0
+                            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                            if self.previousStatusBarStyle != -1 {
+                                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+                            }
+                        })
+                    }
+                })
+            }
+            else {
+                print("Tried to hide IAB after it was closed.")
+            }
+        }
     }
     
     func open(inSystem url: URL) {
-        if UIApplication.shared.openURL(url) == false {
-            NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: "CDVPluginHandleOpenURLNotification"), object: url))
+        if !UIApplication.shared.canOpenURL(url) {
+            NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: "PluginHandleOpenURLNotification"), object: url))
+            return
+        }
+        
+        if #available(iOS 10.0, *) {
+            UIApplication.shared.open(url, options: [:], completionHandler: nil)
+        } else {
+            UIApplication.shared.openURL(url)
         }
     }
     
@@ -342,113 +397,131 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     // '%@' marker).
     //
     // If no wrapper is supplied, then the source string is executed directly.
-    func injectDeferredObject(_ source: String, withWrapper jsWrapper: String, result: FlutterResult?) {
-        let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
-        let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
-        if sourceArrayString != nil {
-            let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.characters.count ?? 0) - 2))
-            let jsToInject = String(format: jsWrapper, sourceString!)
-            
-            webViewController?.webView?.evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
-                if result == nil {
-                    return
-                }
+    func injectDeferredObject(uuid: String, source: String, withWrapper jsWrapper: String, result: FlutterResult?) {
+        if let webViewController = self.webViewControllers[uuid] {
+            let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
+            let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
+            if sourceArrayString != nil {
+                let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.characters.count ?? 0) - 2))
+                let jsToInject = String(format: jsWrapper, sourceString!)
                 
-                do {
-                    let data: Data = ("[" + String(describing: value!) + "]").data(using: String.Encoding.utf8, allowLossyConversion: false)!
-                    let json: Array<Any> = try JSONSerialization.jsonObject(with: data, options: []) as! Array<Any>
-                    if json[0] is String {
-                        result!(json[0])
+                webViewController?.webView?.evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
+                    if result == nil {
+                        return
                     }
-                    else {
-                        result!(value)
+                    
+                    do {
+                        let data: Data = ("[" + String(describing: value!) + "]").data(using: String.Encoding.utf8, allowLossyConversion: false)!
+                        let json: Array<Any> = try JSONSerialization.jsonObject(with: data, options: []) as! Array<Any>
+                        if json[0] is String {
+                            result!(json[0])
+                        }
+                        else {
+                            result!(value)
+                        }
+                    } catch let error as NSError {
+                        print("Failed to load: \(error.localizedDescription)")
+                        result!(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Failed to load: \(error.localizedDescription)", details: error))
                     }
-                } catch let error as NSError {
-                    print("Failed to load: \(error.localizedDescription)")
-                    result!(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Failed to load: \(error.localizedDescription)", details: error))
-                }
-                
-            })
+                    
+                })
+            }
         }
     }
     
-    public func injectScriptCode(arguments: NSDictionary, result: FlutterResult?) {
+    public func injectScriptCode(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
         let jsWrapper = "(function(){return JSON.stringify(eval(%@));})();"
-        injectDeferredObject(arguments["source"] as! String, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(uuid: uuid, source: arguments["source"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectScriptFile(arguments: NSDictionary, result: FlutterResult?) {
+    public func injectScriptFile(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
         let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(uuid: uuid, source: arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectStyleCode(arguments: NSDictionary, result: FlutterResult?) {
+    public func injectStyleCode(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
         let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(arguments["source"] as! String, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(uuid: uuid, source: arguments["source"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectStyleFile(arguments: NSDictionary, result: FlutterResult?) {
+    public func injectStyleFile(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
         let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(uuid: uuid, source: arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
     }
     
-    func onLoadStart(_ webView: WKWebView) {
-        let url: String = webViewController!.currentURL!.absoluteString
-        channel.invokeMethod("onLoadStart", arguments: ["url": url])
-    }
-    
-    func onLoadStop(_ webView: WKWebView) {
-        let url: String = webViewController!.currentURL!.absoluteString
-        channel.invokeMethod("onLoadStop", arguments: ["url": url])
-    }
-    
-    func onLoadError(_ webView: WKWebView, error: Error) {
-        let url: String = webViewController!.currentURL!.absoluteString
-        let arguments = ["url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
-        channel.invokeMethod("onLoadError", arguments: arguments)
-    }
-    
-    func onExit() {
-        channel.invokeMethod("onExit", arguments: [])
-    }
-    
-    func shouldOverrideUrlLoading(_ webView: WKWebView, url: URL) {
-        channel.invokeMethod("shouldOverrideUrlLoading", arguments: ["url": url.absoluteString])
-    }
-    
-    func onChromeSafariBrowserOpened() {
-        channel.invokeMethod("onChromeSafariBrowserOpened", arguments: [])
-    }
-    
-    func onChromeSafariBrowserLoaded() {
-        channel.invokeMethod("onChromeSafariBrowserLoaded", arguments: [])
-    }
-    
-    func onChromeSafariBrowserClosed() {
-        channel.invokeMethod("onChromeSafariBrowserClosed", arguments: [])
-    }
-    
-    func safariExit() {
-        if #available(iOS 9.0, *) {
-            (safariViewController as! SafariViewController).statusDelegate = nil
-            (safariViewController as! SafariViewController).delegate = nil
+    func onLoadStart(uuid: String, webView: WKWebView) {
+        if let webViewController = self.webViewControllers[uuid] {
+            let url: String = webViewController!.currentURL!.absoluteString
+            channel.invokeMethod("onLoadStart", arguments: ["uuid": uuid, "url": url])
         }
-        safariViewController = nil
-        onChromeSafariBrowserClosed()
     }
     
-    func browserExit() {
-        // Set navigationDelegate to nil to ensure no callbacks are received from it.
-        webViewController?.navigationDelegate = nil
-        // Don't recycle the ViewController since it may be consuming a lot of memory.
-        // Also - this is required for the PDF/User-Agent bug work-around.
-        webViewController = nil
-        
-        if previousStatusBarStyle != -1 {
-            UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)!
+    func onLoadStop(uuid: String, webView: WKWebView) {
+        if let webViewController = self.webViewControllers[uuid] {
+            let url: String = webViewController!.currentURL!.absoluteString
+            channel.invokeMethod("onLoadStop", arguments: ["uuid": uuid, "url": url])
         }
-        
-        onExit()
+    }
+    
+    func onLoadError(uuid: String, webView: WKWebView, error: Error) {
+        if let webViewController = self.webViewControllers[uuid] {
+            let url: String = webViewController!.currentURL!.absoluteString
+            let arguments = ["uuid": uuid, "url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
+            channel.invokeMethod("onLoadError", arguments: arguments)
+        }
+    }
+    
+    func onExit(uuid: String) {
+        channel.invokeMethod("onExit", arguments: ["uuid": uuid])
+    }
+    
+    func shouldOverrideUrlLoading(uuid: String, webView: WKWebView, url: URL) {
+        if let webViewController = self.webViewControllers[uuid] {
+            channel.invokeMethod("shouldOverrideUrlLoading", arguments: ["uuid": uuid, "url": url.absoluteString])
+        }
+    }
+    
+    func onChromeSafariBrowserOpened(uuid: String) {
+        if let safariViewController = self.safariViewControllers[uuid] {
+            channel.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
+        }
+    }
+    
+    func onChromeSafariBrowserLoaded(uuid: String) {
+        if let safariViewController = self.safariViewControllers[uuid] {
+            channel.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
+        }
+    }
+    
+    func onChromeSafariBrowserClosed(uuid: String) {
+        channel.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
+    }
+    
+    func safariExit(uuid: String) {
+        if let safariViewController = self.safariViewControllers[uuid] {
+            if #available(iOS 9.0, *) {
+                (safariViewController as! SafariViewController).statusDelegate = nil
+                (safariViewController as! SafariViewController).delegate = nil
+            }
+            self.safariViewControllers[uuid] = nil
+            onChromeSafariBrowserClosed(uuid: uuid)
+        }
+    }
+    
+    func browserExit(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            // Set navigationDelegate to nil to ensure no callbacks are received from it.
+            webViewController?.navigationDelegate = nil
+            // Don't recycle the ViewController since it may be consuming a lot of memory.
+            // Also - this is required for the PDF/User-Agent bug work-around.
+            self.webViewControllers[uuid] = nil
+            
+            if previousStatusBarStyle != -1 {
+                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)!
+            }
+            
+            onExit(uuid: uuid)
+        }
     }
     
 }

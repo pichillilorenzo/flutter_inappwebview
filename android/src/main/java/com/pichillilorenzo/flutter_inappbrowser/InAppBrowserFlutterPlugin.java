@@ -61,8 +61,8 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   public static Registrar registrar;
   public Activity activity;
   public static MethodChannel channel;
-  public static WebViewActivity webViewActivity;
-  public static ChromeCustomTabsActivity chromeCustomTabsActivity;
+  public static Map<String, WebViewActivity> webViewActivities = new HashMap<>();
+  public static Map<String, ChromeCustomTabsActivity> chromeCustomTabsActivities = new HashMap<>();
 
   private static final String NULL = "null";
   protected static final String LOG_TAG = "InAppBrowserFlutterP";
@@ -85,6 +85,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     String source;
     String jsWrapper;
     String urlFile;
+    final String uuid = (String) call.argument("uuid");
 
     switch (call.method) {
       case "open":
@@ -110,13 +111,15 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
             if (useChromeSafariBrowser) {
 
+              final String uuidFallback = (String) call.argument("uuidFallback");
+
               final ChromeCustomTabsOptions options = new ChromeCustomTabsOptions();
               options.parse((HashMap<String, Object>) call.argument("options"));
 
               final InAppBrowserOptions optionsFallback = new InAppBrowserOptions();
               optionsFallback.parse((HashMap<String, Object>) call.argument("optionsFallback"));
 
-              open(url, options, headers,true, optionsFallback);
+              open(uuid, uuidFallback, url, options, headers,true, optionsFallback);
             }
             else {
 
@@ -141,89 +144,90 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
                 // load in InAppBrowserFlutterPlugin
                 else {
                   Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
-                  open(url, options, headers, false, null);
+                  open(uuid, null, url, options, headers, false, null);
                 }
               }
               // SYSTEM
               else if ("_system".equals(target)) {
                 Log.d(LOG_TAG, "in system");
-                openExternal(url, result);
+                openExternal(url);
               }
               // BLANK - or anything else
               else {
                 Log.d(LOG_TAG, "in blank");
-                open(url, options, headers, false, null);
+                open(uuid, null, url, options, headers, false, null);
               }
             }
+
             result.success(true);
           }
         });
         break;
       case "loadUrl":
-        loadUrl(call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+        loadUrl(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
         break;
       case "close":
-        close();
+        close(uuid);
         result.success(true);
         break;
       case "injectScriptCode":
         source = call.argument("source").toString();
         jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
-        injectDeferredObject(source, jsWrapper, result);
+        injectDeferredObject(uuid, source, jsWrapper, result);
         break;
       case "injectScriptFile":
         urlFile = call.argument("urlFile").toString();
         jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
-        injectDeferredObject(urlFile, jsWrapper, null);
+        injectDeferredObject(uuid, urlFile, jsWrapper, null);
         result.success(true);
         break;
       case "injectStyleCode":
         source = call.argument("source").toString();
         jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
-        injectDeferredObject(source, jsWrapper, null);
+        injectDeferredObject(uuid, source, jsWrapper, null);
         result.success(true);
         break;
       case "injectStyleFile":
         urlFile = call.argument("urlFile").toString();
         jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
-        injectDeferredObject(urlFile, jsWrapper, null);
+        injectDeferredObject(uuid, urlFile, jsWrapper, null);
         result.success(true);
         break;
       case "show":
-        show();
+        show(uuid);
         result.success(true);
         break;
       case "hide":
-        hide();
+        hide(uuid);
         result.success(true);
         break;
       case "reload":
-        reload();
+        reload(uuid);
         result.success(true);
         break;
       case "goBack":
-        goBack();
+        goBack(uuid);
         result.success(true);
         break;
       case "canGoBack":
-        result.success(canGoBack());
+        result.success(canGoBack(uuid));
         break;
       case "goForward":
-        goForward();
+        goForward(uuid);
         result.success(true);
         break;
       case "canGoForward":
-        result.success(canGoForward());
+        result.success(canGoForward(uuid));
         break;
       case "stopLoading":
-        stopLoading();
+        stopLoading(uuid);
         result.success(true);
         break;
       case "isLoading":
-        result.success(isLoading());
+        result.success(isLoading(uuid));
         break;
       case "isHidden":
-        result.success(isHidden());
+        result.success(isHidden(uuid));
         break;
       default:
         result.notImplemented();
@@ -240,13 +244,15 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
    * If a wrapper string is supplied, then the source string will be JSON-encoded (adding
    * quotes) and wrapped using string formatting. (The wrapper string should have a single
    * '%s' marker)
-   *  @param source      The source object (filename or script/style text) to inject into
+   * @param uuid
+   * @param source      The source object (filename or script/style text) to inject into
    *                    the document.
    * @param jsWrapper   A JavaScript string to wrap the source string in, so that the object
-   *                    is properly injected, or null if the source string is JavaScript text
+ *                    is properly injected, or null if the source string is JavaScript text
    * @param result
    */
-  private void injectDeferredObject(String source, String jsWrapper, final Result result) {
+  private void injectDeferredObject(String uuid, String source, String jsWrapper, final Result result) {
+    final WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null) {
       String scriptToInject;
       if (jsWrapper != null) {
@@ -323,7 +329,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
    * @param url the url to load.
    * @return "" if ok, or error message.
    */
-  public void openExternal(String url, Result result) {
+  public void openExternal(String url) {
     try {
       Intent intent;
       intent = new Intent(Intent.ACTION_VIEW);
@@ -381,24 +387,29 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
   }
 
-  public static void open(final String url, Options options, Map<String, String> headers, boolean useChromeSafariBrowser, InAppBrowserOptions optionsFallback) {
+  public static void open(String uuid, String uuidFallback, final String url, Options options, Map<String, String> headers, boolean useChromeSafariBrowser, InAppBrowserOptions optionsFallback) {
     Intent intent = new Intent(registrar.activity(), (useChromeSafariBrowser) ? ChromeCustomTabsActivity.class : WebViewActivity.class);
 
     Bundle extras = new Bundle();
+    extras.putString("uuid", uuid);
     extras.putString("url", url);
     extras.putSerializable("options", options.getHashMap());
     extras.putSerializable("headers", (Serializable) headers);
-    if (useChromeSafariBrowser && optionsFallback != null)
-      extras.putSerializable("optionsFallback", optionsFallback.getHashMap());
-    else
-      extras.putSerializable("optionsFallback", (new InAppBrowserOptions()).getHashMap());
+    if (useChromeSafariBrowser) {
+      extras.putString("uuidFallback", uuidFallback);
+      if (optionsFallback != null)
+        extras.putSerializable("optionsFallback", optionsFallback.getHashMap());
+      else
+        extras.putSerializable("optionsFallback", (new InAppBrowserOptions()).getHashMap());
+    }
 
     intent.putExtras(extras);
 
     registrar.activity().startActivity(intent);
   }
 
-  public void loadUrl(String url, Map<String, String> headers, Result result) {
+  public void loadUrl(String uuid, String url, Map<String, String> headers, Result result) {
+      WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null) {
       if (headers != null)
         webViewActivity.loadUrl(url, headers, result);
@@ -407,67 +418,79 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
   }
 
-  public void show() {
+  public void show(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       webViewActivity.show();
   }
 
-  public void hide() {
+  public void hide(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       webViewActivity.hide();
   }
 
-  public void reload() {
+  public void reload(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       webViewActivity.reload();
   }
 
-  public boolean isLoading() {
+  public boolean isLoading(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       return webViewActivity.isLoading();
     return false;
   }
 
-  public boolean isHidden() {
+  public boolean isHidden(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       return webViewActivity.isHidden;
     return false;
   }
 
-  public void stopLoading() {
+  public void stopLoading(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       webViewActivity.stopLoading();
   }
 
-  public void goBack() {
+  public void goBack(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       webViewActivity.goBack();
   }
 
-  public boolean canGoBack() {
+  public boolean canGoBack(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       return webViewActivity.canGoBack();
     return false;
   }
 
-  public void goForward() {
+  public void goForward(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       webViewActivity.goForward();
   }
 
-  public boolean canGoForward() {
+  public boolean canGoForward(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null)
       return webViewActivity.canGoForward();
     return false;
   }
 
 
-  public static void close() {
+  public static void close(final String uuid) {
+    final WebViewActivity webViewActivity = webViewActivities.get(uuid);
     registrar.activity().runOnUiThread(new Runnable() {
       @Override
       public void run() {
 
       Map<String, Object> obj = new HashMap<>();
+      obj.put("uuid", uuid);
       channel.invokeMethod("onExit", obj);
 
       // The JS protects against multiple calls, so this should happen only when

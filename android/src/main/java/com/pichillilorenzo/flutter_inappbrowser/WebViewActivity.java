@@ -7,7 +7,6 @@ import android.os.Build;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,6 +26,7 @@ import io.flutter.plugin.common.MethodChannel;
 
 public class WebViewActivity extends AppCompatActivity {
 
+    String uuid;
     WebView webView;
     ActionBar actionBar;
     InAppBrowserWebViewClient inAppBrowserWebViewClient;
@@ -47,6 +47,7 @@ public class WebViewActivity extends AppCompatActivity {
         webView = findViewById(R.id.webView);
 
         Bundle b = getIntent().getExtras();
+        uuid = b.getString("uuid");
         String url = b.getString("url");
 
         options = new InAppBrowserOptions();
@@ -54,7 +55,7 @@ public class WebViewActivity extends AppCompatActivity {
 
         headers = (HashMap<String, String>) b.getSerializable("headers");
 
-        InAppBrowserFlutterPlugin.webViewActivity = this;
+        InAppBrowserFlutterPlugin.webViewActivities.put(uuid, this);
 
         actionBar = getSupportActionBar();
 
@@ -243,7 +244,7 @@ public class WebViewActivity extends AppCompatActivity {
             if (canGoBack())
                 goBack();
             else if (options.closeOnCannotGoBack)
-                InAppBrowserFlutterPlugin.close();
+                InAppBrowserFlutterPlugin.close(uuid);
             return true;
         }
         return super.onKeyDown(keyCode, event);
@@ -340,7 +341,7 @@ public class WebViewActivity extends AppCompatActivity {
     }
 
     public void closeButtonClicked(MenuItem item) {
-        InAppBrowserFlutterPlugin.close();
+        InAppBrowserFlutterPlugin.close(uuid);
     }
 
 }

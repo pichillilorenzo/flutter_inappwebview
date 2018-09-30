@@ -80,6 +80,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     var browserOptions: InAppBrowserOptions?
     var initHeaders: [String: String]?
     var isHidden = false
+    var uuid: String = ""
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
@@ -323,7 +324,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         currentURL = nil
         
         if (navigationDelegate != nil) {
-            navigationDelegate?.browserExit()
+            navigationDelegate?.browserExit(uuid: self.uuid)
         }
         
         weak var weakSelf = self
@@ -419,7 +420,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let url = navigationAction.request.url
         
         if (url != nil && navigationAction.navigationType == .linkActivated && (browserOptions?.useShouldOverrideUrlLoading)!) {
-            navigationDelegate?.shouldOverrideUrlLoading(webView, url: url!)
+            navigationDelegate?.shouldOverrideUrlLoading(uuid: self.uuid, webView: webView, url: url!)
             decisionHandler(.cancel)
             return
         }
@@ -475,7 +476,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             spinner.startAnimating()
         }
         
-        return (navigationDelegate?.onLoadStart(webView))!
+        return (navigationDelegate?.onLoadStart(uuid: self.uuid, webView: webView))!
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -485,7 +486,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()
-        navigationDelegate?.onLoadStop(webView)
+        navigationDelegate?.onLoadStop(uuid: self.uuid, webView: webView)
     }
     
 //    func webView(_ webView: WKWebView,
@@ -495,7 +496,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
 //        backButton.isEnabled = webView.canGoBack
 //        forwardButton.isEnabled = webView.canGoForward
 //        spinner.stopAnimating()
-//        navigationDelegate?.webView(webView, didFailLoadWithError: error)
+//        navigationDelegate?.webView(uuid: self.uuid, webView: webView, didFailLoadWithError: error)
 //    }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
@@ -503,6 +504,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()
-        navigationDelegate?.onLoadError(webView, error: error)
+        navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
     }
 }

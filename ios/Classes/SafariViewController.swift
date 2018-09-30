@@ -14,6 +14,7 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
     weak var statusDelegate: SwiftFlutterPlugin?
     var tmpWindow: UIWindow?
     var safariOptions: SafariBrowserOptions?
+    var uuid: String = ""
     
     override func viewWillAppear(_ animated: Bool) {
         prepareSafariBrowser()
@@ -37,7 +38,7 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
     
     func close() {
         if (statusDelegate != nil) {
-            statusDelegate?.safariExit()
+            statusDelegate?.safariExit(uuid: self.uuid)
         }
         
         dismiss(animated: true)
@@ -55,7 +56,7 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
     func safariViewController(_ controller: SFSafariViewController,
                               didCompleteInitialLoad didLoadSuccessfully: Bool) {
         if didLoadSuccessfully {
-            statusDelegate?.onChromeSafariBrowserLoaded()
+            statusDelegate?.onChromeSafariBrowserLoaded(uuid: self.uuid)
         }
         else {
             print("Cant load successfully the 'SafariViewController'.")

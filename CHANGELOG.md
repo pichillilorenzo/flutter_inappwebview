@@ -1,6 +1,6 @@
 ## 0.2.0
 
-- added support of Chrome CustomTabs for android
+- added support of Chrome CustomTabs for Android
 - added support of SFSafariViewController for iOS
 - added the ability to create multiple instances of browsers
 

@@ -485,30 +485,32 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
   public static void close(final String uuid) {
     final WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    registrar.activity().runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
+    if (webViewActivity != null) {
+      registrar.activity().runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
 
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("uuid", uuid);
-      channel.invokeMethod("onExit", obj);
+          Map<String, Object> obj = new HashMap<>();
+          obj.put("uuid", uuid);
+          channel.invokeMethod("onExit", obj);
 
-      // The JS protects against multiple calls, so this should happen only when
-      // close() is called by other native code.
-      if (webViewActivity == null)
-        return;
+          // The JS protects against multiple calls, so this should happen only when
+          // close() is called by other native code.
+          if (webViewActivity == null)
+            return;
 
-      webViewActivity.webView.setWebViewClient(new WebViewClient() {
-        // NB: wait for about:blank before dismissing
-        public void onPageFinished(WebView view, String url) {
-          webViewActivity.close();
+          webViewActivity.webView.setWebViewClient(new WebViewClient() {
+            // NB: wait for about:blank before dismissing
+            public void onPageFinished(WebView view, String url) {
+              webViewActivity.close();
+            }
+          });
+          // NB: From SDK 19: "If you call methods on WebView from any thread
+          // other than your app's UI thread, it can cause unexpected results."
+          // http://developer.android.com/guide/webapps/migrating.html#Threads
+          webViewActivity.webView.loadUrl("about:blank");
         }
       });
-      // NB: From SDK 19: "If you call methods on WebView from any thread
-      // other than your app's UI thread, it can cause unexpected results."
-      // http://developer.android.com/guide/webapps/migrating.html#Threads
-      webViewActivity.webView.loadUrl("about:blank");
-      }
-    });
+    }
   }
 }

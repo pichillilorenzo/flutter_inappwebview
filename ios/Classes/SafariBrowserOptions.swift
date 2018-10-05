@@ -15,6 +15,8 @@ public class SafariBrowserOptions: Options {
     var dismissButtonStyle = 0 //done
     var preferredBarTintColor = ""
     var preferredControlTintColor = ""
+    var presentationStyle = 0 //fullscreen
+    var transitionStyle = 0 //crossDissolve
     
     override init(){
         super.init()

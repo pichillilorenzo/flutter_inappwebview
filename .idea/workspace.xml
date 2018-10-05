@@ -11,7 +11,13 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" afterPath="$PROJECT_DIR$/.idea/workspace.xml" />
-      <change beforePath="$PROJECT_DIR$/example/ios/Podfile" afterPath="$PROJECT_DIR$/example/ios/Podfile" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" afterPath="$PROJECT_DIR$/CHANGELOG.md" />
+      <change beforePath="$PROJECT_DIR$/README.md" afterPath="$PROJECT_DIR$/README.md" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" />
+      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" afterPath="$PROJECT_DIR$/example/lib/main.dart" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/SafariBrowserOptions.swift" afterPath="$PROJECT_DIR$/ios/Classes/SafariBrowserOptions.swift" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/SafariViewController.swift" afterPath="$PROJECT_DIR$/ios/Classes/SafariViewController.swift" />
+      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -31,8 +37,8 @@
       <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="4260">
-              <caret line="307" column="30" lean-forward="false" selection-start-line="307" selection-start-column="30" selection-end-line="307" selection-end-column="30" />
+            <state relative-caret-position="135">
+              <caret line="337" column="40" lean-forward="false" selection-start-line="337" selection-start-column="40" selection-end-line="337" selection-end-column="40" />
               <folding>
                 <element signature="e#814#834#0" expanded="true" />
               </folding>
@@ -40,25 +46,67 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="CHANGELOG.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="60">
-                <caret line="4" column="60" lean-forward="false" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="60" />
-                <folding />
+              <first_editor relative-caret-position="133">
+                <caret line="460" column="0" lean-forward="true" selection-start-line="460" selection-start-column="0" selection-end-line="460" selection-end-column="0" />
+                <folding>
+                  <marker date="1538738179486" expanded="true" signature="1261:1358" ph="..." />
+                  <marker date="1538738179486" expanded="true" signature="1402:2447" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="1448:1488" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="1540:2114" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="1826:1879" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+                  <marker date="1538738179486" expanded="true" signature="1934:2006" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+                  <marker date="1538738179486" expanded="true" signature="2185:2246" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2276:2319" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2379:2444" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2574:2639" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2680:3269" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2714:2742" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2793:3267" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="2821:3262" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="2847:3255" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="2875:2958" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="2904:2947" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="2984:3246" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="3019:3235" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="3098:3165" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="10852:10860" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="10979:10987" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="11147:11155" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="11251:11259" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="11543:11549" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="14258:14355" ph="..." />
+                  <marker date="1538738179486" expanded="true" signature="14399:14795" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="14453:14493" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="14545:14585" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="14656:14717" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="14747:14790" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="14914:15224" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15017:15064" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15096:15143" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15175:15222" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15295:15317" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15393:15458" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15499:16401" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15533:15561" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15612:16399" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="15640:16394" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15666:16387" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15694:15777" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15723:15766" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15803:16378" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15838:16367" ph="(...)" />
+                  <marker date="1538738179486" expanded="true" signature="15924:16138" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="16171:16290" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="19145:19153" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="19251:19259" ph="{...}" />
+                  <marker date="1538738179486" expanded="true" signature="19357:19365" ph="{...}" />
+                </folding>
               </first_editor>
               <second_editor />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Podfile" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/example/ios/Podfile">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="695">
-              <caret line="65" column="52" lean-forward="false" selection-start-line="65" selection-start-column="52" selection-end-line="65" selection-end-column="52" />
-              <folding />
             </state>
           </provider>
         </entry>
@@ -66,8 +114,8 @@
       <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1860">
-              <caret line="124" column="36" lean-forward="false" selection-start-line="124" selection-start-column="36" selection-end-line="124" selection-end-column="36" />
+            <state relative-caret-position="395">
+              <caret line="101" column="38" lean-forward="false" selection-start-line="101" selection-start-column="38" selection-end-line="101" selection-end-column="38" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
               </folding>
@@ -86,8 +134,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>(0)</find>
-      <find>closeDi</find>
       <find>hide()</find>
       <find>loadUrl</find>
       <find>showWebPage</find>
@@ -116,6 +162,8 @@
       <find>sourceFile</find>
       <find>hideUrlBar</find>
       <find>InAppBrowser</find>
+      <find>###</find>
+      <find>presentationStyle</find>
     </findStrings>
     <replaceStrings>
       <replace>activity.getPreferences(0)</replace>
@@ -153,17 +201,17 @@
         <option value="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowser.java" />
         <option value="$PROJECT_DIR$/ios/flutter_inappbrowser.podspec" />
         <option value="$PROJECT_DIR$/android/build.gradle" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
+        <option value="$PROJECT_DIR$/example/ios/Podfile" />
+        <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
-        <option value="$PROJECT_DIR$/CHANGELOG.md" />
-        <option value="$PROJECT_DIR$/example/ios/Podfile" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="98" />
+    <option name="x" value="96" />
     <option name="y" value="23" />
     <option name="width" value="1582" />
     <option name="height" value="1018" />
@@ -184,9 +232,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="AndroidView" />
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="Scratches" />
       <pane id="ProjectPane">
         <subPane>
@@ -195,11 +240,24 @@
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
             </path>
+            <path>
+              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
+              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
+              <item name="example" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
+              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
+              <item name="lib" type="462c0819:PsiDirectoryNode" />
+            </path>
           </expand>
           <select />
         </subPane>
         <option name="show-excluded-files" value="false" />
       </pane>
+      <pane id="Scope" />
+      <pane id="AndroidView" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -389,20 +447,20 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="98" y="23" width="1582" height="1018" extended-state="0" />
+    <frame x="96" y="23" width="1582" height="1018" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info id="Android Profiler" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="false" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="true" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.23777778" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31735888" sideWeight="0.5026455" order="8" side_tool="true" content_ui="tabs" />
       <window_info id="Dart Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32161874" sideWeight="0.4973545" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3211111" sideWeight="0.4973545" order="2" side_tool="false" content_ui="tabs" />
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.34" sideWeight="0.4973545" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27888888" sideWeight="0.4973545" order="10" side_tool="false" content_ui="tabs" />
       <window_info id="Flutter Outline" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936507" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
       <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936507" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
@@ -414,13 +472,14 @@
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
-      <window_info id="Flutter Inspector" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Flutter Inspector" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987013" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Cvs" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32800853" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23777778" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
     </layout>
@@ -430,32 +489,33 @@
       <window_info id="Message" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
       <window_info id="Build Variants" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="true" content_ui="tabs" />
       <window_info id="Commander" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="0" side_tool="false" content_ui="tabs" />
-      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="true" content_ui="tabs" />
-      <window_info id="Dart Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
-      <window_info id="Flutter Outline" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32977968" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
-      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Event Log" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.31735888" sideWeight="0.5026455" order="8" side_tool="true" content_ui="tabs" />
+      <window_info id="Dart Analysis" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="14" side_tool="false" content_ui="tabs" />
+      <window_info id="Flutter Outline" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936507" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
+      <window_info id="Logcat" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Dependency Viewer" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32800853" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Tool" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
       <window_info id="Hierarchy" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="2" side_tool="false" content_ui="combo" />
-      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
+      <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.24969475" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Device File Explorer" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="true" content_ui="tabs" />
       <window_info id="Debug" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="11" side_tool="false" content_ui="tabs" />
+      <window_info id="Messages" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.23777778" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
       <window_info id="Palette&#9;" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Image Layers" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
       <window_info id="Capture Analysis" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
       <window_info id="Inspection" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.4" sideWeight="0.5" order="5" side_tool="false" content_ui="tabs" />
-      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2618262" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="12" side_tool="false" content_ui="tabs" />
-      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="13" side_tool="false" content_ui="tabs" />
-      <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.1934085" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Run" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32161874" sideWeight="0.4973545" order="2" side_tool="false" content_ui="tabs" />
+      <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
+      <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.27888888" sideWeight="0.4973545" order="10" side_tool="false" content_ui="tabs" />
+      <window_info id="Captures" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32936507" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.18376623" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Find" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.3290735" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Theme Preview" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="false" content_ui="tabs" />
       <window_info id="Favorites" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="7" side_tool="true" content_ui="tabs" />
-      <window_info id="Flutter Inspector" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
+      <window_info id="Flutter Inspector" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32987013" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
     </layout-to-restore>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -463,7 +523,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="5" />
+      <option name="time" value="9" />
     </breakpoint-manager>
     <watches-manager />
   </component>
@@ -606,13 +666,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="0">
-          <caret line="0" column="6" lean-forward="false" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="26" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ios/Classes/InAppBrowser.h" />
     <entry file="file://$PROJECT_DIR$/ios/Classes/InAppBrowser.m" />
     <entry file="file://$PROJECT_DIR$/LICENSE">
@@ -725,16 +778,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="302">
-            <caret line="225" column="29" lean-forward="false" selection-start-line="225" selection-start-column="29" selection-end-line="225" selection-end-column="29" />
-          </first_editor>
-          <second_editor />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pubspec.lock">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="0">
@@ -749,10 +792,43 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/ios/flutter_inappbrowser.podspec">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="240">
+          <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Podfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="539">
+          <caret line="65" column="52" lean-forward="false" selection-start-line="65" selection-start-column="52" selection-end-line="65" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="0">
+          <caret line="0" column="6" lean-forward="false" selection-start-line="0" selection-start-column="6" selection-end-line="0" selection-end-column="26" />
+          <folding />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="45">
+            <caret line="3" column="49" lean-forward="true" selection-start-line="3" selection-start-column="19" selection-end-line="3" selection-end-column="49" />
+            <folding />
+          </first_editor>
+          <second_editor />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1860">
-          <caret line="124" column="36" lean-forward="false" selection-start-line="124" selection-start-column="36" selection-end-line="124" selection-end-column="36" />
+        <state relative-caret-position="395">
+          <caret line="101" column="38" lean-forward="false" selection-start-line="101" selection-start-column="38" selection-end-line="101" selection-end-column="38" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
@@ -761,38 +837,74 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="4260">
-          <caret line="307" column="30" lean-forward="false" selection-start-line="307" selection-start-column="30" selection-end-line="307" selection-end-column="30" />
+        <state relative-caret-position="135">
+          <caret line="337" column="40" lean-forward="false" selection-start-line="337" selection-start-column="40" selection-end-line="337" selection-end-column="40" />
           <folding>
             <element signature="e#814#834#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+    <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;markdown-preview-editor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="60">
-            <caret line="4" column="60" lean-forward="false" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="60" />
-            <folding />
+          <first_editor relative-caret-position="133">
+            <caret line="460" column="0" lean-forward="true" selection-start-line="460" selection-start-column="0" selection-end-line="460" selection-end-column="0" />
+            <folding>
+              <marker date="1538738179486" expanded="true" signature="1261:1358" ph="..." />
+              <marker date="1538738179486" expanded="true" signature="1402:2447" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="1448:1488" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="1540:2114" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="1826:1879" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+              <marker date="1538738179486" expanded="true" signature="1934:2006" ph="&quot;&quot;&quot;...&quot;&quot;&quot;" />
+              <marker date="1538738179486" expanded="true" signature="2185:2246" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2276:2319" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2379:2444" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2574:2639" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2680:3269" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2714:2742" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2793:3267" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="2821:3262" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="2847:3255" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="2875:2958" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="2904:2947" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="2984:3246" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="3019:3235" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="3098:3165" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="10852:10860" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="10979:10987" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="11147:11155" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="11251:11259" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="11543:11549" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="14258:14355" ph="..." />
+              <marker date="1538738179486" expanded="true" signature="14399:14795" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="14453:14493" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="14545:14585" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="14656:14717" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="14747:14790" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="14914:15224" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15017:15064" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15096:15143" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15175:15222" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15295:15317" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15393:15458" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15499:16401" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15533:15561" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15612:16399" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="15640:16394" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15666:16387" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15694:15777" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15723:15766" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15803:16378" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15838:16367" ph="(...)" />
+              <marker date="1538738179486" expanded="true" signature="15924:16138" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="16171:16290" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="19145:19153" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="19251:19259" ph="{...}" />
+              <marker date="1538738179486" expanded="true" signature="19357:19365" ph="{...}" />
+            </folding>
           </first_editor>
           <second_editor />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ios/flutter_inappbrowser.podspec">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="24" lean-forward="false" selection-start-line="16" selection-start-column="24" selection-end-line="16" selection-end-column="24" />
-          <folding />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/ios/Podfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="695">
-          <caret line="65" column="52" lean-forward="false" selection-start-line="65" selection-start-column="52" selection-end-line="65" selection-end-column="52" />
-          <folding />
         </state>
       </provider>
     </entry>

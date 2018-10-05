@@ -16,11 +16,17 @@ For help on editing plugin code, view the [documentation](https://flutter.io/dev
 First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
 ## Usage
+Classes:
+- [InAppBrowser](#inappbrowser): Native WebView.
+- [ChromeSafariBrowser](#chromesafaribrowser): [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
+
+Screenshots [here](#screenshots).
+
+### `InAppBrowser` class
 Create a Class that extends the `InAppBrowser` Class in order to override the callbacks to manage the browser events.
 Example:
 ```dart
 import 'package:flutter/material.dart';
-
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyInAppBrowser extends InAppBrowser {
@@ -107,7 +113,7 @@ class _MyAppState extends State<MyApp> {
 }
 ```
 
-### Future\<void\> InAppBrowser.open
+#### Future\<void\> InAppBrowser.open
 
 Opens a URL in a new InAppBrowser instance or the system browser.
 
@@ -188,7 +194,7 @@ inAppBrowser.open('https://flutter.io/', options: {
 });
 ``` 
 
-### Events
+#### Events
 
 Event fires when the `InAppBrowser` starts to load an `url`.
 ```dart
@@ -231,7 +237,7 @@ In order to be able to listen this event, you need to set `useShouldOverrideUrlL
   }
 ```
 
-### Future\<void\> InAppBrowser.loadUrl
+#### Future\<void\> InAppBrowser.loadUrl
 
 Loads the given `url` with optional `headers` specified as a map from name to value.
 
@@ -239,7 +245,7 @@ Loads the given `url` with optional `headers` specified as a map from name to va
 inAppBrowser.loadUrl(String url, {Map<String, String> headers = const {}});
 ```
 
-### Future\<void\> InAppBrowser.show
+#### Future\<void\> InAppBrowser.show
 
 Displays an `InAppBrowser` window that was opened hidden. Calling this has no effect if the `InAppBrowser` was already visible.
 
@@ -247,7 +253,7 @@ Displays an `InAppBrowser` window that was opened hidden. Calling this has no ef
 inAppBrowser.show();
 ``` 
 
-### Future\<void\> InAppBrowser.hide
+#### Future\<void\> InAppBrowser.hide
 
 Hides the `InAppBrowser` window. Calling this has no effect if the `InAppBrowser` was already hidden.
 
@@ -255,7 +261,7 @@ Hides the `InAppBrowser` window. Calling this has no effect if the `InAppBrowser
 inAppBrowser.hide();
 ``` 
 
-### Future\<void\> InAppBrowser.close
+#### Future\<void\> InAppBrowser.close
 
 Closes the `InAppBrowser` window.
 
@@ -263,7 +269,7 @@ Closes the `InAppBrowser` window.
 inAppBrowser.close();
 ``` 
 
-### Future\<void\> InAppBrowser.reload
+#### Future\<void\> InAppBrowser.reload
 
 Reloads the `InAppBrowser` window.
 
@@ -271,7 +277,7 @@ Reloads the `InAppBrowser` window.
 inAppBrowser.reload();
 ``` 
 
-### Future\<void\> InAppBrowser.goBack
+#### Future\<void\> InAppBrowser.goBack
 
 Goes back in the history of the `InAppBrowser` window.
 
@@ -279,7 +285,7 @@ Goes back in the history of the `InAppBrowser` window.
 inAppBrowser.goBack();
 ``` 
 
-### Future\<void\> InAppBrowser.goForward
+#### Future\<void\> InAppBrowser.goForward
 
 Goes forward in the history of the `InAppBrowser` window.
 
@@ -287,7 +293,7 @@ Goes forward in the history of the `InAppBrowser` window.
 inAppBrowser.goForward();
 ``` 
 
-### Future\<bool\> InAppBrowser.isLoading
+#### Future\<bool\> InAppBrowser.isLoading
 
 Check if the Web View of the `InAppBrowser` instance is in a loading state.
 
@@ -295,7 +301,7 @@ Check if the Web View of the `InAppBrowser` instance is in a loading state.
 inAppBrowser.isLoading();
 ``` 
 
-### Future\<void\> InAppBrowser.stopLoading
+#### Future\<void\> InAppBrowser.stopLoading
 
 Stops the Web View of the `InAppBrowser` instance from loading.
 
@@ -303,7 +309,7 @@ Stops the Web View of the `InAppBrowser` instance from loading.
 inAppBrowser.stopLoading();
 ``` 
 
-### Future\<bool\> InAppBrowser.isHidden
+#### Future\<bool\> InAppBrowser.isHidden
 
 Check if the Web View of the `InAppBrowser` instance is hidden.
 
@@ -311,7 +317,7 @@ Check if the Web View of the `InAppBrowser` instance is hidden.
 inAppBrowser.isHidden();
 ``` 
 
-### Future\<String\> InAppBrowser.injectScriptCode
+#### Future\<String\> InAppBrowser.injectScriptCode
 
 Injects JavaScript code into the `InAppBrowser` window and returns the result of the evaluation. (Only available when the target is set to `_blank` or to `_self`)
 
@@ -319,7 +325,7 @@ Injects JavaScript code into the `InAppBrowser` window and returns the result of
 inAppBrowser.injectScriptCode(String source);
 ``` 
 
-### Future\<void\> InAppBrowser.injectScriptFile
+#### Future\<void\> InAppBrowser.injectScriptFile
 
 Injects a JavaScript file into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
 
@@ -327,7 +333,7 @@ Injects a JavaScript file into the `InAppBrowser` window. (Only available when t
 inAppBrowser.injectScriptFile(String urlFile);
 ``` 
 
-### Future\<void\> InAppBrowser.injectStyleCode
+#### Future\<void\> InAppBrowser.injectStyleCode
 
 Injects CSS into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
 
@@ -335,7 +341,7 @@ Injects CSS into the `InAppBrowser` window. (Only available when the target is s
 inAppBrowser.injectStyleCode(String source);
 ``` 
 
-### Future\<void\> InAppBrowser.injectStyleFile
+#### Future\<void\> InAppBrowser.injectStyleFile
 
 Injects a CSS file into the `InAppBrowser` window. (Only available when the target is set to `_blank` or to `_self`)
 
@@ -343,8 +349,173 @@ Injects a CSS file into the `InAppBrowser` window. (Only available when the targ
 inAppBrowser.injectStyleFile(String urlFile);
 ``` 
 
+### `ChromeSafariBrowser` class
+Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:
+```dart
+import 'package:flutter/material.dart';
+import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+
+class MyInAppBrowser extends InAppBrowser {
+
+  @override
+  Future onLoadStart(String url) async {
+    print("\n\nStarted $url\n\n");
+  }
+
+  @override
+  Future onLoadStop(String url) async {
+    print("\n\nStopped $url\n\n");
+  }
+
+  @override
+  void onLoadError(String url, int code, String message) {
+    print("\n\nCan't load $url.. Error: $message\n\n");
+  }
+
+  @override
+  void onExit() {
+    print("\n\nBrowser closed!\n\n");
+  }
+  
+}
+
+MyInAppBrowser inAppBrowserFallback = new MyInAppBrowser();
+
+class MyChromeSafariBrowser extends ChromeSafariBrowser {
+  
+  MyChromeSafariBrowser(browserFallback) : super(browserFallback);
+
+  @override
+  void onOpened() {
+    print("ChromeSafari browser opened");
+  }
+
+  @override
+  void onLoaded() {
+    print("ChromeSafari browser loaded");
+  }
+
+  @override
+  void onClosed() {
+    print("ChromeSafari browser closed");
+  }
+}
+
+MyChromeSafariBrowser chromeSafariBrowser = new MyChromeSafariBrowser(inAppBrowserFallback);
+
+
+void main() => runApp(new MyApp());
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => new _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      home: new Scaffold(
+        appBar: new AppBar(
+          title: const Text('Flutter InAppBrowser Plugin example app'),
+        ),
+        body: new Center(
+          child: new RaisedButton(onPressed: () {
+            chromeSafariBrowser.open("https://flutter.io/", options: {
+                  "addShareButton": false,
+                  "toolbarBackgroundColor": "#000000",
+                  "dismissButtonStyle": 1,
+                  "preferredBarTintColor": "#000000",
+                },
+              optionsFallback: {
+                "toolbarTopBackgroundColor": "#000000",
+                "closeButtonCaption": "Close"
+              });
+          },
+          child: Text("Open ChromeSafariBrowser")
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+```
+
+#### Future\<void\> ChromeSafariBrowser.open
+Opens an `url` in a new `ChromeSafariBrowser` instance or the system browser.
+
+- `url`: The `url` to load. Call `encodeUriComponent()` on this if the `url` contains Unicode characters.
+
+- `options`: Options for the `ChromeSafariBrowser`.
+
+- `headersFallback`: The additional header of the `InAppBrowser` instance fallback to be used in the HTTP request for this URL, specified as a map from name to value.
+
+- `optionsFallback`: Options used by the `InAppBrowser` instance fallback.
+
+**Android** supports these options:
+
+- __addShareButton__: Set to `false` if you don't want the default share button. The default value is `true`.
+- __showTitle__: Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
+- __toolbarBackgroundColor__: Set the custom background color of the toolbar.
+- __enableUrlBarHiding__: Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
+- __instantAppsEnabled__: Set to `true` to enable Instant Apps. The default value is `false`.
+
+**iOS** supports these options:
+
+- __entersReaderIfAvailable__: Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
+- __barCollapsingEnabled__: Set to `true` to enable bar collapsing. The default value is `false`.
+- __dismissButtonStyle__: Set the custom style for the dismiss button. The default value is `0 //done`. See [SFSafariViewController.DismissButtonStyle](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/dismissbuttonstyle) for all the available styles.
+- __preferredBarTintColor__: Set the custom background color of the navigation bar and the toolbar.
+- __preferredControlTintColor__: Set the custom color of the control buttons on the navigation bar and the toolbar.
+- __presentationStyle__: Set the custom modal presentation style when presenting the WebView. The default value is `0 //fullscreen`. See [UIModalPresentationStyle](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) for all the available styles.
+- __transitionStyle__: Set to the custom transition style when presenting the WebView. The default value is `0 //crossDissolve`. See [UIModalTransitionStyle](https://developer.apple.com/documentation/uikit/uimodaltransitionStyle) for all the available styles.
+
+Example:
+```dart
+chromeSafariBrowser.open("https://flutter.io/", options: {
+  "addShareButton": false,
+  "toolbarBackgroundColor": "#000000",
+  "dismissButtonStyle": 1,
+  "preferredBarTintColor": "#000000",
+});
+```
+
+#### Events
+
+Event fires when the `ChromeSafariBrowser` is opened.
+```dart
+  @override
+  void onOpened() {
+  
+  }
+```
+
+Event fires when the `ChromeSafariBrowser` is loaded.
+```dart
+  @override
+  void onLoaded() {
+  
+  }
+```
+
+Event fires when the `ChromeSafariBrowser` is closed.
+```dart
+  @override
+  void onClosed() {
+  
+  }
+```
+
 ## Screenshots:
 
+#### InAppBrowser
 iOS:
 
 ![ios](https://user-images.githubusercontent.com/5956938/45934084-2a935400-bf99-11e8-9d71-9e1758b5b8c6.gif)
@@ -352,3 +523,12 @@ iOS:
 Android:
 
 ![android](https://user-images.githubusercontent.com/5956938/45934080-26ffcd00-bf99-11e8-8136-d39a81bd83e7.gif)
+
+#### ChromeSafariBrowser
+iOS:
+
+![ios](https://user-images.githubusercontent.com/5956938/46532148-0c362e00-c8a0-11e8-9a0e-343e049dcf35.gif)
+
+Android:
+
+![android](https://user-images.githubusercontent.com/5956938/46532149-0c362e00-c8a0-11e8-8134-9af18f38a746.gif)

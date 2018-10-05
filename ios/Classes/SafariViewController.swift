@@ -34,6 +34,9 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
                 self.preferredControlTintColor = color(fromHexString: (safariOptions?.preferredControlTintColor)!)
             }
         }
+        
+        self.modalPresentationStyle = UIModalPresentationStyle(rawValue: (safariOptions?.presentationStyle)!)!
+        self.modalTransitionStyle = UIModalTransitionStyle(rawValue: (safariOptions?.transitionStyle)!)!
     }
     
     func close() {

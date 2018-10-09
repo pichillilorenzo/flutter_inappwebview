@@ -48,98 +48,98 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let uuid: String = (arguments!["uuid"] as? String)!
         
         switch call.method {
-        case "open":
-            self.open(uuid: uuid, arguments: arguments!, result: result)
-            break
-        case "loadUrl":
-            self.loadUrl(uuid: uuid, arguments: arguments!, result: result)
-            break
-        case "close":
-            self.close(uuid: uuid)
-            result(true)
-            break
-        case "show":
-            self.show(uuid: uuid)
-            result(true)
-            break
-        case "hide":
-            self.hide(uuid: uuid)
-            result(true)
-            break
-        case "reload":
-            if let webViewController = self.webViewControllers[uuid] {
-                webViewController?.reload()
-            }
-            result(true)
-            break
-        case "goBack":
-            if let webViewController = self.webViewControllers[uuid] {
-                webViewController?.goBack()
-            }
-            result(true)
-            break
-        case "canGoBack":
-            if let webViewController = self.webViewControllers[uuid] {
-                result(webViewController?.canGoBack() ?? false)
-            }
-            else {
-                result(false)
-            }
-            break
-        case "goForward":
-            if let webViewController = self.webViewControllers[uuid] {
-                webViewController?.goForward()
-            }
-            result(true)
-            break
-        case "canGoForward":
-            if let webViewController = self.webViewControllers[uuid] {
-                result(webViewController?.canGoForward() ?? false)
-            }
-            else {
-                result(false)
-            }
-            break
-        case "isLoading":
-            if let webViewController = self.webViewControllers[uuid] {
-                result((webViewController?.webView.isLoading ?? false) == true)
-            }
-            else {
-                result(false)
-            }
-            break
-        case "stopLoading":
-            if let webViewController = self.webViewControllers[uuid] {
-                webViewController?.webView.stopLoading()
-            }
-            result(true)
-            break
-        case "isHidden":
-            if let webViewController = self.webViewControllers[uuid] {
-                result((webViewController?.isHidden ?? false) == true)
-            }
-            else {
-                result(false)
-            }
-            break
-        case "injectScriptCode":
-            self.injectScriptCode(uuid: uuid, arguments: arguments!, result: result)
-            break
-        case "injectScriptFile":
-            self.injectScriptFile(uuid: uuid, arguments: arguments!, result: nil)
-            result(true)
-            break
-        case "injectStyleCode":
-            self.injectStyleCode(uuid: uuid, arguments: arguments!, result: nil)
-            result(true)
-            break
-        case "injectStyleFile":
-            self.injectStyleFile(uuid: uuid, arguments: arguments!, result: nil)
-            result(true)
-            break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
+            case "open":
+                self.open(uuid: uuid, arguments: arguments!, result: result)
+                break
+            case "loadUrl":
+                self.loadUrl(uuid: uuid, arguments: arguments!, result: result)
+                break
+            case "close":
+                self.close(uuid: uuid)
+                result(true)
+                break
+            case "show":
+                self.show(uuid: uuid)
+                result(true)
+                break
+            case "hide":
+                self.hide(uuid: uuid)
+                result(true)
+                break
+            case "reload":
+                if let webViewController = self.webViewControllers[uuid] {
+                    webViewController?.reload()
+                }
+                result(true)
+                break
+            case "goBack":
+                if let webViewController = self.webViewControllers[uuid] {
+                    webViewController?.goBack()
+                }
+                result(true)
+                break
+            case "canGoBack":
+                if let webViewController = self.webViewControllers[uuid] {
+                    result(webViewController?.canGoBack() ?? false)
+                }
+                else {
+                    result(false)
+                }
+                break
+            case "goForward":
+                if let webViewController = self.webViewControllers[uuid] {
+                    webViewController?.goForward()
+                }
+                result(true)
+                break
+            case "canGoForward":
+                if let webViewController = self.webViewControllers[uuid] {
+                    result(webViewController?.canGoForward() ?? false)
+                }
+                else {
+                    result(false)
+                }
+                break
+            case "isLoading":
+                if let webViewController = self.webViewControllers[uuid] {
+                    result((webViewController?.webView.isLoading ?? false) == true)
+                }
+                else {
+                    result(false)
+                }
+                break
+            case "stopLoading":
+                if let webViewController = self.webViewControllers[uuid] {
+                    webViewController?.webView.stopLoading()
+                }
+                result(true)
+                break
+            case "isHidden":
+                if let webViewController = self.webViewControllers[uuid] {
+                    result((webViewController?.isHidden ?? false) == true)
+                }
+                else {
+                    result(false)
+                }
+                break
+            case "injectScriptCode":
+                self.injectScriptCode(uuid: uuid, arguments: arguments!, result: result)
+                break
+            case "injectScriptFile":
+                self.injectScriptFile(uuid: uuid, arguments: arguments!, result: nil)
+                result(true)
+                break
+            case "injectStyleCode":
+                self.injectStyleCode(uuid: uuid, arguments: arguments!, result: nil)
+                result(true)
+                break
+            case "injectStyleFile":
+                self.injectStyleFile(uuid: uuid, arguments: arguments!, result: nil)
+                result(true)
+                break
+            default:
+                result(FlutterMethodNotImplemented)
+                break
         }
     }
     
@@ -410,6 +410,16 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                         return
                     }
                     
+                    if error != nil {
+                        let userInfo = (error! as NSError).userInfo
+                        self.onConsoleMessage(uuid: uuid, sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as! URL).absoluteString, lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: "ERROR")
+                    }
+                    
+                    if value == nil {
+                        result!("")
+                        return
+                    }
+                    
                     do {
                         let data: Data = ("[" + String(describing: value!) + "]").data(using: String.Encoding.utf8, allowLossyConversion: false)!
                         let json: Array<Any> = try JSONSerialization.jsonObject(with: data, options: []) as! Array<Any>
@@ -476,19 +486,25 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     func shouldOverrideUrlLoading(uuid: String, webView: WKWebView, url: URL) {
-        if let webViewController = self.webViewControllers[uuid] {
+        if self.webViewControllers[uuid] != nil {
             channel.invokeMethod("shouldOverrideUrlLoading", arguments: ["uuid": uuid, "url": url.absoluteString])
         }
     }
     
+    func onConsoleMessage(uuid: String, sourceURL: String, lineNumber: Int, message: String, messageLevel: String) {
+        if self.webViewControllers[uuid] != nil {
+            channel.invokeMethod("onConsoleMessage", arguments: ["uuid": uuid, "sourceURL": sourceURL, "lineNumber": lineNumber, "message": message, "messageLevel": messageLevel])
+        }
+    }
+    
     func onChromeSafariBrowserOpened(uuid: String) {
-        if let safariViewController = self.safariViewControllers[uuid] {
+        if self.safariViewControllers[uuid] != nil {
             channel.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
         }
     }
     
     func onChromeSafariBrowserLoaded(uuid: String) {
-        if let safariViewController = self.safariViewControllers[uuid] {
+        if self.safariViewControllers[uuid] != nil {
             channel.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
         }
     }

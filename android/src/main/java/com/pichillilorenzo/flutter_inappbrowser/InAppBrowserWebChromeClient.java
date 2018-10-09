@@ -4,10 +4,15 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
+import android.webkit.ConsoleMessage;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class InAppBrowserWebChromeClient extends WebChromeClient {
 
@@ -20,6 +25,18 @@ public class InAppBrowserWebChromeClient extends WebChromeClient {
     public InAppBrowserWebChromeClient(WebViewActivity activity) {
         super();
         this.activity = activity;
+    }
+
+    @Override
+    public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("uuid", activity.uuid);
+        obj.put("sourceURL", consoleMessage.sourceId());
+        obj.put("lineNumber", consoleMessage.lineNumber());
+        obj.put("message", consoleMessage.message());
+        obj.put("messageLevel", consoleMessage.messageLevel().toString());
+        InAppBrowserFlutterPlugin.channel.invokeMethod("onConsoleMessage", obj);
+        return true;
     }
 
     @Override

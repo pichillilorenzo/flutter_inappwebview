@@ -38,6 +38,32 @@ public class WebViewActivity extends AppCompatActivity {
     public boolean isLoading = false;
     public boolean isHidden = false;
 
+    static final String jsConsoleLogScript = "(function() {\n"+
+"   var oldLogs = {\n"+
+"       'log': console.log,\n"+
+"       'debug': console.debug,\n"+
+"       'error': console.error,\n"+
+"       'info': console.info,\n"+
+"       'warn': console.warn\n"+
+"   };\n"+
+"   for (var k in oldLogs) {\n"+
+"       (function(oldLog) {\n"+
+"           console[oldLog] = function() {\n"+
+"               var message = ''\n"+
+"               for (var i in arguments) {\n"+
+"                   if (message == '') {\n"+
+"                       message += arguments[i];\n"+
+"                   }\n"+
+"                   else {\n"+
+"                       message += ' ' + arguments[i];\n"+
+"                   }\n"+
+"               }\n"+
+"               oldLogs[oldLog].call(console, message);\n"+
+"           }\n"+
+"       })(k);\n"+
+"   }\n"+
+"})();";
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);

@@ -27,7 +27,26 @@ import 'package:uuid/uuid.dart';
 
 typedef Future<dynamic> ListenerCallback(MethodCall call);
 
-var uuidGenerator = new Uuid();
+var _uuidGenerator = new Uuid();
+
+///
+enum ConsoleMessageLevel {
+  DEBUG, ERROR, LOG, TIP, WARNING
+}
+
+///Public class representing a JavaScript console message from WebCore.
+///This could be a issued by a call to one of the console logging functions (e.g. console.log('...')) or a JavaScript error on the page.
+///
+///To receive notifications of these messages, override the [InAppBrowser.onConsoleMessage()] function.
+class ConsoleMessage {
+
+  String sourceURL = "";
+  int lineNumber = 1;
+  String message = "";
+  ConsoleMessageLevel messageLevel = ConsoleMessageLevel.LOG;
+
+  ConsoleMessage(this.sourceURL, this.lineNumber, this.message, this.messageLevel);
+}
 
 class _ChannelManager {
   static const MethodChannel channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
@@ -53,14 +72,14 @@ class _ChannelManager {
 
 ///InAppBrowser class.
 ///
-/// This class uses the native WebView of the platform.
+///This class uses the native WebView of the platform.
 class InAppBrowser {
 
   String uuid;
 
   ///
   InAppBrowser () {
-    uuid = uuidGenerator.v4();
+    uuid = _uuidGenerator.v4();
     _ChannelManager.addListener(uuid, _handleMethod);
   }
 
@@ -86,6 +105,19 @@ class InAppBrowser {
       case "shouldOverrideUrlLoading":
         String url = call.arguments["url"];
         shouldOverrideUrlLoading(url);
+        break;
+      case "onConsoleMessage":
+        String sourceURL = call.arguments["sourceURL"];
+        int lineNumber = call.arguments["lineNumber"];
+        String message = call.arguments["message"];
+        ConsoleMessageLevel messageLevel;
+        ConsoleMessageLevel.values.forEach((element) {
+          if ("ConsoleMessageLevel." + call.arguments["messageLevel"] == element.toString()) {
+            messageLevel = element;
+            return;
+          }
+        });
+        onConsoleMessage(ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
         break;
     }
     return new Future.value("");
@@ -291,6 +323,11 @@ class InAppBrowser {
 
   }
 
+  ///Event fires when the [InAppBrowser] webview receives a [ConsoleMessage].
+  void onConsoleMessage(ConsoleMessage consoleMessage) {
+
+  }
+
 }
 
 ///ChromeSafariBrowser class.
@@ -305,7 +342,7 @@ class ChromeSafariBrowser {
 
   ///Initialize the [ChromeSafariBrowser] instance with a [InAppBrowser] fallback instance or `null`.
   ChromeSafariBrowser (bf) {
-    uuid = uuidGenerator.v4();
+    uuid = _uuidGenerator.v4();
     browserFallback = bf;
     _ChannelManager.addListener(uuid, _handleMethod);
   }

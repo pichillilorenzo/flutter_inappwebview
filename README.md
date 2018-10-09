@@ -41,6 +41,11 @@ class MyInAppBrowser extends InAppBrowser {
     print("\n\nStopped $url\n\n");
     // print body html
     print(await this.injectScriptCode("document.body.innerHTML"));
+
+    // console messages
+    await this.injectScriptCode("console.log({'testObject': 5});"); // the message will be: [object Object]
+    await this.injectScriptCode("console.log('testObjectStringify', JSON.stringify({'testObject': 5}));"); // the message will be: testObjectStringify {"testObject": 5}
+    await this.injectScriptCode("console.error('testError', false);"); // the message will be: testError false
     
     // add jquery library and custom javascript
     await this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
@@ -71,6 +76,17 @@ class MyInAppBrowser extends InAppBrowser {
   void shouldOverrideUrlLoading(String url) {
     print("\n\n override $url\n\n");
     this.loadUrl(url);
+  }
+
+  @override
+  void onConsoleMessage(ConsoleMessage consoleMessage) {
+    print("""
+    console output:
+      sourceURL: ${consoleMessage.sourceURL}
+      lineNumber: ${consoleMessage.lineNumber}
+      message: ${consoleMessage.message}
+      messageLevel: ${consoleMessage.messageLevel}
+    """);
   }
 
 }
@@ -225,6 +241,14 @@ Event fires when the `InAppBrowser` window is closed.
   @override
   void onExit() {
   
+  }
+```
+
+Event fires when the `InAppBrowser` webview receives a `ConsoleMessage`.
+```dart
+  @override
+  void onConsoleMessage(ConsoleMessage consoleMessage) {
+
   }
 ```
 

@@ -12,7 +12,19 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
+
+//    // javascript error
+//    await this.injectScriptCode("console.log({'testJavaScriptError': 5}));");
+//
+//    await this.injectScriptCode("console.log({'testObject': 5});");
+//    await this.injectScriptCode("console.warn('testWarn',null);");
+//    await this.injectScriptCode("console.log('testObjectStringify', JSON.stringify({'asd': 5}));");
+//    await this.injectScriptCode("console.info('testInfo', 6);");
+//    await this.injectScriptCode("console.error('testError', false);");
+//    await this.injectScriptCode("console.debug('testDebug', true);");
 //    print(await this.injectScriptCode("document.body.innerHTML"));
+//    print(await this.injectScriptCode("null"));
+//    print(await this.injectScriptCode("undefined"));
 //    print(await this.injectScriptCode("3"));
 //    print(await this.injectScriptCode("""
 //      function asd (a,b) {
@@ -57,6 +69,17 @@ class MyInAppBrowser extends InAppBrowser {
   void shouldOverrideUrlLoading(String url) {
     print("\n\n override $url\n\n");
     this.loadUrl(url);
+  }
+
+  @override
+  void onConsoleMessage(ConsoleMessage consoleMessage) {
+    print("""
+    console output: 
+      sourceURL: ${consoleMessage.sourceURL}
+      lineNumber: ${consoleMessage.lineNumber}
+      message: ${consoleMessage.message}
+      messageLevel: ${consoleMessage.messageLevel}
+    """);
   }
 }
 
@@ -107,15 +130,15 @@ class _MyAppState extends State<MyApp> {
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {
-            chromeSafariBrowser.open("https://flutter.io/");
-//              inAppBrowserFallback.open("https://flutter.io/", options: {
-//                //"hidden": true,
-//                //"toolbarTopFixedTitle": "Fixed title",
-//                //"useShouldOverrideUrlLoading": true
-//                //"hideUrlBar": true,
-//                //"toolbarTop": false,
-//                //"toolbarBottom": false
-//              });
+            //chromeSafariBrowser.open("https://flutter.io/");
+            inAppBrowserFallback.open("https://flutter.io/", options: {
+              //"hidden": true,
+              //"toolbarTopFixedTitle": "Fixed title",
+              //"useShouldOverrideUrlLoading": true
+              //"hideUrlBar": true,
+              //"toolbarTop": false,
+              //"toolbarBottom": false
+            });
 
           },
           child: Text("Open InAppBrowser")

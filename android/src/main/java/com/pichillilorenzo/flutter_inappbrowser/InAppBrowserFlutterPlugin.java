@@ -285,15 +285,20 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
                 try {
                   String msg;
-                  msg = reader.nextString();
+                  if (reader.peek() == JsonToken.STRING) {
+                    msg = reader.nextString();
 
-                  JsonReader reader2 = new JsonReader(new StringReader(msg));
-                  reader2.setLenient(true);
+                    JsonReader reader2 = new JsonReader(new StringReader(msg));
+                    reader2.setLenient(true);
 
-                  if (reader2.peek() == JsonToken.STRING)
-                    msg = reader2.nextString();
+                    if (reader2.peek() == JsonToken.STRING)
+                      msg = reader2.nextString();
 
-                  result.success(msg);
+                    result.success(msg);
+                  }
+                  else {
+                    result.success("");
+                  }
 
                 } catch (IOException e) {
                   Log.e(LOG_TAG, "IOException", e);

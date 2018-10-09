@@ -1,3 +1,8 @@
+## 0.2.1
+
+- added InAppBrowser.onConsoleMessage() method to manage console messages
+- fixed InAppBrowser.injectScriptCode() method when there is not a return value
+
 ## 0.2.0
 
 - added support of Chrome CustomTabs for Android

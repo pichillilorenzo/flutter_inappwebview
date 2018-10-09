@@ -14,6 +14,36 @@ import AVFoundation
 typealias OlderClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Any?) -> Void
 typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void
 
+// the message needs to be concatenated with '' in order to have the same behavior like on Android
+let jsConsoleLog = """
+(function() {
+    var oldLogs = {
+        'consoleLog': console.log,
+        'consoleDebug': console.debug,
+        'consoleError': console.error,
+        'consoleInfo': console.info,
+        'consoleWarn': console.warn
+    };
+
+    for (var k in oldLogs) {
+        (function(oldLog) {
+            console[oldLog.replace('console', '').toLowerCase()] = function() {
+                var message = '';
+                for (var i in arguments) {
+                    if (message == '') {
+                        message += arguments[i];
+                    }
+                    else {
+                        message += ' ' + arguments[i];
+                    }
+                }
+                window.webkit.messageHandlers[oldLog].postMessage(message);
+            }
+        })(k);
+    }
+})();
+"""
+
 extension WKWebView{
     
     var keyboardDisplayRequiresUserAction: Bool? {
@@ -62,7 +92,7 @@ extension WKWebView{
     
 }
 
-class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate {
+class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
     @IBOutlet var webView: WKWebView!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
@@ -132,7 +162,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     func prepareWebView() {
-        
         //UIApplication.shared.statusBarStyle = preferredStatusBarStyle
         
         self.webView.configuration.userContentController = WKUserContentController()
@@ -208,6 +237,13 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         self.webView.configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
+        let jsConsoleLogScript = WKUserScript(source: jsConsoleLog, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        self.webView.configuration.userContentController.addUserScript(jsConsoleLogScript)
+        self.webView.configuration.userContentController.add(self, name: "consoleLog")
+        self.webView.configuration.userContentController.add(self, name: "consoleDebug")
+        self.webView.configuration.userContentController.add(self, name: "consoleError")
+        self.webView.configuration.userContentController.add(self, name: "consoleInfo")
+        self.webView.configuration.userContentController.add(self, name: "consoleWarn")
         
         if #available(iOS 10.0, *) {
             if (browserOptions?.mediaPlaybackRequiresUserGesture)! {
@@ -481,6 +517,10 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // update url, stop spinner, update back/forward
+        
+        // evaluate the console log script
+        webView.evaluateJavaScript(jsConsoleLog)
+        
         currentURL = webView.url
         updateUrlTextField(url: (currentURL?.absoluteString)!)
         backButton.isEnabled = webView.canGoBack
@@ -505,5 +545,35 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()
         navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
+    }
+    
+    func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
+        print(message.name)
+        if message.name.starts(with: "console") {
+            var messageLevel = "LOG"
+            switch (message.name) {
+                case "consoleLog":
+                    messageLevel = "LOG"
+                    break;
+                case "consoleDebug":
+                    // on Android, console.debug is TIP
+                    messageLevel = "TIP"
+                    break;
+                case "consoleError":
+                    messageLevel = "ERROR"
+                    break;
+                case "consoleInfo":
+                    // on Android, console.info is LOG
+                    messageLevel = "LOG"
+                    break;
+                case "consoleWarn":
+                    messageLevel = "WARNING"
+                    break;
+                default:
+                    messageLevel = "LOG"
+                    break;
+            }
+            navigationDelegate?.onConsoleMessage(uuid: self.uuid, sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
+        }
     }
 }

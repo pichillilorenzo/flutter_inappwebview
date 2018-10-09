@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
+import android.os.Build;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -124,7 +125,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         activity.isLoading = false;
 
         // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
             CookieManager.getInstance().flush();
         } else {
             CookieSyncManager.getInstance().sync();
@@ -133,6 +134,10 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         // https://issues.apache.org/jira/browse/CB-11248
         view.clearFocus();
         view.requestFocus();
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            view.evaluateJavascript(activity.jsConsoleLogScript, null);
+        }
 
         Map<String, Object> obj = new HashMap<>();
         obj.put("uuid", activity.uuid);

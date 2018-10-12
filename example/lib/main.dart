@@ -72,6 +72,13 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
+  void onLoadResource(String url, int statusCode, Map<String, String> headers) {
+    print("\n\n resource: $url\n\n");
+    print(statusCode);
+    print(headers);
+  }
+
+  @override
   void onConsoleMessage(ConsoleMessage consoleMessage) {
     print("""
     console output: 

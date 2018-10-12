@@ -30,7 +30,7 @@ public class InAppBrowserOptions: Options {
     var presentationStyle = 0 //fullscreen
     var transitionStyle = 0 //crossDissolve
     var enableViewportScale = false
-    var keyboardDisplayRequiresUserAction = true
+    //var keyboardDisplayRequiresUserAction = true
     var suppressesIncrementalRendering = false
     var allowsAirPlayForMediaPlayback = true
     var allowsBackForwardNavigationGestures = true

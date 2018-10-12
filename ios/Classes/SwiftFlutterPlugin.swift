@@ -25,6 +25,14 @@ import SafariServices
 let WEBVIEW_STORYBOARD = "WebView"
 let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
 
+extension Dictionary where Key: ExpressibleByStringLiteral {
+    public mutating func lowercaseKeys() {
+        for key in self.keys {
+            self[String(describing: key).lowercased() as! Key] = self.removeValue(forKey: key)
+        }
+    }
+}
+
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -478,6 +486,21 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             let url: String = webViewController!.currentURL!.absoluteString
             let arguments = ["uuid": uuid, "url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
             channel.invokeMethod("onLoadError", arguments: arguments)
+        }
+    }
+    
+    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse) {
+        if self.webViewControllers[uuid] != nil {
+            var headers = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
+            headers.lowercaseKeys()
+            
+            let arguments: [String : Any] = [
+                "uuid": uuid,
+                "url": response.url?.absoluteString ?? "",
+                "statusCode": (response as! HTTPURLResponse).statusCode,
+                "headers": headers
+            ]
+            channel.invokeMethod("onLoadResource", arguments: arguments)
         }
     }
     

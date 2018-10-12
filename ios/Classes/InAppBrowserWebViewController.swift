@@ -92,8 +92,16 @@ extension WKWebView{
     
 }
 
-class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
-    @IBOutlet var webView: WKWebView!
+class WKWebView_IBWrapper: WKWebView {
+    required convenience init?(coder: NSCoder) {
+        let config = WKWebViewConfiguration()
+        self.init(frame: .zero, configuration: config)
+        self.translatesAutoresizingMaskIntoConstraints = false
+    }
+}
+
+class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler, MyURLProtocolDelegate {
+    @IBOutlet var webView: WKWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
     @IBOutlet var backButton: UIBarButtonItem!
@@ -122,6 +130,15 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        URLProtocol.wk_registerScheme("http")
+        URLProtocol.wk_registerScheme("https")
+        
+        MyURLProtocol.URLProtocolDelegate = self
+        
+        URLProtocol.registerClass(MyURLProtocol.self)
+        
         webView.uiDelegate = self
         webView.navigationDelegate = self
         
@@ -237,7 +254,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         self.webView.configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
-        let jsConsoleLogScript = WKUserScript(source: jsConsoleLog, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        let jsConsoleLogScript = WKUserScript(source: jsConsoleLog, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         self.webView.configuration.userContentController.addUserScript(jsConsoleLogScript)
         self.webView.configuration.userContentController.add(self, name: "consoleLog")
         self.webView.configuration.userContentController.add(self, name: "consoleDebug")
@@ -259,7 +276,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         
         
         self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowsInlineMediaPlayback)!
-        self.webView.keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
+        
+        //self.webView.keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
+        
         self.webView.configuration.suppressesIncrementalRendering = (browserOptions?.suppressesIncrementalRendering)!
         self.webView.allowsBackForwardNavigationGestures = (browserOptions?.allowsBackForwardNavigationGestures)!
         if #available(iOS 9.0, *) {
@@ -469,6 +488,16 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         decisionHandler(.allow)
     }
     
+    func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationResponse: WKNavigationResponse,
+                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        
+        //dump((navigationResponse.response as! HTTPURLResponse))
+        //print(navigationResponse.response.mimeType)
+        //print(navigationResponse.response.url)
+        decisionHandler(.allow)
+    }
+
 //    func webView(_ webView: WKWebView,
 //                 decidePolicyFor navigationResponse: WKNavigationResponse,
 //                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
@@ -518,9 +547,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         // update url, stop spinner, update back/forward
         
-        // evaluate the console log script
-        webView.evaluateJavaScript(jsConsoleLog)
-        
         currentURL = webView.url
         updateUrlTextField(url: (currentURL?.absoluteString)!)
         backButton.isEnabled = webView.canGoBack
@@ -529,15 +555,11 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         navigationDelegate?.onLoadStop(uuid: self.uuid, webView: webView)
     }
     
-//    func webView(_ webView: WKWebView,
-//                 didFailProvisionalNavigation navigation: WKNavigation!,
-//                 withError error: Error) {
-//        print("webView:didFailProvisionalNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
-//        backButton.isEnabled = webView.canGoBack
-//        forwardButton.isEnabled = webView.canGoForward
-//        spinner.stopAnimating()
-//        navigationDelegate?.webView(uuid: self.uuid, webView: webView, didFailLoadWithError: error)
-//    }
+    func webView(_ view: WKWebView,
+                      didFailProvisionalNavigation navigation: WKNavigation!,
+                      withError error: Error) {
+        webView(view, didFail: navigation, withError: error)
+    }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         print("webView:didFailNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
@@ -547,8 +569,11 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
     }
     
+    func didReceiveResponse(_ response: URLResponse, from request: URLRequest?) {
+        navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response)
+    }
+    
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
-        print(message.name)
         if message.name.starts(with: "console") {
             var messageLevel = "LOG"
             switch (message.name) {

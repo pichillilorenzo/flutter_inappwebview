@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
+import okhttp3.OkHttpClient;
 
 public class WebViewActivity extends AppCompatActivity {
 
@@ -37,6 +38,7 @@ public class WebViewActivity extends AppCompatActivity {
     ProgressBar progressBar;
     public boolean isLoading = false;
     public boolean isHidden = false;
+    OkHttpClient httpClient;
 
     static final String jsConsoleLogScript = "(function() {\n"+
 "   var oldLogs = {\n"+
@@ -86,6 +88,8 @@ public class WebViewActivity extends AppCompatActivity {
         actionBar = getSupportActionBar();
 
         prepareWebView();
+
+        httpClient = new OkHttpClient();
 
         webView.loadUrl(url, headers);
 

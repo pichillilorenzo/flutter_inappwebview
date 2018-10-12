@@ -106,6 +106,12 @@ class InAppBrowser {
         String url = call.arguments["url"];
         shouldOverrideUrlLoading(url);
         break;
+      case "onLoadResource":
+        String url = call.arguments["url"];
+        int statusCode = call.arguments["statusCode"];
+        Map<dynamic, dynamic> headers = call.arguments["headers"];
+        onLoadResource(url, statusCode, headers.cast<String, String>());
+        break;
       case "onConsoleMessage":
         String sourceURL = call.arguments["sourceURL"];
         int lineNumber = call.arguments["lineNumber"];
@@ -173,7 +179,6 @@ class InAppBrowser {
   ///  - __presentationStyle__: Set the custom modal presentation style when presenting the WebView. The default value is `0 //fullscreen`. See [UIModalPresentationStyle](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) for all the available styles.
   ///  - __transitionStyle__: Set to the custom transition style when presenting the WebView. The default value is `0 //crossDissolve`. See [UIModalTransitionStyle](https://developer.apple.com/documentation/uikit/uimodaltransitionStyle) for all the available styles.
   ///  - __enableViewportScale__: Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
-  ///  - __keyboardDisplayRequiresUserAction__: Set to `true` if you want the user must explicitly tap the elements in the WebView to display the keyboard (or other relevant input view) for that element. When set to `false`, a focus event on an element causes the input view to be displayed and associated with that element automatically. The default value is `true`.
   ///  - __suppressesIncrementalRendering__: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory.. The default value is `false`.
   ///  - __allowsAirPlayForMediaPlayback__: Set to `true` to allow AirPlay. The default value is `true`.
   ///  - __allowsBackForwardNavigationGestures__: Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
@@ -323,6 +328,11 @@ class InAppBrowser {
 
   }
 
+  ///Event fires when the [InAppBrowser] webview will load the resource specified by the given [url].
+  void onLoadResource(String url, int statusCode, Map<String, String> headers) {
+
+  }
+
   ///Event fires when the [InAppBrowser] webview receives a [ConsoleMessage].
   void onConsoleMessage(ConsoleMessage consoleMessage) {
 
@@ -392,7 +402,6 @@ class ChromeSafariBrowser {
   Future<void> open(String url, {Map<String, dynamic> options = const {}, Map<String, String> headersFallback = const {}, Map<String, dynamic> optionsFallback = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    print(browserFallback.uuid);
     args.putIfAbsent('uuidFallback', () => (browserFallback != null) ? browserFallback.uuid : '');
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headersFallback);

@@ -1,29 +1,97 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
+import android.content.ContentResolver;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
+import android.os.Handler;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.annotation.RequiresApi;
+import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
+import android.webkit.MimeTypeMap;
 import android.webkit.SslErrorHandler;
+import android.webkit.WebResourceRequest;
+import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.IOException;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+
+import okhttp3.Headers;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
 
 public class InAppBrowserWebViewClient extends WebViewClient {
 
     protected static final String LOG_TAG = "IABWebViewClient";
     private WebViewActivity activity;
+    Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
 
     public InAppBrowserWebViewClient(WebViewActivity activity) {
         super();
         this.activity = activity;
+        statusCodeMapping.put(100, "Continue");
+        statusCodeMapping.put(101, "Switching Protocols");
+        statusCodeMapping.put(200, "OK");
+        statusCodeMapping.put(201, "Created");
+        statusCodeMapping.put(202, "Accepted");
+        statusCodeMapping.put(203, "Non-Authoritative Information");
+        statusCodeMapping.put(204, "No Content");
+        statusCodeMapping.put(205, "Reset Content");
+        statusCodeMapping.put(206, "Partial Content");
+        statusCodeMapping.put(300, "Multiple Choices");
+        statusCodeMapping.put(301, "Moved Permanently");
+        statusCodeMapping.put(302, "Found");
+        statusCodeMapping.put(303, "See Other");
+        statusCodeMapping.put(304, "Not Modified");
+        statusCodeMapping.put(307, "Temporary Redirect");
+        statusCodeMapping.put(308, "Permanent Redirect");
+        statusCodeMapping.put(400, "Bad Request");
+        statusCodeMapping.put(401, "Unauthorized");
+        statusCodeMapping.put(403, "Forbidden");
+        statusCodeMapping.put(404, "Not Found");
+        statusCodeMapping.put(405, "Method Not Allowed");
+        statusCodeMapping.put(406, "Not Acceptable");
+        statusCodeMapping.put(407, "Proxy Authentication Required");
+        statusCodeMapping.put(408, "Request Timeout");
+        statusCodeMapping.put(409, "Conflict");
+        statusCodeMapping.put(410, "Gone");
+        statusCodeMapping.put(411, "Length Required");
+        statusCodeMapping.put(412, "Precondition Failed");
+        statusCodeMapping.put(413, "Payload Too Large");
+        statusCodeMapping.put(414, "URI Too Long");
+        statusCodeMapping.put(415, "Unsupported Media Type");
+        statusCodeMapping.put(416, "Range Not Satisfiable");
+        statusCodeMapping.put(417, "Expectation Failed");
+        statusCodeMapping.put(418, "I'm a teapot");
+        statusCodeMapping.put(422, "Unprocessable Entity");
+        statusCodeMapping.put(425, "Too Early");
+        statusCodeMapping.put(426, "Upgrade Required");
+        statusCodeMapping.put(428, "Precondition Required");
+        statusCodeMapping.put(429, "Too Many Requests");
+        statusCodeMapping.put(431, "Request Header Fields Too Large");
+        statusCodeMapping.put(451, "Unavailable For Legal Reasons");
+        statusCodeMapping.put(500, "Internal Server Error");
+        statusCodeMapping.put(501, "Not Implemented");
+        statusCodeMapping.put(502, "Bad Gateway");
+        statusCodeMapping.put(503, "Service Unavailable");
+        statusCodeMapping.put(504, "Gateway Timeout");
+        statusCodeMapping.put(505, "HTTP Version Not Supported");
+        statusCodeMapping.put(511, "Network Authentication Required");
     }
 
     @Override
@@ -201,5 +269,54 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         // By default handle 401 like we'd normally do!
         super.onReceivedHttpAuthRequest(view, handler, host, realm);
     }
+
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+    @Override
+    public WebResourceResponse shouldInterceptRequest (WebView view, WebResourceRequest request){
+        final String url = request.getUrl().toString();
+
+        Request mRequest = new Request.Builder().url(url).build();
+
+        try {
+            Response response = activity.httpClient.newCall(mRequest).execute();
+            String reasonPhrase = response.message();
+            if (reasonPhrase.equals("")) {
+                reasonPhrase = statusCodeMapping.get(response.code());
+                Log.d(LOG_TAG, reasonPhrase);
+            }
+            reasonPhrase = (reasonPhrase.equals("") || reasonPhrase == null) ? "OK" : reasonPhrase;
+
+            Map<String, String> headers = new HashMap<String, String>();
+            for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
+                String value = "";
+                for (String val: entry.getValue()) {
+                    value += (value == "") ? val : "; " + val;
+                }
+                headers.put(entry.getKey().toLowerCase(), value);
+            }
+
+            Map<String, Object> obj = new HashMap<>();
+            obj.put("uuid", activity.uuid);
+            obj.put("url", url);
+            obj.put("statusCode", response.code());
+            obj.put("headers", headers);
+
+            InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadResource", obj);
+
+            return new WebResourceResponse(
+                response.header("content-type", "text/plain").split(";")[0].trim(),
+                response.header("content-encoding"),
+                response.code(),
+                reasonPhrase,
+                headers,
+                response.body().byteStream()
+            );
+        } catch (IOException e) {
+            e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage());
+        }
+        return null;
+    }
+
 
 }

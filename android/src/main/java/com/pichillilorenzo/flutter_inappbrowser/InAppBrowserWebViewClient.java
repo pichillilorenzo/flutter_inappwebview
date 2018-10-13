@@ -31,6 +31,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     protected static final String LOG_TAG = "IABWebViewClient";
     private WebViewActivity activity;
     Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
+    long startPageTime = 0;
 
     public InAppBrowserWebViewClient(WebViewActivity activity) {
         super();
@@ -164,6 +165,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     public void onPageStarted(WebView view, String url, Bitmap favicon) {
         super.onPageStarted(view, url, favicon);
 
+        startPageTime = System.currentTimeMillis();
+
         activity.isLoading = true;
 
         if (activity.searchView != null && !url.equals(activity.searchView.getQuery().toString())) {
@@ -195,7 +198,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         view.requestFocus();
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            view.evaluateJavascript(activity.jsConsoleLogScript, null);
+            view.evaluateJavascript(WebViewActivity.consoleLogJS, null);
+            view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, null);
         }
 
         Map<String, Object> obj = new HashMap<>();
@@ -264,14 +268,24 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     public WebResourceResponse shouldInterceptRequest (WebView view, WebResourceRequest request){
+
+        if (!request.getMethod().toLowerCase().equals("get") || !activity.options.useOnLoadResource) {
+            return null;
+        }
+
         final String url = request.getUrl().toString();
 
-        Request mRequest = new Request.Builder().url(url).build();
-
         try {
-            long loadingTime = System.currentTimeMillis();
+            Request mRequest = new Request.Builder().url(url).build();
+
+            long startResourceTime = System.currentTimeMillis();
             Response response = activity.httpClient.newCall(mRequest).execute();
-            loadingTime = System.currentTimeMillis() - loadingTime;
+            long startTime = startResourceTime - startPageTime;
+            long duration = System.currentTimeMillis() - startResourceTime;
+
+            if (response.cacheResponse() != null) {
+                duration = 0;
+            }
 
             String reasonPhrase = response.message();
             if (reasonPhrase.equals("")) {
@@ -281,20 +295,20 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
             Map<String, String> headersResponse = new HashMap<String, String>();
             for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
-                String value = "";
+                StringBuilder value = new StringBuilder();
                 for (String val: entry.getValue()) {
-                    value += (value == "") ? val : "; " + val;
+                    value.append( (value.toString().isEmpty()) ? val : "; " + val );
                 }
-                headersResponse.put(entry.getKey().toLowerCase(), value);
+                headersResponse.put(entry.getKey().toLowerCase(), value.toString());
             }
 
             Map<String, String> headersRequest = new HashMap<String, String>();
             for (Map.Entry<String, List<String>> entry : mRequest.headers().toMultimap().entrySet()) {
-                String value = "";
+                StringBuilder value = new StringBuilder();
                 for (String val: entry.getValue()) {
-                    value += (value == "") ? val : "; " + val;
+                    value.append( (value.toString().isEmpty()) ? val : "; " + val );
                 }
-                headersRequest.put(entry.getKey().toLowerCase(), value);
+                headersRequest.put(entry.getKey().toLowerCase(), value.toString());
             }
 
             Map<String, Object> obj = new HashMap<>();
@@ -309,7 +323,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
             res.put("url", url);
             res.put("statusCode", response.code());
             res.put("headers", headersResponse);
-            res.put("loadingTime", loadingTime);
+            res.put("startTime", startTime);
+            res.put("duration", duration);
             res.put("data", dataBytes);
 
             req.put("url", url);
@@ -332,7 +347,11 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         } catch (IOException e) {
             e.printStackTrace();
             Log.d(LOG_TAG, e.getMessage());
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d(LOG_TAG, e.getMessage());
         }
+
         return null;
     }
 

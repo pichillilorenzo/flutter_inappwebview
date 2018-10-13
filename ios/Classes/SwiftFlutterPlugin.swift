@@ -22,6 +22,19 @@ import Foundation
 import AVFoundation
 import SafariServices
 
+//class CustomURLCache: URLCache {
+//    override func cachedResponse(for request: URLRequest) -> CachedURLResponse? {
+//        dump(request.url)
+//        return super.cachedResponse(for: request)
+//    }
+//
+//    override func getCachedResponse(for dataTask: URLSessionDataTask,
+//                                    completionHandler: @escaping (CachedURLResponse?) -> Void) {
+//        dump(dataTask.response)
+//        super.getCachedResponse(for: dataTask, completionHandler: completionHandler)
+//    }
+//}
+
 let WEBVIEW_STORYBOARD = "WebView"
 let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
 
@@ -46,9 +59,12 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        URLProtocol.wk_registerScheme("http")
-        URLProtocol.wk_registerScheme("https")
-        URLProtocol.registerClass(MyURLProtocol.self)
+//        URLProtocol.wk_registerScheme("http")
+//        URLProtocol.wk_registerScheme("https")
+//        URLProtocol.registerClass(MyURLProtocol.self)
+
+        //URLCache.shared = CustomURLCache()
+        
         let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterPlugin(with: registrar)
         registrar.addMethodCallDelegate(instance, channel: channel)
@@ -423,7 +439,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     
                     if error != nil {
                         let userInfo = (error! as NSError).userInfo
-                        self.onConsoleMessage(uuid: uuid, sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as! URL).absoluteString, lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: "ERROR")
+                        dump(userInfo)
+                        self.onConsoleMessage(uuid: uuid, sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as? URL)?.absoluteString ?? "", lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: "ERROR")
                     }
                     
                     if value == nil {
@@ -492,7 +509,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse, fromRequest request: URLRequest?, withData data: Data, loadingTime time: Int) {
+    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
         if self.webViewControllers[uuid] != nil {
             var headersResponse = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
             headersResponse.lowercaseKeys()
@@ -506,7 +523,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     "url": response.url!.absoluteString,
                     "statusCode": (response as! HTTPURLResponse).statusCode,
                     "headers": headersResponse,
-                    "loadingTime": time,
+                    "startTime": startTime,
+                    "duration": duration,
                     "data": data
                 ],
                 "request": [
@@ -549,6 +567,10 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func onChromeSafariBrowserClosed(uuid: String) {
         channel.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
+    }
+    
+    func onCallJsHandler(uuid: String, webView: WKWebView, handlerName: String, args: String) {
+        channel.invokeMethod("onCallJsHandler", arguments: ["uuid": uuid, "handlerName": handlerName, "args": args])
     }
     
     func safariExit(uuid: String) {

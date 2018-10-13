@@ -13,8 +13,9 @@ class MyInAppBrowser extends InAppBrowser {
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
 
-//    // javascript error
-//    await this.injectScriptCode("console.log({'testJavaScriptError': 5}));");
+    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest', 1, 5,'string', {'key': 5}, [4,6,8]);");
+    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest2', false, null, undefined);");
+    await this.injectScriptCode("setTimeout(function(){window.flutter_inappbrowser.callHandler('handlerTest', 'anotherString');}, 1000);");
 //
 //    await this.injectScriptCode("console.log({'testObject': 5});");
 //    await this.injectScriptCode("console.warn('testWarn',null);");
@@ -73,20 +74,21 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
-    print(response.loadingTime.toString() + "ms " + response.url);
-    if (response.headers["content-length"] != null)
-      print(response.headers["content-length"] + " length");
+
+    print("Started at: " + response.startTime.toString() + "ms ---> duration: " + response.duration.toString() + "ms " + response.url);
+//    if (response.headers["content-length"] != null)
+//      print(response.headers["content-length"] + " length");
   }
 
   @override
   void onConsoleMessage(ConsoleMessage consoleMessage) {
-    print("""
-    console output: 
-      sourceURL: ${consoleMessage.sourceURL}
-      lineNumber: ${consoleMessage.lineNumber}
-      message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel}
-    """);
+//    print("""
+//    console output:
+//      sourceURL: ${consoleMessage.sourceURL}
+//      lineNumber: ${consoleMessage.lineNumber}
+//      message: ${consoleMessage.message}
+//      messageLevel: ${consoleMessage.messageLevel}
+//    """);
   }
 }
 
@@ -112,9 +114,12 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 }
 
+// adding a webview fallback
 MyChromeSafariBrowser chromeSafariBrowser = new MyChromeSafariBrowser(inAppBrowserFallback);
 
-void main() => runApp(new MyApp());
+void main() {
+  runApp(new MyApp());
+}
 
 class MyApp extends StatefulWidget {
   @override
@@ -126,6 +131,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+    int indexTest = inAppBrowserFallback.addJavaScriptHandler("handlerTest", (arguments) async {
+      print("handlerTest arguments");
+      print(arguments);
+    });
+    int indexTest2 = inAppBrowserFallback.addJavaScriptHandler("test2", (arguments) async {
+      print("handlerTest2 arguments");
+      print(arguments);
+      inAppBrowserFallback.removeJavaScriptHandler("test", indexTest);
+    });
   }
 
   @override
@@ -139,6 +153,7 @@ class _MyAppState extends State<MyApp> {
           child: new RaisedButton(onPressed: () {
             //chromeSafariBrowser.open("https://flutter.io/");
             inAppBrowserFallback.open(url: "https://flutter.io/", options: {
+              //"useOnLoadResource": true,
               //"hidden": true,
               //"toolbarTopFixedTitle": "Fixed title",
               //"useShouldOverrideUrlLoading": true

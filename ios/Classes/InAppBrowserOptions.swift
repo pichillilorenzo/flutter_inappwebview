@@ -11,6 +11,7 @@ import Foundation
 public class InAppBrowserOptions: Options {
     
     var useShouldOverrideUrlLoading = false
+    var useOnLoadResource = false
     var clearCache = false
     var userAgent = ""
     var javaScriptEnabled = true

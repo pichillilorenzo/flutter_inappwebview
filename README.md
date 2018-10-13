@@ -39,6 +39,10 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
+
+    // call a javascript message handler
+    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerNameTest', 1, 5,'string', {'key': 5}, [4,6,8]);");
+
     // print body html
     print(await this.injectScriptCode("document.body.innerHTML"));
 
@@ -79,6 +83,11 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
+  void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
+    print("Started at: " + response.startTime.toString() + "ms ---> duration: " + response.duration.toString() + "ms " + response.url);
+  }
+
+  @override
   void onConsoleMessage(ConsoleMessage consoleMessage) {
     print("""
     console output:
@@ -105,6 +114,12 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
+
+    // listen for post messages coming from the JavaScript side
+    int indexTest = inAppBrowserFallback.addJavaScriptHandler("handlerNameTest", (arguments) async {
+      print("handlerNameTest arguments");
+      print(arguments); // it prints: [1, 5, string, {key: 5}, [4, 6, 8]]
+    });
   }
 
   @override
@@ -117,7 +132,8 @@ class _MyAppState extends State<MyApp> {
         body: new Center(
           child: new RaisedButton(onPressed: () {
             inAppBrowser.open("https://flutter.io/", options: {
-               "useShouldOverrideUrlLoading": true
+               "useShouldOverrideUrlLoading": true,
+               "useOnLoadResource": true
              });
           },
           child: Text("Open InAppBrowser")
@@ -134,12 +150,12 @@ class _MyAppState extends State<MyApp> {
 Opens a URL in a new InAppBrowser instance or the system browser.
 
 ```dart
-inAppBrowser.open(String url, {Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}});
+inAppBrowser.open({String url = "about:blank", Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}});
 ```
 
 Opens an `url` in a new `InAppBrowser` instance or the system browser.
 
-- `url`: The `url` to load. Call `encodeUriComponent()` on this if the `url` contains Unicode characters.
+- `url`: The `url` to load. Call `encodeUriComponent()` on this if the `url` contains Unicode characters. The default value is `about:blank`.
 
 - `headers`: The additional headers to be used in the HTTP request for this URL, specified as a map from name to value.
 
@@ -153,6 +169,7 @@ Opens an `url` in a new `InAppBrowser` instance or the system browser.
 
   All platforms support:
   - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the `shouldOverrideUrlLoading` event. The default value is `false`.
+  - __useOnLoadResource__: Set to `true` to be able to listen at the `onLoadResource()` event. The default value is `false`.
   - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
   - __userAgent___: Set the custom WebView's user-agent.
   - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
@@ -200,6 +217,7 @@ Example:
 ```dart
 inAppBrowser.open('https://flutter.io/', options: {
   "useShouldOverrideUrlLoading": true,
+  "useOnLoadResource": true,
   "clearCache": true,
   "disallowOverScroll": true,
   "domStorageEnabled": true,
@@ -252,10 +270,23 @@ Event fires when the `InAppBrowser` webview receives a `ConsoleMessage`.
 ```
 
 Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
-In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
+
+**NOTE**: In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
 ```dart
   @override
   void shouldOverrideUrlLoading(String url) {
+
+  }
+```
+
+Event fires when the `InAppBrowser` webview loads a resource.
+
+**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
+
+**NOTE only for iOS**: In some cases, the `response.data` of a `response` with `text/html` encoding could be empty.
+```dart
+  @override
+  void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
 
   }
 ```
@@ -370,7 +401,31 @@ Injects a CSS file into the `InAppBrowser` window. (Only available when the targ
 
 ```dart
 inAppBrowser.injectStyleFile(String urlFile);
-``` 
+```
+
+#### int InAppBrowser.addJavaScriptHandler
+
+Adds/Appends a JavaScript message handler `callback` (`JavaScriptHandlerCallback`) that listen to post messages sent from JavaScript by the handler with name `handlerName`.
+Returns the position `index` of the handler that can be used to remove it with the `removeJavaScriptHandler()` method.
+
+The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
+The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
+
+The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args);`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
+
+```dart
+inAppBrowser.addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback);
+```
+
+#### bool InAppBrowser.removeJavaScriptHandler
+
+Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` method in the `handlerName` list by its position `index`.
+Returns `true` if the callback is removed, otherwise `false`.
+```dart
+inAppBrowser.removeJavaScriptHandler(String handlerName, int index);
+```
+
 
 ### `ChromeSafariBrowser` class
 Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:

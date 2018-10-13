@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
+import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
 public class WebViewActivity extends AppCompatActivity {
@@ -40,7 +41,7 @@ public class WebViewActivity extends AppCompatActivity {
     public boolean isHidden = false;
     OkHttpClient httpClient;
 
-    static final String jsConsoleLogScript = "(function() {\n"+
+    static final String consoleLogJS = "(function() {\n"+
 "   var oldLogs = {\n"+
 "       'log': console.log,\n"+
 "       'debug': console.debug,\n"+
@@ -89,13 +90,17 @@ public class WebViewActivity extends AppCompatActivity {
 
         prepareWebView();
 
-        httpClient = new OkHttpClient();
+        int cacheSize = 10 * 1024 * 1024; // 10MB
+        httpClient = new OkHttpClient().newBuilder().cache(new Cache(getApplicationContext().getCacheDir(), cacheSize)).build();
 
         webView.loadUrl(url, headers);
+        //webView.loadData("<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"UTF-8\"> <title>Document</title> </head> <body> ciao <img src=\"https://via.placeholder.com/350x150\" /> <img src=\"./images/test\" alt=\"not found\" /></body> </html>", "text/html", "utf8");
 
     }
 
     private void prepareWebView() {
+
+        webView.addJavascriptInterface(new JavaScriptBridgeInterface(this), JavaScriptBridgeInterface.name);
 
         inAppBrowserWebChromeClient = new InAppBrowserWebChromeClient(this);
         webView.setWebChromeClient(inAppBrowserWebChromeClient);

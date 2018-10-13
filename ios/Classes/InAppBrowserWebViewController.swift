@@ -15,7 +15,7 @@ typealias OlderClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, B
 typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void
 
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
-let jsConsoleLog = """
+let consoleLogJS = """
 (function() {
     var oldLogs = {
         'consoleLog': console.log,
@@ -44,53 +44,91 @@ let jsConsoleLog = """
 })();
 """
 
-extension WKWebView{
-    
-    var keyboardDisplayRequiresUserAction: Bool? {
-        get {
-            return self.keyboardDisplayRequiresUserAction
-        }
-        set {
-            self.setKeyboardRequiresUserInteraction(newValue ?? true)
-        }
-    }
-    
-    func setKeyboardRequiresUserInteraction( _ value: Bool) {
-        
-        guard
-            let WKContentViewClass: AnyClass = NSClassFromString("WKContentView") else {
-                print("Cannot find the WKContentView class")
-                return
-        }
-        
-        let olderSelector: Selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:")
-        let newerSelector: Selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:changingActivityState:userObject:")
-        
-        if let method = class_getInstanceMethod(WKContentViewClass, olderSelector) {
-            
-            let originalImp: IMP = method_getImplementation(method)
-            let original: OlderClosureType = unsafeBitCast(originalImp, to: OlderClosureType.self)
-            let block : @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3) in
-                original(me, olderSelector, arg0, !value, arg2, arg3)
-            }
-            let imp: IMP = imp_implementationWithBlock(block)
-            method_setImplementation(method, imp)
-        }
-        
-        if let method = class_getInstanceMethod(WKContentViewClass, newerSelector) {
-            
-            let originalImp: IMP = method_getImplementation(method)
-            let original: NewerClosureType = unsafeBitCast(originalImp, to: NewerClosureType.self)
-            let block : @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3, arg4) in
-                original(me, newerSelector, arg0, !value, arg2, arg3, arg4)
-            }
-            let imp: IMP = imp_implementationWithBlock(block)
-            method_setImplementation(method, imp)
-        }
-        
-    }
-    
+let resourceObserverJS = """
+(function() {
+    var observer = new PerformanceObserver(function(list) {
+        list.getEntries().forEach(function(entry) {
+            window.webkit.messageHandlers['resourceLoaded'].postMessage(JSON.stringify(entry));
+        });
+    });
+    observer.observe({entryTypes: ['resource', 'mark', 'measure']});
+})();
+"""
+
+let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
+
+let javaScriptBridgeJS = """
+window.\(JAVASCRIPT_BRIDGE_NAME) = {};
+window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function(handlerName, ...args) {
+    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': handlerName, 'args': JSON.stringify(args)} );
 }
+"""
+
+func currentTimeInMilliSeconds() -> Int {
+    let currentDate = Date()
+    let since1970 = currentDate.timeIntervalSince1970
+    return Int(since1970 * 1000)
+}
+
+func convertToDictionary(text: String) -> [String: Any]? {
+    if let data = text.data(using: .utf8) {
+        do {
+            return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    return nil
+}
+
+
+//extension WKWebView{
+//
+//    var keyboardDisplayRequiresUserAction: Bool? {
+//        get {
+//            return self.keyboardDisplayRequiresUserAction
+//        }
+//        set {
+//            self.setKeyboardRequiresUserInteraction(newValue ?? true)
+//        }
+//    }
+//
+//    func setKeyboardRequiresUserInteraction( _ value: Bool) {
+//
+//        guard
+//            let WKContentViewClass: AnyClass = NSClassFromString("WKContentView") else {
+//                print("Cannot find the WKContentView class")
+//                return
+//        }
+//
+//        let olderSelector: Selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:")
+//        let newerSelector: Selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:changingActivityState:userObject:")
+//
+//        if let method = class_getInstanceMethod(WKContentViewClass, olderSelector) {
+//
+//            let originalImp: IMP = method_getImplementation(method)
+//            let original: OlderClosureType = unsafeBitCast(originalImp, to: OlderClosureType.self)
+//            let block : @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3) in
+//                original(me, olderSelector, arg0, !value, arg2, arg3)
+//            }
+//            let imp: IMP = imp_implementationWithBlock(block)
+//            method_setImplementation(method, imp)
+//        }
+//
+//        if let method = class_getInstanceMethod(WKContentViewClass, newerSelector) {
+//
+//            let originalImp: IMP = method_getImplementation(method)
+//            let original: NewerClosureType = unsafeBitCast(originalImp, to: NewerClosureType.self)
+//            let block : @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3, arg4) in
+//                original(me, newerSelector, arg0, !value, arg2, arg3, arg4)
+//            }
+//            let imp: IMP = imp_implementationWithBlock(block)
+//            method_setImplementation(method, imp)
+//        }
+//
+//    }
+//
+//}
 
 class WKWebView_IBWrapper: WKWebView {
     required convenience init?(coder: NSCoder) {
@@ -100,7 +138,7 @@ class WKWebView_IBWrapper: WKWebView {
     }
 }
 
-class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler, MyURLProtocolDelegate {
+class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
     @IBOutlet var webView: WKWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
@@ -119,6 +157,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     var initHeaders: [String: String]?
     var isHidden = false
     var uuid: String = ""
+    var WKNavigationMap: [String: [String: Any]] = [:]
+    var startPageTime = 0
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
@@ -132,7 +172,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        MyURLProtocol.wkWebViewDelegateMap[uuid] = self
+        //MyURLProtocol.wkWebViewDelegateMap[uuid] = self
         
         webView.uiDelegate = self
         webView.navigationDelegate = self
@@ -162,6 +202,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         spinner.stopAnimating()
         
         loadUrl(url: self.currentURL!, headers: self.initHeaders)
+        
     }
     
     // Prevent crashes on closing windows
@@ -249,13 +290,24 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         self.webView.configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
-        let jsConsoleLogScript = WKUserScript(source: jsConsoleLog, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        self.webView.configuration.userContentController.addUserScript(jsConsoleLogScript)
+        
+        let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        self.webView.configuration.userContentController.addUserScript(consoleLogJSScript)
         self.webView.configuration.userContentController.add(self, name: "consoleLog")
         self.webView.configuration.userContentController.add(self, name: "consoleDebug")
         self.webView.configuration.userContentController.add(self, name: "consoleError")
         self.webView.configuration.userContentController.add(self, name: "consoleInfo")
         self.webView.configuration.userContentController.add(self, name: "consoleWarn")
+        
+        let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        self.webView.configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
+        self.webView.configuration.userContentController.add(self, name: "callHandler")
+        
+        if (browserOptions?.useOnLoadResource)! {
+            let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            self.webView.configuration.userContentController.addUserScript(resourceObserverJSScript)
+            self.webView.configuration.userContentController.add(self, name: "resourceLoaded")
+        }
         
         if #available(iOS 10.0, *) {
             if (browserOptions?.mediaPlaybackRequiresUserGesture)! {
@@ -298,21 +350,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         if ((browserOptions?.userAgent)! != "") {
             if #available(iOS 9.0, *) {
                 self.webView.customUserAgent = (browserOptions?.userAgent)!
-            }
-        }
-        
-        // set uuid in the User-Agent in order to know which webview is making internal requests and
-        // to send the onLoadResource event to the correct webview
-        if #available(iOS 9.0, *) {
-            if (self.webView.customUserAgent != nil) {
-                self.webView.customUserAgent = self.webView.customUserAgent! + " WKWebView/" + self.uuid
-            }
-            else {
-                self.webView.evaluateJavaScript("navigator.userAgent") { [weak webView] (result, error) in
-                    if let webView = self.webView, let userAgent = result as? String {
-                        webView.customUserAgent = userAgent + " WKWebView/" + self.uuid
-                    }
-                }
             }
         }
         
@@ -480,18 +517,27 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         
-        let url = navigationAction.request.url
-        
-        if (url != nil && navigationAction.navigationType == .linkActivated && (browserOptions?.useShouldOverrideUrlLoading)!) {
-            navigationDelegate?.shouldOverrideUrlLoading(uuid: self.uuid, webView: webView, url: url!)
-            decisionHandler(.cancel)
-            return
+        if let url = navigationAction.request.url {
+            
+            if url.absoluteString != self.currentURL?.absoluteString && (browserOptions?.useOnLoadResource)! {
+                WKNavigationMap[url.absoluteString] = [
+                    "startTime": currentTimeInMilliSeconds(),
+                    "request": navigationAction.request
+                ]
+            }
+            
+            if navigationAction.navigationType == .linkActivated && (browserOptions?.useShouldOverrideUrlLoading)! {
+                navigationDelegate?.shouldOverrideUrlLoading(uuid: self.uuid, webView: webView, url: url)
+                decisionHandler(.cancel)
+                return
+            }
+            
+            if navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .backForward {
+                currentURL = url
+                updateUrlTextField(url: (url.absoluteString))
+            }
         }
         
-        if url != nil && (navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .backForward) {
-            currentURL = url
-            updateUrlTextField(url: (url?.absoluteString)!)
-        }
         
         decisionHandler(.allow)
     }
@@ -499,9 +545,18 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        //dump((navigationResponse.response as! HTTPURLResponse))
-        //print(navigationResponse.response.mimeType)
-        //print(navigationResponse.response.url)
+        
+        if (browserOptions?.useOnLoadResource)! {
+            if let url = navigationResponse.response.url {
+                if WKNavigationMap[url.absoluteString] != nil {
+                    let startResourceTime = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int)
+                    let startTime = startResourceTime - startPageTime;
+                    let duration = currentTimeInMilliSeconds() - startResourceTime;
+                    self.didReceiveResourceResponse(navigationResponse.response, fromRequest: WKNavigationMap[url.absoluteString]!["request"] as? URLRequest, withData: Data(), startTime: startTime, duration: duration)
+                }
+            }
+        }
+        
         decisionHandler(.allow)
     }
 
@@ -540,6 +595,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
 //    }
     
     func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        
+        self.startPageTime = currentTimeInMilliSeconds()
+        
         // loading url, start spinner, update back/forward
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
@@ -552,8 +610,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
+        self.WKNavigationMap = [:]
         // update url, stop spinner, update back/forward
-        
         currentURL = webView.url
         updateUrlTextField(url: (currentURL?.absoluteString)!)
         backButton.isEnabled = webView.canGoBack
@@ -576,8 +634,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
     }
     
-    func didReceiveResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, loadingTime time: Int) {
-        navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, loadingTime: time)
+    func didReceiveResourceResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
+        navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, startTime: startTime, duration: duration)
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -606,6 +664,38 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                     break;
             }
             navigationDelegate?.onConsoleMessage(uuid: self.uuid, sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
+        }
+        else if message.name == "resourceLoaded" {
+            if let resource = convertToDictionary(text: message.body as! String) {
+                let url = URL(string: resource["name"] as! String)!
+                if !UIApplication.shared.canOpenURL(url) {
+                    return
+                }
+                let startTime = Int(resource["startTime"] as! Double)
+                let duration = Int(resource["duration"] as! Double)
+                var urlRequest = URLRequest(url: url)
+                urlRequest.allHTTPHeaderFields = [:]
+                let config = URLSessionConfiguration.default
+                let session = URLSession(configuration: config)
+                let task = session.dataTask(with: urlRequest) { (data, response, error) in
+                    if error != nil {
+                        print(error)
+                        return
+                    }
+                    var withData = data
+                    if withData == nil {
+                        withData = Data()
+                    }
+                    self.didReceiveResourceResponse(response!, fromRequest: urlRequest, withData: withData!, startTime: startTime, duration: duration)
+                }
+                task.resume()
+            }
+        }
+        else if message.name == "callHandler" {
+            let body = message.body as! [String: Any]
+            let handlerName = body["handlerName"] as! String
+            let args = body["args"] as! String
+            self.navigationDelegate?.onCallJsHandler(uuid: self.uuid, webView: webView, handlerName: handlerName, args: args)
         }
     }
 }

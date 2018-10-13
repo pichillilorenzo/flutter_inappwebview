@@ -5,6 +5,7 @@ public class InAppBrowserOptions extends Options {
     final static String LOG_TAG = "InAppBrowserOptions";
 
     public boolean useShouldOverrideUrlLoading = false;
+    public boolean useOnLoadResource = false;
     public boolean clearCache = false;
     public String userAgent = "";
     public boolean javaScriptEnabled = true;

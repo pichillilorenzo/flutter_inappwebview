@@ -22,11 +22,13 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
 
 typedef Future<dynamic> ListenerCallback(MethodCall call);
+typedef Future<void> JavaScriptHandlerCallback(List<dynamic> arguments);
 
 var _uuidGenerator = new Uuid();
 
@@ -35,6 +37,8 @@ enum ConsoleMessageLevel {
   DEBUG, ERROR, LOG, TIP, WARNING
 }
 
+///Public class representing a resource request of the [InAppBrowser] WebView.
+///It is used by the method [InAppBrowser.onLoadResource()].
 class WebResourceRequest {
 
   String url;
@@ -45,15 +49,18 @@ class WebResourceRequest {
 
 }
 
+///Public class representing a resource response of the [InAppBrowser] WebView.
+///It is used by the method [InAppBrowser.onLoadResource()].
 class WebResourceResponse {
 
   String url;
   Map<String, String> headers;
   int statusCode;
-  int loadingTime;
+  int startTime;
+  int duration;
   Uint8List data;
 
-  WebResourceResponse(this.url, this.headers, this.statusCode, this.loadingTime, this.data);
+  WebResourceResponse(this.url, this.headers, this.statusCode, this.startTime, this.duration, this.data);
 
 }
 
@@ -99,6 +106,7 @@ class _ChannelManager {
 class InAppBrowser {
 
   String uuid;
+  Map<String, List<JavaScriptHandlerCallback>> javaScriptHandlersMap = HashMap<String, List<JavaScriptHandlerCallback>>();
 
   ///
   InAppBrowser () {
@@ -139,7 +147,8 @@ class InAppBrowser {
         Map<dynamic, dynamic> headersResponse = rawResponse["headers"];
         headersResponse = headersResponse.cast<String, String>();
         int statusCode = rawResponse["statusCode"];
-        int loadingTime = rawResponse["loadingTime"];
+        int startTime = rawResponse["startTime"];
+        int duration = rawResponse["duration"];
         Uint8List data = rawResponse["data"];
 
         String urlRequest = rawRequest["url"];
@@ -147,7 +156,7 @@ class InAppBrowser {
         headersRequest = headersResponse.cast<String, String>();
         String method = rawRequest["method"];
 
-        var response = new WebResourceResponse(urlResponse, headersResponse, statusCode, loadingTime, data);
+        var response = new WebResourceResponse(urlResponse, headersResponse, statusCode, startTime, duration, data);
         var request = new WebResourceRequest(urlRequest, headersRequest, method);
 
         onLoadResource(response, request);
@@ -165,13 +174,22 @@ class InAppBrowser {
         });
         onConsoleMessage(ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
         break;
+      case "onCallJsHandler":
+        String handlerName = call.arguments["handlerName"];
+        List<dynamic> args = jsonDecode(call.arguments["args"]);
+        if (javaScriptHandlersMap.containsKey(handlerName)) {
+          for (var handler in javaScriptHandlersMap[handlerName]) {
+            handler(args);
+          }
+        }
+        break;
     }
     return new Future.value("");
   }
 
   ///Opens an [url] in a new [InAppBrowser] instance or the system browser.
   ///
-  ///- [url]: The [url] to load. Call [encodeUriComponent()] on this if the [url] contains Unicode characters.
+  ///- [url]: The [url] to load. Call [encodeUriComponent()] on this if the [url] contains Unicode characters. The default value is `about:blank`.
   ///
   ///- [headers]: The additional headers to be used in the HTTP request for this URL, specified as a map from name to value.
   ///
@@ -185,6 +203,7 @@ class InAppBrowser {
   ///
   ///  All platforms support:
   ///  - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [shouldOverrideUrlLoading()] event. The default value is `false`.
+  ///  - __useOnLoadResource__: Set to `true` to be able to listen at the [onLoadResource()] event. The default value is `false`.
   ///  - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
   ///  - __userAgent___: Set the custom WebView's user-agent.
   ///  - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
@@ -342,6 +361,33 @@ class InAppBrowser {
     return await _ChannelManager.channel.invokeMethod('injectStyleFile', args);
   }
 
+  ///Adds/Appends a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
+  ///Returns the position `index` of the handler that can be used to remove it with the [removeJavaScriptHandler()] method.
+  ///
+  ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
+  ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
+  ///
+  ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args);`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+  ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
+  int addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
+    this.javaScriptHandlersMap.putIfAbsent(handlerName, () => List<JavaScriptHandlerCallback>());
+    this.javaScriptHandlersMap[handlerName].add(callback);
+    return this.javaScriptHandlersMap[handlerName].indexOf(callback);
+  }
+
+  ///Removes a JavaScript message handler previously added with the [addJavaScriptHandler()] method in the [handlerName] list by its position [index].
+  ///Returns `true` if the callback is removed, otherwise `false`.
+  bool removeJavaScriptHandler(String handlerName, int index) {
+    try {
+      this.javaScriptHandlersMap[handlerName].removeAt(index);
+      return true;
+    }
+    on RangeError catch(e) {
+      print(e);
+    }
+    return false;
+  }
+
   ///Event fires when the [InAppBrowser] starts to load an [url].
   void onLoadStart(String url) {
 
@@ -363,12 +409,14 @@ class InAppBrowser {
   }
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
-  ///In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
   void shouldOverrideUrlLoading(String url) {
 
   }
 
-  ///Event fires when the [InAppBrowser] webview will load the resource specified by the given [WebResourceRequest].
+  ///Event fires when the [InAppBrowser] webview loads a resource.
+  ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
+  ///**NOTE only for iOS**: In some cases, the [response.data] of a [response] with `text/html` encoding could be empty.
   void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
 
   }

@@ -131,7 +131,7 @@ class _MyAppState extends State<MyApp> {
         ),
         body: new Center(
           child: new RaisedButton(onPressed: () {
-            inAppBrowser.open("https://flutter.io/", options: {
+            inAppBrowser.open(url: "https://flutter.io/", options: {
                "useShouldOverrideUrlLoading": true,
                "useOnLoadResource": true
              });

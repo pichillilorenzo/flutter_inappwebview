@@ -1,3 +1,7 @@
+## 0.3.1
+
+- fixed README.md example
+
 ## 0.3.0
 
 - fixed WebView.storyboard to deployment target 8.0

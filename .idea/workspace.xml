@@ -15,20 +15,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserWebViewClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserWebViewClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/MyURLProtocol.swift" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/NSURLProtocol+WKWebVIew.h" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/NSURLProtocol+WKWebVIew.m" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -66,11 +53,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
+      <file leaf-file-name="README.md" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="280">
+              <first_editor relative-caret-position="471">
                 <caret line="592" lean-forward="true" selection-start-line="592" selection-end-line="592" />
               </first_editor>
               <second_editor>
@@ -80,11 +67,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-10">
-              <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
+            <state relative-caret-position="180">
+              <caret line="13" column="34" lean-forward="true" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -93,8 +80,8 @@
         <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="30">
-                <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="3" />
+              <first_editor relative-caret-position="60">
+                <caret line="4" column="2" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="98" />
               </first_editor>
               <second_editor>
                 <markdownNavigatorState />
@@ -181,10 +168,10 @@
         <option value="$PROJECT_DIR$/example/ios/Podfile" />
         <option value="$PROJECT_DIR$/android/build.gradle" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
       </list>
     </option>
   </component>
@@ -406,9 +393,9 @@
       <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5035553" side_tool="true" weight="0.25689086" />
       <window_info anchor="bottom" id="Dart Analysis" order="14" weight="0.32855567" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49644473" visible="true" weight="0.20384204" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" weight="0.20384204" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49644473" weight="0.25689086" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49644473" visible="true" weight="0.2561366" />
       <window_info anchor="right" id="Flutter Outline" order="3" weight="0.32922077" />
       <window_info anchor="bottom" id="Logcat" order="11" />
       <window_info id="Captures" order="2" weight="0.32936507" />
@@ -701,30 +688,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-10">
-          <caret line="99" lean-forward="true" selection-start-line="99" selection-end-line="99" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="69" lean-forward="true" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="73" />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="30">
-            <caret line="2" column="3" selection-start-line="2" selection-start-column="3" selection-end-line="2" selection-end-column="3" />
-          </first_editor>
-          <second_editor>
-            <markdownNavigatorState />
-          </second_editor>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/android/build.gradle">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="462">
@@ -750,12 +713,36 @@
       </provider>
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="280">
+          <first_editor relative-caret-position="471">
             <caret line="592" lean-forward="true" selection-start-line="592" selection-end-line="592" />
           </first_editor>
           <second_editor>
             <markdownNavigatorState />
           </second_editor>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="69" lean-forward="true" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="73" />
+        </state>
+      </provider>
+      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="60">
+            <caret line="4" column="2" selection-start-line="4" selection-start-column="2" selection-end-line="4" selection-end-column="98" />
+          </first_editor>
+          <second_editor>
+            <markdownNavigatorState />
+          </second_editor>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="180">
+          <caret line="13" column="34" lean-forward="true" selection-start-line="13" selection-start-column="34" selection-end-line="13" selection-end-column="34" />
         </state>
       </provider>
     </entry>

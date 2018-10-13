@@ -13,9 +13,9 @@ class MyInAppBrowser extends InAppBrowser {
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
 
-    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest', 1, 5,'string', {'key': 5}, [4,6,8]);");
-    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest2', false, null, undefined);");
-    await this.injectScriptCode("setTimeout(function(){window.flutter_inappbrowser.callHandler('handlerTest', 'anotherString');}, 1000);");
+//    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest', 1, 5,'string', {'key': 5}, [4,6,8]);");
+//    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest2', false, null, undefined);");
+//    await this.injectScriptCode("setTimeout(function(){window.flutter_inappbrowser.callHandler('handlerTest', 'anotherString');}, 1000);");
 //
 //    await this.injectScriptCode("console.log({'testObject': 5});");
 //    await this.injectScriptCode("console.warn('testWarn',null);");
@@ -131,15 +131,15 @@ class _MyAppState extends State<MyApp> {
   @override
   void initState() {
     super.initState();
-    int indexTest = inAppBrowserFallback.addJavaScriptHandler("handlerTest", (arguments) async {
-      print("handlerTest arguments");
-      print(arguments);
-    });
-    int indexTest2 = inAppBrowserFallback.addJavaScriptHandler("test2", (arguments) async {
-      print("handlerTest2 arguments");
-      print(arguments);
-      inAppBrowserFallback.removeJavaScriptHandler("test", indexTest);
-    });
+//    int indexTest = inAppBrowserFallback.addJavaScriptHandler("handlerTest", (arguments) async {
+//      print("handlerTest arguments");
+//      print(arguments);
+//    });
+//    int indexTest2 = inAppBrowserFallback.addJavaScriptHandler("test2", (arguments) async {
+//      print("handlerTest2 arguments");
+//      print(arguments);
+//      inAppBrowserFallback.removeJavaScriptHandler("test", indexTest);
+//    });
   }
 
   @override

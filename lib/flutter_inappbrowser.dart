@@ -21,6 +21,7 @@
 
 import 'dart:async';
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 import 'package:uuid/uuid.dart';
@@ -32,6 +33,28 @@ var _uuidGenerator = new Uuid();
 ///
 enum ConsoleMessageLevel {
   DEBUG, ERROR, LOG, TIP, WARNING
+}
+
+class WebResourceRequest {
+
+  String url;
+  Map<String, String> headers;
+  String method;
+
+  WebResourceRequest(this.url, this.headers, this.method);
+
+}
+
+class WebResourceResponse {
+
+  String url;
+  Map<String, String> headers;
+  int statusCode;
+  int loadingTime;
+  Uint8List data;
+
+  WebResourceResponse(this.url, this.headers, this.statusCode, this.loadingTime, this.data);
+
 }
 
 ///Public class representing a JavaScript console message from WebCore.
@@ -107,10 +130,27 @@ class InAppBrowser {
         shouldOverrideUrlLoading(url);
         break;
       case "onLoadResource":
-        String url = call.arguments["url"];
-        int statusCode = call.arguments["statusCode"];
-        Map<dynamic, dynamic> headers = call.arguments["headers"];
-        onLoadResource(url, statusCode, headers.cast<String, String>());
+        Map<dynamic, dynamic> rawResponse = call.arguments["response"];
+        rawResponse = rawResponse.cast<String, dynamic>();
+        Map<dynamic, dynamic> rawRequest = call.arguments["request"];
+        rawRequest = rawRequest.cast<String, dynamic>();
+
+        String urlResponse = rawResponse["url"];
+        Map<dynamic, dynamic> headersResponse = rawResponse["headers"];
+        headersResponse = headersResponse.cast<String, String>();
+        int statusCode = rawResponse["statusCode"];
+        int loadingTime = rawResponse["loadingTime"];
+        Uint8List data = rawResponse["data"];
+
+        String urlRequest = rawRequest["url"];
+        Map<dynamic, dynamic> headersRequest = rawRequest["headers"];
+        headersRequest = headersResponse.cast<String, String>();
+        String method = rawRequest["method"];
+
+        var response = new WebResourceResponse(urlResponse, headersResponse, statusCode, loadingTime, data);
+        var request = new WebResourceRequest(urlRequest, headersRequest, method);
+
+        onLoadResource(response, request);
         break;
       case "onConsoleMessage":
         String sourceURL = call.arguments["sourceURL"];
@@ -187,7 +227,7 @@ class InAppBrowser {
   ///  - __allowsInlineMediaPlayback__: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls. For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
   ///  - __allowsPictureInPictureMediaPlayback__: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
   ///  - __spinner__: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
-  Future<void> open(String url, {Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}}) async {
+  Future<void> open({String url = "about:blank", Map<String, String> headers = const {}, String target = "_self", Map<String, dynamic> options = const {}}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => url);
@@ -328,8 +368,8 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the [InAppBrowser] webview will load the resource specified by the given [url].
-  void onLoadResource(String url, int statusCode, Map<String, String> headers) {
+  ///Event fires when the [InAppBrowser] webview will load the resource specified by the given [WebResourceRequest].
+  void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
 
   }
 

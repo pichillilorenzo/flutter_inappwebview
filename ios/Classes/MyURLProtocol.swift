@@ -6,29 +6,47 @@
 //
 
 import Foundation
+import WebKit
+
+
+func currentTimeInMilliSeconds() -> Int {
+    let currentDate = Date()
+    let since1970 = currentDate.timeIntervalSince1970
+    return Int(since1970 * 1000)
+}
 
 class MyURLProtocol: URLProtocol {
     
-    struct Constants {
-        static let RequestHandledKey = "URLProtocolRequestHandled"
-    }
+//    struct Constants {
+//        static let RequestHandledKey = "URLProtocolRequestHandled"
+//    }
     
+    var wkWebViewUuid: String?
     var session: URLSession?
     var sessionTask: URLSessionDataTask?
-    static var URLProtocolDelegate: MyURLProtocolDelegate?
+    var response: URLResponse?
+    var data: Data?
+    static var wkWebViewDelegateMap: [String: MyURLProtocolDelegate] = [:]
+    var loadingTime: Int = 0
     
     override init(request: URLRequest, cachedResponse: CachedURLResponse?, client: URLProtocolClient?) {
         super.init(request: request, cachedResponse: cachedResponse, client: client)
         
-        if session == nil {
+        self.wkWebViewUuid = MyURLProtocol.getUuid(request)
+        
+        if session == nil && self.wkWebViewUuid != nil {
             session = URLSession(configuration: .default, delegate: self, delegateQueue: nil)
         }
     }
     
     override class func canInit(with request: URLRequest) -> Bool {
-        if MyURLProtocol.property(forKey: Constants.RequestHandledKey, in: request) != nil {
+
+        if getUuid(request) == nil {
             return false
         }
+//        if MyURLProtocol.property(forKey: Constants.RequestHandledKey, in: request) != nil {
+//            return false
+//        }
         return true
     }
     
@@ -38,25 +56,54 @@ class MyURLProtocol: URLProtocol {
     
     override func startLoading() {
         let newRequest = ((request as NSURLRequest).mutableCopy() as? NSMutableURLRequest)!
-        MyURLProtocol.setProperty(true, forKey: Constants.RequestHandledKey, in: newRequest)
+        loadingTime = currentTimeInMilliSeconds()
+        //MyURLProtocol.setProperty(true, forKey: Constants.RequestHandledKey, in: newRequest)
         sessionTask = session?.dataTask(with: newRequest as URLRequest)
         sessionTask?.resume()
     }
     
     override func stopLoading() {
+        if let uuid = self.wkWebViewUuid {
+            if MyURLProtocol.wkWebViewDelegateMap[uuid] != nil && self.response != nil {
+                loadingTime = currentTimeInMilliSeconds() - loadingTime
+                if self.data == nil {
+                    self.data = Data()
+                }
+                MyURLProtocol.wkWebViewDelegateMap[uuid]!.didReceiveResponse(self.response!, fromRequest: request, withData: self.data!, loadingTime: loadingTime)
+            }
+        }
+        
         sessionTask?.cancel()
+    }
+    
+    class func getUuid(_ request: URLRequest?) -> String? {
+        let userAgent: String? = request?.allHTTPHeaderFields?["User-Agent"]
+        var uuid: String? = nil
+        if userAgent != nil {
+            if userAgent!.contains("WKWebView/") {
+                let userAgentSplitted = userAgent!.split(separator: " ")
+                uuid = String(userAgentSplitted[userAgentSplitted.count-1]).replacingOccurrences(of: "WKWebView/", with: "")
+            }
+        }
+        return uuid
     }
 }
 
 extension MyURLProtocol: URLSessionDataDelegate {
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        if self.data == nil {
+            self.data = data
+        }
+        else {
+            self.data!.append(data)
+        }
         client?.urlProtocol(self, didLoad: data)
     }
     
     func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         let policy = URLCache.StoragePolicy(rawValue: request.cachePolicy.rawValue) ?? .notAllowed
+        self.response = response
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: policy)
-        MyURLProtocol.URLProtocolDelegate?.didReceiveResponse(response, from: dataTask.currentRequest)
         completionHandler(.allow)
     }
     
@@ -98,5 +145,5 @@ extension MyURLProtocol: URLSessionDataDelegate {
 }
 
 protocol MyURLProtocolDelegate {
-    func didReceiveResponse(_ response: URLResponse, from request: URLRequest?)
+    func didReceiveResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, loadingTime time: Int)
 }

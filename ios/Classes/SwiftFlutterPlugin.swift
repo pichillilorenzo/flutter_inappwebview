@@ -46,6 +46,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
+        URLProtocol.wk_registerScheme("http")
+        URLProtocol.wk_registerScheme("https")
+        URLProtocol.registerClass(MyURLProtocol.self)
         let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterPlugin(with: registrar)
         registrar.addMethodCallDelegate(instance, channel: channel)
@@ -489,16 +492,28 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse) {
+    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse, fromRequest request: URLRequest?, withData data: Data, loadingTime time: Int) {
         if self.webViewControllers[uuid] != nil {
-            var headers = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
-            headers.lowercaseKeys()
+            var headersResponse = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
+            headersResponse.lowercaseKeys()
+            
+            var headersRequest = request!.allHTTPHeaderFields! as [String: String]
+            headersRequest.lowercaseKeys()
             
             let arguments: [String : Any] = [
                 "uuid": uuid,
-                "url": response.url?.absoluteString ?? "",
-                "statusCode": (response as! HTTPURLResponse).statusCode,
-                "headers": headers
+                "response": [
+                    "url": response.url!.absoluteString,
+                    "statusCode": (response as! HTTPURLResponse).statusCode,
+                    "headers": headersResponse,
+                    "loadingTime": time,
+                    "data": data
+                ],
+                "request": [
+                    "url": request!.url!.absoluteString,
+                    "headers": headersRequest,
+                    "method": request!.httpMethod!
+                ]
             ]
             channel.invokeMethod("onLoadResource", arguments: arguments)
         }

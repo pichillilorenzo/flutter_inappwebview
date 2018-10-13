@@ -72,10 +72,10 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onLoadResource(String url, int statusCode, Map<String, String> headers) {
-    print("\n\n resource: $url\n\n");
-    print(statusCode);
-    print(headers);
+  void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
+    print(response.loadingTime.toString() + "ms " + response.url);
+    if (response.headers["content-length"] != null)
+      print(response.headers["content-length"] + " length");
   }
 
   @override
@@ -138,7 +138,7 @@ class _MyAppState extends State<MyApp> {
         body: new Center(
           child: new RaisedButton(onPressed: () {
             //chromeSafariBrowser.open("https://flutter.io/");
-            inAppBrowserFallback.open("https://flutter.io/", options: {
+            inAppBrowserFallback.open(url: "https://flutter.io/", options: {
               //"hidden": true,
               //"toolbarTopFixedTitle": "Fixed title",
               //"useShouldOverrideUrlLoading": true

@@ -1,37 +1,28 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.content.ContentResolver;
-import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
-import android.os.Handler;
-import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.support.annotation.RequiresApi;
-import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
-import android.webkit.MimeTypeMap;
 import android.webkit.SslErrorHandler;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.util.Arrays;
+import java.io.InputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
-import okhttp3.Headers;
-import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -278,28 +269,55 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         Request mRequest = new Request.Builder().url(url).build();
 
         try {
+            long loadingTime = System.currentTimeMillis();
             Response response = activity.httpClient.newCall(mRequest).execute();
+            loadingTime = System.currentTimeMillis() - loadingTime;
+
             String reasonPhrase = response.message();
             if (reasonPhrase.equals("")) {
                 reasonPhrase = statusCodeMapping.get(response.code());
-                Log.d(LOG_TAG, reasonPhrase);
             }
             reasonPhrase = (reasonPhrase.equals("") || reasonPhrase == null) ? "OK" : reasonPhrase;
 
-            Map<String, String> headers = new HashMap<String, String>();
+            Map<String, String> headersResponse = new HashMap<String, String>();
             for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
                 String value = "";
                 for (String val: entry.getValue()) {
                     value += (value == "") ? val : "; " + val;
                 }
-                headers.put(entry.getKey().toLowerCase(), value);
+                headersResponse.put(entry.getKey().toLowerCase(), value);
+            }
+
+            Map<String, String> headersRequest = new HashMap<String, String>();
+            for (Map.Entry<String, List<String>> entry : mRequest.headers().toMultimap().entrySet()) {
+                String value = "";
+                for (String val: entry.getValue()) {
+                    value += (value == "") ? val : "; " + val;
+                }
+                headersRequest.put(entry.getKey().toLowerCase(), value);
             }
 
             Map<String, Object> obj = new HashMap<>();
+            Map<String, Object> res = new HashMap<>();
+            Map<String, Object> req = new HashMap<>();
+
             obj.put("uuid", activity.uuid);
-            obj.put("url", url);
-            obj.put("statusCode", response.code());
-            obj.put("headers", headers);
+
+            byte[] dataBytes = response.body().bytes();
+            InputStream dataStream = new ByteArrayInputStream(dataBytes);
+
+            res.put("url", url);
+            res.put("statusCode", response.code());
+            res.put("headers", headersResponse);
+            res.put("loadingTime", loadingTime);
+            res.put("data", dataBytes);
+
+            req.put("url", url);
+            req.put("headers", headersRequest);
+            req.put("method", mRequest.method());
+
+            obj.put("response", res);
+            obj.put("request", req);
 
             InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadResource", obj);
 
@@ -308,8 +326,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
                 response.header("content-encoding"),
                 response.code(),
                 reasonPhrase,
-                headers,
-                response.body().byteStream()
+                headersResponse,
+                dataStream
             );
         } catch (IOException e) {
             e.printStackTrace();

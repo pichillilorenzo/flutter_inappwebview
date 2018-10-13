@@ -131,13 +131,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        URLProtocol.wk_registerScheme("http")
-        URLProtocol.wk_registerScheme("https")
-        
-        MyURLProtocol.URLProtocolDelegate = self
-        
-        URLProtocol.registerClass(MyURLProtocol.self)
+
+        MyURLProtocol.wkWebViewDelegateMap[uuid] = self
         
         webView.uiDelegate = self
         webView.navigationDelegate = self
@@ -303,8 +298,21 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         if ((browserOptions?.userAgent)! != "") {
             if #available(iOS 9.0, *) {
                 self.webView.customUserAgent = (browserOptions?.userAgent)!
-            } else {
-                // Fallback on earlier versions
+            }
+        }
+        
+        // set uuid in the User-Agent in order to know which webview is making internal requests and
+        // to send the onLoadResource event to the correct webview
+        if #available(iOS 9.0, *) {
+            if (self.webView.customUserAgent != nil) {
+                self.webView.customUserAgent = self.webView.customUserAgent! + " WKWebView/" + self.uuid
+            }
+            else {
+                self.webView.evaluateJavaScript("navigator.userAgent") { [weak webView] (result, error) in
+                    if let webView = self.webView, let userAgent = result as? String {
+                        webView.customUserAgent = userAgent + " WKWebView/" + self.uuid
+                    }
+                }
             }
         }
         
@@ -491,7 +499,6 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        
         //dump((navigationResponse.response as! HTTPURLResponse))
         //print(navigationResponse.response.mimeType)
         //print(navigationResponse.response.url)
@@ -569,8 +576,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
     }
     
-    func didReceiveResponse(_ response: URLResponse, from request: URLRequest?) {
-        navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response)
+    func didReceiveResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, loadingTime time: Int) {
+        navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, loadingTime: time)
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {

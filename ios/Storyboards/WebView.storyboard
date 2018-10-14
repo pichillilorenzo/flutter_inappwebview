@@ -4,7 +4,7 @@
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
-        <deployment identifier="iOS"/>
+        <deployment version="2048" identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -21,9 +21,6 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="5cB-8U-Az3">
-                                <rect key="frame" x="206.66666666666666" y="367.66666666666669" width="1" height="1"/>
-                            </imageView>
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" customClass="WKWebView_IBWrapper" customModule="flutter_inappbrowser">
                                 <rect key="frame" x="0.0" y="66" width="414" height="626"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
@@ -71,7 +68,6 @@
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
                         <constraints>
-                            <constraint firstItem="5cB-8U-Az3" firstAttribute="centerY" secondItem="ISu-6l-aO1" secondAttribute="centerY" id="7gS-HV-ExU"/>
                             <constraint firstItem="gA9-n8-qaQ" firstAttribute="leading" secondItem="ISu-6l-aO1" secondAttribute="leading" id="8YB-0N-UzE"/>
                             <constraint firstItem="gA9-n8-qaQ" firstAttribute="trailing" secondItem="ISu-6l-aO1" secondAttribute="trailing" id="Dhn-ga-7dD"/>
                             <constraint firstItem="gA9-n8-qaQ" firstAttribute="bottom" secondItem="8Pf-5R-cFf" secondAttribute="top" id="KeI-jL-Qoi"/>
@@ -79,7 +75,6 @@
                             <constraint firstItem="vlz-kT-71x" firstAttribute="leading" secondItem="gA9-n8-qaQ" secondAttribute="leading" id="OZ2-Kx-4su"/>
                             <constraint firstItem="gA9-n8-qaQ" firstAttribute="leading" secondItem="8Pf-5R-cFf" secondAttribute="leading" id="RGD-3l-ddR"/>
                             <constraint firstItem="gA9-n8-qaQ" firstAttribute="top" secondItem="vlz-kT-71x" secondAttribute="bottom" id="Sjd-dV-din"/>
-                            <constraint firstItem="5cB-8U-Az3" firstAttribute="centerX" secondItem="ISu-6l-aO1" secondAttribute="centerX" id="Wh0-qC-IDM"/>
                             <constraint firstItem="vlz-kT-71x" firstAttribute="trailing" secondItem="gA9-n8-qaQ" secondAttribute="trailing" id="XRo-VA-krE"/>
                             <constraint firstItem="vlz-kT-71x" firstAttribute="top" secondItem="eCU-xC-qdo" secondAttribute="bottom" id="bWR-2T-bWy"/>
                             <constraint firstItem="HWt-17-FMf" firstAttribute="centerX" secondItem="gA9-n8-qaQ" secondAttribute="centerX" id="dV8-Dm-9mc"/>
@@ -107,7 +102,4 @@
             <point key="canvasLocation" x="433.33333333333337" y="-217.66304347826087"/>
         </scene>
     </scenes>
-    <resources>
-        <image name="LaunchImage" width="1" height="1"/>
-    </resources>
 </document>

@@ -13,6 +13,7 @@ A new Flutter plugin.
   s.author           = { 'Your Company' => 'email@example.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
+  s.resources = 'Storyboards/**/*.storyboard'
   s.public_header_files = 'Classes/**/*.h'
   s.dependency 'Flutter'
   

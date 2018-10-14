@@ -27,6 +27,8 @@ Classes:
 Screenshots [here](#screenshots).
 
 ### `InAppBrowser` class
+Native WebView.
+
 Create a Class that extends the `InAppBrowser` Class in order to override the callbacks to manage the browser events.
 Example:
 ```dart
@@ -432,6 +434,8 @@ inAppBrowser.removeJavaScriptHandler(String handlerName, int index);
 
 
 ### `ChromeSafariBrowser` class
+[Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
+
 Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:
 ```dart
 import 'package:flutter/material.dart';

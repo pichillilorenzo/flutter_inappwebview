@@ -244,7 +244,7 @@ InAppBrowser.openWithSystemBrowser(String url);
 
 Serve the `assetFilePath` from Flutter assets on http://localhost:`port`/. It is similar to `InAppBrowser.open()` with option `isLocalFile: true`, but it starts a server.
 
-**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file (See [ATS Configuration Basics](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35):
+**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file (See [ATS Configuration Basics](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35)):
 ```xml
 <key>NSAppTransportSecurity</key>
 <dict>

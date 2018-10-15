@@ -81,7 +81,6 @@ func convertToDictionary(text: String) -> [String: Any]? {
     return nil
 }
 
-
 //extension WKWebView{
 //
 //    var keyboardDisplayRequiresUserAction: Bool? {
@@ -139,6 +138,7 @@ class WKWebView_IBWrapper: WKWebView {
 }
 
 class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
+    
     @IBOutlet var webView: WKWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
@@ -200,7 +200,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         spinner.hidesWhenStopped = true
         spinner.isHidden = false
         spinner.stopAnimating()
-        
+
         loadUrl(url: self.currentURL!, headers: self.initHeaders)
         
     }
@@ -421,11 +421,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     @objc func close() {
-        currentURL = nil
-        
-        if (navigationDelegate != nil) {
-            navigationDelegate?.browserExit(uuid: self.uuid)
-        }
+        //currentURL = nil
         
         weak var weakSelf = self
         
@@ -435,12 +431,18 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                 weakSelf?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
                     self.tmpWindow?.windowLevel = 0.0
                     UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                    if (self.navigationDelegate != nil) {
+                        self.navigationDelegate?.browserExit(uuid: self.uuid)
+                    }
                 })
             }
             else {
                 weakSelf?.parent?.dismiss(animated: true, completion: {() -> Void in
                     self.tmpWindow?.windowLevel = 0.0
                     UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                    if (self.navigationDelegate != nil) {
+                        self.navigationDelegate?.browserExit(uuid: self.uuid)
+                    }
                 })
             }
         })
@@ -527,7 +529,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             }
             
             if navigationAction.navigationType == .linkActivated && (browserOptions?.useShouldOverrideUrlLoading)! {
-                navigationDelegate?.shouldOverrideUrlLoading(uuid: self.uuid, webView: webView, url: url)
+                if navigationDelegate != nil {
+                    navigationDelegate?.shouldOverrideUrlLoading(uuid: self.uuid, webView: webView, url: url)
+                }
                 decisionHandler(.cancel)
                 return
             }
@@ -606,7 +610,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             spinner.startAnimating()
         }
         
-        return (navigationDelegate?.onLoadStart(uuid: self.uuid, webView: webView))!
+        if navigationDelegate != nil {
+            navigationDelegate?.onLoadStart(uuid: self.uuid, webView: webView)
+        }
     }
     
     func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
@@ -617,7 +623,10 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()
-        navigationDelegate?.onLoadStop(uuid: self.uuid, webView: webView)
+        
+        if navigationDelegate != nil {
+            navigationDelegate?.onLoadStop(uuid: self.uuid, webView: webView)
+        }
     }
     
     func webView(_ view: WKWebView,
@@ -627,15 +636,19 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
     
     func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
-        print("webView:didFailNavigationWithError - \(Int(error._code)): \(error.localizedDescription)")
         backButton.isEnabled = webView.canGoBack
         forwardButton.isEnabled = webView.canGoForward
         spinner.stopAnimating()
-        navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
+        
+        if navigationDelegate != nil {
+            navigationDelegate?.onLoadError(uuid: self.uuid, webView: webView, error: error)
+        }
     }
     
     func didReceiveResourceResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
-        navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, startTime: startTime, duration: duration)
+        if navigationDelegate != nil {
+            navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, startTime: startTime, duration: duration)
+        }
     }
     
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -663,7 +676,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                     messageLevel = "LOG"
                     break;
             }
-            navigationDelegate?.onConsoleMessage(uuid: self.uuid, sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
+            if navigationDelegate != nil {
+                navigationDelegate?.onConsoleMessage(uuid: self.uuid, sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
+            }
         }
         else if message.name == "resourceLoaded" {
             if let resource = convertToDictionary(text: message.body as! String) {
@@ -695,7 +710,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             let body = message.body as! [String: Any]
             let handlerName = body["handlerName"] as! String
             let args = body["args"] as! String
-            self.navigationDelegate?.onCallJsHandler(uuid: self.uuid, webView: webView, handlerName: handlerName, args: args)
+            if navigationDelegate != nil {
+                self.navigationDelegate?.onCallJsHandler(uuid: self.uuid, webView: webView, handlerName: handlerName, args: args)
+            }
         }
     }
 }

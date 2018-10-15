@@ -23,337 +23,341 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.flutter.plugin.common.MethodChannel;
 import okhttp3.Request;
 import okhttp3.Response;
 
 public class InAppBrowserWebViewClient extends WebViewClient {
 
-    protected static final String LOG_TAG = "IABWebViewClient";
-    private WebViewActivity activity;
-    Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
-    long startPageTime = 0;
+  protected static final String LOG_TAG = "IABWebViewClient";
+  private WebViewActivity activity;
+  Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
+  long startPageTime = 0;
 
-    public InAppBrowserWebViewClient(WebViewActivity activity) {
-        super();
-        this.activity = activity;
-        statusCodeMapping.put(100, "Continue");
-        statusCodeMapping.put(101, "Switching Protocols");
-        statusCodeMapping.put(200, "OK");
-        statusCodeMapping.put(201, "Created");
-        statusCodeMapping.put(202, "Accepted");
-        statusCodeMapping.put(203, "Non-Authoritative Information");
-        statusCodeMapping.put(204, "No Content");
-        statusCodeMapping.put(205, "Reset Content");
-        statusCodeMapping.put(206, "Partial Content");
-        statusCodeMapping.put(300, "Multiple Choices");
-        statusCodeMapping.put(301, "Moved Permanently");
-        statusCodeMapping.put(302, "Found");
-        statusCodeMapping.put(303, "See Other");
-        statusCodeMapping.put(304, "Not Modified");
-        statusCodeMapping.put(307, "Temporary Redirect");
-        statusCodeMapping.put(308, "Permanent Redirect");
-        statusCodeMapping.put(400, "Bad Request");
-        statusCodeMapping.put(401, "Unauthorized");
-        statusCodeMapping.put(403, "Forbidden");
-        statusCodeMapping.put(404, "Not Found");
-        statusCodeMapping.put(405, "Method Not Allowed");
-        statusCodeMapping.put(406, "Not Acceptable");
-        statusCodeMapping.put(407, "Proxy Authentication Required");
-        statusCodeMapping.put(408, "Request Timeout");
-        statusCodeMapping.put(409, "Conflict");
-        statusCodeMapping.put(410, "Gone");
-        statusCodeMapping.put(411, "Length Required");
-        statusCodeMapping.put(412, "Precondition Failed");
-        statusCodeMapping.put(413, "Payload Too Large");
-        statusCodeMapping.put(414, "URI Too Long");
-        statusCodeMapping.put(415, "Unsupported Media Type");
-        statusCodeMapping.put(416, "Range Not Satisfiable");
-        statusCodeMapping.put(417, "Expectation Failed");
-        statusCodeMapping.put(418, "I'm a teapot");
-        statusCodeMapping.put(422, "Unprocessable Entity");
-        statusCodeMapping.put(425, "Too Early");
-        statusCodeMapping.put(426, "Upgrade Required");
-        statusCodeMapping.put(428, "Precondition Required");
-        statusCodeMapping.put(429, "Too Many Requests");
-        statusCodeMapping.put(431, "Request Header Fields Too Large");
-        statusCodeMapping.put(451, "Unavailable For Legal Reasons");
-        statusCodeMapping.put(500, "Internal Server Error");
-        statusCodeMapping.put(501, "Not Implemented");
-        statusCodeMapping.put(502, "Bad Gateway");
-        statusCodeMapping.put(503, "Service Unavailable");
-        statusCodeMapping.put(504, "Gateway Timeout");
-        statusCodeMapping.put(505, "HTTP Version Not Supported");
-        statusCodeMapping.put(511, "Network Authentication Required");
+  public InAppBrowserWebViewClient(WebViewActivity activity) {
+    super();
+    this.activity = activity;
+    statusCodeMapping.put(100, "Continue");
+    statusCodeMapping.put(101, "Switching Protocols");
+    statusCodeMapping.put(200, "OK");
+    statusCodeMapping.put(201, "Created");
+    statusCodeMapping.put(202, "Accepted");
+    statusCodeMapping.put(203, "Non-Authoritative Information");
+    statusCodeMapping.put(204, "No Content");
+    statusCodeMapping.put(205, "Reset Content");
+    statusCodeMapping.put(206, "Partial Content");
+    statusCodeMapping.put(300, "Multiple Choices");
+    statusCodeMapping.put(301, "Moved Permanently");
+    statusCodeMapping.put(302, "Found");
+    statusCodeMapping.put(303, "See Other");
+    statusCodeMapping.put(304, "Not Modified");
+    statusCodeMapping.put(307, "Temporary Redirect");
+    statusCodeMapping.put(308, "Permanent Redirect");
+    statusCodeMapping.put(400, "Bad Request");
+    statusCodeMapping.put(401, "Unauthorized");
+    statusCodeMapping.put(403, "Forbidden");
+    statusCodeMapping.put(404, "Not Found");
+    statusCodeMapping.put(405, "Method Not Allowed");
+    statusCodeMapping.put(406, "Not Acceptable");
+    statusCodeMapping.put(407, "Proxy Authentication Required");
+    statusCodeMapping.put(408, "Request Timeout");
+    statusCodeMapping.put(409, "Conflict");
+    statusCodeMapping.put(410, "Gone");
+    statusCodeMapping.put(411, "Length Required");
+    statusCodeMapping.put(412, "Precondition Failed");
+    statusCodeMapping.put(413, "Payload Too Large");
+    statusCodeMapping.put(414, "URI Too Long");
+    statusCodeMapping.put(415, "Unsupported Media Type");
+    statusCodeMapping.put(416, "Range Not Satisfiable");
+    statusCodeMapping.put(417, "Expectation Failed");
+    statusCodeMapping.put(418, "I'm a teapot");
+    statusCodeMapping.put(422, "Unprocessable Entity");
+    statusCodeMapping.put(425, "Too Early");
+    statusCodeMapping.put(426, "Upgrade Required");
+    statusCodeMapping.put(428, "Precondition Required");
+    statusCodeMapping.put(429, "Too Many Requests");
+    statusCodeMapping.put(431, "Request Header Fields Too Large");
+    statusCodeMapping.put(451, "Unavailable For Legal Reasons");
+    statusCodeMapping.put(500, "Internal Server Error");
+    statusCodeMapping.put(501, "Not Implemented");
+    statusCodeMapping.put(502, "Bad Gateway");
+    statusCodeMapping.put(503, "Service Unavailable");
+    statusCodeMapping.put(504, "Gateway Timeout");
+    statusCodeMapping.put(505, "HTTP Version Not Supported");
+    statusCodeMapping.put(511, "Network Authentication Required");
+  }
+
+  @Override
+  public boolean shouldOverrideUrlLoading(WebView webView, String url) {
+
+    if (activity.options.useShouldOverrideUrlLoading) {
+      Map<String, Object> obj = new HashMap<>();
+      obj.put("uuid", activity.uuid);
+      obj.put("url", url);
+      InAppBrowserFlutterPlugin.channel.invokeMethod("shouldOverrideUrlLoading", obj);
+      return true;
     }
 
-    @Override
-    public boolean shouldOverrideUrlLoading(WebView webView, String url) {
-
-        if (activity.options.useShouldOverrideUrlLoading) {
-            Map<String, Object> obj = new HashMap<>();
-            obj.put("uuid", activity.uuid);
-            obj.put("url", url);
-            InAppBrowserFlutterPlugin.channel.invokeMethod("shouldOverrideUrlLoading", obj);
-            return true;
-        }
-
-        if (url.startsWith(WebView.SCHEME_TEL)) {
-            try {
-                Intent intent = new Intent(Intent.ACTION_DIAL);
-                intent.setData(Uri.parse(url));
-                activity.startActivity(intent);
-                return true;
-            } catch (android.content.ActivityNotFoundException e) {
-                Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
-            }
-        }
-        else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-                intent.setData(Uri.parse(url));
-                activity.startActivity(intent);
-                return true;
-            } catch (android.content.ActivityNotFoundException e) {
-                Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
-            }
-        }
-        // If sms:5551212?body=This is the message
-        else if (url.startsWith("sms:")) {
-            try {
-                Intent intent = new Intent(Intent.ACTION_VIEW);
-
-                // Get address
-                String address;
-                int parmIndex = url.indexOf('?');
-                if (parmIndex == -1) {
-                    address = url.substring(4);
-                } else {
-                    address = url.substring(4, parmIndex);
-
-                    // If body, then set sms body
-                    Uri uri = Uri.parse(url);
-                    String query = uri.getQuery();
-                    if (query != null) {
-                        if (query.startsWith("body=")) {
-                            intent.putExtra("sms_body", query.substring(5));
-                        }
-                    }
-                }
-                intent.setData(Uri.parse("sms:" + address));
-                intent.putExtra("address", address);
-                intent.setType("vnd.android-dir/mms-sms");
-                activity.startActivity(intent);
-                return true;
-            } catch (android.content.ActivityNotFoundException e) {
-                Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
-            }
-        }
-
-        return super.shouldOverrideUrlLoading(webView, url);
-
+    if (url.startsWith(WebView.SCHEME_TEL)) {
+      try {
+        Intent intent = new Intent(Intent.ACTION_DIAL);
+        intent.setData(Uri.parse(url));
+        activity.startActivity(intent);
+        return true;
+      } catch (android.content.ActivityNotFoundException e) {
+        Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+      }
+    } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+      try {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+        intent.setData(Uri.parse(url));
+        activity.startActivity(intent);
+        return true;
+      } catch (android.content.ActivityNotFoundException e) {
+        Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
+      }
     }
+    // If sms:5551212?body=This is the message
+    else if (url.startsWith("sms:")) {
+      try {
+        Intent intent = new Intent(Intent.ACTION_VIEW);
 
-
-    /*
-     * onPageStarted fires the LOAD_START_EVENT
-     *
-     * @param view
-     * @param url
-     * @param favicon
-     */
-    @Override
-    public void onPageStarted(WebView view, String url, Bitmap favicon) {
-        super.onPageStarted(view, url, favicon);
-
-        startPageTime = System.currentTimeMillis();
-
-        activity.isLoading = true;
-
-        if (activity.searchView != null && !url.equals(activity.searchView.getQuery().toString())) {
-            activity.searchView.setQuery(url, false);
-        }
-
-        Map<String, Object> obj = new HashMap<>();
-        obj.put("uuid", activity.uuid);
-        obj.put("url", url);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStart", obj);
-    }
-
-
-
-    public void onPageFinished(WebView view, String url) {
-        super.onPageFinished(view, url);
-
-        activity.isLoading = false;
-
-        // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().flush();
+        // Get address
+        String address;
+        int parmIndex = url.indexOf('?');
+        if (parmIndex == -1) {
+          address = url.substring(4);
         } else {
-            CookieSyncManager.getInstance().sync();
-        }
+          address = url.substring(4, parmIndex);
 
-        // https://issues.apache.org/jira/browse/CB-11248
-        view.clearFocus();
-        view.requestFocus();
-
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            view.evaluateJavascript(WebViewActivity.consoleLogJS, null);
-            view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, null);
-        }
-
-        Map<String, Object> obj = new HashMap<>();
-        obj.put("uuid", activity.uuid);
-        obj.put("url", url);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStop", obj);
-    }
-
-    public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-        super.onReceivedError(view, errorCode, description, failingUrl);
-
-        activity.isLoading = false;
-
-        Map<String, Object> obj = new HashMap<>();
-        obj.put("uuid", activity.uuid);
-        obj.put("url", failingUrl);
-        obj.put("code", errorCode);
-        obj.put("message", description);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
-    }
-
-    public void onReceivedSslError (WebView view, SslErrorHandler handler, SslError error) {
-        super.onReceivedSslError(view, handler, error);
-
-        Map<String, Object> obj = new HashMap<>();
-        obj.put("uuid", activity.uuid);
-        obj.put("url", error.getUrl());
-        obj.put("code", error.getPrimaryError());
-        String message;
-        switch (error.getPrimaryError()) {
-            case SslError.SSL_DATE_INVALID:
-                message = "The date of the certificate is invalid";
-                break;
-            case SslError.SSL_EXPIRED:
-                message = "The certificate has expired";
-                break;
-            case SslError.SSL_IDMISMATCH:
-                message = "Hostname mismatch";
-                break;
-            default:
-            case SslError.SSL_INVALID:
-                message = "A generic error occurred";
-                break;
-            case SslError.SSL_NOTYETVALID:
-                message = "The certificate is not yet valid";
-                break;
-            case SslError.SSL_UNTRUSTED:
-                message = "The certificate authority is not trusted";
-                break;
-        }
-        obj.put("message", "SslError: " + message);
-        InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
-
-        handler.cancel();
-    }
-
-    /**
-     * On received http auth request.
-     */
-    @Override
-    public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-        // By default handle 401 like we'd normally do!
-        super.onReceivedHttpAuthRequest(view, handler, host, realm);
-    }
-
-    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-    @Override
-    public WebResourceResponse shouldInterceptRequest (WebView view, WebResourceRequest request){
-
-        if (!request.getMethod().toLowerCase().equals("get") || !activity.options.useOnLoadResource) {
-            return null;
-        }
-
-        final String url = request.getUrl().toString();
-
-        try {
-            Request mRequest = new Request.Builder().url(url).build();
-
-            long startResourceTime = System.currentTimeMillis();
-            Response response = activity.httpClient.newCall(mRequest).execute();
-            long startTime = startResourceTime - startPageTime;
-            long duration = System.currentTimeMillis() - startResourceTime;
-
-            if (response.cacheResponse() != null) {
-                duration = 0;
+          // If body, then set sms body
+          Uri uri = Uri.parse(url);
+          String query = uri.getQuery();
+          if (query != null) {
+            if (query.startsWith("body=")) {
+              intent.putExtra("sms_body", query.substring(5));
             }
-
-            String reasonPhrase = response.message();
-            if (reasonPhrase.equals("")) {
-                reasonPhrase = statusCodeMapping.get(response.code());
-            }
-            reasonPhrase = (reasonPhrase.equals("") || reasonPhrase == null) ? "OK" : reasonPhrase;
-
-            Map<String, String> headersResponse = new HashMap<String, String>();
-            for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
-                StringBuilder value = new StringBuilder();
-                for (String val: entry.getValue()) {
-                    value.append( (value.toString().isEmpty()) ? val : "; " + val );
-                }
-                headersResponse.put(entry.getKey().toLowerCase(), value.toString());
-            }
-
-            Map<String, String> headersRequest = new HashMap<String, String>();
-            for (Map.Entry<String, List<String>> entry : mRequest.headers().toMultimap().entrySet()) {
-                StringBuilder value = new StringBuilder();
-                for (String val: entry.getValue()) {
-                    value.append( (value.toString().isEmpty()) ? val : "; " + val );
-                }
-                headersRequest.put(entry.getKey().toLowerCase(), value.toString());
-            }
-
-            Map<String, Object> obj = new HashMap<>();
-            Map<String, Object> res = new HashMap<>();
-            Map<String, Object> req = new HashMap<>();
-
-            obj.put("uuid", activity.uuid);
-
-            byte[] dataBytes = response.body().bytes();
-            InputStream dataStream = new ByteArrayInputStream(dataBytes);
-
-            res.put("url", url);
-            res.put("statusCode", response.code());
-            res.put("headers", headersResponse);
-            res.put("startTime", startTime);
-            res.put("duration", duration);
-            res.put("data", dataBytes);
-
-            req.put("url", url);
-            req.put("headers", headersRequest);
-            req.put("method", mRequest.method());
-
-            obj.put("response", res);
-            obj.put("request", req);
-
-            InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadResource", obj);
-
-            return new WebResourceResponse(
-                response.header("content-type", "text/plain").split(";")[0].trim(),
-                response.header("content-encoding"),
-                response.code(),
-                reasonPhrase,
-                headersResponse,
-                dataStream
-            );
-        } catch (IOException e) {
-            e.printStackTrace();
-            Log.d(LOG_TAG, e.getMessage());
-        } catch (Exception e) {
-            e.printStackTrace();
-            Log.d(LOG_TAG, e.getMessage());
+          }
         }
-
-        return null;
+        intent.setData(Uri.parse("sms:" + address));
+        intent.putExtra("address", address);
+        intent.setType("vnd.android-dir/mms-sms");
+        activity.startActivity(intent);
+        return true;
+      } catch (android.content.ActivityNotFoundException e) {
+        Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
+      }
     }
+
+    return super.shouldOverrideUrlLoading(webView, url);
+
+  }
+
+
+  /*
+   * onPageStarted fires the LOAD_START_EVENT
+   *
+   * @param view
+   * @param url
+   * @param favicon
+   */
+  @Override
+  public void onPageStarted(WebView view, String url, Bitmap favicon) {
+    super.onPageStarted(view, url, favicon);
+
+    startPageTime = System.currentTimeMillis();
+
+    activity.isLoading = true;
+
+    if (activity.searchView != null && !url.equals(activity.searchView.getQuery().toString())) {
+      activity.searchView.setQuery(url, false);
+    }
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", activity.uuid);
+    obj.put("url", url);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStart", obj);
+  }
+
+
+  public void onPageFinished(WebView view, String url) {
+    super.onPageFinished(view, url);
+
+    activity.isLoading = false;
+
+    // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager.getInstance().flush();
+    } else {
+      CookieSyncManager.getInstance().sync();
+    }
+
+    // https://issues.apache.org/jira/browse/CB-11248
+    view.clearFocus();
+    view.requestFocus();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      view.evaluateJavascript(WebViewActivity.consoleLogJS, null);
+      view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, null);
+    }
+    else {
+      view.loadUrl("javascript:"+WebViewActivity.consoleLogJS);
+      view.loadUrl("javascript:"+JavaScriptBridgeInterface.flutterInAppBroserJSClass);
+    }
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", activity.uuid);
+    obj.put("url", url);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStop", obj);
+  }
+
+  public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
+    super.onReceivedError(view, errorCode, description, failingUrl);
+
+    activity.isLoading = false;
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", activity.uuid);
+    obj.put("url", failingUrl);
+    obj.put("code", errorCode);
+    obj.put("message", description);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
+  }
+
+  public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
+    super.onReceivedSslError(view, handler, error);
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", activity.uuid);
+    obj.put("url", error.getUrl());
+    obj.put("code", error.getPrimaryError());
+    String message;
+    switch (error.getPrimaryError()) {
+      case SslError.SSL_DATE_INVALID:
+        message = "The date of the certificate is invalid";
+        break;
+      case SslError.SSL_EXPIRED:
+        message = "The certificate has expired";
+        break;
+      case SslError.SSL_IDMISMATCH:
+        message = "Hostname mismatch";
+        break;
+      default:
+      case SslError.SSL_INVALID:
+        message = "A generic error occurred";
+        break;
+      case SslError.SSL_NOTYETVALID:
+        message = "The certificate is not yet valid";
+        break;
+      case SslError.SSL_UNTRUSTED:
+        message = "The certificate authority is not trusted";
+        break;
+    }
+    obj.put("message", "SslError: " + message);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
+
+    handler.cancel();
+  }
+
+  /**
+   * On received http auth request.
+   */
+  @Override
+  public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
+    // By default handle 401 like we'd normally do!
+    super.onReceivedHttpAuthRequest(view, handler, host, realm);
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  @Override
+  public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
+    if (!request.getMethod().toLowerCase().equals("get") || !activity.options.useOnLoadResource) {
+      return null;
+    }
+
+    final String url = request.getUrl().toString();
+
+    try {
+      Request mRequest = new Request.Builder().url(url).build();
+
+      long startResourceTime = System.currentTimeMillis();
+      Response response = activity.httpClient.newCall(mRequest).execute();
+      long startTime = startResourceTime - startPageTime;
+      startTime = (startTime < 0) ? 0 : startTime;
+      long duration = System.currentTimeMillis() - startResourceTime;
+
+      if (response.cacheResponse() != null) {
+        duration = 0;
+      }
+
+      String reasonPhrase = response.message();
+      if (reasonPhrase.equals("")) {
+        reasonPhrase = statusCodeMapping.get(response.code());
+      }
+      reasonPhrase = (reasonPhrase.equals("") || reasonPhrase == null) ? "OK" : reasonPhrase;
+
+      Map<String, String> headersResponse = new HashMap<String, String>();
+      for (Map.Entry<String, List<String>> entry : response.headers().toMultimap().entrySet()) {
+        StringBuilder value = new StringBuilder();
+        for (String val : entry.getValue()) {
+          value.append((value.toString().isEmpty()) ? val : "; " + val);
+        }
+        headersResponse.put(entry.getKey().toLowerCase(), value.toString());
+      }
+
+      Map<String, String> headersRequest = new HashMap<String, String>();
+      for (Map.Entry<String, List<String>> entry : mRequest.headers().toMultimap().entrySet()) {
+        StringBuilder value = new StringBuilder();
+        for (String val : entry.getValue()) {
+          value.append((value.toString().isEmpty()) ? val : "; " + val);
+        }
+        headersRequest.put(entry.getKey().toLowerCase(), value.toString());
+      }
+
+      Map<String, Object> obj = new HashMap<>();
+      Map<String, Object> res = new HashMap<>();
+      Map<String, Object> req = new HashMap<>();
+
+      obj.put("uuid", activity.uuid);
+
+      byte[] dataBytes = response.body().bytes();
+      InputStream dataStream = new ByteArrayInputStream(dataBytes);
+
+      res.put("url", url);
+      res.put("statusCode", response.code());
+      res.put("headers", headersResponse);
+      res.put("startTime", startTime);
+      res.put("duration", duration);
+      res.put("data", dataBytes);
+
+      req.put("url", url);
+      req.put("headers", headersRequest);
+      req.put("method", mRequest.method());
+
+      obj.put("response", res);
+      obj.put("request", req);
+
+      InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadResource", obj);
+
+      return new WebResourceResponse(
+              response.header("content-type", "text/plain").split(";")[0].trim(),
+              response.header("content-encoding"),
+              response.code(),
+              reasonPhrase,
+              headersResponse,
+              dataStream
+      );
+    } catch (IOException e) {
+      e.printStackTrace();
+      Log.d(LOG_TAG, e.getMessage());
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.d(LOG_TAG, e.getMessage());
+    }
+
+    return null;
+  }
 
 
 }

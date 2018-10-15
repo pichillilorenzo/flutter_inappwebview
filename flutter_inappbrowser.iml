@@ -14,6 +14,12 @@
       <excludeFolder url="file://$MODULE_DIR$/example/flutter_plugin/.dart_tool" />
       <excludeFolder url="file://$MODULE_DIR$/example/flutter_plugin/.pub" />
       <excludeFolder url="file://$MODULE_DIR$/example/flutter_plugin/build" />
+      <excludeFolder url="file://$MODULE_DIR$/example/ios/.symlinks/plugins/flutter_inappbrowser/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/example/ios/.symlinks/plugins/flutter_inappbrowser/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/example/ios/.symlinks/plugins/flutter_inappbrowser/build" />
+      <excludeFolder url="file://$MODULE_DIR$/example/ios/.symlinks/plugins/flutter_inappbrowser/example/.dart_tool" />
+      <excludeFolder url="file://$MODULE_DIR$/example/ios/.symlinks/plugins/flutter_inappbrowser/example/.pub" />
+      <excludeFolder url="file://$MODULE_DIR$/example/ios/.symlinks/plugins/flutter_inappbrowser/example/build" />
       <excludeFolder url="file://$MODULE_DIR$/example/ios/Flutter/flutter_assets/packages" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

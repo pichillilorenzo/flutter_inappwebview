@@ -1,3 +1,13 @@
+## 0.4.0
+
+- removed `target` parameter to `InAppBrowser.open()` method. To open the url on the system browser, use the `openWithSystemBrowser: true` option
+- fixes for the `_ChannelManager` private class
+- fixed `EXC_BAD_INSTRUCTION` onLoadStart in Swift
+- added `openWithSystemBrowser` and `isLocalFile` options
+- added `InAppBrowser.openWithSystemBrowser` method
+- added `InAppBrowser.openOnLocalhost` method
+- added `InAppBrowser.loadFile` method
+
 ## 0.3.2
 
 - fixed WebView.storyboard path for iOS

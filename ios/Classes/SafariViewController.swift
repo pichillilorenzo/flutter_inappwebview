@@ -40,15 +40,15 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
     }
     
     func close() {
-        if (statusDelegate != nil) {
-            statusDelegate?.safariExit(uuid: self.uuid)
-        }
-        
         dismiss(animated: true)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {() -> Void in
             self.tmpWindow?.windowLevel = 0.0
             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            
+            if (self.statusDelegate != nil) {
+                self.statusDelegate?.safariExit(uuid: self.uuid)
+            }
         })
     }
     

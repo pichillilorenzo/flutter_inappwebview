@@ -12,6 +12,7 @@ public class InAppBrowserOptions: Options {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
+    var openWithSystemBrowser = false;
     var clearCache = false
     var userAgent = ""
     var javaScriptEnabled = true
@@ -21,6 +22,7 @@ public class InAppBrowserOptions: Options {
     var toolbarTopBackgroundColor = ""
     var hideUrlBar = false
     var mediaPlaybackRequiresUserGesture = true
+    var isLocalFile = false
     
     var disallowOverScroll = false
     var toolbarBottom = true

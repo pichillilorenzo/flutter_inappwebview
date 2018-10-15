@@ -17,99 +17,78 @@ import java.util.Map;
 
 public class ChromeCustomTabsActivity extends Activity {
 
-    protected static final String LOG_TAG = "CustomTabsActivity";
-    String uuid;
-    String uuidFallback;
-    CustomTabsIntent.Builder builder;
-    ChromeCustomTabsOptions options;
-    Map<String, String> headersFallback;
-    InAppBrowserOptions optionsFallback;
-    private CustomTabActivityHelper customTabActivityHelper;
-    private final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
+  protected static final String LOG_TAG = "CustomTabsActivity";
+  String uuid;
+  CustomTabsIntent.Builder builder;
+  ChromeCustomTabsOptions options;
+  private CustomTabActivityHelper customTabActivityHelper;
+  private final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.chrome_custom_tabs_layout);
+    setContentView(R.layout.chrome_custom_tabs_layout);
 
-        Bundle b = getIntent().getExtras();
-        uuid = b.getString("uuid");
-        uuidFallback = b.getString("uuidFallback");
-        String url = b.getString("url");
+    Bundle b = getIntent().getExtras();
+    assert b != null;
+    uuid = b.getString("uuid");
+    String url = b.getString("url");
 
-        options = new ChromeCustomTabsOptions();
-        options.parse((HashMap<String, Object>) b.getSerializable("options"));
+    options = new ChromeCustomTabsOptions();
+    options.parse((HashMap<String, Object>) b.getSerializable("options"));
 
-        headersFallback = (HashMap<String, String>) b.getSerializable("headers");
+    InAppBrowserFlutterPlugin.chromeCustomTabsActivities.put(uuid, this);
 
-        optionsFallback = new InAppBrowserOptions();
-        optionsFallback.parse((HashMap<String, Object>) b.getSerializable("optionsFallback"));
+    customTabActivityHelper = new CustomTabActivityHelper();
+    builder = new CustomTabsIntent.Builder();
 
-        InAppBrowserFlutterPlugin.chromeCustomTabsActivities.put(uuid, this);
+    prepareCustomTabs();
 
-        customTabActivityHelper = new CustomTabActivityHelper();
-        builder = new CustomTabsIntent.Builder();
+    CustomTabsIntent customTabsIntent = builder.build();
 
-        prepareCustomTabs();
+    CustomTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), CHROME_CUSTOM_TAB_REQUEST_CODE);
 
-        CustomTabsIntent customTabsIntent = builder.build();
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", uuid);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserOpened", obj);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserLoaded", obj);
+  }
 
-        boolean chromeCustomTabsOpened = customTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), CHROME_CUSTOM_TAB_REQUEST_CODE,
-                new CustomTabActivityHelper.CustomTabFallback() {
-                    @Override
-                    public void openUri(Activity activity, Uri uri) {
-                      if (!uuidFallback.isEmpty())
-                          InAppBrowserFlutterPlugin.open(uuidFallback, null, uri.toString(), optionsFallback, headersFallback, false, null);
-                      else {
-                        Log.d(LOG_TAG, "No WebView fallback declared.");
-                        activity.finish();
-                      }
-                    }
-                });
+  private void prepareCustomTabs() {
+    if (options.addShareButton)
+      builder.addDefaultShareMenuItem();
 
-        if (chromeCustomTabsOpened) {
-            Map<String, Object> obj = new HashMap<>();
-            obj.put("uuid", uuid);
-            InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserOpened", obj);
-            InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserLoaded", obj);
-        }
+    if (!options.toolbarBackgroundColor.isEmpty())
+      builder.setToolbarColor(Color.parseColor(options.toolbarBackgroundColor));
+
+    builder.setShowTitle(options.showTitle);
+
+    if (options.enableUrlBarHiding)
+      builder.enableUrlBarHiding();
+
+    builder.setInstantAppsEnabled(options.instantAppsEnabled);
+  }
+
+  @Override
+  protected void onStart() {
+    super.onStart();
+    customTabActivityHelper.bindCustomTabsService(this);
+  }
+
+  @Override
+  protected void onStop() {
+    super.onStop();
+    customTabActivityHelper.unbindCustomTabsService(this);
+  }
+
+  @Override
+  protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
+      finish();
+      Map<String, Object> obj = new HashMap<>();
+      obj.put("uuid", uuid);
+      InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
     }
-
-    private void prepareCustomTabs() {
-        if (options.addShareButton)
-            builder.addDefaultShareMenuItem();
-
-        if (!options.toolbarBackgroundColor.isEmpty())
-            builder.setToolbarColor(Color.parseColor(options.toolbarBackgroundColor));
-
-        builder.setShowTitle(options.showTitle);
-
-        if (options.enableUrlBarHiding)
-            builder.enableUrlBarHiding();
-
-        builder.setInstantAppsEnabled(options.instantAppsEnabled);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        customTabActivityHelper.bindCustomTabsService(this);
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        customTabActivityHelper.unbindCustomTabsService(this);
-    }
-
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
-            finish();
-            Map<String, Object> obj = new HashMap<>();
-            obj.put("uuid", uuid);
-            InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
-        }
-    }
+  }
 }

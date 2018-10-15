@@ -14,12 +14,13 @@ public class Options: NSObject {
         super.init()
     }
     
-    public func parse(options: [String: Any]) {
+    public func parse(options: [String: Any]) -> Options {
         for (key, value) in options {
             if self.responds(to: Selector(key)) {
                 self.setValue(value, forKey: key)
             }
         }
+        return self
     }
 }
 

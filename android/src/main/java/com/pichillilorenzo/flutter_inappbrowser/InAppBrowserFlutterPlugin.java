@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.content.res.AssetManager;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.net.Uri;
@@ -40,8 +41,10 @@ import android.util.Log;
 
 import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsActivity;
 import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsOptions;
+import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.CustomTabActivityHelper;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.io.StringReader;
 import java.util.ArrayList;
@@ -55,7 +58,9 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
 import io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 
-/** InAppBrowserFlutterPlugin */
+/**
+ * InAppBrowserFlutterPlugin
+ */
 public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
   public static Registrar registrar;
@@ -64,9 +69,9 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   public static Map<String, WebViewActivity> webViewActivities = new HashMap<>();
   public static Map<String, ChromeCustomTabsActivity> chromeCustomTabsActivities = new HashMap<>();
 
-  private static final String NULL = "null";
-  protected static final String LOG_TAG = "InAppBrowserFlutterP";
+  protected static final String LOG_TAG = "IABFlutterPlugin";
 
+  static final String ANDROID_ASSET_URL = "file:///android_asset/";
 
   public InAppBrowserFlutterPlugin(Registrar r, Activity activity) {
     registrar = r;
@@ -74,7 +79,9 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
   }
 
-  /** Plugin registration. */
+  /**
+   * Plugin registration.
+   */
   public static void registerWith(Registrar registrar) {
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
     channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar, registrar.activity()));
@@ -89,15 +96,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
     switch (call.method) {
       case "open":
-        final String url = call.argument("url").toString();
-
-        String t = call.argument("target").toString();
-        if (t == null || t.equals("") || t.equals(NULL)) {
-          t = "_self";
-        }
-        final String target = t;
-
-        Log.d(LOG_TAG, "target = " + target);
+        final String url_final = call.argument("url").toString();
 
         final boolean useChromeSafariBrowser = (boolean) call.argument("useChromeSafariBrowser");
 
@@ -119,19 +118,48 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
               final InAppBrowserOptions optionsFallback = new InAppBrowserOptions();
               optionsFallback.parse((HashMap<String, Object>) call.argument("optionsFallback"));
 
-              open(uuid, uuidFallback, url, options, headers,true, optionsFallback);
-            }
-            else {
+              open(uuid, uuidFallback, url_final, options, headers, true, optionsFallback, result);
+            } else {
+
+              String url = url_final;
 
               final InAppBrowserOptions options = new InAppBrowserOptions();
               options.parse((HashMap<String, Object>) call.argument("options"));
 
-              if ("_self".equals(target)) {
-                Log.d(LOG_TAG, "in self");
+              if (options.isLocalFile) {
+                // check if the asset file exists
+                String key = registrar.lookupKeyForAsset(url);
+                AssetManager mg = registrar.activeContext().getResources().getAssets();
+                InputStream is = null;
+                boolean assetExists = false;
+                try {
+                  is = mg.open(key);
+                  assetExists = true;
+                } catch (IOException ex) {
 
+                } finally {
+                  if (is != null) {
+                    try {
+                      is.close();
+                    } catch (IOException e) {
+                      e.printStackTrace();
+                    }
+                  }
+                }
+                if (!assetExists) {
+                  result.error(LOG_TAG, key + " asset file cannot be found!", null);
+                  return;
+                }
+                url = ANDROID_ASSET_URL + key;
+              }
+              // SYSTEM
+              if (options.openWithSystemBrowser) {
+                Log.d(LOG_TAG, "in system");
+                openExternal(url, result);
+              }
+              else {
                 //Load the dialer
-                if (url.startsWith(WebView.SCHEME_TEL))
-                {
+                if (url.startsWith(WebView.SCHEME_TEL)) {
                   try {
                     Log.d(LOG_TAG, "loading in dialer");
                     Intent intent = new Intent(Intent.ACTION_DIAL);
@@ -144,31 +172,21 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
                 // load in InAppBrowserFlutterPlugin
                 else {
                   Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
-                  open(uuid, null, url, options, headers, false, null);
+                  open(uuid, null, url, options, headers, false, null, result);
                 }
               }
-              // SYSTEM
-              else if ("_system".equals(target)) {
-                Log.d(LOG_TAG, "in system");
-                openExternal(url);
-              }
-              // BLANK - or anything else
-              else {
-                Log.d(LOG_TAG, "in blank");
-                open(uuid, null, url, options, headers, false, null);
-              }
             }
-
-            result.success(true);
           }
         });
         break;
       case "loadUrl":
         loadUrl(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
         break;
+      case "loadFile":
+        loadFile(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+        break;
       case "close":
-        close(uuid);
-        result.success(true);
+        close(uuid, result);
         break;
       case "injectScriptCode":
         source = call.argument("source").toString();
@@ -237,18 +255,19 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
   /**
    * Inject an object (script or style) into the InAppBrowserFlutterPlugin WebView.
-   *
+   * <p>
    * This is a helper method for the inject{Script|Style}{Code|File} API calls, which
    * provides a consistent method for injecting JavaScript code into the document.
-   *
+   * <p>
    * If a wrapper string is supplied, then the source string will be JSON-encoded (adding
    * quotes) and wrapped using string formatting. (The wrapper string should have a single
    * '%s' marker)
+   *
    * @param uuid
-   * @param source      The source object (filename or script/style text) to inject into
-   *                    the document.
-   * @param jsWrapper   A JavaScript string to wrap the source string in, so that the object
- *                    is properly injected, or null if the source string is JavaScript text
+   * @param source    The source object (filename or script/style text) to inject into
+   *                  the document.
+   * @param jsWrapper A JavaScript string to wrap the source string in, so that the object
+   *                  is properly injected, or null if the source string is JavaScript text
    * @param result
    */
   private void injectDeferredObject(String uuid, String source, String jsWrapper, final Result result) {
@@ -259,7 +278,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         org.json.JSONArray jsonEsc = new org.json.JSONArray();
         jsonEsc.put(source);
         String jsonRepr = jsonEsc.toString();
-        String jsonSourceString = jsonRepr.substring(1, jsonRepr.length()-1);
+        String jsonSourceString = jsonRepr.substring(1, jsonRepr.length() - 1);
         scriptToInject = String.format(jsWrapper, jsonSourceString);
       } else {
         scriptToInject = source;
@@ -295,8 +314,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
                       msg = reader2.nextString();
 
                     result.success(msg);
-                  }
-                  else {
+                  } else {
                     result.success("");
                   }
 
@@ -332,9 +350,10 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
    * Display a new browser with the specified URL.
    *
    * @param url the url to load.
+   * @param result
    * @return "" if ok, or error message.
    */
-  public void openExternal(String url) {
+  public void openExternal(String url, Result result) {
     try {
       Intent intent;
       intent = new Intent(Intent.ACTION_VIEW);
@@ -349,9 +368,11 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       intent.putExtra(Browser.EXTRA_APPLICATION_ID, activity.getPackageName());
       // CB-10795: Avoid circular loops by preventing it from opening in the current app
       this.openExternalExcludeCurrentApp(intent);
+      result.success(true);
       // not catching FileUriExposedException explicitly because buildtools<24 doesn't know about it
     } catch (java.lang.RuntimeException e) {
-      Log.d(LOG_TAG, "InAppBrowserFlutterPlugin: Error loading url "+url+":"+ e.toString());
+      Log.d(LOG_TAG, url + " cannot be opened: " + e.toString());
+      result.error(LOG_TAG, url + " cannot be opened!", null);
     }
   }
 
@@ -367,11 +388,10 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     ArrayList<Intent> targetIntents = new ArrayList<Intent>();
     for (ResolveInfo ri : activities) {
       if (!currentPackage.equals(ri.activityInfo.packageName)) {
-        Intent targetIntent = (Intent)intent.clone();
+        Intent targetIntent = (Intent) intent.clone();
         targetIntent.setPackage(ri.activityInfo.packageName);
         targetIntents.add(targetIntent);
-      }
-      else {
+      } else {
         hasCurrentPackage = true;
       }
     }
@@ -386,40 +406,72 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
     // Otherwise, show a custom chooser without the current app listed
     else if (targetIntents.size() > 0) {
-      Intent chooser = Intent.createChooser(targetIntents.remove(targetIntents.size()-1), null);
-      chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetIntents.toArray(new Parcelable[] {}));
+      Intent chooser = Intent.createChooser(targetIntents.remove(targetIntents.size() - 1), null);
+      chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS, targetIntents.toArray(new Parcelable[]{}));
       activity.startActivity(chooser);
     }
   }
 
-  public static void open(String uuid, String uuidFallback, final String url, Options options, Map<String, String> headers, boolean useChromeSafariBrowser, InAppBrowserOptions optionsFallback) {
-    Intent intent = new Intent(registrar.activity(), (useChromeSafariBrowser) ? ChromeCustomTabsActivity.class : WebViewActivity.class);
+  public void open(String uuid, String uuidFallback, String url, Options options, Map<String, String> headers, boolean useChromeSafariBrowser, InAppBrowserOptions optionsFallback, Result result) {
 
+    Intent intent = null;
     Bundle extras = new Bundle();
-    extras.putString("uuid", uuid);
     extras.putString("url", url);
+
+    extras.putString("uuid", uuid);
     extras.putSerializable("options", options.getHashMap());
     extras.putSerializable("headers", (Serializable) headers);
-    if (useChromeSafariBrowser) {
-      extras.putString("uuidFallback", uuidFallback);
+
+    if (useChromeSafariBrowser && CustomTabActivityHelper.isAvailable(activity)) {
+      intent = new Intent(activity, ChromeCustomTabsActivity.class);
+    }
+    // check for webview fallback
+    else if (useChromeSafariBrowser && !CustomTabActivityHelper.isAvailable(activity) && !uuidFallback.isEmpty()) {
+      Log.d(LOG_TAG, "WebView fallback declared.");
+      // overwrite with extras fallback parameters
+      extras.putString("uuid", uuidFallback);
       if (optionsFallback != null)
-        extras.putSerializable("optionsFallback", optionsFallback.getHashMap());
+        extras.putSerializable("options", optionsFallback.getHashMap());
       else
-        extras.putSerializable("optionsFallback", (new InAppBrowserOptions()).getHashMap());
+        extras.putSerializable("options", (new InAppBrowserOptions()).getHashMap());
+      extras.putSerializable("headers", (Serializable) headers);
+      intent = new Intent(activity, WebViewActivity.class);
+    }
+    // native webview
+    else if (!useChromeSafariBrowser) {
+      intent = new Intent(activity, WebViewActivity.class);
+    }
+    else {
+      Log.d(LOG_TAG, "No WebView fallback declared.");
     }
 
-    intent.putExtras(extras);
+    if (intent != null) {
+      intent.putExtras(extras);
+      activity.startActivity(intent);
+      result.success(true);
+      return;
+    }
 
-    registrar.activity().startActivity(intent);
+    result.error(LOG_TAG, "No WebView fallback declared.", null);
   }
 
   public void loadUrl(String uuid, String url, Map<String, String> headers, Result result) {
-      WebViewActivity webViewActivity = webViewActivities.get(uuid);
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null) {
       if (headers != null)
         webViewActivity.loadUrl(url, headers, result);
       else
         webViewActivity.loadUrl(url, result);
+    }
+  }
+
+  public void loadFile(String uuid, String url, Map<String, String> headers, Result result) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
+    if (webViewActivity != null) {
+      if (headers != null)
+        webViewActivity.loadFile(url, headers, result);
+      else
+        webViewActivity.loadFile(url, result);
     }
   }
 
@@ -488,7 +540,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   }
 
 
-  public static void close(final String uuid) {
+  public static void close(final String uuid, final Result result) {
     final WebViewActivity webViewActivity = webViewActivities.get(uuid);
     if (webViewActivity != null) {
       registrar.activity().runOnUiThread(new Runnable() {
@@ -501,8 +553,12 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
           // The JS protects against multiple calls, so this should happen only when
           // close() is called by other native code.
-          if (webViewActivity == null)
+          if (webViewActivity == null) {
+            if (result != null) {
+              result.success(true);
+            }
             return;
+          }
 
           webViewActivity.webView.setWebViewClient(new WebViewClient() {
             // NB: wait for about:blank before dismissing
@@ -514,8 +570,14 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
           // other than your app's UI thread, it can cause unexpected results."
           // http://developer.android.com/guide/webapps/migrating.html#Threads
           webViewActivity.webView.loadUrl("about:blank");
+          if (result != null) {
+            result.success(true);
+          }
         }
       });
+    }
+    else if (result != null) {
+      result.success(true);
     }
   }
 }

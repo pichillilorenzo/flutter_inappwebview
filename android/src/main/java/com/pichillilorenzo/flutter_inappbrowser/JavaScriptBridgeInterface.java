@@ -10,9 +10,9 @@ public class JavaScriptBridgeInterface {
   static final String name = "flutter_inappbrowser";
   WebViewActivity activity;
 
-  static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function(handlerName, ...args) {\n" +
-    "window." + name + "._callHandler(handlerName, JSON.stringify(args));\n" +
-  "}\n";
+  static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function(handlerName, ...args) {" +
+    "window." + name + "._callHandler(handlerName, JSON.stringify(args));" +
+  "}";
 
   JavaScriptBridgeInterface(WebViewActivity a) {
     activity = a;

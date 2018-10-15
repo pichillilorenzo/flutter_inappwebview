@@ -22,19 +22,6 @@ import Foundation
 import AVFoundation
 import SafariServices
 
-//class CustomURLCache: URLCache {
-//    override func cachedResponse(for request: URLRequest) -> CachedURLResponse? {
-//        dump(request.url)
-//        return super.cachedResponse(for: request)
-//    }
-//
-//    override func getCachedResponse(for dataTask: URLSessionDataTask,
-//                                    completionHandler: @escaping (CachedURLResponse?) -> Void) {
-//        dump(dataTask.response)
-//        super.getCachedResponse(for: dataTask, completionHandler: completionHandler)
-//    }
-//}
-
 let WEBVIEW_STORYBOARD = "WebView"
 let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
 
@@ -47,6 +34,9 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
 }
 
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
+    
+    static var registrar: FlutterPluginRegistrar?
+    
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
     
@@ -59,11 +49,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-//        URLProtocol.wk_registerScheme("http")
-//        URLProtocol.wk_registerScheme("https")
-//        URLProtocol.registerClass(MyURLProtocol.self)
-
-        //URLCache.shared = CustomURLCache()
+        
+        SwiftFlutterPlugin.registrar = registrar
         
         let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterPlugin(with: registrar)
@@ -73,7 +60,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         let uuid: String = (arguments!["uuid"] as? String)!
-        
+
         switch call.method {
             case "open":
                 self.open(uuid: uuid, arguments: arguments!, result: result)
@@ -177,7 +164,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             print("IAB.close() called but it was already closed.")
-            return
         }
     }
     
@@ -192,41 +178,38 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let url: String = (arguments["url"] as? String)!
 
         let headers = (arguments["headers"] as? [String: String])!
-        var target: String? = (arguments["target"] as? String)!
-        target = target != nil ? target : "_self"
         let absoluteUrl = URL(string: url)?.absoluteURL
         
         let useChromeSafariBrowser = (arguments["useChromeSafariBrowser"] as? Bool)
         
         if useChromeSafariBrowser! {
             let uuidFallback = (arguments["uuidFallback"] as? String)!
-            let options = (arguments["options"] as? [String: Any])!
-            let optionsFallback = (arguments["optionsFallback"] as? [String: Any])!
+            let safariOptions = SafariBrowserOptions()
+            safariOptions.parse(options: (arguments["options"] as? [String: Any])!)
             
-            open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback);
+            let optionsFallback = InAppBrowserOptions()
+            optionsFallback.parse(options: (arguments["optionsFallback"] as? [String: Any])!)
+            
+            open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: safariOptions, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback, result: result);
         }
         else {
-            let options = (arguments["options"] as? [String: Any])!
-            
+            let options = InAppBrowserOptions()
+            options.parse(options: (arguments["options"] as? [String: Any])!)
+
             if isSystemUrl(absoluteUrl!) {
-                target = "_system"
+                options.openWithSystemBrowser = true
             }
             
-            if (target == "_self" || target == "_target") {
-                open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
-            }
-            else if (target == "_system") {
-                open(inSystem: absoluteUrl!)
+            if (options.openWithSystemBrowser) {
+                open(inSystem: absoluteUrl!, result: result)
             }
             else {
-                // anything else
-                open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers,withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil)
+                open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil, result: result)
             }
         }
-        result(true)
     }
     
-    func open(uuid: String, uuidFallback: String?, inAppBrowser url: URL, headers: [String: String], withOptions options: [String: Any], useChromeSafariBrowser: Bool, withOptionsFallback optionsFallback: [String: Any]?) {
+    func open(uuid: String, uuidFallback: String?, inAppBrowser url: URL, headers: [String: String], withOptions options: Options, useChromeSafariBrowser: Bool, withOptionsFallback optionsFallback: Options?, result: @escaping FlutterResult) {
         
         var uuid = uuid
         
@@ -235,7 +218,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         
         let safariViewController = self.safariViewControllers[uuid]
-        
         if safariViewController != nil {
             if #available(iOS 9.0, *) {
                 (safariViewController! as! SafariViewController).close()
@@ -264,8 +246,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         
         if useChromeSafariBrowser == true {
             if #available(iOS 9.0, *) {
-                let safariOptions = SafariBrowserOptions()
-                safariOptions.parse(options: options)
+                let safariOptions = options as! SafariBrowserOptions
                 
                 let safari: SafariViewController
                 
@@ -290,24 +271,37 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 
                 tmpController.present(self.safariViewControllers[uuid]! as! SFSafariViewController, animated: true)
                 onChromeSafariBrowserOpened(uuid: uuid)
+                result(true)
                 
                 return
             }
             else {
                 if uuidFallback == nil {
                     print("No WebView fallback declared.")
+                    result(true)
+                    
                     return
                 }
                 uuid = uuidFallback!
-                browserOptions = InAppBrowserOptions()
-                browserOptions.parse(options: optionsFallback!)
+                browserOptions = optionsFallback as! InAppBrowserOptions
             }
         }
         else {
-            browserOptions = InAppBrowserOptions()
-            browserOptions.parse(options: options)
+            browserOptions = options as! InAppBrowserOptions
         }
-
+        
+        var currentURL = url
+        
+        if browserOptions.isLocalFile {
+            let key = SwiftFlutterPlugin.registrar!.lookupKey(forAsset: url.absoluteString)
+            let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
+            if assetURL == nil {
+                result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url.absoluteString + " asset file cannot be found!", details: nil))
+                return
+            }
+            currentURL = assetURL!
+        }
+        
         let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppBrowserFlutterPlugin.self))
         let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
         self.webViewControllers[uuid] = vc as? InAppBrowserWebViewController
@@ -316,7 +310,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         webViewController.browserOptions = browserOptions
         webViewController.isHidden = browserOptions.hidden
         webViewController.tmpWindow = tmpWindow
-        webViewController.currentURL = url
+        webViewController.currentURL = currentURL
         webViewController.initHeaders = headers
         webViewController.navigationDelegate = self
         
@@ -338,6 +332,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         else {
             tmpController.present(webViewController, animated: true, completion: nil)
         }
+        
+        result(true)
     }
     
     public func loadUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
@@ -350,7 +346,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             webViewController.loadUrl(url: absoluteUrl, headers: headers)
         }
         else {
-            print("url is empty")
             result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
         }
         result(true)
@@ -403,17 +398,18 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func open(inSystem url: URL) {
+    func open(inSystem url: URL, result: @escaping FlutterResult) {
         if !UIApplication.shared.canOpenURL(url) {
-            NotificationCenter.default.post(Notification(name: Notification.Name(rawValue: "PluginHandleOpenURLNotification"), object: url))
-            return
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url.absoluteString + " cannot be opened!", details: nil))
         }
-        
-        if #available(iOS 10.0, *) {
-            UIApplication.shared.open(url, options: [:], completionHandler: nil)
-        } else {
-            UIApplication.shared.openURL(url)
+        else {
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
+            }
         }
+        result(true)
     }
     
     // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
@@ -429,7 +425,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
             let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
             if sourceArrayString != nil {
-                let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.characters.count ?? 0) - 2))
+                let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.count ?? 0) - 2))
                 let jsToInject = String(format: jsWrapper, sourceString!)
                 
                 webViewController?.webView?.evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
@@ -439,7 +435,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     
                     if error != nil {
                         let userInfo = (error! as NSError).userInfo
-                        dump(userInfo)
                         self.onConsoleMessage(uuid: uuid, sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as? URL)?.absoluteString ?? "", lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: "ERROR")
                     }
                     
@@ -458,7 +453,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                             result!(value)
                         }
                     } catch let error as NSError {
-                        print("Failed to load: \(error.localizedDescription)")
                         result!(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Failed to load: \(error.localizedDescription)", details: error))
                     }
                     

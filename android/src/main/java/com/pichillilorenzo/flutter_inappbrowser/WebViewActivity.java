@@ -28,85 +28,85 @@ import okhttp3.OkHttpClient;
 
 public class WebViewActivity extends AppCompatActivity {
 
-    String uuid;
-    WebView webView;
-    ActionBar actionBar;
-    InAppBrowserWebViewClient inAppBrowserWebViewClient;
-    InAppBrowserWebChromeClient inAppBrowserWebChromeClient;
-    SearchView searchView;
-    InAppBrowserOptions options;
-    Map<String, String> headers;
-    ProgressBar progressBar;
-    public boolean isLoading = false;
-    public boolean isHidden = false;
-    OkHttpClient httpClient;
+  String uuid;
+  WebView webView;
+  ActionBar actionBar;
+  InAppBrowserWebViewClient inAppBrowserWebViewClient;
+  InAppBrowserWebChromeClient inAppBrowserWebChromeClient;
+  SearchView searchView;
+  InAppBrowserOptions options;
+  Map<String, String> headers;
+  ProgressBar progressBar;
+  public boolean isLoading = false;
+  public boolean isHidden = false;
+  OkHttpClient httpClient;
 
-    static final String consoleLogJS = "(function() {\n"+
-"   var oldLogs = {\n"+
-"       'log': console.log,\n"+
-"       'debug': console.debug,\n"+
-"       'error': console.error,\n"+
-"       'info': console.info,\n"+
-"       'warn': console.warn\n"+
-"   };\n"+
-"   for (var k in oldLogs) {\n"+
-"       (function(oldLog) {\n"+
-"           console[oldLog] = function() {\n"+
-"               var message = ''\n"+
-"               for (var i in arguments) {\n"+
-"                   if (message == '') {\n"+
-"                       message += arguments[i];\n"+
-"                   }\n"+
-"                   else {\n"+
-"                       message += ' ' + arguments[i];\n"+
-"                   }\n"+
-"               }\n"+
-"               oldLogs[oldLog].call(console, message);\n"+
-"           }\n"+
-"       })(k);\n"+
-"   }\n"+
-"})();";
+  static final String consoleLogJS = "(function() {" +
+          "   var oldLogs = {" +
+          "       'log': console.log," +
+          "       'debug': console.debug," +
+          "       'error': console.error," +
+          "       'info': console.info," +
+          "       'warn': console.warn" +
+          "   };" +
+          "   for (var k in oldLogs) {" +
+          "       (function(oldLog) {" +
+          "           console[oldLog] = function() {" +
+          "               var message = '';" +
+          "               for (var i in arguments) {" +
+          "                   if (message == '') {" +
+          "                       message += arguments[i];" +
+          "                   }" +
+          "                   else {" +
+          "                       message += ' ' + arguments[i];" +
+          "                   }" +
+          "               }" +
+          "               oldLogs[oldLog].call(console, message);" +
+          "           }" +
+          "       })(k);" +
+          "   }" +
+          "})();";
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_web_view);
+    setContentView(R.layout.activity_web_view);
 
-        webView = findViewById(R.id.webView);
+    webView = findViewById(R.id.webView);
 
-        Bundle b = getIntent().getExtras();
-        uuid = b.getString("uuid");
-        String url = b.getString("url");
+    Bundle b = getIntent().getExtras();
+    uuid = b.getString("uuid");
+    String url = b.getString("url");
 
-        options = new InAppBrowserOptions();
-        options.parse((HashMap<String, Object>) b.getSerializable("options"));
+    options = new InAppBrowserOptions();
+    options.parse((HashMap<String, Object>) b.getSerializable("options"));
 
-        headers = (HashMap<String, String>) b.getSerializable("headers");
+    headers = (HashMap<String, String>) b.getSerializable("headers");
 
-        InAppBrowserFlutterPlugin.webViewActivities.put(uuid, this);
+    InAppBrowserFlutterPlugin.webViewActivities.put(uuid, this);
 
-        actionBar = getSupportActionBar();
+    actionBar = getSupportActionBar();
 
-        prepareWebView();
+    prepareWebView();
 
-        int cacheSize = 10 * 1024 * 1024; // 10MB
-        httpClient = new OkHttpClient().newBuilder().cache(new Cache(getApplicationContext().getCacheDir(), cacheSize)).build();
+    int cacheSize = 10 * 1024 * 1024; // 10MB
+    httpClient = new OkHttpClient().newBuilder().cache(new Cache(getApplicationContext().getCacheDir(), cacheSize)).build();
 
-        webView.loadUrl(url, headers);
-        //webView.loadData("<!DOCTYPE html> <html lang=\"en\"> <head> <meta charset=\"UTF-8\"> <title>Document</title> </head> <body> ciao <img src=\"https://via.placeholder.com/350x150\" /> <img src=\"./images/test\" alt=\"not found\" /></body> </html>", "text/html", "utf8");
+    webView.loadUrl(url, headers);
+    //webView.loadData("<!DOCTYPE assets> <assets lang=\"en\"> <head> <meta charset=\"UTF-8\"> <title>Document</title> </head> <body> ciao <img src=\"https://via.placeholder.com/350x150\" /> <img src=\"./images/test\" alt=\"not found\" /></body> </assets>", "text/assets", "utf8");
 
-    }
+  }
 
-    private void prepareWebView() {
+  private void prepareWebView() {
 
-        webView.addJavascriptInterface(new JavaScriptBridgeInterface(this), JavaScriptBridgeInterface.name);
+    webView.addJavascriptInterface(new JavaScriptBridgeInterface(this), JavaScriptBridgeInterface.name);
 
-        inAppBrowserWebChromeClient = new InAppBrowserWebChromeClient(this);
-        webView.setWebChromeClient(inAppBrowserWebChromeClient);
+    inAppBrowserWebChromeClient = new InAppBrowserWebChromeClient(this);
+    webView.setWebChromeClient(inAppBrowserWebChromeClient);
 
-        inAppBrowserWebViewClient = new InAppBrowserWebViewClient(this);
-        webView.setWebViewClient(inAppBrowserWebViewClient);
+    inAppBrowserWebViewClient = new InAppBrowserWebViewClient(this);
+    webView.setWebViewClient(inAppBrowserWebViewClient);
 
 //        final Activity activity = this;
 //
@@ -142,241 +142,256 @@ public class WebViewActivity extends AppCompatActivity {
 //            }
 //        });
 
-        WebSettings settings = webView.getSettings();
+    WebSettings settings = webView.getSettings();
 
-        if (options.hidden)
-            hide();
-        else
-            show();
+    if (options.hidden)
+      hide();
+    else
+      show();
 
-        settings.setJavaScriptEnabled(options.javaScriptEnabled);
-        settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
-        settings.setBuiltInZoomControls(options.builtInZoomControls);
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-            settings.setSafeBrowsingEnabled(options.safeBrowsingEnabled);
+    settings.setJavaScriptEnabled(options.javaScriptEnabled);
+    settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
+    settings.setBuiltInZoomControls(options.builtInZoomControls);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+      settings.setSafeBrowsingEnabled(options.safeBrowsingEnabled);
 
-        settings.setMediaPlaybackRequiresUserGesture(options.mediaPlaybackRequiresUserGesture);
+    settings.setMediaPlaybackRequiresUserGesture(options.mediaPlaybackRequiresUserGesture);
 
-        settings.setDatabaseEnabled(options.databaseEnabled);
-        settings.setDomStorageEnabled(options.domStorageEnabled);
+    settings.setDatabaseEnabled(options.databaseEnabled);
+    settings.setDomStorageEnabled(options.domStorageEnabled);
 
-        if (!options.userAgent.isEmpty())
-            settings.setUserAgentString(options.userAgent);
+    if (!options.userAgent.isEmpty())
+      settings.setUserAgentString(options.userAgent);
 
-        if (options.clearCache)
-            clearCache();
-        else if (options.clearSessionCache)
-            CookieManager.getInstance().removeSessionCookie();
+    if (options.clearCache)
+      clearCache();
+    else if (options.clearSessionCache)
+      CookieManager.getInstance().removeSessionCookie();
 
-        // Enable Thirdparty Cookies on >=Android 5.0 device
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-          CookieManager.getInstance().setAcceptThirdPartyCookies(webView,true);
+    // Enable Thirdparty Cookies on >=Android 5.0 device
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+      CookieManager.getInstance().setAcceptThirdPartyCookies(webView, true);
 
-        settings.setLoadWithOverviewMode(true);
-        settings.setUseWideViewPort(options.useWideViewPort);
-        settings.setSupportZoom(options.supportZoom);
+    settings.setLoadWithOverviewMode(true);
+    settings.setUseWideViewPort(options.useWideViewPort);
+    settings.setSupportZoom(options.supportZoom);
 
-        // fix webview scaling
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-            settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
-        else
-            settings.setTextZoom(100);
+    // fix webview scaling
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
+      settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
+    else
+      settings.setTextZoom(100);
 
-        if (options.progressBar)
-            progressBar = findViewById(R.id.progressBar);
+    if (options.progressBar)
+      progressBar = findViewById(R.id.progressBar);
 
-        actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
+    actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
 
-        if (!options.toolbarTop)
-            actionBar.hide();
+    if (!options.toolbarTop)
+      actionBar.hide();
 
-        if (!options.toolbarTopBackgroundColor.isEmpty())
-            actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(options.toolbarTopBackgroundColor)));
+    if (!options.toolbarTopBackgroundColor.isEmpty())
+      actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(options.toolbarTopBackgroundColor)));
 
-        if (!options.toolbarTopFixedTitle.isEmpty())
-            actionBar.setTitle(options.toolbarTopFixedTitle);
+    if (!options.toolbarTopFixedTitle.isEmpty())
+      actionBar.setTitle(options.toolbarTopFixedTitle);
 
-    }
+  }
 
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        MenuInflater inflater = getMenuInflater();
-        // Inflate menu to add items to action bar if it is present.
-        inflater.inflate(R.menu.menu_main, menu);
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
+    MenuInflater inflater = getMenuInflater();
+    // Inflate menu to add items to action bar if it is present.
+    inflater.inflate(R.menu.menu_main, menu);
 
-        searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-        searchView.setFocusable(true);
+    searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
+    searchView.setFocusable(true);
 
-        if (options.hideUrlBar)
-            menu.findItem(R.id.menu_search).setVisible(false);
+    if (options.hideUrlBar)
+      menu.findItem(R.id.menu_search).setVisible(false);
 
-        searchView.setQuery(webView.getUrl(), false);
+    searchView.setQuery(webView.getUrl(), false);
 
-        if (options.toolbarTopFixedTitle.isEmpty())
-            actionBar.setTitle(webView.getTitle());
+    if (options.toolbarTopFixedTitle.isEmpty())
+      actionBar.setTitle(webView.getTitle());
 
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                if (!query.isEmpty()) {
-                    webView.loadUrl(query);
-                    searchView.setQuery("", false);
-                    searchView.setIconified(true);
-                    return true;
-                }
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
-            }
-
-        });
-
-        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-            @Override
-            public boolean onClose() {
-                if (searchView.getQuery().toString().isEmpty())
-                    searchView.setQuery(webView.getUrl(), false);
-                return false;
-            }
-        });
-
-        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean b) {
-                if (!b) {
-                    searchView.setQuery("", false);
-                    searchView.setIconified(true);
-                }
-            }
-        });
-
-        return true;
-    }
-
-    public void loadUrl (String url, MethodChannel.Result result) {
-        if (webView != null && !url.isEmpty()) {
-            webView.loadUrl(url);
+    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+      @Override
+      public boolean onQueryTextSubmit(String query) {
+        if (!query.isEmpty()) {
+          webView.loadUrl(query);
+          searchView.setQuery("", false);
+          searchView.setIconified(true);
+          return true;
         }
-        else {
-            result.error("Cannot load url", "", null);
-        }
-    }
-
-    public void loadUrl (String url, Map<String, String> headers, MethodChannel.Result result) {
-        if (webView != null && !url.isEmpty()) {
-            webView.loadUrl(url, headers);
-        }
-        else {
-            result.error("Cannot load url", "", null);
-        }
-    }
-
-    public boolean onKeyDown(int keyCode, KeyEvent event) {
-        if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-            if (canGoBack())
-                goBack();
-            else if (options.closeOnCannotGoBack)
-                InAppBrowserFlutterPlugin.close(uuid);
-            return true;
-        }
-        return super.onKeyDown(keyCode, event);
-    }
-
-    public void close() {
-        hide();
-        finish();
-    }
-
-    public void reload() {
-        if (webView != null)
-            webView.reload();
-    }
-
-    public void goBack() {
-        if (webView != null && canGoBack())
-            webView.goBack();
-    }
-
-    public void goForward() {
-        if (webView != null && canGoForward())
-            webView.goForward();
-    }
-
-    public boolean canGoBack() {
-        return webView.canGoBack();
-    }
-
-    public boolean canGoForward() {
-        return webView.canGoForward();
-    }
-
-    public void hide() {
-        isHidden = true;
-        Intent openActivity = new Intent(this, InAppBrowserFlutterPlugin.registrar.activity().getClass());
-        openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivityIfNeeded(openActivity, 0);
-    }
-    public void show() {
-        isHidden = false;
-        Intent openActivity = new Intent(InAppBrowserFlutterPlugin.registrar.activity(), WebViewActivity.class);
-        openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-        startActivityIfNeeded(openActivity, 0);
-    }
-
-    public void stopLoading(){
-        if (webView != null)
-            webView.stopLoading();
-    }
-
-    public boolean isLoading() {
-        if (webView != null)
-            return isLoading;
         return false;
-    }
+      }
 
-    private void clearCookies() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
-                @Override
-                public void onReceiveValue(Boolean aBoolean) {
+      @Override
+      public boolean onQueryTextChange(String newText) {
+        return false;
+      }
 
-                }
-            });
-        } else {
-            CookieManager.getInstance().removeAllCookie();
+    });
+
+    searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+      @Override
+      public boolean onClose() {
+        if (searchView.getQuery().toString().isEmpty())
+          searchView.setQuery(webView.getUrl(), false);
+        return false;
+      }
+    });
+
+    searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+      @Override
+      public void onFocusChange(View view, boolean b) {
+        if (!b) {
+          searchView.setQuery("", false);
+          searchView.setIconified(true);
         }
-    }
+      }
+    });
 
-    private void clearCache() {
-        webView.clearCache(true);
-        clearCookies();
-        webView.clearFormData();
-    }
+    return true;
+  }
 
-    public void goBackButtonClicked(MenuItem item) {
+  public void loadUrl(String url, MethodChannel.Result result) {
+    if (webView != null && !url.isEmpty()) {
+      webView.loadUrl(url);
+    } else {
+      result.error("Cannot load url", "", null);
+    }
+  }
+
+  public void loadUrl(String url, Map<String, String> headers, MethodChannel.Result result) {
+    if (webView != null && !url.isEmpty()) {
+      webView.loadUrl(url, headers);
+    } else {
+      result.error("Cannot load url", "", null);
+    }
+  }
+
+  public void loadFile(String url, MethodChannel.Result result) {
+    if (webView != null && !url.isEmpty()) {
+      webView.loadUrl(url);
+    } else {
+      result.error("Cannot load url", "", null);
+    }
+  }
+
+  public void loadFile(String url, Map<String, String> headers, MethodChannel.Result result) {
+    if (webView != null && !url.isEmpty()) {
+      webView.loadUrl(url, headers);
+    } else {
+      result.error("Cannot load url", "", null);
+    }
+  }
+
+  public boolean onKeyDown(int keyCode, KeyEvent event) {
+    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
+      if (canGoBack())
         goBack();
+      else if (options.closeOnCannotGoBack)
+        InAppBrowserFlutterPlugin.close(uuid, null);
+      return true;
     }
+    return super.onKeyDown(keyCode, event);
+  }
 
-    public void goForwardButtonClicked(MenuItem item) {
-        goForward();
-    }
+  public void close() {
+    hide();
+    finish();
+  }
 
-    public void shareButtonClicked(MenuItem item) {
-        Intent share = new Intent(Intent.ACTION_SEND);
-        share.setType("text/plain");
-        share.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
-        startActivity(Intent.createChooser(share, "Share"));
-    }
+  public void reload() {
+    if (webView != null)
+      webView.reload();
+  }
 
-    public void reloadButtonClicked(MenuItem item) {
-        reload();
-    }
+  public void goBack() {
+    if (webView != null && canGoBack())
+      webView.goBack();
+  }
 
-    public void closeButtonClicked(MenuItem item) {
-        InAppBrowserFlutterPlugin.close(uuid);
+  public void goForward() {
+    if (webView != null && canGoForward())
+      webView.goForward();
+  }
+
+  public boolean canGoBack() {
+    return webView.canGoBack();
+  }
+
+  public boolean canGoForward() {
+    return webView.canGoForward();
+  }
+
+  public void hide() {
+    isHidden = true;
+    Intent openActivity = new Intent(this, InAppBrowserFlutterPlugin.registrar.activity().getClass());
+    openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    startActivityIfNeeded(openActivity, 0);
+  }
+
+  public void show() {
+    isHidden = false;
+    Intent openActivity = new Intent(InAppBrowserFlutterPlugin.registrar.activity(), WebViewActivity.class);
+    openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+    startActivityIfNeeded(openActivity, 0);
+  }
+
+  public void stopLoading() {
+    if (webView != null)
+      webView.stopLoading();
+  }
+
+  public boolean isLoading() {
+    if (webView != null)
+      return isLoading;
+    return false;
+  }
+
+  private void clearCookies() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      CookieManager.getInstance().removeAllCookies(new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean aBoolean) {
+
+        }
+      });
+    } else {
+      CookieManager.getInstance().removeAllCookie();
     }
+  }
+
+  private void clearCache() {
+    webView.clearCache(true);
+    clearCookies();
+    webView.clearFormData();
+  }
+
+  public void goBackButtonClicked(MenuItem item) {
+    goBack();
+  }
+
+  public void goForwardButtonClicked(MenuItem item) {
+    goForward();
+  }
+
+  public void shareButtonClicked(MenuItem item) {
+    Intent share = new Intent(Intent.ACTION_SEND);
+    share.setType("text/plain");
+    share.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
+    startActivity(Intent.createChooser(share, "Share"));
+  }
+
+  public void reloadButtonClicked(MenuItem item) {
+    reload();
+  }
+
+  public void closeButtonClicked(MenuItem item) {
+    InAppBrowserFlutterPlugin.close(uuid, null);
+  }
 
 }

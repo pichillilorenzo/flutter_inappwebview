@@ -1,8 +1,8 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyInAppBrowser extends InAppBrowser {
-
   @override
   Future onLoadStart(String url) async {
     print("\n\nStarted $url\n\n");
@@ -12,6 +12,8 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
+
+    //print("\n\n ${await this.isHidden()} \n\n");
 
 //    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest', 1, 5,'string', {'key': 5}, [4,6,8]);");
 //    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest2', false, null, undefined);");
@@ -40,8 +42,7 @@ class MyInAppBrowser extends InAppBrowser {
 //      var x = {"as":4, "dfdfg": 6};
 //      x;
 //    """));
-    //print("\n\n ${await this.isHidden()} \n\n");
-
+//
 //    await this.injectScriptFile("https://code.jquery.com/jquery-3.3.1.min.js");
 //    this.injectScriptCode("""
 //      \$( "body" ).html( "Next Step..." )
@@ -73,29 +74,33 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
-
-    print("Started at: " + response.startTime.toString() + "ms ---> duration: " + response.duration.toString() + "ms " + response.url);
+  void onLoadResource(
+      WebResourceResponse response, WebResourceRequest request) {
+    print("Started at: " +
+        response.startTime.toString() +
+        "ms ---> duration: " +
+        response.duration.toString() +
+        "ms " +
+        response.url);
 //    if (response.headers["content-length"] != null)
 //      print(response.headers["content-length"] + " length");
   }
 
   @override
   void onConsoleMessage(ConsoleMessage consoleMessage) {
-//    print("""
-//    console output:
-//      sourceURL: ${consoleMessage.sourceURL}
-//      lineNumber: ${consoleMessage.lineNumber}
-//      message: ${consoleMessage.message}
-//      messageLevel: ${consoleMessage.messageLevel}
-//    """);
+    print("""
+    console output:
+      sourceURL: ${consoleMessage.sourceURL}
+      lineNumber: ${consoleMessage.lineNumber}
+      message: ${consoleMessage.message}
+      messageLevel: ${consoleMessage.messageLevel}
+    """);
   }
 }
 
 MyInAppBrowser inAppBrowserFallback = new MyInAppBrowser();
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-
   MyChromeSafariBrowser(browserFallback) : super(browserFallback);
 
   @override
@@ -115,9 +120,10 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 }
 
 // adding a webview fallback
-MyChromeSafariBrowser chromeSafariBrowser = new MyChromeSafariBrowser(inAppBrowserFallback);
+MyChromeSafariBrowser chromeSafariBrowser =
+    new MyChromeSafariBrowser(inAppBrowserFallback);
 
-void main() {
+Future main() async {
   runApp(new MyApp());
 }
 
@@ -127,11 +133,11 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
-//    int indexTest = inAppBrowserFallback.addJavaScriptHandler("handlerTest", (arguments) async {
+//    int indexTest = inAppBrowserFallback.addJavaScriptHandler("handlerTest",
+//        (arguments) async {
 //      print("handlerTest arguments");
 //      print(arguments);
 //    });
@@ -150,21 +156,45 @@ class _MyAppState extends State<MyApp> {
           title: const Text('Flutter InAppBrowser Plugin example app'),
         ),
         body: new Center(
-          child: new RaisedButton(onPressed: () {
-            //chromeSafariBrowser.open("https://flutter.io/");
-            inAppBrowserFallback.open(url: "https://flutter.io/", options: {
-              //"useOnLoadResource": true,
-              //"hidden": true,
-              //"toolbarTopFixedTitle": "Fixed title",
-              //"useShouldOverrideUrlLoading": true
-              //"hideUrlBar": true,
-              //"toolbarTop": false,
-              //"toolbarBottom": false
-            });
+          child: new RaisedButton(
+              onPressed: () async {
+//              await chromeSafariBrowser.open("https://flutter.io/");
 
-          },
-          child: Text("Open InAppBrowser")
-          ),
+//              await InAppBrowser.openWithSystemBrowser("https://flutter.io/");
+
+              await inAppBrowserFallback.openOnLocalhost("assets/index.html", options: {
+                "useOnLoadResource": true,
+                //"hidden": true,
+                //"toolbarTopFixedTitle": "Fixed title",
+                //"useShouldOverrideUrlLoading": true
+                //"hideUrlBar": true,
+                //"toolbarTop": false,
+                //"toolbarBottom": false
+              });
+
+//              await inAppBrowserFallback.open(url: "assets/index.html", options: {
+//                "isLocalFile": true,
+//                "useOnLoadResource": true,
+//                //"hidden": true,
+//                //"toolbarTopFixedTitle": "Fixed title",
+//                //"useShouldOverrideUrlLoading": true
+//                //"hideUrlBar": true,
+//                //"toolbarTop": false,
+//                //"toolbarBottom": false
+//              });
+
+//              await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
+//                //"useOnLoadResource": true,
+//                //"hidden": true,
+//                //"toolbarTopFixedTitle": "Fixed title",
+//                //"useShouldOverrideUrlLoading": true
+//                //"hideUrlBar": true,
+//                //"toolbarTop": false,
+//                //"toolbarBottom": false
+//              });
+              //await inAppBrowserFallback.openOnLocalhost("assets/index.html");
+              },
+              child: Text("Open InAppBrowser")),
         ),
       ),
     );

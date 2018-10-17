@@ -503,7 +503,7 @@ inAppBrowser.removeJavaScriptHandler(String handlerName, int index);
 
 #### Future\<Uint8List\> InAppBrowser.takeScreenshot
 
-Takes a screenshot (in PNG format) of the view's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
+Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
 
 **NOTE for iOS**: available from iOS 11.0+.
 ```dart
@@ -512,14 +512,14 @@ inAppBrowser.takeScreenshot();
 
 #### Future\<void\> InAppBrowser.setOptions
 
-Sets the InAppBrowser options with the new `options` and evaluates them.
+Sets the `InAppBrowser` options with the new `options` and evaluates them.
 ```dart
 inAppBrowser.setOptions(Map<String, dynamic> options);
 ```
 
 #### Future\<Map\<String, dynamic\>\> InAppBrowser.getOptions
 
-Gets the current InAppBrowser options. Returns `null` if the options are not setted yet.
+Gets the current `InAppBrowser` options. Returns `null` if the options are not setted yet.
 ```dart
 inAppBrowser.getOptions();
 ```

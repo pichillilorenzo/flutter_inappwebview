@@ -31,6 +31,7 @@ import android.provider.Browser;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.webkit.MimeTypeMap;
@@ -246,6 +247,28 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         break;
       case "isHidden":
         result.success(isHidden(uuid));
+        break;
+      case "takeScreenshot":
+        result.success(takeScreenshot(uuid));
+        break;
+      case "setOptions":
+        {
+          String optionsType = (String) call.argument("optionsType");
+          switch (optionsType){
+            case "InAppBrowserOptions":
+              InAppBrowserOptions inAppBrowserOptions = new InAppBrowserOptions();
+              HashMap<String, Object> inAppBroeserOptionsMap = (HashMap<String, Object>) call.argument("options");
+              inAppBrowserOptions.parse(inAppBroeserOptionsMap);
+              setOptions(uuid, inAppBrowserOptions, inAppBroeserOptionsMap);
+              break;
+            default:
+              result.error(LOG_TAG, "Options " + optionsType + " not available.", null);
+          }
+        }
+        result.success(true);
+        break;
+      case "getOptions":
+        result.success(getOptions(uuid));
         break;
       default:
         result.notImplemented();
@@ -580,4 +603,25 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       result.success(true);
     }
   }
+
+  public byte[] takeScreenshot(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
+    if (webViewActivity != null)
+      return webViewActivity.takeScreenshot();
+    return null;
+  }
+
+  public void setOptions(String uuid, InAppBrowserOptions options, HashMap<String, Object> optionsMap) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
+    if (webViewActivity != null)
+      webViewActivity.setOptions(options, optionsMap);
+  }
+
+  public HashMap<String, Object> getOptions(String uuid) {
+    WebViewActivity webViewActivity = webViewActivities.get(uuid);
+    if (webViewActivity != null)
+      return webViewActivity.getOptions();
+    return null;
+  }
+
 }

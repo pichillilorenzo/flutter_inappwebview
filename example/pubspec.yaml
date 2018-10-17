@@ -25,7 +25,7 @@ dev_dependencies:
     sdk: flutter
 
   flutter_inappbrowser:
-    path: ../
+      path: ../
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

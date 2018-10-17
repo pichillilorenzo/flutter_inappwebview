@@ -92,7 +92,9 @@
                         <outlet property="shareButton" destination="skL-Lw-jYB" id="8hu-WC-OM0"/>
                         <outlet property="spinner" destination="HWt-17-FMf" id="c2Y-Tb-XfA"/>
                         <outlet property="toolbarBottom" destination="8Pf-5R-cFf" id="Og7-Xw-2sq"/>
+                        <outlet property="toolbarBottom_TopToWebViewBottomConstraint" destination="KeI-jL-Qoi" id="jKQ-OC-jpD"/>
                         <outlet property="toolbarTop" destination="vlz-kT-71x" id="WgC-80-Z28"/>
+                        <outlet property="toolbarTop_BottomToWebViewTopConstraint" destination="Sjd-dV-din" id="vkO-Yu-xaE"/>
                         <outlet property="urlField" destination="sy2-Vx-Cxd" id="MCW-lJ-Ehl"/>
                         <outlet property="webView" destination="gA9-n8-qaQ" id="7JE-lp-bwe"/>
                     </connections>

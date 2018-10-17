@@ -1,7 +1,10 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Picture;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.v7.app.ActionBar;
@@ -12,6 +15,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
@@ -19,6 +23,10 @@ import android.webkit.WebView;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,6 +39,7 @@ public class WebViewActivity extends AppCompatActivity {
   String uuid;
   WebView webView;
   ActionBar actionBar;
+  Menu menu;
   InAppBrowserWebViewClient inAppBrowserWebViewClient;
   InAppBrowserWebChromeClient inAppBrowserWebChromeClient;
   SearchView searchView;
@@ -182,8 +191,12 @@ public class WebViewActivity extends AppCompatActivity {
     else
       settings.setTextZoom(100);
 
-    if (options.progressBar)
-      progressBar = findViewById(R.id.progressBar);
+    progressBar = findViewById(R.id.progressBar);
+
+    if (!options.progressBar)
+      progressBar.setMax(0);
+    else
+      progressBar.setMax(100);
 
     actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
 
@@ -199,7 +212,9 @@ public class WebViewActivity extends AppCompatActivity {
   }
 
   @Override
-  public boolean onCreateOptionsMenu(Menu menu) {
+  public boolean onCreateOptionsMenu(Menu m) {
+    menu = m;
+
     MenuInflater inflater = getMenuInflater();
     // Inflate menu to add items to action bar if it is present.
     inflater.inflate(R.menu.menu_main, menu);
@@ -366,9 +381,11 @@ public class WebViewActivity extends AppCompatActivity {
   }
 
   private void clearCache() {
-    webView.clearCache(true);
-    clearCookies();
-    webView.clearFormData();
+    if (webView != null) {
+      webView.clearCache(true);
+      clearCookies();
+      webView.clearFormData();
+    }
   }
 
   public void goBackButtonClicked(MenuItem item) {
@@ -392,6 +409,109 @@ public class WebViewActivity extends AppCompatActivity {
 
   public void closeButtonClicked(MenuItem item) {
     InAppBrowserFlutterPlugin.close(uuid, null);
+  }
+
+  public byte[] takeScreenshot() {
+    if (webView != null) {
+      Picture picture = webView.capturePicture();
+      Bitmap b = Bitmap.createBitmap( webView.getWidth(),
+              webView.getHeight(), Bitmap.Config.ARGB_8888);
+      Canvas c = new Canvas(b);
+
+      picture.draw(c);
+      ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+      b.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+      try {
+        byteArrayOutputStream.close();
+      } catch (IOException e) {
+        e.printStackTrace();
+      }
+      return byteArrayOutputStream.toByteArray();
+    }
+    return null;
+  }
+
+  public void setOptions(InAppBrowserOptions newOptions, HashMap<String, Object> newOptionsMap) {
+
+    WebSettings settings = webView.getSettings();
+
+    if (newOptionsMap.get("hidden") != null && options.hidden != newOptions.hidden) {
+      if (newOptions.hidden)
+        hide();
+      else
+        show();
+    }
+
+    if (newOptionsMap.get("javaScriptEnabled") != null && options.javaScriptEnabled != newOptions.javaScriptEnabled)
+      settings.setJavaScriptEnabled(newOptions.javaScriptEnabled);
+
+    if (newOptionsMap.get("javaScriptCanOpenWindowsAutomatically") != null && options.javaScriptCanOpenWindowsAutomatically != newOptions.javaScriptCanOpenWindowsAutomatically)
+      settings.setJavaScriptCanOpenWindowsAutomatically(newOptions.javaScriptCanOpenWindowsAutomatically);
+
+    if (newOptionsMap.get("builtInZoomControls") != null && options.builtInZoomControls != newOptions.builtInZoomControls)
+      settings.setBuiltInZoomControls(newOptions.builtInZoomControls);
+
+    if (newOptionsMap.get("safeBrowsingEnabled") != null && options.safeBrowsingEnabled != newOptions.safeBrowsingEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+      settings.setSafeBrowsingEnabled(newOptions.safeBrowsingEnabled);
+
+    if (newOptionsMap.get("mediaPlaybackRequiresUserGesture") != null && options.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture)
+      settings.setMediaPlaybackRequiresUserGesture(newOptions.mediaPlaybackRequiresUserGesture);
+
+    if (newOptionsMap.get("databaseEnabled") != null && options.databaseEnabled != newOptions.databaseEnabled)
+      settings.setDatabaseEnabled(newOptions.databaseEnabled);
+
+    if (newOptionsMap.get("domStorageEnabled") != null && options.domStorageEnabled != newOptions.domStorageEnabled)
+      settings.setDomStorageEnabled(newOptions.domStorageEnabled);
+
+    if (newOptionsMap.get("userAgent") != null && options.userAgent != newOptions.userAgent && !newOptions.userAgent.isEmpty())
+      settings.setUserAgentString(newOptions.userAgent);
+
+    if (newOptionsMap.get("clearCache") != null && newOptions.clearCache)
+      clearCache();
+    else if (newOptionsMap.get("clearSessionCache") != null && newOptions.clearSessionCache)
+      CookieManager.getInstance().removeSessionCookie();
+
+    if (newOptionsMap.get("useWideViewPort") != null && options.useWideViewPort != newOptions.useWideViewPort)
+      settings.setUseWideViewPort(newOptions.useWideViewPort);
+
+    if (newOptionsMap.get("supportZoom") != null && options.supportZoom != newOptions.supportZoom)
+      settings.setSupportZoom(newOptions.supportZoom);
+
+    if (newOptionsMap.get("progressBar") != null && options.progressBar != newOptions.progressBar && progressBar != null) {
+      if (newOptions.progressBar)
+        progressBar.setMax(0);
+      else
+        progressBar.setMax(100);
+    }
+
+    if (newOptionsMap.get("hideTitleBar") != null && options.hideTitleBar != newOptions.hideTitleBar)
+      actionBar.setDisplayShowTitleEnabled(!newOptions.hideTitleBar);
+
+    if (newOptionsMap.get("toolbarTop") != null && options.toolbarTop != newOptions.toolbarTop) {
+      if (!newOptions.toolbarTop)
+        actionBar.hide();
+      else
+        actionBar.show();
+    }
+
+    if (newOptionsMap.get("toolbarTopBackgroundColor") != null && options.toolbarTopBackgroundColor != newOptions.toolbarTopBackgroundColor && !newOptions.toolbarTopBackgroundColor.isEmpty())
+      actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(newOptions.toolbarTopBackgroundColor)));
+
+    if (newOptionsMap.get("toolbarTopFixedTitle") != null && options.toolbarTopFixedTitle != newOptions.toolbarTopFixedTitle && !newOptions.toolbarTopFixedTitle.isEmpty())
+      actionBar.setTitle(newOptions.toolbarTopFixedTitle);
+
+    if (newOptionsMap.get("hideUrlBar") != null && options.hideUrlBar != newOptions.hideUrlBar) {
+      if (newOptions.hideUrlBar)
+        menu.findItem(R.id.menu_search).setVisible(false);
+      else
+        menu.findItem(R.id.menu_search).setVisible(true);
+    }
+
+    options = newOptions;
+  }
+
+  public HashMap<String, Object> getOptions() {
+    return (options != null) ? options.getHashMap() : null;
   }
 
 }

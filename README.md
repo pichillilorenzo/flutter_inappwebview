@@ -9,6 +9,14 @@
 A Flutter plugin that allows you to open an in-app browser window.
 This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://github.com/apache/cordova-plugin-inappbrowser)!
 
+### IMPORTANT Note for iOS
+To be able to use this plugin on iOS, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
+```
+=== BUILD TARGET flutter_inappbrowser OF PROJECT Pods WITH CONFIGURATION Debug ===
+The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2. This setting can be set in the build settings editor.
+```
+that is not true! The Swift version that I have used is already a supported value: 4.0.
+
 ## Getting Started
 
 For help getting started with Flutter, view our online
@@ -334,7 +342,7 @@ inAppBrowser.loadUrl(String url, {Map<String, String> headers = const {}});
 
 Loads the given `assetFilePath` with optional `headers` specified as a map from name to value.
 
-To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
+To be able to load your local files (html, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
 
 Example of a `pubspec.yaml` file:
 ```yaml
@@ -493,6 +501,35 @@ Returns `true` if the callback is removed, otherwise `false`.
 inAppBrowser.removeJavaScriptHandler(String handlerName, int index);
 ```
 
+#### Future\<Uint8List\> InAppBrowser.takeScreenshot
+
+Takes a screenshot (in PNG format) of the view's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
+
+**NOTE for iOS**: available from iOS 11.0+.
+```dart
+inAppBrowser.takeScreenshot();
+```
+
+#### Future\<void\> InAppBrowser.setOptions
+
+Sets the InAppBrowser options with the new `options` and evaluates them.
+```dart
+inAppBrowser.setOptions(Map<String, dynamic> options);
+```
+
+#### Future\<Map\<String, dynamic\>\> InAppBrowser.getOptions
+
+Gets the current InAppBrowser options. Returns `null` if the options are not setted yet.
+```dart
+inAppBrowser.getOptions();
+```
+
+#### bool InAppBrowser.isOpened
+
+Returns `true` if the `InAppBrowser` instance is opened, otherwise `false`.
+```dart
+inAppBrowser.isOpened();
+```
 
 ### `ChromeSafariBrowser` class
 [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.

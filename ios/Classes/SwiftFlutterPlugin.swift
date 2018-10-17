@@ -59,7 +59,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        let uuid: String = (arguments!["uuid"] as? String)!
+        let uuid: String = arguments!["uuid"] as! String
 
         switch call.method {
             case "open":
@@ -150,6 +150,33 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "injectStyleFile":
                 self.injectStyleFile(uuid: uuid, arguments: arguments!, result: nil)
                 result(true)
+                break
+            case "takeScreenshot":
+                if let webViewController = self.webViewControllers[uuid] {
+                    webViewController?.takeScreenshot(completionHandler: { (screenshot) -> Void in
+                        result(screenshot)
+                    })
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "setOptions":
+                let optionsType = arguments!["optionsType"] as! String;
+                switch (optionsType){
+                    case "InAppBrowserOptions":
+                        let inAppBrowserOptions = InAppBrowserOptions();
+                        let inAppBroeserOptionsMap = arguments!["options"] as! [String: Any];
+                        inAppBrowserOptions.parse(options: inAppBroeserOptionsMap);
+                        self.setOptions(uuid: uuid, options: inAppBrowserOptions, optionsMap: inAppBroeserOptionsMap);
+                        break;
+                    default:
+                        result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Options " + optionsType + " not available.", details: nil))
+                }
+                result(true)
+                break
+            case "getOptions":
+                result(self.getOptions(uuid: uuid))
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -592,6 +619,19 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             
             onExit(uuid: uuid)
         }
+    }
+    
+    func setOptions(uuid: String, options: InAppBrowserOptions, optionsMap: [String: Any]) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.setOptions(newOptions: options, newOptionsMap: optionsMap)
+        }
+    }
+    
+    func getOptions(uuid: String) -> [String: Any]? {
+        if let webViewController = self.webViewControllers[uuid] {
+            return webViewController!.getOptions()
+        }
+        return nil
     }
     
 }

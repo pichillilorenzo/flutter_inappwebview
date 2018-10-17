@@ -91,4 +91,5 @@ public class ChromeCustomTabsActivity extends Activity {
       InAppBrowserFlutterPlugin.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
     }
   }
+
 }

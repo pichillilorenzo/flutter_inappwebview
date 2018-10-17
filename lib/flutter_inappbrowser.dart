@@ -579,7 +579,38 @@ class InAppBrowser {
 
   }
 
-  ///Returns `true` if the browser is opened, otherwise `false`.
+  ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
+  ///
+  ///**NOTE for iOS**: available from iOS 11.0+.
+  Future<Uint8List> takeScreenshot() async {
+    this._throwIsNotOpened();
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    return await _ChannelManager.channel.invokeMethod('takeScreenshot', args);
+  }
+
+  ///Sets the [InAppBrowser] options with the new [options] and evaluates them.
+  Future<void> setOptions(Map<String, dynamic> options) async {
+    this._throwIsNotOpened();
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
+    await _ChannelManager.channel.invokeMethod('setOptions', args);
+  }
+
+  ///Gets the current [InAppBrowser] options. Returns `null` if the options are not setted yet.
+  Future<Map<String, dynamic>> getOptions() async {
+    this._throwIsNotOpened();
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
+    Map<dynamic, dynamic> options = await _ChannelManager.channel.invokeMethod('getOptions', args);
+    options = options.cast<String, dynamic>();
+    return options;
+  }
+
+  ///Returns `true` if the [InAppBrowser] instance is opened, otherwise `false`.
   bool isOpened() {
     return this._isOpened;
   }

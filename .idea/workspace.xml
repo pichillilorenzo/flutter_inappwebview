@@ -15,7 +15,21 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/ChromeCustomTabsActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/ChromeCustomTabsActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/flutter_inappbrowser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_inappbrowser.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/Options.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/Options.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Storyboards/WebView.storyboard" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Storyboards/WebView.storyboard" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -32,63 +46,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
+      <file leaf-file-name="pubspec.yaml" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="128">
-              <caret line="82" column="21" selection-start-line="82" selection-start-column="6" selection-end-line="82" selection-end-column="21" />
-              <folding>
-                <element signature="e#814#831#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="README.md" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/README.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="203">
-                <caret line="246" column="318" selection-start-line="246" selection-start-column="318" selection-end-line="246" selection-end-column="318" />
-              </first_editor>
-              <second_editor>
-                <markdownNavigatorState />
-              </second_editor>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="pubspec.yaml" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="CHANGELOG.md" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-          <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
-            <state split_layout="SPLIT">
-              <first_editor relative-caret-position="30">
-                <caret line="2" selection-start-line="2" selection-end-line="8" selection-end-column="38" />
-              </first_editor>
-              <second_editor>
-                <markdownNavigatorState />
-              </second_editor>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="165">
-              <caret line="165" column="42" selection-start-line="165" selection-start-column="42" selection-end-line="165" selection-end-column="42" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="405">
+              <caret line="27" column="15" selection-start-line="27" selection-start-column="15" selection-end-line="27" selection-end-column="15" />
             </state>
           </provider>
         </entry>
@@ -104,11 +66,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>getPre</find>
-      <find>client</find>
-      <find>webView</find>
-      <find>result.s</find>
-      <find>result</find>
       <find>Client</find>
       <find>LOAD_START_EVENT</find>
       <find>loadstop</find>
@@ -134,6 +91,11 @@
       <find>_blank</find>
       <find>.html</find>
       <find>close(</find>
+      <find>isOpened</find>
+      <find>javascript</find>
+      <find>header</find>
+      <find>localhost</find>
+      <find>/main.dart</find>
     </findStrings>
     <replaceStrings>
       <replace>activity.getPreferences(0)</replace>
@@ -171,21 +133,22 @@
         <option value="$PROJECT_DIR$/android/build.gradle" />
         <option value="$PROJECT_DIR$/example/html/css/style.css" />
         <option value="$PROJECT_DIR$/example/html/index.html" />
-        <option value="$PROJECT_DIR$/pubspec.yaml" />
         <option value="$PROJECT_DIR$/example/assets/css/style.css" />
         <option value="$PROJECT_DIR$/example/assets/index.html" />
-        <option value="$PROJECT_DIR$/example/pubspec.yaml" />
+        <option value="$PROJECT_DIR$/pubspec.yaml" />
+        <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
-        <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/example/ios/Flutter/Generated.xcconfig" />
+        <option value="$PROJECT_DIR$/example/pubspec.yaml" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="-1920" />
-    <option name="y" value="-21" />
-    <option name="width" value="1711" />
+    <option name="x" value="116" />
+    <option name="y" value="23" />
+    <option name="width" value="1695" />
     <option name="height" value="1057" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
@@ -194,18 +157,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope">
-        <subPane subId="Project Files">
-          <expand>
-            <path>
-              <item name="Root" type="cbb8eebc:String" user="Root" />
-              <item name="flutter_inappbrowser" type="cbb8eebc:String" user="flutter_inappbrowser" />
-            </path>
-          </expand>
-          <select />
-        </subPane>
-      </pane>
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -216,24 +167,7 @@
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="android" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
               <item name="example" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
@@ -245,7 +179,19 @@
         </subPane>
         <option name="show-excluded-files" value="false" />
       </pane>
+      <pane id="Scope">
+        <subPane subId="Project Files">
+          <expand>
+            <path>
+              <item name="Root" type="cbb8eebc:String" user="Root" />
+              <item name="flutter_inappbrowser" type="cbb8eebc:String" user="flutter_inappbrowser" />
+            </path>
+          </expand>
+          <select />
+        </subPane>
+      </pane>
       <pane id="AndroidView" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -402,33 +348,34 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="-1920" y="-21" width="1711" height="1057" extended-state="0" />
+    <frame x="116" y="23" width="1695" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
-      <window_info anchor="bottom" id="TODO" order="6" />
-      <window_info anchor="right" id="Palette&#9;" order="3" />
-      <window_info id="Image Layers" order="2" />
       <window_info id="Build Variants" order="2" side_tool="true" />
-      <window_info anchor="right" id="Capture Analysis" order="3" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5035553" side_tool="true" weight="0.25689086" />
       <window_info anchor="bottom" id="Dart Analysis" order="14" weight="0.32855567" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" weight="0.3628602" />
-      <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49644473" visible="true" weight="0.2529349" />
       <window_info anchor="right" id="Flutter Outline" order="3" weight="0.32922077" />
       <window_info anchor="bottom" id="Logcat" order="11" />
-      <window_info id="Captures" order="2" weight="0.32936507" />
       <window_info id="Capture Tool" order="2" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.16956261" />
       <window_info id="Structure" order="1" sideWeight="0.50275636" side_tool="true" weight="0.1910871" />
       <window_info anchor="right" id="Device File Explorer" order="3" side_tool="true" />
-      <window_info anchor="right" id="Theme Preview" order="3" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.4" />
-      <window_info id="Favorites" order="2" side_tool="true" />
-      <window_info anchor="right" id="Flutter Inspector" order="3" weight="0.32987013" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.34364995" />
+      <window_info anchor="bottom" id="TODO" order="6" />
       <window_info anchor="bottom" id="Messages" order="12" weight="0.23692636" />
+      <window_info anchor="right" id="Palette&#9;" order="3" />
+      <window_info id="Image Layers" order="2" />
+      <window_info anchor="right" id="Capture Analysis" order="3" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" visible="true" weight="0.36179295" />
+      <window_info anchor="bottom" id="Version Control" order="9" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49644473" weight="0.25080043" />
+      <window_info id="Captures" order="2" weight="0.32936507" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.25771326" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.3276414" />
+      <window_info anchor="right" id="Theme Preview" order="3" />
+      <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="right" id="Flutter Inspector" order="3" weight="0.32938388" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Assistant" order="4" visible="true" weight="0.32987013" />
@@ -437,7 +384,6 @@
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="Dependency Viewer" order="13" weight="0.32800853" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.3276414" />
     </layout>
     <layout-to-restore>
       <window_info id="Designer" order="4" />
@@ -482,45 +428,10 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="9" />
+      <option name="time" value="14" />
     </breakpoint-manager>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/example/android/app/src/main/java/com/pichillilorenzo/flutterwebviewexample/MainActivity.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="135">
-          <caret line="9" column="19" selection-end-line="13" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/ios/Classes/SwiftFlutterWebviewPlugin.swift" />
-    <entry file="file://$PROJECT_DIR$/example/ios/Podfile.lock">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/ios/Flutter/Generated.xcconfig">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/ios/Pods/Manifest.lock">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" selection-start-line="22" selection-end-line="22" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/ios/Runner/GeneratedPluginRegistrant.m">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/ios/Runner/AppDelegate.swift">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/pubspec.lock">
       <provider selected="true" editor-type-id="text-editor">
         <state />
@@ -606,13 +517,6 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/ios/Podfile">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="539">
-          <caret line="65" column="52" selection-start-line="65" selection-start-column="52" selection-end-line="65" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="1560">
@@ -622,16 +526,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/android/gradlew" />
     <entry file="file://$PROJECT_DIR$/android/gradlew.bat" />
-    <entry file="file://$PROJECT_DIR$/example/flutter_webview_example.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/flutter_webview_example_android.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state />
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/flutter_inappbrowser_android.iml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="420">
@@ -669,13 +563,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/flutter_inappbrowser.iml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="9" selection-start-line="22" selection-start-column="9" selection-end-line="22" selection-end-column="9" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/ios/flutter_inappbrowser.podspec">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="330">
@@ -709,71 +596,134 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
+    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="60">
+            <caret line="4" column="21" selection-start-line="4" selection-start-column="21" selection-end-line="4" selection-end-column="21" />
+          </first_editor>
+          <second_editor>
+            <markdownNavigatorState />
+          </second_editor>
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="30">
+          <caret line="2" column="69" lean-forward="true" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="73" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
+        <state split_layout="SPLIT">
+          <first_editor relative-caret-position="622">
+            <caret line="524" column="3" selection-start-line="524" selection-start-column="3" selection-end-line="524" selection-end-column="3" />
+          </first_editor>
+          <second_editor>
+            <markdownNavigatorState />
+          </second_editor>
+        </state>
+      </provider>
+      <provider editor-type-id="text-editor">
+        <state relative-caret-position="247">
+          <caret line="19" column="15" selection-start-line="19" selection-start-column="3" selection-end-line="19" selection-end-column="15" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="405">
-          <caret line="27" column="13" selection-start-line="27" selection-start-column="13" selection-end-line="27" selection-end-column="13" />
+        <state relative-caret-position="30">
+          <caret line="2" column="14" selection-start-line="2" selection-start-column="14" selection-end-line="2" selection-end-column="14" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="165">
-          <caret line="165" column="42" selection-start-line="165" selection-start-column="42" selection-end-line="165" selection-end-column="42" />
+        <state relative-caret-position="495">
+          <caret line="33" column="11" selection-start-line="23" selection-start-column="30" selection-end-line="33" selection-end-column="11" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/flutter_inappbrowser.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="330">
+          <caret line="22" column="9" selection-start-line="22" selection-start-column="9" selection-end-line="22" selection-end-column="9" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/ServiceDefinitions.json">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Podfile">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="975">
+          <caret line="65" column="52" selection-start-line="65" selection-start-column="52" selection-end-line="65" selection-end-column="52" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/flutter_webview_example.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/flutter_webview_example_android.iml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Pods/Target Support Files/flutter_inappbrowser/flutter_inappbrowser-prefix.pch">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Pods/Target Support Files/flutter_inappbrowser/flutter_inappbrowser-dummy.m">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Pods/Target Support Files/flutter_inappbrowser/flutter_inappbrowser.xcconfig">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Pods/Target Support Files/flutter_inappbrowser/flutter_inappbrowser-umbrella.h">
+      <provider selected="true" editor-type-id="text-editor">
+        <state />
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/ios/Pods/Target Support Files/flutter_inappbrowser/Info.plist">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="255">
+          <caret line="17" column="24" selection-start-line="17" selection-start-column="24" selection-end-line="17" selection-end-column="24" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="128">
-          <caret line="82" column="21" selection-start-line="82" selection-start-column="6" selection-end-line="82" selection-end-column="21" />
+        <state relative-caret-position="407">
+          <caret line="404" selection-start-line="404" selection-end-line="404" />
           <folding>
             <element signature="e#814#831#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="30">
-          <caret line="2" column="69" lean-forward="true" selection-start-line="2" selection-start-column="2" selection-end-line="2" selection-end-column="73" />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="30">
-            <caret line="2" selection-start-line="2" selection-end-line="8" selection-end-column="38" />
-          </first_editor>
-          <second_editor>
-            <markdownNavigatorState />
-          </second_editor>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+    <entry file="file://$PROJECT_DIR$/example/ios/Flutter/Generated.xcconfig">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="14" selection-start-line="12" selection-start-column="14" selection-end-line="12" selection-end-column="14" />
+        <state relative-caret-position="105">
+          <caret line="7" column="69" selection-start-line="7" selection-start-column="69" selection-end-line="7" selection-end-column="69" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/README.md">
-      <provider editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="19" column="15" selection-start-line="19" selection-start-column="3" selection-end-line="19" selection-end-column="15" />
-        </state>
-      </provider>
-      <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
-        <state split_layout="SPLIT">
-          <first_editor relative-caret-position="203">
-            <caret line="246" column="318" selection-start-line="246" selection-start-column="318" selection-end-line="246" selection-end-column="318" />
-          </first_editor>
-          <second_editor>
-            <markdownNavigatorState />
-          </second_editor>
+    <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="405">
+          <caret line="27" column="15" selection-start-line="27" selection-start-column="15" selection-end-line="27" selection-end-column="15" />
         </state>
       </provider>
     </entry>

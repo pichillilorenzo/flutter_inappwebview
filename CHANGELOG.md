@@ -1,3 +1,9 @@
+## 0.4.1
+
+- added `InAppBrowser.takeScreenshot()`
+- added `InAppBrowser.setOptions()`
+- added `InAppBrowser.getOptions()`
+
 ## 0.4.0
 
 - removed `target` parameter to `InAppBrowser.open()` method. To open the url on the system browser, use the `openWithSystemBrowser: true` option
@@ -7,6 +13,7 @@
 - added `InAppBrowser.openWithSystemBrowser` method
 - added `InAppBrowser.openOnLocalhost` method
 - added `InAppBrowser.loadFile` method
+- added `InAppBrowser.isOpened` method
 
 ## 0.3.2
 

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert' show base64;
 import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
@@ -13,7 +14,40 @@ class MyInAppBrowser extends InAppBrowser {
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
 
-    //print("\n\n ${await this.isHidden()} \n\n");
+//    var screenshot = await this.takeScreenshot();
+//    await this.injectScriptCode("""
+//    document.body.innerHTML = '<img style="max-width: 100%; width: 100%" src="data:image/png;base64,${base64.encode(screenshot)}" />';
+//    """);
+
+//    var options = await this.getOptions();
+//    if (options["javaScriptEnabled"]) {
+//      await this.setOptions({
+//        //"progressBar": true,
+//        //"useOnLoadResource": true,
+//        //"hidden": true,
+//        //"toolbarTopFixedTitle": "Fixed title A",
+//        //"useShouldOverrideUrlLoading": true
+//        //"hideUrlBar": true,
+//        "javaScriptEnabled": false,
+//        "toolbarTop": true,
+//        "toolbarBottom": false
+//      });
+//    }
+//    else {
+//      await this.setOptions({
+//        //"progressBar": false,
+//        //"useOnLoadResource": false,
+//        //"hidden": true,
+//        //"toolbarTopFixedTitle": "Fixed title B",
+//        //"useShouldOverrideUrlLoading": true
+//        //"hideUrlBar": false,
+//        "javaScriptEnabled": true,
+//        "toolbarTop": false,
+//        "toolbarBottom": true
+//      });
+//    }
+
+//    print("\n\n ${await this.isHidden()} \n\n");
 
 //    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest', 1, 5,'string', {'key': 5}, [4,6,8]);");
 //    await this.injectScriptCode("window.flutter_inappbrowser.callHandler('handlerTest2', false, null, undefined);");
@@ -25,7 +59,9 @@ class MyInAppBrowser extends InAppBrowser {
 //    await this.injectScriptCode("console.info('testInfo', 6);");
 //    await this.injectScriptCode("console.error('testError', false);");
 //    await this.injectScriptCode("console.debug('testDebug', true);");
+
 //    print(await this.injectScriptCode("document.body.innerHTML"));
+
 //    print(await this.injectScriptCode("null"));
 //    print(await this.injectScriptCode("undefined"));
 //    print(await this.injectScriptCode("3"));
@@ -88,13 +124,14 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   void onConsoleMessage(ConsoleMessage consoleMessage) {
-    print("""
-    console output:
-      sourceURL: ${consoleMessage.sourceURL}
-      lineNumber: ${consoleMessage.lineNumber}
-      message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel}
-    """);
+    print(consoleMessage.message);
+//    print("""
+//    console output:
+//      sourceURL: ${consoleMessage.sourceURL}
+//      lineNumber: ${consoleMessage.lineNumber}
+//      message: ${consoleMessage.message}
+//      messageLevel: ${consoleMessage.messageLevel}
+//    """);
   }
 }
 
@@ -162,15 +199,15 @@ class _MyAppState extends State<MyApp> {
 
 //              await InAppBrowser.openWithSystemBrowser("https://flutter.io/");
 
-              await inAppBrowserFallback.openOnLocalhost("assets/index.html", options: {
-                "useOnLoadResource": true,
-                //"hidden": true,
-                //"toolbarTopFixedTitle": "Fixed title",
-                //"useShouldOverrideUrlLoading": true
-                //"hideUrlBar": true,
-                //"toolbarTop": false,
-                //"toolbarBottom": false
-              });
+//              await inAppBrowserFallback.openOnLocalhost("assets/index.html", options: {
+//                "useOnLoadResource": true,
+//                //"hidden": true,
+//                //"toolbarTopFixedTitle": "Fixed title",
+//                //"useShouldOverrideUrlLoading": true
+//                //"hideUrlBar": true,
+//                //"toolbarTop": false,
+//                //"toolbarBottom": false
+//              });
 
 //              await inAppBrowserFallback.open(url: "assets/index.html", options: {
 //                "isLocalFile": true,
@@ -183,15 +220,15 @@ class _MyAppState extends State<MyApp> {
 //                //"toolbarBottom": false
 //              });
 
-//              await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
-//                //"useOnLoadResource": true,
-//                //"hidden": true,
-//                //"toolbarTopFixedTitle": "Fixed title",
-//                //"useShouldOverrideUrlLoading": true
-//                //"hideUrlBar": true,
-//                //"toolbarTop": false,
-//                //"toolbarBottom": false
-//              });
+              await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
+                //"useOnLoadResource": true,
+                //"hidden": true,
+                //"toolbarTopFixedTitle": "Fixed title",
+                //"useShouldOverrideUrlLoading": true
+                //"hideUrlBar": true,
+                //"toolbarTop": false,
+                //"toolbarBottom": false
+              });
               //await inAppBrowserFallback.openOnLocalhost("assets/index.html");
               },
               child: Text("Open InAppBrowser")),

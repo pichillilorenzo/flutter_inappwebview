@@ -1055,7 +1055,7 @@ Future main() async {
         body: new Center(
           child: new RaisedButton(
             onPressed: () async {
-              await inAppBrowserFallback.open(
+              await inAppBrowser.open(
                   url: "http://localhost:8080/assets/index.html",
                   options: {});
             },

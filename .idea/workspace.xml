@@ -16,7 +16,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -61,8 +60,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="142">
-                <caret line="623" column="31" selection-start-line="623" selection-start-column="31" selection-end-line="623" selection-end-column="31" />
+              <first_editor relative-caret-position="147">
+                <caret line="1058" column="39" lean-forward="true" selection-start-line="1058" selection-start-column="39" selection-end-line="1058" selection-end-column="39" />
               </first_editor>
               <second_editor>
                 <markdownNavigatorState />
@@ -718,8 +717,8 @@
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="142">
-            <caret line="623" column="31" selection-start-line="623" selection-start-column="31" selection-end-line="623" selection-end-column="31" />
+          <first_editor relative-caret-position="147">
+            <caret line="1058" column="39" lean-forward="true" selection-start-line="1058" selection-start-column="39" selection-end-line="1058" selection-end-column="39" />
           </first_editor>
           <second_editor>
             <markdownNavigatorState />

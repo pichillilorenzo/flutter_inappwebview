@@ -15,36 +15,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/FlutterWebView.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ios/Classes/InAppWebViewOptions.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/AndroidManifest.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/AndroidManifest.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserOptions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserWebChromeClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserWebViewClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/JavaScriptBridgeInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/JavaScriptBridgeInterface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/Options.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/Options.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/WebViewActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/ChromeCustomTabsActivity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/ChromeCustomTabsOptions.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/CustomTabActivityHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/CustomTabsHelper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/KeepAliveService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/ServiceConnection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/chrome_custom_tabs/ServiceConnectionCallback.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/res/layout/activity_web_view.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/res/menu/menu_main.xml" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/res/menu/menu_main.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flutter_inappbrowser.iml" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_inappbrowser.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserOptions.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Storyboards/WebView.storyboard" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Storyboards/WebView.storyboard" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -64,8 +36,8 @@
       <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="133">
-              <caret line="500" column="57" selection-start-line="500" selection-start-column="57" selection-end-line="500" selection-end-column="57" />
+            <state relative-caret-position="181">
+              <caret line="506" column="20" selection-start-line="506" selection-start-column="7" selection-end-line="506" selection-end-column="20" />
               <folding>
                 <element signature="e#814#831#0" expanded="true" />
               </folding>
@@ -89,8 +61,8 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
             <state split_layout="SPLIT">
-              <first_editor relative-caret-position="120">
-                <caret line="8" column="91" selection-start-line="8" selection-start-column="91" selection-end-line="8" selection-end-column="91" />
+              <first_editor relative-caret-position="142">
+                <caret line="623" column="31" selection-start-line="623" selection-start-column="31" selection-end-line="623" selection-end-column="31" />
               </first_editor>
               <second_editor>
                 <markdownNavigatorState />
@@ -116,8 +88,8 @@
       <file leaf-file-name="pubspec.yaml" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/pubspec.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="45">
-              <caret line="3" column="52" lean-forward="true" selection-start-line="3" selection-start-column="52" selection-end-line="3" selection-end-column="52" />
+            <state relative-caret-position="15">
+              <caret line="1" column="103" lean-forward="true" selection-start-line="1" selection-start-column="13" selection-end-line="1" selection-end-column="103" />
             </state>
           </provider>
         </entry>
@@ -133,7 +105,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>isHi</find>
       <find>isHidde</find>
       <find>onWebViewCreated</find>
       <find>WebViewCreatedCallback</find>
@@ -163,6 +134,7 @@
       <find>InAppLocalhostServer</find>
       <find>local</find>
       <find>openWithSystemBrowser</find>
+      <find>__userAgent__</find>
     </findStrings>
     <replaceStrings>
       <replace>activity.getPreferences(0)</replace>
@@ -206,8 +178,8 @@
         <option value="$PROJECT_DIR$/example/pubspec.yaml" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
-        <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
+        <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
         <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
@@ -699,33 +671,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="133">
-          <caret line="500" column="57" selection-start-line="500" selection-start-column="57" selection-end-line="500" selection-end-column="57" />
-          <folding>
-            <element signature="e#814#831#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="721">
-          <caret line="254" column="25" selection-start-line="254" selection-start-column="25" selection-end-line="254" selection-end-column="25" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="45">
-          <caret line="3" column="52" lean-forward="true" selection-start-line="3" selection-start-column="52" selection-end-line="3" selection-end-column="52" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
@@ -743,11 +688,38 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="721">
+          <caret line="254" column="25" selection-start-line="254" selection-start-column="25" selection-end-line="254" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="15">
+          <caret line="1" column="103" lean-forward="true" selection-start-line="1" selection-start-column="13" selection-end-line="1" selection-end-column="103" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="506" column="20" selection-start-line="506" selection-start-column="7" selection-end-line="506" selection-end-column="20" />
+          <folding>
+            <element signature="e#814#831#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="split-provider[text-editor;MarkdownPreviewEditor]">
         <state split_layout="SPLIT">
-          <first_editor relative-caret-position="120">
-            <caret line="8" column="91" selection-start-line="8" selection-start-column="91" selection-end-line="8" selection-end-column="91" />
+          <first_editor relative-caret-position="142">
+            <caret line="623" column="31" selection-start-line="623" selection-start-column="31" selection-end-line="623" selection-end-column="31" />
           </first_editor>
           <second_editor>
             <markdownNavigatorState />

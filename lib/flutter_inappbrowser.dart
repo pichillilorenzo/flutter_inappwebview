@@ -147,7 +147,7 @@ class InAppBrowser {
   ///    - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [shouldOverrideUrlLoading()] event. The default value is `false`.
   ///    - __useOnLoadResource__: Set to `true` to be able to listen at the [onLoadResource()] event. The default value is `false`.
   ///    - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
-  ///    - __userAgent___: Set the custom WebView's user-agent.
+  ///    - __userAgent__: Set the custom WebView's user-agent.
   ///    - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
   ///    - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   ///    - __hidden__: Set to `true` to create the browser and load the page, but not show it. The `onLoadStop` event fires when loading is complete. Omit or set to `false` (default) to have the browser open and load normally.
@@ -504,7 +504,7 @@ typedef void onWebViewLoadResourceCallback(InAppWebViewController controller, We
 ///  - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [InAppWebView.shouldOverrideUrlLoading()] event. The default value is `false`.
 ///  - __useOnLoadResource__: Set to `true` to be able to listen at the [InAppWebView.onLoadResource()] event. The default value is `false`.
 ///  - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
-///  - __userAgent___: Set the custom WebView's user-agent.
+///  - __userAgent__: Set the custom WebView's user-agent.
 ///  - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
 ///  - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
 ///  - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.

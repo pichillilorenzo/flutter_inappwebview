@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs;
+package com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs;
 
 import com.pichillilorenzo.flutter_inappbrowser.Options;
 

@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class Options {
 
-  static String LOG_TAG = "";
+  static String LOG_TAG = "Options";
 
   public Options parse(HashMap<String, Object> options) {
     Iterator it = options.entrySet().iterator();

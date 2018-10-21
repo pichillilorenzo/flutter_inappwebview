@@ -25,29 +25,20 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.content.res.AssetManager;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
-import android.util.Base64;
-import android.util.JsonReader;
-import android.util.JsonToken;
 import android.webkit.MimeTypeMap;
-import android.webkit.ValueCallback;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
 
-import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsActivity;
-import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.ChromeCustomTabsOptions;
-import com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs.CustomTabActivityHelper;
+import com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs.ChromeCustomTabsActivity;
+import com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs.CustomTabActivityHelper;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.Serializable;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -67,12 +58,10 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   public static Registrar registrar;
   public Activity activity;
   public static MethodChannel channel;
-  public static Map<String, WebViewActivity> webViewActivities = new HashMap<>();
+  public static Map<String, InAppBrowserActivity> webViewActivities = new HashMap<>();
   public static Map<String, ChromeCustomTabsActivity> chromeCustomTabsActivities = new HashMap<>();
 
   protected static final String LOG_TAG = "IABFlutterPlugin";
-
-  static final String ANDROID_ASSET_URL = "file:///android_asset/";
 
   public InAppBrowserFlutterPlugin(Registrar r, Activity activity) {
     registrar = r;
@@ -84,8 +73,15 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
    * Plugin registration.
    */
   public static void registerWith(Registrar registrar) {
+    Activity activity = registrar.activity();
+
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
-    channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar, registrar.activity()));
+    channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar, activity));
+
+    registrar
+      .platformViewRegistry()
+      .registerViewFactory(
+              "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar, activity));
   }
 
   @Override
@@ -113,48 +109,32 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
               final String uuidFallback = (String) call.argument("uuidFallback");
 
-              final ChromeCustomTabsOptions options = new ChromeCustomTabsOptions();
-              options.parse((HashMap<String, Object>) call.argument("options"));
+              final HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
 
-              final InAppBrowserOptions optionsFallback = new InAppBrowserOptions();
-              optionsFallback.parse((HashMap<String, Object>) call.argument("optionsFallback"));
+              final HashMap<String, Object> optionsFallback = (HashMap<String, Object>) call.argument("optionsFallback");
 
               open(uuid, uuidFallback, url_final, options, headers, true, optionsFallback, result);
             } else {
 
               String url = url_final;
 
-              final InAppBrowserOptions options = new InAppBrowserOptions();
-              options.parse((HashMap<String, Object>) call.argument("options"));
+              final HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
 
-              if (options.isLocalFile) {
+              final boolean isLocalFile = (boolean) call.argument("isLocalFile");
+              final boolean openWithSystemBrowser = (boolean) call.argument("openWithSystemBrowser");
+
+              if (isLocalFile) {
                 // check if the asset file exists
-                String key = registrar.lookupKeyForAsset(url);
-                AssetManager mg = registrar.activeContext().getResources().getAssets();
-                InputStream is = null;
-                boolean assetExists = false;
                 try {
-                  is = mg.open(key);
-                  assetExists = true;
-                } catch (IOException ex) {
-
-                } finally {
-                  if (is != null) {
-                    try {
-                      is.close();
-                    } catch (IOException e) {
-                      e.printStackTrace();
-                    }
-                  }
-                }
-                if (!assetExists) {
-                  result.error(LOG_TAG, key + " asset file cannot be found!", null);
+                  url = Util.getUrlAsset(registrar, url);
+                } catch (IOException e) {
+                  e.printStackTrace();
+                  result.error(LOG_TAG, url + " asset file cannot be found!", e);
                   return;
                 }
-                url = ANDROID_ASSET_URL + key;
               }
               // SYSTEM
-              if (options.openWithSystemBrowser) {
+              if (openWithSystemBrowser) {
                 Log.d(LOG_TAG, "in system");
                 openExternal(url, result);
               }
@@ -257,9 +237,9 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
           switch (optionsType){
             case "InAppBrowserOptions":
               InAppBrowserOptions inAppBrowserOptions = new InAppBrowserOptions();
-              HashMap<String, Object> inAppBroeserOptionsMap = (HashMap<String, Object>) call.argument("options");
-              inAppBrowserOptions.parse(inAppBroeserOptionsMap);
-              setOptions(uuid, inAppBrowserOptions, inAppBroeserOptionsMap);
+              HashMap<String, Object> inAppBrowserOptionsMap = (HashMap<String, Object>) call.argument("options");
+              inAppBrowserOptions.parse(inAppBrowserOptionsMap);
+              setOptions(uuid, inAppBrowserOptions, inAppBrowserOptionsMap);
               break;
             default:
               result.error(LOG_TAG, "Options " + optionsType + " not available.", null);
@@ -276,85 +256,10 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
   }
 
-  /**
-   * Inject an object (script or style) into the InAppBrowserFlutterPlugin WebView.
-   * <p>
-   * This is a helper method for the inject{Script|Style}{Code|File} API calls, which
-   * provides a consistent method for injecting JavaScript code into the document.
-   * <p>
-   * If a wrapper string is supplied, then the source string will be JSON-encoded (adding
-   * quotes) and wrapped using string formatting. (The wrapper string should have a single
-   * '%s' marker)
-   *
-   * @param uuid
-   * @param source    The source object (filename or script/style text) to inject into
-   *                  the document.
-   * @param jsWrapper A JavaScript string to wrap the source string in, so that the object
-   *                  is properly injected, or null if the source string is JavaScript text
-   * @param result
-   */
   private void injectDeferredObject(String uuid, String source, String jsWrapper, final Result result) {
-    final WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null) {
-      String scriptToInject;
-      if (jsWrapper != null) {
-        org.json.JSONArray jsonEsc = new org.json.JSONArray();
-        jsonEsc.put(source);
-        String jsonRepr = jsonEsc.toString();
-        String jsonSourceString = jsonRepr.substring(1, jsonRepr.length() - 1);
-        scriptToInject = String.format(jsWrapper, jsonSourceString);
-      } else {
-        scriptToInject = source;
-      }
-      final String finalScriptToInject = scriptToInject;
-      activity.runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
-            // This action will have the side-effect of blurring the currently focused element
-            webViewActivity.webView.loadUrl("javascript:" + finalScriptToInject);
-          } else {
-            webViewActivity.webView.evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
-              @Override
-              public void onReceiveValue(String s) {
-                if (result == null)
-                  return;
-
-                JsonReader reader = new JsonReader(new StringReader(s));
-
-                // Must set lenient to parse single values
-                reader.setLenient(true);
-
-                try {
-                  String msg;
-                  if (reader.peek() == JsonToken.STRING) {
-                    msg = reader.nextString();
-
-                    JsonReader reader2 = new JsonReader(new StringReader(msg));
-                    reader2.setLenient(true);
-
-                    if (reader2.peek() == JsonToken.STRING)
-                      msg = reader2.nextString();
-
-                    result.success(msg);
-                  } else {
-                    result.success("");
-                  }
-
-                } catch (IOException e) {
-                  Log.e(LOG_TAG, "IOException", e);
-                } finally {
-                  try {
-                    reader.close();
-                  } catch (IOException e) {
-                    // NOOP
-                  }
-                }
-              }
-            });
-          }
-        }
-      });
+    final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity.injectDeferredObject(source, jsWrapper, result);
     } else {
       Log.d(LOG_TAG, "Can't inject code into the system browser");
     }
@@ -435,14 +340,14 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
   }
 
-  public void open(String uuid, String uuidFallback, String url, Options options, Map<String, String> headers, boolean useChromeSafariBrowser, InAppBrowserOptions optionsFallback, Result result) {
+  public void open(String uuid, String uuidFallback, String url, HashMap<String, Object> options, Map<String, String> headers, boolean useChromeSafariBrowser, HashMap<String, Object> optionsFallback, Result result) {
 
     Intent intent = null;
     Bundle extras = new Bundle();
     extras.putString("url", url);
 
     extras.putString("uuid", uuid);
-    extras.putSerializable("options", options.getHashMap());
+    extras.putSerializable("options", options);
     extras.putSerializable("headers", (Serializable) headers);
 
     if (useChromeSafariBrowser && CustomTabActivityHelper.isAvailable(activity)) {
@@ -454,15 +359,15 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       // overwrite with extras fallback parameters
       extras.putString("uuid", uuidFallback);
       if (optionsFallback != null)
-        extras.putSerializable("options", optionsFallback.getHashMap());
+        extras.putSerializable("options", optionsFallback);
       else
         extras.putSerializable("options", (new InAppBrowserOptions()).getHashMap());
       extras.putSerializable("headers", (Serializable) headers);
-      intent = new Intent(activity, WebViewActivity.class);
+      intent = new Intent(activity, InAppBrowserActivity.class);
     }
     // native webview
     else if (!useChromeSafariBrowser) {
-      intent = new Intent(activity, WebViewActivity.class);
+      intent = new Intent(activity, InAppBrowserActivity.class);
     }
     else {
       Log.d(LOG_TAG, "No WebView fallback declared.");
@@ -479,93 +384,93 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   }
 
   public void loadUrl(String uuid, String url, Map<String, String> headers, Result result) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
       if (headers != null)
-        webViewActivity.loadUrl(url, headers, result);
+        inAppBrowserActivity.loadUrl(url, headers, result);
       else
-        webViewActivity.loadUrl(url, result);
+        inAppBrowserActivity.loadUrl(url, result);
     }
   }
 
   public void loadFile(String uuid, String url, Map<String, String> headers, Result result) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
       if (headers != null)
-        webViewActivity.loadFile(url, headers, result);
+        inAppBrowserActivity.loadFile(url, headers, result);
       else
-        webViewActivity.loadFile(url, result);
+        inAppBrowserActivity.loadFile(url, result);
     }
   }
 
   public void show(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.show();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.show();
   }
 
   public void hide(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.hide();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.hide();
   }
 
   public void reload(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.reload();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.reload();
   }
 
   public boolean isLoading(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      return webViewActivity.isLoading();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.isLoading();
     return false;
   }
 
   public boolean isHidden(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      return webViewActivity.isHidden;
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.isHidden;
     return false;
   }
 
   public void stopLoading(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.stopLoading();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.stopLoading();
   }
 
   public void goBack(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.goBack();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.goBack();
   }
 
   public boolean canGoBack(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      return webViewActivity.canGoBack();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.canGoBack();
     return false;
   }
 
   public void goForward(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.goForward();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.goForward();
   }
 
   public boolean canGoForward(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      return webViewActivity.canGoForward();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.canGoForward();
     return false;
   }
 
 
   public static void close(final String uuid, final Result result) {
-    final WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null) {
+    final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
       registrar.activity().runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -576,23 +481,23 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
           // The JS protects against multiple calls, so this should happen only when
           // close() is called by other native code.
-          if (webViewActivity == null) {
+          if (inAppBrowserActivity == null) {
             if (result != null) {
               result.success(true);
             }
             return;
           }
 
-          webViewActivity.webView.setWebViewClient(new WebViewClient() {
+          inAppBrowserActivity.webView.setWebViewClient(new WebViewClient() {
             // NB: wait for about:blank before dismissing
             public void onPageFinished(WebView view, String url) {
-              webViewActivity.close();
+              inAppBrowserActivity.close();
             }
           });
           // NB: From SDK 19: "If you call methods on WebView from any thread
           // other than your app's UI thread, it can cause unexpected results."
           // http://developer.android.com/guide/webapps/migrating.html#Threads
-          webViewActivity.webView.loadUrl("about:blank");
+          inAppBrowserActivity.webView.loadUrl("about:blank");
           if (result != null) {
             result.success(true);
           }
@@ -605,22 +510,22 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
   }
 
   public byte[] takeScreenshot(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      return webViewActivity.takeScreenshot();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.takeScreenshot();
     return null;
   }
 
   public void setOptions(String uuid, InAppBrowserOptions options, HashMap<String, Object> optionsMap) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      webViewActivity.setOptions(options, optionsMap);
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.setOptions(options, optionsMap);
   }
 
   public HashMap<String, Object> getOptions(String uuid) {
-    WebViewActivity webViewActivity = webViewActivities.get(uuid);
-    if (webViewActivity != null)
-      return webViewActivity.getOptions();
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getOptions();
     return null;
   }
 

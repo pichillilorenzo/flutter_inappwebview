@@ -21,7 +21,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" customClass="WKWebView_IBWrapper" customModule="flutter_inappbrowser">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" customClass="InAppWebView_IBWrapper" customModule="flutter_inappbrowser">
                                 <rect key="frame" x="0.0" y="66" width="414" height="626"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -96,7 +96,7 @@
                         <outlet property="toolbarTop" destination="vlz-kT-71x" id="WgC-80-Z28"/>
                         <outlet property="toolbarTop_BottomToWebViewTopConstraint" destination="Sjd-dV-din" id="vkO-Yu-xaE"/>
                         <outlet property="urlField" destination="sy2-Vx-Cxd" id="MCW-lJ-Ehl"/>
-                        <outlet property="webView" destination="gA9-n8-qaQ" id="7JE-lp-bwe"/>
+                        <outlet property="webView" destination="gA9-n8-qaQ" id="439-rj-hHB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cYA-mw-BIR" userLabel="First Responder" sceneMemberID="firstResponder"/>

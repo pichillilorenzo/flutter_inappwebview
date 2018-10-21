@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs;
+package com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs;
 
 import android.app.Activity;
 import android.net.Uri;
@@ -9,8 +9,6 @@ import android.support.customtabs.CustomTabsServiceConnection;
 import android.support.customtabs.CustomTabsSession;
 
 import java.util.List;
-
-import static android.support.v4.app.ActivityCompat.startActivityForResult;
 
 /**
  * This is a helper class to manage the connection to the Custom Tabs Service.

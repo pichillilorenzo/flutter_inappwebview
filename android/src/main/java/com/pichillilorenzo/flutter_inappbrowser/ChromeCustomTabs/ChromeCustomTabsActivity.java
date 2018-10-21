@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappbrowser.chrome_custom_tabs;
+package com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -6,10 +6,8 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.customtabs.CustomTabsIntent;
-import android.util.Log;
 
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
-import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserOptions;
 import com.pichillilorenzo.flutter_inappbrowser.R;
 
 import java.util.HashMap;

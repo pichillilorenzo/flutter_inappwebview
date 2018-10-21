@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappbrowser;
+package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -16,6 +16,11 @@ import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
+import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
+import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
+import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
+
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -27,16 +32,24 @@ import io.flutter.plugin.common.MethodChannel;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class InAppBrowserWebViewClient extends WebViewClient {
+public class InAppWebViewClient extends WebViewClient {
 
   protected static final String LOG_TAG = "IABWebViewClient";
-  private WebViewActivity activity;
+  private FlutterWebView flutterWebView;
+  private InAppBrowserActivity inAppBrowserActivity;
   Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
   long startPageTime = 0;
 
-  public InAppBrowserWebViewClient(WebViewActivity activity) {
+  public InAppWebViewClient(Object obj) {
     super();
-    this.activity = activity;
+    if (obj instanceof InAppBrowserActivity)
+      this.inAppBrowserActivity = (InAppBrowserActivity) obj;
+    else if (obj instanceof FlutterWebView)
+      this.flutterWebView = (FlutterWebView) obj;
+    prepareStatusCodeMapping();
+  }
+
+  private void prepareStatusCodeMapping () {
     statusCodeMapping.put(100, "Continue");
     statusCodeMapping.put(101, "Switching Protocols");
     statusCodeMapping.put(200, "OK");
@@ -90,11 +103,12 @@ public class InAppBrowserWebViewClient extends WebViewClient {
   @Override
   public boolean shouldOverrideUrlLoading(WebView webView, String url) {
 
-    if (activity.options.useShouldOverrideUrlLoading) {
+    if (((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).options.useShouldOverrideUrlLoading) {
       Map<String, Object> obj = new HashMap<>();
-      obj.put("uuid", activity.uuid);
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("url", url);
-      InAppBrowserFlutterPlugin.channel.invokeMethod("shouldOverrideUrlLoading", obj);
+      getChannel().invokeMethod("shouldOverrideUrlLoading", obj);
       return true;
     }
 
@@ -102,7 +116,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
       try {
         Intent intent = new Intent(Intent.ACTION_DIAL);
         intent.setData(Uri.parse(url));
-        activity.startActivity(intent);
+        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
         return true;
       } catch (android.content.ActivityNotFoundException e) {
         Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
@@ -111,7 +125,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
       try {
         Intent intent = new Intent(Intent.ACTION_VIEW);
         intent.setData(Uri.parse(url));
-        activity.startActivity(intent);
+        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
         return true;
       } catch (android.content.ActivityNotFoundException e) {
         Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
@@ -142,7 +156,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         intent.setData(Uri.parse("sms:" + address));
         intent.putExtra("address", address);
         intent.setType("vnd.android-dir/mms-sms");
-        activity.startActivity(intent);
+        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
         return true;
       } catch (android.content.ActivityNotFoundException e) {
         Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
@@ -167,23 +181,24 @@ public class InAppBrowserWebViewClient extends WebViewClient {
 
     startPageTime = System.currentTimeMillis();
 
-    activity.isLoading = true;
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = true;
 
-    if (activity.searchView != null && !url.equals(activity.searchView.getQuery().toString())) {
-      activity.searchView.setQuery(url, false);
+    if (inAppBrowserActivity != null && inAppBrowserActivity.searchView != null && !url.equals(inAppBrowserActivity.searchView.getQuery().toString())) {
+      inAppBrowserActivity.searchView.setQuery(url, false);
     }
 
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", activity.uuid);
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStart", obj);
+    getChannel().invokeMethod("onLoadStart", obj);
   }
 
 
   public void onPageFinished(WebView view, String url) {
     super.onPageFinished(view, url);
 
-    activity.isLoading = false;
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = false;
 
     // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -197,38 +212,41 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     view.requestFocus();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      view.evaluateJavascript(WebViewActivity.consoleLogJS, null);
+      view.evaluateJavascript(InAppWebView.consoleLogJS, null);
       view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, null);
     }
     else {
-      view.loadUrl("javascript:"+WebViewActivity.consoleLogJS);
+      view.loadUrl("javascript:"+InAppWebView.consoleLogJS);
       view.loadUrl("javascript:"+JavaScriptBridgeInterface.flutterInAppBroserJSClass);
     }
 
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", activity.uuid);
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadStop", obj);
+    getChannel().invokeMethod("onLoadStop", obj);
   }
 
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
     super.onReceivedError(view, errorCode, description, failingUrl);
 
-    activity.isLoading = false;
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = false;
 
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", activity.uuid);
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", failingUrl);
     obj.put("code", errorCode);
     obj.put("message", description);
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
+    getChannel().invokeMethod("onLoadError", obj);
   }
 
   public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
     super.onReceivedSslError(view, handler, error);
 
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", activity.uuid);
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", error.getUrl());
     obj.put("code", error.getPrimaryError());
     String message;
@@ -254,7 +272,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
         break;
     }
     obj.put("message", "SslError: " + message);
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadError", obj);
+    getChannel().invokeMethod("onLoadError", obj);
 
     handler.cancel();
   }
@@ -271,8 +289,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   @Override
   public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-
-    if (!request.getMethod().toLowerCase().equals("get") || !activity.options.useOnLoadResource) {
+    if (!request.getMethod().toLowerCase().equals("get") ||
+            !(((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).options.useOnLoadResource)) {
       return null;
     }
 
@@ -282,7 +300,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
       Request mRequest = new Request.Builder().url(url).build();
 
       long startResourceTime = System.currentTimeMillis();
-      Response response = activity.httpClient.newCall(mRequest).execute();
+      Response response = ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).httpClient.newCall(mRequest).execute();
       long startTime = startResourceTime - startPageTime;
       startTime = (startTime < 0) ? 0 : startTime;
       long duration = System.currentTimeMillis() - startResourceTime;
@@ -319,7 +337,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
       Map<String, Object> res = new HashMap<>();
       Map<String, Object> req = new HashMap<>();
 
-      obj.put("uuid", activity.uuid);
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
 
       byte[] dataBytes = response.body().bytes();
       InputStream dataStream = new ByteArrayInputStream(dataBytes);
@@ -338,7 +357,7 @@ public class InAppBrowserWebViewClient extends WebViewClient {
       obj.put("response", res);
       obj.put("request", req);
 
-      InAppBrowserFlutterPlugin.channel.invokeMethod("onLoadResource", obj);
+      getChannel().invokeMethod("onLoadResource", obj);
 
       return new WebResourceResponse(
               response.header("content-type", "text/plain").split(";")[0].trim(),
@@ -359,5 +378,8 @@ public class InAppBrowserWebViewClient extends WebViewClient {
     return null;
   }
 
+  private MethodChannel getChannel() {
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+  }
 
 }

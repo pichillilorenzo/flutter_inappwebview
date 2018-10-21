@@ -1,3 +1,14 @@
+## 0.5.0
+
+- added initial support for Inline WebViews using the `InAppWebView` widget
+- added `InAppBrowser.openFile()` method
+- added `InAppBrowser.onProgressChanged()` event
+- moved `InAppBrowser` WebView related functions on the `InAppWebViewController` class
+- added `InAppLocalhostServer` class
+- added `InAppWebView.canGoBack()` and `InAppWebView.canGoForward()` methods
+- removed `openWithSystemBrowser` and `isLocalFile` option. Now use the corresponding method
+- code refactoring
+
 ## 0.4.1
 
 - added `InAppBrowser.takeScreenshot()`

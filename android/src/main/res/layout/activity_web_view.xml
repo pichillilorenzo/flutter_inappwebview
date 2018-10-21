@@ -7,15 +7,13 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:focusableInTouchMode="true"
-    tools:context=".WebViewActivity"
+    tools:context=".InAppBrowserActivity"
     android:focusable="true">
 
-    <WebView
+    <com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView
         android:id="@+id/webView"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-    </WebView>
+        android:layout_height="match_parent" />
 
     <ProgressBar
         android:id="@+id/progressBar"

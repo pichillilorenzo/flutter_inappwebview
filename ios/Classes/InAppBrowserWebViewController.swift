@@ -129,7 +129,7 @@ func convertToDictionary(text: String) -> [String: Any]? {
 //
 //}
 
-class WKWebView_IBWrapper: WKWebView {
+class InAppWebView_IBWrapper: InAppWebView {
     required convenience init?(coder: NSCoder) {
         let config = WKWebViewConfiguration()
         self.init(frame: .zero, configuration: config)
@@ -139,7 +139,7 @@ class WKWebView_IBWrapper: WKWebView {
 
 class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
     
-    @IBOutlet var webView: WKWebView_IBWrapper!
+    @IBOutlet var webView: InAppWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
     @IBOutlet var backButton: UIBarButtonItem!
@@ -159,6 +159,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     var currentURL: URL?
     var tmpWindow: UIWindow?
     var browserOptions: InAppBrowserOptions?
+    var webViewOptions: InAppWebViewOptions?
     var initHeaders: [String: String]?
     var isHidden = false
     var uuid: String = ""
@@ -216,7 +217,8 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     
     // Prevent crashes on closing windows
     deinit {
-        webView?.uiDelegate = nil
+        webView.removeObserver(self, forKeyPath: "estimatedProgress")
+        webView.uiDelegate = nil
     }
     
     override func viewWillDisappear (_ animated: Bool) {
@@ -230,6 +232,11 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     
     func prepareWebView() {
         //UIApplication.shared.statusBarStyle = preferredStatusBarStyle
+        
+        self.webView.addObserver(self,
+                            forKeyPath: #keyPath(WKWebView.estimatedProgress),
+                            options: .new,
+                            context: nil)
         
         self.webView.configuration.userContentController = WKUserContentController()
         self.webView.configuration.preferences = WKPreferences()
@@ -273,7 +280,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         self.modalTransitionStyle = UIModalTransitionStyle(rawValue: (browserOptions?.transitionStyle)!)!
         
         // prevent webView from bouncing
-        if (browserOptions?.disallowOverScroll)! {
+        if (webViewOptions?.disallowOverScroll)! {
             if self.webView.responds(to: #selector(getter: self.webView.scrollView)) {
                 self.webView.scrollView.bounces = false
             }
@@ -286,7 +293,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             }
         }
         
-        if (browserOptions?.enableViewportScale)! {
+        if (webViewOptions?.enableViewportScale)! {
             let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
             let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
             self.webView.configuration.userContentController.addUserScript(userScript)
@@ -314,44 +321,44 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         self.webView.configuration.userContentController.add(self, name: "resourceLoaded")
         
         if #available(iOS 10.0, *) {
-            self.webView.configuration.mediaTypesRequiringUserActionForPlayback = ((browserOptions?.mediaPlaybackRequiresUserGesture)!) ? .all : []
+            self.webView.configuration.mediaTypesRequiringUserActionForPlayback = ((webViewOptions?.mediaPlaybackRequiresUserGesture)!) ? .all : []
         } else {
             // Fallback on earlier versions
-            self.webView.configuration.mediaPlaybackRequiresUserAction = (browserOptions?.mediaPlaybackRequiresUserGesture)!
+            self.webView.configuration.mediaPlaybackRequiresUserAction = (webViewOptions?.mediaPlaybackRequiresUserGesture)!
         }
         
         
-        self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowsInlineMediaPlayback)!
+        self.webView.configuration.allowsInlineMediaPlayback = (webViewOptions?.allowsInlineMediaPlayback)!
         
         //self.webView.keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
         
-        self.webView.configuration.suppressesIncrementalRendering = (browserOptions?.suppressesIncrementalRendering)!
-        self.webView.allowsBackForwardNavigationGestures = (browserOptions?.allowsBackForwardNavigationGestures)!
+        self.webView.configuration.suppressesIncrementalRendering = (webViewOptions?.suppressesIncrementalRendering)!
+        self.webView.allowsBackForwardNavigationGestures = (webViewOptions?.allowsBackForwardNavigationGestures)!
         if #available(iOS 9.0, *) {
-            self.webView.allowsLinkPreview = (browserOptions?.allowsLinkPreview)!
+            self.webView.allowsLinkPreview = (webViewOptions?.allowsLinkPreview)!
         }
         
         if #available(iOS 10.0, *) {
-            self.webView.configuration.ignoresViewportScaleLimits = (browserOptions?.ignoresViewportScaleLimits)!
+            self.webView.configuration.ignoresViewportScaleLimits = (webViewOptions?.ignoresViewportScaleLimits)!
         }
         
-        self.webView.configuration.allowsInlineMediaPlayback = (browserOptions?.allowsInlineMediaPlayback)!
+        self.webView.configuration.allowsInlineMediaPlayback = (webViewOptions?.allowsInlineMediaPlayback)!
         
         if #available(iOS 9.0, *) {
-            self.webView.configuration.allowsPictureInPictureMediaPlayback = (browserOptions?.allowsPictureInPictureMediaPlayback)!
+            self.webView.configuration.allowsPictureInPictureMediaPlayback = (webViewOptions?.allowsPictureInPictureMediaPlayback)!
         }
         
-        self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = (browserOptions?.javaScriptCanOpenWindowsAutomatically)!
+        self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = (webViewOptions?.javaScriptCanOpenWindowsAutomatically)!
         
-        self.webView.configuration.preferences.javaScriptEnabled = (browserOptions?.javaScriptEnabled)!
+        self.webView.configuration.preferences.javaScriptEnabled = (webViewOptions?.javaScriptEnabled)!
         
-        if ((browserOptions?.userAgent)! != "") {
+        if ((webViewOptions?.userAgent)! != "") {
             if #available(iOS 9.0, *) {
-                self.webView.customUserAgent = (browserOptions?.userAgent)!
+                self.webView.customUserAgent = (webViewOptions?.userAgent)!
             }
         }
         
-        if (browserOptions?.clearCache)! {
+        if (webViewOptions?.clearCache)! {
             clearCache()
         }
         
@@ -519,14 +526,14 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         
         if let url = navigationAction.request.url {
             
-            if url.absoluteString != self.currentURL?.absoluteString && (browserOptions?.useOnLoadResource)! {
+            if url.absoluteString != self.currentURL?.absoluteString && (webViewOptions?.useOnLoadResource)! {
                 WKNavigationMap[url.absoluteString] = [
                     "startTime": currentTimeInMilliSeconds(),
                     "request": navigationAction.request
                 ]
             }
             
-            if navigationAction.navigationType == .linkActivated && (browserOptions?.useShouldOverrideUrlLoading)! {
+            if navigationAction.navigationType == .linkActivated && (webViewOptions?.useShouldOverrideUrlLoading)! {
                 if navigationDelegate != nil {
                     navigationDelegate?.shouldOverrideUrlLoading(uuid: self.uuid, webView: webView, url: url)
                 }
@@ -548,7 +555,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         
-        if (browserOptions?.useOnLoadResource)! {
+        if (webViewOptions?.useOnLoadResource)! {
             if let url = navigationResponse.response.url {
                 if WKNavigationMap[url.absoluteString] != nil {
                     let startResourceTime = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int)
@@ -678,7 +685,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                 navigationDelegate?.onConsoleMessage(uuid: self.uuid, sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
             }
         }
-        else if message.name == "resourceLoaded" && (browserOptions?.useOnLoadResource)! {
+        else if message.name == "resourceLoaded" && (webViewOptions?.useOnLoadResource)! {
             if let resource = convertToDictionary(text: message.body as! String) {
                 let url = URL(string: resource["name"] as! String)!
                 if !UIApplication.shared.canOpenURL(url) {
@@ -729,6 +736,9 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     }
 
     func setOptions(newOptions: InAppBrowserOptions, newOptionsMap: [String: Any]) {
+        
+        let newInAppWebViewOptions = InAppWebViewOptions()
+        newInAppWebViewOptions.parse(options: newOptionsMap)
         
         if newOptionsMap["hidden"] != nil && browserOptions?.hidden != newOptions.hidden {
             if newOptions.hidden {
@@ -784,93 +794,107 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             self.modalTransitionStyle = UIModalTransitionStyle(rawValue: newOptions.transitionStyle)!
         }
 
-        if newOptionsMap["disallowOverScroll"] != nil && browserOptions?.disallowOverScroll != newOptions.disallowOverScroll {
+        if newOptionsMap["disallowOverScroll"] != nil && webViewOptions?.disallowOverScroll != newInAppWebViewOptions.disallowOverScroll {
             if self.webView.responds(to: #selector(getter: self.webView.scrollView)) {
-                self.webView.scrollView.bounces = !newOptions.disallowOverScroll
+                self.webView.scrollView.bounces = !newInAppWebViewOptions.disallowOverScroll
             }
             else {
                 for subview: UIView in self.webView.subviews {
                     if subview is UIScrollView {
-                        (subview as! UIScrollView).bounces = !newOptions.disallowOverScroll
+                        (subview as! UIScrollView).bounces = !newInAppWebViewOptions.disallowOverScroll
                     }
                 }
             }
         }
 
-        if newOptionsMap["enableViewportScale"] != nil && browserOptions?.enableViewportScale != newOptions.enableViewportScale && newOptions.enableViewportScale {
+        if newOptionsMap["enableViewportScale"] != nil && webViewOptions?.enableViewportScale != newInAppWebViewOptions.enableViewportScale && newInAppWebViewOptions.enableViewportScale {
             let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
             self.webView.evaluateJavaScript(jscript, completionHandler: nil)
         }
         
-        if newOptionsMap["mediaPlaybackRequiresUserGesture"] != nil && browserOptions?.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture {
+        if newOptionsMap["mediaPlaybackRequiresUserGesture"] != nil && webViewOptions?.mediaPlaybackRequiresUserGesture != newInAppWebViewOptions.mediaPlaybackRequiresUserGesture {
             if #available(iOS 10.0, *) {
-                self.webView.configuration.mediaTypesRequiringUserActionForPlayback = (newOptions.mediaPlaybackRequiresUserGesture) ? .all : []
+                self.webView.configuration.mediaTypesRequiringUserActionForPlayback = (newInAppWebViewOptions.mediaPlaybackRequiresUserGesture) ? .all : []
             } else {
                 // Fallback on earlier versions
-                self.webView.configuration.mediaPlaybackRequiresUserAction = newOptions.mediaPlaybackRequiresUserGesture
+                self.webView.configuration.mediaPlaybackRequiresUserAction = newInAppWebViewOptions.mediaPlaybackRequiresUserGesture
             }
         }
 
-        if newOptionsMap["allowsInlineMediaPlayback"] != nil && browserOptions?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
-            self.webView.configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
+        if newOptionsMap["allowsInlineMediaPlayback"] != nil && webViewOptions?.allowsInlineMediaPlayback != newInAppWebViewOptions.allowsInlineMediaPlayback {
+            self.webView.configuration.allowsInlineMediaPlayback = newInAppWebViewOptions.allowsInlineMediaPlayback
         }
         
 //        if newOptionsMap["keyboardDisplayRequiresUserAction"] != nil && browserOptions?.keyboardDisplayRequiresUserAction != newOptions.keyboardDisplayRequiresUserAction {
 //            self.webView.keyboardDisplayRequiresUserAction = newOptions.keyboardDisplayRequiresUserAction
 //        }
         
-        if newOptionsMap["suppressesIncrementalRendering"] != nil && browserOptions?.suppressesIncrementalRendering != newOptions.suppressesIncrementalRendering {
-            self.webView.configuration.suppressesIncrementalRendering = newOptions.suppressesIncrementalRendering
+        if newOptionsMap["suppressesIncrementalRendering"] != nil && webViewOptions?.suppressesIncrementalRendering != newInAppWebViewOptions.suppressesIncrementalRendering {
+            self.webView.configuration.suppressesIncrementalRendering = newInAppWebViewOptions.suppressesIncrementalRendering
         }
         
-        if newOptionsMap["allowsBackForwardNavigationGestures"] != nil && browserOptions?.allowsBackForwardNavigationGestures != newOptions.allowsBackForwardNavigationGestures {
-            self.webView.allowsBackForwardNavigationGestures = newOptions.allowsBackForwardNavigationGestures
+        if newOptionsMap["allowsBackForwardNavigationGestures"] != nil && webViewOptions?.allowsBackForwardNavigationGestures != newInAppWebViewOptions.allowsBackForwardNavigationGestures {
+            self.webView.allowsBackForwardNavigationGestures = newInAppWebViewOptions.allowsBackForwardNavigationGestures
         }
         
-        if newOptionsMap["allowsLinkPreview"] != nil && browserOptions?.allowsLinkPreview != newOptions.allowsLinkPreview {
+        if newOptionsMap["allowsLinkPreview"] != nil && webViewOptions?.allowsLinkPreview != newInAppWebViewOptions.allowsLinkPreview {
             if #available(iOS 9.0, *) {
-                self.webView.allowsLinkPreview = newOptions.allowsLinkPreview
+                self.webView.allowsLinkPreview = newInAppWebViewOptions.allowsLinkPreview
             }
         }
         
-        if newOptionsMap["ignoresViewportScaleLimits"] != nil && browserOptions?.ignoresViewportScaleLimits != newOptions.ignoresViewportScaleLimits {
+        if newOptionsMap["ignoresViewportScaleLimits"] != nil && webViewOptions?.ignoresViewportScaleLimits != newInAppWebViewOptions.ignoresViewportScaleLimits {
             if #available(iOS 10.0, *) {
-                self.webView.configuration.ignoresViewportScaleLimits = newOptions.ignoresViewportScaleLimits
+                self.webView.configuration.ignoresViewportScaleLimits = newInAppWebViewOptions.ignoresViewportScaleLimits
             }
         }
         
-        if newOptionsMap["allowsInlineMediaPlayback"] != nil && browserOptions?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
-            self.webView.configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
+        if newOptionsMap["allowsInlineMediaPlayback"] != nil && webViewOptions?.allowsInlineMediaPlayback != newInAppWebViewOptions.allowsInlineMediaPlayback {
+            self.webView.configuration.allowsInlineMediaPlayback = newInAppWebViewOptions.allowsInlineMediaPlayback
         }
         
-        if newOptionsMap["allowsPictureInPictureMediaPlayback"] != nil && browserOptions?.allowsPictureInPictureMediaPlayback != newOptions.allowsPictureInPictureMediaPlayback {
+        if newOptionsMap["allowsPictureInPictureMediaPlayback"] != nil && webViewOptions?.allowsPictureInPictureMediaPlayback != newInAppWebViewOptions.allowsPictureInPictureMediaPlayback {
             if #available(iOS 9.0, *) {
-                self.webView.configuration.allowsPictureInPictureMediaPlayback = newOptions.allowsPictureInPictureMediaPlayback
+                self.webView.configuration.allowsPictureInPictureMediaPlayback = newInAppWebViewOptions.allowsPictureInPictureMediaPlayback
             }
         }
         
-        if newOptionsMap["javaScriptCanOpenWindowsAutomatically"] != nil && browserOptions?.javaScriptCanOpenWindowsAutomatically != newOptions.javaScriptCanOpenWindowsAutomatically {
-            self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = newOptions.javaScriptCanOpenWindowsAutomatically
+        if newOptionsMap["javaScriptCanOpenWindowsAutomatically"] != nil && webViewOptions?.javaScriptCanOpenWindowsAutomatically != newInAppWebViewOptions.javaScriptCanOpenWindowsAutomatically {
+            self.webView.configuration.preferences.javaScriptCanOpenWindowsAutomatically = newInAppWebViewOptions.javaScriptCanOpenWindowsAutomatically
         }
         
-        if newOptionsMap["javaScriptEnabled"] != nil && browserOptions?.javaScriptEnabled != newOptions.javaScriptEnabled {
-            self.webView.configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
+        if newOptionsMap["javaScriptEnabled"] != nil && webViewOptions?.javaScriptEnabled != newInAppWebViewOptions.javaScriptEnabled {
+            self.webView.configuration.preferences.javaScriptEnabled = newInAppWebViewOptions.javaScriptEnabled
         }
 
-        if newOptionsMap["userAgent"] != nil && browserOptions?.userAgent != newOptions.userAgent && (newOptions.userAgent != "") {
+        if newOptionsMap["userAgent"] != nil && webViewOptions?.userAgent != newInAppWebViewOptions.userAgent && (newInAppWebViewOptions.userAgent != "") {
             if #available(iOS 9.0, *) {
-                self.webView.customUserAgent = newOptions.userAgent
+                self.webView.customUserAgent = newInAppWebViewOptions.userAgent
             }
         }
 
-        if newOptionsMap["clearCache"] != nil && newOptions.clearCache {
+        if newOptionsMap["clearCache"] != nil && newInAppWebViewOptions.clearCache {
             clearCache()
         }
         
         self.browserOptions = newOptions
+        self.webViewOptions = newInAppWebViewOptions
     }
     
     func getOptions() -> [String: Any]? {
-        return (self.browserOptions != nil) ? self.browserOptions?.getHashMap() : nil
+        if (self.browserOptions == nil || self.webViewOptions == nil) {
+            return nil
+        }
+        var optionsMap = self.browserOptions!.getHashMap()
+        optionsMap.merge(self.webViewOptions!.getHashMap(), uniquingKeysWith: { (current, _) in current })
+        return optionsMap
+    }
+    
+    override func observeValue(forKeyPath keyPath: String?, of object: Any?,
+                               change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
+        if keyPath == "estimatedProgress" {
+            let progress = Int(webView.estimatedProgress * 100)
+            self.navigationDelegate?.onProgressChanged(uuid: self.uuid, webView: self.webView, progress: progress)
+        }
     }
 }

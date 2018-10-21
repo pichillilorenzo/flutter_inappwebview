@@ -1,65 +1,82 @@
-package com.pichillilorenzo.flutter_inappbrowser;
+package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 
+import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
+import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
+import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
+
 import java.util.HashMap;
 import java.util.Map;
 
-public class InAppBrowserWebChromeClient extends WebChromeClient {
+import io.flutter.plugin.common.MethodChannel;
+
+public class InAppWebChromeClient extends WebChromeClient {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
-  private WebViewActivity activity;
+  private FlutterWebView flutterWebView;
+  private InAppBrowserActivity inAppBrowserActivity;
   private ValueCallback<Uri[]> mUploadMessageArray;
   private ValueCallback<Uri> mUploadMessage;
   private final static int FILECHOOSER_RESULTCODE = 1;
 
-  public InAppBrowserWebChromeClient(WebViewActivity activity) {
+  public InAppWebChromeClient(Object obj) {
     super();
-    this.activity = activity;
+    if (obj instanceof InAppBrowserActivity)
+      this.inAppBrowserActivity = (InAppBrowserActivity) obj;
+    else if (obj instanceof FlutterWebView)
+      this.flutterWebView = (FlutterWebView) obj;
   }
 
   @Override
   public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", activity.uuid);
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("sourceURL", consoleMessage.sourceId());
     obj.put("lineNumber", consoleMessage.lineNumber());
     obj.put("message", consoleMessage.message());
     obj.put("messageLevel", consoleMessage.messageLevel().toString());
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onConsoleMessage", obj);
+    getChannel().invokeMethod("onConsoleMessage", obj);
     return true;
   }
 
   @Override
   public void onProgressChanged(WebView view, int progress) {
-    if (activity.progressBar != null) {
-      activity.progressBar.setVisibility(View.VISIBLE);
+    if (inAppBrowserActivity != null && inAppBrowserActivity.progressBar != null) {
+      inAppBrowserActivity.progressBar.setVisibility(View.VISIBLE);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        activity.progressBar.setProgress(progress, true);
+        inAppBrowserActivity.progressBar.setProgress(progress, true);
       } else {
-        activity.progressBar.setProgress(progress);
+        inAppBrowserActivity.progressBar.setProgress(progress);
       }
       if (progress == 100) {
-        activity.progressBar.setVisibility(View.GONE);
+        inAppBrowserActivity.progressBar.setVisibility(View.GONE);
       }
     }
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("progress", progress);
+    getChannel().invokeMethod("onProgressChanged", obj);
+
     super.onProgressChanged(view, progress);
   }
 
   @Override
   public void onReceivedTitle(WebView view, String title) {
     super.onReceivedTitle(view, title);
-    if (activity.actionBar != null && activity.options.toolbarTopFixedTitle.isEmpty())
-      activity.actionBar.setTitle(title);
+    if (inAppBrowserActivity != null && inAppBrowserActivity.actionBar != null && inAppBrowserActivity.options.toolbarTopFixedTitle.isEmpty())
+      inAppBrowserActivity.actionBar.setTitle(title);
   }
 
   @Override
@@ -76,7 +93,7 @@ public class InAppBrowserWebChromeClient extends WebChromeClient {
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("image/*");
-    activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
 
   }
 
@@ -86,7 +103,7 @@ public class InAppBrowserWebChromeClient extends WebChromeClient {
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("*/*");
-    activity.startActivityForResult(
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(
             Intent.createChooser(i, "File Browser"),
             FILECHOOSER_RESULTCODE);
   }
@@ -97,7 +114,7 @@ public class InAppBrowserWebChromeClient extends WebChromeClient {
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("image/*");
-    activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
 
   }
 
@@ -120,7 +137,11 @@ public class InAppBrowserWebChromeClient extends WebChromeClient {
     chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
     chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
     chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-    activity.startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
+    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
     return true;
+  }
+
+  private MethodChannel getChannel() {
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
   }
 }

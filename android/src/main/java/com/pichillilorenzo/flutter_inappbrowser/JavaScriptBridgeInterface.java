@@ -5,25 +5,36 @@ import android.webkit.JavascriptInterface;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.plugin.common.MethodChannel;
+
 public class JavaScriptBridgeInterface {
   private static final String LOG_TAG = "JSBridgeInterface";
-  static final String name = "flutter_inappbrowser";
-  WebViewActivity activity;
+  public static final String name = "flutter_inappbrowser";
+  private FlutterWebView flutterWebView;
+  private InAppBrowserActivity inAppBrowserActivity;
 
-  static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function(handlerName, ...args) {" +
+  public static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function(handlerName, ...args) {" +
     "window." + name + "._callHandler(handlerName, JSON.stringify(args));" +
   "}";
 
-  JavaScriptBridgeInterface(WebViewActivity a) {
-    activity = a;
+  public JavaScriptBridgeInterface(Object obj) {
+    if (obj instanceof InAppBrowserActivity)
+      this.inAppBrowserActivity = (InAppBrowserActivity) obj;
+    else if (obj instanceof FlutterWebView)
+      this.flutterWebView = (FlutterWebView) obj;
   }
 
   @JavascriptInterface
   public void _callHandler(String handlerName, String args) {
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", activity.uuid);
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("handlerName", handlerName);
     obj.put("args", args);
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onCallJsHandler", obj);
+    getChannel().invokeMethod("onCallJsHandler", obj);
+  }
+
+  private MethodChannel getChannel() {
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
   }
 }

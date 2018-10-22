@@ -29,10 +29,10 @@ First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](ht
 
 ## Usage
 Classes:
-- [InAppWebView](#inappwebview): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. [**Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment].
-- [InAppBrowser](#inappbrowser): In-App Browser using native WebView.
-- [ChromeSafariBrowser](#chromesafaribrowser): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
-- [InAppLocalhostServer](#inapplocalhostserver): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. [**Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment].
+- [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
+- [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
+- [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
 
 ### `InAppWebView` class
 Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.

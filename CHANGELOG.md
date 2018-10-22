@@ -1,3 +1,7 @@
+## 0.5.1
+
+- updated README.md
+
 ## 0.5.0
 
 - added initial support for Inline WebViews using the `InAppWebView` widget

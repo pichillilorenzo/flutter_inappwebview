@@ -42,7 +42,8 @@ So, if you want use it, you can but you will have some limitation such as the in
 
 **Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment.
 
-Example
+Use `InAppWebViewController` to control the WebView instance.
+Example:
 ```dart
 import 'dart:async';
 import 'package:flutter/material.dart';
@@ -295,7 +296,7 @@ InAppWebView(
 ```
 
 
-#### Future\<void\> InAppWebView.loadUrl
+#### Future\<void\> InAppWebViewController.loadUrl
 
 Loads the given `url` with optional `headers` specified as a map from name to value.
 
@@ -303,7 +304,7 @@ Loads the given `url` with optional `headers` specified as a map from name to va
 inAppWebViewController.loadUrl(String url, {Map<String, String> headers = const {}});
 ```
 
-#### Future\<void\> InAppWebView.loadFile
+#### Future\<void\> InAppWebViewController.loadFile
 
 Loads the given `assetFilePath` with optional `headers` specified as a map from name to value.
 
@@ -339,7 +340,7 @@ inAppWebViewController.loadFile("assets/index.html");
 inAppWebViewController.loadFile(String assetFilePath, {Map<String, String> headers = const {}});
 ```
 
-#### Future\<void\> InAppWebView.reload
+#### Future\<void\> InAppWebViewController.reload
 
 Reloads the `InAppWebView` window.
 
@@ -347,7 +348,7 @@ Reloads the `InAppWebView` window.
 inAppWebViewController.reload();
 ```
 
-#### Future\<void\> InAppWebView.goBack
+#### Future\<void\> InAppWebViewController.goBack
 
 Goes back in the history of the `InAppWebView` window.
 
@@ -355,7 +356,7 @@ Goes back in the history of the `InAppWebView` window.
 inAppWebViewController.goBack();
 ```
 
-#### Future\<bool\> InAppWebView.canGoBack
+#### Future\<bool\> InAppWebViewController.canGoBack
 
 Returns a Boolean value indicating whether the `InAppWebView` can move backward.
 
@@ -363,7 +364,7 @@ Returns a Boolean value indicating whether the `InAppWebView` can move backward.
 inAppWebViewController.canGoBack();
 ```
 
-#### Future\<void\> InAppWebView.goForward
+#### Future\<void\> InAppWebViewController.goForward
 
 Goes forward in the history of the `InAppWebView` window.
 
@@ -371,7 +372,7 @@ Goes forward in the history of the `InAppWebView` window.
 inAppWebViewController.goForward();
 ```
 
-#### Future\<bool\> InAppWebView.canGoForward
+#### Future\<bool\> InAppWebViewController.canGoForward
 
 Returns a Boolean value indicating whether the `InAppWebView` can move forward.
 
@@ -379,7 +380,7 @@ Returns a Boolean value indicating whether the `InAppWebView` can move forward.
 inAppWebViewController.canGoForward();
 ```
 
-#### Future\<bool\> InAppWebView.isLoading
+#### Future\<bool\> InAppWebViewController.isLoading
 
 Check if the Web View of the `InAppWebView` instance is in a loading state.
 
@@ -387,7 +388,7 @@ Check if the Web View of the `InAppWebView` instance is in a loading state.
 inAppWebViewController.isLoading();
 ```
 
-#### Future\<void\> InAppWebView.stopLoading
+#### Future\<void\> InAppWebViewController.stopLoading
 
 Stops the Web View of the `InAppWebView` instance from loading.
 
@@ -395,7 +396,7 @@ Stops the Web View of the `InAppWebView` instance from loading.
 inAppWebViewController.stopLoading();
 ```
 
-#### Future\<String\> InAppWebView.injectScriptCode
+#### Future\<String\> InAppWebViewController.injectScriptCode
 
 Injects JavaScript code into the `InAppWebView` window and returns the result of the evaluation.
 
@@ -403,7 +404,7 @@ Injects JavaScript code into the `InAppWebView` window and returns the result of
 inAppWebViewController.injectScriptCode(String source);
 ```
 
-#### Future\<void\> InAppWebView.injectScriptFile
+#### Future\<void\> InAppWebViewController.injectScriptFile
 
 Injects a JavaScript file into the `InAppWebView` window.
 
@@ -411,7 +412,7 @@ Injects a JavaScript file into the `InAppWebView` window.
 inAppWebViewController.injectScriptFile(String urlFile);
 ```
 
-#### Future\<void\> InAppWebView.injectStyleCode
+#### Future\<void\> InAppWebViewController.injectStyleCode
 
 Injects CSS into the `InAppWebView` window.
 
@@ -419,7 +420,7 @@ Injects CSS into the `InAppWebView` window.
 inAppWebViewController.injectStyleCode(String source);
 ```
 
-#### Future\<void\> InAppWebView.injectStyleFile
+#### Future\<void\> InAppWebViewController.injectStyleFile
 
 Injects a CSS file into the `InAppWebView` window.
 
@@ -427,7 +428,7 @@ Injects a CSS file into the `InAppWebView` window.
 inAppWebViewController.injectStyleFile(String urlFile);
 ```
 
-#### int InAppWebView.addJavaScriptHandler
+#### int InAppWebViewController.addJavaScriptHandler
 
 Adds/Appends a JavaScript message handler `callback` (`JavaScriptHandlerCallback`) that listen to post messages sent from JavaScript by the handler with name `handlerName`.
 Returns the position `index` of the handler that can be used to remove it with the `removeJavaScriptHandler()` method.
@@ -442,7 +443,7 @@ The `args` will be stringified automatically using `JSON.stringify(args)` method
 inAppWebViewController.addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback);
 ```
 
-#### bool InAppWebView.removeJavaScriptHandler
+#### bool InAppWebViewController.removeJavaScriptHandler
 
 Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` method in the `handlerName` list by its position `index`.
 Returns `true` if the callback is removed, otherwise `false`.
@@ -450,7 +451,7 @@ Returns `true` if the callback is removed, otherwise `false`.
 inAppWebViewController.removeJavaScriptHandler(String handlerName, int index);
 ```
 
-#### Future\<Uint8List\> InAppWebView.takeScreenshot
+#### Future\<Uint8List\> InAppWebViewController.takeScreenshot
 
 Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
 
@@ -459,14 +460,14 @@ Takes a screenshot (in PNG format) of the WebView's visible viewport and returns
 inAppWebViewController.takeScreenshot();
 ```
 
-#### Future\<void\> InAppWebView.setOptions
+#### Future\<void\> InAppWebViewController.setOptions
 
 Sets the `InAppWebView` options with the new `options` and evaluates them.
 ```dart
 inAppWebViewController.setOptions(Map<String, dynamic> options);
 ```
 
-#### Future\<Map\<String, dynamic\>\> InAppWebView.getOptions
+#### Future\<Map\<String, dynamic\>\> InAppWebViewController.getOptions
 
 Gets the current `InAppWebView` options. Returns `null` if the options are not setted yet.
 ```dart

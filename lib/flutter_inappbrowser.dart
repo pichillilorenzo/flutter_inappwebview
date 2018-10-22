@@ -504,7 +504,7 @@ typedef void onWebViewLoadResourceCallback(InAppWebViewController controller, We
 ///  - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [InAppWebView.shouldOverrideUrlLoading()] event. The default value is `false`.
 ///  - __useOnLoadResource__: Set to `true` to be able to listen at the [InAppWebView.onLoadResource()] event. The default value is `false`.
 ///  - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
-///  - __userAgent__: Set the custom WebView's user-agent.
+///  - __userAgent___: Set the custom WebView's user-agent.
 ///  - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
 ///  - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
 ///  - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
@@ -643,9 +643,9 @@ class _InAppWebViewState extends State<InAppWebView> {
   }
 }
 
-/// Controls an [InAppWebView].
+/// Controls an [InAppWebView] widget instance.
 ///
-/// A [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
+/// An [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
 /// callback for an [InAppWebView] widget.
 class InAppWebViewController {
 

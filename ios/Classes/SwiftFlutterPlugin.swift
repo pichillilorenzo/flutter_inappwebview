@@ -68,6 +68,12 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "loadUrl":
                 self.loadUrl(uuid: uuid, arguments: arguments!, result: result)
                 break
+            case "loadData":
+                self.loadData(uuid: uuid, arguments: arguments!, result: result)
+                break
+            case "postUrl":
+                self.postUrl(uuid: uuid, arguments: arguments!, result: result)
+                break
             case "loadFile":
                 self.loadFile(uuid: uuid, arguments: arguments!, result: result)
                 break
@@ -384,8 +390,32 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+            return
         }
         result(true)
+    }
+    
+    public func loadData(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
+        let data = (arguments["data"] as? String)!
+        let mimeType = (arguments["mimeType"] as? String)!
+        let encoding = (arguments["encoding"] as? String)!
+        let baseUrl = (arguments["baseUrl"] as? String)!
+        webViewController.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+        result(true)
+    }
+    
+    public func postUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
+        if let url = arguments["url"] as? String {
+            let postData = (arguments["postData"] as? FlutterStandardTypedData)!
+            let absoluteUrl = URL(string: url)!.absoluteURL
+            webViewController.postUrl(url: absoluteUrl, postData: postData.data, result: result)
+        }
+        else {
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+            return
+        }
     }
     
     public func loadFile(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
@@ -404,6 +434,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+            return
         }
         result(true)
     }
@@ -458,6 +489,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     func open(inSystem url: URL, result: @escaping FlutterResult) {
         if !UIApplication.shared.canOpenURL(url) {
             result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url.absoluteString + " cannot be opened!", details: nil))
+            return
         }
         else {
             if #available(iOS 10.0, *) {

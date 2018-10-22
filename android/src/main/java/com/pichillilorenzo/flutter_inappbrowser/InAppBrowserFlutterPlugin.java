@@ -137,8 +137,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
               if (openWithSystemBrowser) {
                 Log.d(LOG_TAG, "in system");
                 openExternal(url, result);
-              }
-              else {
+              } else {
                 //Load the dialer
                 if (url.startsWith(WebView.SCHEME_TEL)) {
                   try {
@@ -162,6 +161,18 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         break;
       case "loadUrl":
         loadUrl(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+        break;
+      case "postUrl":
+        postUrl(uuid, call.argument("url").toString(), (byte[]) call.argument("postData"), result);
+        break;
+      case "loadData":
+        {
+          String data = call.argument("data").toString();
+          String mimeType = call.argument("mimeType").toString();
+          String encoding = call.argument("encoding").toString();
+          String baseUrl = call.argument("baseUrl").toString();
+          loadData(uuid, data, mimeType, encoding, baseUrl, result);
+        }
         break;
       case "loadFile":
         loadFile(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
@@ -391,6 +402,18 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       else
         inAppBrowserActivity.loadUrl(url, result);
     }
+  }
+
+  public void postUrl(String uuid, String url, byte[] postData, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.postUrl(url, postData, result);
+  }
+
+  public void loadData(String uuid, String data, String mimeType, String encoding, String baseUrl, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.loadData(data, mimeType, encoding, baseUrl, result);
   }
 
   public void loadFile(String uuid, String url, Map<String, String> headers, Result result) {

@@ -295,13 +295,30 @@ InAppWebView(
 }
 ```
 
-
 #### Future\<void\> InAppWebViewController.loadUrl
 
 Loads the given `url` with optional `headers` specified as a map from name to value.
 
 ```dart
 inAppWebViewController.loadUrl(String url, {Map<String, String> headers = const {}});
+```
+
+#### Future\<void\> InAppWebViewController.postUrl
+
+Loads the given `url` with `postData` using `POST` method into this WebView.
+
+```dart
+inAppWebViewController.postUrl(String url, Uint8List postData);
+```
+
+#### Future\<void\> InAppWebViewController.loadData
+
+Loads the given `data` into this WebView, using `baseUrl` as the base URL for the content.
+The `mimeType` parameter specifies the format of the data.
+The `encoding` parameter specifies the encoding of the data.
+
+```dart
+inAppWebViewController.loadData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank"});
 ```
 
 #### Future\<void\> InAppWebViewController.loadFile

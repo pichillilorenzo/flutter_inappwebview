@@ -180,6 +180,22 @@ public class InAppBrowserActivity extends AppCompatActivity {
     }
   }
 
+  public void postUrl(String url, byte[] postData, MethodChannel.Result result) {
+    if (webView != null) {
+      webView.postUrl(url, postData, result);
+    } else {
+      result.error(LOG_TAG, "Cannot load url " + url, null);
+    }
+  }
+
+  public void loadData(String data, String mimeType, String encoding, String baseUrl, MethodChannel.Result result) {
+    if (webView != null) {
+      webView.loadData(data, mimeType, encoding, baseUrl, result);
+    } else {
+      result.error(LOG_TAG, "Cannot load data", null);
+    }
+  }
+
   public void loadFile(String url, MethodChannel.Result result) {
     if (webView != null) {
       webView.loadFile(url, result);

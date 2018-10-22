@@ -1,5 +1,5 @@
 import 'dart:async';
-import 'dart:convert' show base64;
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
@@ -7,9 +7,9 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future onLoadStart(String url) async {
     print("\n\nStarted $url\n\n");
-    print("\n\n ${await this.isHidden()} \n\n");
-    print(await this.webViewController.canGoBack());
-    print(await this.webViewController.canGoForward());
+//    print("\n\n ${await this.isHidden()} \n\n");
+//    print(await this.webViewController.canGoBack());
+//    print(await this.webViewController.canGoForward());
   }
 
   @override
@@ -105,7 +105,7 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   void onProgressChanged(int progress) {
-    print("Progress: $progress");
+//    print("Progress: $progress");
   }
 
   @override
@@ -117,6 +117,47 @@ class MyInAppBrowser extends InAppBrowser {
   void shouldOverrideUrlLoading(String url) {
     print("\n\n override $url\n\n");
     this.webViewController.loadUrl(url);
+    
+//    var postData = "username=my_username&password=my_password";
+//    inAppBrowserFallback.webViewController.postUrl("http://localhost:8080", utf8.encode(postData));
+    
+//    var htmlData = """
+//<!doctype html>
+//<html lang="en">
+//<head>
+//    <meta charset="UTF-8">
+//    <meta name="viewport"
+//          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+//    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+//    <title>Document</title>
+//    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css">
+//    <link rel="stylesheet" href="http://localhost:8080/assets/css/style.css">
+//    <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
+//</head>
+//<body>
+//<div class="container">
+//    <div class="container">
+//        <img src="http://localhost:8080/assets/images/dart.svg" alt="dart logo">
+//        <div class="row">
+//            <div class="col-sm">
+//                One of three columns
+//            </div>
+//            <div class="col-sm">
+//                One of three columns
+//            </div>
+//            <div class="col-sm">
+//                One of three columns
+//            </div>
+//        </div>
+//    </div>
+//    <script>
+//        console.log("hello");
+//    </script>
+//</div>
+//</body>
+//</html>
+//    """;
+//    inAppBrowserFallback.webViewController.loadData(htmlData);
   }
 
   @override
@@ -231,10 +272,10 @@ class _MyAppState extends State<MyApp> {
 //              });
 //
               await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
-                "useOnLoadResource": true,
+                //"useOnLoadResource": true,
                 //"hidden": true,
                 //"toolbarTopFixedTitle": "Fixed title",
-                //"useShouldOverrideUrlLoading": true
+                "useShouldOverrideUrlLoading": true
                 //"hideUrlBar": true,
                 //"toolbarTop": false,
                 //"toolbarBottom": false

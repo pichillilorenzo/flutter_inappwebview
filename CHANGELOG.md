@@ -1,3 +1,9 @@
+## 0.5.2
+
+- fixed some missing `result.success()` on Android and iOS
+- added `postUrl()` method for `InAppWebView` and `InAppBrowser`
+- added `loadData()` method for `InAppWebView` and `InAppBrowser`
+
 ## 0.5.1
 
 - updated README.md

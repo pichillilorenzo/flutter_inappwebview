@@ -378,6 +378,34 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         webView.load(request)
     }
     
+    func loadData(data: String, mimeType: String, encoding: String, baseUrl: String) {
+        let url = URL(string: baseUrl)!
+        currentURL = url
+        if #available(iOS 9.0, *) {
+            webView.load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: url)
+        } else {
+            webView.loadHTMLString(data, baseURL: url)
+        }
+    }
+    
+    func postUrl(url: URL, postData: Data, result: @escaping FlutterResult) {
+        var request = URLRequest(url: url)
+        request.httpMethod = "POST"
+        request.httpBody = postData
+        
+        let task = URLSession.shared.dataTask(with: request) { (data : Data?, response : URLResponse?, error : Error?) in
+            var returnString = ""
+            if data != nil {
+                returnString = String(data: data!, encoding: .utf8) ?? ""
+            }
+            DispatchQueue.main.async(execute: {() -> Void in
+                self.webView.loadHTMLString(returnString, baseURL: url)
+                result(true)
+            })
+        }
+        task.resume()
+    }
+    
     // Load user requested url
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()

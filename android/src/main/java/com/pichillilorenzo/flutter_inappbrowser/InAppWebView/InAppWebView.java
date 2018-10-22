@@ -183,7 +183,9 @@ public class InAppWebView extends WebView {
       loadUrl(url);
     } else {
       result.error(LOG_TAG, "url is empty", null);
+      return;
     }
+    result.success(true);
   }
 
   public void loadUrl(String url, Map<String, String> headers, MethodChannel.Result result) {
@@ -191,7 +193,24 @@ public class InAppWebView extends WebView {
       loadUrl(url, headers);
     } else {
       result.error(LOG_TAG, "url is empty", null);
+      return;
     }
+    result.success(true);
+  }
+
+  public void postUrl(String url, byte[] postData, MethodChannel.Result result) {
+    if (!url.isEmpty()) {
+      postUrl(url, postData);
+    } else {
+      result.error(LOG_TAG, "url is empty", null);
+      return;
+    }
+    result.success(true);
+  }
+
+  public void loadData(String data, String mimeType, String encoding, String baseUrl, MethodChannel.Result result) {
+    loadDataWithBaseURL(baseUrl, data, mimeType, encoding, null);
+    result.success(true);
   }
 
   public void loadFile(String url, MethodChannel.Result result) {
@@ -206,7 +225,9 @@ public class InAppWebView extends WebView {
       loadUrl(url);
     } else {
       result.error(LOG_TAG, "url is empty", null);
+      return;
     }
+    result.success(true);
   }
 
   public void loadFile(String url, Map<String, String> headers, MethodChannel.Result result) {
@@ -221,7 +242,9 @@ public class InAppWebView extends WebView {
       loadUrl(url, headers);
     } else {
       result.error(LOG_TAG, "url is empty", null);
+      return;
     }
+    result.success(true);
   }
 
   public boolean isLoading() {

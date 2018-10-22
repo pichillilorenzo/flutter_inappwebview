@@ -189,7 +189,7 @@ class InAppBrowser {
   ///    - __allowsPictureInPictureMediaPlayback__: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
   ///    - __spinner__: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
   Future<void> open({String url = "about:blank", Map<String, String> headers = const {}, Map<String, dynamic> options = const {}}) async {
-    assert(url != null);
+    assert(url != null && url.isNotEmpty);
     this._throwIsAlreadyOpened(message: 'Cannot open $url!');
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -233,7 +233,7 @@ class InAppBrowser {
   ///...
   ///```
   Future<void> openFile(String assetFilePath, {Map<String, String> headers = const {}, Map<String, dynamic> options = const {}}) async {
-    assert(assetFilePath != null);
+    assert(assetFilePath != null && assetFilePath.isNotEmpty);
     this._throwIsAlreadyOpened(message: 'Cannot open $assetFilePath!');
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -249,7 +249,7 @@ class InAppBrowser {
 
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [InAppBrowser] methods here!
   static Future<void> openWithSystemBrowser(String url) async {
-    assert(url != null);
+    assert(url != null && url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => "");
     args.putIfAbsent('url', () => url);
@@ -441,7 +441,7 @@ class ChromeSafariBrowser {
   ///- __presentationStyle__: Set the custom modal presentation style when presenting the WebView. The default value is `0 //fullscreen`. See [UIModalPresentationStyle](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) for all the available styles.
   ///- __transitionStyle__: Set to the custom transition style when presenting the WebView. The default value is `0 //crossDissolve`. See [UIModalTransitionStyle](https://developer.apple.com/documentation/uikit/uimodaltransitionStyle) for all the available styles.
   Future<void> open(String url, {Map<String, dynamic> options = const {}, Map<String, String> headersFallback = const {}, Map<String, dynamic> optionsFallback = const {}}) async {
-    assert(url != null);
+    assert(url != null && url.isNotEmpty);
     this._throwIsAlreadyOpened(message: 'Cannot open $url!');
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -768,7 +768,7 @@ class InAppWebViewController {
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
   Future<void> loadUrl(String url, {Map<String, String> headers = const {}}) async {
-    assert(url != null);
+    assert(url != null && url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null) {
       _inAppBrowser._throwIsNotOpened(message: 'Cannot laod $url!');
@@ -777,6 +777,37 @@ class InAppWebViewController {
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
     await _channel.invokeMethod('loadUrl', args);
+  }
+
+  ///Loads the given [url] with [postData] using `POST` method into this WebView.
+  Future<void> postUrl(String url, Uint8List postData) async {
+    assert(url != null && url.isNotEmpty);
+    assert(postData != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened(message: 'Cannot laod $url!');
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('postData', () => postData);
+    await _channel.invokeMethod('postUrl', args);
+  }
+
+  ///Loads the given [data] into this WebView, using [baseUrl] as the base URL for the content.
+  ///The [mimeType] parameter specifies the format of the data.
+  ///The [encoding] parameter specifies the encoding of the data.
+  Future<void> loadData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank"}) async {
+    assert(data != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('data', () => data);
+    args.putIfAbsent('mimeType', () => mimeType);
+    args.putIfAbsent('encoding', () => encoding);
+    args.putIfAbsent('baseUrl', () => baseUrl);
+    await _channel.invokeMethod('loadData', args);
   }
 
   ///Loads the given [assetFilePath] with optional [headers] specified as a map from name to value.
@@ -809,7 +840,7 @@ class InAppWebViewController {
   ///...
   ///```
   Future<void> loadFile(String assetFilePath, {Map<String, String> headers = const {}}) async {
-    assert(assetFilePath != null);
+    assert(assetFilePath != null && assetFilePath.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null) {
       _inAppBrowser._throwIsNotOpened(message: 'Cannot laod $assetFilePath!');
@@ -1063,8 +1094,6 @@ class InAppLocalhostServer {
               contentType = mimeType.split('/');
             }
           }
-
-          print(contentType);
 
           request.response.headers.contentType = new ContentType(contentType[0], contentType[1], charset: 'utf-8');
           request.response.add(body);

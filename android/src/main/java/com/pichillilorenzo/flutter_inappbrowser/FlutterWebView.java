@@ -83,6 +83,25 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         else
           result.success(false);
         break;
+      case "postUrl":
+        if (webView != null)
+          webView.postUrl(call.argument("url").toString(), (byte[]) call.argument("postData"), result);
+        else
+          result.success(false);
+        break;
+      case "loadData":
+        {
+          String data = call.argument("data").toString();
+          String mimeType = call.argument("mimeType").toString();
+          String encoding = call.argument("encoding").toString();
+          String baseUrl = call.argument("baseUrl").toString();
+
+          if (webView != null)
+            webView.loadData(data, mimeType, encoding, baseUrl, result);
+          else
+            result.success(false);
+        }
+        break;
       case "loadFile":
         if (webView != null)
           webView.loadFile(call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);

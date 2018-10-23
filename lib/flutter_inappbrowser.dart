@@ -86,7 +86,7 @@ class ConsoleMessage {
 
 class _ChannelManager {
   static const MethodChannel channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
-  static final initialized = false;
+  static bool initialized = false;
   static final listeners = HashMap<String, ListenerCallback>();
 
   static Future<dynamic> _handleMethod(MethodCall call) async {
@@ -102,6 +102,7 @@ class _ChannelManager {
 
   static void init () {
     channel.setMethodCallHandler(_handleMethod);
+    initialized = true;
   }
 }
 
@@ -1116,4 +1117,44 @@ class InAppLocalhostServer {
     }
   }
 
+}
+
+class CookieManager {
+  static bool _initialized = false;
+  static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser_cookiemanager');
+
+  static void _init () {
+    _channel.setMethodCallHandler(_handleMethod);
+    _initialized = true;
+  }
+
+  static Future<dynamic> _handleMethod(MethodCall call) async {
+  }
+
+  static Future<void> setCookie(String url, String name, String value, String domain,
+      { String path = "/",
+        int expiresDate,
+        bool isHTTPOnly,
+        bool isSecure }) async {
+    if (!_initialized)
+      _init();
+
+    assert(url != null && url.isNotEmpty);
+    assert(name != null && name.isNotEmpty);
+    assert(value != null && value.isNotEmpty);
+    assert(domain != null && domain.isNotEmpty);
+    assert(path != null && path.isNotEmpty);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('name', () => name);
+    args.putIfAbsent('value', () => value);
+    args.putIfAbsent('domain', () => domain);
+    args.putIfAbsent('path', () => path);
+    args.putIfAbsent('expiresDate', () => expiresDate);
+    args.putIfAbsent('isHTTPOnly', () => isHTTPOnly);
+    args.putIfAbsent('isSecure', () => isSecure);
+
+    await _channel.invokeMethod('setCookie', args);
+  }
 }

@@ -65,7 +65,7 @@ class MyInAppBrowser extends InAppBrowser {
 //    await this.webViewController.injectScriptCode("console.error('testError', false);");
 //    await this.webViewController.injectScriptCode("console.debug('testDebug', true);");
 //
-//    print(await this.webViewController.injectScriptCode("document.body.innerHTML"));
+    print(await this.webViewController.injectScriptCode("document.cookie"));
 //
 //    print(await this.webViewController.injectScriptCode("null"));
 //    print(await this.webViewController.injectScriptCode("undefined"));
@@ -271,6 +271,7 @@ class _MyAppState extends State<MyApp> {
 //                //"toolbarBottom": false
 //              });
 //
+              await CookieManager.setCookie("https://flutter.io/", "my_cookie2", "cookieValue2", "flutter.io", expiresDate: 1000000, path: "/get-started/install");
               await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
                 //"useOnLoadResource": true,
                 //"hidden": true,

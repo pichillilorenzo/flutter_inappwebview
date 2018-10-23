@@ -39,6 +39,8 @@ import com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs.CustomTabActivi
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -77,6 +79,8 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
     final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
     channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar, activity));
+
+    new MyCookieManager(registrar);
 
     registrar
       .platformViewRegistry()

@@ -1,3 +1,7 @@
+## 0.5.3
+
+- added `CookieManager` class
+
 ## 0.5.2
 
 - fixed some missing `result.success()` on Android and iOS

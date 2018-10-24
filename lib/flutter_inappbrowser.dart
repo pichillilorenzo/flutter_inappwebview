@@ -1119,6 +1119,7 @@ class InAppLocalhostServer {
 
 }
 
+///Manages the cookies used by an application's [InAppWebView] instances.
 class CookieManager {
   static bool _initialized = false;
   static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser_cookiemanager');
@@ -1131,6 +1132,7 @@ class CookieManager {
   static Future<dynamic> _handleMethod(MethodCall call) async {
   }
 
+  ///Sets a cookie for the given [url]. Any existing cookie with the same [host], [path] and [name] will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
   static Future<void> setCookie(String url, String name, String value, String domain,
       { String path = "/",
         int expiresDate,
@@ -1156,5 +1158,37 @@ class CookieManager {
     args.putIfAbsent('isSecure', () => isSecure);
 
     await _channel.invokeMethod('setCookie', args);
+  }
+
+  ///Gets all the cookies for the given [url].
+  static Future<List<Map<String, dynamic>>> getCookies(String url) async {
+    assert(url != null && url.isNotEmpty);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    List<dynamic> cookies = await _channel.invokeMethod('getCookies', args);
+    cookies = cookies.cast<Map<dynamic, dynamic>>();
+    for(var i = 0; i < cookies.length; i++) {
+      cookies[i] = cookies[i].cast<String, dynamic>();
+    }
+    cookies = cookies.cast<Map<String, dynamic>>();
+    return cookies;
+  }
+
+  ///Gets a cookie by its [cookieName] for the given [url].
+  static Future<Map<String, dynamic>> getCookie(String url, String cookieName) async {
+    assert(url != null && url.isNotEmpty);
+    assert(cookieName != null && cookieName.isNotEmpty);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    List<dynamic> cookies = await _channel.invokeMethod('getCookies', args);
+    cookies = cookies.cast<Map<dynamic, dynamic>>();
+    for(var i = 0; i < cookies.length; i++) {
+      cookies[i] = cookies[i].cast<String, dynamic>();
+      if (cookies[i]["name"] == cookieName)
+        return cookies[i];
+    }
+    return null;
   }
 }

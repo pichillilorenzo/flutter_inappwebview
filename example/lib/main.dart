@@ -66,6 +66,12 @@ class MyInAppBrowser extends InAppBrowser {
 //    await this.webViewController.injectScriptCode("console.debug('testDebug', true);");
 //
     print(await this.webViewController.injectScriptCode("document.cookie"));
+
+    print("");
+    print(await CookieManager.getCookies("https://flutter.io/"));
+    print("");
+    print(await CookieManager.getCookie("https://flutter.io/", "_ga"));
+    print("");
 //
 //    print(await this.webViewController.injectScriptCode("null"));
 //    print(await this.webViewController.injectScriptCode("undefined"));
@@ -281,6 +287,7 @@ class _MyAppState extends State<MyApp> {
                 //"toolbarTop": false,
                 //"toolbarBottom": false
               });
+
             },
             child: Text("Open InAppBrowser")
           ),

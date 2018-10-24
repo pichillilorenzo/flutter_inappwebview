@@ -1,15 +1,15 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.os.Build;
-import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
 
 import java.net.HttpCookie;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -44,6 +44,9 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
           MyCookieManager.setCookie(url, name, value, domain, path, expiresDate, isHTTPOnly, isSecure, result);
         }
         break;
+      case "getCookies":
+        result.success(MyCookieManager.getCookies((String) call.argument("url")));
+        break;
       default:
         result.notImplemented();
     }
@@ -70,9 +73,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     if (expiresDate != null)
       cookieValue += "; Max-Age=" + expiresDate.toString();
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-      if (isHTTPOnly != null && isHTTPOnly)
-        cookieValue += "; HttpOnly";
+    if (isHTTPOnly != null && isHTTPOnly)
+      cookieValue += "; HttpOnly";
 
     if (isSecure != null && isSecure)
       cookieValue += "; Secure";
@@ -91,6 +93,26 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieManager.setCookie(url, cookieValue);
       result.success(true);
     }
+  }
+
+  public static List<Map<String, Object>> getCookies(final String url) {
+
+    final List<Map<String, Object>> cookieListMap = new ArrayList<>();
+
+    CookieManager cookieManager = CookieManager.getInstance();
+
+    String[] cookies = cookieManager.getCookie(url).split(";");
+    for (String cookie : cookies) {
+      String[] nameValue = cookie.split("=", 2);
+      String name = nameValue[0].trim();
+      String value = nameValue[1].trim();
+      Map<String, Object> cookieMap = new HashMap<>();
+      cookieMap.put("name", name);
+      cookieMap.put("value", value);
+      cookieListMap.add(cookieMap);
+    }
+    return cookieListMap;
+
   }
 
 }

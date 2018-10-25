@@ -15,12 +15,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/MyCookieManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/MyCookieManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/android/build.gradle" beforeDir="false" afterPath="$PROJECT_DIR$/example/android/build.gradle" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -40,8 +36,8 @@
       <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="542">
-              <caret line="1178" column="47" selection-start-line="1178" selection-start-column="38" selection-end-line="1178" selection-end-column="47" />
+            <state relative-caret-position="269">
+              <caret line="1179" column="42" lean-forward="true" selection-start-line="1179" selection-start-column="42" selection-end-line="1179" selection-end-column="42" />
               <folding>
                 <element signature="e#814#831#0" expanded="true" />
               </folding>
@@ -152,7 +148,7 @@
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="2053" />
+    <option name="x" value="133" />
     <option name="y" value="23" />
     <option name="width" value="1787" />
     <option name="height" value="1057" />
@@ -349,8 +345,7 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="2053" y="23" width="1787" height="1057" extended-state="0" />
-    <editor active="true" />
+    <frame x="133" y="23" width="1787" height="1057" extended-state="0" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="TODO" order="6" />
@@ -664,8 +659,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="542">
-          <caret line="1178" column="47" selection-start-line="1178" selection-start-column="38" selection-end-line="1178" selection-end-column="47" />
+        <state relative-caret-position="269">
+          <caret line="1179" column="42" lean-forward="true" selection-start-line="1179" selection-start-column="42" selection-end-line="1179" selection-end-column="42" />
           <folding>
             <element signature="e#814#831#0" expanded="true" />
           </folding>

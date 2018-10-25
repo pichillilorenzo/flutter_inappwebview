@@ -3,13 +3,16 @@ package com.pichillilorenzo.flutter_inappbrowser;
 import android.os.Build;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 
-import java.net.HttpCookie;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -47,6 +50,16 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       case "getCookies":
         result.success(MyCookieManager.getCookies((String) call.argument("url")));
         break;
+      case "deleteCookie":
+        {
+          String url = (String) call.argument("url");
+          String name = (String) call.argument("name");
+          MyCookieManager.deleteCookie(url, name, result);
+        }
+        break;
+      case "deleteCookies":
+        MyCookieManager.deleteCookies(result);
+        break;
       default:
         result.notImplemented();
     }
@@ -71,7 +84,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieValue += "; Path=" + path;
 
     if (expiresDate != null)
-      cookieValue += "; Max-Age=" + expiresDate.toString();
+      cookieValue += "; Expires=" + getCookieExpirationDate(expiresDate);
 
     if (isHTTPOnly != null && isHTTPOnly)
       cookieValue += "; HttpOnly";
@@ -88,10 +101,15 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
           result.success(true);
         }
       });
+      cookieManager.flush();
     }
     else {
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+      cookieSyncMngr.startSync();
       cookieManager.setCookie(url, cookieValue);
       result.success(true);
+      cookieSyncMngr.stopSync();
+      cookieSyncMngr.sync();
     }
   }
 
@@ -113,6 +131,58 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     }
     return cookieListMap;
 
+  }
+
+  public static void deleteCookie(String url, String cookieName, final MethodChannel.Result result) {
+
+    String cookieValue = cookieName + "=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
+
+    CookieManager cookieManager = CookieManager.getInstance();
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean aBoolean) {
+          result.success(true);
+        }
+      });
+      cookieManager.flush();
+    }
+    else {
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+      cookieSyncMngr.startSync();
+      cookieManager.setCookie(url, cookieValue);
+      result.success(true);
+      cookieSyncMngr.stopSync();
+      cookieSyncMngr.sync();
+    }
+  }
+
+  public static void deleteCookies(final MethodChannel.Result result) {
+    CookieManager cookieManager = CookieManager.getInstance();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean aBoolean) {
+          result.success(true);
+        }
+      });
+      cookieManager.flush();
+    }
+    else {
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+      cookieSyncMngr.startSync();
+      cookieManager.removeAllCookie();
+      result.success(true);
+      cookieSyncMngr.stopSync();
+      cookieSyncMngr.sync();
+    }
+  }
+
+  public static String getCookieExpirationDate(Long timestamp) {
+    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss z");
+    sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
+    return sdf.format(new Date(timestamp));
   }
 
 }

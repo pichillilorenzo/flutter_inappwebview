@@ -1133,13 +1133,20 @@ class CookieManager {
   }
 
   ///Sets a cookie for the given [url]. Any existing cookie with the same [host], [path] and [name] will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
-  static Future<void> setCookie(String url, String name, String value, String domain,
-      { String path = "/",
+  ///
+  ///The default value of [path] is `"/"`.
+  ///If [domain] is `null`, its default value will be the domain name of [url].
+  static Future<void> setCookie(String url, String name, String value,
+      { String domain,
+        String path = "/",
         int expiresDate,
-        bool isHTTPOnly,
+        int maxAge,
         bool isSecure }) async {
     if (!_initialized)
       _init();
+
+    if (domain == null)
+      domain = _getDomainName(url);
 
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
@@ -1153,8 +1160,8 @@ class CookieManager {
     args.putIfAbsent('value', () => value);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
-    args.putIfAbsent('expiresDate', () => expiresDate);
-    args.putIfAbsent('isHTTPOnly', () => isHTTPOnly);
+    args.putIfAbsent('expiresDate', () => expiresDate.toString());
+    args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
 
     await _channel.invokeMethod('setCookie', args);
@@ -1175,10 +1182,10 @@ class CookieManager {
     return cookies;
   }
 
-  ///Gets a cookie by its [cookieName] for the given [url].
-  static Future<Map<String, dynamic>> getCookie(String url, String cookieName) async {
+  ///Gets a cookie by its [name] for the given [url].
+  static Future<Map<String, dynamic>> getCookie(String url, String name) async {
     assert(url != null && url.isNotEmpty);
-    assert(cookieName != null && cookieName.isNotEmpty);
+    assert(name != null && name.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
@@ -1186,9 +1193,63 @@ class CookieManager {
     cookies = cookies.cast<Map<dynamic, dynamic>>();
     for(var i = 0; i < cookies.length; i++) {
       cookies[i] = cookies[i].cast<String, dynamic>();
-      if (cookies[i]["name"] == cookieName)
+      if (cookies[i]["name"] == name)
         return cookies[i];
     }
     return null;
+  }
+
+  ///Removes a cookie by its [name] for the given [url], [domain] and [path].
+  ///The default value of [path] is `"/"`.
+  ///If [domain] is `null` or empty, its default value will be the domain name of [url].
+  static Future<void> deleteCookie(String url, String name, {String domain = "", String path = "/"}) async {
+
+    if (domain == null || domain.isEmpty)
+      domain = _getDomainName(url);
+
+    assert(url != null && url.isNotEmpty);
+    assert(name != null && name.isNotEmpty);
+    assert(domain != null && url.isNotEmpty);
+    assert(path != null && url.isNotEmpty);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('name', () => name);
+    args.putIfAbsent('domain', () => domain);
+    args.putIfAbsent('path', () => path);
+    await _channel.invokeMethod('deleteCookie', args);
+  }
+
+  ///Removes all cookies for the given [url], [domain] and [path].
+  ///The default value of [path] is `"/"`.
+  ///If [domain] is `null` or empty, its default value will be the domain name of [url].
+  static Future<void> deleteCookies(String url, {String domain = "", String path = "/"}) async {
+
+    if (domain == null || domain.isEmpty)
+      domain = _getDomainName(url);
+
+    assert(url != null && url.isNotEmpty);
+    assert(domain != null && url.isNotEmpty);
+    assert(path != null && url.isNotEmpty);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('domain', () => domain);
+    args.putIfAbsent('path', () => path);
+    await _channel.invokeMethod('deleteCookies', args);
+  }
+
+  ///Removes all cookies.
+  static Future<void> deleteAllCookies() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('deleteAllCookies', args);
+  }
+
+  static String _getDomainName(String url) {
+    Uri uri = Uri.parse(url);
+    String domain = uri.host;
+    if (domain == null)
+      return "";
+    return domain.startsWith("www.") ? domain.substring(4) : domain;
   }
 }

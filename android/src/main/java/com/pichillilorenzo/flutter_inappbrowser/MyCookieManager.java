@@ -6,6 +6,8 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,11 +26,13 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
 
   public static PluginRegistry.Registrar registrar;
   public static MethodChannel channel;
+  public static CookieManager cookieManager;
 
   public MyCookieManager(PluginRegistry.Registrar r) {
     registrar = r;
     channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser_cookiemanager");
     channel.setMethodCallHandler(this);
+    cookieManager = CookieManager.getInstance();
   }
 
   @Override
@@ -41,10 +45,10 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
           String value = (String) call.argument("value");
           String domain = (String) call.argument("domain");
           String path = (String) call.argument("path");
-          Long expiresDate = new Long((Integer) call.argument("expiresDate"));
-          Boolean isHTTPOnly = (Boolean) call.argument("isHTTPOnly");
+          Long expiresDate = new Long((String) call.argument("expiresDate"));
+          Integer maxAge = (Integer) call.argument("maxAge");
           Boolean isSecure = (Boolean) call.argument("isSecure");
-          MyCookieManager.setCookie(url, name, value, domain, path, expiresDate, isHTTPOnly, isSecure, result);
+          MyCookieManager.setCookie(url, name, value, domain, path, expiresDate, maxAge, isSecure, result);
         }
         break;
       case "getCookies":
@@ -54,11 +58,21 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
         {
           String url = (String) call.argument("url");
           String name = (String) call.argument("name");
-          MyCookieManager.deleteCookie(url, name, result);
+          String domain = (String) call.argument("domain");
+          String path = (String) call.argument("path");
+          MyCookieManager.deleteCookie(url, name, domain, path, result);
         }
         break;
       case "deleteCookies":
-        MyCookieManager.deleteCookies(result);
+        {
+          String url = (String) call.argument("url");
+          String domain = (String) call.argument("domain");
+          String path = (String) call.argument("path");
+          MyCookieManager.deleteCookies(url, domain, path, result);
+        }
+        break;
+      case "deleteAllCookies":
+        MyCookieManager.deleteAllCookies(result);
         break;
       default:
         result.notImplemented();
@@ -71,28 +85,22 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
                                String domain,
                                String path,
                                Long expiresDate,
-                               Boolean isHTTPOnly,
+                               Integer maxAge,
                                Boolean isSecure,
                                final MethodChannel.Result result) {
 
-    String cookieValue = name + "=" + value;
-
-    if (domain != null && !domain.isEmpty())
-      cookieValue += "; Domain=" + domain;
-
-    if (path != null && !path.isEmpty())
-      cookieValue += "; Path=" + path;
+    String cookieValue = name + "=" + value + "; Domain=" + domain + "; Path=" + path;
 
     if (expiresDate != null)
       cookieValue += "; Expires=" + getCookieExpirationDate(expiresDate);
 
-    if (isHTTPOnly != null && isHTTPOnly)
-      cookieValue += "; HttpOnly";
+    if (maxAge != null)
+      cookieValue += "; Max-Age=" + maxAge.toString();
 
     if (isSecure != null && isSecure)
       cookieValue += "; Secure";
 
-    CookieManager cookieManager = CookieManager.getInstance();
+    cookieValue += ";";
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
@@ -117,27 +125,27 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
 
     final List<Map<String, Object>> cookieListMap = new ArrayList<>();
 
-    CookieManager cookieManager = CookieManager.getInstance();
+    String cookiesString = cookieManager.getCookie(url);
 
-    String[] cookies = cookieManager.getCookie(url).split(";");
-    for (String cookie : cookies) {
-      String[] nameValue = cookie.split("=", 2);
-      String name = nameValue[0].trim();
-      String value = nameValue[1].trim();
-      Map<String, Object> cookieMap = new HashMap<>();
-      cookieMap.put("name", name);
-      cookieMap.put("value", value);
-      cookieListMap.add(cookieMap);
+    if (cookiesString != null) {
+      String[] cookies = cookiesString.split(";");
+      for (String cookie : cookies) {
+        String[] nameValue = cookie.split("=", 2);
+        String name = nameValue[0].trim();
+        String value = nameValue[1].trim();
+        Map<String, Object> cookieMap = new HashMap<>();
+        cookieMap.put("name", name);
+        cookieMap.put("value", value);
+        cookieListMap.add(cookieMap);
+      }
     }
     return cookieListMap;
 
   }
 
-  public static void deleteCookie(String url, String cookieName, final MethodChannel.Result result) {
+  public static void deleteCookie(String url, String name, String domain, String path, final MethodChannel.Result result) {
 
-    String cookieValue = cookieName + "=; Expires=Thu, 01 Jan 1970 00:00:01 GMT;";
-
-    CookieManager cookieManager = CookieManager.getInstance();
+    String cookieValue = name + "=; Path=" + path + "; Domain=" + domain + "; Max-Age=-1;";
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
@@ -158,8 +166,40 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     }
   }
 
-  public static void deleteCookies(final MethodChannel.Result result) {
-    CookieManager cookieManager = CookieManager.getInstance();
+  public static void deleteCookies(String url, String domain, String path, final MethodChannel.Result result) {
+
+    CookieSyncManager cookieSyncMngr = null;
+
+    String cookiesString = cookieManager.getCookie(url);
+    if (cookiesString != null) {
+
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+        cookieSyncMngr.startSync();
+      }
+
+      String[] cookies = cookiesString.split(";");
+      for (String cookie : cookies) {
+        String[] nameValue = cookie.split("=", 2);
+        String name = nameValue[0].trim();
+        String cookieValue = name + "=; Path=" + path + "; Domain=" + domain + "; Max-Age=-1;";
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+          cookieManager.setCookie(url, cookieValue, null);
+        else
+          cookieManager.setCookie(url, cookieValue);
+      }
+
+      if (cookieSyncMngr != null) {
+        cookieSyncMngr.stopSync();
+        cookieSyncMngr.sync();
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+        cookieManager.flush();
+    }
+    result.success(true);
+  }
+
+  public static void deleteAllCookies(final MethodChannel.Result result) {
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.removeAllCookies(new ValueCallback<Boolean>() {
         @Override

@@ -55,6 +55,12 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterPlugin(with: registrar)
         registrar.addMethodCallDelegate(instance, channel: channel)
+        
+        if #available(iOS 11.0, *) {
+            MyCookieManager(registrar: registrar)
+        } else {
+            // Fallback on earlier versions
+        }
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

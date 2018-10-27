@@ -15,8 +15,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/MyCookieManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/MyCookieManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppBrowserWebViewController.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -33,11 +36,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="269">
-              <caret line="1179" column="42" lean-forward="true" selection-start-line="1179" selection-start-column="42" selection-end-line="1179" selection-end-column="42" />
+            <state relative-caret-position="8878">
+              <caret line="1144" column="23" selection-start-line="1144" selection-start-column="23" selection-end-line="1144" selection-end-column="23" />
               <folding>
                 <element signature="e#814#831#0" expanded="true" />
               </folding>
@@ -45,11 +48,11 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="422">
-              <caret line="72" column="67" selection-start-line="72" selection-start-column="67" selection-end-line="72" selection-end-column="67" />
+            <state relative-caret-position="226">
+              <caret line="294" lean-forward="true" selection-start-line="294" selection-end-line="294" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -68,8 +71,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>onProgress</find>
-      <find>goBack</find>
       <find>_controller</find>
       <find>canGoBack</find>
       <find>getOp</find>
@@ -98,6 +99,8 @@
       <find>headers</find>
       <find>.cast</find>
       <find>WebView</find>
+      <find>print</find>
+      <find>throw</find>
     </findStrings>
     <replaceStrings>
       <replace>activity.getPreferences(0)</replace>
@@ -142,16 +145,16 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
       </list>
     </option>
   </component>
   <component name="ProjectFrameBounds">
-    <option name="x" value="133" />
+    <option name="x" value="1921" />
     <option name="y" value="23" />
-    <option name="width" value="1787" />
-    <option name="height" value="1057" />
+    <option name="width" value="1749" />
+    <option name="height" value="1027" />
   </component>
   <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
   <component name="ProjectView">
@@ -159,7 +162,7 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="PackagesPane" />
+      <pane id="AndroidView" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -177,7 +180,6 @@
         </subPane>
         <option name="show-excluded-files" value="false" />
       </pane>
-      <pane id="AndroidView" />
       <pane id="Scope">
         <subPane subId="Project Files">
           <expand>
@@ -189,6 +191,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -345,32 +348,33 @@
     <servers />
   </component>
   <component name="ToolWindowManager">
-    <frame x="133" y="23" width="1787" height="1057" extended-state="0" />
+    <frame x="1921" y="23" width="1749" height="1027" extended-state="0" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="TODO" order="6" />
+      <window_info anchor="bottom" id="Messages" order="12" weight="0.23594266" />
       <window_info anchor="right" id="Palette&#9;" order="9" />
       <window_info id="Image Layers" order="7" />
       <window_info id="Build Variants" order="3" side_tool="true" />
       <window_info anchor="right" id="Capture Analysis" order="4" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5035553" side_tool="true" weight="0.25689086" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5043937" side_tool="true" weight="0.30650496" />
       <window_info anchor="bottom" id="Dart Analysis" order="14" weight="0.3276414" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" weight="0.44503736" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" weight="0.34068358" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49644473" visible="true" weight="0.30736393" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49560633" visible="true" weight="0.30650496" />
       <window_info anchor="right" id="Flutter Outline" order="6" weight="0.32922077" />
       <window_info anchor="bottom" id="Logcat" order="11" />
       <window_info id="Captures" order="4" weight="0.32936507" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.14670487" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.14059754" />
       <window_info id="Structure" order="1" sideWeight="0.50275636" side_tool="true" weight="0.1910871" />
       <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="7" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.34364995" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.34288865" />
       <window_info id="Favorites" order="5" side_tool="true" />
       <window_info anchor="right" id="Flutter Inspector" order="3" weight="0.32938388" />
-      <window_info anchor="bottom" id="Messages" order="12" weight="0.23692636" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="right" id="Assistant" order="8" visible="true" weight="0.3295129" />
@@ -633,13 +637,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-3761">
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-            <element signature="e#0#39#0" expanded="true" />
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
+        <state relative-caret-position="-3761" />
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
@@ -647,22 +645,22 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+    <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="422">
-          <caret line="72" column="67" selection-start-line="72" selection-start-column="67" selection-end-line="72" selection-end-column="67" />
+        <state relative-caret-position="8878">
+          <caret line="1144" column="23" selection-start-line="1144" selection-start-column="23" selection-end-line="1144" selection-end-column="23" />
           <folding>
-            <element signature="e#0#20#0" expanded="true" />
+            <element signature="e#814#831#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="269">
-          <caret line="1179" column="42" lean-forward="true" selection-start-line="1179" selection-start-column="42" selection-end-line="1179" selection-end-column="42" />
+        <state relative-caret-position="226">
+          <caret line="294" lean-forward="true" selection-start-line="294" selection-end-line="294" />
           <folding>
-            <element signature="e#814#831#0" expanded="true" />
+            <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>

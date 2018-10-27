@@ -33,6 +33,7 @@ Classes:
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
+- [CookieManager](#cookiemanager-class): Manages the cookies used by WebView instances. **NOTE for iOS**: available from iOS 11.0+.
 
 ### `InAppWebView` class
 Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
@@ -1110,4 +1111,73 @@ Closes the server.
 
 ```dart
 localhostServer.close();
+```
+
+### `CookieManager` class
+Manages the cookies used by WebView instances.
+
+**NOTE for iOS**: available from iOS 11.0+.
+
+Example:
+```dart
+var url = "https://flutter.io/";
+await CookieManager.setCookie(url, "myCookie", "cookieValue", domain: "flutter.io", expiresDate: 1540838864611);
+print(await CookieManager.getCookies(url));
+print(await CookieManager.getCookie(url, "myCookie"));
+await CookieManager.deleteCookie(url, "myCookie");
+await CookieManager.deleteCookie(url, "_gid", domain: ".googleblog.com");
+await CookieManager.deleteCookies(url);
+await CookieManager.deleteAllCookies();
+```
+
+#### static Future\<void\> CookieManager.setCookie
+
+Sets a cookie for the given `url`. Any existing cookie with the same `host`, `path` and `name` will be replaced with the new cookie. 
+The cookie being set will be ignored if it is expired.
+
+The default value of `path` is `"/"`.
+If `domain` is `null`, its default value will be the domain name of `url`.
+```dart
+CookieManager.setCookie(String url, String name, String value, { String domain, String path = "/", int expiresDate, int maxAge, bool isSecure });
+```
+
+#### static Future\<void\> CookieManager.getCookies
+
+Gets all the cookies for the given `url`.
+```dart
+CookieManager.getCookies(String url);
+```
+
+#### static Future\<void\> CookieManager.getCookie
+
+Gets a cookie by its `name` for the given `url`.
+```dart
+CookieManager.getCookie(String url, String name);
+```
+
+#### static Future\<void\> CookieManager.deleteCookie
+
+Removes a cookie by its `name` for the given `url`, `domain` and `path`.
+
+The default value of `path` is `"/"`.
+If `domain` is `null` or empty, its default value will be the domain name of `url`.
+```dart
+CookieManager.deleteCookie(String url, String name, {String domain = "", String path = "/"});
+```
+
+#### static Future\<void\> CookieManager.deleteCookies
+
+Removes all cookies for the given `url`, `domain` and `path`.
+
+The default value of `path` is `"/"`.
+If `domain` is `null` or empty, its default value will be the domain name of `url`.
+```dart
+CookieManager.deleteCookies(String url, {String domain = "", String path = "/"});
+```
+
+#### static Future\<void\> CookieManager.deleteAllCookies
+
+Removes all cookies.
+```dart
+CookieManager.deleteAllCookies();
 ```

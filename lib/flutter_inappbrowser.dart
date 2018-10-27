@@ -1119,7 +1119,7 @@ class InAppLocalhostServer {
 
 }
 
-///Manages the cookies used by an application's [InAppWebView] instances.
+///Manages the cookies used by WebView instances.
 ///
 ///**NOTE for iOS**: available from iOS 11.0+.
 class CookieManager {
@@ -1171,6 +1171,9 @@ class CookieManager {
 
   ///Gets all the cookies for the given [url].
   static Future<List<Map<String, dynamic>>> getCookies(String url) async {
+    if (!_initialized)
+      _init();
+
     assert(url != null && url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1186,6 +1189,9 @@ class CookieManager {
 
   ///Gets a cookie by its [name] for the given [url].
   static Future<Map<String, dynamic>> getCookie(String url, String name) async {
+    if (!_initialized)
+      _init();
+
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
 
@@ -1206,6 +1212,8 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
   static Future<void> deleteCookie(String url, String name, {String domain = "", String path = "/"}) async {
+    if (!_initialized)
+      _init();
 
     if (domain == null || domain.isEmpty)
       domain = _getDomainName(url);
@@ -1228,6 +1236,8 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
   static Future<void> deleteCookies(String url, {String domain = "", String path = "/"}) async {
+    if (!_initialized)
+      _init();
 
     if (domain == null || domain.isEmpty)
       domain = _getDomainName(url);
@@ -1245,6 +1255,9 @@ class CookieManager {
 
   ///Removes all cookies.
   static Future<void> deleteAllCookies() async {
+    if (!_initialized)
+      _init();
+
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('deleteAllCookies', args);
   }

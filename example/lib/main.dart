@@ -67,24 +67,24 @@ class MyInAppBrowser extends InAppBrowser {
 //
 //    print(await this.webViewController.injectScriptCode("document.cookie"));
 //
-    print("");
-    print(await CookieManager.getCookies(url));
-    print("");
-    print(await CookieManager.getCookie(url, "my_cookie2"));
-    print("");
-    await CookieManager.deleteCookie(url, "my_cookie2");
-    await CookieManager.deleteCookie(url, "_gid", domain: ".googleblog.com");
-    print("");
-    print(await CookieManager.getCookies(url));
-    print("");
-    await CookieManager.deleteCookies(url);
-    print("");
-    print(await CookieManager.getCookies(url));
-    print("");
-    await CookieManager.deleteAllCookies();
-    print("");
-    print(await CookieManager.getCookies(url));
-    print("");
+//    print("");
+//    print(await CookieManager.getCookies(url));
+//    print("");
+//    print(await CookieManager.getCookie(url, "my_cookie2"));
+//    print("");
+//    await CookieManager.deleteCookie(url, "my_cookie2");
+//    await CookieManager.deleteCookie(url, "_gid", domain: ".googleblog.com");
+//    print("");
+//    print(await CookieManager.getCookies(url));
+//    print("");
+//    await CookieManager.deleteCookies(url);
+//    print("");
+//    print(await CookieManager.getCookies(url));
+//    print("");
+//    await CookieManager.deleteAllCookies();
+//    print("");
+//    print(await CookieManager.getCookies(url));
+//    print("");
 //
 //    print(await this.webViewController.injectScriptCode("null"));
 //    print(await this.webViewController.injectScriptCode("undefined"));
@@ -290,8 +290,8 @@ class _MyAppState extends State<MyApp> {
 //                //"toolbarBottom": false
 //              });
 //
-              await CookieManager.setCookie("https://flutter.io/", "my_cookie2", "cookieValue2", domain: "flutter.io", expiresDate: 1540838864611);
-              await CookieManager.setCookie("https://flutter.io/", "my_cookie", "cookieValue", domain: "flutter.io", expiresDate: 1540838864611);
+//              await CookieManager.setCookie("https://flutter.io/", "my_cookie2", "cookieValue2", domain: "flutter.io", expiresDate: 1540838864611);
+//              await CookieManager.setCookie("https://flutter.io/", "my_cookie", "cookieValue", domain: "flutter.io", expiresDate: 1540838864611);
 
               await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
                 //"useOnLoadResource": true,

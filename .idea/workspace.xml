@@ -15,9 +15,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -34,11 +32,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="428">
-              <caret line="1154" column="46" lean-forward="true" selection-start-line="1154" selection-start-column="46" selection-end-line="1154" selection-end-column="46" />
+              <caret line="1154" column="46" selection-start-line="1154" selection-start-column="46" selection-end-line="1154" selection-end-column="46" />
               <folding>
                 <element signature="e#814#831#0" expanded="true" />
               </folding>
@@ -50,7 +48,7 @@
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="-4">
-              <caret line="1114" lean-forward="true" selection-start-line="1114" selection-end-line="1114" />
+              <caret line="1114" selection-start-line="1114" selection-end-line="1114" />
             </state>
           </provider>
         </entry>
@@ -59,16 +57,16 @@
         <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="240">
-              <caret line="16" column="10" lean-forward="true" selection-start-line="16" selection-start-column="10" selection-end-line="16" selection-end-column="10" />
+              <caret line="16" column="10" selection-start-line="16" selection-start-column="10" selection-end-line="16" selection-end-column="10" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="170">
-              <caret line="69" selection-start-line="69" selection-end-line="86" selection-end-column="16" />
+            <state relative-caret-position="136">
+              <caret line="293" column="25" selection-start-line="292" selection-start-column="24" selection-end-line="293" selection-end-column="25" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -160,9 +158,9 @@
         <option value="$PROJECT_DIR$/example/pubspec.yaml" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
       </list>
     </option>
   </component>
@@ -378,13 +376,13 @@
       <window_info anchor="bottom" id="Dart Analysis" order="14" weight="0.3276414" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" weight="0.34068358" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49560633" visible="true" weight="0.30650496" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49560633" visible="true" weight="0.30650496" />
       <window_info anchor="right" id="Flutter Outline" order="6" weight="0.32922077" />
       <window_info anchor="bottom" id="Logcat" order="11" />
       <window_info id="Captures" order="4" weight="0.32936507" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.15180266" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.15180266" />
       <window_info id="Structure" order="1" sideWeight="0.50275636" side_tool="true" weight="0.1910871" />
       <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="7" />
@@ -651,36 +649,36 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="170">
-          <caret line="69" selection-start-line="69" selection-end-line="86" selection-end-column="16" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="240">
-          <caret line="16" column="10" lean-forward="true" selection-start-line="16" selection-start-column="10" selection-end-line="16" selection-end-column="10" />
+          <caret line="16" column="10" selection-start-line="16" selection-start-column="10" selection-end-line="16" selection-end-column="10" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-4">
-          <caret line="1114" lean-forward="true" selection-start-line="1114" selection-end-line="1114" />
+          <caret line="1114" selection-start-line="1114" selection-end-line="1114" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="428">
-          <caret line="1154" column="46" lean-forward="true" selection-start-line="1154" selection-start-column="46" selection-end-line="1154" selection-end-column="46" />
+          <caret line="1154" column="46" selection-start-line="1154" selection-start-column="46" selection-end-line="1154" selection-end-column="46" />
           <folding>
             <element signature="e#814#831#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="136">
+          <caret line="293" column="25" selection-start-line="292" selection-start-column="24" selection-end-line="293" selection-end-column="25" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>

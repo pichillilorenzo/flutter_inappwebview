@@ -16,9 +16,6 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/MyCookieManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/MyCookieManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
@@ -36,11 +33,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="false">
+      <file leaf-file-name="flutter_inappbrowser.dart" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="8878">
-              <caret line="1144" column="23" selection-start-line="1144" selection-start-column="23" selection-end-line="1144" selection-end-column="23" />
+            <state relative-caret-position="337">
+              <caret line="1225" column="66" lean-forward="true" selection-start-line="1225" selection-start-column="66" selection-end-line="1225" selection-end-column="66" />
               <folding>
                 <element signature="e#814#831#0" expanded="true" />
               </folding>
@@ -48,7 +45,7 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="main.dart" pinned="false" current-in-tab="true">
+      <file leaf-file-name="main.dart" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="226">
@@ -145,8 +142,8 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/pubspec.yaml" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
-        <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
+        <option value="$PROJECT_DIR$/lib/flutter_inappbrowser.dart" />
       </list>
     </option>
   </component>
@@ -362,13 +359,13 @@
       <window_info anchor="bottom" id="Dart Analysis" order="14" weight="0.3276414" />
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49644473" weight="0.34068358" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49560633" visible="true" weight="0.30650496" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.49560633" visible="true" weight="0.30650496" />
       <window_info anchor="right" id="Flutter Outline" order="6" weight="0.32922077" />
       <window_info anchor="bottom" id="Logcat" order="11" />
       <window_info id="Captures" order="4" weight="0.32936507" />
       <window_info id="Capture Tool" order="6" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.14059754" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.49724367" visible="true" weight="0.14059754" />
       <window_info id="Structure" order="1" sideWeight="0.50275636" side_tool="true" weight="0.1910871" />
       <window_info anchor="right" id="Device File Explorer" order="5" side_tool="true" />
       <window_info anchor="right" id="Theme Preview" order="7" />
@@ -645,22 +642,22 @@
         <state />
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="8878">
-          <caret line="1144" column="23" selection-start-line="1144" selection-start-column="23" selection-end-line="1144" selection-end-column="23" />
-          <folding>
-            <element signature="e#814#831#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="226">
           <caret line="294" lean-forward="true" selection-start-line="294" selection-end-line="294" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/flutter_inappbrowser.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="337">
+          <caret line="1225" column="66" lean-forward="true" selection-start-line="1225" selection-start-column="66" selection-end-line="1225" selection-end-column="66" />
+          <folding>
+            <element signature="e#814#831#0" expanded="true" />
           </folding>
         </state>
       </provider>

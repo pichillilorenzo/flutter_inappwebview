@@ -1120,6 +1120,8 @@ class InAppLocalhostServer {
 }
 
 ///Manages the cookies used by an application's [InAppWebView] instances.
+///
+///**NOTE for iOS**: available from iOS 11.0+.
 class CookieManager {
   static bool _initialized = false;
   static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser_cookiemanager');
@@ -1200,6 +1202,7 @@ class CookieManager {
   }
 
   ///Removes a cookie by its [name] for the given [url], [domain] and [path].
+  ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
   static Future<void> deleteCookie(String url, String name, {String domain = "", String path = "/"}) async {
@@ -1221,6 +1224,7 @@ class CookieManager {
   }
 
   ///Removes all cookies for the given [url], [domain] and [path].
+  ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
   static Future<void> deleteCookies(String url, {String domain = "", String path = "/"}) async {

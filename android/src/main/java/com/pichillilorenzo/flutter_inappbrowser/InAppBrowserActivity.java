@@ -381,4 +381,11 @@ public class InAppBrowserActivity extends AppCompatActivity {
     else
       result.success("");
   }
+
+  public HashMap<String, Object> getCopyBackForwardList() {
+    if (webView != null)
+      return webView.getCopyBackForwardList();
+    return null;
+  }
+
 }

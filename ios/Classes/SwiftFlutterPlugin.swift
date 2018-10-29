@@ -193,6 +193,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "getOptions":
                 result(self.getOptions(uuid: uuid))
                 break
+            case "getCopyBackForwardList":
+                result(self.getCopyBackForwardList(uuid: uuid));
+                break;
             default:
                 result(FlutterMethodNotImplemented)
                 break
@@ -704,6 +707,13 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     func getOptions(uuid: String) -> [String: Any]? {
         if let webViewController = self.webViewControllers[uuid] {
             return webViewController!.getOptions()
+        }
+        return nil
+    }
+    
+    func getCopyBackForwardList(uuid: String) -> [String: Any]? {
+        if let webViewController = self.webViewControllers[uuid] {
+            return webViewController!.getCopyBackForwardList()
         }
         return nil
     }

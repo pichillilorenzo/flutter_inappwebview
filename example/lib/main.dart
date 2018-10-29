@@ -16,6 +16,12 @@ class MyInAppBrowser extends InAppBrowser {
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
 
+    WebHistory history = await this.webViewController.getCopyBackForwardList();
+    print(history.list.length);
+    print(history.list[history.currentIndex].url);
+    for(WebHistoryItem item in history.list) {
+      print(item.title);
+    }
 //    print(await this.webViewController.canGoBack());
 //    print(await this.webViewController.canGoForward());
 

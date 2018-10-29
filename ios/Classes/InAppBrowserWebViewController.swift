@@ -925,4 +925,30 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
             self.navigationDelegate?.onProgressChanged(uuid: self.uuid, webView: self.webView, progress: progress)
         }
     }
+    
+    func getCopyBackForwardList() -> [String: Any] {
+        let currentList = self.webView.backForwardList
+        let currentIndex = currentList.backList.count
+        var completeList = currentList.backList
+        if currentList.currentItem != nil {
+            completeList.append(currentList.currentItem!)
+        }
+        completeList.append(contentsOf: currentList.forwardList)
+        
+        var history: [[String: String]] = []
+        
+        for historyItem in completeList {
+            var historyItemMap: [String: String] = [:]
+            historyItemMap["originalUrl"] = historyItem.initialURL.absoluteString
+            historyItemMap["title"] = historyItem.title
+            historyItemMap["url"] = historyItem.url.absoluteString
+            history.append(historyItemMap)
+        }
+        
+        var result: [String: Any] = [:]
+        result["history"] = history
+        result["currentIndex"] = currentIndex
+        
+        return result;
+    }
 }

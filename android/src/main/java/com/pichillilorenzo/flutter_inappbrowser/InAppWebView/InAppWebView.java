@@ -11,6 +11,8 @@ import android.util.JsonToken;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.ValueCallback;
+import android.webkit.WebBackForwardList;
+import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
@@ -22,7 +24,9 @@ import com.pichillilorenzo.flutter_inappbrowser.Util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.StringReader;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -394,4 +398,31 @@ public class InAppWebView extends WebView {
       }
     });
   }
+
+  public HashMap<String, Object> getCopyBackForwardList() {
+    WebBackForwardList currentList = copyBackForwardList();
+    int currentSize = currentList.getSize();
+    int currentIndex = currentList.getCurrentIndex();
+
+    List<HashMap<String, String>> history = new ArrayList<HashMap<String, String>>();
+
+    for(int i = 0; i < currentSize; i++) {
+      WebHistoryItem historyItem = currentList.getItemAtIndex(i);
+      HashMap<String, String> historyItemMap = new HashMap<>();
+
+      historyItemMap.put("originalUrl", historyItem.getOriginalUrl());
+      historyItemMap.put("title", historyItem.getTitle());
+      historyItemMap.put("url", historyItem.getUrl());
+
+      history.add(historyItemMap);
+    }
+
+    HashMap<String, Object> result = new HashMap<>();
+
+    result.put("history", history);
+    result.put("currentIndex", currentIndex);
+
+    return result;
+  }
+
 }

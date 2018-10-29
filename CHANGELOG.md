@@ -1,3 +1,8 @@
+## 0.5.4
+
+- added `WebHistory` and `WebHistoryItem` class
+- added `getCopyBackForwardList` method for `InAppWebView` and `InAppBrowser`
+
 ## 0.5.3
 
 - added `CookieManager` class

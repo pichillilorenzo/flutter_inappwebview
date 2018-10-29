@@ -658,6 +658,7 @@ class InAppWebViewController {
   String _inAppBrowserUuid;
   InAppBrowser _inAppBrowser;
 
+
   InAppWebViewController(int id, InAppWebView widget) {
     _id = id;
     _channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
@@ -1030,10 +1031,57 @@ class InAppWebViewController {
     return options;
   }
 
+  ///Gets the WebHistory for this WebView. This contains the back/forward list for use in querying each item in the history stack.
+  ///This contains only a snapshot of the current state.
+  ///Multiple calls to this method may return different objects.
+  ///The object returned from this method will not be updated to reflect any new state.
+  Future<WebHistory> getCopyBackForwardList() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    Map<dynamic, dynamic> result = await _channel.invokeMethod('getCopyBackForwardList', args);
+    result = result.cast<String, dynamic>();
+
+    List<dynamic> historyListMap = result["history"];
+    historyListMap = historyListMap.cast<LinkedHashMap<dynamic, dynamic>>();
+
+    int currentIndex = result["currentIndex"];
+
+    List<WebHistoryItem> historyList = List();
+    for(LinkedHashMap<dynamic, dynamic> historyItem in historyListMap) {
+      historyList.add(WebHistoryItem(historyItem["originalUrl"], historyItem["title"], historyItem["url"]));
+    }
+    return WebHistory(historyList, currentIndex);
+  }
+
   Future<void> _dispose() async {
     await _channel.invokeMethod('dispose');
   }
 
+}
+
+///WebHistory class.
+///
+///This class contains a snapshot of the current back/forward list for a WebView.
+class WebHistory {
+  List<WebHistoryItem> _list;
+  List<WebHistoryItem> get list => _list;
+  int currentIndex;
+
+  WebHistory(this._list, this.currentIndex);
+}
+
+///WebHistoryItem class.
+///
+///A convenience class for accessing fields in an entry in the back/forward list of a WebView. Each WebHistoryItem is a snapshot of the requested history item.
+class WebHistoryItem {
+  String originalUrl;
+  String title;
+  String url;
+
+  WebHistoryItem(this.originalUrl, this.title, this.url);
 }
 
 ///InAppLocalhostServer class.

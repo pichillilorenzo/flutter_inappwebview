@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
-import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -186,6 +185,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       case "getOptions":
         result.success((webView != null) ? webView.getOptions() : null);
         break;
+      case "getCopyBackForwardList":
+        result.success((webView != null) ? webView.getCopyBackForwardList() : null);
+        break;
       case "dispose":
         dispose();
         result.success(true);
@@ -201,6 +203,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {
+          webView.destroy();
           webView = null;
         }
       });

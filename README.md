@@ -1,6 +1,7 @@
 # Flutter InAppBrowser Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappbrowser&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappbrowser)
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappbrowser.svg)](https://pub.dartlang.org/packages/flutter_inappbrowser)
+[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://stackoverflow.com/questions/tagged/flutter?sort=votes)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](/LICENSE)
 
 [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/LorenzoPichilli)
@@ -8,6 +9,10 @@
 
 A Flutter plugin that allows you to add an inline webview or open an in-app browser window.
 This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://github.com/apache/cordova-plugin-inappbrowser)!
+
+### Requirements
+- Dart sdk: ">=2.1.0-dev.7.1 <3.0.0"
+- Flutter: ">=0.10.1 <2.0.0"
 
 ### IMPORTANT Note for iOS
 To be able to use this plugin on iOS, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
@@ -29,7 +34,7 @@ First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](ht
 
 ## Usage
 Classes:
-- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. [**Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment].
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. [**Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment. For iOS, it will be available as soon as the Flutter team will release the corresponding dart class.].
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
@@ -42,6 +47,7 @@ Flutter Widget for adding an **inline native WebView** integrated in the flutter
 So, if you want use it, you can but you will have some limitation such as the inability to use the keyboard!
 
 **Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment.
+For iOS, it will be available as soon as the Flutter team will release the corresponding dart class.
 
 Use `InAppWebViewController` to control the WebView instance.
 Example:

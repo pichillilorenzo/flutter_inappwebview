@@ -265,6 +265,9 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       case "getOptions":
         result.success(getOptions(uuid));
         break;
+      case "getCopyBackForwardList":
+        result.success(getCopyBackForwardList(uuid));
+        break;
       default:
         result.notImplemented();
     }
@@ -553,6 +556,13 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       return inAppBrowserActivity.getOptions();
+    return null;
+  }
+
+  public HashMap<String, Object> getCopyBackForwardList(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getCopyBackForwardList();
     return null;
   }
 

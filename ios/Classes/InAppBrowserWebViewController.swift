@@ -481,13 +481,20 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         })
     }
     
+    @objc func goBack() {
+        if canGoBack() {
+            webView.goBack()
+            updateUrlTextField(url: (webView?.url?.absoluteString)!)
+        }
+    }
+    
     func canGoBack() -> Bool {
         return webView.canGoBack
     }
     
-    @objc func goBack() {
-        if canGoBack() {
-            webView.goBack()
+    @objc func goForward() {
+        if canGoForward() {
+            webView.goForward()
             updateUrlTextField(url: (webView?.url?.absoluteString)!)
         }
     }
@@ -496,11 +503,13 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         return webView.canGoForward
     }
     
-    @objc func goForward() {
-        if canGoForward() {
-            webView.goForward()
-            updateUrlTextField(url: (webView?.url?.absoluteString)!)
-        }
+    @objc func goBackOrForward(steps: Int) {
+        webView.goBackOrForward(steps: steps)
+        updateUrlTextField(url: (webView?.url?.absoluteString)!)
+    }
+    
+    func canGoBackOrForward(steps: Int) -> Bool {
+        return webView.canGoBackOrForward(steps: steps)
     }
     
     func updateUrlTextField(url: String) {

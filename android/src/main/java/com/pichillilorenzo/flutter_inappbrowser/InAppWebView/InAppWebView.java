@@ -97,6 +97,12 @@ public class InAppWebView extends WebView {
     this.options = options;
   }
 
+  @Override
+  public void reload() {
+    super.reload();
+    Log.d(LOG_TAG, "RELOAD");
+  }
+
   public void prepare() {
 
     boolean isFromInAppBrowserActivity = inAppBrowserActivity != null;

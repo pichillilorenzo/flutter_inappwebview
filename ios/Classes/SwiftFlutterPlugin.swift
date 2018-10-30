@@ -129,6 +129,22 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     result(false)
                 }
                 break
+            case "goBackOrForward":
+                if let webViewController = self.webViewControllers[uuid] {
+                    let steps = arguments!["steps"] as! Int
+                    webViewController?.goBackOrForward(steps: steps)
+                }
+                result(true)
+                break
+            case "canGoBackOrForward":
+                if let webViewController = self.webViewControllers[uuid] {
+                    let steps = arguments!["steps"] as! Int
+                    result(webViewController?.canGoBackOrForward(steps: steps) ?? false)
+                }
+                else {
+                    result(false)
+                }
+                break
             case "isLoading":
                 if let webViewController = self.webViewControllers[uuid] {
                     result((webViewController?.webView.isLoading ?? false) == true)

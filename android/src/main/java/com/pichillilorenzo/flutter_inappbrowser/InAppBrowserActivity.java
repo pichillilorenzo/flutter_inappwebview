@@ -238,17 +238,32 @@ public class InAppBrowserActivity extends AppCompatActivity {
       webView.goBack();
   }
 
+  public boolean canGoBack() {
+    if (webView != null)
+      return webView.canGoBack();
+    return false;
+  }
+
   public void goForward() {
     if (webView != null && canGoForward())
       webView.goForward();
   }
 
-  public boolean canGoBack() {
-    return webView.canGoBack();
+  public boolean canGoForward() {
+    if (webView != null)
+      return webView.canGoForward();
+    return false;
   }
 
-  public boolean canGoForward() {
-    return webView.canGoForward();
+  public void goBackOrForward(int steps) {
+    if (webView != null && canGoBackOrForward(steps))
+      webView.goBackOrForward(steps);
+  }
+
+  public boolean canGoBackOrForward(int steps) {
+    if (webView != null)
+      return webView.canGoBackOrForward(steps);
+    return false;
   }
 
   public void hide() {

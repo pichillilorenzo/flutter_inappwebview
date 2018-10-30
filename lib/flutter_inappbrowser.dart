@@ -903,6 +903,37 @@ class InAppWebViewController {
     return await _channel.invokeMethod('canGoForward', args);
   }
 
+  ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
+  Future<void> goBackOrForward(int steps) async {
+    assert(steps != null);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('steps', () => steps);
+    await _channel.invokeMethod('goBackOrForward', args);
+  }
+
+  ///Gets whether the page can go back or forward the given number of steps.
+  Future<bool> canGoBackOrForward(int steps) async {
+    assert(steps != null);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('steps', () => steps);
+    return await _channel.invokeMethod('canGoBackOrForward', args);
+  }
+
+  ///Navigates to an item from the back-forward list and sets it as the current item.
+  Future<void> goTo(WebHistoryItem historyItem) async {
+    await goBackOrForward(historyItem.offset);
+  }
+
   ///Check if the Web View of the [InAppWebView] instance is in a loading state.
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1050,8 +1081,9 @@ class InAppWebViewController {
     int currentIndex = result["currentIndex"];
 
     List<WebHistoryItem> historyList = List();
-    for(LinkedHashMap<dynamic, dynamic> historyItem in historyListMap) {
-      historyList.add(WebHistoryItem(historyItem["originalUrl"], historyItem["title"], historyItem["url"]));
+    for(var i = 0; i < historyListMap.length; i++) {
+      LinkedHashMap<dynamic, dynamic> historyItem = historyListMap[i];
+      historyList.add(WebHistoryItem(historyItem["originalUrl"], historyItem["title"], historyItem["url"], i, i - currentIndex));
     }
     return WebHistory(historyList, currentIndex);
   }
@@ -1067,7 +1099,9 @@ class InAppWebViewController {
 ///This class contains a snapshot of the current back/forward list for a WebView.
 class WebHistory {
   List<WebHistoryItem> _list;
+  ///List of all [WebHistoryItem]s.
   List<WebHistoryItem> get list => _list;
+  ///Index of the current [WebHistoryItem].
   int currentIndex;
 
   WebHistory(this._list, this.currentIndex);
@@ -1077,11 +1111,18 @@ class WebHistory {
 ///
 ///A convenience class for accessing fields in an entry in the back/forward list of a WebView. Each WebHistoryItem is a snapshot of the requested history item.
 class WebHistoryItem {
+  ///Original url of this history item.
   String originalUrl;
+  ///Document title of this history item.
   String title;
+  ///Url of this history item.
   String url;
+  ///0-based position index in the back-forward [WebHistory.list].
+  int index;
+  ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
+  int offset;
 
-  WebHistoryItem(this.originalUrl, this.title, this.url);
+  WebHistoryItem(this.originalUrl, this.title, this.url, this.index, this.offset);
 }
 
 ///InAppLocalhostServer class.

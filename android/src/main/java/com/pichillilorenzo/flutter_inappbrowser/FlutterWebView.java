@@ -162,6 +162,14 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       case "canGoForward":
         result.success((webView != null) && webView.canGoForward());
         break;
+      case "goBackOrForward":
+        if (webView != null)
+          webView.goBackOrForward((Integer) call.argument("steps"));
+        result.success(true);
+        break;
+      case "canGoBackOrForward":
+        result.success((webView != null) && webView.canGoBackOrForward((Integer) call.argument("steps")));
+        break;
       case "stopLoading":
         if (webView != null)
           webView.stopLoading();

@@ -233,6 +233,13 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       case "canGoForward":
         result.success(canGoForward(uuid));
         break;
+      case "goBackOrForward":
+        goBackOrForward(uuid, (Integer) call.argument("steps"));
+        result.success(true);
+        break;
+      case "canGoBackOrForward":
+        result.success(canGoBackOrForward(uuid, (Integer) call.argument("steps")));
+        break;
       case "stopLoading":
         stopLoading(uuid);
         result.success(true);
@@ -497,6 +504,18 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     return false;
   }
 
+  public void goBackOrForward(String uuid, int steps) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.goBackOrForward(steps);
+  }
+
+  public boolean canGoBackOrForward(String uuid, int steps) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.canGoBackOrForward(steps);
+    return false;
+  }
 
   public static void close(final String uuid, final Result result) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);

@@ -873,7 +873,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('goBack', args);
   }
 
-  ///Returns a Boolean value indicating whether the [InAppWebView] can move backward.
+  ///Returns a boolean value indicating whether the [InAppWebView] can move backward.
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null) {
@@ -893,7 +893,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('goForward', args);
   }
 
-  ///Returns a Boolean value indicating whether the [InAppWebView] can move forward.
+  ///Returns a boolean value indicating whether the [InAppWebView] can move forward.
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null) {
@@ -916,7 +916,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('goBackOrForward', args);
   }
 
-  ///Gets whether the page can go back or forward the given number of steps.
+  ///Returns a boolean value indicating whether the [InAppWebView] can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
   Future<bool> canGoBackOrForward(int steps) async {
     assert(steps != null);
 
@@ -929,7 +929,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('canGoBackOrForward', args);
   }
 
-  ///Navigates to an item from the back-forward list and sets it as the current item.
+  ///Navigates to a [WebHistoryItem] from the back-forward [WebHistory.list] and sets it as the current item.
   Future<void> goTo(WebHistoryItem historyItem) async {
     await goBackOrForward(historyItem.offset);
   }

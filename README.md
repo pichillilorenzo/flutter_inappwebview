@@ -382,7 +382,7 @@ inAppWebViewController.goBack();
 
 #### Future\<bool\> InAppWebViewController.canGoBack
 
-Returns a Boolean value indicating whether the `InAppWebView` can move backward.
+Returns a boolean value indicating whether the `InAppWebView` can move backward.
 
 ```dart
 inAppWebViewController.canGoBack();
@@ -398,10 +398,34 @@ inAppWebViewController.goForward();
 
 #### Future\<bool\> InAppWebViewController.canGoForward
 
-Returns a Boolean value indicating whether the `InAppWebView` can move forward.
+Returns a boolean value indicating whether the `InAppWebView` can move forward.
 
 ```dart
 inAppWebViewController.canGoForward();
+```
+
+#### Future\<void\> InAppWebViewController.goBackOrForward
+
+Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
+
+```dart
+inAppWebViewController.goBackOrForward(int steps);
+```
+
+#### Future\<bool\> InAppWebViewController.canGoBackOrForward
+
+Returns a boolean value indicating whether the `InAppWebView` can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
+
+```dart
+inAppWebViewController.canGoBackOrForward(int steps);
+```
+
+#### Future\<void\> InAppWebViewController.goTo
+
+Navigates to a `WebHistoryItem` from the back-forward `WebHistory.list` and sets it as the current item.
+
+```dart
+inAppWebViewController.goTo(WebHistoryItem historyItem);
 ```
 
 #### Future\<bool\> InAppWebViewController.isLoading
@@ -496,6 +520,16 @@ inAppWebViewController.setOptions(Map<String, dynamic> options);
 Gets the current `InAppWebView` options. Returns `null` if the options are not setted yet.
 ```dart
 inAppWebViewController.getOptions();
+```
+
+#### Future\<WebHistory\> InAppWebViewController.getCopyBackForwardList
+
+Gets the WebHistory for this WebView. This contains the back/forward list for use in querying each item in the history stack.
+This contains only a snapshot of the current state.
+Multiple calls to this method may return different objects.
+The object returned from this method will not be updated to reflect any new state.
+```dart
+inAppWebViewController.getCopyBackForwardList();
 ```
 
 ### `InAppBrowser` class

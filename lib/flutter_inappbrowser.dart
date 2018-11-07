@@ -524,15 +524,15 @@ class ChromeSafariBrowser {
   }
 }
 
-typedef void onWebViewCreatedCallback(InAppWebViewController controller);
-typedef void onWebViewLoadStartCallback(InAppWebViewController controller, String url);
-typedef void onWebViewLoadStopCallback(InAppWebViewController controller, String url);
-typedef void onWebViewLoadErrorCallback(InAppWebViewController controller, String url, int code, String message);
-typedef void onWebViewProgressChangedCallback(InAppWebViewController controller, int progress);
-typedef void onWebViewConsoleMessageCallback(InAppWebViewController controller, ConsoleMessage consoleMessage);
-typedef void shouldOverrideUrlLoadingCallback(InAppWebViewController controller, String url);
-typedef void onWebViewLoadResourceCallback(InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request);
-typedef void onWebViewScrollChangedCallback(InAppWebViewController controller, int x, int y);
+typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
+typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
+typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
+typedef onWebViewLoadErrorCallback = void Function(InAppWebViewController controller, String url, int code, String message);
+typedef onWebViewProgressChangedCallback = void Function(InAppWebViewController controller, int progress);
+typedef onWebViewConsoleMessageCallback = void Function(InAppWebViewController controller, ConsoleMessage consoleMessage);
+typedef shouldOverrideUrlLoadingCallback = void Function(InAppWebViewController controller, String url);
+typedef onWebViewLoadResourceCallback = void Function(InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request);
+typedef onWebViewScrollChangedCallback = void Function(InAppWebViewController controller, int x, int y);
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
 ///The [mimeType] property specifies the format of the data.

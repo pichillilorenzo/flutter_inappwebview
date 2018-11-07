@@ -1,3 +1,8 @@
+## 0.5.51
+
+- updated `pubspec.yaml`
+- updated `README.md`
+
 ## 0.5.5
 
 - added `getUrl` method for the `InAppWebViewController` class

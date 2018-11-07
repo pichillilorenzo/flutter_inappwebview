@@ -40,11 +40,18 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
     String initialUrl = (String) params.get("initialUrl");
     String initialFile = (String) params.get("initialFile");
+    Map<String, String> initialData = (Map<String, String>) params.get("initialData");
     Map<String, String> initialHeaders = (Map<String, String>) params.get("initialHeaders");
     HashMap<String, Object> initialOptions = (HashMap<String, Object>) params.get("initialOptions");
 
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
+
+    webView = new InAppWebView(context, this, id, options);
+    webView.prepare();
+
+    channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappwebview_" + id);
+    channel.setMethodCallHandler(this);
 
     if (initialFile != null) {
       try {
@@ -56,13 +63,15 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       }
     }
 
-    webView = new InAppWebView(context, this, id, options);
-    webView.prepare();
-
-    channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappwebview_" + id);
-    channel.setMethodCallHandler(this);
-
-    webView.loadUrl(initialUrl, initialHeaders);
+    if (initialData != null) {
+      String data = initialData.get("data");
+      String mimeType = initialData.get("mimeType");
+      String encoding = initialData.get("encoding");
+      String baseUrl = initialData.get("baseUrl");
+      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, null);
+    }
+    else
+      webView.loadUrl(initialUrl, initialHeaders);
   }
 
   @Override
@@ -76,6 +85,15 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     String jsWrapper;
     String urlFile;
     switch (call.method) {
+      case "getUrl":
+        result.success((webView != null) ? webView.getUrl() : null);
+        break;
+      case "getTitle":
+        result.success((webView != null) ? webView.getTitle() : null);
+        break;
+      case "getProgress":
+        result.success((webView != null) ? webView.getProgress() : null);
+        break;
       case "loadUrl":
         if (webView != null)
           webView.loadUrl(call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);

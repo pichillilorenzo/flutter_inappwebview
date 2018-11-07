@@ -18,6 +18,7 @@ import android.webkit.WebView;
 
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
+import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappbrowser.Util;
 
@@ -431,4 +432,26 @@ public class InAppWebView extends WebView {
     return result;
   }
 
+  @Override
+  protected void onScrollChanged (int l,
+                                  int t,
+                                  int oldl,
+                                  int oldt) {
+    super.onScrollChanged(l, t, oldl, oldt);
+
+    float scale = getResources().getDisplayMetrics().density;
+    int x = (int) (l/scale);
+    int y = (int) (t/scale);
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("x", x);
+    obj.put("y", y);
+    getChannel().invokeMethod("onScrollChanged", obj);
+  }
+
+  private MethodChannel getChannel() {
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+  }
 }

@@ -40,6 +40,8 @@ Classes:
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
 - [CookieManager](#cookiemanager-class): Manages the cookies used by WebView instances. **NOTE for iOS**: available from iOS 11.0+.
 
+See the online [docs](https://pub.dartlang.org/documentation/flutter_inappbrowser/latest/) to get the full documentation.
+
 ### `InAppWebView` class
 Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
 
@@ -193,6 +195,9 @@ Initial url that will be loaded.
 #### InAppWebView.initialFile
 Initial asset file that will be loaded. See `InAppWebView.loadFile()` for explanation.
 
+#### InAppWebView.initialData
+Initial `InAppWebViewInitialData` that will be loaded.
+
 #### InAppWebView.initialHeaders
 Initial headers that will be used.
 
@@ -300,6 +305,49 @@ InAppWebView(
     initialUrl: "https://flutter.io/",
     onLoadResource: (InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request) {}
 }
+```
+
+Event `onScrollChanged` fires when the `InAppWebView` scrolls.
+`x` represents the current horizontal scroll origin in pixels.
+`y` represents the current vertical scroll origin in pixels.
+```dart
+InAppWebView(
+    initialUrl: "https://flutter.io/",
+    onScrollChanged: (InAppWebViewController controller, int x, int y) {}
+}
+```
+
+#### Future\<String\> InAppWebViewController.getUrl
+
+Gets the URL for the current page.
+This is not always the same as the URL passed to `InAppWebView.onLoadStarted` because although the load for that URL has begun, the current page may not have changed.
+
+```dart
+inAppWebViewController.getUrl();
+```
+
+#### Future\<String\> InAppWebViewController.getTitle
+
+Gets the title for the current page.
+
+```dart
+inAppWebViewController.getTitle();
+```
+
+#### Future\<int\> InAppWebViewController.getProgress
+
+Gets the progress for the current page. The progress value is between 0 and 100.
+
+```dart
+inAppWebViewController.getProgress();
+```
+
+#### Future\<List\<int\>\> InAppWebViewController.getFavicon
+
+Gets the favicon for the current page.
+
+```dart
+inAppWebViewController.getFavicon();
 ```
 
 #### Future\<void\> InAppWebViewController.loadUrl
@@ -744,7 +792,7 @@ inAppBrowser.open({String url = "about:blank", Map<String, String> headers = con
 
 #### Future\<void\> InAppBrowser.openFile
 
-Opens the giver `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open()`.
+Opens the given `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open()`.
 
 To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
 
@@ -776,6 +824,16 @@ inAppBrowser.openFile("assets/index.html");
 
 ```dart
 inAppBrowser.openFile(String assetFilePath, {Map<String, String> headers = const {}, Map<String, dynamic> options = const {}});
+```
+
+#### static Future\<void\> InAppBrowser.openData
+
+Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
+The `mimeType` parameter specifies the format of the data.
+The `encoding` parameter specifies the encoding of the data.
+
+```dart
+InAppBrowser.openData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", Map<String, dynamic> options = const {}});
 ```
 
 #### static Future\<void\> InAppBrowser.openWithSystemBrowser
@@ -840,6 +898,14 @@ inAppBrowser.isOpened();
 ```
 
 #### Events
+
+Event `onBrowserCreated` fires when the `InAppBrowser` is created.
+```dart
+  @override
+  void onBrowserCreated() {
+
+  }
+```
 
 Event `onLoadStart` fires when the `InAppBrowser` starts to load an `url`.
 ```dart
@@ -909,6 +975,17 @@ Event `onLoadResource` fires when the `InAppBrowser` webview loads a resource.
   void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
 
   }
+```
+
+Event `onScrollChanged` fires when the `InAppBrowser` webview scrolls.
+`x` represents the current horizontal scroll origin in pixels.
+`y` represents the current vertical scroll origin in pixels.
+```dart
+  @override
+  void onScrollChanged(int x, int y) {
+                                                                         
+  }
+
 ```
 
 ### `ChromeSafariBrowser` class

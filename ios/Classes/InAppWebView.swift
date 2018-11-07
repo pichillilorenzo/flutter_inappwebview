@@ -10,6 +10,8 @@ import WebKit
 
 public class InAppWebView: WKWebView {
     
+    var historyOffset = 0
+    
     public func goBackOrForward(steps: Int) {
         if canGoBackOrForward(steps: steps) {
             if (steps > 0) {

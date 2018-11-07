@@ -71,6 +71,31 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "open":
                 self.open(uuid: uuid, arguments: arguments!, result: result)
                 break
+            case "getUrl":
+                if let webViewController = self.webViewControllers[uuid] {
+                    result(webViewController!.webView.url?.absoluteString)
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "getTitle":
+                if let webViewController = self.webViewControllers[uuid] {
+                    result(webViewController!.webView.title)
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "getProgress":
+                if let webViewController = self.webViewControllers[uuid] {
+                    let progress = Int(webViewController!.webView.estimatedProgress * 100)
+                    result(progress)
+                }
+                else {
+                    result(nil)
+                }
+                break
             case "loadUrl":
                 self.loadUrl(uuid: uuid, arguments: arguments!, result: result)
                 break
@@ -97,19 +122,19 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "reload":
                 if let webViewController = self.webViewControllers[uuid] {
-                    webViewController?.reload()
+                    webViewController!.reload()
                 }
                 result(true)
                 break
             case "goBack":
                 if let webViewController = self.webViewControllers[uuid] {
-                    webViewController?.goBack()
+                    webViewController!.goBack()
                 }
                 result(true)
                 break
             case "canGoBack":
                 if let webViewController = self.webViewControllers[uuid] {
-                    result(webViewController?.canGoBack() ?? false)
+                    result(webViewController!.canGoBack())
                 }
                 else {
                     result(false)
@@ -117,13 +142,13 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "goForward":
                 if let webViewController = self.webViewControllers[uuid] {
-                    webViewController?.goForward()
+                    webViewController!.goForward()
                 }
                 result(true)
                 break
             case "canGoForward":
                 if let webViewController = self.webViewControllers[uuid] {
-                    result(webViewController?.canGoForward() ?? false)
+                    result(webViewController!.canGoForward())
                 }
                 else {
                     result(false)
@@ -132,14 +157,14 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "goBackOrForward":
                 if let webViewController = self.webViewControllers[uuid] {
                     let steps = arguments!["steps"] as! Int
-                    webViewController?.goBackOrForward(steps: steps)
+                    webViewController!.goBackOrForward(steps: steps)
                 }
                 result(true)
                 break
             case "canGoBackOrForward":
                 if let webViewController = self.webViewControllers[uuid] {
                     let steps = arguments!["steps"] as! Int
-                    result(webViewController?.canGoBackOrForward(steps: steps) ?? false)
+                    result(webViewController!.canGoBackOrForward(steps: steps))
                 }
                 else {
                     result(false)
@@ -147,7 +172,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "isLoading":
                 if let webViewController = self.webViewControllers[uuid] {
-                    result((webViewController?.webView.isLoading ?? false) == true)
+                    result(webViewController!.webView.isLoading == true)
                 }
                 else {
                     result(false)
@@ -155,13 +180,13 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "stopLoading":
                 if let webViewController = self.webViewControllers[uuid] {
-                    webViewController?.webView.stopLoading()
+                    webViewController!.webView.stopLoading()
                 }
                 result(true)
                 break
             case "isHidden":
                 if let webViewController = self.webViewControllers[uuid] {
-                    result((webViewController?.isHidden ?? false) == true)
+                    result(webViewController!.isHidden == true)
                 }
                 else {
                     result(false)
@@ -184,7 +209,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "takeScreenshot":
                 if let webViewController = self.webViewControllers[uuid] {
-                    webViewController?.takeScreenshot(completionHandler: { (screenshot) -> Void in
+                    webViewController!.takeScreenshot(completionHandler: { (screenshot) -> Void in
                         result(screenshot)
                     })
                 }
@@ -236,47 +261,60 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     }
     
     public func open(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
-        let url: String = (arguments["url"] as? String)!
-
-        let headers = (arguments["headers"] as? [String: String])!
-        var absoluteUrl = URL(string: url)?.absoluteURL
-
-        let useChromeSafariBrowser = (arguments["useChromeSafariBrowser"] as? Bool)!
+        let isData: Bool = (arguments["isData"] as? Bool)!
         
-        if useChromeSafariBrowser {
-            let uuidFallback = (arguments["uuidFallback"] as? String)!
-            let safariOptions = (arguments["options"] as? [String: Any])!
+        if !isData {
+            let url: String = (arguments["url"] as? String)!
+
+            let headers = (arguments["headers"] as? [String: String])!
+            var absoluteUrl = URL(string: url)?.absoluteURL
+
+            let useChromeSafariBrowser = (arguments["useChromeSafariBrowser"] as? Bool)!
             
-            let optionsFallback = (arguments["optionsFallback"] as? [String: Any])!
-            
-            open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: safariOptions, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback, result: result);
+            if useChromeSafariBrowser {
+                let uuidFallback = (arguments["uuidFallback"] as? String)!
+                let safariOptions = (arguments["options"] as? [String: Any])!
+                
+                let optionsFallback = (arguments["optionsFallback"] as? [String: Any])!
+                
+                open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: safariOptions, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback, result: result);
+            }
+            else {
+                let options = (arguments["options"] as? [String: Any])!
+                
+                let isLocalFile = (arguments["isLocalFile"] as? Bool)!
+                var openWithSystemBrowser = (arguments["openWithSystemBrowser"] as? Bool)!
+                
+                if isLocalFile {
+                    let key = SwiftFlutterPlugin.registrar!.lookupKey(forAsset: url)
+                    let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
+                    if assetURL == nil {
+                        result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url + " asset file cannot be found!", details: nil))
+                        return
+                    }
+                    absoluteUrl = assetURL!
+                }
+
+                if isSystemUrl(absoluteUrl!) {
+                    openWithSystemBrowser = true
+                }
+                
+                if (openWithSystemBrowser) {
+                    open(inSystem: absoluteUrl!, result: result)
+                }
+                else {
+                    open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil, result: result)
+                }
+            }
         }
         else {
             let options = (arguments["options"] as? [String: Any])!
-            
-            let isLocalFile = (arguments["isLocalFile"] as? Bool)!
-            var openWithSystemBrowser = (arguments["openWithSystemBrowser"] as? Bool)!
-            
-            if isLocalFile {
-                let key = SwiftFlutterPlugin.registrar!.lookupKey(forAsset: url)
-                let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
-                if assetURL == nil {
-                    result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url + " asset file cannot be found!", details: nil))
-                    return
-                }
-                absoluteUrl = assetURL!
-            }
-
-            if isSystemUrl(absoluteUrl!) {
-                openWithSystemBrowser = true
-            }
-            
-            if (openWithSystemBrowser) {
-                open(inSystem: absoluteUrl!, result: result)
-            }
-            else {
-                open(uuid: uuid, uuidFallback: nil, inAppBrowser: absoluteUrl!, headers: headers, withOptions: options, useChromeSafariBrowser: false, withOptionsFallback: nil, result: result)
-            }
+            let data = (arguments["data"] as? String)!
+            let mimeType = (arguments["mimeType"] as? String)!
+            let encoding = (arguments["encoding"] as? String)!
+            let baseUrl = (arguments["baseUrl"] as? String)!
+            open(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+            result(true)
         }
     }
     
@@ -404,6 +442,71 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         
         result(true)
+    }
+    
+    func open(uuid: String, options: [String: Any], data: String, mimeType: String, encoding: String, baseUrl: String) {
+        
+        var uuid = uuid
+        
+        if self.webViewControllers[uuid] != nil {
+            close(uuid: uuid)
+        }
+        
+        if self.previousStatusBarStyle == -1 {
+            self.previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
+        }
+        
+        if !(self.tmpWindow != nil) {
+            let frame: CGRect = UIScreen.main.bounds
+            self.tmpWindow = UIWindow(frame: frame)
+        }
+        
+        let tmpController = UIViewController()
+        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
+        self.tmpWindow?.rootViewController = tmpController
+        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+        self.tmpWindow?.makeKeyAndVisible()
+        
+        let browserOptions: InAppBrowserOptions
+        let webViewOptions: InAppWebViewOptions
+        
+        browserOptions = InAppBrowserOptions()
+        browserOptions.parse(options: options)
+        
+        webViewOptions = InAppWebViewOptions()
+        webViewOptions.parse(options: options)
+        
+        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppBrowserFlutterPlugin.self))
+        let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
+        self.webViewControllers[uuid] = vc as? InAppBrowserWebViewController
+        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
+        webViewController.uuid = uuid
+        webViewController.browserOptions = browserOptions
+        webViewController.webViewOptions = webViewOptions
+        webViewController.isHidden = browserOptions.hidden
+        webViewController.tmpWindow = tmpWindow
+        webViewController.initData = data
+        webViewController.initMimeType = mimeType
+        webViewController.initEncoding = encoding
+        webViewController.initBaseUrl = baseUrl
+        webViewController.navigationDelegate = self
+        
+        if browserOptions.hidden {
+            webViewController.view.isHidden = true
+            tmpController.present(webViewController, animated: false, completion: {() -> Void in
+                webViewController.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+            })
+            webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
+                self.tmpWindow?.windowLevel = 0.0
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            })
+        }
+        else {
+            tmpController.present(webViewController, animated: true, completion: {() -> Void in
+                webViewController.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+            })
+        }
+        
     }
     
     public func loadUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
@@ -595,6 +698,12 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         injectDeferredObject(uuid: uuid, source: arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
     }
     
+    func onBrowserCreated(uuid: String, webView: WKWebView) {
+        if let webViewController = self.webViewControllers[uuid] {
+            channel.invokeMethod("onBrowserCreated", arguments: ["uuid": uuid])
+        }
+    }
+    
     func onLoadStart(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
             let url: String = webViewController!.currentURL!.absoluteString
@@ -648,6 +757,12 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 ]
             ]
             channel.invokeMethod("onLoadResource", arguments: arguments)
+        }
+    }
+    
+    func onScrollChanged(uuid: String, webView: WKWebView, x: Int, y: Int) {
+        if let webViewController = self.webViewControllers[uuid] {
+            channel.invokeMethod("onScrollChanged", arguments: ["uuid": uuid, "x": x, "y": y])
         }
     }
     

@@ -5,6 +5,11 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyInAppBrowser extends InAppBrowser {
   @override
+  Future onBrowserCreated() async {
+    print("\n\nBrowser Ready!\n\n");
+  }
+
+  @override
   Future onLoadStart(String url) async {
     print("\n\nStarted $url\n\n");
 //    print("\n\n ${await this.isHidden()} \n\n");
@@ -16,6 +21,7 @@ class MyInAppBrowser extends InAppBrowser {
   Future onLoadStop(String url) async {
     print("\n\nStopped $url\n\n");
 
+//    print(base64.encode(await this.webViewController.getFavicon()));
 //    WebHistory history = await this.webViewController.getCopyBackForwardList();
 //    print(history.list.length);
 //    print(history.currentIndex);
@@ -23,6 +29,7 @@ class MyInAppBrowser extends InAppBrowser {
 //    for(WebHistoryItem item in history.list) {
 //      print(item.title);
 //    }
+
 //
 //    print(await this.webViewController.canGoBackOrForward(1));
 //    if (await this.webViewController.canGoBackOrForward(-2)) {
@@ -133,6 +140,11 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
+  Future onScrollChanged(int x, int y) async {
+//    print(x.toString() + " " + y.toString());
+  }
+
+  @override
   void onLoadError(String url, int code, String message) {
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
@@ -151,10 +163,10 @@ class MyInAppBrowser extends InAppBrowser {
   void shouldOverrideUrlLoading(String url) {
     print("\n\n override $url\n\n");
     this.webViewController.loadUrl(url);
-    
+
 //    var postData = "username=my_username&password=my_password";
 //    inAppBrowserFallback.webViewController.postUrl("http://localhost:8080", utf8.encode(postData));
-    
+
 //    var htmlData = """
 //<!doctype html>
 //<html lang="en">
@@ -308,11 +320,13 @@ class _MyAppState extends State<MyApp> {
 //              await CookieManager.setCookie("https://flutter.io/", "my_cookie2", "cookieValue2", domain: "flutter.io", expiresDate: 1540838864611);
 //              await CookieManager.setCookie("https://flutter.io/", "my_cookie", "cookieValue", domain: "flutter.io", expiresDate: 1540838864611);
 
+//              await inAppBrowserFallback.openData("<html><head><title>Data example</title></head><body><p>This is a \"p\" tag</p></body></html>", options: {});
+
               await inAppBrowserFallback.open(url: "https://flutter.io/", options: {
                 //"useOnLoadResource": true,
                 //"hidden": true,
                 //"toolbarTopFixedTitle": "Fixed title",
-                "useShouldOverrideUrlLoading": true
+                "useShouldOverrideUrlLoading": true,
                 //"hideUrlBar": true,
                 //"toolbarTop": false,
                 //"toolbarBottom": false
@@ -382,6 +396,7 @@ class _MyAppState extends State<MyApp> {
 //                  ),
 //                  child: InAppWebView(
 //                    initialUrl: "https://flutter.io/",
+//                    //initialData: InAppWebViewInitialData("<html><head><title>Data example</title></head><body><p>This is a \"p\" tag</p></body></html>"),
 //                    initialHeaders: {
 //
 //                    },

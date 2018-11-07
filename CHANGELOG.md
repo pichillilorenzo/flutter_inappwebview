@@ -1,7 +1,18 @@
+## 0.5.5
+
+- added `getUrl` method for the `InAppWebViewController` class
+- added `getTitle` method for the `InAppWebViewController` class
+- added `getProgress` method for the `InAppWebViewController` class
+- added `getFavicon` method for the `InAppWebViewController` class
+- added `onScrollChanged` event for the `InAppWebViewController` and `InAppBrowser` class
+- added `onBrowserCreated` event for the `InAppBrowser` class
+- added `openData` method for the `InAppBrowser` class
+- added `initialData` property for the `InAppWebView` widget
+
 ## 0.5.4
 
 - added `WebHistory` and `WebHistoryItem` class
-- added `getCopyBackForwardList`, `goBackOrForward`, `canGoBackOrForward` and `goTo` methods for `InAppWebView` and `InAppBrowser`
+- added `getCopyBackForwardList`, `goBackOrForward`, `canGoBackOrForward` and `goTo` methods for the `InAppWebViewController` class
 
 ## 0.5.3
 
@@ -10,8 +21,8 @@
 ## 0.5.2
 
 - fixed some missing `result.success()` on Android and iOS
-- added `postUrl()` method for `InAppWebView` and `InAppBrowser`
-- added `loadData()` method for `InAppWebView` and `InAppBrowser`
+- added `postUrl()` method for the `InAppWebViewController` class
+- added `loadData()` method for the `InAppWebViewController` class
 
 ## 0.5.1
 

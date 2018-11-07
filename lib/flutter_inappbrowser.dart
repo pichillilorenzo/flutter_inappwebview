@@ -127,6 +127,10 @@ class InAppBrowser {
 
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch(call.method) {
+      case "onBrowserCreated":
+        this._isOpened = true;
+        onBrowserCreated();
+        break;
       case "onExit":
         this._isOpened = false;
         onExit();
@@ -199,12 +203,12 @@ class InAppBrowser {
     args.putIfAbsent('options', () => options);
     args.putIfAbsent('openWithSystemBrowser', () => false);
     args.putIfAbsent('isLocalFile', () => false);
+    args.putIfAbsent('isData', () => false);
     args.putIfAbsent('useChromeSafariBrowser', () => false);
     await _ChannelManager.channel.invokeMethod('open', args);
-    this._isOpened = true;
   }
 
-  ///Opens the giver [assetFilePath] file in a new [InAppBrowser] instance. The other arguments are the same of [InAppBrowser.open()].
+  ///Opens the given [assetFilePath] file in a new [InAppBrowser] instance. The other arguments are the same of [InAppBrowser.open()].
   ///
   ///To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
   ///
@@ -243,9 +247,28 @@ class InAppBrowser {
     args.putIfAbsent('options', () => options);
     args.putIfAbsent('openWithSystemBrowser', () => false);
     args.putIfAbsent('isLocalFile', () => true);
+    args.putIfAbsent('isData', () => false);
     args.putIfAbsent('useChromeSafariBrowser', () => false);
     await _ChannelManager.channel.invokeMethod('open', args);
-    this._isOpened = true;
+  }
+
+  ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
+  ///The [mimeType] parameter specifies the format of the data.
+  ///The [encoding] parameter specifies the encoding of the data.
+  Future<void> openData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", Map<String, dynamic> options = const {}}) async {
+    assert(data != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('data', () => data);
+    args.putIfAbsent('mimeType', () => mimeType);
+    args.putIfAbsent('encoding', () => encoding);
+    args.putIfAbsent('baseUrl', () => baseUrl);
+    args.putIfAbsent('openWithSystemBrowser', () => false);
+    args.putIfAbsent('isLocalFile', () => false);
+    args.putIfAbsent('isData', () => true);
+    args.putIfAbsent('useChromeSafariBrowser', () => false);
+    await _ChannelManager.channel.invokeMethod('open', args);
   }
 
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [InAppBrowser] methods here!
@@ -256,6 +279,7 @@ class InAppBrowser {
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => {});
     args.putIfAbsent('isLocalFile', () => false);
+    args.putIfAbsent('isData', () => false);
     args.putIfAbsent('openWithSystemBrowser', () => true);
     args.putIfAbsent('useChromeSafariBrowser', () => false);
     return await _ChannelManager.channel.invokeMethod('open', args);
@@ -319,6 +343,11 @@ class InAppBrowser {
     return this._isOpened;
   }
 
+  ///Event fires when the [InAppBrowser] is created.
+  void onBrowserCreated() {
+
+  }
+
   ///Event fires when the [InAppBrowser] starts to load an [url].
   void onLoadStart(String url) {
 
@@ -362,6 +391,13 @@ class InAppBrowser {
   ///
   ///**NOTE only for iOS**: In some cases, the [response.data] of a [response] with `text/assets` encoding could be empty.
   void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
+
+  }
+
+  ///Event fires when the [InAppBrowser] webview scrolls.
+  ///[x] represents the current horizontal scroll origin in pixels.
+  ///[y] represents the current vertical scroll origin in pixels.
+  void onScrollChanged(int x, int y) {
 
   }
 
@@ -496,6 +532,28 @@ typedef void onWebViewProgressChangedCallback(InAppWebViewController controller,
 typedef void onWebViewConsoleMessageCallback(InAppWebViewController controller, ConsoleMessage consoleMessage);
 typedef void shouldOverrideUrlLoadingCallback(InAppWebViewController controller, String url);
 typedef void onWebViewLoadResourceCallback(InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request);
+typedef void onWebViewScrollChangedCallback(InAppWebViewController controller, int x, int y);
+
+///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
+///The [mimeType] property specifies the format of the data.
+///The [encoding] property specifies the encoding of the data.
+class InAppWebViewInitialData {
+  String data;
+  String mimeType;
+  String encoding;
+  String baseUrl;
+
+  InAppWebViewInitialData(this.data, {this.mimeType = "text/html", this.encoding = "utf8", this.baseUrl = "about:blank"});
+
+  Map<String, String> toMap() {
+    return {
+      "data": data,
+      "mimeType": mimeType,
+      "encoding": encoding,
+      "baseUrl": baseUrl
+    };
+  }
+}
 
 ///InAppWebView Widget class.
 ///
@@ -563,10 +621,17 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE only for iOS**: In some cases, the [response.data] of a [response] with `text/assets` encoding could be empty.
   final onWebViewLoadResourceCallback onLoadResource;
 
+  ///Event fires when the [InAppWebView] scrolls.
+  ///[x] represents the current horizontal scroll origin in pixels.
+  ///[y] represents the current vertical scroll origin in pixels.
+  final onWebViewScrollChangedCallback onScrollChanged;
+
   ///Initial url that will be loaded.
   final String initialUrl;
   ///Initial asset file that will be loaded. See [InAppWebView.loadFile()] for explanation.
   final String initialFile;
+  ///Initial [InAppWebViewInitialData] that will be loaded.
+  final InAppWebViewInitialData initialData;
   ///Initial headers that will be used.
   final Map<String, String> initialHeaders;
   ///Initial options that will be used.
@@ -577,6 +642,7 @@ class InAppWebView extends StatefulWidget {
     Key key,
     this.initialUrl = "about:blank",
     this.initialFile,
+    this.initialData,
     this.initialHeaders = const {},
     this.initialOptions = const {},
     this.onWebViewCreated,
@@ -587,6 +653,7 @@ class InAppWebView extends StatefulWidget {
     this.onProgressChanged,
     this.shouldOverrideUrlLoading,
     this.onLoadResource,
+    this.onScrollChanged,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -620,6 +687,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           creationParams: <String, dynamic>{
               'initialUrl': widget.initialUrl,
               'initialFile': widget.initialFile,
+              'initialData': widget.initialData?.toMap(),
               'initialHeaders': widget.initialHeaders,
               'initialOptions': widget.initialOptions
             },
@@ -754,6 +822,14 @@ class InAppWebViewController {
         else
           _inAppBrowser.onConsoleMessage(ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
         break;
+      case "onScrollChanged":
+        int x = call.arguments["x"];
+        int y = call.arguments["y"];
+        if (_widget != null)
+          _widget.onScrollChanged(this, x, y);
+        else
+          _inAppBrowser.onScrollChanged(x, y);
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         List<dynamic> args = jsonDecode(call.arguments["args"]);
@@ -766,6 +842,57 @@ class InAppWebViewController {
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
+  }
+
+  ///Gets the URL for the current page.
+  ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun, the current page may not have changed.
+  Future<String> getUrl() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('getUrl', args);
+  }
+
+  ///Gets the title for the current page.
+  Future<String> getTitle() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('getTitle', args);
+  }
+
+  ///Gets the progress for the current page. The progress value is between 0 and 100.
+  Future<int> getProgress() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('getProgress', args);
+  }
+
+  ///Gets the favicon for the current page.
+  Future<List<int>> getFavicon() async {
+    var completer = new Completer<List<int>>();
+    var faviconData = new List<int>();
+    HttpClient client = new HttpClient();
+    var url = Uri.parse(await getUrl());
+    // solution found here: https://stackoverflow.com/a/15750809/4637638
+    var faviconUrl = Uri.parse("https://plus.google.com/_/favicon?domain_url=" + url.scheme + "://" + url.host);
+
+    client.getUrl(faviconUrl).then((HttpClientRequest request) {
+      return request.close();
+    }).then((HttpClientResponse response) {
+      response.listen((List<int> data) {
+        faviconData = data;
+      }, onDone: () => completer.complete(faviconData));
+    });
+
+    return completer.future;
   }
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.

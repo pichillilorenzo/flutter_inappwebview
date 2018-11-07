@@ -137,7 +137,7 @@ class InAppWebView_IBWrapper: InAppWebView {
     }
 }
 
-class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
+class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, UITextFieldDelegate, WKScriptMessageHandler {
     
     @IBOutlet var webView: InAppWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
@@ -161,6 +161,10 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     var browserOptions: InAppBrowserOptions?
     var webViewOptions: InAppWebViewOptions?
     var initHeaders: [String: String]?
+    var initData: String?
+    var initMimeType: String?
+    var initEncoding: String?
+    var initBaseUrl: String?
     var isHidden = false
     var uuid: String = ""
     var WKNavigationMap: [String: [String: Any]] = [:]
@@ -186,6 +190,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         
         webView.uiDelegate = self
         webView.navigationDelegate = self
+        webView.scrollView.delegate = self
         
         urlField.delegate = self
         urlField.text = self.currentURL?.absoluteString
@@ -210,9 +215,15 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         spinner.hidesWhenStopped = true
         spinner.isHidden = false
         spinner.stopAnimating()
-
-        loadUrl(url: self.currentURL!, headers: self.initHeaders)
         
+        if self.initData == nil {
+            loadUrl(url: self.currentURL!, headers: self.initHeaders)
+        }
+        else {
+            loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
+        }
+        
+        navigationDelegate?.onBrowserCreated(uuid: uuid, webView: webView)
     }
     
     // Prevent crashes on closing windows
@@ -369,10 +380,11 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         currentURL = url
         updateUrlTextField(url: (currentURL?.absoluteString)!)
         
-        if headers != nil {
+        if let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest {
             for (key, value) in headers! {
-                request.setValue(value, forHTTPHeaderField: key)
+                mutableRequest.setValue(value, forHTTPHeaderField: key)
             }
+            request = mutableRequest as URLRequest
         }
         
         webView.load(request)
@@ -582,6 +594,7 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
                 currentURL = url
                 updateUrlTextField(url: (url.absoluteString))
             }
+            
         }
         
         
@@ -690,6 +703,14 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
     func didReceiveResourceResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
         if navigationDelegate != nil {
             navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, startTime: startTime, duration: duration)
+        }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if navigationDelegate != nil {
+            let x = Int(scrollView.contentOffset.x / scrollView.contentScaleFactor)
+            let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
+            navigationDelegate?.onScrollChanged(uuid: self.uuid, webView: webView, x: x, y: y)
         }
     }
     
@@ -960,4 +981,5 @@ class InAppBrowserWebViewController: UIViewController, WKUIDelegate, WKNavigatio
         
         return result;
     }
+
 }

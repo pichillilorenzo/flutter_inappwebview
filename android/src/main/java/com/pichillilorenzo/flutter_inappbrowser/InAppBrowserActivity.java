@@ -52,7 +52,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     Bundle b = getIntent().getExtras();
     uuid = b.getString("uuid");
-    String url = b.getString("url");
+
     HashMap<String, Object> optionsMap = (HashMap<String, Object>) b.getSerializable("options");
 
     options = new InAppBrowserOptions();
@@ -62,16 +62,29 @@ public class InAppBrowserActivity extends AppCompatActivity {
     webViewOptions.parse(optionsMap);
     webView.options = webViewOptions;
 
-    headers = (HashMap<String, String>) b.getSerializable("headers");
-
     InAppBrowserFlutterPlugin.webViewActivities.put(uuid, this);
 
     actionBar = getSupportActionBar();
 
     prepareView();
 
-    webView.loadUrl(url, headers);
-    //webView.loadData("<!DOCTYPE assets> <assets lang=\"en\"> <head> <meta charset=\"UTF-8\"> <title>Document</title> </head> <body> ciao <img src=\"https://via.placeholder.com/350x150\" /> <img src=\"./images/test\" alt=\"not found\" /></body> </assets>", "text/assets", "utf8");
+    Boolean isData = b.getBoolean("isData");
+    if (!isData) {
+      headers = (HashMap<String, String>) b.getSerializable("headers");
+      String url = b.getString("url");
+      webView.loadUrl(url, headers);
+    }
+    else {
+      String data = b.getString("data");
+      String mimeType = b.getString("mimeType");
+      String encoding = b.getString("encoding");
+      String baseUrl = b.getString("baseUrl");
+      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, null);
+    }
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", uuid);
+    InAppBrowserFlutterPlugin.channel.invokeMethod("onBrowserCreated", obj);
 
   }
 
@@ -162,6 +175,24 @@ public class InAppBrowserActivity extends AppCompatActivity {
     });
 
     return true;
+  }
+
+  public String getUrl() {
+    if (webView != null)
+      return webView.getUrl();
+    return null;
+  }
+
+  public String getWebViewTitle() {
+    if (webView != null)
+      return webView.getTitle();
+    return null;
+  }
+
+  public Integer getProgress() {
+    if (webView != null)
+      return webView.getProgress();
+    return null;
   }
 
   public void loadUrl(String url, MethodChannel.Result result) {

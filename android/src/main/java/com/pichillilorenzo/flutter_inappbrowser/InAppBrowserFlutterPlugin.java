@@ -97,71 +97,97 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
     switch (call.method) {
       case "open":
-        final String url_final = call.argument("url").toString();
+        boolean isData = (boolean) call.argument("isData");
+        if (!isData) {
+          final String url_final = call.argument("url").toString();
 
-        final boolean useChromeSafariBrowser = (boolean) call.argument("useChromeSafariBrowser");
+          final boolean useChromeSafariBrowser = (boolean) call.argument("useChromeSafariBrowser");
 
-        final Map<String, String> headers = (Map<String, String>) call.argument("headers");
+          final Map<String, String> headers = (Map<String, String>) call.argument("headers");
 
-        Log.d(LOG_TAG, "use Chrome Custom Tabs = " + useChromeSafariBrowser);
+          Log.d(LOG_TAG, "use Chrome Custom Tabs = " + useChromeSafariBrowser);
 
-        this.activity.runOnUiThread(new Runnable() {
-          @Override
-          public void run() {
+          this.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
 
-            if (useChromeSafariBrowser) {
+              if (useChromeSafariBrowser) {
 
-              final String uuidFallback = (String) call.argument("uuidFallback");
+                final String uuidFallback = (String) call.argument("uuidFallback");
 
-              final HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
+                final HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
 
-              final HashMap<String, Object> optionsFallback = (HashMap<String, Object>) call.argument("optionsFallback");
+                final HashMap<String, Object> optionsFallback = (HashMap<String, Object>) call.argument("optionsFallback");
 
-              open(uuid, uuidFallback, url_final, options, headers, true, optionsFallback, result);
-            } else {
-
-              String url = url_final;
-
-              final HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
-
-              final boolean isLocalFile = (boolean) call.argument("isLocalFile");
-              final boolean openWithSystemBrowser = (boolean) call.argument("openWithSystemBrowser");
-
-              if (isLocalFile) {
-                // check if the asset file exists
-                try {
-                  url = Util.getUrlAsset(registrar, url);
-                } catch (IOException e) {
-                  e.printStackTrace();
-                  result.error(LOG_TAG, url + " asset file cannot be found!", e);
-                  return;
-                }
-              }
-              // SYSTEM
-              if (openWithSystemBrowser) {
-                Log.d(LOG_TAG, "in system");
-                openExternal(url, result);
+                open(uuid, uuidFallback, url_final, options, headers, true, optionsFallback, result);
               } else {
-                //Load the dialer
-                if (url.startsWith(WebView.SCHEME_TEL)) {
+
+                String url = url_final;
+
+                final HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
+
+                final boolean isLocalFile = (boolean) call.argument("isLocalFile");
+                final boolean openWithSystemBrowser = (boolean) call.argument("openWithSystemBrowser");
+
+                if (isLocalFile) {
+                  // check if the asset file exists
                   try {
-                    Log.d(LOG_TAG, "loading in dialer");
-                    Intent intent = new Intent(Intent.ACTION_DIAL);
-                    intent.setData(Uri.parse(url));
-                    activity.startActivity(intent);
-                  } catch (android.content.ActivityNotFoundException e) {
-                    Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                    url = Util.getUrlAsset(registrar, url);
+                  } catch (IOException e) {
+                    e.printStackTrace();
+                    result.error(LOG_TAG, url + " asset file cannot be found!", e);
+                    return;
                   }
                 }
-                // load in InAppBrowserFlutterPlugin
-                else {
-                  Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
-                  open(uuid, null, url, options, headers, false, null, result);
+                // SYSTEM
+                if (openWithSystemBrowser) {
+                  Log.d(LOG_TAG, "in system");
+                  openExternal(url, result);
+                } else {
+                  //Load the dialer
+                  if (url.startsWith(WebView.SCHEME_TEL)) {
+                    try {
+                      Log.d(LOG_TAG, "loading in dialer");
+                      Intent intent = new Intent(Intent.ACTION_DIAL);
+                      intent.setData(Uri.parse(url));
+                      activity.startActivity(intent);
+                    } catch (android.content.ActivityNotFoundException e) {
+                      Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+                    }
+                  }
+                  // load in InAppBrowserFlutterPlugin
+                  else {
+                    Log.d(LOG_TAG, "loading in InAppBrowserFlutterPlugin");
+                    open(uuid, null, url, options, headers, false, null, result);
+                  }
                 }
               }
             }
-          }
-        });
+          });
+        }
+        else {
+          this.activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+              HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
+              String data = call.argument("data").toString();
+              String mimeType = call.argument("mimeType").toString();
+              String encoding = call.argument("encoding").toString();
+              String baseUrl = call.argument("baseUrl").toString();
+              openData(uuid, options, data, mimeType, encoding, baseUrl);
+              result.success(true);
+            }
+          });
+        }
+        break;
+      case "getUrl":
+        result.success(getUrl(uuid));
+        break;
+      case "getTitle":
+        result.success(getTitle(uuid));
+        break;
+      case "getProgress":
+        result.success(getProgress(uuid));
         break;
       case "loadUrl":
         loadUrl(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
@@ -370,7 +396,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     Intent intent = null;
     Bundle extras = new Bundle();
     extras.putString("url", url);
-
+    extras.putBoolean("isData", false);
     extras.putString("uuid", uuid);
     extras.putSerializable("options", options);
     extras.putSerializable("headers", (Serializable) headers);
@@ -406,6 +432,43 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     }
 
     result.error(LOG_TAG, "No WebView fallback declared.", null);
+  }
+
+  public void openData(String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding, String baseUrl) {
+    Intent intent = new Intent(activity, InAppBrowserActivity.class);
+    Bundle extras = new Bundle();
+
+    extras.putBoolean("isData", true);
+    extras.putString("uuid", uuid);
+    extras.putSerializable("options", options);
+    extras.putString("data", data);
+    extras.putString("mimeType", mimeType);
+    extras.putString("encoding", encoding);
+    extras.putString("baseUrl", baseUrl);
+
+    intent.putExtras(extras);
+    activity.startActivity(intent);
+  }
+
+  private String getUrl(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getUrl();
+    return null;
+  }
+
+  private String getTitle(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getWebViewTitle();
+    return null;
+  }
+
+  private Integer getProgress(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getProgress();
+    return null;
   }
 
   public void loadUrl(String uuid, String url, Map<String, String> headers, Result result) {

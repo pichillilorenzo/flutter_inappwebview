@@ -592,7 +592,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyInAppBrowser extends InAppBrowser {
-
+  
+  @override
+  void onBrowserCreated() async {
+    print("\n\nBrowser Ready!\n\n");
+  }
+  
   @override
   void onLoadStart(String url) {
     print("\n\nStarted $url\n\n");

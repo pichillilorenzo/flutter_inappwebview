@@ -694,6 +694,20 @@ class _InAppWebViewState extends State<InAppWebView> {
           creationParamsCodec: const StandardMessageCodec(),
         ),
       );
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+      return UiKitView(
+        viewType: 'com.pichillilorenzo/flutter_inappwebview',
+        onPlatformViewCreated: _onPlatformViewCreated,
+        gestureRecognizers: widget.gestureRecognizers,
+        creationParams: <String, dynamic>{
+          'initialUrl': widget.initialUrl,
+          'initialFile': widget.initialFile,
+          'initialData': widget.initialData?.toMap(),
+          'initialHeaders': widget.initialHeaders,
+          'initialOptions': widget.initialOptions
+        },
+        creationParamsCodec: const StandardMessageCodec(),
+      );
     }
     return Text(
         '$defaultTargetPlatform is not yet supported by the flutter_inappbrowser plugin');

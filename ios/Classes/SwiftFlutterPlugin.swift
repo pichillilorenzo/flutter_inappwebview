@@ -36,12 +36,12 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     static var registrar: FlutterPluginRegistrar?
+    var channel: FlutterMethodChannel
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
     
     var tmpWindow: UIWindow?
-    var channel: FlutterMethodChannel
     private var previousStatusBarStyle = -1
     
     public init(with registrar: FlutterPluginRegistrar) {
@@ -55,6 +55,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
         let instance = SwiftFlutterPlugin(with: registrar)
         registrar.addMethodCallDelegate(instance, channel: channel)
+        
+        registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: "com.pichillilorenzo/flutter_inappwebview")
         
         if #available(iOS 11.0, *) {
             MyCookieManager(registrar: registrar)

@@ -130,9 +130,9 @@ func convertToDictionary(text: String) -> [String: Any]? {
 //}
 
 class InAppWebView_IBWrapper: InAppWebView {
-    required convenience init?(coder: NSCoder) {
+    required convenience init(coder: NSCoder) {
         let config = WKWebViewConfiguration()
-        self.init(frame: .zero, configuration: config)
+        self.init(frame: .zero, configuration: config, IABController: nil, IAWController: nil)
         self.translatesAutoresizingMaskIntoConstraints = false
     }
 }
@@ -176,6 +176,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        self.webView.IABController = self
         if !viewPrepared {
             prepareConstraints()
             prepareWebView()

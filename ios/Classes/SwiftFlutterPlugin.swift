@@ -36,7 +36,7 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     static var registrar: FlutterPluginRegistrar?
-    var channel: FlutterMethodChannel
+    static var channel: FlutterMethodChannel?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -45,7 +45,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     private var previousStatusBarStyle = -1
     
     public init(with registrar: FlutterPluginRegistrar) {
-        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
+        SwiftFlutterPlugin.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -220,14 +220,14 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 }
                 break
             case "setOptions":
-                let optionsType = arguments!["optionsType"] as! String;
+                let optionsType = arguments!["optionsType"] as! String
                 switch (optionsType){
                     case "InAppBrowserOptions":
-                        let inAppBrowserOptions = InAppBrowserOptions();
-                        let inAppBroeserOptionsMap = arguments!["options"] as! [String: Any];
-                        inAppBrowserOptions.parse(options: inAppBroeserOptionsMap);
-                        self.setOptions(uuid: uuid, options: inAppBrowserOptions, optionsMap: inAppBroeserOptionsMap);
-                        break;
+                        let inAppBrowserOptions = InAppBrowserOptions()
+                        let inAppBrowserOptionsMap = arguments!["options"] as! [String: Any]
+                        inAppBrowserOptions.parse(options: inAppBrowserOptionsMap)
+                        self.setOptions(uuid: uuid, options: inAppBrowserOptions, optionsMap: inAppBrowserOptionsMap)
+                        break
                     default:
                         result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Options " + optionsType + " not available.", details: nil))
                 }
@@ -237,8 +237,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 result(self.getOptions(uuid: uuid))
                 break
             case "getCopyBackForwardList":
-                result(self.getCopyBackForwardList(uuid: uuid));
-                break;
+                result(self.getCopyBackForwardList(uuid: uuid))
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break
@@ -279,7 +279,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 
                 let optionsFallback = (arguments["optionsFallback"] as? [String: Any])!
                 
-                open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: safariOptions, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback, result: result);
+                open(uuid: uuid, uuidFallback: uuidFallback, inAppBrowser: absoluteUrl!, headers: headers, withOptions: safariOptions, useChromeSafariBrowser: true, withOptionsFallback: optionsFallback, result: result)
             }
             else {
                 let options = (arguments["options"] as? [String: Any])!
@@ -702,21 +702,21 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func onBrowserCreated(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
-            channel.invokeMethod("onBrowserCreated", arguments: ["uuid": uuid])
+            SwiftFlutterPlugin.channel!.invokeMethod("onBrowserCreated", arguments: ["uuid": uuid])
         }
     }
     
     func onLoadStart(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
             let url: String = webViewController!.currentURL!.absoluteString
-            channel.invokeMethod("onLoadStart", arguments: ["uuid": uuid, "url": url])
+            SwiftFlutterPlugin.channel!.invokeMethod("onLoadStart", arguments: ["uuid": uuid, "url": url])
         }
     }
     
     func onLoadStop(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
             let url: String = webViewController!.currentURL!.absoluteString
-            channel.invokeMethod("onLoadStop", arguments: ["uuid": uuid, "url": url])
+            SwiftFlutterPlugin.channel!.invokeMethod("onLoadStop", arguments: ["uuid": uuid, "url": url])
         }
     }
     
@@ -724,13 +724,13 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         if let webViewController = self.webViewControllers[uuid] {
             let url: String = webViewController!.currentURL!.absoluteString
             let arguments = ["uuid": uuid, "url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
-            channel.invokeMethod("onLoadError", arguments: arguments)
+            SwiftFlutterPlugin.channel!.invokeMethod("onLoadError", arguments: arguments)
         }
     }
     
     func onProgressChanged(uuid: String, webView: WKWebView, progress: Int) {
         if let webViewController = self.webViewControllers[uuid] {
-            channel.invokeMethod("onProgressChanged", arguments: ["uuid": uuid, "progress": progress])
+            SwiftFlutterPlugin.channel!.invokeMethod("onProgressChanged", arguments: ["uuid": uuid, "progress": progress])
         }
     }
     
@@ -758,50 +758,50 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     "method": request!.httpMethod!
                 ]
             ]
-            channel.invokeMethod("onLoadResource", arguments: arguments)
+            SwiftFlutterPlugin.channel!.invokeMethod("onLoadResource", arguments: arguments)
         }
     }
     
     func onScrollChanged(uuid: String, webView: WKWebView, x: Int, y: Int) {
         if let webViewController = self.webViewControllers[uuid] {
-            channel.invokeMethod("onScrollChanged", arguments: ["uuid": uuid, "x": x, "y": y])
+            SwiftFlutterPlugin.channel!.invokeMethod("onScrollChanged", arguments: ["uuid": uuid, "x": x, "y": y])
         }
     }
     
     func onExit(uuid: String) {
-        channel.invokeMethod("onExit", arguments: ["uuid": uuid])
+        SwiftFlutterPlugin.channel!.invokeMethod("onExit", arguments: ["uuid": uuid])
     }
     
     func shouldOverrideUrlLoading(uuid: String, webView: WKWebView, url: URL) {
         if self.webViewControllers[uuid] != nil {
-            channel.invokeMethod("shouldOverrideUrlLoading", arguments: ["uuid": uuid, "url": url.absoluteString])
+            SwiftFlutterPlugin.channel!.invokeMethod("shouldOverrideUrlLoading", arguments: ["uuid": uuid, "url": url.absoluteString])
         }
     }
     
     func onConsoleMessage(uuid: String, sourceURL: String, lineNumber: Int, message: String, messageLevel: String) {
         if self.webViewControllers[uuid] != nil {
-            channel.invokeMethod("onConsoleMessage", arguments: ["uuid": uuid, "sourceURL": sourceURL, "lineNumber": lineNumber, "message": message, "messageLevel": messageLevel])
+            SwiftFlutterPlugin.channel!.invokeMethod("onConsoleMessage", arguments: ["uuid": uuid, "sourceURL": sourceURL, "lineNumber": lineNumber, "message": message, "messageLevel": messageLevel])
         }
     }
     
     func onChromeSafariBrowserOpened(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
-            channel.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
+            SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
         }
     }
     
     func onChromeSafariBrowserLoaded(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
-            channel.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
+            SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
         }
     }
     
     func onChromeSafariBrowserClosed(uuid: String) {
-        channel.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
+        SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
     }
     
     func onCallJsHandler(uuid: String, webView: WKWebView, handlerName: String, args: String) {
-        channel.invokeMethod("onCallJsHandler", arguments: ["uuid": uuid, "handlerName": handlerName, "args": args])
+        SwiftFlutterPlugin.channel!.invokeMethod("onCallJsHandler", arguments: ["uuid": uuid, "handlerName": handlerName, "args": args])
     }
     
     func safariExit(uuid: String) {

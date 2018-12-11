@@ -488,6 +488,7 @@ class ChromeSafariBrowser {
     args.putIfAbsent('options', () => options);
     args.putIfAbsent('optionsFallback', () => optionsFallback);
     args.putIfAbsent('useChromeSafariBrowser', () => true);
+    args.putIfAbsent('isData', () => false);
     await _ChannelManager.channel.invokeMethod('open', args);
     this._isOpened = true;
   }

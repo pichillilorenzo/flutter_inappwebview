@@ -26,7 +26,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         scrollView.delegate = self
     }
     
-    required init(coder aDecoder: NSCoder) {
+    required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }
     

@@ -734,7 +734,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
+    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int64, duration: Int64) {
         if self.webViewControllers[uuid] != nil {
             var headersResponse = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
             headersResponse.lowercaseKeys()

@@ -15,7 +15,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var options: InAppWebViewOptions?
     var currentURL: URL?
     var WKNavigationMap: [String: [String: Any]] = [:]
-    var startPageTime = 0
+    var startPageTime: Int64 = 0
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, IAWController: FlutterWebViewController?) {
         super.init(frame: frame, configuration: configuration)
@@ -449,9 +449,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.useOnLoadResource)! {
             if let url = navigationResponse.response.url {
                 if WKNavigationMap[url.absoluteString] != nil {
-                    let startResourceTime = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int)
-                    let startTime = startResourceTime - startPageTime;
-                    let duration = currentTimeInMilliSeconds() - startResourceTime;
+                    let startResourceTime: Int64 = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int64)
+                    let startTime: Int64 = startResourceTime - startPageTime;
+                    let duration: Int64 = currentTimeInMilliSeconds() - startResourceTime;
                     onLoadResource(response: navigationResponse.response, fromRequest: WKNavigationMap[url.absoluteString]!["request"] as? URLRequest, withData: Data(), startTime: startTime, duration: duration)
                 }
             }
@@ -520,7 +520,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         getChannel().invokeMethod("onProgressChanged", arguments: arguments)
     }
     
-    public func onLoadResource(response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
+    public func onLoadResource(response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int64, duration: Int64) {
         var headersResponse = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
         headersResponse.lowercaseKeys()
         
@@ -613,8 +613,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 if !UIApplication.shared.canOpenURL(url) {
                     return
                 }
-                let startTime = Int(resource["startTime"] as! Double)
-                let duration = Int(resource["duration"] as! Double)
+                let startTime: Int64 = Int64(resource["startTime"] as! Double)
+                let duration: Int64 = Int64(resource["duration"] as! Double)
                 var urlRequest = URLRequest(url: url)
                 urlRequest.allHTTPHeaderFields = [:]
                 let config = URLSessionConfiguration.default

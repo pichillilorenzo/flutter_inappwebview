@@ -64,10 +64,10 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function(handlerName, ...args) {
 }
 """
 
-func currentTimeInMilliSeconds() -> Int {
+func currentTimeInMilliSeconds() -> Int64 {
     let currentDate = Date()
     let since1970 = currentDate.timeIntervalSince1970
-    return Int(since1970 * 1000)
+    return Int64(since1970 * 1000)
 }
 
 func convertToDictionary(text: String) -> [String: Any]? {
@@ -168,7 +168,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     var isHidden = false
     var uuid: String = ""
     var WKNavigationMap: [String: [String: Any]] = [:]
-    var startPageTime = 0
+    var startPageTime: Int64 = 0
     var viewPrepared = false
     
     required init(coder aDecoder: NSCoder) {
@@ -609,9 +609,9 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         if (webViewOptions?.useOnLoadResource)! {
             if let url = navigationResponse.response.url {
                 if WKNavigationMap[url.absoluteString] != nil {
-                    let startResourceTime = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int)
-                    let startTime = startResourceTime - startPageTime;
-                    let duration = currentTimeInMilliSeconds() - startResourceTime;
+                    let startResourceTime: Int64 = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int64)
+                    let startTime: Int64 = startResourceTime - startPageTime;
+                    let duration: Int64 = currentTimeInMilliSeconds() - startResourceTime;
                     self.didReceiveResourceResponse(navigationResponse.response, fromRequest: WKNavigationMap[url.absoluteString]!["request"] as? URLRequest, withData: Data(), startTime: startTime, duration: duration)
                 }
             }
@@ -701,7 +701,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         }
     }
     
-    func didReceiveResourceResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int, duration: Int) {
+    func didReceiveResourceResponse(_ response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int64, duration: Int64) {
         if navigationDelegate != nil {
             navigationDelegate?.onLoadResource(uuid: self.uuid, webView: webView, response: response, fromRequest: request, withData: data, startTime: startTime, duration: duration)
         }
@@ -750,8 +750,8 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
                 if !UIApplication.shared.canOpenURL(url) {
                     return
                 }
-                let startTime = Int(resource["startTime"] as! Double)
-                let duration = Int(resource["duration"] as! Double)
+                let startTime = Int64(resource["startTime"] as! Double)
+                let duration = Int64(resource["duration"] as! Double)
                 var urlRequest = URLRequest(url: url)
                 urlRequest.allHTTPHeaderFields = [:]
                 let config = URLSessionConfiguration.default

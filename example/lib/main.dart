@@ -33,29 +33,31 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: DefaultTabController(
-          length: 3,
-          child: Scaffold(
-              appBar: AppBar(
-                title: Text('Tabs Demo'),
-              ),
-              body: TabBarView(
-                children: [
-                  WebviewExampleScreen(),
-                  ChromeSafariExampleScreen(),
-                  InlineExampleScreen(),
-                ],
-              ),
-              bottomNavigationBar: Container(
-                color: Theme.of(context).primaryColor,
-                child: TabBar(
-                  indicatorColor: Colors.white,
-                  tabs: [
-                    Tab(text: "Webview"),
-                    Tab(text: "Chrome/Safari"),
-                    Tab(text: "Inline",),
-                  ],
+        length: 3,
+        child: Scaffold(
+          appBar: AppBar(
+            title: Text('Tabs Demo'),
+          ),
+          body: TabBarView(
+            children: [
+              WebviewExampleScreen(),
+              ChromeSafariExampleScreen(),
+              InlineExampleScreen(),
+            ],
+          ),
+          bottomNavigationBar: Container(
+            color: Theme.of(context).primaryColor,
+            child: TabBar(
+              indicatorColor: Colors.white,
+              tabs: [
+                Tab(text: "Webview"),
+                Tab(text: "Chrome/Safari"),
+                Tab(
+                  text: "Inline",
                 ),
-              ))),
+              ],
+            ),
+          ))),
     );
   }
 }

@@ -359,14 +359,15 @@ public class InAppWebViewClient extends WebViewClient {
 
       getChannel().invokeMethod("onLoadResource", obj);
 
-      return new WebResourceResponse(
-              response.header("content-type", "text/plain").split(";")[0].trim(),
-              response.header("content-encoding"),
-              response.code(),
-              reasonPhrase,
-              headersResponse,
-              dataStream
-      );
+      // this return is not working (it blocks some resources), so return null
+//      return new WebResourceResponse(
+//              response.header("content-type", "text/plain").split(";")[0].trim(),
+//              response.header("content-encoding", "utf-8"),
+//              response.code(),
+//              reasonPhrase,
+//              headersResponse,
+//              dataStream
+//      );
     } catch (IOException e) {
       e.printStackTrace();
       Log.d(LOG_TAG, e.getMessage());

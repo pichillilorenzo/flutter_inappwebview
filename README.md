@@ -15,12 +15,30 @@ This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://git
 - Flutter: ">=0.10.1 <2.0.0"
 
 ### IMPORTANT Note for iOS
-To be able to use this plugin on iOS, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
+If you are starting a new fresh app, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```
 === BUILD TARGET flutter_inappbrowser OF PROJECT Pods WITH CONFIGURATION Debug ===
 The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2. This setting can be set in the build settings editor.
 ```
-that is not true! The Swift version that I have used is already a supported value: 4.0.
+
+If you still have this problem, try to edit iOS `Podfile` like this (see [#15](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/15)):
+```
+target 'Runner' do
+  use_frameworks!  # required by simple_permission
+  ...
+end
+
+post_install do |installer|
+  installer.pods_project.targets.each do |target|
+    target.build_configurations.each do |config|
+      config.build_settings['SWIFT_VERSION'] = '4.0'  # required by simple_permission
+      config.build_settings['ENABLE_BITCODE'] = 'NO'
+    end
+  end
+end
+```
+
+Instead, if you have already a non-swift project, you can check this issue to solve the problem: [Friction adding swift plugin to objective-c project](https://github.com/flutter/flutter/issues/16049).
 
 ## Getting Started
 
@@ -34,7 +52,7 @@ First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](ht
 
 ## Usage
 Classes:
-- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. [**Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment. For iOS, it will be available as soon as the Flutter team will release the corresponding dart class.].
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
@@ -45,11 +63,10 @@ See the online [docs](https://pub.dartlang.org/documentation/flutter_inappbrowse
 ### `InAppWebView` class
 Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
 
-[AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html) is not officially stable yet!
+[AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html) and [UiKitView](https://docs.flutter.io/flutter/widgets/UiKitView-class.html) is not officially stable yet!
 So, if you want use it, you can but you will have some limitation such as the inability to use the keyboard!
 
-**Available only for Android** ([AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html)) at this moment.
-For iOS, it will be available as soon as the Flutter team will release the corresponding dart class.
+To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
 
 Use `InAppWebViewController` to control the WebView instance.
 Example:
@@ -188,6 +205,10 @@ Screenshots:
 - Android:
 
 ![android](https://user-images.githubusercontent.com/5956938/47271038-7aebda80-d574-11e8-98fd-41e6bbc9fe2d.gif)
+
+- iOS:
+
+![ios](https://user-images.githubusercontent.com/5956938/54096363-e1e72000-43ab-11e9-85c2-983a830ab7a0.gif)
 
 #### InAppWebView.initialUrl
 Initial url that will be loaded.

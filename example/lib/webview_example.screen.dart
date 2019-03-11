@@ -4,7 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyInappBrowser extends InAppBrowser {
-   @override
+
+ @override
  Future onBrowserCreated() async {
    print("\n\nBrowser Ready!\n\n");
  }
@@ -64,7 +65,7 @@ class MyInappBrowser extends InAppBrowser {
 }
 
 class WebviewExampleScreen extends StatefulWidget {
-  final InAppBrowser browser = new InAppBrowser();
+  final InAppBrowser browser = new MyInappBrowser();
   @override
   _WebviewExampleScreenState createState() => new _WebviewExampleScreenState();
 }

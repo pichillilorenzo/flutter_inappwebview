@@ -1,3 +1,13 @@
+## 0.6.0
+
+- added support for **iOS** inline native WebView integrated in the flutter widget tree
+- updated example folder (thanks to [marquesinijatinha](https://github.com/marquesinijatinha))
+- Fixed bug where passing null to expiresDate failed (thanks to [Sense545](https://github.com/Sense545)) 
+- Fixed iOS error: encode resourceURL (thanks to [igtm](https://github.com/igtm))
+- Fixed iOS error: Double value cannot be converted to Int because the result would be greater than Int.max in 32-bit devices (thanks to [huzhiren](https://github.com/huzhiren))
+- Fixed iOS error: problem in ChromeSafariBrowser (thanks to [marquesinijatinha](https://github.com/marquesinijatinha))
+- Fixed Android build error caused by gradle and build gradle versions (thanks to [tje3d](https://github.com/tje3d))
+
 ## 0.5.51
 
 - updated `pubspec.yaml`

@@ -8,6 +8,73 @@
 import Foundation
 import WebKit
 
+func currentTimeInMilliSeconds() -> Int64 {
+    let currentDate = Date()
+    let since1970 = currentDate.timeIntervalSince1970
+    return Int64(since1970 * 1000)
+}
+
+func convertToDictionary(text: String) -> [String: Any]? {
+    if let data = text.data(using: .utf8) {
+        do {
+            return try JSONSerialization.jsonObject(with: data, options: []) as? [String: Any]
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+    return nil
+}
+
+// the message needs to be concatenated with '' in order to have the same behavior like on Android
+let consoleLogJS = """
+(function() {
+    var oldLogs = {
+        'consoleLog': console.log,
+        'consoleDebug': console.debug,
+        'consoleError': console.error,
+        'consoleInfo': console.info,
+        'consoleWarn': console.warn
+    };
+
+    for (var k in oldLogs) {
+        (function(oldLog) {
+            console[oldLog.replace('console', '').toLowerCase()] = function() {
+                var message = '';
+                for (var i in arguments) {
+                    if (message == '') {
+                        message += arguments[i];
+                    }
+                    else {
+                        message += ' ' + arguments[i];
+                    }
+                }
+                window.webkit.messageHandlers[oldLog].postMessage(message);
+            }
+        })(k);
+    }
+})();
+"""
+
+let resourceObserverJS = """
+(function() {
+    var observer = new PerformanceObserver(function(list) {
+        list.getEntries().forEach(function(entry) {
+            window.webkit.messageHandlers['resourceLoaded'].postMessage(JSON.stringify(entry));
+        });
+    });
+    observer.observe({entryTypes: ['resource', 'mark', 'measure']});
+})();
+"""
+
+let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
+
+let javaScriptBridgeJS = """
+window.\(JAVASCRIPT_BRIDGE_NAME) = {};
+window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function(handlerName, ...args) {
+    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': handlerName, 'args': JSON.stringify(args)} );
+}
+"""
+
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
     
     var IABController: InAppBrowserWebViewController?
@@ -86,7 +153,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             // Fallback on earlier versions
             configuration.mediaPlaybackRequiresUserAction = (options?.mediaPlaybackRequiresUserGesture)!
         }
-        
         
         configuration.allowsInlineMediaPlayback = (options?.allowsInlineMediaPlayback)!
         
@@ -436,6 +502,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             if navigationAction.navigationType == .linkActivated || navigationAction.navigationType == .backForward {
                 currentURL = url
+                if IABController != nil {
+                    IABController!.updateUrlTextField(url: (currentURL?.absoluteString)!)
+                }
             }
         }
         
@@ -460,14 +529,66 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         decisionHandler(.allow)
     }
     
+    //    func webView(_ webView: WKWebView,
+    //                 decidePolicyFor navigationResponse: WKNavigationResponse,
+    //                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+    //        let mimeType = navigationResponse.response.mimeType
+    //        if mimeType != nil && !mimeType!.starts(with: "text/") {
+    //            download(url: webView.url)
+    //            decisionHandler(.cancel)
+    //            return
+    //        }
+    //        decisionHandler(.allow)
+    //    }
+    //
+    //    func download (url: URL?) {
+    //        let filename = url?.lastPathComponent
+    //
+    //        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
+    //            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    //            let fileURL = documentsURL.appendingPathComponent(filename!)
+    //
+    //            return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
+    //        }
+    //
+    //        Alamofire.download((url?.absoluteString)!, to: destination).downloadProgress { progress in
+    //            print("Download Progress: \(progress.fractionCompleted)")
+    //            }.response { response in
+    //                if response.error == nil, let path = response.destinationURL?.path {
+    //                    UIAlertView(title: nil, message: "File saved to " + path, delegate: nil, cancelButtonTitle: nil).show()
+    //                }
+    //                else {
+    //                   UIAlertView(title: nil, message: "Cannot save " + filename!, delegate: nil, cancelButtonTitle: nil).show()
+    //                }
+    //            }
+    //    }
+    
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         self.startPageTime = currentTimeInMilliSeconds()
         onLoadStart(url: (currentURL?.absoluteString)!)
+        
+        if IABController != nil {
+            // loading url, start spinner, update back/forward
+            IABController!.backButton.isEnabled = canGoBack
+            IABController!.forwardButton.isEnabled = canGoForward
+            
+            if (IABController!.browserOptions?.spinner)! {
+                IABController!.spinner.startAnimating()
+            }
+        }
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.WKNavigationMap = [:]
-        onLoadStop(url: (url?.absoluteString)!)
+        currentURL = url
+        onLoadStop(url: (currentURL?.absoluteString)!)
+        
+        if IABController != nil {
+            IABController!.updateUrlTextField(url: (currentURL?.absoluteString)!)
+            IABController!.backButton.isEnabled = canGoBack
+            IABController!.forwardButton.isEnabled = canGoForward
+            IABController!.spinner.stopAnimating()
+        }
     }
     
     public func webView(_ view: WKWebView,
@@ -478,6 +599,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         onLoadError(url: (currentURL?.absoluteString)!, error: error)
+        
+        if IABController != nil {
+            IABController!.backButton.isEnabled = canGoBack
+            IABController!.forwardButton.isEnabled = canGoForward
+            IABController!.spinner.stopAnimating()
+        }
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -609,7 +736,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         else if message.name == "resourceLoaded" && (options?.useOnLoadResource)! {
             if let resource = convertToDictionary(text: message.body as! String) {
-                let url = URL(string: resource["name"] as! String)!
+                // escape special chars
+                let resourceName = (resource["name"] as! String).addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed)
+                
+                let url = URL(string: resourceName!)!
                 if !UIApplication.shared.canOpenURL(url) {
                     return
                 }

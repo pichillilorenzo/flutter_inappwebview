@@ -211,7 +211,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "takeScreenshot":
                 if let webViewController = self.webViewControllers[uuid] {
-                    webViewController!.takeScreenshot(completionHandler: { (screenshot) -> Void in
+                    webViewController!.webView.takeScreenshot(completionHandler: { (screenshot) -> Void in
                         result(screenshot)
                     })
                 }
@@ -420,7 +420,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         webViewController.webViewOptions = webViewOptions
         webViewController.isHidden = browserOptions.hidden
         webViewController.tmpWindow = tmpWindow
-        webViewController.currentURL = url
+        webViewController.initURL = url
         webViewController.initHeaders = headers
         webViewController.navigationDelegate = self
         
@@ -708,21 +708,21 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func onLoadStart(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
-            let url: String = webViewController!.currentURL!.absoluteString
+            let url: String = webViewController!.webView.currentURL!.absoluteString
             SwiftFlutterPlugin.channel!.invokeMethod("onLoadStart", arguments: ["uuid": uuid, "url": url])
         }
     }
     
     func onLoadStop(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
-            let url: String = webViewController!.currentURL!.absoluteString
+            let url: String = webViewController!.webView.currentURL!.absoluteString
             SwiftFlutterPlugin.channel!.invokeMethod("onLoadStop", arguments: ["uuid": uuid, "url": url])
         }
     }
     
     func onLoadError(uuid: String, webView: WKWebView, error: Error) {
         if let webViewController = self.webViewControllers[uuid] {
-            let url: String = webViewController!.currentURL!.absoluteString
+            let url: String = webViewController!.webView.currentURL!.absoluteString
             let arguments = ["uuid": uuid, "url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
             SwiftFlutterPlugin.channel!.invokeMethod("onLoadError", arguments: arguments)
         }
@@ -846,7 +846,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func getCopyBackForwardList(uuid: String) -> [String: Any]? {
         if let webViewController = self.webViewControllers[uuid] {
-            return webViewController!.getCopyBackForwardList()
+            return webViewController!.webView.getCopyBackForwardList()
         }
         return nil
     }

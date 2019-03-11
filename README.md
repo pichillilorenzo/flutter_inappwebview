@@ -52,7 +52,7 @@ First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](ht
 
 ## Usage
 Classes:
-- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
@@ -61,9 +61,9 @@ Classes:
 See the online [docs](https://pub.dartlang.org/documentation/flutter_inappbrowser/latest/) to get the full documentation.
 
 ### `InAppWebView` class
-Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
+Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree.
 
-[AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html) and [UiKitView](https://docs.flutter.io/flutter/widgets/UiKitView-class.html) is not officially stable yet!
+[AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html) and [UiKitView](https://docs.flutter.io/flutter/widgets/UiKitView-class.html) are not officially stable yet!
 So, if you want use it, you can but you will have some limitation such as the inability to use the keyboard!
 
 To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.

@@ -22,11 +22,11 @@ rootProject.allprojects {
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 27
+    compileSdkVersion 28
 
     defaultConfig {
         minSdkVersion 17
-        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
     }
@@ -36,7 +36,7 @@ android {
 }
 
 dependencies {
-    implementation 'com.android.support:customtabs:27.1.1'
-    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'androidx.browser:browser:1.0.0-beta01'
+    implementation 'androidx.appcompat:appcompat:1.0.0-beta01'
     implementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
 }

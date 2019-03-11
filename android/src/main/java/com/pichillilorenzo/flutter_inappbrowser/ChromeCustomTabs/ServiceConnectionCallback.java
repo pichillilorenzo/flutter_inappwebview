@@ -1,6 +1,6 @@
 package com.pichillilorenzo.flutter_inappbrowser.ChromeCustomTabs;
 
-import android.support.customtabs.CustomTabsClient;
+import androidx.browser.customtabs.CustomTabsClient;
 
 /**
  * Callback for events when connecting and disconnecting from Custom Tabs Service.

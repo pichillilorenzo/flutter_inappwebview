@@ -1,3 +1,8 @@
+## 1.0.0
+
+Breaking changes:
+- Fixed [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0`.
+
 ## 0.6.0
 
 - added support for **iOS** inline native WebView integrated in the flutter widget tree

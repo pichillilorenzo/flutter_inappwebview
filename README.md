@@ -17,6 +17,8 @@ This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://git
 ### Note for Android
 During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `build.gradle` file to at least `17`. 
 
+Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0`.
+
 ### IMPORTANT Note for iOS
 If you are starting a new fresh app, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```

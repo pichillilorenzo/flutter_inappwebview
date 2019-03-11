@@ -14,6 +14,9 @@ This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://git
 - Dart sdk: ">=2.1.0-dev.7.1 <3.0.0"
 - Flutter: ">=0.10.1 <2.0.0"
 
+### Note for Android
+During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `build.gradle` file to at least `17`. 
+
 ### IMPORTANT Note for iOS
 If you are starting a new fresh app, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```

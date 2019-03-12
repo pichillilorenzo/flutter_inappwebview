@@ -406,6 +406,26 @@ public class InAppWebView extends WebView {
     });
   }
 
+  public void injectScriptCode(String source, MethodChannel.Result result) {
+    String jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
+    injectDeferredObject(source, jsWrapper, result);
+  }
+
+  public void injectScriptFile(String urlFile) {
+    String jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
+    injectDeferredObject(urlFile, jsWrapper, null);
+  }
+
+  public void injectStyleCode(String source) {
+    String jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
+    injectDeferredObject(source, jsWrapper, null);
+  }
+
+  public void injectStyleFile(String urlFile) {
+    String jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
+    injectDeferredObject(urlFile, jsWrapper, null);
+  }
+
   public HashMap<String, Object> getCopyBackForwardList() {
     WebBackForwardList currentList = copyBackForwardList();
     int currentSize = currentList.getSize();

@@ -279,8 +279,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if assetURL == nil {
             throw NSError(domain: url + " asset file cannot be found!", code: 0)
         }
-        let absoluteUrl = URL(string: url)!.absoluteURL
-        loadUrl(url: absoluteUrl, headers: headers)
+        loadUrl(url: assetURL!, headers: headers)
     }
     
     func setOptions(newOptions: InAppWebViewOptions, newOptionsMap: [String: Any]) {
@@ -440,19 +439,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         injectDeferredObject(source: source, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectScriptFile(urlFile: String, result: FlutterResult?) {
+    public func injectScriptFile(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectStyleCode(source: String, result: FlutterResult?) {
+    public func injectStyleCode(source: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(source: source, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(source: source, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectStyleFile(urlFile: String, result: FlutterResult?) {
+    public func injectStyleFile(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
     }
     
     public func getCopyBackForwardList() -> [String: Any] {

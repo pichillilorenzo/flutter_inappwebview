@@ -1,7 +1,12 @@
+## 1.0.1
+
+- Fixed Unable to load initialFile on iOS #56
+- Some code cleanup
+
 ## 1.0.0
 
 Breaking changes:
-- Fixed [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0`.
+- Fixed [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0` (thanks to [juicycleff](https://github.com/juicycleff)).
 
 ## 0.6.0
 

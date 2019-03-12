@@ -24,7 +24,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         self.channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
         self.channel?.setMethodCallHandler(self.handle)
         
-        var initialUrl = (args["initialUrl"] as? String)!
+        let initialUrl = (args["initialUrl"] as? String)!
         let initialFile = args["initialFile"] as? String
         let initialData = args["initialData"] as? [String: String]
         let initialHeaders = (args["initialHeaders"] as? [String: String])!
@@ -134,35 +134,29 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                     webView!.injectScriptCode(source: source, result: result)
                 }
                 else {
-                    result(false)
+                    result("")
                 }
                 break
             case "injectScriptFile":
                 if webView != nil {
                     let urlFile = (arguments!["urlFile"] as? String)!
-                    webView!.injectScriptFile(urlFile: urlFile, result: result)
+                    webView!.injectScriptFile(urlFile: urlFile)
                 }
-                else {
-                    result(false)
-                }
+                result(true)
                 break
             case "injectStyleCode":
                 if webView != nil {
                     let source = (arguments!["source"] as? String)!
-                    webView!.injectStyleCode(source: source, result: result)
+                    webView!.injectStyleCode(source: source)
                 }
-                else {
-                    result(false)
-                }
+                result(true)
                 break
             case "injectStyleFile":
                 if webView != nil {
                     let urlFile = (arguments!["urlFile"] as? String)!
-                    webView!.injectStyleFile(urlFile: urlFile, result: result)
+                    webView!.injectStyleFile(urlFile: urlFile)
                 }
-                else {
-                    result(false)
-                }
+                result(true)
                 break
             case "reload":
                 if webView != nil {

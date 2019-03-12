@@ -128,8 +128,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       case "injectScriptCode":
         if (webView != null) {
           source = call.argument("source").toString();
-          jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
-          webView.injectDeferredObject(source, jsWrapper, result);
+          webView.injectScriptCode(source, result);
         }
         else {
           result.success("");
@@ -138,24 +137,21 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       case "injectScriptFile":
         if (webView != null) {
           urlFile = call.argument("urlFile").toString();
-          jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
-          webView.injectDeferredObject(urlFile, jsWrapper, null);
+          webView.injectScriptFile(urlFile);
         }
         result.success(true);
         break;
       case "injectStyleCode":
         if (webView != null) {
           source = call.argument("source").toString();
-          jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
-          webView.injectDeferredObject(source, jsWrapper, null);
+          webView.injectStyleCode(source);
         }
         result.success(true);
         break;
       case "injectStyleFile":
         if (webView != null) {
           urlFile = call.argument("urlFile").toString();
-          jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
-          webView.injectDeferredObject(urlFile, jsWrapper, null);
+          webView.injectStyleFile(urlFile);
         }
         result.success(true);
         break;

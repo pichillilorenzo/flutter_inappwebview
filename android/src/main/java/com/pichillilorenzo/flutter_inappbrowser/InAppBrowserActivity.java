@@ -198,7 +198,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null) {
       webView.loadUrl(url, result);
     } else {
-      result.error(LOG_TAG, "Cannot load url " + url, null);
+      result.error(LOG_TAG, "webView is null", null);
     }
   }
 
@@ -206,7 +206,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null) {
       webView.loadUrl(url, headers, result);
     } else {
-      result.error(LOG_TAG, "Cannot load url " + url, null);
+      result.error(LOG_TAG, "webView is null", null);
     }
   }
 
@@ -214,7 +214,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null) {
       webView.postUrl(url, postData, result);
     } else {
-      result.error(LOG_TAG, "Cannot load url " + url, null);
+      result.error(LOG_TAG, "webView is null", null);
     }
   }
 
@@ -222,7 +222,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null) {
       webView.loadData(data, mimeType, encoding, baseUrl, result);
     } else {
-      result.error(LOG_TAG, "Cannot load data", null);
+      result.error(LOG_TAG, "webView is null", null);
     }
   }
 
@@ -230,7 +230,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null) {
       webView.loadFile(url, result);
     } else {
-      result.error(LOG_TAG, "Cannot load file " + url, null);
+      result.error(LOG_TAG, "webView is null", null);
     }
   }
 
@@ -238,7 +238,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null) {
       webView.loadFile(url, headers, result);
     } else {
-      result.error(LOG_TAG, "Cannot load file " + url, null);
+      result.error(LOG_TAG, "webView is null", null);
     }
   }
 
@@ -420,11 +420,26 @@ public class InAppBrowserActivity extends AppCompatActivity {
     return optionsMap;
   }
 
-  public void injectDeferredObject(String source, String jsWrapper, MethodChannel.Result result) {
+  public void injectScriptCode(String source, MethodChannel.Result result) {
     if (webView != null)
-      webView.injectDeferredObject(source, jsWrapper, result);
+      webView.injectScriptCode(source, result);
     else
       result.success("");
+  }
+
+  public void injectScriptFile(String urlFile) {
+    if (webView != null)
+      webView.injectScriptFile(urlFile);
+  }
+
+  public void injectStyleCode(String source) {
+    if (webView != null)
+      webView.injectStyleCode(source);
+  }
+
+  public void injectStyleFile(String urlFile) {
+    if (webView != null)
+      webView.injectStyleFile(urlFile);
   }
 
   public HashMap<String, Object> getCopyBackForwardList() {

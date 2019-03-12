@@ -212,25 +212,21 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         break;
       case "injectScriptCode":
         source = call.argument("source").toString();
-        jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
-        injectDeferredObject(uuid, source, jsWrapper, result);
+        injectScriptCode(uuid, source, result);
         break;
       case "injectScriptFile":
         urlFile = call.argument("urlFile").toString();
-        jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
-        injectDeferredObject(uuid, urlFile, jsWrapper, null);
+        injectScriptFile(uuid, urlFile);
         result.success(true);
         break;
       case "injectStyleCode":
         source = call.argument("source").toString();
-        jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
-        injectDeferredObject(uuid, source, jsWrapper, null);
+        injectStyleCode(uuid, source);
         result.success(true);
         break;
       case "injectStyleFile":
         urlFile = call.argument("urlFile").toString();
-        jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
-        injectDeferredObject(uuid, urlFile, jsWrapper, null);
+        injectStyleFile(uuid, urlFile);
         result.success(true);
         break;
       case "show":
@@ -307,12 +303,33 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
   }
 
-  private void injectDeferredObject(String uuid, String source, String jsWrapper, final Result result) {
+  private void injectScriptCode(String uuid, String source, final Result result) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
-      inAppBrowserActivity.injectDeferredObject(source, jsWrapper, result);
+      inAppBrowserActivity.injectScriptCode(source, result);
     } else {
-      Log.d(LOG_TAG, "Can't inject code into the system browser");
+      Log.d(LOG_TAG, "webView is null");
+    }
+  }
+
+  private void injectScriptFile(String uuid, String urlFile) {
+    final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity.injectScriptFile(urlFile);
+    }
+  }
+
+  private void injectStyleCode(String uuid, String source) {
+    final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity.injectStyleCode(source);
+    }
+  }
+
+  private void injectStyleFile(String uuid, String urlFile) {
+    final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity.injectStyleFile(urlFile);
     }
   }
 

@@ -198,15 +198,15 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 self.injectScriptCode(uuid: uuid, arguments: arguments!, result: result)
                 break
             case "injectScriptFile":
-                self.injectScriptFile(uuid: uuid, arguments: arguments!, result: nil)
+                self.injectScriptFile(uuid: uuid, arguments: arguments!)
                 result(true)
                 break
             case "injectStyleCode":
-                self.injectStyleCode(uuid: uuid, arguments: arguments!, result: nil)
+                self.injectStyleCode(uuid: uuid, arguments: arguments!)
                 result(true)
                 break
             case "injectStyleFile":
-                self.injectStyleFile(uuid: uuid, arguments: arguments!, result: nil)
+                self.injectStyleFile(uuid: uuid, arguments: arguments!)
                 result(true)
                 break
             case "takeScreenshot":
@@ -496,7 +496,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         if browserOptions.hidden {
             webViewController.view.isHidden = true
             tmpController.present(webViewController, animated: false, completion: {() -> Void in
-                webViewController.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+                webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
             })
             webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
                 self.tmpWindow?.windowLevel = 0.0
@@ -505,66 +505,23 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             tmpController.present(webViewController, animated: true, completion: {() -> Void in
-                webViewController.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+                webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
             })
         }
         
     }
     
-    public func loadUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
-        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
-        if let url = arguments["url"] as? String {
-            let headers = (arguments["headers"] as? [String: String])!
-            let absoluteUrl = URL(string: url)!.absoluteURL
-            webViewController.loadUrl(url: absoluteUrl, headers: headers)
-        }
-        else {
-            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+    func open(inSystem url: URL, result: @escaping FlutterResult) {
+        if !UIApplication.shared.canOpenURL(url) {
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url.absoluteString + " cannot be opened!", details: nil))
             return
         }
-        result(true)
-    }
-    
-    public func loadData(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
-        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
-        let data = (arguments["data"] as? String)!
-        let mimeType = (arguments["mimeType"] as? String)!
-        let encoding = (arguments["encoding"] as? String)!
-        let baseUrl = (arguments["baseUrl"] as? String)!
-        webViewController.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
-        result(true)
-    }
-    
-    public func postUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
-        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
-        if let url = arguments["url"] as? String {
-            let postData = (arguments["postData"] as? FlutterStandardTypedData)!
-            let absoluteUrl = URL(string: url)!.absoluteURL
-            webViewController.postUrl(url: absoluteUrl, postData: postData.data, result: result)
-        }
         else {
-            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
-            return
-        }
-    }
-    
-    public func loadFile(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
-        let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
-        if let url = arguments["url"] as? String {
-            let headers = (arguments["headers"] as? [String: String])!
-
-            let key = SwiftFlutterPlugin.registrar!.lookupKey(forAsset: url)
-            let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
-            if assetURL == nil {
-                result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url + " asset file cannot be found!", details: nil))
-                return
+            if #available(iOS 10.0, *) {
+                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+            } else {
+                UIApplication.shared.openURL(url)
             }
-            let absoluteUrl = URL(string: url)!.absoluteURL
-            webViewController.loadUrl(url: absoluteUrl, headers: headers)
-        }
-        else {
-            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
-            return
         }
         result(true)
     }
@@ -616,88 +573,106 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func open(inSystem url: URL, result: @escaping FlutterResult) {
-        if !UIApplication.shared.canOpenURL(url) {
-            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url.absoluteString + " cannot be opened!", details: nil))
-            return
+    public func loadUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            if let url = arguments["url"] as? String {
+                let headers = (arguments["headers"] as? [String: String])!
+                let absoluteUrl = URL(string: url)!.absoluteURL
+                webViewController!.loadUrl(url: absoluteUrl, headers: headers)
+            }
+            else {
+                result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+                return
+            }
+            result(true)
         }
         else {
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
-            } else {
-                UIApplication.shared.openURL(url)
-            }
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "webView is null", details: nil))
         }
-        result(true)
     }
     
-    // This is a helper method for the inject{Script|Style}{Code|File} API calls, which
-    // provides a consistent method for injecting JavaScript code into the document.
-    //
-    // If a wrapper string is supplied, then the source string will be JSON-encoded (adding
-    // quotes) and wrapped using string formatting. (The wrapper string should have a single
-    // '%@' marker).
-    //
-    // If no wrapper is supplied, then the source string is executed directly.
-    func injectDeferredObject(uuid: String, source: String, withWrapper jsWrapper: String, result: FlutterResult?) {
+    public func loadData(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
         if let webViewController = self.webViewControllers[uuid] {
-            let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
-            let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
-            if sourceArrayString != nil {
-                let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.count ?? 0) - 2))
-                let jsToInject = String(format: jsWrapper, sourceString!)
-                
-                webViewController?.webView?.evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
-                    if result == nil {
-                        return
-                    }
-                    
-                    if error != nil {
-                        let userInfo = (error! as NSError).userInfo
-                        self.onConsoleMessage(uuid: uuid, sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as? URL)?.absoluteString ?? "", lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: "ERROR")
-                    }
-                    
-                    if value == nil {
-                        result!("")
-                        return
-                    }
-                    
-                    do {
-                        let data: Data = ("[" + String(describing: value!) + "]").data(using: String.Encoding.utf8, allowLossyConversion: false)!
-                        let json: Array<Any> = try JSONSerialization.jsonObject(with: data, options: []) as! Array<Any>
-                        if json[0] is String {
-                            result!(json[0])
-                        }
-                        else {
-                            result!(value)
-                        }
-                    } catch let error as NSError {
-                        result!(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Failed to load: \(error.localizedDescription)", details: error))
-                    }
-                    
+            let data = (arguments["data"] as? String)!
+            let mimeType = (arguments["mimeType"] as? String)!
+            let encoding = (arguments["encoding"] as? String)!
+            let baseUrl = (arguments["baseUrl"] as? String)!
+            webViewController!.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+            result(true)
+        }
+        else {
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "webView is null", details: nil))
+        }
+    }
+    
+    public func postUrl(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            if let url = arguments["url"] as? String {
+                let postData = (arguments["postData"] as? FlutterStandardTypedData)!
+                let absoluteUrl = URL(string: url)!.absoluteURL
+                webViewController!.webView.postUrl(url: absoluteUrl, postData: postData.data, completionHandler: { () -> Void in
+                    result(true)
                 })
             }
+            else {
+                result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+                return
+            }
+        }
+        else {
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "webView is null", details: nil))
         }
     }
     
-    public func injectScriptCode(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
-        let jsWrapper = "(function(){return JSON.stringify(eval(%@));})();"
-        injectDeferredObject(uuid: uuid, source: arguments["source"] as! String, withWrapper: jsWrapper, result: result)
+    public func loadFile(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            if let url = arguments["url"] as? String {
+                let headers = (arguments["headers"] as? [String: String])!
+                do {
+                    try webViewController!.webView.loadFile(url: url, headers: headers)
+                }
+                catch let error as NSError {
+                    dump(error)
+                    result(FlutterError(code: "InAppBrowserFlutterPlugin", message: error.localizedDescription, details: nil))
+                    return
+                }
+            }
+            else {
+                result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "url is empty", details: nil))
+                return
+            }
+            result(true)
+        }
+        else {
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "webView is null", details: nil))
+        }
     }
     
-    public func injectScriptFile(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
-        let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(uuid: uuid, source: arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
+    public func injectScriptCode(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.injectScriptCode(source: arguments["source"] as! String, result: result)
+        }
+        else {
+            result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "webView is null", details: nil))
+        }
     }
     
-    public func injectStyleCode(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
-        let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(uuid: uuid, source: arguments["source"] as! String, withWrapper: jsWrapper, result: result)
+    public func injectScriptFile(uuid: String, arguments: NSDictionary) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.injectScriptFile(urlFile: arguments["urlFile"] as! String)
+        }
     }
     
-    public func injectStyleFile(uuid: String, arguments: NSDictionary, result: FlutterResult?) {
-        let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(uuid: uuid, source: arguments["urlFile"] as! String, withWrapper: jsWrapper, result: result)
+    public func injectStyleCode(uuid: String, arguments: NSDictionary) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.injectStyleCode(source: arguments["source"] as! String)
+        }
+    }
+    
+    public func injectStyleFile(uuid: String, arguments: NSDictionary) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.injectStyleFile(urlFile: arguments["urlFile"] as! String)
+        }
     }
     
     func onBrowserCreated(uuid: String, webView: WKWebView) {
@@ -706,82 +681,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func onLoadStart(uuid: String, webView: WKWebView) {
-        if let webViewController = self.webViewControllers[uuid] {
-            let url: String = webViewController!.webView.currentURL!.absoluteString
-            SwiftFlutterPlugin.channel!.invokeMethod("onLoadStart", arguments: ["uuid": uuid, "url": url])
-        }
-    }
-    
-    func onLoadStop(uuid: String, webView: WKWebView) {
-        if let webViewController = self.webViewControllers[uuid] {
-            let url: String = webViewController!.webView.currentURL!.absoluteString
-            SwiftFlutterPlugin.channel!.invokeMethod("onLoadStop", arguments: ["uuid": uuid, "url": url])
-        }
-    }
-    
-    func onLoadError(uuid: String, webView: WKWebView, error: Error) {
-        if let webViewController = self.webViewControllers[uuid] {
-            let url: String = webViewController!.webView.currentURL!.absoluteString
-            let arguments = ["uuid": uuid, "url": url, "code": error._code, "message": error.localizedDescription] as [String : Any]
-            SwiftFlutterPlugin.channel!.invokeMethod("onLoadError", arguments: arguments)
-        }
-    }
-    
-    func onProgressChanged(uuid: String, webView: WKWebView, progress: Int) {
-        if let webViewController = self.webViewControllers[uuid] {
-            SwiftFlutterPlugin.channel!.invokeMethod("onProgressChanged", arguments: ["uuid": uuid, "progress": progress])
-        }
-    }
-    
-    func onLoadResource(uuid: String, webView: WKWebView, response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int64, duration: Int64) {
-        if self.webViewControllers[uuid] != nil {
-            var headersResponse = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
-            headersResponse.lowercaseKeys()
-            
-            var headersRequest = request!.allHTTPHeaderFields! as [String: String]
-            headersRequest.lowercaseKeys()
-            
-            let arguments: [String : Any] = [
-                "uuid": uuid,
-                "response": [
-                    "url": response.url!.absoluteString,
-                    "statusCode": (response as! HTTPURLResponse).statusCode,
-                    "headers": headersResponse,
-                    "startTime": startTime,
-                    "duration": duration,
-                    "data": data
-                ],
-                "request": [
-                    "url": request!.url!.absoluteString,
-                    "headers": headersRequest,
-                    "method": request!.httpMethod!
-                ]
-            ]
-            SwiftFlutterPlugin.channel!.invokeMethod("onLoadResource", arguments: arguments)
-        }
-    }
-    
-    func onScrollChanged(uuid: String, webView: WKWebView, x: Int, y: Int) {
-        if let webViewController = self.webViewControllers[uuid] {
-            SwiftFlutterPlugin.channel!.invokeMethod("onScrollChanged", arguments: ["uuid": uuid, "x": x, "y": y])
-        }
-    }
-    
     func onExit(uuid: String) {
         SwiftFlutterPlugin.channel!.invokeMethod("onExit", arguments: ["uuid": uuid])
-    }
-    
-    func shouldOverrideUrlLoading(uuid: String, webView: WKWebView, url: URL) {
-        if self.webViewControllers[uuid] != nil {
-            SwiftFlutterPlugin.channel!.invokeMethod("shouldOverrideUrlLoading", arguments: ["uuid": uuid, "url": url.absoluteString])
-        }
-    }
-    
-    func onConsoleMessage(uuid: String, sourceURL: String, lineNumber: Int, message: String, messageLevel: String) {
-        if self.webViewControllers[uuid] != nil {
-            SwiftFlutterPlugin.channel!.invokeMethod("onConsoleMessage", arguments: ["uuid": uuid, "sourceURL": sourceURL, "lineNumber": lineNumber, "message": message, "messageLevel": messageLevel])
-        }
     }
     
     func onChromeSafariBrowserOpened(uuid: String) {
@@ -798,10 +699,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func onChromeSafariBrowserClosed(uuid: String) {
         SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
-    }
-    
-    func onCallJsHandler(uuid: String, webView: WKWebView, handlerName: String, args: String) {
-        SwiftFlutterPlugin.channel!.invokeMethod("onCallJsHandler", arguments: ["uuid": uuid, "handlerName": handlerName, "args": args])
     }
     
     func safariExit(uuid: String) {

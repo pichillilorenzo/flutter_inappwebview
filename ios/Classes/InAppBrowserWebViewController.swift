@@ -154,7 +154,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
             loadUrl(url: self.initURL!, headers: self.initHeaders)
         }
         else {
-            loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
+            webView.loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
         }
         
         navigationDelegate?.onBrowserCreated(uuid: uuid, webView: webView)
@@ -223,16 +223,6 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     func loadUrl(url: URL, headers: [String: String]?) {
         webView.loadUrl(url: url, headers: headers)
         updateUrlTextField(url: (webView.currentURL?.absoluteString)!)
-    }
-    
-    func loadData(data: String, mimeType: String, encoding: String, baseUrl: String) {
-        webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
-    }
-    
-    func postUrl(url: URL, postData: Data, result: @escaping FlutterResult) {
-        webView.postUrl(url: url, postData: postData, completionHandler: { () -> Void in
-            result(true)
-        })
     }
     
     // Load user requested url

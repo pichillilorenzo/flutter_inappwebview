@@ -65,7 +65,7 @@ class MyInappBrowser extends InAppBrowser {
 }
 
 class WebviewExampleScreen extends StatefulWidget {
-  final InAppBrowser browser = new MyInappBrowser();
+  final MyInappBrowser browser = new MyInappBrowser();
   @override
   _WebviewExampleScreenState createState() => new _WebviewExampleScreenState();
 }
@@ -81,7 +81,10 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
     return new Center(
       child: new RaisedButton(
           onPressed: ()  {
-            widget.browser.open(url:"https://flutter.io/");
+            widget.browser.open(url: "https://flutter.dev/", options: {
+              "useShouldOverrideUrlLoading": true,
+              "useOnLoadResource": true
+            });
           },
           child: Text("Open Webview Browser")),
     );

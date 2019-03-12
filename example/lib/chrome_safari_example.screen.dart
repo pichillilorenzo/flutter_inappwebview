@@ -38,7 +38,7 @@ class _ChromeSafariExampleScreenState extends State<ChromeSafariExampleScreen> {
     return new Center(
       child: new RaisedButton(
           onPressed: () async {
-            await widget.browser.open("https://flutter.io/");
+            await widget.browser.open("https://flutter.dev/");
           },
           child: Text("Open Chrome Safari Browser")),
     );

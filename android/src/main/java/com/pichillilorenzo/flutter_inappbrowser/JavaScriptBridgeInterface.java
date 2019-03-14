@@ -4,7 +4,6 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
-import com.google.gson.Gson;
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
 
 import java.util.HashMap;
@@ -43,13 +42,12 @@ public class JavaScriptBridgeInterface {
 
     getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
       @Override
-      public void success(Object o) {
-        String json = new Gson().toJson(o);
+      public void success(Object json) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-          flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + ");", null);
+          flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
         }
         else {
-          flutterWebView.webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + ");");
+          flutterWebView.webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
         }
       }
 

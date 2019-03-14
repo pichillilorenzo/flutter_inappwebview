@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
 import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -129,6 +130,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null) {
           source = call.argument("source").toString();
           webView.injectScriptCode(source, result);
+          // ((InputMethodManager) this.activity.getSystemService(Context.INPUT_METHOD_SERVICE)).toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
         }
         else {
           result.success("");

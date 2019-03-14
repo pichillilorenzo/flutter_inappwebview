@@ -722,12 +722,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             else {
                 var json = "null"
                 if let r = result {
-                    json = JSONSerializer.toJson(r)
-                    if json == "{}" {
-                        json = "\(r)"
-                    }
+                    json = r as! String
                 }
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));", completionHandler: nil)
+                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json)); delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];", completionHandler: nil)
             }
         })
     }

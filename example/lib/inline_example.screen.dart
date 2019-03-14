@@ -6,6 +6,20 @@ class InlineExampleScreen extends StatefulWidget {
   _InlineExampleScreenState createState() => new _InlineExampleScreenState();
 }
 
+class User {
+  String username;
+  String password;
+
+  User({this.username, this.password});
+
+  Map<String, dynamic> toJson() {
+    return {
+      'username': this.username,
+      'password': this.password
+    };
+  }
+}
+
 class _InlineExampleScreenState extends State<InlineExampleScreen> {
   InAppWebViewController webView;
   String url = "";
@@ -40,15 +54,18 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
           decoration:
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
-            initialUrl: "https://flutter.dev/",
-            //initialFile: "assets/index.html",
+            //initialUrl: "https://mottie.github.io/Keyboard/",
+            initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: {
-              "useShouldOverrideUrlLoading": true,
-              "useOnLoadResource": true
+              //"useShouldOverrideUrlLoading": true,
+              //"useOnLoadResource": true
             },
             onWebViewCreated: (InAppWebViewController controller) {
               webView = controller;
+              controller.addJavaScriptHandler('handlerTest', (args) {
+                return new User(username: 'user', password: 'secret');
+              });
             },
             onLoadStart: (InAppWebViewController controller, String url) {
               print("started $url");

@@ -27,7 +27,14 @@
         </div>
     </div>
     <script>
-        console.log("hello");
+        window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+            console.log("ready");
+
+            window.flutter_inappbrowser.callHandler('handlerTest', 1).then(function(result) {
+                console.log(result, typeof result);
+            });
+        });
+
     </script>
 </div>
 </body>

@@ -76,6 +76,8 @@ public class InAppWebView extends WebView {
           "   }" +
           "})();";
 
+  static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
+
   public InAppWebView(Context context) {
     super(context);
   }

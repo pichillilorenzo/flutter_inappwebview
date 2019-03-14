@@ -1,6 +1,11 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
+import android.os.Build;
+import android.util.Log;
 import android.webkit.JavascriptInterface;
+
+import com.google.gson.Gson;
+import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -14,7 +19,11 @@ public class JavaScriptBridgeInterface {
   private InAppBrowserActivity inAppBrowserActivity;
 
   public static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function(handlerName, ...args) {" +
-    "window." + name + "._callHandler(handlerName, JSON.stringify(args));" +
+    "var _callHandlerID = setTimeout(function(){});" +
+    "window." + name + "._callHandler(handlerName, _callHandlerID, JSON.stringify(args));" +
+    "return new Promise(function(resolve, reject) {" +
+    "  window." + name + "[_callHandlerID] = resolve;" +
+    "});" +
   "}";
 
   public JavaScriptBridgeInterface(Object obj) {
@@ -25,13 +34,35 @@ public class JavaScriptBridgeInterface {
   }
 
   @JavascriptInterface
-  public void _callHandler(String handlerName, String args) {
+  public void _callHandler(String handlerName, final String _callHandlerID, String args) {
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("handlerName", handlerName);
     obj.put("args", args);
-    getChannel().invokeMethod("onCallJsHandler", obj);
+
+    getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object o) {
+        String json = new Gson().toJson(o);
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+          flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + ");", null);
+        }
+        else {
+          flutterWebView.webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + ");");
+        }
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.d(LOG_TAG, "ERROR: " + s + " " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+
+      }
+    });
   }
 
   private MethodChannel getChannel() {

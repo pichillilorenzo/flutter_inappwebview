@@ -41,6 +41,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
             initialUrl: "https://flutter.dev/",
+            //initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: {
               "useShouldOverrideUrlLoading": true,
@@ -55,7 +56,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 this.url = url;
               });
             },
-            onLoadStop: (InAppWebViewController controller, String url) {
+            onLoadStop: (InAppWebViewController controller, String url) async {
               print("stopped $url");
             },
             onProgressChanged:
@@ -70,7 +71,10 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onLoadResource: (InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request) {
               print("resource " + request.url);
-            }
+            },
+            onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
+              print(consoleMessage.message);
+            },
           ),
         ),
       ),

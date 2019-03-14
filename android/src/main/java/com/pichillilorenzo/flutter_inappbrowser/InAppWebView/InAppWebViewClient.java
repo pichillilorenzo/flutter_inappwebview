@@ -11,6 +11,7 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -195,7 +196,7 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
 
-  public void onPageFinished(WebView view, String url) {
+  public void onPageFinished(final WebView view, String url) {
     super.onPageFinished(view, url);
 
     ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = false;
@@ -213,11 +214,18 @@ public class InAppWebViewClient extends WebViewClient {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       view.evaluateJavascript(InAppWebView.consoleLogJS, null);
-      view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, null);
+      view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, new ValueCallback<String>() {
+        @Override
+        public void onReceiveValue(String value) {
+          view.evaluateJavascript(InAppWebView.platformReadyJS, null);
+        }
+      });
+
     }
     else {
       view.loadUrl("javascript:"+InAppWebView.consoleLogJS);
       view.loadUrl("javascript:"+JavaScriptBridgeInterface.flutterInAppBroserJSClass);
+      view.loadUrl("javascript:"+InAppWebView.platformReadyJS);
     }
 
     Map<String, Object> obj = new HashMap<>();

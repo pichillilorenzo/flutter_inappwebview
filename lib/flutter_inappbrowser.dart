@@ -34,7 +34,7 @@ import 'package:uuid/uuid.dart';
 import 'package:mime/mime.dart';
 
 typedef Future<dynamic> ListenerCallback(MethodCall call);
-typedef Future<void> JavaScriptHandlerCallback(List<dynamic> arguments);
+typedef dynamic JavaScriptHandlerCallback(List<dynamic> arguments);
 
 var _uuidGenerator = new Uuid();
 
@@ -112,7 +112,7 @@ class _ChannelManager {
 class InAppBrowser {
 
   String uuid;
-  Map<String, List<JavaScriptHandlerCallback>> javaScriptHandlersMap = HashMap<String, List<JavaScriptHandlerCallback>>();
+  Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap = HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
   /// WebView Controller that can be used to access the [InAppWebView] API.
   InAppWebViewController webViewController;
@@ -735,7 +735,7 @@ class InAppWebViewController {
 
   InAppWebView _widget;
   MethodChannel _channel;
-  Map<String, List<JavaScriptHandlerCallback>> javaScriptHandlersMap = HashMap<String, List<JavaScriptHandlerCallback>>();
+  Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap = HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
   int _id;
   String _inAppBrowserUuid;
@@ -849,9 +849,7 @@ class InAppWebViewController {
         String handlerName = call.arguments["handlerName"];
         List<dynamic> args = jsonDecode(call.arguments["args"]);
         if (javaScriptHandlersMap.containsKey(handlerName)) {
-          for (var handler in javaScriptHandlersMap[handlerName]) {
-            handler(args);
-          }
+          return await javaScriptHandlersMap[handlerName](args);
         }
         break;
       default:
@@ -1140,31 +1138,22 @@ class InAppWebViewController {
     await _channel.invokeMethod('injectStyleFile', args);
   }
 
-  ///Adds/Appends a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
-  ///Returns the position `index` of the handler that can be used to remove it with the [removeJavaScriptHandler()] method.
+  ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
   ///
   ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
   ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
   ///
   ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args);`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
-  int addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
-    this.javaScriptHandlersMap.putIfAbsent(handlerName, () => List<JavaScriptHandlerCallback>());
-    this.javaScriptHandlersMap[handlerName].add(callback);
-    return this.javaScriptHandlersMap[handlerName].indexOf(callback);
+  void addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
+    this.javaScriptHandlersMap[handlerName] = (callback);
   }
 
-  ///Removes a JavaScript message handler previously added with the [addJavaScriptHandler()] method in the [handlerName] list by its position [index].
-  ///Returns `true` if the callback is removed, otherwise `false`.
-  bool removeJavaScriptHandler(String handlerName, int index) {
-    try {
-      this.javaScriptHandlersMap[handlerName].removeAt(index);
-      return true;
-    }
-    on RangeError catch(e) {
-      print(e);
-    }
-    return false;
+  ///Removes a JavaScript message handler previously added with the [addJavaScriptHandler()] associated to [handlerName] key.
+  ///Returns the value associated with [handlerName] before it was removed.
+  ///Returns `null` if [handlerName] was not found.
+  JavaScriptHandlerCallback removeJavaScriptHandler(String handlerName) {
+    return this.javaScriptHandlersMap.remove(handlerName);
   }
 
   ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.

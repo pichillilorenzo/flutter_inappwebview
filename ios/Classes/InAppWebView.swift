@@ -5,6 +5,7 @@
 //  Created by Lorenzo on 21/10/18.
 //
 
+import Flutter
 import Foundation
 import WebKit
 
@@ -71,9 +72,15 @@ let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
 let javaScriptBridgeJS = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = {};
 window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function(handlerName, ...args) {
-    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': handlerName, 'args': JSON.stringify(args)} );
+    var _callHandlerID = setTimeout(function(){});
+    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': handlerName, '_callHandlerID': _callHandlerID, 'args': JSON.stringify(args)} );
+    return new Promise(function(resolve, reject) {
+        window.\(JAVASCRIPT_BRIDGE_NAME)[_callHandlerID] = resolve;
+    });
 }
 """
+
+let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
     
@@ -235,11 +242,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func loadUrl(url: URL, headers: [String: String]?) {
         var request = URLRequest(url: url)
         currentURL = url
-        if let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest {
-            for (key, value) in headers! {
-                mutableRequest.setValue(value, forHTTPHeaderField: key)
+        if headers != nil {
+            if let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest {
+                for (key, value) in headers! {
+                    mutableRequest.setValue(value, forHTTPHeaderField: key)
+                }
+                request = mutableRequest as URLRequest
             }
-            request = mutableRequest as URLRequest
         }
         load(request)
     }
@@ -581,6 +590,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         self.WKNavigationMap = [:]
         currentURL = url
         onLoadStop(url: (currentURL?.absoluteString)!)
+        evaluateJavaScript(platformReadyJS, completionHandler: nil)
         
         if IABController != nil {
             IABController!.updateUrlTextField(url: (currentURL?.absoluteString)!)
@@ -698,12 +708,28 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         getChannel().invokeMethod("onConsoleMessage", arguments: arguments)
     }
     
-    public func onCallJsHandler(handlerName: String, args: String) {
+    public func onCallJsHandler(handlerName: String, _callHandlerID: Int64, args: String) {
         var arguments: [String: Any] = ["handlerName": handlerName, "args": args]
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onCallJsHandler", arguments: arguments)
+        
+        getChannel().invokeMethod("onCallJsHandler", arguments: arguments, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message)
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {}
+            else {
+                var json = "null"
+                if let r = result {
+                    json = JSONSerializer.toJson(r)
+                    if json == "{}" {
+                        json = "\(r)"
+                    }
+                }
+                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));", completionHandler: nil)
+            }
+        })
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -765,8 +791,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         else if message.name == "callHandler" {
             let body = message.body as! [String: Any]
             let handlerName = body["handlerName"] as! String
+            let _callHandlerID = body["_callHandlerID"] as! Int64
             let args = body["args"] as! String
-            onCallJsHandler(handlerName: handlerName, args: args)
+            onCallJsHandler(handlerName: handlerName, _callHandlerID: _callHandlerID, args: args)
         }
     }
     

@@ -750,7 +750,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     // listen for post messages coming from the JavaScript side
-    int indexTest = inAppBrowser.webViewController.addJavaScriptHandler("handlerNameTest", (arguments) async {
+    inAppBrowser.webViewController.addJavaScriptHandler("handlerNameTest", (arguments) async {
       print("handlerNameTest arguments");
       print(arguments); // it prints: [1, 5, string, {key: 5}, [4, 6, 8]]
     });

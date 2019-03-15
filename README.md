@@ -552,10 +552,9 @@ Injects a CSS file into the `InAppWebView` window.
 inAppWebViewController.injectStyleFile(String urlFile);
 ```
 
-#### int InAppWebViewController.addJavaScriptHandler
+#### void InAppWebViewController.addJavaScriptHandler
 
-Adds/Appends a JavaScript message handler `callback` (`JavaScriptHandlerCallback`) that listen to post messages sent from JavaScript by the handler with name `handlerName`.
-Returns the position `index` of the handler that can be used to remove it with the `removeJavaScriptHandler()` method.
+Adds a JavaScript message handler `callback` (`JavaScriptHandlerCallback`) that listen to post messages sent from JavaScript by the handler with name `handlerName`.
 
 The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
 The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
@@ -563,14 +562,42 @@ The iOS implementation uses [addScriptMessageHandler](https://developer.apple.co
 The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args);`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
 The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
 
+In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
+This event will be dispatch as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
+```javascript
+window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+    console.log("ready");
+});
+```
+
+`window.flutter_inappbrowser.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+that can be used to get the json result returned by `JavaScriptHandlerCallback`.
+In this case, simply return data that you want to send and it will be automatically json encoded using `jsonEncode` from the `dart:convert` library.
+
+So, on the JavaScript side, to get data coming from the Dart side, you will use:
+```javascript
+window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+    window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
+        console.log(result, typeof result);
+        console.log(JSON.stringify(result));
+    });
+
+    window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
+        console.log(result, typeof result);
+        console.log(JSON.stringify(result));
+    });
+});
+```
+
 ```dart
 inAppWebViewController.addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback);
 ```
 
-#### bool InAppWebViewController.removeJavaScriptHandler
+#### JavaScriptHandlerCallback InAppWebViewController.removeJavaScriptHandler
 
-Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` method in the `handlerName` list by its position `index`.
-Returns `true` if the callback is removed, otherwise `false`.
+Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
+Returns the value associated with `handlerName` before it was removed.
+Returns `null` if `handlerName` was not found.
 ```dart
 inAppWebViewController.removeJavaScriptHandler(String handlerName, int index);
 ```

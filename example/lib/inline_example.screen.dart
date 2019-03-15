@@ -6,16 +6,16 @@ class InlineExampleScreen extends StatefulWidget {
   _InlineExampleScreenState createState() => new _InlineExampleScreenState();
 }
 
-class User {
-  String username;
-  String password;
+class Foo {
+  String bar;
+  String baz;
 
-  User({this.username, this.password});
+  Foo({this.bar, this.baz});
 
   Map<String, dynamic> toJson() {
     return {
-      'username': this.username,
-      'password': this.password
+      'bar': this.bar,
+      'baz': this.baz
     };
   }
 }
@@ -54,7 +54,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
           decoration:
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
-            //initialUrl: "https://mottie.github.io/Keyboard/",
+            //initialUrl: "https://flutter.dev/",
             initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: {
@@ -63,8 +63,14 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onWebViewCreated: (InAppWebViewController controller) {
               webView = controller;
-              controller.addJavaScriptHandler('handlerTest', (args) {
-                return new User(username: 'user', password: 'secret');
+
+              webView.addJavaScriptHandler('handlerFoo', (args) {
+                return new Foo(bar: 'bar_value', baz: 'baz_value');
+              });
+
+              webView.addJavaScriptHandler('handlerFooWithArgs', (args) {
+                print(args);
+                return [args[0] + 5, !args[1], args[2][0], args[3]['foo']];
               });
             },
             onLoadStart: (InAppWebViewController controller, String url) {
@@ -87,10 +93,21 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               controller.loadUrl(url);
             },
             onLoadResource: (InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request) {
-              print("resource " + request.url);
+              print("Started at: " +
+                  response.startTime.toString() +
+                  "ms ---> duration: " +
+                  response.duration.toString() +
+                  "ms " +
+                  response.url);
             },
             onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-              print(consoleMessage.message);
+              print("""
+              console output:
+                sourceURL: ${consoleMessage.sourceURL}
+                lineNumber: ${consoleMessage.lineNumber}
+                message: ${consoleMessage.message}
+                messageLevel: ${consoleMessage.messageLevel}
+              """);
             },
           ),
         ),

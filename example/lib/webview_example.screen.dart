@@ -47,8 +47,7 @@ class MyInappBrowser extends InAppBrowser {
  }
 
  @override
- void onLoadResource(
-     WebResourceResponse response, WebResourceRequest request) {
+ void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
    print("Started at: " +
        response.startTime.toString() +
        "ms ---> duration: " +
@@ -59,7 +58,13 @@ class MyInappBrowser extends InAppBrowser {
 
  @override
  void onConsoleMessage(ConsoleMessage consoleMessage) {
-   print(consoleMessage.message);
+   print("""
+    console output:
+      sourceURL: ${consoleMessage.sourceURL}
+      lineNumber: ${consoleMessage.lineNumber}
+      message: ${consoleMessage.message}
+      messageLevel: ${consoleMessage.messageLevel}
+   """);
  }
   
 }

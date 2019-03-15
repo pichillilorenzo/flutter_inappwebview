@@ -858,6 +858,7 @@ class InAppWebViewController {
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
+        // decode args to json
         List<dynamic> args = jsonDecode(call.arguments["args"]);
         if (javaScriptHandlersMap.containsKey(handlerName)) {
           // convert result to json
@@ -1160,11 +1161,35 @@ class InAppWebViewController {
   ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
   ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
   ///
-  ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args);`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+  ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
   ///
-  ///Also, a [JavaScriptHandlerCallback] can return json data to the JavaScript side.
+  ///In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
+  ///This event will be dispatch as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
+  ///```javascript
+  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+  ///     console.log("ready");
+  ///   });
+  ///```
+  ///
+  ///`window.flutter_inappbrowser.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+  ///that can be used to get the json result returned by [JavaScriptHandlerCallback].
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
+  ///
+  ///So, on the JavaScript side, to get data coming from the Dart side, you will use:
+  ///```javascript
+  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+  ///     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
+  ///       console.log(result, typeof result);
+  ///       console.log(JSON.stringify(result));
+  ///     });
+  ///
+  ///     window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
+  ///       console.log(result, typeof result);
+  ///       console.log(JSON.stringify(result));
+  ///     });
+  ///   });
+  ///```
   void addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
     this.javaScriptHandlersMap[handlerName] = (callback);
   }

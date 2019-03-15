@@ -1177,7 +1177,8 @@ class InAppWebViewController {
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
   ///
   ///So, on the JavaScript side, to get data coming from the Dart side, you will use:
-  ///```javascript
+  ///```html
+  ///<script>
   ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
   ///     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
   ///       console.log(result, typeof result);
@@ -1189,6 +1190,17 @@ class InAppWebViewController {
   ///       console.log(JSON.stringify(result));
   ///     });
   ///   });
+  ///</script>
+  ///```
+  ///
+  ///Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
+  ///```dart
+  ///  // Inject JavaScript that will receive data back from Flutter
+  ///  inAppWebViewController.injectScriptCode("""
+  ///    window.flutter_inappbrowser.callHandler('test', 'Text from Javascript').then(function(result) {
+  ///      console.log(result);
+  ///    });
+  ///  """);
   ///```
   void addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
     this.javaScriptHandlersMap[handlerName] = (callback);

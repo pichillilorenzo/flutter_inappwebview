@@ -1,3 +1,7 @@
+## 1.1.1
+
+- Fixed README.md and `addJavaScriptHandler` method documentation
+
 ## 1.1.0
 
 - Breaking change for `addJavaScriptHandler` and `removeJavaScriptHandler` methods.

@@ -575,18 +575,30 @@ that can be used to get the json result returned by `JavaScriptHandlerCallback`.
 In this case, simply return data that you want to send and it will be automatically json encoded using `jsonEncode` from the `dart:convert` library.
 
 So, on the JavaScript side, to get data coming from the Dart side, you will use:
-```javascript
-window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
-    window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
-        console.log(result, typeof result);
-        console.log(JSON.stringify(result));
+```html
+<script>
+    window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+        window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
+            console.log(result, typeof result);
+            console.log(JSON.stringify(result));
+        });
+    
+        window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
+            console.log(result, typeof result);
+            console.log(JSON.stringify(result));
+        });
     });
+</script>
+```
 
-    window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
-        console.log(result, typeof result);
-        console.log(JSON.stringify(result));
-    });
-});
+Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
+```dart
+// Inject JavaScript that will receive data back from Flutter
+inAppWebViewController.injectScriptCode("""
+  window.flutter_inappbrowser.callHandler('test', 'Text from Javascript').then(function(result) {
+    console.log(result);
+  });
+""");
 ```
 
 ```dart
@@ -599,7 +611,7 @@ Removes a JavaScript message handler previously added with the `addJavaScriptHan
 Returns the value associated with `handlerName` before it was removed.
 Returns `null` if `handlerName` was not found.
 ```dart
-inAppWebViewController.removeJavaScriptHandler(String handlerName, int index);
+inAppWebViewController.removeJavaScriptHandler(String handlerName);
 ```
 
 #### Future\<Uint8List\> InAppWebViewController.takeScreenshot

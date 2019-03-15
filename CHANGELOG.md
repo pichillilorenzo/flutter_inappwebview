@@ -1,3 +1,8 @@
+## 1.1.0
+
+- `addJavaScriptHandler` method can return data to JavaScript using `Promise` [#46](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/46)
+- added `flutterInAppBrowserPlatformReady` JavaScript event to wait until the platform is ready [#64](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/64)
+
 ## 1.0.1
 
 - Fixed Unable to load initialFile on iOS #56

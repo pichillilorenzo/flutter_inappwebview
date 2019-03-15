@@ -1,5 +1,6 @@
 ## 1.1.0
 
+- Breaking change for `addJavaScriptHandler` method
 - `addJavaScriptHandler` method can return data to JavaScript using `Promise` [#46](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/46)
 - added `flutterInAppBrowserPlatformReady` JavaScript event to wait until the platform is ready [#64](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/64)
 

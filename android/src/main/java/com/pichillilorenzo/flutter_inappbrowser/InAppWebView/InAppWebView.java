@@ -183,12 +183,7 @@ public class InAppWebView extends WebView {
     settings.setUseWideViewPort(options.useWideViewPort);
     settings.setSupportZoom(options.supportZoom);
 
-    // fix webview scaling
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-      settings.setLayoutAlgorithm(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
-    else
-      settings.setTextZoom(100);
-
+    settings.setTextZoom(options.textZoom);
   }
 
   public void loadUrl(String url, MethodChannel.Result result) {
@@ -338,6 +333,9 @@ public class InAppWebView extends WebView {
 
     if (newOptionsMap.get("supportZoom") != null && options.supportZoom != newOptions.supportZoom)
       settings.setSupportZoom(newOptions.supportZoom);
+
+    if (newOptionsMap.get("textZoom") != null && options.textZoom != newOptions.textZoom)
+      settings.setTextZoom(newOptions.textZoom);
 
     options = newOptions;
   }

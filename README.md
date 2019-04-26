@@ -249,7 +249,8 @@ All platforms support:
   - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
   - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
   - __useWideViewPort__: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport. When the value of the setting is false, the layout width is always set to the width of the WebView control in device-independent (CSS) pixels. When the value is true and the page contains the viewport meta tag, the value of the width specified in the tag is used. If the page does not contain the tag or does not provide a width, then a wide viewport will be used. The default value is `true`.
-  - __safeBrowsingEnabled__: Set to `true` if you want the Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links. The default value is `true`.
+  - __safeBrowsingEnabled__: Set to `true` if you want the Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links. The default value is `true`. 
+  - __textZoom__: Set text scaling of android-webview. The default value is `100`.  
 
   **iOS** supports these additional options:
 

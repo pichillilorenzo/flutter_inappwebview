@@ -750,6 +750,7 @@ class InAppWebViewController {
   MethodChannel _channel;
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap = HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
+  // ignore: unused_field
   int _id;
   String _inAppBrowserUuid;
   InAppBrowser _inAppBrowser;
@@ -772,39 +773,39 @@ class InAppWebViewController {
     switch(call.method) {
       case "onLoadStart":
         String url = call.arguments["url"];
-        if (_widget != null)
+        if (_widget != null && _widget.onLoadStart != null)
           _widget.onLoadStart(this, url);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onLoadStart(url);
         break;
       case "onLoadStop":
         String url = call.arguments["url"];
-        if (_widget != null)
+        if (_widget != null && _widget.onLoadStop != null)
           _widget.onLoadStop(this, url);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onLoadStop(url);
         break;
       case "onLoadError":
         String url = call.arguments["url"];
         int code = call.arguments["code"];
         String message = call.arguments["message"];
-        if (_widget != null)
+        if (_widget != null && _widget.onLoadError != null)
           _widget.onLoadError(this, url, code, message);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onLoadError(url, code, message);
         break;
       case "onProgressChanged":
         int progress = call.arguments["progress"];
-        if (_widget != null)
+        if (_widget != null && _widget.onProgressChanged != null)
           _widget.onProgressChanged(this, progress);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onProgressChanged(progress);
         break;
       case "shouldOverrideUrlLoading":
         String url = call.arguments["url"];
-        if (_widget != null)
+        if (_widget != null && _widget.shouldOverrideUrlLoading != null)
           _widget.shouldOverrideUrlLoading(this, url);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.shouldOverrideUrlLoading(url);
         break;
       case "onLoadResource":
@@ -829,9 +830,9 @@ class InAppWebViewController {
         var response = new WebResourceResponse(urlResponse, headersResponse, statusCode, startTime, duration, data);
         var request = new WebResourceRequest(urlRequest, headersRequest, method);
 
-        if (_widget != null)
+        if (_widget != null && _widget.onLoadResource != null)
           _widget.onLoadResource(this, response, request);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onLoadResource(response, request);
         break;
       case "onConsoleMessage":
@@ -845,17 +846,17 @@ class InAppWebViewController {
             return;
           }
         });
-        if (_widget != null)
+        if (_widget != null && _widget.onConsoleMessage != null)
           _widget.onConsoleMessage(this, ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onConsoleMessage(ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
         break;
       case "onScrollChanged":
         int x = call.arguments["x"];
         int y = call.arguments["y"];
-        if (_widget != null)
+        if (_widget != null && _widget.onScrollChanged != null)
           _widget.onScrollChanged(this, x, y);
-        else
+        else if (_inAppBrowser != null)
           _inAppBrowser.onScrollChanged(x, y);
         break;
       case "onCallJsHandler":
@@ -881,7 +882,7 @@ class InAppWebViewController {
   ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun, the current page may not have changed.
   Future<String> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -891,7 +892,7 @@ class InAppWebViewController {
   ///Gets the title for the current page.
   Future<String> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -901,7 +902,7 @@ class InAppWebViewController {
   ///Gets the progress for the current page. The progress value is between 0 and 100.
   Future<int> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -932,7 +933,7 @@ class InAppWebViewController {
   Future<void> loadUrl(String url, {Map<String, String> headers = const {}}) async {
     assert(url != null && url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened(message: 'Cannot laod $url!');
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -946,7 +947,7 @@ class InAppWebViewController {
     assert(url != null && url.isNotEmpty);
     assert(postData != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened(message: 'Cannot laod $url!');
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -961,7 +962,7 @@ class InAppWebViewController {
   Future<void> loadData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank"}) async {
     assert(data != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1004,7 +1005,7 @@ class InAppWebViewController {
   Future<void> loadFile(String assetFilePath, {Map<String, String> headers = const {}}) async {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened(message: 'Cannot laod $assetFilePath!');
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1016,7 +1017,7 @@ class InAppWebViewController {
   ///Reloads the [InAppWebView] window.
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1026,7 +1027,7 @@ class InAppWebViewController {
   ///Goes back in the history of the [InAppWebView] window.
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1036,7 +1037,7 @@ class InAppWebViewController {
   ///Returns a boolean value indicating whether the [InAppWebView] can move backward.
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1046,7 +1047,7 @@ class InAppWebViewController {
   ///Goes forward in the history of the [InAppWebView] window.
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1056,7 +1057,7 @@ class InAppWebViewController {
   ///Returns a boolean value indicating whether the [InAppWebView] can move forward.
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1068,7 +1069,7 @@ class InAppWebViewController {
     assert(steps != null);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1081,7 +1082,7 @@ class InAppWebViewController {
     assert(steps != null);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1097,7 +1098,7 @@ class InAppWebViewController {
   ///Check if the Web View of the [InAppWebView] instance is in a loading state.
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1107,7 +1108,7 @@ class InAppWebViewController {
   ///Stops the Web View of the [InAppWebView] instance from loading.
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1117,7 +1118,7 @@ class InAppWebViewController {
   ///Injects JavaScript code into the [InAppWebView] window and returns the result of the evaluation.
   Future<String> injectScriptCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1128,7 +1129,7 @@ class InAppWebViewController {
   ///Injects a JavaScript file into the [InAppWebView] window.
   Future<void> injectScriptFile(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1139,7 +1140,7 @@ class InAppWebViewController {
   ///Injects CSS into the [InAppWebView] window.
   Future<void> injectStyleCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1150,7 +1151,7 @@ class InAppWebViewController {
   ///Injects a CSS file into the [InAppWebView] window.
   Future<void> injectStyleFile(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1220,7 +1221,7 @@ class InAppWebViewController {
   ///**NOTE for iOS**: available from iOS 11.0+.
   Future<Uint8List> takeScreenshot() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1230,7 +1231,7 @@ class InAppWebViewController {
   ///Sets the [InAppWebView] options with the new [options] and evaluates them.
   Future<void> setOptions(Map<String, dynamic> options) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1242,7 +1243,7 @@ class InAppWebViewController {
   ///Gets the current [InAppWebView] options. Returns `null` if the options are not setted yet.
   Future<Map<String, dynamic>> getOptions() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
@@ -1258,7 +1259,7 @@ class InAppWebViewController {
   ///The object returned from this method will not be updated to reflect any new state.
   Future<WebHistory> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null) {
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser._throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }

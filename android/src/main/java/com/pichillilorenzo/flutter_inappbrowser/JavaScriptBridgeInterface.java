@@ -17,9 +17,9 @@ public class JavaScriptBridgeInterface {
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
 
-  public static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function(handlerName, ...args) {" +
+  public static final String flutterInAppBroserJSClass = "window." + name + ".callHandler = function() {" +
     "var _callHandlerID = setTimeout(function(){});" +
-    "window." + name + "._callHandler(handlerName, _callHandlerID, JSON.stringify(args));" +
+    "window." + name + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
     "return new Promise(function(resolve, reject) {" +
     "  window." + name + "[_callHandlerID] = resolve;" +
     "});" +

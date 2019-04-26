@@ -71,9 +71,9 @@ let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
 
 let javaScriptBridgeJS = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = {};
-window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function(handlerName, ...args) {
+window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
     var _callHandlerID = setTimeout(function(){});
-    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': handlerName, '_callHandlerID': _callHandlerID, 'args': JSON.stringify(args)} );
+    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': arguments[0], '_callHandlerID': _callHandlerID, 'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))} );
     return new Promise(function(resolve, reject) {
         window.\(JAVASCRIPT_BRIDGE_NAME)[_callHandlerID] = resolve;
     });
@@ -629,7 +629,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onLoadStart", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onLoadStart", arguments: arguments)
+        }
     }
     
     public func onLoadStop(url: String) {
@@ -637,7 +639,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onLoadStop", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onLoadStop", arguments: arguments)
+        }
     }
     
     public func onLoadError(url: String, error: Error) {
@@ -645,7 +649,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onLoadError", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onLoadError", arguments: arguments)
+        }
     }
     
     public func onProgressChanged(progress: Int) {
@@ -653,7 +659,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onProgressChanged", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onProgressChanged", arguments: arguments)
+        }
     }
     
     public func onLoadResource(response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int64, duration: Int64) {
@@ -681,7 +689,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onLoadResource", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onLoadResource", arguments: arguments)
+        }
     }
     
     public func onScrollChanged(x: Int, y: Int) {
@@ -689,7 +699,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onScrollChanged", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onScrollChanged", arguments: arguments)
+        }
     }
     
     public func shouldOverrideUrlLoading(url: URL) {
@@ -697,7 +709,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("shouldOverrideUrlLoading", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("shouldOverrideUrlLoading", arguments: arguments)
+        }
     }
     
     public func onConsoleMessage(sourceURL: String, lineNumber: Int, message: String, messageLevel: String) {
@@ -705,7 +719,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
-        getChannel().invokeMethod("onConsoleMessage", arguments: arguments)
+        if let channel = getChannel() {
+            channel.invokeMethod("onConsoleMessage", arguments: arguments)
+        }
     }
     
     public func onCallJsHandler(handlerName: String, _callHandlerID: Int64, args: String) {
@@ -714,19 +730,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             arguments["uuid"] = IABController!.uuid
         }
         
-        getChannel().invokeMethod("onCallJsHandler", arguments: arguments, result: {(result) -> Void in
-            if result is FlutterError {
-                print((result as! FlutterError).message)
-            }
-            else if (result as? NSObject) == FlutterMethodNotImplemented {}
-            else {
-                var json = "null"
-                if let r = result {
-                    json = r as! String
+        if let channel = getChannel() {
+            channel.invokeMethod("onCallJsHandler", arguments: arguments, result: {(result) -> Void in
+                if result is FlutterError {
+                    print((result as! FlutterError).message)
                 }
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json)); delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];", completionHandler: nil)
-            }
-        })
+                else if (result as? NSObject) == FlutterMethodNotImplemented {}
+                else {
+                    var json = "null"
+                    if let r = result {
+                        json = r as! String
+                    }
+                    self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json)); delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];", completionHandler: nil)
+                }
+            })
+        }
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -794,7 +812,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    private func getChannel() -> FlutterMethodChannel {
-        return (IABController != nil) ? SwiftFlutterPlugin.channel! : IAWController!.channel!;
+    private func getChannel() -> FlutterMethodChannel? {
+        return (IABController != nil) ? SwiftFlutterPlugin.channel! : ((IAWController != nil) ? IAWController!.channel! : nil);
     }
 }

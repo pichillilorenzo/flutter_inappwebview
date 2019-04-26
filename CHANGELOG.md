@@ -1,3 +1,10 @@
+## 1.1.2
+
+- Fix InAppBrowser crashes the app when i change the page "Lost connection" [#74](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/74)
+- Fix javascript `...args` parameter of `window.flutter_inappbrowser.callHandler()`
+- Merge Enable setTextZoom function of Android WebViewSetting [#81](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/81)
+- Merge bug fix for android build: Android dependency 'androidx.core:core' has different version for the compile (1.0.0) and runtime (1.0.1) classpath [#83](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/83)
+
 ## 1.1.1
 
 - Fixed README.md and `addJavaScriptHandler` method documentation

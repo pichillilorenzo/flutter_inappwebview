@@ -13,6 +13,7 @@ public class InAppWebViewOptions extends Options {
   public boolean javaScriptEnabled = true;
   public boolean javaScriptCanOpenWindowsAutomatically = false;
   public boolean mediaPlaybackRequiresUserGesture = true;
+  public int textZoom = 100;
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;
@@ -22,5 +23,4 @@ public class InAppWebViewOptions extends Options {
   public boolean useWideViewPort = true;
   public boolean safeBrowsingEnabled = true;
 
-  public int textZoom = 100;
 }

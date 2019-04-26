@@ -182,7 +182,6 @@ public class InAppWebView extends WebView {
     settings.setLoadWithOverviewMode(true);
     settings.setUseWideViewPort(options.useWideViewPort);
     settings.setSupportZoom(options.supportZoom);
-
     settings.setTextZoom(options.textZoom);
   }
 

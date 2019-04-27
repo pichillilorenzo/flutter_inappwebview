@@ -113,6 +113,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
         
+        if (options?.transparentBackground)! {
+            isOpaque = false
+            backgroundColor = UIColor.clear
+            scrollView.backgroundColor = UIColor.clear
+        }
+
         // prevent webView from bouncing
         if (options?.disallowOverScroll)! {
             if responds(to: #selector(getter: scrollView)) {

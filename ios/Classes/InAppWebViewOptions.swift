@@ -28,6 +28,7 @@ public class InAppWebViewOptions: Options {
     var ignoresViewportScaleLimits = false
     var allowsInlineMediaPlayback = false
     var allowsPictureInPictureMediaPlayback = true
+    var transparentBackground = false
     
     override init(){
         super.init()

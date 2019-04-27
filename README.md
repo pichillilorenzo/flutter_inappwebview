@@ -240,6 +240,7 @@ All platforms support:
   - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
   - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
+  - __transparentBackground__: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
 
   **Android** supports these additional options:
 

@@ -171,6 +171,7 @@ class InAppBrowser {
   ///    - __toolbarTopBackgroundColor__: Set the custom background color of the toolbar at the top.
   ///    - __hideUrlBar__: Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   ///    - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
+  ///    - __transparentBackground__: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
   ///
   ///  - **Android** supports these additional options:
   ///

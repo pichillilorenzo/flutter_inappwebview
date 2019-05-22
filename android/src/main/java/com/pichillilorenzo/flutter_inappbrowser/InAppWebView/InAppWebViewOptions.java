@@ -22,5 +22,5 @@ public class InAppWebViewOptions extends Options {
   public boolean domStorageEnabled = false;
   public boolean useWideViewPort = true;
   public boolean safeBrowsingEnabled = true;
-
+  public boolean transparentBackground = false;
 }

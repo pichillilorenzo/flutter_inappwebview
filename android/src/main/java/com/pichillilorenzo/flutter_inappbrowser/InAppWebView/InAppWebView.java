@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
+import android.graphics.Color;
 import android.graphics.Picture;
 import android.os.Build;
 import android.util.AttributeSet;
@@ -183,6 +184,10 @@ public class InAppWebView extends WebView {
     settings.setUseWideViewPort(options.useWideViewPort);
     settings.setSupportZoom(options.supportZoom);
     settings.setTextZoom(options.textZoom);
+
+    if (options.transparentBackground) {
+      setBackgroundColor(Color.TRANSPARENT);
+    }
   }
 
   public void loadUrl(String url, MethodChannel.Result result) {

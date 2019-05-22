@@ -294,6 +294,7 @@ class InAppBrowser {
     args.putIfAbsent('isData', () => false);
     args.putIfAbsent('openWithSystemBrowser', () => true);
     args.putIfAbsent('useChromeSafariBrowser', () => false);
+    args.putIfAbsent('options', () => {});
     return await _ChannelManager.channel.invokeMethod('open', args);
   }
 

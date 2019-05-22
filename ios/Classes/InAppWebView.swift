@@ -622,6 +622,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
             onScrollChanged(x: x, y: y)
         }
+        setNeedsLayout()
     }
     
     public func onLoadStart(url: String) {

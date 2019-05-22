@@ -30,13 +30,11 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public InAppWebView webView;
   public MethodChannel channel;
   public final Registrar registrar;
-  public final Context context;
 
   public FlutterWebView(Registrar registrar, int id, HashMap<String, Object> params) {
 
     this.registrar = registrar;
     this.activity = registrar.activity();
-    this.context = registrar.context();
 
     String initialUrl = (String) params.get("initialUrl");
     String initialFile = (String) params.get("initialFile");
@@ -47,7 +45,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
 
-    webView = new InAppWebView(context, this, id, options);
+    webView = new InAppWebView(registrar, this, id, options);
     webView.prepare();
 
     channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappwebview_" + id);

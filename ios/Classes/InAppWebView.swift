@@ -112,7 +112,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
-        
+
         if (options?.transparentBackground)! {
             isOpaque = false
             backgroundColor = UIColor.clear
@@ -298,6 +298,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     func setOptions(newOptions: InAppWebViewOptions, newOptionsMap: [String: Any]) {
+        
+        if newOptionsMap["transparentBackground"] != nil && options?.transparentBackground != newOptions.transparentBackground {
+            if newOptions.transparentBackground {
+                isOpaque = false
+                backgroundColor = UIColor.clear
+                scrollView.backgroundColor = UIColor.clear
+            } else {
+                isOpaque = true
+                backgroundColor = nil
+                scrollView.backgroundColor = UIColor(red: 1, green: 1, blue: 1, alpha: 1)
+            }
+        }
         
         if newOptionsMap["disallowOverScroll"] != nil && options?.disallowOverScroll != newOptions.disallowOverScroll {
             if responds(to: #selector(getter: scrollView)) {

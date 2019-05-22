@@ -246,6 +246,7 @@ All platforms support:
 
   - __clearSessionCache__: Set to `true` to have the session cookie cache cleared before the new window is opened.
   - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+  - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
   - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
   - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
@@ -819,6 +820,7 @@ Opens an `url` in a new `InAppBrowser` instance.
   - __closeOnCannotGoBack__: Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
   - __clearSessionCache__: Set to `true` to have the session cookie cache cleared before the new window is opened.
   - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+  - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
   - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
   - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.

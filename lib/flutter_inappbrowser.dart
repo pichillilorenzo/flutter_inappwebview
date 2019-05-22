@@ -179,6 +179,7 @@ class InAppBrowser {
   ///    - __closeOnCannotGoBack__: Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
   ///    - __clearSessionCache__: Set to `true` to have the session cookie cache cleared before the new window is opened.
   ///    - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+  ///    - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
   ///    - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   ///    - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
   ///    - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
@@ -582,11 +583,13 @@ class InAppWebViewInitialData {
 ///  - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
 ///  - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
 ///  - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
+///  - __transparentBackground__: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
 ///
 ///  **Android** supports these additional options:
 ///
 ///  - __clearSessionCache__: Set to `true` to have the session cookie cache cleared before the new window is opened.
 ///  - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+///  - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
 ///  - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
 ///  - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
 ///  - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
@@ -652,6 +655,13 @@ class InAppWebView extends StatefulWidget {
   final Map<String, String> initialHeaders;
   ///Initial options that will be used.
   final Map<String, dynamic> initialOptions;
+  /// `gestureRecognizers` specifies which gestures should be consumed by the web view.
+  /// It is possible for other gesture recognizers to be competing with the web view on pointer
+  /// events, e.g if the web view is inside a [ListView] the [ListView] will want to handle
+  /// vertical drags. The web view will claim gestures that are recognized by any of the
+  /// recognizers on this list.
+  /// When `gestureRecognizers` is empty or null, the web view will only handle pointer events for gestures that
+  /// were not claimed by any other gesture recognizer.
   final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
 
   const InAppWebView({
@@ -695,6 +705,7 @@ class _InAppWebViewState extends State<InAppWebView> {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return GestureDetector(
         onLongPress: () {},
+        excludeFromSemantics: true,
         child: AndroidView(
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
           onPlatformViewCreated: _onPlatformViewCreated,

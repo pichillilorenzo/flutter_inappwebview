@@ -17,6 +17,7 @@ public class InAppWebViewOptions extends Options {
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;
+  public boolean displayZoomControls = false;
   public boolean supportZoom = true;
   public boolean databaseEnabled = false;
   public boolean domStorageEnabled = false;

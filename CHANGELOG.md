@@ -1,3 +1,13 @@
+## 1.2.0
+
+- Merge "Adds a transparentBackground option for iOS and Android" [#86](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/86) (thanks to [matthewlloyd](https://github.com/matthewlloyd))
+- Merge "The 'open' method requires an options dictionary" [#87](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/87) (thanks to [matthewlloyd](https://github.com/matthewlloyd))
+- Merge "iOS: Call setNeedsLayout() in scrollViewDidScroll()" [#88](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/88) (thanks to [matthewlloyd](https://github.com/matthewlloyd))
+- Fixed "java.lang.RuntimeException: Methods marked with @UiThread must be executed on the main thread." [#98](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/98) (thanks to [DreamBuddy](https://github.com/DreamBuddy))
+- Fixed "app force close/crash when enabling zoom and repeatedly changing orientation and zoomin zoomout" [#93](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/93)
+- Added `displayZoomControls` webview option for Android
+- Fixed "Compatibility with other plugins" [#80](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/80)
+
 ## 1.1.3
 
 - Merge "Add null checks around calls to InAppWebView callbacks" [#85](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/85) (thanks to [matthewlloyd](https://github.com/matthewlloyd))

@@ -1,6 +1,8 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 
@@ -34,33 +36,42 @@ public class JavaScriptBridgeInterface {
 
   @JavascriptInterface
   public void _callHandler(String handlerName, final String _callHandlerID, String args) {
-    Map<String, Object> obj = new HashMap<>();
+    final Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("handlerName", handlerName);
     obj.put("args", args);
 
-    getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
+    // java.lang.RuntimeException: Methods marked with @UiThread must be executed on the main thread.
+    // https://github.com/pichillilorenzo/flutter_inappbrowser/issues/98
+    final Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
       @Override
-      public void success(Object json) {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-          flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
-        }
-        else {
-          flutterWebView.webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
-        }
-      }
+      public void run() {
+        getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
+          @Override
+          public void success(Object json) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+              flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
+            }
+            else {
+              flutterWebView.webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
+            }
+          }
 
-      @Override
-      public void error(String s, String s1, Object o) {
-        Log.d(LOG_TAG, "ERROR: " + s + " " + s1);
-      }
+          @Override
+          public void error(String s, String s1, Object o) {
+            Log.d(LOG_TAG, "ERROR: " + s + " " + s1);
+          }
 
-      @Override
-      public void notImplemented() {
+          @Override
+          public void notImplemented() {
 
+          }
+        });
       }
     });
+
   }
 
   private MethodChannel getChannel() {

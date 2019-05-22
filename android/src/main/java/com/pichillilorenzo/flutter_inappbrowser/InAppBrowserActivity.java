@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -9,6 +10,7 @@ import android.graphics.drawable.ColorDrawable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -25,6 +27,8 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.app.FlutterActivity;
+import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.MethodChannel;
 
 public class InAppBrowserActivity extends AppCompatActivity {
@@ -39,6 +43,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
   public Map<String, String> headers;
   public ProgressBar progressBar;
   public boolean isHidden = false;
+  public String fromActivity;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -51,6 +56,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     Bundle b = getIntent().getExtras();
     uuid = b.getString("uuid");
+    fromActivity = b.getString("fromActivity");
 
     HashMap<String, Object> optionsMap = (HashMap<String, Object>) b.getSerializable("options");
 
@@ -247,7 +253,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
       if (canGoBack())
         goBack();
       else if (options.closeOnCannotGoBack)
-        InAppBrowserFlutterPlugin.close(uuid, null);
+        InAppBrowserFlutterPlugin.close(this, uuid, null);
       return true;
     }
     return super.onKeyDown(keyCode, event);
@@ -297,15 +303,20 @@ public class InAppBrowserActivity extends AppCompatActivity {
   }
 
   public void hide() {
-    isHidden = true;
-    Intent openActivity = new Intent(this, InAppBrowserFlutterPlugin.registrar.activity().getClass());
-    openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
-    startActivityIfNeeded(openActivity, 0);
+    try {
+      isHidden = true;
+      Intent openActivity = new Intent(this, Class.forName(fromActivity));
+      openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+      startActivityIfNeeded(openActivity, 0);
+    } catch (ClassNotFoundException e) {
+      e.printStackTrace();
+      Log.d(LOG_TAG, e.getMessage());
+    }
   }
 
   public void show() {
     isHidden = false;
-    Intent openActivity = new Intent(InAppBrowserFlutterPlugin.registrar.activity(), InAppBrowserActivity.class);
+    Intent openActivity = new Intent(this, InAppBrowserActivity.class);
     openActivity.setFlags(Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
     startActivityIfNeeded(openActivity, 0);
   }
@@ -341,7 +352,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
   }
 
   public void closeButtonClicked(MenuItem item) {
-    InAppBrowserFlutterPlugin.close(uuid, null);
+    InAppBrowserFlutterPlugin.close(this, uuid, null);
   }
 
   public byte[] takeScreenshot() {

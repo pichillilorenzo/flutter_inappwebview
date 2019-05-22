@@ -6,6 +6,9 @@ import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import androidx.annotation.RequiresApi;
+
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -341,7 +344,7 @@ public class InAppWebViewClient extends WebViewClient {
         headersRequest.put(entry.getKey().toLowerCase(), value.toString());
       }
 
-      Map<String, Object> obj = new HashMap<>();
+      final Map<String, Object> obj = new HashMap<>();
       Map<String, Object> res = new HashMap<>();
       Map<String, Object> req = new HashMap<>();
 
@@ -365,7 +368,15 @@ public class InAppWebViewClient extends WebViewClient {
       obj.put("response", res);
       obj.put("request", req);
 
-      getChannel().invokeMethod("onLoadResource", obj);
+      // java.lang.RuntimeException: Methods marked with @UiThread must be executed on the main thread.
+      // https://github.com/pichillilorenzo/flutter_inappbrowser/issues/98
+      final Handler handler = new Handler(Looper.getMainLooper());
+      handler.post(new Runnable() {
+         @Override
+         public void run() {
+           getChannel().invokeMethod("onLoadResource", obj);
+         }
+       });
 
       // this return is not working (it blocks some resources), so return null
 //      return new WebResourceResponse(

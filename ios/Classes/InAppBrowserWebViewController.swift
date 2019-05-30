@@ -63,9 +63,9 @@ typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, B
 //}
 
 class InAppWebView_IBWrapper: InAppWebView {
-    required convenience init(coder: NSCoder) {
+    required init(coder: NSCoder) {
         let config = WKWebViewConfiguration()
-        self.init(frame: .zero, configuration: config, IABController: nil, IAWController: nil)
+        super.init(frame: .zero, configuration: config, IABController: nil, IAWController: nil)
         self.translatesAutoresizingMaskIntoConstraints = false
     }
 }

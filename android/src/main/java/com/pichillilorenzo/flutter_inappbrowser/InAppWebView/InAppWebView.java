@@ -191,6 +191,16 @@ public class InAppWebView extends WebView {
     if (options.transparentBackground) {
       setBackgroundColor(Color.TRANSPARENT);
     }
+
+    if (!options.mixedContentMode.isEmpty()) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (options.mixedContentMode.equals("MIXED_CONTENT_COMPATIBILITY_MODE")) {
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        } else if (options.mixedContentMode.equals("MIXED_CONTENT_ALWAYS_ALLOW")) {
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
+      }
+    }
   }
 
   public void loadUrl(String url, MethodChannel.Result result) {
@@ -352,6 +362,16 @@ public class InAppWebView extends WebView {
         setBackgroundColor(Color.TRANSPARENT);
       } else {
         setBackgroundColor(Color.parseColor("#FFFFFF"));
+      }
+    }
+
+    if (newOptionsMap.get("mixedContentMode") != null && options.mixedContentMode != newOptions.mixedContentMode) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        if (newOptions.mixedContentMode.equals("MIXED_CONTENT_COMPATIBILITY_MODE")) {
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+        } else if (newOptions.mixedContentMode.equals("MIXED_CONTENT_ALWAYS_ALLOW")) {
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        }
       }
     }
 

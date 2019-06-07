@@ -1,3 +1,11 @@
+## 1.2.1
+
+- Merge "Add new option to control the contentMode in Android platform" [#101](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/101) (thanks to [DreamBuddy](https://github.com/DreamBuddy))
+- Merge "Fix crash on xcode 10.2" [#107](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/107) (thanks to [robsonfingo](https://github.com/robsonfingo))
+- Merge "Remove headers_build_phase from example's Podfile" [#108](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/108) (thanks to [robsonfingo](https://github.com/robsonfingo))
+- Fixed "Make html5 video fullscreen" for Android [#43](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/43)
+- Fixed "AllowsInlineMediaPlayback not working" for iOS [#73](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/73)
+
 ## 1.2.0
 
 - Merge "Adds a transparentBackground option for iOS and Android" [#86](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/86) (thanks to [matthewlloyd](https://github.com/matthewlloyd))

@@ -116,7 +116,7 @@ public class InAppWebView extends WebView {
 
     addJavascriptInterface(new JavaScriptBridgeInterface((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView), JavaScriptBridgeInterface.name);
 
-    inAppWebChromeClient = new InAppWebChromeClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
+    inAppWebChromeClient = new InAppWebChromeClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView, this.registrar);
     setWebChromeClient(inAppWebChromeClient);
 
     inAppWebViewClient = new InAppWebViewClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
@@ -198,6 +198,8 @@ public class InAppWebView extends WebView {
           settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         } else if (options.mixedContentMode.equals("MIXED_CONTENT_ALWAYS_ALLOW")) {
           settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        } else if (options.mixedContentMode.equals("MIXED_CONTENT_NEVER_ALLOW")) {
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         }
       }
     }
@@ -371,6 +373,8 @@ public class InAppWebView extends WebView {
           settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
         } else if (newOptions.mixedContentMode.equals("MIXED_CONTENT_ALWAYS_ALLOW")) {
           settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+        } else if (newOptions.mixedContentMode.equals("MIXED_CONTENT_NEVER_ALLOW")) {
+          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
         }
       }
     }

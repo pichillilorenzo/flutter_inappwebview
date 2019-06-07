@@ -19,10 +19,6 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         super.init()
         self.registrar = registrar
         self.viewId = viewId
-        webView = InAppWebView(frame: frame, configuration: WKWebViewConfiguration(), IABController: nil, IAWController: self)
-        let channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(viewId)
-        self.channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
-        self.channel?.setMethodCallHandler(self.handle)
         
         let initialUrl = (args["initialUrl"] as? String)!
         let initialFile = args["initialFile"] as? String
@@ -32,8 +28,14 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         
         let options = InAppWebViewOptions()
         options.parse(options: initialOptions)
-        webView!.options = options
+        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options)
         
+        webView = InAppWebView(frame: frame, configuration: preWebviewConfiguration, IABController: nil, IAWController: self)
+        let channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(viewId)
+        self.channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
+        self.channel?.setMethodCallHandler(self.handle)
+        
+        webView!.options = options
         webView!.prepare()
         
         if initialFile != nil {

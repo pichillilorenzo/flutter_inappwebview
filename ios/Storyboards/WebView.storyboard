@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14313.18" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
     <device id="retina5_5" orientation="portrait">
         <adaptation id="fullscreen"/>
     </device>
     <dependencies>
         <deployment version="2048" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14283.14"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -21,7 +21,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" customClass="InAppWebView_IBWrapper" customModule="flutter_inappbrowser">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" userLabel="Container WebView" customClass="InAppWebView_IBWrapper" customModule="flutter_inappbrowser">
                                 <rect key="frame" x="0.0" y="66" width="414" height="626"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
@@ -87,6 +87,7 @@
                     <connections>
                         <outlet property="backButton" destination="595-GQ-9lo" id="dvV-nO-BJ6"/>
                         <outlet property="closeButton" destination="zlr-JJ-Uuj" id="vcO-DA-ByF"/>
+                        <outlet property="containerWebView" destination="gA9-n8-qaQ" id="lkF-Wk-Bm1"/>
                         <outlet property="forwardButton" destination="cCF-Ou-NU3" id="IqB-62-XYC"/>
                         <outlet property="reloadButton" destination="fig-ca-P2P" id="271-Gw-S2k"/>
                         <outlet property="shareButton" destination="skL-Lw-jYB" id="8hu-WC-OM0"/>
@@ -96,7 +97,6 @@
                         <outlet property="toolbarTop" destination="vlz-kT-71x" id="WgC-80-Z28"/>
                         <outlet property="toolbarTop_BottomToWebViewTopConstraint" destination="Sjd-dV-din" id="vkO-Yu-xaE"/>
                         <outlet property="urlField" destination="sy2-Vx-Cxd" id="MCW-lJ-Ehl"/>
-                        <outlet property="webView" destination="gA9-n8-qaQ" id="439-rj-hHB"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="cYA-mw-BIR" userLabel="First Responder" sceneMemberID="firstResponder"/>

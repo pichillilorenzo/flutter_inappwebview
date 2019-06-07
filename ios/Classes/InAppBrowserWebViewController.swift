@@ -72,7 +72,7 @@ class InAppWebView_IBWrapper: InAppWebView {
 
 class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKUIDelegate, UITextFieldDelegate {
     
-    @IBOutlet var webView: InAppWebView_IBWrapper!
+    @IBOutlet var containerWebView: UIView!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
     @IBOutlet var backButton: UIBarButtonItem!
@@ -85,9 +85,12 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     
     @IBOutlet var toolbarTop_BottomToWebViewTopConstraint: NSLayoutConstraint!
     @IBOutlet var toolbarBottom_TopToWebViewBottomConstraint: NSLayoutConstraint!
+    @IBOutlet var containerWebView_BottomFullScreenConstraint: NSLayoutConstraint!
+    @IBOutlet var containerWebView_TopFullScreenConstraint: NSLayoutConstraint!
     @IBOutlet var webView_BottomFullScreenConstraint: NSLayoutConstraint!
     @IBOutlet var webView_TopFullScreenConstraint: NSLayoutConstraint!
     
+    var webView: InAppWebView!
     weak var navigationDelegate: SwiftFlutterPlugin?
     var initURL: URL?
     var tmpWindow: UIWindow?
@@ -109,10 +112,21 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        self.webView.IABController = self
         if !viewPrepared {
+            let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
+            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, IAWController: nil)
+            self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
+            
+            if self.initData == nil {
+                loadUrl(url: self.initURL!, headers: self.initHeaders)
+            }
+            else {
+                webView.loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
+            }
+            
+            navigationDelegate?.onBrowserCreated(uuid: uuid, webView: webView)
         }
         viewPrepared = true
         super.viewWillAppear(animated)
@@ -121,10 +135,6 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-//        webView.uiDelegate = self
-//        webView.navigationDelegate = nil
-//        webView.scrollView.delegate = self
         
         urlField.delegate = self
         urlField.text = self.initURL?.absoluteString
@@ -149,15 +159,6 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         spinner.hidesWhenStopped = true
         spinner.isHidden = false
         spinner.stopAnimating()
-        
-        if self.initData == nil {
-            loadUrl(url: self.initURL!, headers: self.initHeaders)
-        }
-        else {
-            webView.loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
-        }
-        
-        navigationDelegate?.onBrowserCreated(uuid: uuid, webView: webView)
     }
     
     // Prevent crashes on closing windows
@@ -171,8 +172,19 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     }
     
     func prepareConstraints () {
-        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
-        webView_TopFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
+        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
+        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
+        
+        webView.translatesAutoresizingMaskIntoConstraints = false
+        let height = NSLayoutConstraint(item: webView, attribute: .height, relatedBy: .equal, toItem: containerWebView, attribute: .height, multiplier: 1, constant: 0)
+        let width = NSLayoutConstraint(item: webView, attribute: .width, relatedBy: .equal, toItem: containerWebView, attribute: .width, multiplier: 1, constant: 0)
+        let leftConstraint = NSLayoutConstraint(item: webView, attribute: .leftMargin, relatedBy: .equal, toItem: containerWebView, attribute: .leftMargin, multiplier: 1, constant: 0)
+        let rightConstraint = NSLayoutConstraint(item: webView, attribute: .rightMargin, relatedBy: .equal, toItem: containerWebView, attribute: .rightMargin, multiplier: 1, constant: 0)
+        let bottomContraint = NSLayoutConstraint(item: webView, attribute: .bottomMargin, relatedBy: .equal, toItem: containerWebView, attribute: .bottomMargin, multiplier: 1, constant: 0)
+        containerWebView.addConstraints([height, width, leftConstraint, rightConstraint, bottomContraint])
+        
+        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.containerWebView, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
+        webView_TopFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.containerWebView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
     }
     
     func prepareWebView() {
@@ -194,6 +206,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         else {
             self.toolbarTop.isHidden = true
             self.toolbarTop_BottomToWebViewTopConstraint.isActive = false
+            self.containerWebView_TopFullScreenConstraint.isActive = true
             self.webView_TopFullScreenConstraint.isActive = true
         }
         
@@ -206,6 +219,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         else {
             self.toolbarBottom.isHidden = true
             self.toolbarBottom_TopToWebViewBottomConstraint.isActive = false
+            self.containerWebView_BottomFullScreenConstraint.isActive = true
             self.webView_BottomFullScreenConstraint.isActive = true
         }
         
@@ -378,6 +392,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         }
         
         if newOptionsMap["toolbarTop"] != nil && browserOptions?.toolbarTop != newOptions.toolbarTop {
+            self.containerWebView_TopFullScreenConstraint.isActive = !newOptions.toolbarTop
             self.webView_TopFullScreenConstraint.isActive = !newOptions.toolbarTop
             self.toolbarTop.isHidden = !newOptions.toolbarTop
             self.toolbarTop_BottomToWebViewTopConstraint.isActive = newOptions.toolbarTop
@@ -388,6 +403,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         }
         
         if newOptionsMap["toolbarBottom"] != nil && browserOptions?.toolbarBottom != newOptions.toolbarBottom {
+            self.containerWebView_BottomFullScreenConstraint.isActive = !newOptions.toolbarBottom
             self.webView_BottomFullScreenConstraint.isActive = !newOptions.toolbarBottom
             self.toolbarBottom.isHidden = !newOptions.toolbarBottom
             self.toolbarBottom_TopToWebViewBottomConstraint.isActive = newOptions.toolbarBottom

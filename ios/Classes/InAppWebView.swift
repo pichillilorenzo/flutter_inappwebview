@@ -112,13 +112,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
-
+        
         if (options?.transparentBackground)! {
             isOpaque = false
             backgroundColor = UIColor.clear
             scrollView.backgroundColor = UIColor.clear
         }
-
+        
         // prevent webView from bouncing
         if (options?.disallowOverScroll)! {
             if responds(to: #selector(getter: scrollView)) {
@@ -160,15 +160,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addUserScript(resourceObserverJSScript)
         configuration.userContentController.add(self, name: "resourceLoaded")
         
-        if #available(iOS 10.0, *) {
-            configuration.mediaTypesRequiringUserActionForPlayback = ((options?.mediaPlaybackRequiresUserGesture)!) ? .all : []
-        } else {
-            // Fallback on earlier versions
-            configuration.mediaPlaybackRequiresUserAction = (options?.mediaPlaybackRequiresUserGesture)!
-        }
-        
-        configuration.allowsInlineMediaPlayback = (options?.allowsInlineMediaPlayback)!
-        
         //keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
         
         configuration.suppressesIncrementalRendering = (options?.suppressesIncrementalRendering)!
@@ -180,8 +171,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if #available(iOS 10.0, *) {
             configuration.ignoresViewportScaleLimits = (options?.ignoresViewportScaleLimits)!
         }
-        
-        configuration.allowsInlineMediaPlayback = (options?.allowsInlineMediaPlayback)!
         
         if #available(iOS 9.0, *) {
             configuration.allowsPictureInPictureMediaPlayback = (options?.allowsPictureInPictureMediaPlayback)!
@@ -200,6 +189,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.clearCache)! {
             clearCache()
         }
+    }
+    
+    public static func preWKWebViewConfiguration(options: InAppWebViewOptions?) -> WKWebViewConfiguration {
+        let configuration = WKWebViewConfiguration()
+        
+        if #available(iOS 10.0, *) {
+            configuration.mediaTypesRequiringUserActionForPlayback = ((options?.mediaPlaybackRequiresUserGesture)!) ? .all : []
+        } else {
+            // Fallback on earlier versions
+            configuration.mediaPlaybackRequiresUserAction = (options?.mediaPlaybackRequiresUserGesture)!
+        }
+        
+        configuration.allowsInlineMediaPlayback = (options?.allowsInlineMediaPlayback)!
+        
+        return configuration
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?,

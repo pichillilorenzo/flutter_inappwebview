@@ -2,6 +2,8 @@ package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.view.View;
@@ -9,6 +11,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.FrameLayout;
 
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
@@ -18,22 +21,67 @@ import java.util.HashMap;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
+import io.flutter.plugin.common.PluginRegistry;
 
 public class InAppWebChromeClient extends WebChromeClient {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
+  private PluginRegistry.Registrar registrar;
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
   private ValueCallback<Uri[]> mUploadMessageArray;
   private ValueCallback<Uri> mUploadMessage;
   private final static int FILECHOOSER_RESULTCODE = 1;
 
-  public InAppWebChromeClient(Object obj) {
+  private View mCustomView;
+  private WebChromeClient.CustomViewCallback mCustomViewCallback;
+  protected FrameLayout mFullscreenContainer;
+  private int mOriginalOrientation;
+  private int mOriginalSystemUiVisibility;
+
+  public InAppWebChromeClient(Object obj, PluginRegistry.Registrar registrar) {
     super();
+    this.registrar = registrar;
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
+  }
+
+  public Bitmap getDefaultVideoPoster()
+  {
+    if (mCustomView == null) {
+      return null;
+    }
+    return BitmapFactory.decodeResource(this.registrar.activeContext().getResources(), 2130837573);
+  }
+
+  public void onHideCustomView()
+  {
+    View decorView = this.registrar.activity().getWindow().getDecorView();
+    ((FrameLayout) decorView).removeView(this.mCustomView);
+    this.mCustomView = null;
+    decorView.setSystemUiVisibility(this.mOriginalSystemUiVisibility);
+    this.registrar.activity().setRequestedOrientation(this.mOriginalOrientation);
+    this.mCustomViewCallback.onCustomViewHidden();
+    this.mCustomViewCallback = null;
+  }
+
+  public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback)
+  {
+    if (this.mCustomView != null)
+    {
+      onHideCustomView();
+      return;
+    }
+    View decorView = this.registrar.activity().getWindow().getDecorView();
+    this.mCustomView = paramView;
+    this.mOriginalSystemUiVisibility = decorView.getSystemUiVisibility();
+    this.mOriginalOrientation = this.registrar.activity().getRequestedOrientation();
+    this.mCustomViewCallback = paramCustomViewCallback;
+    this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
+    ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+    decorView.setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
   }
 
   @Override

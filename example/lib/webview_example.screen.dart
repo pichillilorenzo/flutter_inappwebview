@@ -86,10 +86,13 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
     return new Center(
       child: new RaisedButton(
           onPressed: ()  {
-            widget.browser.open(url: "https://google.com", options: {
-              "useShouldOverrideUrlLoading": true,
-              "useOnLoadResource": true
-            });
+            widget.browser.open(
+                url: "https://google.com",
+                options: {
+                  "useShouldOverrideUrlLoading": true,
+                  "useOnLoadResource": true,
+                }
+            );
           },
           child: Text("Open Webview Browser")),
     );

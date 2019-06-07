@@ -54,10 +54,13 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
           decoration:
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
+            //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
             //initialUrl: "https://flutter.dev/",
             initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: {
+              //"mediaPlaybackRequiresUserGesture": false,
+              //"allowsInlineMediaPlayback": true,
               //"useShouldOverrideUrlLoading": true,
               //"useOnLoadResource": true
             },

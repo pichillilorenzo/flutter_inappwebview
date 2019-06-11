@@ -413,7 +413,7 @@ class InAppBrowser {
   ///Event fires when the [InAppBrowser] webview scrolls.
   ///[x] represents the current horizontal scroll origin in pixels.
   ///[y] represents the current vertical scroll origin in pixels.
-  void onScrollChanged(int x, int y) {
+  void onScrollChanged(int x, int y, int bottom) {
 
   }
 
@@ -549,7 +549,7 @@ typedef onWebViewProgressChangedCallback = void Function(InAppWebViewController 
 typedef onWebViewConsoleMessageCallback = void Function(InAppWebViewController controller, ConsoleMessage consoleMessage);
 typedef shouldOverrideUrlLoadingCallback = void Function(InAppWebViewController controller, String url);
 typedef onWebViewLoadResourceCallback = void Function(InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request);
-typedef onWebViewScrollChangedCallback = void Function(InAppWebViewController controller, int x, int y);
+typedef onWebViewScrollChangedCallback = void Function(InAppWebViewController controller, int x, int y, int bottom);
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
 ///The [mimeType] property specifies the format of the data.
@@ -869,10 +869,11 @@ class InAppWebViewController {
       case "onScrollChanged":
         int x = call.arguments["x"];
         int y = call.arguments["y"];
+        int bottom = call.arguments["bottom"];
         if (_widget != null && _widget.onScrollChanged != null)
-          _widget.onScrollChanged(this, x, y);
+          _widget.onScrollChanged(this, x, y, bottom);
         else if (_inAppBrowser != null)
-          _inAppBrowser.onScrollChanged(x, y);
+          _inAppBrowser.onScrollChanged(x, y, bottom);
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
@@ -1108,6 +1109,29 @@ class InAppWebViewController {
   ///Navigates to a [WebHistoryItem] from the back-forward [WebHistory.list] and sets it as the current item.
   Future<void> goTo(WebHistoryItem historyItem) async {
     await goBackOrForward(historyItem.offset);
+  }
+
+  Future<bool> scrollTo(int x,int y) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('x', () => x);
+    args.putIfAbsent('y', () => y);
+    return await _channel.invokeMethod('scrollTo', args);
+  }
+
+  Future<bool> smoothScrollTo(int x,int y, {int duration = 250}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser._throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('x', () => x);
+    args.putIfAbsent('y', () => y);
+    args.putIfAbsent('duration', () => duration);
+    return await _channel.invokeMethod('smoothScrollTo', args);
   }
 
   ///Check if the Web View of the [InAppWebView] instance is in a loading state.

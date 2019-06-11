@@ -16,6 +16,7 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.OverScroller;
 
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
@@ -40,6 +41,7 @@ public class InAppWebView extends WebView {
 
   static final String LOG_TAG = "InAppWebView";
 
+  private OverScroller mScroller;  
   public PluginRegistry.Registrar registrar;
   public InAppBrowserActivity inAppBrowserActivity;
   public FlutterWebView flutterWebView;
@@ -156,6 +158,7 @@ public class InAppWebView extends WebView {
 //            }
 //        });
 
+    mScroller = new OverScroller(getContext());
     WebSettings settings = getSettings();
 
     settings.setJavaScriptEnabled(options.javaScriptEnabled);
@@ -295,6 +298,28 @@ public class InAppWebView extends WebView {
     clearCache(true);
     clearCookies();
     clearFormData();
+  }
+  
+  //调用此方法滚动到目标位置
+  public void smoothScrollTo(int fx, int fy, int duration) {
+      int dx = fx - mScroller.getFinalX();
+      int dy = fy - mScroller.getFinalY();
+      smoothScrollBy(dx, dy, duration);
+  }
+
+  //调用此方法设置滚动的相对偏移
+  public void smoothScrollBy(int dx, int dy, int duration) {
+      mScroller.startScroll(mScroller.getFinalX(), mScroller.getFinalY(), dx, dy, duration);
+      invalidate();
+  }
+  
+  @Override
+  public void computeScroll() {
+      if (mScroller.computeScrollOffset()) {
+          scrollTo(mScroller.getCurrX(), mScroller.getCurrY());
+          postInvalidate();
+      }
+      super.computeScroll(); 
   }
 
   public byte[] takeScreenshot() {
@@ -504,12 +529,14 @@ public class InAppWebView extends WebView {
     float scale = getResources().getDisplayMetrics().density;
     int x = (int) (l/scale);
     int y = (int) (t/scale);
+    int bottom = (int) (getContentHeight() * scale);
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("x", x);
     obj.put("y", y);
+    obj.put("bottom", bottom);
     getChannel().invokeMethod("onScrollChanged", obj);
   }
 

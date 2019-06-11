@@ -21,7 +21,7 @@ class MyInappBrowser extends InAppBrowser {
  }
 
  @override
- Future onScrollChanged(int x, int y) async {
+ Future onScrollChanged(int x, int y, int bottom) async {
    print("Scrolled: x:$x y:$y");
  }
 

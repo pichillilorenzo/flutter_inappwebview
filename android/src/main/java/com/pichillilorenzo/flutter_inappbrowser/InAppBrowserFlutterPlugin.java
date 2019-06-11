@@ -267,6 +267,14 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         stopLoading(uuid);
         result.success(true);
         break;
+      case "scrollTo":
+        scrollTo(uuid, (Integer) call.argument("x"), (Integer) call.argument("y"));
+        result.success(true);
+        break;
+      case "smoothScrollTo":
+        smoothScrollTo(uuid, (Integer) call.argument("x"), (Integer) call.argument("y"), (Integer) call.argument("duration"));
+        result.success(true);
+        break;
       case "isLoading":
         result.success(isLoading(uuid));
         break;
@@ -538,6 +546,18 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       inAppBrowserActivity.reload();
+  }
+
+  public void scrollTo(String uuid, int x, int y) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.scrollTo(x, y);
+  }
+
+  public void smoothScrollTo(String uuid, int x, int y, int duration) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.smoothScrollTo(x, y, duration);
   }
 
   public boolean isLoading(String uuid) {

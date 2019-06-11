@@ -326,6 +326,18 @@ public class InAppBrowserActivity extends AppCompatActivity {
       webView.stopLoading();
   }
 
+  public void scrollTo(int x, int y) {
+    if (webView != null){
+      webView.scrollTo(x, y);
+    }
+  }
+
+  public void smoothScrollTo(int x, int y, int duration) {
+    if (webView != null){
+      webView.smoothScrollTo(x, y, duration);
+    }
+  }
+
   public boolean isLoading() {
     if (webView != null)
       return webView.isLoading;

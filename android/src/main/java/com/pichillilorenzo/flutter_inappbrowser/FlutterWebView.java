@@ -186,6 +186,16 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           webView.stopLoading();
         result.success(true);
         break;
+      case "scrollTo":
+        if (webView != null)
+          webView.scrollTo((Integer) call.argument("x"), (Integer) call.argument("y"));
+        result.success(true);
+        break;
+      case "smoothScrollTo":
+        if (webView != null)
+          webView.smoothScrollTo((Integer) call.argument("x"), (Integer) call.argument("y"), (Integer) call.argument("duration"));
+        result.success(true);
+        break;
       case "isLoading":
         result.success((webView != null) && webView.isLoading());
         break;

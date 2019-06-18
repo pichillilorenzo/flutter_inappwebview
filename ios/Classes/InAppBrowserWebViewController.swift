@@ -272,27 +272,21 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         
         weak var weakSelf = self
         
-        // Run later to avoid the "took a long time" log message.
-        DispatchQueue.main.async(execute: {() -> Void in
-            if (weakSelf?.responds(to: #selector(getter: self.presentingViewController)))! {
-                weakSelf?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
-                    self.tmpWindow?.windowLevel = 0.0
-                    UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-                    if (self.navigationDelegate != nil) {
-                        self.navigationDelegate?.browserExit(uuid: self.uuid)
-                    }
-                })
-            }
-            else {
-                weakSelf?.parent?.dismiss(animated: true, completion: {() -> Void in
-                    self.tmpWindow?.windowLevel = 0.0
-                    UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-                    if (self.navigationDelegate != nil) {
-                        self.navigationDelegate?.browserExit(uuid: self.uuid)
-                    }
-                })
-            }
-        })
+        if (weakSelf?.responds(to: #selector(getter: self.presentingViewController)))! {
+            weakSelf?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
+                self.tmpWindow?.windowLevel = 0.0
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            })
+        }
+        else {
+            weakSelf?.parent?.dismiss(animated: true, completion: {() -> Void in
+                self.tmpWindow?.windowLevel = 0.0
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            })
+        }
+        if (self.navigationDelegate != nil) {
+            self.navigationDelegate?.browserExit(uuid: self.uuid)
+        }
     }
     
     @objc func goBack() {

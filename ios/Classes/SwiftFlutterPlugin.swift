@@ -350,7 +350,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let tmpController = UIViewController()
         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
         self.tmpWindow?.rootViewController = tmpController
-        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1)
         self.tmpWindow?.makeKeyAndVisible()
         
         let browserOptions: InAppBrowserOptions
@@ -435,7 +435,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
 //                UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
 //            }
             webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = 0.0
+                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }
@@ -466,7 +466,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let tmpController = UIViewController()
         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
         self.tmpWindow?.rootViewController = tmpController
-        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1)
         self.tmpWindow?.makeKeyAndVisible()
         
         let browserOptions: InAppBrowserOptions
@@ -499,7 +499,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
             })
             webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = 0.0
+                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }
@@ -518,7 +518,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         else {
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                UIApplication.shared.open(url, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
             } else {
                 UIApplication.shared.openURL(url)
             }
@@ -536,7 +536,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 DispatchQueue.main.async(execute: {() -> Void in
                     if webViewController != nil {
                         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-                        self.tmpWindow?.windowLevel = UIWindowLevel(baseWindowLevel! + 1)
+                        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1)
                         self.tmpWindow?.makeKeyAndVisible()
                         UIApplication.shared.delegate?.window??.makeKeyAndVisible()
                         self.tmpWindow?.rootViewController?.present(webViewController!, animated: true, completion: nil)
@@ -558,7 +558,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 DispatchQueue.main.async(execute: {() -> Void in
                     if webViewController != nil {
                         webViewController?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
-                            self.tmpWindow?.windowLevel = 0.0
+                            self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
                             if self.previousStatusBarStyle != -1 {
                                 UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
@@ -748,4 +748,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         return nil
     }
     
+}
+
+// Helper function inserted by Swift 4.2 migrator.
+fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
+	return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

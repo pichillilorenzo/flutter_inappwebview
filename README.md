@@ -121,7 +121,7 @@ class _MyAppState extends State<MyApp> {
                 padding: EdgeInsets.all(20.0),
                 child: Text("CURRENT URL\n${ (url.length > 50) ? url.substring(0, 50) + "..." : url }"),
               ),
-              (progress != 1.0) ? LinearProgressIndicator(value: progress) : null,
+              (progress != 1.0) ? LinearProgressIndicator(value: progress) : Container(),
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.all(10.0),

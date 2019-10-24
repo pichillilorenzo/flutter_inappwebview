@@ -350,7 +350,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let tmpController = UIViewController()
         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
         self.tmpWindow?.rootViewController = tmpController
-        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1)
+        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
         self.tmpWindow?.makeKeyAndVisible()
         
         let browserOptions: InAppBrowserOptions
@@ -466,7 +466,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         let tmpController = UIViewController()
         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
         self.tmpWindow?.rootViewController = tmpController
-        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1)
+        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
         self.tmpWindow?.makeKeyAndVisible()
         
         let browserOptions: InAppBrowserOptions
@@ -536,7 +536,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 DispatchQueue.main.async(execute: {() -> Void in
                     if webViewController != nil {
                         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-                        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1)
+                        self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
                         self.tmpWindow?.makeKeyAndVisible()
                         UIApplication.shared.delegate?.window??.makeKeyAndVisible()
                         self.tmpWindow?.rootViewController?.present(webViewController!, animated: true, completion: nil)

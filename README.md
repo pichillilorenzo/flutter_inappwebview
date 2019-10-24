@@ -25,7 +25,7 @@ Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development
 If you are starting a new fresh app, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```
 === BUILD TARGET flutter_inappbrowser OF PROJECT Pods WITH CONFIGURATION Debug ===
-The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2. This setting can be set in the build settings editor.
+The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2, 5.0. This setting can be set in the build settings editor.
 ```
 
 If you still have this problem, try to edit iOS `Podfile` like this (see [#15](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/15)):
@@ -38,7 +38,7 @@ end
 post_install do |installer|
   installer.pods_project.targets.each do |target|
     target.build_configurations.each do |config|
-      config.build_settings['SWIFT_VERSION'] = '4.0'  # required by simple_permission
+      config.build_settings['SWIFT_VERSION'] = '5.0'  # required by simple_permission
       config.build_settings['ENABLE_BITCODE'] = 'NO'
     end
   end
@@ -70,8 +70,8 @@ See the online [docs](https://pub.dartlang.org/documentation/flutter_inappbrowse
 ### `InAppWebView` class
 Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree.
 
-[AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html) and [UiKitView](https://docs.flutter.io/flutter/widgets/UiKitView-class.html) are not officially stable yet!
-So, if you want use it, you can but you will have some limitation such as the inability to use the keyboard!
+The plugin relies on Flutter's mechanism (in developers preview) for embedding Android and iOS native views: [AndroidView](https://docs.flutter.io/flutter/widgets/AndroidView-class.html) and [UiKitView](https://docs.flutter.io/flutter/widgets/UiKitView-class.html).
+Known issues are tagged with the [platform-views](https://github.com/flutter/flutter/labels/a%3A%20platform-views) label in the [Flutter official repo](https://github.com/flutter/flutter).
 
 To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
 
@@ -121,7 +121,7 @@ class _MyAppState extends State<MyApp> {
                 padding: EdgeInsets.all(20.0),
                 child: Text("CURRENT URL\n${ (url.length > 50) ? url.substring(0, 50) + "..." : url }"),
               ),
-              (progress != 1.0) ? LinearProgressIndicator(value: progress) : null,
+              (progress != 1.0) ? LinearProgressIndicator(value: progress) : Container(),
               Expanded(
                 child: Container(
                   margin: const EdgeInsets.all(10.0),

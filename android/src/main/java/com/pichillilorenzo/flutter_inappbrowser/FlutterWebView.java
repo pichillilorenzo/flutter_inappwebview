@@ -229,4 +229,11 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       webView.loadUrl("about:blank");
     }
   }
+
+  @Override
+  public void onInputConnectionLocked() {}
+
+  @Override
+  public void onInputConnectionUnlocked() {}
+
 }

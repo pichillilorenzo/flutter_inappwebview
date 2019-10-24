@@ -298,19 +298,27 @@ public class InAppWebView extends WebView {
   }
 
   public byte[] takeScreenshot() {
-    Picture picture = capturePicture();
+    float scale = getScale();
+    int height = (int) (getContentHeight() * scale + 0.5);
+
     Bitmap b = Bitmap.createBitmap( getWidth(),
-            getHeight(), Bitmap.Config.ARGB_8888);
+            height, Bitmap.Config.ARGB_8888);
     Canvas c = new Canvas(b);
 
-    picture.draw(c);
+    draw(c);
+    int scrollOffset = (getScrollY() + getMeasuredHeight() > b.getHeight())
+                    ? b.getHeight() : getScrollY();
+    Bitmap resized = Bitmap.createBitmap(
+                    b, 0, scrollOffset, b.getWidth(), getMeasuredHeight());
+
     ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    b.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+    resized.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
     try {
       byteArrayOutputStream.close();
     } catch (IOException e) {
       e.printStackTrace();
     }
+    resized.recycle();    
     return byteArrayOutputStream.toByteArray();
   }
 

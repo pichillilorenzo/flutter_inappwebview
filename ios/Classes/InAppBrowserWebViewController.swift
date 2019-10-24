@@ -172,8 +172,8 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     }
     
     func prepareConstraints () {
-        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
-        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.view, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
+        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
+        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
         
         webView.translatesAutoresizingMaskIntoConstraints = false
         let height = NSLayoutConstraint(item: webView, attribute: .height, relatedBy: .equal, toItem: containerWebView, attribute: .height, multiplier: 1, constant: 0)
@@ -183,8 +183,8 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         let bottomContraint = NSLayoutConstraint(item: webView, attribute: .bottomMargin, relatedBy: .equal, toItem: containerWebView, attribute: .bottomMargin, multiplier: 1, constant: 0)
         containerWebView.addConstraints([height, width, leftConstraint, rightConstraint, bottomContraint])
         
-        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutAttribute.bottom, relatedBy: NSLayoutRelation.equal, toItem: self.containerWebView, attribute: NSLayoutAttribute.bottom, multiplier: 1, constant: 0)
-        webView_TopFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutAttribute.top, relatedBy: NSLayoutRelation.equal, toItem: self.containerWebView, attribute: NSLayoutAttribute.top, multiplier: 1, constant: 0)
+        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
+        webView_TopFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
     }
     
     func prepareWebView() {
@@ -254,7 +254,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     }
     
     func setWebViewFrame(_ frame: CGRect) {
-        print("Setting the WebView's frame to \(NSStringFromCGRect(frame))")
+        print("Setting the WebView's frame to \(NSCoder.string(for: frame))")
         webView.frame = frame
     }
     
@@ -274,13 +274,13 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         
         if (weakSelf?.responds(to: #selector(getter: self.presentingViewController)))! {
             weakSelf?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = 0.0
+                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }
         else {
             weakSelf?.parent?.dismiss(animated: true, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = 0.0
+                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }

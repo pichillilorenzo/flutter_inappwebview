@@ -240,7 +240,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             takeSnapshot(with: nil, completionHandler: {(image, error) -> Void in
                 var imageData: Data? = nil
                 if let screenshot = image {
-                    imageData = UIImagePNGRepresentation(screenshot)!
+                    imageData = screenshot.pngData()!
                 }
                 completionHandler(imageData)
             })

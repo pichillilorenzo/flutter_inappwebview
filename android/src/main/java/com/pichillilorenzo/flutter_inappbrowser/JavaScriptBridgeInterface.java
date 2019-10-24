@@ -51,6 +51,10 @@ public class JavaScriptBridgeInterface {
         getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
           @Override
           public void success(Object json) {
+            if (flutterWebView.webView == null) {
+              // The webview has already been disposed, ignore.
+              return;
+            }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
               flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
             }

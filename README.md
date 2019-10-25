@@ -8,7 +8,6 @@
 [![Donate to this project using Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=9269604)
 
 A Flutter plugin that allows you to add an inline webview or open an in-app browser window.
-This plugin is inspired by the popular [cordova-plugin-inappbrowser](https://github.com/apache/cordova-plugin-inappbrowser)!
 
 ### Requirements
 - Dart sdk: ">=2.1.0-dev.7.1 <3.0.0"

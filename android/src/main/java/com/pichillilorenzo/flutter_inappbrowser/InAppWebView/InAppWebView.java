@@ -1,16 +1,26 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
+import android.Manifest;
+import android.app.Activity;
+import android.app.DownloadManager;
+import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Picture;
+import android.net.Uri;
 import android.os.Build;
+import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
 import android.webkit.CookieManager;
+import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
@@ -21,6 +31,7 @@ import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
+import com.pichillilorenzo.flutter_inappbrowser.RequestPermissionHandler;
 import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayOutputStream;
@@ -35,6 +46,8 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+
+import static android.content.Context.DOWNLOAD_SERVICE;
 
 public class InAppWebView extends WebView {
 
@@ -110,6 +123,8 @@ public class InAppWebView extends WebView {
 
   public void prepare() {
 
+    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity();
+
     boolean isFromInAppBrowserActivity = inAppBrowserActivity != null;
 
     httpClient = new OkHttpClient().newBuilder().cache(new Cache(getContext().getCacheDir(), okHttpClientCacheSize)).build();
@@ -122,39 +137,43 @@ public class InAppWebView extends WebView {
     inAppWebViewClient = new InAppWebViewClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
     setWebViewClient(inAppWebViewClient);
 
-//        final Activity activity = this;
-//
-//        webView.setDownloadListener(new DownloadListener() {
-//            @Override
-//            public void onDownloadStart(final String url, final String userAgent,
-//                                        final String contentDisposition, final String mimetype,
-//                                        final long contentLength) {
-//
-//                RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable(){
-//                    @Override
-//                    public void run(){
-//                        DownloadManager.Request request = new DownloadManager.Request(
-//                                Uri.parse(url));
-//
-//                        final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-//                        request.allowScanningByMediaScanner();
-//                        request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-//                        request.setVisibleInDownloadsUi(true);
-//                        request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-//                        DownloadManager dm = (DownloadManager) getSystemService(DOWNLOAD_SERVICE);
-//                        if (dm != null) {
-//                            dm.enqueue(request);
-//                            Toast.makeText(getApplicationContext(), "Downloading File: " + filename, //To notify the Client that the file is being downloaded
-//                                    Toast.LENGTH_LONG).show();
-//                        }
-//                        else {
-//                            Toast.makeText(getApplicationContext(), "Cannot Download File: " + filename, //To notify the Client that the file cannot be downloaded
-//                                    Toast.LENGTH_LONG).show();
-//                        }
-//                    }
-//                });
-//            }
-//        });
+    activity.registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+
+    setDownloadListener(new DownloadListener() {
+        @Override
+        public void onDownloadStart(final String url, final String userAgent,
+                                    final String contentDisposition, final String mimetype,
+                                    final long contentLength) {
+
+            RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable(){
+                @Override
+                public void run(){
+
+                    Log.e(LOG_TAG, url);
+                    Log.e(LOG_TAG, contentDisposition);
+                    Log.e(LOG_TAG, mimetype);
+
+                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
+
+                    final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
+                    request.allowScanningByMediaScanner();
+                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
+                    request.setVisibleInDownloadsUi(true);
+                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
+                    DownloadManager dm = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
+                    if (dm != null) {
+                        dm.enqueue(request);
+                        //Toast.makeText(getApplicationContext(), "Downloading File: " + filename, //To notify the Client that the file is being downloaded
+                        //        Toast.LENGTH_LONG).show();
+                    }
+                    else {
+                        //Toast.makeText(getApplicationContext(), "Cannot Download File: " + filename, //To notify the Client that the file cannot be downloaded
+                        //        Toast.LENGTH_LONG).show();
+                    }
+                }
+            });
+        }
+    });
 
     WebSettings settings = getSettings();
 
@@ -187,6 +206,8 @@ public class InAppWebView extends WebView {
     settings.setUseWideViewPort(options.useWideViewPort);
     settings.setSupportZoom(options.supportZoom);
     settings.setTextZoom(options.textZoom);
+    setVerticalScrollBarEnabled(options.verticalScrollBarEnabled);
+    setHorizontalScrollBarEnabled(options.horizontalScrollBarEnabled);
 
     if (options.transparentBackground) {
       setBackgroundColor(Color.TRANSPARENT);
@@ -204,6 +225,19 @@ public class InAppWebView extends WebView {
       }
     }
   }
+
+  private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      //Fetching the download id received with the broadcast
+      long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
+      //Checking if the received broadcast is for our enqueued download by matching download id
+      if (1 == id) { // test
+      //if (downloadID == id) {
+        //Toast.makeText(MainActivity.this, "Download Completed", Toast.LENGTH_SHORT).show();
+      }
+    }
+  };
 
   public void loadUrl(String url, MethodChannel.Result result) {
     if (!url.isEmpty()) {
@@ -367,6 +401,12 @@ public class InAppWebView extends WebView {
     if (newOptionsMap.get("textZoom") != null && options.textZoom != newOptions.textZoom)
       settings.setTextZoom(newOptions.textZoom);
 
+    if (newOptionsMap.get("verticalScrollBarEnabled") != null && options.verticalScrollBarEnabled != newOptions.verticalScrollBarEnabled)
+      setVerticalScrollBarEnabled(newOptions.verticalScrollBarEnabled);
+
+    if (newOptionsMap.get("horizontalScrollBarEnabled") != null && options.horizontalScrollBarEnabled != newOptions.horizontalScrollBarEnabled)
+      setHorizontalScrollBarEnabled(newOptions.horizontalScrollBarEnabled);
+
     if (newOptionsMap.get("transparentBackground") != null && options.transparentBackground != newOptions.transparentBackground) {
       if (newOptions.transparentBackground) {
         setBackgroundColor(Color.TRANSPARENT);
@@ -523,5 +563,12 @@ public class InAppWebView extends WebView {
 
   private MethodChannel getChannel() {
     return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+  }
+
+  @Override
+  public void destroy() {
+    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity();
+    activity.unregisterReceiver(onDownloadComplete);
+    super.destroy();
   }
 }

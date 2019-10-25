@@ -15,6 +15,8 @@ public abstract class RequestPermissionHandler implements ActivityCompat.OnReque
 
     private static Map<Integer, List<Runnable>> actionDictionary = new HashMap<>();
 
+    public static int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1;
+
     public static void checkAndRun(Activity activity, String permission, int requestCode, Runnable runnable) {
 
         int permissionCheck = ContextCompat.checkSelfPermission(activity.getApplicationContext(), permission);

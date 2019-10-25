@@ -3,6 +3,7 @@
     package="com.pichillilorenzo.flutter_inappbrowser">
 
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
 
     <application>
         <activity android:theme="@style/AppTheme" android:name=".InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>

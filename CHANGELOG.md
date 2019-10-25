@@ -1,3 +1,14 @@
+## 1.3.0
+
+- Merge
+- Merge
+- Merge
+- Merge
+- Merge
+- Merge
+- Added `horizontalScrollBarEnabled` and `verticalScrollBarEnabled` options to enable/disable the corresponding scrollbar of the WebView [#165](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/165)
+
+
 ## 1.2.1
 
 - Merge "Add new option to control the contentMode in Android platform" [#101](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/101) (thanks to [DreamBuddy](https://github.com/DreamBuddy))

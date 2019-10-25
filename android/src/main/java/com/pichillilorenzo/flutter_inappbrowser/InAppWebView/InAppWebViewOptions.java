@@ -14,6 +14,8 @@ public class InAppWebViewOptions extends Options {
   public boolean javaScriptCanOpenWindowsAutomatically = false;
   public boolean mediaPlaybackRequiresUserGesture = true;
   public int textZoom = 100;
+  public boolean verticalScrollBarEnabled = true;
+  public boolean horizontalScrollBarEnabled = true;
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;

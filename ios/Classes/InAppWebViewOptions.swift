@@ -17,6 +17,8 @@ public class InAppWebViewOptions: Options {
     var javaScriptEnabled = true
     var javaScriptCanOpenWindowsAutomatically = false
     var mediaPlaybackRequiresUserGesture = true
+    var verticalScrollBarEnabled = true
+    var horizontalScrollBarEnabled = true
     
     var disallowOverScroll = false
     var enableViewportScale = false

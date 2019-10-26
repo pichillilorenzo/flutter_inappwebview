@@ -63,7 +63,7 @@ let resourceObserverJS = """
             window.webkit.messageHandlers['resourceLoaded'].postMessage(JSON.stringify(entry));
         });
     });
-    observer.observe({entryTypes: ['resource', 'mark', 'measure']});
+    observer.observe({entryTypes: ['resource']});
 })();
 """
 
@@ -586,23 +586,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         
-        if (options?.useOnLoadResource)! {
-            if let url = navigationResponse.response.url {
-                if WKNavigationMap[url.absoluteString] != nil {
-                    let startResourceTime: Int64 = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int64)
-                    let startTime: Int64 = startResourceTime - startPageTime;
-                    let duration: Int64 = currentTimeInMilliSeconds() - startResourceTime;
-                    onLoadResource(response: navigationResponse.response, fromRequest: WKNavigationMap[url.absoluteString]!["request"] as? URLRequest, withData: Data(), startTime: startTime, duration: duration)
-                }
-            }
-        }
+//        if (options?.useOnLoadResource)! {
+//            if let url = navigationResponse.response.url {
+//                if WKNavigationMap[url.absoluteString] != nil {
+//                    let startResourceTime: Int64 = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int64)
+//                    let startTime: Int64 = startResourceTime - startPageTime;
+//                    let duration: Int64 = currentTimeInMilliSeconds() - startResourceTime;
+//                    onLoadResource(response: navigationResponse.response, fromRequest: WKNavigationMap[url.absoluteString]!["request"] as? URLRequest, withData: Data(), startTime: startTime, duration: duration)
+//                }
+//            }
+//        }
         
-        let mimeType = navigationResponse.response.mimeType
-        if let url = navigationResponse.response.url {
-            if mimeType != nil && !mimeType!.starts(with: "text/") {
-                onDownloadStart(url: url.absoluteString)
-                decisionHandler(.cancel)
-                return
+        if (options?.useOnDownloadStart)! {
+            let mimeType = navigationResponse.response.mimeType
+            if let url = navigationResponse.response.url {
+                if mimeType != nil && !mimeType!.starts(with: "text/") {
+                    onDownloadStart(url: url.absoluteString)
+                    decisionHandler(.cancel)
+                    return
+                }
             }
         }
         
@@ -703,27 +705,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func onLoadResource(response: URLResponse, fromRequest request: URLRequest?, withData data: Data, startTime: Int64, duration: Int64) {
-        var headersResponse = (response as! HTTPURLResponse).allHeaderFields as! [String: String]
-        headersResponse.lowercaseKeys()
-        
-        var headersRequest = request!.allHTTPHeaderFields! as [String: String]
-        headersRequest.lowercaseKeys()
-        
+    public func onLoadResource(initiatorType: String, url: String, startTime: Double, duration: Double) {
         var arguments: [String : Any] = [
-            "response": [
-                "url": response.url!.absoluteString,
-                "statusCode": (response as! HTTPURLResponse).statusCode,
-                "headers": headersResponse,
-                "startTime": startTime,
-                "duration": duration,
-                "data": data
-            ],
-            "request": [
-                "url": request!.url!.absoluteString,
-                "headers": headersRequest,
-                "method": request!.httpMethod!
-            ]
+            "initiatorType": initiatorType,
+            "url": url,
+            "startTime": startTime,
+            "duration": duration
         ]
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
@@ -852,24 +839,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 if !UIApplication.shared.canOpenURL(url) {
                     return
                 }
-                let startTime: Int64 = Int64(resource["startTime"] as! Double)
-                let duration: Int64 = Int64(resource["duration"] as! Double)
-                var urlRequest = URLRequest(url: url)
-                urlRequest.allHTTPHeaderFields = [:]
-                let config = URLSessionConfiguration.default
-                let session = URLSession(configuration: config)
-                let task = session.dataTask(with: urlRequest) { (data, response, error) in
-                    if error != nil {
-                        print(error)
-                        return
-                    }
-                    var withData = data
-                    if withData == nil {
-                        withData = Data()
-                    }
-                    self.onLoadResource(response: response!, fromRequest: urlRequest, withData: withData!, startTime: startTime, duration: duration)
-                }
-                task.resume()
+                let initiatorType = resource["initiatorType"] as! String
+                let startTime = resource["startTime"] as! Double
+                let duration = resource["duration"] as! Double
+                
+                self.onLoadResource(initiatorType: initiatorType, url: url.absoluteString, startTime: startTime, duration: duration)
             }
         }
         else if message.name == "callHandler" {

@@ -12,8 +12,8 @@ import 'package:flutter/gestures.dart';
 
 import 'types.dart';
 import 'in_app_browser.dart';
-import 'web_history.dart';
 import 'channel_manager.dart';
+import 'webview_options.dart';
 
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
@@ -44,6 +44,7 @@ class InAppWebViewInitialData {
 ///All platforms support these options:
 ///  - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [InAppWebView.shouldOverrideUrlLoading()] event. The default value is `false`.
 ///  - __useOnLoadResource__: Set to `true` to be able to listen at the [InAppWebView.onLoadResource()] event. The default value is `false`.
+///  - __useOnDownloadStart__: Set to `true` to be able to listen at the [InAppWebView.onDownloadStart()] event. The default value is `false`.
 ///  - __useOnTargetBlank__: Set to `true` to be able to listen at the [InAppWebView.onTargetBlank()] event. The default value is `false`.
 ///  - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
 ///  - __userAgent___: Set the custom WebView's user-agent.
@@ -136,7 +137,7 @@ class InAppWebView extends StatefulWidget {
   ///Initial headers that will be used.
   final Map<String, String> initialHeaders;
   ///Initial options that will be used.
-  final Map<String, dynamic> initialOptions;
+  final List<WebViewOptions> initialOptions;
   /// `gestureRecognizers` specifies which gestures should be consumed by the web view.
   /// It is possible for other gesture recognizers to be competing with the web view on pointer
   /// events, e.g if the web view is inside a [ListView] the [ListView] will want to handle
@@ -152,7 +153,7 @@ class InAppWebView extends StatefulWidget {
     this.initialFile,
     this.initialData,
     this.initialHeaders = const {},
-    this.initialOptions = const {},
+    this.initialOptions = const [],
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
@@ -187,6 +188,11 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   Widget build(BuildContext context) {
+    Map<String, dynamic> initialOptions = {};
+    widget.initialOptions.forEach((webViewOption) {
+      initialOptions.addAll(webViewOption.toMap());
+    });
+
     if (defaultTargetPlatform == TargetPlatform.android) {
       return GestureDetector(
         onLongPress: () {},
@@ -201,7 +207,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialFile': widget.initialFile,
             'initialData': widget.initialData?.toMap(),
             'initialHeaders': widget.initialHeaders,
-            'initialOptions': widget.initialOptions
+            'initialOptions': initialOptions
           },
           creationParamsCodec: const StandardMessageCodec(),
         ),
@@ -216,7 +222,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
-          'initialOptions': widget.initialOptions
+          'initialOptions': initialOptions
         },
         creationParamsCodec: const StandardMessageCodec(),
       );
@@ -307,31 +313,17 @@ class InAppWebViewController {
           _inAppBrowser.shouldOverrideUrlLoading(url);
         break;
       case "onLoadResource":
-        Map<dynamic, dynamic> rawResponse = call.arguments["response"];
-        rawResponse = rawResponse.cast<String, dynamic>();
-        Map<dynamic, dynamic> rawRequest = call.arguments["request"];
-        rawRequest = rawRequest.cast<String, dynamic>();
+        String initiatorType = call.arguments["initiatorType"];
+        String url = call.arguments["url"];
+        double startTime = call.arguments["startTime"];
+        double duration = call.arguments["duration"];
 
-        String urlResponse = rawResponse["url"];
-        Map<dynamic, dynamic> headersResponse = rawResponse["headers"];
-        headersResponse = headersResponse.cast<String, String>();
-        int statusCode = rawResponse["statusCode"];
-        int startTime = rawResponse["startTime"];
-        int duration = rawResponse["duration"];
-        Uint8List data = rawResponse["data"];
-
-        String urlRequest = rawRequest["url"];
-        Map<dynamic, dynamic> headersRequest = rawRequest["headers"];
-        headersRequest = headersResponse.cast<String, String>();
-        String method = rawRequest["method"];
-
-        var response = new WebResourceResponse(urlResponse, headersResponse, statusCode, startTime, duration, data);
-        var request = new WebResourceRequest(urlRequest, headersRequest, method);
+        var response = new WebResourceResponse(initiatorType, url, startTime, duration);
 
         if (_widget != null && _widget.onLoadResource != null)
-          _widget.onLoadResource(this, response, request);
+          _widget.onLoadResource(this, response);
         else if (_inAppBrowser != null)
-          _inAppBrowser.onLoadResource(response, request);
+          _inAppBrowser.onLoadResource(response);
         break;
       case "onConsoleMessage":
         String sourceURL = call.arguments["sourceURL"];

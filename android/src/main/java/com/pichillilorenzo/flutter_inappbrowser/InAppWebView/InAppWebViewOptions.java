@@ -4,6 +4,7 @@ import com.pichillilorenzo.flutter_inappbrowser.Options;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 public class InAppWebViewOptions extends Options {
 
@@ -11,6 +12,7 @@ public class InAppWebViewOptions extends Options {
 
   public boolean useShouldOverrideUrlLoading = false;
   public boolean useOnLoadResource = false;
+  public boolean useOnDownloadStart = false;
   public boolean useOnTargetBlank = false;
   public boolean clearCache = false;
   public String userAgent = "";
@@ -21,6 +23,7 @@ public class InAppWebViewOptions extends Options {
   public boolean verticalScrollBarEnabled = true;
   public boolean horizontalScrollBarEnabled = true;
   public List<String> resourceCustomSchemes = new ArrayList<>();
+  public List<Map<String, Map<String, Object>>> contentBlockers = new ArrayList<>();
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;

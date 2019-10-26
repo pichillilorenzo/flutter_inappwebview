@@ -52,6 +52,7 @@ class InAppBrowser {
   ///  - All platforms support:
   ///    - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [shouldOverrideUrlLoading()] event. The default value is `false`.
   ///    - __useOnLoadResource__: Set to `true` to be able to listen at the [onLoadResource()] event. The default value is `false`.
+  ///    - __useOnDownloadStart__: Set to `true` to be able to listen at the [onDownloadStart()] event. The default value is `false`.
   ///    - __useOnTargetBlank__: Set to `true` to be able to listen at the [onTargetBlank()] event. The default value is `false`.
   ///    - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
   ///    - __userAgent__: Set the custom WebView's user-agent.
@@ -296,9 +297,7 @@ class InAppBrowser {
   ///Event fires when the [InAppBrowser] webview loads a resource.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
-  ///
-  ///**NOTE only for iOS**: In some cases, the [response.data] of a [response] with `text/assets` encoding could be empty.
-  void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
+  void onLoadResource(WebResourceResponse response) {
 
   }
 

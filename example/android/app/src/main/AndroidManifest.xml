@@ -17,6 +17,7 @@
     <application
         android:name="com.pichillilorenzo.flutterwebviewexample.MyApplication"
         android:label="flutter_inappbrowser_example"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity
             android:name=".MainActivity"

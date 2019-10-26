@@ -400,9 +400,7 @@ class _MyAppState extends State<MyApp> {
                     initialHeaders: {
 
                     },
-                    initialOptions: {
-
-                    },
+                    initialOptions: [],
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },

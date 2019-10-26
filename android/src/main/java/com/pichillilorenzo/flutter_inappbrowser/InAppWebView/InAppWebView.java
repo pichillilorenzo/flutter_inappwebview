@@ -1,6 +1,5 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -23,7 +22,6 @@ import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
-import com.pichillilorenzo.flutter_inappbrowser.RequestPermissionHandler;
 import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayOutputStream;
@@ -47,11 +45,11 @@ public class InAppWebView extends WebView {
   public InAppBrowserActivity inAppBrowserActivity;
   public FlutterWebView flutterWebView;
   public int id;
-  InAppWebViewClient inAppWebViewClient;
-  InAppWebChromeClient inAppWebChromeClient;
+  public InAppWebViewClient inAppWebViewClient;
+  public InAppWebChromeClient inAppWebChromeClient;
   public InAppWebViewOptions options;
   public boolean isLoading = false;
-  OkHttpClient httpClient;
+  public OkHttpClient httpClient;
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
 
   static final String consoleLogJS = "(function() {" +
@@ -78,6 +76,15 @@ public class InAppWebView extends WebView {
           "           }" +
           "       })(k);" +
           "   }" +
+          "})();";
+
+  static final String resourceObserverJS = "(function() {" +
+          "   var observer = new PerformanceObserver(function(list) {" +
+          "       list.getEntries().forEach(function(entry) {" +
+          "         window." + JavaScriptBridgeInterface.name + "._resourceLoaded(JSON.stringify(entry));" +
+          "       });" +
+          "   });" +
+          "   observer.observe({entryTypes: ['resource']});" +
           "})();";
 
   static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
@@ -117,7 +124,8 @@ public class InAppWebView extends WebView {
 
     boolean isFromInAppBrowserActivity = inAppBrowserActivity != null;
 
-    httpClient = new OkHttpClient().newBuilder().cache(new Cache(getContext().getCacheDir(), okHttpClientCacheSize)).build();
+    //httpClient = new OkHttpClient().newBuilder().cache(new Cache(getContext().getCacheDir(), okHttpClientCacheSize)).build();
+    httpClient = new OkHttpClient().newBuilder().build();
 
     addJavascriptInterface(new JavaScriptBridgeInterface((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView), JavaScriptBridgeInterface.name);
 
@@ -127,23 +135,8 @@ public class InAppWebView extends WebView {
     inAppWebViewClient = new InAppWebViewClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
     setWebViewClient(inAppWebViewClient);
 
-    setDownloadListener(new DownloadListener() {
-        @Override
-        public void onDownloadStart(final String url, final String userAgent,
-                                    final String contentDisposition, final String mimetype,
-                                    final long contentLength) {
-            RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable(){
-                @Override
-                public void run(){
-                    Map<String, Object> obj = new HashMap<>();
-                    if (inAppBrowserActivity != null)
-                      obj.put("uuid", inAppBrowserActivity.uuid);
-                    obj.put("url", url);
-                    getChannel().invokeMethod("onDownloadStart", obj);
-                }
-            });
-        }
-    });
+    if (options.useOnDownloadStart)
+      setDownloadListener(new DownloadStartListener());
 
     WebSettings settings = getSettings();
 
@@ -396,6 +389,14 @@ public class InAppWebView extends WebView {
     if (newOptionsMap.get("useOnTargetBlank") != null && options.useOnTargetBlank != newOptions.useOnTargetBlank)
       settings.setSupportMultipleWindows(newOptions.useOnTargetBlank);
 
+    if (newOptionsMap.get("useOnDownloadStart") != null && options.useOnDownloadStart != newOptions.useOnDownloadStart) {
+      if (newOptions.useOnDownloadStart) {
+        setDownloadListener(new DownloadStartListener());
+      } else {
+        setDownloadListener(null);
+      }
+    }
+
     options = newOptions;
   }
 
@@ -532,6 +533,17 @@ public class InAppWebView extends WebView {
 
   private MethodChannel getChannel() {
     return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
+  }
+
+  class DownloadStartListener implements DownloadListener {
+    @Override
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
+      Map<String, Object> obj = new HashMap<>();
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
+      obj.put("url", url);
+      getChannel().invokeMethod("onDownloadStart", obj);
+    }
   }
 
   @Override

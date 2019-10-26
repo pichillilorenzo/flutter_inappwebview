@@ -9,9 +9,17 @@
 - Merge "migrating to swift 5.0" [#162](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/162) (thanks to [fattiger00](https://github.com/fattiger00))
 - Merge "Update readme example" [#178](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/178) (thanks to [SebastienBtr](https://github.com/SebastienBtr))
 - Added `horizontalScrollBarEnabled` and `verticalScrollBarEnabled` options to enable/disable the corresponding scrollbar of the WebView [#165](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/165)
-- Added `onDownloadStart` event: event fires when the WebView recognizes and starts a downloadable file.
+- Added `onDownloadStart` event and `useOnDownloadStart` option: event fires when the WebView recognizes and starts a downloadable file.
 - Added `onLoadResourceCustomScheme` event and `resourceCustomSchemes` option to set custom schemes that WebView must handle to load resources
 - Added `onTargetBlank` event and `useOnTargetBlank` option to manage links with `target="_blank"`
+- Added `ContentBlocker`, `ContentBlockerTrigger` and `ContentBlockerAction` classes and the `contentBlockers` option that allows to define a set of rules to use to block content in the WebView
+
+### BREAKING CHANGES
+- Deleted `WebResourceRequest` class
+- Updated `WebResourceResponse` class
+- Updated `onLoadResource` event
+- WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSChromeCustomTabsOptions`
+
 
 ## 1.2.1
 

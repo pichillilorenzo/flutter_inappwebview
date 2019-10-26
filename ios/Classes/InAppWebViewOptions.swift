@@ -12,6 +12,7 @@ public class InAppWebViewOptions: Options {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
+    var useOnDownloadStart = false
     var useOnTargetBlank = false
     var clearCache = false
     var userAgent = ""
@@ -21,6 +22,7 @@ public class InAppWebViewOptions: Options {
     var verticalScrollBarEnabled = true
     var horizontalScrollBarEnabled = true
     var resourceCustomSchemes: [String] = []
+    var contentBlockers: [[String: [String : Any]]] = []
     
     var disallowOverScroll = false
     var enableViewportScale = false

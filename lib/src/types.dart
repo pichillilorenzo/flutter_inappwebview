@@ -25,41 +25,34 @@ enum ConsoleMessageLevel {
   DEBUG, ERROR, LOG, TIP, WARNING
 }
 
-///Public class representing a resource request of the [InAppBrowser] WebView.
-///It is used by the method [InAppBrowser.onLoadResource()].
-class WebResourceRequest {
-
-  String url;
-  Map<String, String> headers;
-  String method;
-
-  WebResourceRequest(this.url, this.headers, this.method);
-
-}
-
 ///Public class representing a resource response of the [InAppBrowser] WebView.
 ///It is used by the method [InAppBrowser.onLoadResource()].
 class WebResourceResponse {
 
+  ///A string representing the type of resource.
+  String initiatorType;
+  ///Resource URL.
   String url;
-  Map<String, String> headers;
-  int statusCode;
-  int startTime;
-  int duration;
-  Uint8List data;
+  ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) for the time a resource fetch started.
+  double startTime;
+  ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
+  double duration;
 
-  WebResourceResponse(this.url, this.headers, this.statusCode, this.startTime, this.duration, this.data);
+  WebResourceResponse(this.initiatorType, this.url, this.startTime, this.duration);
 
 }
 
 ///Public class representing the response returned by the [onLoadResourceCustomScheme()] event of [InAppWebView].
 ///It allows to load a specific resource. The resource data must be encoded to `base64`.
 class CustomSchemeResponse {
+  ///Data enconded to 'base64'.
   String base64data;
+  ///Content-Type of the data, such as `image/png`.
   String contentType;
+  ///Content-Enconding of the data, such as `utf-8`.
   String contentEnconding;
 
-  CustomSchemeResponse(this.base64data, this.contentType, this.contentEnconding);
+  CustomSchemeResponse(this.base64data, this.contentType, {this.contentEnconding = 'utf-8'});
 
   Map<String, dynamic> toJson() {
     return {
@@ -84,6 +77,37 @@ class ConsoleMessage {
   ConsoleMessage(this.sourceURL, this.lineNumber, this.message, this.messageLevel);
 }
 
+///WebHistory class.
+///
+///This class contains a snapshot of the current back/forward list for a WebView.
+class WebHistory {
+  List<WebHistoryItem> _list;
+  ///List of all [WebHistoryItem]s.
+  List<WebHistoryItem> get list => _list;
+  ///Index of the current [WebHistoryItem].
+  int currentIndex;
+
+  WebHistory(this._list, this.currentIndex);
+}
+
+///WebHistoryItem class.
+///
+///A convenience class for accessing fields in an entry in the back/forward list of a WebView. Each WebHistoryItem is a snapshot of the requested history item.
+class WebHistoryItem {
+  ///Original url of this history item.
+  String originalUrl;
+  ///Document title of this history item.
+  String title;
+  ///Url of this history item.
+  String url;
+  ///0-based position index in the back-forward [WebHistory.list].
+  int index;
+  ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
+  int offset;
+
+  WebHistoryItem(this.originalUrl, this.title, this.url, this.index, this.offset);
+}
+
 typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
 typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
@@ -91,7 +115,7 @@ typedef onWebViewLoadErrorCallback = void Function(InAppWebViewController contro
 typedef onWebViewProgressChangedCallback = void Function(InAppWebViewController controller, int progress);
 typedef onWebViewConsoleMessageCallback = void Function(InAppWebViewController controller, ConsoleMessage consoleMessage);
 typedef shouldOverrideUrlLoadingCallback = void Function(InAppWebViewController controller, String url);
-typedef onWebViewLoadResourceCallback = void Function(InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request);
+typedef onWebViewLoadResourceCallback = void Function(InAppWebViewController controller, WebResourceResponse response);
 typedef onWebViewScrollChangedCallback = void Function(InAppWebViewController controller, int x, int y);
 typedef onDownloadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onLoadResourceCustomSchemeCallback = Future<CustomSchemeResponse> Function(InAppWebViewController controller, String scheme, String url);

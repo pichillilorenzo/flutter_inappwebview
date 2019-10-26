@@ -47,7 +47,7 @@ class MyInappBrowser extends InAppBrowser {
  }
 
  @override
- void onLoadResource(WebResourceResponse response, WebResourceRequest request) {
+ void onLoadResource(WebResourceResponse response) {
    print("Started at: " +
        response.startTime.toString() +
        "ms ---> duration: " +

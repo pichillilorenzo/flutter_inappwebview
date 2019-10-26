@@ -65,14 +65,21 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             //initialUrl: "https://flutter.dev/",
             initialFile: "assets/index.html",
             initialHeaders: {},
-            initialOptions: {
-              //"mediaPlaybackRequiresUserGesture": false,
-              //"allowsInlineMediaPlayback": true,
-              "useShouldOverrideUrlLoading": true,
-              "useOnTargetBlank": true,
-              "resourceCustomSchemes": ["my-special-custom-scheme"],
-              //"useOnLoadResource": true
-            },
+            initialOptions: [
+              InAppWebViewOptions(
+                useShouldOverrideUrlLoading: true,
+                useOnTargetBlank: true,
+                //useOnLoadResource: true,
+                useOnDownloadStart: true,
+                resourceCustomSchemes: ["my-special-custom-scheme"],
+                contentBlockers: [
+                  ContentBlocker(
+                      ContentBlockerTrigger(".*", resourceType: [ContentBlockerTriggerResourceType.IMAGE]),
+                      ContentBlockerAction(ContentBlockerActionType.BLOCK)
+                  )
+                ]
+              )
+            ],
             onWebViewCreated: (InAppWebViewController controller) {
               webView = controller;
 
@@ -104,8 +111,8 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("override $url");
               controller.loadUrl(url);
             },
-            onLoadResource: (InAppWebViewController controller, WebResourceResponse response, WebResourceRequest request) {
-              print("Started at: " +
+            onLoadResource: (InAppWebViewController controller, WebResourceResponse response) {
+              print("Resource type: '"+response.initiatorType + "' started at: " +
                   response.startTime.toString() +
                   "ms ---> duration: " +
                   response.duration.toString() +
@@ -113,13 +120,13 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                   response.url);
             },
             onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-//              print("""
-//              console output:
-//                sourceURL: ${consoleMessage.sourceURL}
-//                lineNumber: ${consoleMessage.lineNumber}
-//                message: ${consoleMessage.message}
-//                messageLevel: ${consoleMessage.messageLevel}
-//              """);
+              print("""
+              console output:
+                sourceURL: ${consoleMessage.sourceURL}
+                lineNumber: ${consoleMessage.lineNumber}
+                message: ${consoleMessage.message}
+                messageLevel: ${consoleMessage.messageLevel}
+              """);
             },
             onDownloadStart: (InAppWebViewController controller, String url) async {
               final taskId = await FlutterDownloader.enqueue(
@@ -133,7 +140,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               if (scheme == "my-special-custom-scheme") {
                 var bytes = await rootBundle.load("assets/" + url.replaceFirst("my-special-custom-scheme://", "", 0));
                 var asBase64 = base64.encode(bytes.buffer.asUint8List());
-                var response = new CustomSchemeResponse(asBase64, "image/svg+xml", "utf-8");
+                var response = new CustomSchemeResponse(asBase64, "image/svg+xml", contentEnconding: "utf-8");
                 return response;
               }
               return null;

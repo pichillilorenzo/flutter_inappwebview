@@ -1,9 +1,16 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.content.res.AssetManager;
+import android.os.Handler;
+import android.os.Looper;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
 public class Util {
@@ -37,4 +44,53 @@ public class Util {
     return ANDROID_ASSET_URL + key;
   }
 
+    public static WaitFlutterResult invokeMethodAndWait(final MethodChannel channel, final String method, final Object arguments) {
+      final Map<String, Object> flutterResultMap = new HashMap<>();
+      flutterResultMap.put("result", null);
+      flutterResultMap.put("error", null);
+      flutterResultMap.put("isBlocking", true);
+
+      Handler handler = new Handler(Looper.getMainLooper());
+      handler.post(new Runnable() {
+        @Override
+        public void run() {
+          channel.invokeMethod(method, arguments, new MethodChannel.Result() {
+            @Override
+            public void success(Object result) {
+              flutterResultMap.put("result", result);
+              flutterResultMap.put("isBlocking", false);
+            }
+
+            @Override
+            public void error(String s, String s1, Object o) {
+              flutterResultMap.put("error", "ERROR: " + s + " " + s1);
+              flutterResultMap.put("result", o);
+              flutterResultMap.put("isBlocking", false);
+            }
+
+            @Override
+            public void notImplemented() {
+              flutterResultMap.put("isBlocking", false);
+            }
+          });
+        }
+      });
+
+      while((Boolean) flutterResultMap.get("isBlocking")) {
+        // block until flutter side returns
+      }
+
+      return new WaitFlutterResult(flutterResultMap.get("result"), (String) flutterResultMap.get("error"));
+    }
+
+    public static class WaitFlutterResult {
+      public Object result;
+      public String error;
+
+      public WaitFlutterResult(Object r, String e) {
+        result = r;
+        error = e;
+      }
+
+    }
 }

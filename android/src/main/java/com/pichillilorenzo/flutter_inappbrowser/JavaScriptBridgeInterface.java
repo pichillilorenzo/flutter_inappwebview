@@ -51,15 +51,17 @@ public class JavaScriptBridgeInterface {
         getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
           @Override
           public void success(Object json) {
-            if (flutterWebView.webView == null) {
+            InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
+
+            if (webView == null) {
               // The webview has already been disposed, ignore.
               return;
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-              flutterWebView.webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
+              webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
             }
             else {
-              flutterWebView.webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
+              webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
             }
           }
 
@@ -79,6 +81,6 @@ public class JavaScriptBridgeInterface {
   }
 
   private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
   }
 }

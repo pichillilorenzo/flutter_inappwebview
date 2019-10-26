@@ -2,25 +2,17 @@ package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.Manifest;
 import android.app.Activity;
-import android.app.DownloadManager;
-import android.content.BroadcastReceiver;
 import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Picture;
-import android.net.Uri;
 import android.os.Build;
-import android.os.Environment;
 import android.util.AttributeSet;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
-import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
@@ -47,8 +39,6 @@ import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
-import static android.content.Context.DOWNLOAD_SERVICE;
-
 public class InAppWebView extends WebView {
 
   static final String LOG_TAG = "InAppWebView";
@@ -56,7 +46,7 @@ public class InAppWebView extends WebView {
   public PluginRegistry.Registrar registrar;
   public InAppBrowserActivity inAppBrowserActivity;
   public FlutterWebView flutterWebView;
-  int id;
+  public int id;
   InAppWebViewClient inAppWebViewClient;
   InAppWebChromeClient inAppWebChromeClient;
   public InAppWebViewOptions options;
@@ -137,39 +127,19 @@ public class InAppWebView extends WebView {
     inAppWebViewClient = new InAppWebViewClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
     setWebViewClient(inAppWebViewClient);
 
-    activity.registerReceiver(onDownloadComplete, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
-
     setDownloadListener(new DownloadListener() {
         @Override
         public void onDownloadStart(final String url, final String userAgent,
                                     final String contentDisposition, final String mimetype,
                                     final long contentLength) {
-
             RequestPermissionHandler.checkAndRun(activity, Manifest.permission.WRITE_EXTERNAL_STORAGE, RequestPermissionHandler.REQUEST_CODE_WRITE_EXTERNAL_STORAGE, new Runnable(){
                 @Override
                 public void run(){
-
-                    Log.e(LOG_TAG, url);
-                    Log.e(LOG_TAG, contentDisposition);
-                    Log.e(LOG_TAG, mimetype);
-
-                    DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
-
-                    final String filename = URLUtil.guessFileName(url, contentDisposition, mimetype);
-                    request.allowScanningByMediaScanner();
-                    request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED); //Notify client once download is completed!
-                    request.setVisibleInDownloadsUi(true);
-                    request.setDestinationInExternalPublicDir(Environment.DIRECTORY_DOWNLOADS, filename);
-                    DownloadManager dm = (DownloadManager) activity.getSystemService(DOWNLOAD_SERVICE);
-                    if (dm != null) {
-                        dm.enqueue(request);
-                        //Toast.makeText(getApplicationContext(), "Downloading File: " + filename, //To notify the Client that the file is being downloaded
-                        //        Toast.LENGTH_LONG).show();
-                    }
-                    else {
-                        //Toast.makeText(getApplicationContext(), "Cannot Download File: " + filename, //To notify the Client that the file cannot be downloaded
-                        //        Toast.LENGTH_LONG).show();
-                    }
+                    Map<String, Object> obj = new HashMap<>();
+                    if (inAppBrowserActivity != null)
+                      obj.put("uuid", inAppBrowserActivity.uuid);
+                    obj.put("url", url);
+                    getChannel().invokeMethod("onDownloadStart", obj);
                 }
             });
         }
@@ -181,6 +151,7 @@ public class InAppWebView extends WebView {
     settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
     settings.setBuiltInZoomControls(options.builtInZoomControls);
     settings.setDisplayZoomControls(options.displayZoomControls);
+    settings.setSupportMultipleWindows(options.useOnTargetBlank);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
       settings.setSafeBrowsingEnabled(options.safeBrowsingEnabled);
@@ -215,29 +186,20 @@ public class InAppWebView extends WebView {
 
     if (!options.mixedContentMode.isEmpty()) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        if (options.mixedContentMode.equals("MIXED_CONTENT_COMPATIBILITY_MODE")) {
-          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        } else if (options.mixedContentMode.equals("MIXED_CONTENT_ALWAYS_ALLOW")) {
-          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        } else if (options.mixedContentMode.equals("MIXED_CONTENT_NEVER_ALLOW")) {
-          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        switch (options.mixedContentMode) {
+          case "MIXED_CONTENT_COMPATIBILITY_MODE":
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+            break;
+          case "MIXED_CONTENT_ALWAYS_ALLOW":
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            break;
+          case "MIXED_CONTENT_NEVER_ALLOW":
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+            break;
         }
       }
     }
   }
-
-  private BroadcastReceiver onDownloadComplete = new BroadcastReceiver() {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      //Fetching the download id received with the broadcast
-      long id = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, -1);
-      //Checking if the received broadcast is for our enqueued download by matching download id
-      if (1 == id) { // test
-      //if (downloadID == id) {
-        //Toast.makeText(MainActivity.this, "Download Completed", Toast.LENGTH_SHORT).show();
-      }
-    }
-  };
 
   public void loadUrl(String url, MethodChannel.Result result) {
     if (!url.isEmpty()) {
@@ -332,7 +294,7 @@ public class InAppWebView extends WebView {
   }
 
   public byte[] takeScreenshot() {
-    float scale = getScale();
+    float scale = getResources().getDisplayMetrics().density; // getScale();
     int height = (int) (getContentHeight() * scale + 0.5);
 
     Bitmap b = Bitmap.createBitmap( getWidth(),
@@ -384,7 +346,7 @@ public class InAppWebView extends WebView {
     if (newOptionsMap.get("domStorageEnabled") != null && options.domStorageEnabled != newOptions.domStorageEnabled)
       settings.setDomStorageEnabled(newOptions.domStorageEnabled);
 
-    if (newOptionsMap.get("userAgent") != null && options.userAgent != newOptions.userAgent && !newOptions.userAgent.isEmpty())
+    if (newOptionsMap.get("userAgent") != null && !options.userAgent.equals(newOptions.userAgent) && !newOptions.userAgent.isEmpty())
       settings.setUserAgentString(newOptions.userAgent);
 
     if (newOptionsMap.get("clearCache") != null && newOptions.clearCache)
@@ -415,17 +377,24 @@ public class InAppWebView extends WebView {
       }
     }
 
-    if (newOptionsMap.get("mixedContentMode") != null && options.mixedContentMode != newOptions.mixedContentMode) {
+    if (newOptionsMap.get("mixedContentMode") != null && !options.mixedContentMode.equals(newOptions.mixedContentMode)) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        if (newOptions.mixedContentMode.equals("MIXED_CONTENT_COMPATIBILITY_MODE")) {
-          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-        } else if (newOptions.mixedContentMode.equals("MIXED_CONTENT_ALWAYS_ALLOW")) {
-          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-        } else if (newOptions.mixedContentMode.equals("MIXED_CONTENT_NEVER_ALLOW")) {
-          settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+        switch (newOptions.mixedContentMode) {
+          case "MIXED_CONTENT_COMPATIBILITY_MODE":
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
+            break;
+          case "MIXED_CONTENT_ALWAYS_ALLOW":
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
+            break;
+          case "MIXED_CONTENT_NEVER_ALLOW":
+            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
+            break;
         }
       }
     }
+
+    if (newOptionsMap.get("useOnTargetBlank") != null && options.useOnTargetBlank != newOptions.useOnTargetBlank)
+      settings.setSupportMultipleWindows(newOptions.useOnTargetBlank);
 
     options = newOptions;
   }
@@ -562,13 +531,11 @@ public class InAppWebView extends WebView {
   }
 
   private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
   }
 
   @Override
   public void destroy() {
-    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity();
-    activity.unregisterReceiver(onDownloadComplete);
     super.destroy();
   }
 }

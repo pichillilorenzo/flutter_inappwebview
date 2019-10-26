@@ -66,7 +66,16 @@ class MyInappBrowser extends InAppBrowser {
       messageLevel: ${consoleMessage.messageLevel}
    """);
  }
-  
+
+ @override
+ void onDownloadStart(String url) {
+   print("Download of " + url);
+ }
+
+ @override
+ Future<CustomSchemeResponse> onLoadResourceCustomScheme(String scheme, String url) async {
+   print("custom scheme: " + scheme);
+ }
 }
 
 class WebviewExampleScreen extends StatefulWidget {
@@ -87,7 +96,7 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
       child: new RaisedButton(
           onPressed: ()  {
             widget.browser.open(
-                url: "https://google.com",
+                url: "https://www.google.com/",
                 options: {
                   "useShouldOverrideUrlLoading": true,
                   "useOnLoadResource": true,

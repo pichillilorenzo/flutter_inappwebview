@@ -24,6 +24,7 @@ import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebViewOptions
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -67,7 +68,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     webViewOptions.parse(optionsMap);
     webView.options = webViewOptions;
 
-    InAppBrowserFlutterPlugin.webViewActivities.put(uuid, this);
+    InAppBrowserFlutterPlugin.instance.webViewActivities.put(uuid, this);
 
     actionBar = getSupportActionBar();
 
@@ -89,7 +90,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("uuid", uuid);
-    InAppBrowserFlutterPlugin.channel.invokeMethod("onBrowserCreated", obj);
+    InAppBrowserFlutterPlugin.instance.channel.invokeMethod("onBrowserCreated", obj);
 
   }
 
@@ -253,7 +254,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
       if (canGoBack())
         goBack();
       else if (options.closeOnCannotGoBack)
-        InAppBrowserFlutterPlugin.close(this, uuid, null);
+        InAppBrowserFlutterPlugin.instance.close(this, uuid, null);
       return true;
     }
     return super.onKeyDown(keyCode, event);
@@ -352,7 +353,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
   }
 
   public void closeButtonClicked(MenuItem item) {
-    InAppBrowserFlutterPlugin.close(this, uuid, null);
+    InAppBrowserFlutterPlugin.instance.close(this, uuid, null);
   }
 
   public byte[] takeScreenshot() {

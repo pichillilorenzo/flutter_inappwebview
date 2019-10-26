@@ -82,7 +82,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 
 let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
 
-public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, URLSessionDownloadDelegate {
+public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
 
     var IABController: InAppBrowserWebViewController?
     var IAWController: FlutterWebViewController?
@@ -206,6 +206,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         configuration.allowsInlineMediaPlayback = (options?.allowsInlineMediaPlayback)!
         
+        if #available(iOS 11.0, *) {
+            if let schemes = options?.resourceCustomSchemes {
+                for scheme in schemes {
+                    configuration.setURLSchemeHandler(CustomeSchemeHandler(), forURLScheme: scheme)
+                }
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+        
         return configuration
     }
     
@@ -296,7 +306,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func loadFile(url: String, headers: [String: String]?) throws {
-        let key = SwiftFlutterPlugin.registrar!.lookupKey(forAsset: url)
+        let key = SwiftFlutterPlugin.instance!.registrar!.lookupKey(forAsset: url)
         let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
         if assetURL == nil {
             throw NSError(domain: url + " asset file cannot be found!", code: 0)
@@ -524,7 +534,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
-
+        
+        let app = UIApplication.shared
+        
         if let url = navigationAction.request.url {
             if url.absoluteString != url.absoluteString && (options?.useOnLoadResource)! {
                 WKNavigationMap[url.absoluteString] = [
@@ -533,8 +545,28 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 ]
             }
             
+            // Handle target="_blank"
+            if navigationAction.targetFrame == nil && (options?.useOnTargetBlank)! {
+                onTargetBlank(url: url)
+                decisionHandler(.cancel)
+                return
+            }
+            
             if navigationAction.navigationType == .linkActivated && (options?.useShouldOverrideUrlLoading)! {
                 shouldOverrideUrlLoading(url: url)
+                decisionHandler(.cancel)
+                return
+            }
+            
+            // Handle phone and email links
+            if url.scheme == "tel" || url.scheme == "mailto" {
+                if app.canOpenURL(url) {
+                    if #available(iOS 10.0, *) {
+                        app.open(url)
+                    } else {
+                        app.openURL(url)
+                    }
+                }
                 decisionHandler(.cancel)
                 return
             }
@@ -568,9 +600,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let mimeType = navigationResponse.response.mimeType
         if let url = navigationResponse.response.url {
             if mimeType != nil && !mimeType!.starts(with: "text/") {
-                Downloader.load(delegate: self, url: url, completion: { (destinationUrl: URL) in
-                    print(destinationUrl)
-                })
+                onDownloadStart(url: url.absoluteString)
                 decisionHandler(.cancel)
                 return
             }
@@ -578,40 +608,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         decisionHandler(.allow)
     }
-    
-    //    func webView(_ webView: WKWebView,
-    //                 decidePolicyFor navigationResponse: WKNavigationResponse,
-    //                 decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-    //        let mimeType = navigationResponse.response.mimeType
-    //        if mimeType != nil && !mimeType!.starts(with: "text/") {
-    //            download(url: webView.url)
-    //            decisionHandler(.cancel)
-    //            return
-    //        }
-    //        decisionHandler(.allow)
-    //    }
-    //
-    //    func download (url: URL?) {
-    //        let filename = url?.lastPathComponent
-    //
-    //        let destination: DownloadRequest.DownloadFileDestination = { _, _ in
-    //            let documentsURL = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    //            let fileURL = documentsURL.appendingPathComponent(filename!)
-    //
-    //            return (fileURL, [.removePreviousFile, .createIntermediateDirectories])
-    //        }
-    //
-    //        Alamofire.download((url?.absoluteString)!, to: destination).downloadProgress { progress in
-    //            print("Download Progress: \(progress.fractionCompleted)")
-    //            }.response { response in
-    //                if response.error == nil, let path = response.destinationURL?.path {
-    //                    UIAlertView(title: nil, message: "File saved to " + path, delegate: nil, cancelButtonTitle: nil).show()
-    //                }
-    //                else {
-    //                   UIAlertView(title: nil, message: "Cannot save " + filename!, delegate: nil, cancelButtonTitle: nil).show()
-    //                }
-    //            }
-    //    }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         self.startPageTime = currentTimeInMilliSeconds()
@@ -665,20 +661,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             onScrollChanged(x: x, y: y)
         }
         setNeedsLayout()
-    }
-    
-    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didFinishDownloadingTo location: URL) {
-        
-    }
-    
-    public func urlSession(_ session: URLSession, downloadTask: URLSessionDownloadTask, didWriteData bytesWritten: Int64, totalBytesWritten: Int64, totalBytesExpectedToWrite: Int64) {
-        guard
-            let url = downloadTask.originalRequest?.url
-            else {
-                return
-        }
-        let progress = Float(totalBytesWritten) / Float(totalBytesExpectedToWrite)
-        let totalSize = ByteCountFormatter.string(fromByteCount: totalBytesExpectedToWrite, countStyle: .file)
     }
     
     public func onLoadStart(url: String) {
@@ -761,6 +743,26 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func onDownloadStart(url: String) {
+        var arguments: [String: Any] = ["url": url]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onDownloadStart", arguments: arguments)
+        }
+    }
+    
+    public func onLoadResourceCustomScheme(scheme: String, url: String, result: FlutterResult?) {
+        var arguments: [String: Any] = ["scheme": scheme, "url": url]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onLoadResourceCustomScheme", arguments: arguments, result: result)
+        }
+    }
+    
     public func shouldOverrideUrlLoading(url: URL) {
         var arguments: [String: Any] = ["url": url.absoluteString]
         if IABController != nil {
@@ -768,6 +770,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         if let channel = getChannel() {
             channel.invokeMethod("shouldOverrideUrlLoading", arguments: arguments)
+        }
+    }
+    
+    public func onTargetBlank(url: URL) {
+        var arguments: [String: Any] = ["url": url.absoluteString]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onTargetBlank", arguments: arguments)
         }
     }
     
@@ -870,50 +882,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     private func getChannel() -> FlutterMethodChannel? {
-        return (IABController != nil) ? SwiftFlutterPlugin.channel! : ((IAWController != nil) ? IAWController!.channel! : nil);
-    }
-}
-
-class Downloader {
-    class func load(delegate: URLSessionDelegate, url: URL, completion: @escaping (_ destinationUrl: URL) -> ()) {
-        let documentsUrl =  FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).last as! URL
-        let destinationUrl = documentsUrl.appendingPathComponent(url.lastPathComponent)
-        
-        if FileManager.default.fileExists(atPath: destinationUrl.path) {
-            print("file already exists [\(destinationUrl.path)]")
-            //completion(path: destinationUrl.path!, error:nil)
-            return
-        }
-        
-        let sessionConfig = URLSessionConfiguration.default
-        let session = URLSession(configuration: sessionConfig, delegate: delegate, delegateQueue: nil)
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        
-        let task = session.downloadTask(with: request) { (tempLocalUrl, response, error) in
-            if let tempLocalUrl = tempLocalUrl, error == nil {
-                // Success
-                if let statusCode = (response as? HTTPURLResponse)?.statusCode {
-                    if statusCode == 200 {
-                        do {
-                            try FileManager.default.moveItem(at: tempLocalUrl, to: destinationUrl)
-                            completion(destinationUrl)
-                        } catch (let writeError) {
-                            print("error writing file \(destinationUrl) : \(writeError)")
-                            //completion(path: destinationUrl.path!, error:nil)
-                        }
-                    } else {
-                        //completion(path: destinationUrl.path!, error:nil)
-                    }
-                } else {
-                    //completion(path: destinationUrl.path!, error:nil)
-                }
-                
-            } else {
-                print("Failure: %@", error?.localizedDescription);
-                //completion(path: destinationUrl.path!, error:nil)
-            }
-        }
-        task.resume()
+        return (IABController != nil) ? SwiftFlutterPlugin.instance!.channel! : ((IAWController != nil) ? IAWController!.channel! : nil);
     }
 }

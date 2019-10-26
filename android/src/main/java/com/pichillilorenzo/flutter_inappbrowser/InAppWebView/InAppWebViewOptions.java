@@ -2,12 +2,16 @@ package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import com.pichillilorenzo.flutter_inappbrowser.Options;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class InAppWebViewOptions extends Options {
 
   static final String LOG_TAG = "InAppWebViewOptions";
 
   public boolean useShouldOverrideUrlLoading = false;
   public boolean useOnLoadResource = false;
+  public boolean useOnTargetBlank = false;
   public boolean clearCache = false;
   public String userAgent = "";
   public boolean javaScriptEnabled = true;
@@ -16,6 +20,7 @@ public class InAppWebViewOptions extends Options {
   public int textZoom = 100;
   public boolean verticalScrollBarEnabled = true;
   public boolean horizontalScrollBarEnabled = true;
+  public List<String> resourceCustomSchemes = new ArrayList<>();
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;

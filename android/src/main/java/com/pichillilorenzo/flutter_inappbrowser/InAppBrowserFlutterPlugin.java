@@ -57,16 +57,18 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  */
 public class InAppBrowserFlutterPlugin implements MethodCallHandler {
 
+  public static InAppBrowserFlutterPlugin instance;
   public Registrar registrar;
-  public static MethodChannel channel;
-  public static Map<String, InAppBrowserActivity> webViewActivities = new HashMap<>();
-  public static Map<String, ChromeCustomTabsActivity> chromeCustomTabsActivities = new HashMap<>();
+  public MethodChannel channel;
+  public Map<String, InAppBrowserActivity> webViewActivities = new HashMap<>();
+  public Map<String, ChromeCustomTabsActivity> chromeCustomTabsActivities = new HashMap<>();
 
   protected static final String LOG_TAG = "IABFlutterPlugin";
 
   public InAppBrowserFlutterPlugin(Registrar r) {
     registrar = r;
     channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
+    channel.setMethodCallHandler(this);
   }
 
   /**
@@ -77,8 +79,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     // registrar.activity() may return null because of Flutter's background execution feature
     // described here: https://medium.com/flutter-io/executing-dart-in-the-background-with-flutter-plugins-and-geofencing-2b3e40a1a124
     if (activity != null) {
-      final MethodChannel channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
-      channel.setMethodCallHandler(new InAppBrowserFlutterPlugin(registrar));
+      instance = new InAppBrowserFlutterPlugin(registrar);
 
       new MyCookieManager(registrar);
 
@@ -599,7 +600,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     return false;
   }
 
-  public static void close(Activity activity, final String uuid, final Result result) {
+  public void close(Activity activity, final String uuid, final Result result) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
       activity.runOnUiThread(new Runnable() {

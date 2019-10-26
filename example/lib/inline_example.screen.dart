@@ -1,5 +1,12 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:flutter/services.dart' show rootBundle;
 
 class InlineExampleScreen extends StatefulWidget {
   @override
@@ -44,7 +51,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
         child: Text(
             "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
       ),
-      Container( 
+      Container(
         padding: EdgeInsets.all(10.0),
         child: progress < 1.0 ? LinearProgressIndicator(value: progress) : Container()
       ),
@@ -55,13 +62,15 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
             //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
-            initialUrl: "https://flutter.dev/",
-            //initialFile: "assets/index.html",
+            //initialUrl: "https://flutter.dev/",
+            initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: {
               //"mediaPlaybackRequiresUserGesture": false,
               //"allowsInlineMediaPlayback": true,
-              //"useShouldOverrideUrlLoading": true,
+              "useShouldOverrideUrlLoading": true,
+              "useOnTargetBlank": true,
+              "resourceCustomSchemes": ["my-special-custom-scheme"],
               //"useOnLoadResource": true
             },
             onWebViewCreated: (InAppWebViewController controller) {
@@ -104,13 +113,34 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                   response.url);
             },
             onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
-              print("""
-              console output:
-                sourceURL: ${consoleMessage.sourceURL}
-                lineNumber: ${consoleMessage.lineNumber}
-                message: ${consoleMessage.message}
-                messageLevel: ${consoleMessage.messageLevel}
-              """);
+//              print("""
+//              console output:
+//                sourceURL: ${consoleMessage.sourceURL}
+//                lineNumber: ${consoleMessage.lineNumber}
+//                message: ${consoleMessage.message}
+//                messageLevel: ${consoleMessage.messageLevel}
+//              """);
+            },
+            onDownloadStart: (InAppWebViewController controller, String url) async {
+              final taskId = await FlutterDownloader.enqueue(
+                url: url,
+                savedDir: await _findLocalPath(),
+                showNotification: true, // show download progress in status bar (for Android)
+                openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+              );
+            },
+            onLoadResourceCustomScheme: (InAppWebViewController controller, String scheme, String url) async {
+              if (scheme == "my-special-custom-scheme") {
+                var bytes = await rootBundle.load("assets/" + url.replaceFirst("my-special-custom-scheme://", "", 0));
+                var asBase64 = base64.encode(bytes.buffer.asUint8List());
+                var response = new CustomSchemeResponse(asBase64, "image/svg+xml", "utf-8");
+                return response;
+              }
+              return null;
+            },
+            onTargetBlank: (InAppWebViewController controller, String url) {
+              print("target _blank: " + url);
+              controller.loadUrl(url);
             },
           ),
         ),
@@ -145,5 +175,12 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
         ],
       ),
     ]));
+  }
+
+  Future<String> _findLocalPath() async {
+    final directory = Platform.isAndroid
+        ? await getExternalStorageDirectory()
+        : await getApplicationDocumentsDirectory();
+    return directory.path;
   }
 }

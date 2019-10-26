@@ -35,8 +35,9 @@ extension Dictionary where Key: ExpressibleByStringLiteral {
 
 public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
-    static var registrar: FlutterPluginRegistrar?
-    static var channel: FlutterMethodChannel?
+    static var instance: SwiftFlutterPlugin?
+    var registrar: FlutterPluginRegistrar?
+    var channel: FlutterMethodChannel?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -45,17 +46,14 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     private var previousStatusBarStyle = -1
     
     public init(with registrar: FlutterPluginRegistrar) {
-        SwiftFlutterPlugin.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
+        super.init()
+        self.registrar = registrar
+        self.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
+        registrar.addMethodCallDelegate(self, channel: channel!)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
-        
-        SwiftFlutterPlugin.registrar = registrar
-        
-        let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
-        let instance = SwiftFlutterPlugin(with: registrar)
-        registrar.addMethodCallDelegate(instance, channel: channel)
-        
+        SwiftFlutterPlugin.instance = SwiftFlutterPlugin(with: registrar)
         registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: "com.pichillilorenzo/flutter_inappwebview")
         
         if #available(iOS 11.0, *) {
@@ -288,7 +286,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 var openWithSystemBrowser = (arguments["openWithSystemBrowser"] as? Bool)!
                 
                 if isLocalFile {
-                    let key = SwiftFlutterPlugin.registrar!.lookupKey(forAsset: url)
+                    let key = self.registrar!.lookupKey(forAsset: url)
                     let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
                     if assetURL == nil {
                         result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url + " asset file cannot be found!", details: nil))
@@ -677,28 +675,28 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     func onBrowserCreated(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
-            SwiftFlutterPlugin.channel!.invokeMethod("onBrowserCreated", arguments: ["uuid": uuid])
+            self.channel!.invokeMethod("onBrowserCreated", arguments: ["uuid": uuid])
         }
     }
     
     func onExit(uuid: String) {
-        SwiftFlutterPlugin.channel!.invokeMethod("onExit", arguments: ["uuid": uuid])
+        self.channel!.invokeMethod("onExit", arguments: ["uuid": uuid])
     }
     
     func onChromeSafariBrowserOpened(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
-            SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
+            self.channel!.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
         }
     }
     
     func onChromeSafariBrowserLoaded(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
-            SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
+            self.channel!.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
         }
     }
     
     func onChromeSafariBrowserClosed(uuid: String) {
-        SwiftFlutterPlugin.channel!.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
+        self.channel!.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
     }
     
     func safariExit(uuid: String) {

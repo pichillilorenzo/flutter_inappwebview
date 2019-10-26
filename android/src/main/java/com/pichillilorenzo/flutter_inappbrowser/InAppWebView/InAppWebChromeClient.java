@@ -6,6 +6,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.ValueCallback;
@@ -82,6 +83,19 @@ public class InAppWebChromeClient extends WebChromeClient {
     this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
     ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
     decorView.setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+  }
+
+  @Override
+  public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, android.os.Message resultMsg)
+  {
+    WebView.HitTestResult result = view.getHitTestResult();
+    String data = result.getExtra();
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", data);
+    getChannel().invokeMethod("onTargetBlank", obj);
+    return false;
   }
 
   @Override
@@ -190,6 +204,6 @@ public class InAppWebChromeClient extends WebChromeClient {
   }
 
   private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
   }
 }

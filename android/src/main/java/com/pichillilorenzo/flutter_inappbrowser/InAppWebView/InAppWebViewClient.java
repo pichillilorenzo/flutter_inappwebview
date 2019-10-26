@@ -9,6 +9,7 @@ import androidx.annotation.RequiresApi;
 
 import android.os.Handler;
 import android.os.Looper;
+import android.util.Base64;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -24,6 +25,7 @@ import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
+import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -116,54 +118,56 @@ public class InAppWebViewClient extends WebViewClient {
       return true;
     }
 
-    if (url.startsWith(WebView.SCHEME_TEL)) {
-      try {
-        Intent intent = new Intent(Intent.ACTION_DIAL);
-        intent.setData(Uri.parse(url));
-        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
-        return true;
-      } catch (android.content.ActivityNotFoundException e) {
-        Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+    if (url != null) {
+      if (url.startsWith(WebView.SCHEME_TEL)) {
+        try {
+          Intent intent = new Intent(Intent.ACTION_DIAL);
+          intent.setData(Uri.parse(url));
+          ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
+          return true;
+        } catch (android.content.ActivityNotFoundException e) {
+          Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
+        }
+      } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+        try {
+          Intent intent = new Intent(Intent.ACTION_VIEW);
+          intent.setData(Uri.parse(url));
+          ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
+          return true;
+        } catch (android.content.ActivityNotFoundException e) {
+          Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
+        }
       }
-    } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
-      try {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
-        intent.setData(Uri.parse(url));
-        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
-        return true;
-      } catch (android.content.ActivityNotFoundException e) {
-        Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
-      }
-    }
-    // If sms:5551212?body=This is the message
-    else if (url.startsWith("sms:")) {
-      try {
-        Intent intent = new Intent(Intent.ACTION_VIEW);
+      // If sms:5551212?body=This is the message
+      else if (url.startsWith("sms:")) {
+        try {
+          Intent intent = new Intent(Intent.ACTION_VIEW);
 
-        // Get address
-        String address;
-        int parmIndex = url.indexOf('?');
-        if (parmIndex == -1) {
-          address = url.substring(4);
-        } else {
-          address = url.substring(4, parmIndex);
+          // Get address
+          String address;
+          int parmIndex = url.indexOf('?');
+          if (parmIndex == -1) {
+            address = url.substring(4);
+          } else {
+            address = url.substring(4, parmIndex);
 
-          // If body, then set sms body
-          Uri uri = Uri.parse(url);
-          String query = uri.getQuery();
-          if (query != null) {
-            if (query.startsWith("body=")) {
-              intent.putExtra("sms_body", query.substring(5));
+            // If body, then set sms body
+            Uri uri = Uri.parse(url);
+            String query = uri.getQuery();
+            if (query != null) {
+              if (query.startsWith("body=")) {
+                intent.putExtra("sms_body", query.substring(5));
+              }
             }
           }
+          intent.setData(Uri.parse("sms:" + address));
+          intent.putExtra("address", address);
+          intent.setType("vnd.android-dir/mms-sms");
+          ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
+          return true;
+        } catch (android.content.ActivityNotFoundException e) {
+          Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
         }
-        intent.setData(Uri.parse("sms:" + address));
-        intent.putExtra("address", address);
-        intent.setType("vnd.android-dir/mms-sms");
-        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
-        return true;
-      } catch (android.content.ActivityNotFoundException e) {
-        Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
       }
     }
 
@@ -300,12 +304,35 @@ public class InAppWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   @Override
   public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+
+    InAppWebView webView = (InAppWebView) view;
+
+    final String url = request.getUrl().toString();
+    String scheme = request.getUrl().getScheme();
+
+    if (webView.options.resourceCustomSchemes != null && webView.options.resourceCustomSchemes.contains(scheme)) {
+      final Map<String, Object> obj = new HashMap<>();
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
+      obj.put("url", url);
+      obj.put("scheme", scheme);
+
+      Util.WaitFlutterResult flutterResult = Util.invokeMethodAndWait(getChannel(), "onLoadResourceCustomScheme", obj);
+
+      if (flutterResult.error != null) {
+        Log.d(LOG_TAG, flutterResult.error);
+      }
+      else if (flutterResult.result != null) {
+        Map<String, String> res = (Map<String, String>) flutterResult.result;
+        byte[] data = Base64.decode(res.get("base64data"), Base64.DEFAULT);
+        return new WebResourceResponse(res.get("content-type"), res.get("content-encoding"), new ByteArrayInputStream(data));
+      }
+    }
+
     if (!request.getMethod().toLowerCase().equals("get") ||
             !(((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).options.useOnLoadResource)) {
       return null;
     }
-
-    final String url = request.getUrl().toString();
 
     try {
       Request mRequest = new Request.Builder().url(url).build();
@@ -399,7 +426,7 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
   private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.channel : flutterWebView.channel;
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
   }
 
 }

@@ -11,8 +11,11 @@ import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -22,9 +25,14 @@ import okhttp3.Response;
 public class ContentBlocker {
     protected static final String LOG_TAG = "ContentBlocker";
 
-    public static WebResourceResponse checkUrl(final InAppWebView webView, String url, ContentBlockerTriggerResourceType responseResourceType) {
+    public static WebResourceResponse checkUrl(final InAppWebView webView, String url, ContentBlockerTriggerResourceType responseResourceType) throws URISyntaxException, InterruptedException {
         if (webView.options.contentBlockers == null)
             return null;
+
+        URI u = new URI(url);
+        String host = u.getHost();
+        int port = u.getPort();
+        String scheme = u.getScheme();
 
         for (Map<String, Map<String, Object>> contentBlocker : webView.options.contentBlockers) {
             ContentBlockerTrigger trigger =  ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
@@ -36,13 +44,68 @@ public class ContentBlocker {
             Matcher m = mPattern.matcher(url);
 
             if (m.matches()) {
-                Log.d(LOG_TAG, url);
-                Log.d(LOG_TAG, responseResourceType.toString());
-                Log.d(LOG_TAG, resourceTypes.toString());
 
-                if (resourceTypes != null && resourceTypes.size() > 0 && !resourceTypes.contains(responseResourceType)) {
+                if (!resourceTypes.isEmpty() && !resourceTypes.contains(responseResourceType)) {
                     return null;
                 }
+                if (!trigger.ifDomain.isEmpty()) {
+                    boolean matchFound = false;
+                    for (String domain : trigger.ifDomain) {
+                        if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host)) {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                    if (!matchFound)
+                        return null;
+                }
+                if (!trigger.unlessDomain.isEmpty()) {
+                    for (String domain : trigger.unlessDomain)
+                        if ((domain.startsWith("*") && host.endsWith(domain.replace("*", ""))) || domain.equals(host))
+                            return null;
+                }
+
+                final String[] webViewUrl = new String[1];
+                if (!trigger.loadType.isEmpty() || !trigger.ifTopUrl.isEmpty() || !trigger.unlessTopUrl.isEmpty()) {
+                    final CountDownLatch latch = new CountDownLatch(1);
+                    Handler handler = new Handler(Looper.getMainLooper());
+                    handler.post(new Runnable() {
+                        @Override
+                        public void run() {
+                            webViewUrl[0] = webView.getUrl();
+                            latch.countDown();
+                        }
+                    });
+                    latch.await();
+                }
+
+                if (!trigger.loadType.isEmpty()) {
+                    URI cUrl = new URI(webViewUrl[0]);
+                    String cHost = cUrl.getHost();
+                    int cPort = cUrl.getPort();
+                    String cScheme = cUrl.getScheme();
+
+                    if ( (trigger.loadType.contains("first-party") && cHost != null && !(cScheme.equals(scheme) && cHost.equals(host) && cPort == port)) ||
+                            (trigger.loadType.contains("third-party") && cHost != null && cHost.equals(host)) )
+                        return null;
+                }
+                if (!trigger.ifTopUrl.isEmpty()) {
+                    boolean matchFound = false;
+                    for (String topUrl : trigger.ifTopUrl) {
+                        if (webViewUrl[0].equals(topUrl)) {
+                            matchFound = true;
+                            break;
+                        }
+                    }
+                    if (!matchFound)
+                        return null;
+                }
+                if (!trigger.unlessTopUrl.isEmpty()) {
+                    for (String topUrl : trigger.unlessTopUrl)
+                        if (webViewUrl[0].equals(topUrl))
+                            return null;
+                }
+
                 switch (action.type) {
 
                     case BLOCK:
@@ -103,12 +166,12 @@ public class ContentBlocker {
         return null;
     }
 
-    public static WebResourceResponse checkUrl(final InAppWebView webView, String url) {
+    public static WebResourceResponse checkUrl(final InAppWebView webView, String url) throws URISyntaxException, InterruptedException {
         ContentBlockerTriggerResourceType responseResourceType = getResourceTypeFromUrl(webView, url);
         return checkUrl(webView, url, responseResourceType);
     }
 
-    public static WebResourceResponse checkUrl(final InAppWebView webView, String url, String contentType) {
+    public static WebResourceResponse checkUrl(final InAppWebView webView, String url, String contentType) throws URISyntaxException, InterruptedException {
         ContentBlockerTriggerResourceType responseResourceType = getResourceTypeFromContentType(contentType);
         return checkUrl(webView, url, responseResourceType);
     }
@@ -141,6 +204,7 @@ public class ContentBlocker {
                     response.close();
                 }
                 e.printStackTrace();
+                Log.e(LOG_TAG, e.getMessage());
             }
         }
         return responseResourceType;

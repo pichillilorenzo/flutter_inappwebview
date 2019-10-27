@@ -418,6 +418,28 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             clearCache()
         }
         
+        if #available(iOS 11.0, *), newOptionsMap["contentBlockers"] != nil {
+            let contentBlockers = newOptions.contentBlockers
+            configuration.userContentController.removeAllContentRuleLists()
+            if contentBlockers.count > 0 {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                    let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                    WKContentRuleListStore.default().compileContentRuleList(
+                        forIdentifier: "ContentBlockingRules",
+                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
+                            if let error = error {
+                                print(error.localizedDescription)
+                                return
+                            }
+                            self.configuration.userContentController.add(contentRuleList!)
+                    }
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        }
+        
         self.options = newOptions
     }
     

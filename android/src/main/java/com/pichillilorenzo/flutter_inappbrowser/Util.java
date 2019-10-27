@@ -9,6 +9,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
@@ -44,11 +45,12 @@ public class Util {
     return ANDROID_ASSET_URL + key;
   }
 
-    public static WaitFlutterResult invokeMethodAndWait(final MethodChannel channel, final String method, final Object arguments) {
+    public static WaitFlutterResult invokeMethodAndWait(final MethodChannel channel, final String method, final Object arguments) throws InterruptedException {
+      final CountDownLatch latch = new CountDownLatch(1);
+
       final Map<String, Object> flutterResultMap = new HashMap<>();
       flutterResultMap.put("result", null);
       flutterResultMap.put("error", null);
-      flutterResultMap.put("isBlocking", true);
 
       Handler handler = new Handler(Looper.getMainLooper());
       handler.post(new Runnable() {
@@ -58,27 +60,25 @@ public class Util {
             @Override
             public void success(Object result) {
               flutterResultMap.put("result", result);
-              flutterResultMap.put("isBlocking", false);
+              latch.countDown();
             }
 
             @Override
             public void error(String s, String s1, Object o) {
               flutterResultMap.put("error", "ERROR: " + s + " " + s1);
               flutterResultMap.put("result", o);
-              flutterResultMap.put("isBlocking", false);
+              latch.countDown();
             }
 
             @Override
             public void notImplemented() {
-              flutterResultMap.put("isBlocking", false);
+              latch.countDown();
             }
           });
         }
       });
 
-      while((Boolean) flutterResultMap.get("isBlocking")) {
-        // block until flutter side returns
-      }
+      latch.await();
 
       return new WaitFlutterResult(flutterResultMap.get("result"), (String) flutterResultMap.get("error"));
     }

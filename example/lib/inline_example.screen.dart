@@ -74,7 +74,9 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 resourceCustomSchemes: ["my-special-custom-scheme"],
                 contentBlockers: [
                   ContentBlocker(
-                      ContentBlockerTrigger(".*", resourceType: [ContentBlockerTriggerResourceType.IMAGE]),
+                      ContentBlockerTrigger(".*",
+                          resourceType: [ContentBlockerTriggerResourceType.IMAGE, ContentBlockerTriggerResourceType.STYLE_SHEET],
+                          ifTopUrl: ["https://getbootstrap.com/"]),
                       ContentBlockerAction(ContentBlockerActionType.BLOCK)
                   )
                 ]

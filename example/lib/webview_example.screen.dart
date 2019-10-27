@@ -97,10 +97,12 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
           onPressed: ()  {
             widget.browser.open(
                 url: "https://www.google.com/",
-                options: {
-                  "useShouldOverrideUrlLoading": true,
-                  "useOnLoadResource": true,
-                }
+                options: [
+                  InAppWebViewOptions(
+                      useShouldOverrideUrlLoading: true,
+                      useOnLoadResource: true,
+                  )
+                ]
             );
           },
           child: Text("Open Webview Browser")),

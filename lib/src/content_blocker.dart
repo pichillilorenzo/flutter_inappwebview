@@ -27,22 +27,68 @@ class ContentBlockerTriggerResourceType {
   static const RAW = const ContentBlockerTriggerResourceType._internal('raw');
 }
 
+class ContentBlockerTriggerLoadType {
+  final String _value;
+  const ContentBlockerTriggerLoadType._internal(this._value);
+  toString() => _value;
+
+  static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
+  static const THIRD_PARTY = const ContentBlockerTriggerLoadType._internal('third-party');
+}
+
 class ContentBlockerTrigger {
   String urlFilter;
+  bool urlFilterIsCaseSensitive;
   List<ContentBlockerTriggerResourceType> resourceType;
+  List<String> ifDomain;
+  List<String> unlessDomain;
+  List<ContentBlockerTriggerLoadType> loadType;
+  List<String> ifTopUrl;
+  List<String> unlessTopUrl;
 
-  ContentBlockerTrigger(this.urlFilter, {this.resourceType = const []});
+  ContentBlockerTrigger(String urlFilter, {bool urlFilterIsCaseSensitive = false, List<ContentBlockerTriggerResourceType> resourceType = const [],
+    List<String> ifDomain = const [], List<String> unlessDomain = const [], List<ContentBlockerTriggerLoadType> loadType = const [],
+    List<String> ifTopUrl = const [], List<String> unlessTopUrl = const []}) {
+    this.urlFilter = urlFilter;
+    this.resourceType = resourceType;
+    this.urlFilterIsCaseSensitive = urlFilterIsCaseSensitive;
+    this.ifDomain = ifDomain;
+    this.unlessDomain = unlessDomain;
+    assert(!(this.ifDomain.isEmpty || this.unlessDomain.isEmpty) == false);
+    this.loadType = loadType;
+    assert(this.loadType.length <= 2);
+    this.ifTopUrl = ifTopUrl;
+    this.unlessTopUrl = unlessTopUrl;
+    assert(!(this.ifTopUrl.isEmpty || this.unlessTopUrl.isEmpty) == false);
+  }
 
   Map<String, dynamic> toMap() {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
       resourceTypeStringList.add(type.toString());
     });
+    List<String> loadTypeStringList = [];
+    loadType.forEach((type) {
+      loadTypeStringList.add(type.toString());
+    });
 
-    return {
+    Map<String, dynamic> map = {
       "url-filter": urlFilter,
-      "resource-type": resourceTypeStringList
+      "url-filter-is-case-sensitive": urlFilterIsCaseSensitive,
+      "if-domain": ifDomain,
+      "unless-domain": unlessDomain,
+      "resource-type": resourceTypeStringList,
+      "load-type": loadTypeStringList,
+      "if-top-url": ifTopUrl,
+      "unless-top-url": unlessTopUrl
     };
+
+    map.keys
+        .where((key) => map[key] == null || (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .toList() // create a copy to avoid concurrent modifications
+        .forEach(map.remove);
+
+    return map;
   }
 }
 
@@ -69,9 +115,16 @@ class ContentBlockerAction {
   }
 
   Map<String, dynamic> toMap() {
-    return {
+    Map<String, dynamic> map =  {
       "type": type.toString(),
       "selector": selector
     };
+
+    map.keys
+        .where((key) => map[key] == null || (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .toList() // create a copy to avoid concurrent modifications
+        .forEach(map.remove);
+
+    return map;
   }
 }

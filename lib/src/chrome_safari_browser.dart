@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappbrowser/src/webview_options.dart';
 
 import 'types.dart';
 import 'channel_manager.dart';
@@ -69,16 +70,27 @@ class ChromeSafariBrowser {
   ///- __preferredControlTintColor__: Set the custom color of the control buttons on the navigation bar and the toolbar.
   ///- __presentationStyle__: Set the custom modal presentation style when presenting the WebView. The default value is `0 //fullscreen`. See [UIModalPresentationStyle](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) for all the available styles.
   ///- __transitionStyle__: Set to the custom transition style when presenting the WebView. The default value is `0 //crossDissolve`. See [UIModalTransitionStyle](https://developer.apple.com/documentation/uikit/uimodaltransitionStyle) for all the available styles.
-  Future<void> open(String url, {Map<String, dynamic> options = const {}, Map<String, String> headersFallback = const {}, Map<String, dynamic> optionsFallback = const {}}) async {
+  Future<void> open(String url, {List<ChromeCustomTabsOptions> options = const [], Map<String, String> headersFallback = const {}, List<BrowserOptions> optionsFallback = const []}) async {
     assert(url != null && url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
+
+    Map<String, dynamic> optionsMap = {};
+    options.forEach((webViewOption) {
+      optionsMap.addAll(webViewOption.toMap());
+    });
+
+    Map<String, dynamic> optionsFallbackMap = {};
+    optionsFallback.forEach((webViewOption) {
+      optionsFallbackMap.addAll(webViewOption.toMap());
+    });
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('uuidFallback', () => (browserFallback != null) ? browserFallback.uuid : '');
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headersFallback);
-    args.putIfAbsent('options', () => options);
-    args.putIfAbsent('optionsFallback', () => optionsFallback);
+    args.putIfAbsent('options', () => optionsMap);
+    args.putIfAbsent('optionsFallback', () => optionsFallbackMap);
     args.putIfAbsent('isData', () => false);
     args.putIfAbsent('useChromeSafariBrowser', () => true);
     await ChannelManager.channel.invokeMethod('open', args);

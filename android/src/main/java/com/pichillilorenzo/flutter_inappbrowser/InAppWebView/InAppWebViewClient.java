@@ -27,6 +27,8 @@ import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayInputStream;
+import java.net.MalformedURLException;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -317,14 +319,27 @@ public class InAppWebViewClient extends WebViewClient {
       obj.put("url", url);
       obj.put("scheme", scheme);
 
-      Util.WaitFlutterResult flutterResult = Util.invokeMethodAndWait(getChannel(), "onLoadResourceCustomScheme", obj);
+      Util.WaitFlutterResult flutterResult;
+      try {
+        flutterResult = Util.invokeMethodAndWait(getChannel(), "onLoadResourceCustomScheme", obj);
+      } catch (InterruptedException e) {
+        e.printStackTrace();
+        Log.e(LOG_TAG, e.getMessage());
+        return null;
+      }
 
       if (flutterResult.error != null) {
-        Log.d(LOG_TAG, flutterResult.error);
+        Log.e(LOG_TAG, flutterResult.error);
       }
       else if (flutterResult.result != null) {
         Map<String, String> res = (Map<String, String>) flutterResult.result;
-        WebResourceResponse response = ContentBlocker.checkUrl(webView, url, res.get("content-type"));
+        WebResourceResponse response = null;
+        try {
+          response = ContentBlocker.checkUrl(webView, url, res.get("content-type"));
+        } catch (Exception e) {
+          e.printStackTrace();
+          Log.e(LOG_TAG, e.getMessage());
+        }
         if (response != null)
           return response;
         byte[] data = Base64.decode(res.get("base64data"), Base64.DEFAULT);
@@ -332,7 +347,13 @@ public class InAppWebViewClient extends WebViewClient {
       }
     }
 
-    WebResourceResponse response = ContentBlocker.checkUrl(webView, url);
+    WebResourceResponse response = null;
+    try {
+      response = ContentBlocker.checkUrl(webView, url);
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, e.getMessage());
+    }
     return response;
   }
 

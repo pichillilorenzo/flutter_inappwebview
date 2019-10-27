@@ -38,6 +38,39 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         webView!.options = options
         webView!.prepare()
         
+        if #available(iOS 11.0, *) {
+            if let contentBlockers = webView!.options?.contentBlockers {
+                do {
+                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                    let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                    WKContentRuleListStore.default().compileContentRuleList(
+                        forIdentifier: "ContentBlockingRules",
+                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
+                            
+                            if let error = error {
+                                print(error.localizedDescription)
+                                return
+                            }
+                            
+                            let configuration = self.webView!.configuration
+                            configuration.userContentController.add(contentRuleList!)
+                            
+                            self.load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+                    }
+                    return
+                } catch {
+                    print(error.localizedDescription)
+                }
+            }
+        }
+        load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+    }
+    
+    public func view() -> UIView {
+        return webView!
+    }
+    
+    public func load(initialUrl: String, initialFile: String?, initialData: [String: String]?, initialHeaders: [String: String]) {
         if initialFile != nil {
             do {
                 try webView!.loadFile(url: initialFile!, headers: initialHeaders)
@@ -58,10 +91,6 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         else {
             webView!.loadUrl(url: URL(string: initialUrl)!, headers: initialHeaders)
         }
-    }
-    
-    public func view() -> UIView {
-        return webView!
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

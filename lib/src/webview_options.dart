@@ -6,7 +6,13 @@ class WebViewOptions {
   }
 }
 
-class InAppWebViewOptions implements WebViewOptions {
+class BrowserOptions {
+  Map<String, dynamic> toMap() {
+    return {};
+  }
+}
+
+class InAppWebViewOptions implements WebViewOptions, BrowserOptions {
   bool useShouldOverrideUrlLoading;
   bool useOnLoadResource;
   bool useOnDownloadStart;
@@ -53,7 +59,7 @@ class InAppWebViewOptions implements WebViewOptions {
   }
 }
 
-class AndroidInAppWebViewOptions implements WebViewOptions {
+class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions {
   bool clearSessionCache;
   bool builtInZoomControls;
   bool displayZoomControls;
@@ -85,7 +91,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions {
   }
 }
 
-class iOSInAppWebViewOptions implements WebViewOptions {
+class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions {
   bool disallowOverScroll;
   bool enableViewportScale;
   bool suppressesIncrementalRendering;
@@ -118,7 +124,7 @@ class iOSInAppWebViewOptions implements WebViewOptions {
   }
 }
 
-class InAppBrowserOptions implements WebViewOptions {
+class InAppBrowserOptions implements BrowserOptions {
   bool hidden;
   bool toolbarTop;
   String toolbarTopBackgroundColor;
@@ -139,7 +145,7 @@ class InAppBrowserOptions implements WebViewOptions {
   }
 }
 
-class AndroidInAppBrowserOptions implements WebViewOptions {
+class AndroidInAppBrowserOptions implements BrowserOptions {
   bool hideTitleBar;
   bool closeOnCannotGoBack;
   bool progressBar;
@@ -156,7 +162,7 @@ class AndroidInAppBrowserOptions implements WebViewOptions {
   }
 }
 
-class iOSInAppBrowserOptions implements WebViewOptions {
+class iOSInAppBrowserOptions implements BrowserOptions {
   bool toolbarBottom;
   String toolbarBottomBackgroundColor;
   bool toolbarBottomTranslucent;
@@ -184,7 +190,13 @@ class iOSInAppBrowserOptions implements WebViewOptions {
   }
 }
 
-class AndroidChromeCustomTabsOptions implements WebViewOptions {
+class ChromeCustomTabsOptions {
+  Map<String, dynamic> toMap() {
+    return {};
+  }
+}
+
+class AndroidChromeCustomTabsOptions implements ChromeCustomTabsOptions {
   bool addShareButton;
   bool showTitle;
   String toolbarBackgroundColor;
@@ -205,7 +217,7 @@ class AndroidChromeCustomTabsOptions implements WebViewOptions {
   }
 }
 
-class iOSChromeCustomTabsOptions implements WebViewOptions {
+class iOSChromeCustomTabsOptions implements ChromeCustomTabsOptions {
   bool entersReaderIfAvailable;
   bool barCollapsingEnabled;
   int dismissButtonStyle; //default done

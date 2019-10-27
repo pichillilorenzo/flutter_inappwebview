@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappbrowser/src/webview_options.dart';
 
 import 'types.dart';
 import 'channel_manager.dart';
@@ -101,14 +102,20 @@ class InAppBrowser {
   ///    - __allowsInlineMediaPlayback__: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls. For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
   ///    - __allowsPictureInPictureMediaPlayback__: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
   ///    - __spinner__: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
-  Future<void> open({String url = "about:blank", Map<String, String> headers = const {}, Map<String, dynamic> options = const {}}) async {
+  Future<void> open({String url = "about:blank", Map<String, String> headers = const {}, List<BrowserOptions> options = const []}) async {
     assert(url != null && url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
+
+    Map<String, dynamic> optionsMap = {};
+    options.forEach((webViewOption) {
+      optionsMap.addAll(webViewOption.toMap());
+    });
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('options', () => optionsMap);
     args.putIfAbsent('openWithSystemBrowser', () => false);
     args.putIfAbsent('isLocalFile', () => false);
     args.putIfAbsent('isData', () => false);
@@ -145,14 +152,20 @@ class InAppBrowser {
   ///inAppBrowser.openFile("assets/index.html");
   ///...
   ///```
-  Future<void> openFile(String assetFilePath, {Map<String, String> headers = const {}, Map<String, dynamic> options = const {}}) async {
+  Future<void> openFile(String assetFilePath, {Map<String, String> headers = const {}, List<BrowserOptions> options = const []}) async {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $assetFilePath!');
+
+    Map<String, dynamic> optionsMap = {};
+    options.forEach((webViewOption) {
+      optionsMap.addAll(webViewOption.toMap());
+    });
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => assetFilePath);
     args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('options', () => optionsMap);
     args.putIfAbsent('openWithSystemBrowser', () => false);
     args.putIfAbsent('isLocalFile', () => true);
     args.putIfAbsent('isData', () => false);
@@ -163,11 +176,17 @@ class InAppBrowser {
   ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
   ///The [mimeType] parameter specifies the format of the data.
   ///The [encoding] parameter specifies the encoding of the data.
-  Future<void> openData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", Map<String, dynamic> options = const {}}) async {
+  Future<void> openData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", List<BrowserOptions> options = const []}) async {
     assert(data != null);
+
+    Map<String, dynamic> optionsMap = {};
+    options.forEach((webViewOption) {
+      optionsMap.addAll(webViewOption.toMap());
+    });
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('options', () => optionsMap);
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
@@ -227,16 +246,22 @@ class InAppBrowser {
   }
 
   ///Sets the [InAppBrowser] options with the new [options] and evaluates them.
-  Future<void> setOptions(Map<String, dynamic> options) async {
+  Future<void> setOptions(List<BrowserOptions> options) async {
     this.throwIsNotOpened();
+
+    Map<String, dynamic> optionsMap = {};
+    options.forEach((webViewOption) {
+      optionsMap.addAll(webViewOption.toMap());
+    });
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('options', () => options);
+    args.putIfAbsent('options', () => optionsMap);
     args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
     await ChannelManager.channel.invokeMethod('setOptions', args);
   }
 
-  ///Gets the current [InAppBrowser] options. Returns `null` if the options are not setted yet.
+  ///Gets the current [InAppBrowser] options as a `Map`. Returns `null` if the options are not setted yet.
   Future<Map<String, dynamic>> getOptions() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};

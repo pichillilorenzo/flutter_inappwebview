@@ -1,5 +1,7 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
+import android.Manifest;
+import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -9,6 +11,7 @@ import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
+import android.webkit.GeolocationPermissions;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -17,6 +20,7 @@ import android.widget.FrameLayout;
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
+import com.pichillilorenzo.flutter_inappbrowser.RequestPermissionHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -96,6 +100,34 @@ public class InAppWebChromeClient extends WebChromeClient {
     obj.put("url", data);
     getChannel().invokeMethod("onTargetBlank", obj);
     return false;
+  }
+
+  @Override
+  public void onGeolocationPermissionsShowPrompt (final String origin, final GeolocationPermissions.Callback callback) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("origin", origin);
+    getChannel().invokeMethod("onGeolocationPermissionsShowPrompt", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object o) {
+        Map<String, Object> response = (Map<String, Object>) o;
+        if (response != null)
+          callback.invoke((String) response.get("origin"),(Boolean) response.get("allow"),(Boolean) response.get("retain"));
+        else
+          callback.invoke(origin,false,false);
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        callback.invoke(origin,false,false);
+      }
+
+      @Override
+      public void notImplemented() {
+        callback.invoke(origin,false,false);
+      }
+    });
   }
 
   @Override

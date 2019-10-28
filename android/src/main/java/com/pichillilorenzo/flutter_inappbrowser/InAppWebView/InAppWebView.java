@@ -18,6 +18,10 @@ import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlocker;
+import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlockerAction;
+import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlockerHandler;
+import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlockerTrigger;
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
@@ -34,7 +38,6 @@ import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
-import okhttp3.Cache;
 import okhttp3.OkHttpClient;
 
 public class InAppWebView extends WebView {
@@ -51,6 +54,7 @@ public class InAppWebView extends WebView {
   public boolean isLoading = false;
   public OkHttpClient httpClient;
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
+  public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
 
   static final String consoleLogJS = "(function() {" +
           "   var oldLogs = {" +
@@ -115,12 +119,11 @@ public class InAppWebView extends WebView {
   @Override
   public void reload() {
     super.reload();
-    Log.d(LOG_TAG, "RELOAD");
   }
 
   public void prepare() {
 
-    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity();
+    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity().getParent();
 
     boolean isFromInAppBrowserActivity = inAppBrowserActivity != null;
 
@@ -173,24 +176,53 @@ public class InAppWebView extends WebView {
     setVerticalScrollBarEnabled(options.verticalScrollBarEnabled);
     setHorizontalScrollBarEnabled(options.horizontalScrollBarEnabled);
 
-    if (options.transparentBackground) {
+    if (options.transparentBackground)
       setBackgroundColor(Color.TRANSPARENT);
-    }
 
-    if (!options.mixedContentMode.isEmpty()) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        switch (options.mixedContentMode) {
-          case "MIXED_CONTENT_COMPATIBILITY_MODE":
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-            break;
-          case "MIXED_CONTENT_ALWAYS_ALLOW":
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-            break;
-          case "MIXED_CONTENT_NEVER_ALLOW":
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-            break;
-        }
-      }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && options.mixedContentMode != null)
+      settings.setMixedContentMode(options.mixedContentMode);
+
+    settings.setAllowContentAccess(options.allowContentAccess);
+    settings.setAllowFileAccess(options.allowFileAccess);
+    settings.setAllowFileAccessFromFileURLs(options.allowFileAccessFromFileURLs);
+    settings.setAllowUniversalAccessFromFileURLs(options.allowUniversalAccessFromFileURLs);
+    settings.setAppCacheEnabled(options.appCacheEnabled);
+    if (options.appCachePath != null && !options.appCachePath.isEmpty() && options.appCacheEnabled)
+      settings.setAppCachePath(options.appCachePath);
+    settings.setBlockNetworkImage(options.blockNetworkImage);
+    settings.setBlockNetworkLoads(options.blockNetworkLoads);
+    if (options.cacheMode != null)
+      settings.setCacheMode(options.cacheMode);
+    settings.setCursiveFontFamily(options.cursiveFontFamily);
+    settings.setDefaultFixedFontSize(options.defaultFixedFontSize);
+    settings.setDefaultFontSize(options.defaultFontSize);
+    settings.setDefaultTextEncodingName(options.defaultTextEncodingName);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && options.disabledActionModeMenuItems != null)
+      settings.setDisabledActionModeMenuItems(options.disabledActionModeMenuItems);
+    settings.setFantasyFontFamily(options.fantasyFontFamily);
+    settings.setFixedFontFamily(options.fixedFontFamily);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.forceDark != null)
+      settings.setForceDark(options.forceDark);
+    settings.setGeolocationEnabled(options.geolocationEnabled);
+    if (options.layoutAlgorithm != null)
+      settings.setLayoutAlgorithm(options.layoutAlgorithm);
+    settings.setLoadWithOverviewMode(options.loadWithOverviewMode);
+    settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
+    settings.setMinimumFontSize(options.minimumFontSize);
+    settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
+    settings.setNeedInitialFocus(options.needInitialFocus);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+      settings.setOffscreenPreRaster(options.offscreenPreRaster);
+    settings.setSansSerifFontFamily(options.sansSerifFontFamily);
+    settings.setSerifFontFamily(options.serifFontFamily);
+    settings.setStandardFontFamily(options.standardFontFamily);
+
+    contentBlockerHandler.getRuleList().clear();
+    for (Map<String, Map<String, Object>> contentBlocker : options.contentBlockers) {
+      // compile ContentBlockerTrigger urlFilter
+      ContentBlockerTrigger trigger = ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
+      ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
+      contentBlockerHandler.getRuleList().add(new ContentBlocker(trigger, action));
     }
   }
 
@@ -286,29 +318,36 @@ public class InAppWebView extends WebView {
     clearFormData();
   }
 
-  public byte[] takeScreenshot() {
-    float scale = getResources().getDisplayMetrics().density; // getScale();
-    int height = (int) (getContentHeight() * scale + 0.5);
+  public void takeScreenshot(final MethodChannel.Result result) {
+    post(new Runnable() {
+      @Override
+      public void run() {
+        float scale = getResources().getDisplayMetrics().density; // getScale();
+        int height = (int) (getContentHeight() * scale + 0.5);
 
-    Bitmap b = Bitmap.createBitmap( getWidth(),
-            height, Bitmap.Config.ARGB_8888);
-    Canvas c = new Canvas(b);
+        Bitmap b = Bitmap.createBitmap( getWidth(),
+                height, Bitmap.Config.ARGB_8888);
+        Canvas c = new Canvas(b);
 
-    draw(c);
-    int scrollOffset = (getScrollY() + getMeasuredHeight() > b.getHeight())
-                    ? b.getHeight() : getScrollY();
-    Bitmap resized = Bitmap.createBitmap(
-                    b, 0, scrollOffset, b.getWidth(), getMeasuredHeight());
+        draw(c);
+        int scrollOffset = (getScrollY() + getMeasuredHeight() > b.getHeight())
+                ? b.getHeight() : getScrollY();
+        Bitmap resized = Bitmap.createBitmap(
+                b, 0, scrollOffset, b.getWidth(), getMeasuredHeight());
 
-    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-    resized.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
-    try {
-      byteArrayOutputStream.close();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    resized.recycle();    
-    return byteArrayOutputStream.toByteArray();
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+        resized.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+        try {
+          byteArrayOutputStream.close();
+        } catch (IOException e) {
+          e.printStackTrace();
+          Log.e(LOG_TAG, e.getMessage());
+        }
+        resized.recycle();
+        result.success(byteArrayOutputStream.toByteArray());
+      }
+    });
   }
 
   public void setOptions(InAppWebViewOptions newOptions, HashMap<String, Object> newOptionsMap) {
@@ -353,7 +392,7 @@ public class InAppWebView extends WebView {
     if (newOptionsMap.get("supportZoom") != null && options.supportZoom != newOptions.supportZoom)
       settings.setSupportZoom(newOptions.supportZoom);
 
-    if (newOptionsMap.get("textZoom") != null && options.textZoom != newOptions.textZoom)
+    if (newOptionsMap.get("textZoom") != null && !options.textZoom.equals(newOptions.textZoom))
       settings.setTextZoom(newOptions.textZoom);
 
     if (newOptionsMap.get("verticalScrollBarEnabled") != null && options.verticalScrollBarEnabled != newOptions.verticalScrollBarEnabled)
@@ -370,21 +409,9 @@ public class InAppWebView extends WebView {
       }
     }
 
-    if (newOptionsMap.get("mixedContentMode") != null && !options.mixedContentMode.equals(newOptions.mixedContentMode)) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        switch (newOptions.mixedContentMode) {
-          case "MIXED_CONTENT_COMPATIBILITY_MODE":
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_COMPATIBILITY_MODE);
-            break;
-          case "MIXED_CONTENT_ALWAYS_ALLOW":
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_ALWAYS_ALLOW);
-            break;
-          case "MIXED_CONTENT_NEVER_ALLOW":
-            settings.setMixedContentMode(WebSettings.MIXED_CONTENT_NEVER_ALLOW);
-            break;
-        }
-      }
-    }
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+      if (newOptionsMap.get("mixedContentMode") != null && !options.mixedContentMode.equals(newOptions.mixedContentMode))
+        settings.setMixedContentMode(newOptions.mixedContentMode);
 
     if (newOptionsMap.get("useOnTargetBlank") != null && options.useOnTargetBlank != newOptions.useOnTargetBlank)
       settings.setSupportMultipleWindows(newOptions.useOnTargetBlank);
@@ -394,6 +421,104 @@ public class InAppWebView extends WebView {
         setDownloadListener(new DownloadStartListener());
       } else {
         setDownloadListener(null);
+      }
+    }
+
+    if (newOptionsMap.get("allowContentAccess") != null && options.allowContentAccess != newOptions.allowContentAccess)
+      settings.setAllowContentAccess(newOptions.allowContentAccess);
+
+    if (newOptionsMap.get("allowFileAccess") != null && options.allowFileAccess != newOptions.allowFileAccess)
+      settings.setAllowFileAccess(newOptions.allowFileAccess);
+
+    if (newOptionsMap.get("allowFileAccessFromFileURLs") != null && options.allowFileAccessFromFileURLs != newOptions.allowFileAccessFromFileURLs)
+      settings.setAllowFileAccessFromFileURLs(newOptions.allowFileAccessFromFileURLs);
+
+    if (newOptionsMap.get("allowUniversalAccessFromFileURLs") != null && options.allowUniversalAccessFromFileURLs != newOptions.allowUniversalAccessFromFileURLs)
+      settings.setAllowUniversalAccessFromFileURLs(newOptions.allowUniversalAccessFromFileURLs);
+
+    if (newOptionsMap.get("appCacheEnabled") != null && options.appCacheEnabled != newOptions.appCacheEnabled)
+      settings.setAppCacheEnabled(newOptions.appCacheEnabled);
+
+    if (newOptionsMap.get("appCachePath") != null && !options.appCachePath.equals(newOptions.appCachePath))
+      if (newOptions.appCacheEnabled)
+        settings.setAppCachePath(newOptions.appCachePath);
+
+    if (newOptionsMap.get("blockNetworkImage") != null && options.blockNetworkImage != newOptions.blockNetworkImage)
+      settings.setBlockNetworkImage(newOptions.blockNetworkImage);
+
+    if (newOptionsMap.get("blockNetworkLoads") != null && options.blockNetworkLoads != newOptions.blockNetworkLoads)
+      settings.setBlockNetworkLoads(newOptions.blockNetworkLoads);
+
+    if (newOptionsMap.get("cacheMode") != null && !options.cacheMode.equals(newOptions.cacheMode))
+      settings.setCacheMode(newOptions.cacheMode);
+
+    if (newOptionsMap.get("cursiveFontFamily") != null && !options.cursiveFontFamily.equals(newOptions.cursiveFontFamily))
+      settings.setCursiveFontFamily(newOptions.cursiveFontFamily);
+
+    if (newOptionsMap.get("defaultFixedFontSize") != null && !options.defaultFixedFontSize.equals(newOptions.defaultFixedFontSize))
+      settings.setDefaultFixedFontSize(newOptions.defaultFixedFontSize);
+
+    if (newOptionsMap.get("defaultFontSize") != null && !options.defaultFontSize.equals(newOptions.defaultFontSize))
+      settings.setDefaultFontSize(newOptions.defaultFontSize);
+
+    if (newOptionsMap.get("defaultTextEncodingName") != null && !options.defaultTextEncodingName.equals(newOptions.defaultTextEncodingName))
+      settings.setDefaultTextEncodingName(newOptions.defaultTextEncodingName);
+
+    if (newOptionsMap.get("disabledActionModeMenuItems") != null && !options.disabledActionModeMenuItems.equals(newOptions.disabledActionModeMenuItems))
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+        settings.setDisabledActionModeMenuItems(newOptions.disabledActionModeMenuItems);
+
+    if (newOptionsMap.get("fantasyFontFamily") != null && !options.fantasyFontFamily.equals(newOptions.fantasyFontFamily))
+      settings.setFantasyFontFamily(newOptions.fantasyFontFamily);
+
+    if (newOptionsMap.get("fixedFontFamily") != null && !options.fixedFontFamily.equals(newOptions.fixedFontFamily))
+      settings.setFixedFontFamily(newOptions.fixedFontFamily);
+
+    if (newOptionsMap.get("forceDark") != null && !options.forceDark.equals(newOptions.forceDark))
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
+        settings.setForceDark(newOptions.forceDark);
+
+    if (newOptionsMap.get("geolocationEnabled") != null && options.geolocationEnabled != newOptions.geolocationEnabled)
+      settings.setGeolocationEnabled(newOptions.geolocationEnabled);
+
+    if (newOptionsMap.get("layoutAlgorithm") != null && options.layoutAlgorithm != newOptions.layoutAlgorithm)
+      settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+
+    if (newOptionsMap.get("loadWithOverviewMode") != null && options.loadWithOverviewMode != newOptions.loadWithOverviewMode)
+      settings.setLoadWithOverviewMode(newOptions.loadWithOverviewMode);
+
+    if (newOptionsMap.get("loadsImagesAutomatically") != null && options.loadsImagesAutomatically != newOptions.loadsImagesAutomatically)
+      settings.setLoadsImagesAutomatically(newOptions.loadsImagesAutomatically);
+
+    if (newOptionsMap.get("minimumFontSize") != null && !options.minimumFontSize.equals(newOptions.minimumFontSize))
+      settings.setMinimumFontSize(newOptions.minimumFontSize);
+
+    if (newOptionsMap.get("minimumLogicalFontSize") != null && !options.minimumLogicalFontSize.equals(newOptions.minimumLogicalFontSize))
+      settings.setMinimumLogicalFontSize(newOptions.minimumLogicalFontSize);
+
+    if (newOptionsMap.get("needInitialFocus") != null && options.needInitialFocus != newOptions.needInitialFocus)
+      settings.setNeedInitialFocus(newOptions.needInitialFocus);
+
+    if (newOptionsMap.get("offscreenPreRaster") != null && options.offscreenPreRaster != newOptions.offscreenPreRaster)
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
+        settings.setOffscreenPreRaster(newOptions.offscreenPreRaster);
+
+    if (newOptionsMap.get("sansSerifFontFamily") != null && !options.sansSerifFontFamily.equals(newOptions.sansSerifFontFamily))
+      settings.setSansSerifFontFamily(newOptions.sansSerifFontFamily);
+
+    if (newOptionsMap.get("serifFontFamily") != null && !options.serifFontFamily.equals(newOptions.serifFontFamily))
+      settings.setSerifFontFamily(newOptions.serifFontFamily);
+
+    if (newOptionsMap.get("standardFontFamily") != null && !options.standardFontFamily.equals(newOptions.standardFontFamily))
+      settings.setStandardFontFamily(newOptions.standardFontFamily);
+
+    if (newOptions.contentBlockers != null) {
+      contentBlockerHandler.getRuleList().clear();
+      for (Map<String, Map<String, Object>> contentBlocker : newOptions.contentBlockers) {
+        // compile ContentBlockerTrigger urlFilter
+        ContentBlockerTrigger trigger = ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
+        ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
+        contentBlockerHandler.getRuleList().add(new ContentBlocker(trigger, action));
       }
     }
 

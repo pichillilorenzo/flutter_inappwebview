@@ -2,6 +2,8 @@ package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.app.Activity;
 import android.content.pm.PackageManager;
+import android.util.Log;
+
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
@@ -14,8 +16,6 @@ import java.util.Map;
 public abstract class RequestPermissionHandler implements ActivityCompat.OnRequestPermissionsResultCallback {
 
     private static Map<Integer, List<Runnable>> actionDictionary = new HashMap<>();
-
-    public static int REQUEST_CODE_WRITE_EXTERNAL_STORAGE = 1;
 
     public static void checkAndRun(Activity activity, String permission, int requestCode, Runnable runnable) {
 
@@ -34,6 +34,7 @@ public abstract class RequestPermissionHandler implements ActivityCompat.OnReque
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
+        Log.d("asdasd", "\n\na asd asd \n\n");
         if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             List<Runnable> callbacks = actionDictionary.get(requestCode);
             for (Runnable runnable : callbacks) {

@@ -3,10 +3,12 @@ package com.pichillilorenzo.flutter_inappbrowser.ContentBlocker;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class ContentBlockerTrigger {
 
     public String urlFilter;
+    public Pattern urlFilterPatternCompiled;
     public Boolean urlFilterIsCaseSensitive;
     public List<ContentBlockerTriggerResourceType> resourceType = new ArrayList<>();
     public List<String> ifDomain = new ArrayList<>();
@@ -18,6 +20,8 @@ public class ContentBlockerTrigger {
     public ContentBlockerTrigger(String urlFilter, Boolean urlFilterIsCaseSensitive, List<ContentBlockerTriggerResourceType> resourceType, List<String> ifDomain,
                                  List<String> unlessDomain, List<String> loadType, List<String> ifTopUrl, List<String> unlessTopUrl) {
         this.urlFilter = urlFilter;
+        this.urlFilterPatternCompiled = Pattern.compile(this.urlFilter);
+
         this.resourceType = resourceType != null ? resourceType : this.resourceType;
         this.urlFilterIsCaseSensitive = urlFilterIsCaseSensitive != null ? urlFilterIsCaseSensitive : false;
         this.ifDomain = ifDomain != null ? ifDomain : this.ifDomain;

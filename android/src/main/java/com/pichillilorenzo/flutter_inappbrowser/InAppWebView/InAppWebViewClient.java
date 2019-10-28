@@ -335,7 +335,7 @@ public class InAppWebViewClient extends WebViewClient {
         Map<String, String> res = (Map<String, String>) flutterResult.result;
         WebResourceResponse response = null;
         try {
-          response = ContentBlocker.checkUrl(webView, url, res.get("content-type"));
+          response = webView.contentBlockerHandler.checkUrl(webView, url, res.get("content-type"));
         } catch (Exception e) {
           e.printStackTrace();
           Log.e(LOG_TAG, e.getMessage());
@@ -349,7 +349,7 @@ public class InAppWebViewClient extends WebViewClient {
 
     WebResourceResponse response = null;
     try {
-      response = ContentBlocker.checkUrl(webView, url);
+      response = webView.contentBlockerHandler.checkUrl(webView, url);
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, e.getMessage());

@@ -80,6 +80,16 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                       ContentBlockerAction(ContentBlockerActionType.BLOCK)
                   )
                 ]
+              ),
+              AndroidInAppWebViewOptions(
+                databaseEnabled: true,
+                appCacheEnabled: true,
+                domStorageEnabled: true,
+                geolocationEnabled: true,
+                //blockNetworkImage: true,
+              ),
+              iOSInAppWebViewOptions(
+                  preferredContentMode: iOSInAppWebViewUserPreferredContentMode.DESKTOP
               )
             ],
             onWebViewCreated: (InAppWebViewController controller) {
@@ -102,6 +112,9 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onLoadStop: (InAppWebViewController controller, String url) async {
               print("stopped $url");
+            },
+            onLoadError: (InAppWebViewController controller, String url, int code, String message) async {
+              print("error $url: $code, $message");
             },
             onProgressChanged:
                 (InAppWebViewController controller, int progress) {
@@ -131,12 +144,12 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               """);
             },
             onDownloadStart: (InAppWebViewController controller, String url) async {
-              final taskId = await FlutterDownloader.enqueue(
+              /*final taskId = await FlutterDownloader.enqueue(
                 url: url,
                 savedDir: await _findLocalPath(),
                 showNotification: true, // show download progress in status bar (for Android)
                 openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-              );
+              );*/
             },
             onLoadResourceCustomScheme: (InAppWebViewController controller, String scheme, String url) async {
               if (scheme == "my-special-custom-scheme") {
@@ -151,6 +164,37 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("target _blank: " + url);
               controller.loadUrl(url);
             },
+            onGeolocationPermissionsShowPrompt: (InAppWebViewController controller, String origin) async {
+              GeolocationPermissionShowPromptResponse response;
+
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: new Text("Permission Geolocation API"),
+                    content: new Text("Can we use Geolocation API?"),
+                    actions: <Widget>[
+                      new FlatButton(
+                        child: new Text("Close"),
+                        onPressed: () {
+                          response = new GeolocationPermissionShowPromptResponse(origin, false, false);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      new FlatButton(
+                        child: new Text("Accept"),
+                        onPressed: () {
+                          response = new GeolocationPermissionShowPromptResponse(origin, true, true);
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              return response;
+            }
           ),
         ),
       ),

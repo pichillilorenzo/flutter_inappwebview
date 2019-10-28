@@ -1,16 +1,21 @@
 import 'dart:async';
+
 import 'package:flutter/material.dart';
+
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 import 'package:flutter_inappbrowser_example/chrome_safari_example.screen.dart';
 import 'package:flutter_inappbrowser_example/inline_example.screen.dart';
 import 'package:flutter_inappbrowser_example/webview_example.screen.dart';
+
 import 'package:flutter_downloader/flutter_downloader.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 // InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
 Future main() async {
   // await localhostServer.start();
-  await FlutterDownloader.initialize();
+  // await FlutterDownloader.initialize();
+  await PermissionHandler().requestPermissions([PermissionGroup.locationAlways]);
   runApp(new MyApp());
 }
 

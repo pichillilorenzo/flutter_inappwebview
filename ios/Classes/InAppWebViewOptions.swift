@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import WebKit
 
 @objcMembers
 public class InAppWebViewOptions: Options {
@@ -23,6 +24,7 @@ public class InAppWebViewOptions: Options {
     var horizontalScrollBarEnabled = true
     var resourceCustomSchemes: [String] = []
     var contentBlockers: [[String: [String : Any]]] = []
+    var minimumFontSize = 0;
     
     var disallowOverScroll = false
     var enableViewportScale = false
@@ -35,6 +37,11 @@ public class InAppWebViewOptions: Options {
     var allowsInlineMediaPlayback = false
     var allowsPictureInPictureMediaPlayback = true
     var transparentBackground = false
+    var applicationNameForUserAgent = "";
+    var isFraudulentWebsiteWarningEnabled = true;
+    var selectionGranularity = 0;
+    var dataDetectorTypes: [String] = ["NONE"]; // WKDataDetectorTypeNone
+    var preferredContentMode = 0;
     
     override init(){
         super.init()

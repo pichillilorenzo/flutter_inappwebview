@@ -76,6 +76,11 @@ class MyInappBrowser extends InAppBrowser {
  Future<CustomSchemeResponse> onLoadResourceCustomScheme(String scheme, String url) async {
    print("custom scheme: " + scheme);
  }
+
+ @override
+ Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt(String origin) async {
+   print("request Geolocation permission API");
+ }
 }
 
 class WebviewExampleScreen extends StatefulWidget {

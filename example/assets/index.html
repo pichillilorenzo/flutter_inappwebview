@@ -56,6 +56,15 @@
         });
         $(document).ready(function() {
             console.log("jQuery ready");
+
+            if ("geolocation" in navigator) {
+                console.log("Geolocation API enabled");
+                navigator.geolocation.getCurrentPosition(function(position) {
+                    console.log(position.coords.latitude, position.coords.longitude);
+                });
+            } else {
+                console.log("No geolocation API");
+            }
         });
     </script>
 </body>

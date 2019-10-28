@@ -128,6 +128,13 @@ class InAppWebView extends StatefulWidget {
   ///[url] represents the url of the link.
   final onTargetBlankCallback onTargetBlank;
 
+  ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
+  ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
+  ///On non-secure origins geolocation requests are automatically denied.
+  ///[origin] represents the origin of the web content attempting to use the Geolocation API.
+  ///**NOTE**: available only for Android.
+  final onGeolocationPermissionsShowPromptCallback onGeolocationPermissionsShowPrompt;
+
   ///Initial url that will be loaded.
   final String initialUrl;
   ///Initial asset file that will be loaded. See [InAppWebView.loadFile()] for explanation.
@@ -166,6 +173,7 @@ class InAppWebView extends StatefulWidget {
     this.onDownloadStart,
     this.onLoadResourceCustomScheme,
     this.onTargetBlank,
+    this.onGeolocationPermissionsShowPrompt,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -383,6 +391,13 @@ class InAppWebViewController {
           _widget.onTargetBlank(this, url);
         else if (_inAppBrowser != null)
           _inAppBrowser.onTargetBlank(url);
+        break;
+      case "onGeolocationPermissionsShowPrompt":
+        String origin = call.arguments["origin"];
+        if (_widget != null && _widget.onGeolocationPermissionsShowPrompt != null)
+          return (await _widget.onGeolocationPermissionsShowPrompt(this, origin)).toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onGeolocationPermissionsShowPrompt(origin)).toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];

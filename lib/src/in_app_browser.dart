@@ -342,7 +342,7 @@ class InAppBrowser {
   ///Event fires when the [InAppBrowser] webview finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///[scheme] represents the scheme of the url.
   ///[url] represents the url of the request.
-  Future<CustomSchemeResponse> onLoadResourceCustomScheme(String scheme, String url) async {
+  Future<CustomSchemeResponse> onLoadResourceCustomScheme(String scheme, String url) {
 
   }
 
@@ -351,6 +351,15 @@ class InAppBrowser {
   void onTargetBlank(String url) {
 
   }
+
+  ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
+  ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
+  ///On non-secure origins geolocation requests are automatically denied.
+  ///[origin] represents the origin of the web content attempting to use the Geolocation API.
+  ///**NOTE**: available only for Android.
+  Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt (String origin) {
+
+}
 
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {

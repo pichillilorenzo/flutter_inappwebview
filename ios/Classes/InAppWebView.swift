@@ -166,31 +166,73 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         allowsBackForwardNavigationGestures = (options?.allowsBackForwardNavigationGestures)!
         if #available(iOS 9.0, *) {
             allowsLinkPreview = (options?.allowsLinkPreview)!
-        }
-        
-        if #available(iOS 10.0, *) {
-            configuration.ignoresViewportScaleLimits = (options?.ignoresViewportScaleLimits)!
-        }
-        
-        if #available(iOS 9.0, *) {
             configuration.allowsPictureInPictureMediaPlayback = (options?.allowsPictureInPictureMediaPlayback)!
-        }
-        
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = (options?.javaScriptCanOpenWindowsAutomatically)!
-        
-        configuration.preferences.javaScriptEnabled = (options?.javaScriptEnabled)!
-        
-        scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
-        scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
-        
-        if ((options?.userAgent)! != "") {
-            if #available(iOS 9.0, *) {
+            if ((options?.applicationNameForUserAgent)! != "") {
+                configuration.applicationNameForUserAgent = (options?.applicationNameForUserAgent)!
+            }
+            if ((options?.userAgent)! != "") {
                 customUserAgent = (options?.userAgent)!
             }
         }
         
+        configuration.preferences.javaScriptCanOpenWindowsAutomatically = (options?.javaScriptCanOpenWindowsAutomatically)!
+        configuration.preferences.javaScriptEnabled = (options?.javaScriptEnabled)!
+        configuration.preferences.minimumFontSize = CGFloat((options?.minimumFontSize)!)
+        configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: (options?.selectionGranularity)!)!
+        
+        if #available(iOS 10.0, *) {
+            configuration.ignoresViewportScaleLimits = (options?.ignoresViewportScaleLimits)!
+            
+            var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
+            for type in options?.dataDetectorTypes ?? [] {
+                let dataDetectorType = getDataDetectorType(type: type)
+                dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
+            }
+            configuration.dataDetectorTypes = dataDetectorTypes
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        if #available(iOS 13.0, *) {
+            configuration.preferences.isFraudulentWebsiteWarningEnabled = (options?.isFraudulentWebsiteWarningEnabled)!
+            configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: (options?.preferredContentMode)!)!
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
+        scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
+
         if (options?.clearCache)! {
             clearCache()
+        }
+    }
+    
+    @available(iOS 10.0, *)
+    public func getDataDetectorType(type: String) -> WKDataDetectorTypes {
+        switch type {
+            case "NONE":
+                return WKDataDetectorTypes.init(rawValue: 0)
+            case "PHONE_NUMBER":
+                return .phoneNumber
+            case "LINK":
+                return .link
+            case "ADDRESS":
+                return .address
+            case "CALENDAR_EVENT":
+                return .calendarEvent
+            case "TRACKING_NUMBER":
+                return .trackingNumber
+            case "FLIGHT_NUMBER":
+                return .flightNumber
+            case "LOOKUP_SUGGESTION":
+                return .lookupSuggestion
+            case "SPOTLIGHT_SUGGESTION":
+                return .spotlightSuggestion
+            case "ALL":
+                return .all
+            default:
+                return WKDataDetectorTypes.init(rawValue: 0)
         }
     }
     
@@ -371,26 +413,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             allowsBackForwardNavigationGestures = newOptions.allowsBackForwardNavigationGestures
         }
         
-        if newOptionsMap["allowsLinkPreview"] != nil && options?.allowsLinkPreview != newOptions.allowsLinkPreview {
-            if #available(iOS 9.0, *) {
-                allowsLinkPreview = newOptions.allowsLinkPreview
-            }
-        }
-        
-        if newOptionsMap["ignoresViewportScaleLimits"] != nil && options?.ignoresViewportScaleLimits != newOptions.ignoresViewportScaleLimits {
-            if #available(iOS 10.0, *) {
-                configuration.ignoresViewportScaleLimits = newOptions.ignoresViewportScaleLimits
-            }
-        }
-        
         if newOptionsMap["allowsInlineMediaPlayback"] != nil && options?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
             configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
-        }
-        
-        if newOptionsMap["allowsPictureInPictureMediaPlayback"] != nil && options?.allowsPictureInPictureMediaPlayback != newOptions.allowsPictureInPictureMediaPlayback {
-            if #available(iOS 9.0, *) {
-                configuration.allowsPictureInPictureMediaPlayback = newOptions.allowsPictureInPictureMediaPlayback
-            }
         }
         
         if newOptionsMap["javaScriptCanOpenWindowsAutomatically"] != nil && options?.javaScriptCanOpenWindowsAutomatically != newOptions.javaScriptCanOpenWindowsAutomatically {
@@ -401,6 +425,38 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
         }
         
+        if newOptionsMap["minimumFontSize"] != nil && options?.minimumFontSize != newOptions.minimumFontSize {
+            configuration.preferences.minimumFontSize = CGFloat(newOptions.minimumFontSize)
+        }
+        
+        if newOptionsMap["selectionGranularity"] != nil && options?.selectionGranularity != newOptions.selectionGranularity {
+            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: newOptions.selectionGranularity)!
+        }
+        
+        if #available(iOS 10.0, *) {
+            if newOptionsMap["ignoresViewportScaleLimits"] != nil && options?.ignoresViewportScaleLimits != newOptions.ignoresViewportScaleLimits {
+                configuration.ignoresViewportScaleLimits = newOptions.ignoresViewportScaleLimits
+            }
+            
+            if newOptionsMap["dataDetectorTypes"] != nil && options?.dataDetectorTypes != newOptions.dataDetectorTypes {
+                var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
+                for type in newOptions.dataDetectorTypes {
+                    let dataDetectorType = getDataDetectorType(type: type)
+                    dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
+                }
+                configuration.dataDetectorTypes = dataDetectorTypes
+            }
+        } else {
+            // Fallback on earlier versions
+        }
+        
+        if #available(iOS 13.0, *) {
+            configuration.preferences.isFraudulentWebsiteWarningEnabled = (options?.isFraudulentWebsiteWarningEnabled)!
+            configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: (options?.preferredContentMode)!)!
+        } else {
+            // Fallback on earlier versions
+        }
+        
         if newOptionsMap["verticalScrollBarEnabled"] != nil && options?.verticalScrollBarEnabled != newOptions.verticalScrollBarEnabled {
             scrollView.showsVerticalScrollIndicator = newOptions.verticalScrollBarEnabled
         }
@@ -408,19 +464,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.showsHorizontalScrollIndicator = newOptions.horizontalScrollBarEnabled
         }
         
-        if newOptionsMap["userAgent"] != nil && options?.userAgent != newOptions.userAgent && (newOptions.userAgent != "") {
-            if #available(iOS 9.0, *) {
+        if #available(iOS 9.0, *) {
+            if newOptionsMap["allowsLinkPreview"] != nil && options?.allowsLinkPreview != newOptions.allowsLinkPreview {
+                allowsLinkPreview = newOptions.allowsLinkPreview
+            }
+            if newOptionsMap["allowsPictureInPictureMediaPlayback"] != nil && options?.allowsPictureInPictureMediaPlayback != newOptions.allowsPictureInPictureMediaPlayback {
+                configuration.allowsPictureInPictureMediaPlayback = newOptions.allowsPictureInPictureMediaPlayback
+            }
+            if newOptionsMap["applicationNameForUserAgent"] != nil && options?.applicationNameForUserAgent != newOptions.applicationNameForUserAgent && newOptions.applicationNameForUserAgent != "" {
+                configuration.applicationNameForUserAgent = newOptions.applicationNameForUserAgent
+            }
+            if newOptionsMap["userAgent"] != nil && options?.userAgent != newOptions.userAgent && newOptions.userAgent != "" {
                 customUserAgent = newOptions.userAgent
             }
         }
+        
+        
         
         if newOptionsMap["clearCache"] != nil && newOptions.clearCache {
             clearCache()
         }
         
         if #available(iOS 11.0, *), newOptionsMap["contentBlockers"] != nil {
-            let contentBlockers = newOptions.contentBlockers
             configuration.userContentController.removeAllContentRuleLists()
+            let contentBlockers = newOptions.contentBlockers
             if contentBlockers.count > 0 {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])

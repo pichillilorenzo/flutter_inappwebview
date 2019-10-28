@@ -1,5 +1,3 @@
-import 'dart:typed_data';
-
 import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
 import 'in_app_webview.dart' show InAppWebViewController;
@@ -108,6 +106,28 @@ class WebHistoryItem {
   WebHistoryItem(this.originalUrl, this.title, this.url, this.index, this.offset);
 }
 
+///GeolocationPermissionPromptResponse class.
+///
+///Class used by the host application to set the Geolocation permission state for an origin during the [onGeolocationPermissionsShowPrompt] event.
+class GeolocationPermissionShowPromptResponse {
+  ///The origin for which permissions are set.
+  String origin;
+  ///Whether or not the origin should be allowed to use the Geolocation API.
+  bool allow;
+  ///Whether the permission should be retained beyond the lifetime of a page currently being displayed by a WebView
+  bool retain;
+
+  GeolocationPermissionShowPromptResponse(this.origin, this.allow, this.retain);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "origin": origin,
+      "allow": allow,
+      "retain": retain
+    };
+  }
+}
+
 typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
 typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
@@ -120,3 +140,4 @@ typedef onWebViewScrollChangedCallback = void Function(InAppWebViewController co
 typedef onDownloadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onLoadResourceCustomSchemeCallback = Future<CustomSchemeResponse> Function(InAppWebViewController controller, String scheme, String url);
 typedef onTargetBlankCallback = void Function(InAppWebViewController controller, String url);
+typedef onGeolocationPermissionsShowPromptCallback = Future<GeolocationPermissionShowPromptResponse> Function(InAppWebViewController controller, String origin);

@@ -15,7 +15,7 @@ class ContentBlocker {
 class ContentBlockerTriggerResourceType {
   final String _value;
   const ContentBlockerTriggerResourceType._internal(this._value);
-  toString() => _value;
+  toValue() => _value;
 
   static const DOCUMENT = const ContentBlockerTriggerResourceType._internal('document');
   static const IMAGE = const ContentBlockerTriggerResourceType._internal('image');
@@ -30,7 +30,7 @@ class ContentBlockerTriggerResourceType {
 class ContentBlockerTriggerLoadType {
   final String _value;
   const ContentBlockerTriggerLoadType._internal(this._value);
-  toString() => _value;
+  toValue() => _value;
 
   static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
   static const THIRD_PARTY = const ContentBlockerTriggerLoadType._internal('third-party');
@@ -65,11 +65,11 @@ class ContentBlockerTrigger {
   Map<String, dynamic> toMap() {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(type.toString());
+      resourceTypeStringList.add(type.toValue());
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {
-      loadTypeStringList.add(type.toString());
+      loadTypeStringList.add(type.toValue());
     });
 
     Map<String, dynamic> map = {
@@ -95,7 +95,7 @@ class ContentBlockerTrigger {
 class ContentBlockerActionType {
   final String _value;
   const ContentBlockerActionType._internal(this._value);
-  toString() => _value;
+  toValue() => _value;
 
   static const BLOCK = const ContentBlockerActionType._internal('block');
   static const CSS_DISPLAY_NONE = const ContentBlockerActionType._internal('css-display-none');
@@ -116,7 +116,7 @@ class ContentBlockerAction {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map =  {
-      "type": type.toString(),
+      "type": type.toValue(),
       "selector": selector
     };
 

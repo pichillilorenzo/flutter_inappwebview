@@ -39,7 +39,8 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         webView!.prepare()
         
         if #available(iOS 11.0, *) {
-            if let contentBlockers = webView!.options?.contentBlockers {
+            self.webView!.configuration.userContentController.removeAllContentRuleLists()
+            if let contentBlockers = webView!.options?.contentBlockers, contentBlockers.count > 0 {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
                     let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)

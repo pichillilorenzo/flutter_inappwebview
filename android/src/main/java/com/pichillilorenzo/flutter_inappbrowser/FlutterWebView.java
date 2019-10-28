@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
@@ -191,7 +192,10 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         result.success((webView != null) && webView.isLoading());
         break;
       case "takeScreenshot":
-        result.success((webView != null) ? webView.takeScreenshot() : null);
+        if (webView != null)
+          webView.takeScreenshot(result);
+        else
+          result.error(LOG_TAG, "webView is null", null);
         break;
       case "setOptions":
         if (webView != null) {

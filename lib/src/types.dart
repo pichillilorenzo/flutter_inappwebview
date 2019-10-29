@@ -270,6 +270,34 @@ class SafeBrowsingResponse {
   }
 }
 
+class HttpAuthResponseAction {
+  final int _value;
+  const HttpAuthResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const CANCEL = const HttpAuthResponseAction._internal(0);
+  static const PROCEED = const HttpAuthResponseAction._internal(1);
+  static const USE_HTTP_AUTH_USERNAME_PASSWORD = const HttpAuthResponseAction._internal(2);
+}
+
+class HttpAuthResponse {
+  String username;
+  String password;
+  bool permanentPersistence;
+  HttpAuthResponseAction action;
+
+  HttpAuthResponse({this.username = "", this.password = "", this.permanentPersistence = false, this.action = HttpAuthResponseAction.CANCEL});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "username": username,
+      "password": password,
+      "permanentPersistence": permanentPersistence,
+      "action": action?.toValue()
+    };
+  }
+}
+
 typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
 typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
@@ -287,3 +315,4 @@ typedef onJsAlertCallback = Future<JsAlertResponse> Function(InAppWebViewControl
 typedef onJsConfirmCallback = Future<JsConfirmResponse> Function(InAppWebViewController controller, String message);
 typedef onJsPromptCallback = Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue);
 typedef onSafeBrowsingHitCallback = Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType);
+typedef onReceivedHttpAuthRequestCallback = Future<HttpAuthResponse> Function(InAppWebViewController controller, String url, String realm);

@@ -19,6 +19,7 @@ public class InAppWebViewOptions extends Options {
   public boolean clearCache = false;
   public String userAgent = "";
   public boolean javaScriptEnabled = true;
+  public boolean debuggingEnabled = false;
   public boolean javaScriptCanOpenWindowsAutomatically = false;
   public boolean mediaPlaybackRequiresUserGesture = true;
   public Integer textZoom = 100;

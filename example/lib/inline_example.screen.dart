@@ -70,6 +70,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             initialHeaders: {},
             initialOptions: [
               InAppWebViewOptions(
+                clearCache: true,
                 useShouldOverrideUrlLoading: true,
                 useOnTargetBlank: true,
                 //useOnLoadResource: true,

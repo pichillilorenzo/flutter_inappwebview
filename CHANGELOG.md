@@ -13,17 +13,19 @@
 - Added `onLoadResourceCustomScheme` event and `resourceCustomSchemes` option to set custom schemes that WebView must handle to load resources
 - Added `onTargetBlank` event and `useOnTargetBlank` option to manage links with `target="_blank"`
 - Added `ContentBlocker`, `ContentBlockerTrigger` and `ContentBlockerAction` classes and the `contentBlockers` option that allows to define a set of rules to use to block content in the WebView
-- Added new WebView option `minimumFontSize`
+- Added new WebView options: `minimumFontSize`, `debuggingEnabled`
 - Added new Android WebView options: `allowContentAccess`, `allowFileAccess`, `allowFileAccessFromFileURLs`, `allowUniversalAccessFromFileURLs`, `appCacheEnabled`, `appCachePath`, `blockNetworkImage`, `blockNetworkLoads`, `cacheMode`, `cursiveFontFamily`, `defaultFixedFontSize`, `defaultFontSize`, `defaultTextEncodingName`, `disabledActionModeMenuItems`, `fantasyFontFamily`, `fixedFontFamily`, `forceDark`, `geolocationEnabled`, `layoutAlgorithm`, `loadWithOverviewMode`, `loadsImagesAutomatically`, `minimumLogicalFontSize`, `needInitialFocus`, `offscreenPreRaster`, `sansSerifFontFamily`, `serifFontFamily`, `standardFontFamily`
 - Added new iOS WebView options: `applicationNameForUserAgent`, `isFraudulentWebsiteWarningEnabled`, `selectionGranularity`, `dataDetectorTypes`, `preferredContentMode`
 - Added `onGeolocationPermissionsShowPrompt` event and `GeolocationPermissionShowPromptResponse` class (available only for Android)
 - Added `startSafeBrowsing`, `setSafeBrowsingWhitelist` and `getSafeBrowsingPrivacyPolicyUrl` methods (available only for Android)
 - Added `onSafeBrowsingHit` event (available only for Android)
 - Added `onJsAlert`, `onJsConfirm` and `onJsPrompt` events to manage javascript popup dialogs
+- Fixed `InputConnection` error on Android
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class
 - Updated `WebResourceResponse` class
+- Updated `ConsoleMessageLevel` class
 - Updated `onLoadResource` event
 - WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSChromeCustomTabsOptions`
 

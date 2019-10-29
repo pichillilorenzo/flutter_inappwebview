@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.content.Context;
+import android.view.View;
 
 import java.util.HashMap;
 
@@ -11,16 +12,18 @@ import io.flutter.plugin.platform.PlatformViewFactory;
 
 public class FlutterWebViewFactory extends PlatformViewFactory {
   private final Registrar registrar;
+  private final View containerView;
 
-  public FlutterWebViewFactory(Registrar registrar) {
+  public FlutterWebViewFactory(Registrar registrar, View containerView) {
     super(StandardMessageCodec.INSTANCE);
     this.registrar = registrar;
+    this.containerView = containerView;
   }
 
   @Override
   public PlatformView create(Context context, int id, Object args) {
     HashMap<String, Object> params = (HashMap<String, Object>) args;
-    return new FlutterWebView(registrar, id, params);
+    return new FlutterWebView(registrar, id, params, containerView);
   }
 }
 

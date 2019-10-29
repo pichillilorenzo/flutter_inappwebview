@@ -17,6 +17,7 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.webkit.WebViewDatabase;
 
 import androidx.annotation.RequiresApi;
 
@@ -296,9 +297,56 @@ public class InAppWebViewClient extends WebViewClient {
    * On received http auth request.
    */
   @Override
-  public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
-    // By default handle 401 like we'd normally do!
-    super.onReceivedHttpAuthRequest(view, handler, host, realm);
+  public void onReceivedHttpAuthRequest(final WebView view, final HttpAuthHandler handler, final String host, final String realm) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("host", host);
+    obj.put("realm", realm);
+
+    getChannel().invokeMethod("onReceivedHttpAuthRequest", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          Integer action = (Integer) responseMap.get("action");
+
+          Log.d(LOG_TAG, "\n\naction: " + action);
+
+          if (action != null) {
+            switch (action) {
+              case 0:
+                handler.cancel();
+                return;
+              case 1:
+                String username = (String) responseMap.get("username");
+                String password = (String) responseMap.get("password");
+                Boolean permanentPersistence = (Boolean) responseMap.get("permanentPersistence");
+                if (permanentPersistence != null && permanentPersistence && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                  WebViewDatabase.getInstance(view.getContext()).setHttpAuthUsernamePassword(host, realm, username, password);
+                }
+                handler.proceed(username, password);
+                return;
+              case 2:
+                handler.useHttpAuthUsernamePassword();
+                return;
+            }
+          }
+        }
+
+        handler.cancel();
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.e(LOG_TAG, s + ", " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+        handler.cancel();
+      }
+    });
   }
 
   @Override
@@ -323,9 +371,6 @@ public class InAppWebViewClient extends WebViewClient {
           Map<String, Object> responseMap = (Map<String, Object>) response;
           Boolean report = (Boolean) responseMap.get("report");
           Integer action = (Integer) responseMap.get("action");
-
-          Log.d(LOG_TAG, "\n\nreport: " + report);
-          Log.d(LOG_TAG, "\n\naction: " + action);
 
           report = report != null ? report : true;
 

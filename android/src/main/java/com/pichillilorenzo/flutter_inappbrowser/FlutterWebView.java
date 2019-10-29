@@ -3,21 +3,26 @@ package com.pichillilorenzo.flutter_inappbrowser;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.hardware.display.DisplayManager;
 import android.os.Build;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.DisplayListenerProxy;
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebViewOptions;
+import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InputAwareWebView;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -31,13 +36,18 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
   public final Activity activity;
   public InAppWebView webView;
-  public MethodChannel channel;
+  public final MethodChannel channel;
   public final Registrar registrar;
 
-  public FlutterWebView(Registrar registrar, int id, HashMap<String, Object> params) {
+  public FlutterWebView(Registrar registrar, int id, HashMap<String, Object> params, View containerView) {
 
     this.registrar = registrar;
     this.activity = registrar.activity();
+
+    DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
+    DisplayManager displayManager =
+            (DisplayManager) this.registrar.context().getSystemService(Context.DISPLAY_SERVICE);
+    displayListenerProxy.onPreWebViewInitialization(displayManager);
 
     String initialUrl = (String) params.get("initialUrl");
     String initialFile = (String) params.get("initialFile");
@@ -48,7 +58,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
 
-    webView = new InAppWebView(registrar, this, id, options);
+    webView = new InAppWebView(registrar, this, id, options, containerView);
+    displayListenerProxy.onPostWebViewInitialization(displayManager);
+
     webView.prepare();
 
     channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappwebview_" + id);
@@ -257,9 +269,15 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   }
 
   @Override
-  public void onInputConnectionLocked() {}
+  public void onInputConnectionLocked() {
+    if (webView.inAppBrowserActivity == null)
+      webView.lockInputConnection();
+  }
 
   @Override
-  public void onInputConnectionUnlocked() {}
+  public void onInputConnectionUnlocked() {
+    if (webView.inAppBrowserActivity == null)
+      webView.unlockInputConnection();
+  }
 
 }

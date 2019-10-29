@@ -18,6 +18,7 @@ public class InAppWebViewOptions: Options {
     var clearCache = false
     var userAgent = ""
     var javaScriptEnabled = true
+    var debuggingEnabled = true
     var javaScriptCanOpenWindowsAutomatically = false
     var mediaPlaybackRequiresUserGesture = true
     var verticalScrollBarEnabled = true
@@ -25,7 +26,7 @@ public class InAppWebViewOptions: Options {
     var resourceCustomSchemes: [String] = []
     var contentBlockers: [[String: [String : Any]]] = []
     var minimumFontSize = 0;
-    
+
     var disallowOverScroll = false
     var enableViewportScale = false
     //var keyboardDisplayRequiresUserAction = true

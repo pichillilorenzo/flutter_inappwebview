@@ -86,7 +86,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       registrar
               .platformViewRegistry()
               .registerViewFactory(
-                      "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar));
+                      "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar, registrar.view()));
     }
   }
 

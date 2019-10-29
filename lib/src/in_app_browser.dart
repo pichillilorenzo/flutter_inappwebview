@@ -406,6 +406,15 @@ class InAppBrowser {
 
   }
 
+  ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
+  ///
+  ///[host] represents the host requiring authentication.
+  ///
+  ///[realm] represents the realm for which authentication is required
+  Future<HttpAuthResponse> onReceivedHttpAuthRequest(String url, String realm) {
+
+  }
+
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
       throw Exception(['Error: ${ (message.isEmpty) ? '' : message + ' '}The browser is already opened.']);

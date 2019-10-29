@@ -176,6 +176,13 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE**: available only for Android.
   final onSafeBrowsingHitCallback onSafeBrowsingHit;
 
+  ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
+  ///
+  ///[host] represents the host requiring authentication.
+  ///
+  ///[realm] represents the realm for which authentication is required
+  final onReceivedHttpAuthRequestCallback onReceivedHttpAuthRequest;
+
   ///Initial url that will be loaded.
   final String initialUrl;
   ///Initial asset file that will be loaded. See [InAppWebView.loadFile()] for explanation.
@@ -219,6 +226,7 @@ class InAppWebView extends StatefulWidget {
     this.onJsConfirm,
     this.onJsPrompt,
     this.onSafeBrowsingHit,
+    this.onReceivedHttpAuthRequest,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -467,6 +475,14 @@ class InAppWebViewController {
           return (await _widget.onSafeBrowsingHit(this, url, threatType))?.toMap();
         else if (_inAppBrowser != null)
           return (await _inAppBrowser.onSafeBrowsingHit(url, threatType))?.toMap();
+        break;
+      case "onReceivedHttpAuthRequest":
+        String host = call.arguments["host"];
+        String realm = call.arguments["realm"];
+        if (_widget != null && _widget.onReceivedHttpAuthRequest != null)
+          return (await _widget.onReceivedHttpAuthRequest(this, host, realm))?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onReceivedHttpAuthRequest(host, realm))?.toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];

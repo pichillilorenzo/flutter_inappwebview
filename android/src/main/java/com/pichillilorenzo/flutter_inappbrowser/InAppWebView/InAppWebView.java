@@ -10,9 +10,9 @@ import android.util.AttributeSet;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
+import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
-import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
@@ -41,7 +41,7 @@ import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.OkHttpClient;
 
-public class InAppWebView extends WebView {
+final public class InAppWebView extends InputAwareWebView {
 
   static final String LOG_TAG = "InAppWebView";
 
@@ -107,8 +107,8 @@ public class InAppWebView extends WebView {
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(PluginRegistry.Registrar registrar, Object obj, int id, InAppWebViewOptions options) {
-    super(registrar.activeContext());
+  public InAppWebView(PluginRegistry.Registrar registrar, Object obj, int id, InAppWebViewOptions options, View containerView) {
+    super(registrar.activeContext(), containerView);
     this.registrar = registrar;
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
@@ -146,6 +146,9 @@ public class InAppWebView extends WebView {
     WebSettings settings = getSettings();
 
     settings.setJavaScriptEnabled(options.javaScriptEnabled);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      setWebContentsDebuggingEnabled(options.debuggingEnabled);
+    }
     settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
     settings.setBuiltInZoomControls(options.builtInZoomControls);
     settings.setDisplayZoomControls(options.displayZoomControls);

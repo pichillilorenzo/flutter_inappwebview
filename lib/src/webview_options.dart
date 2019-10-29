@@ -22,6 +22,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions {
   bool clearCache;
   String userAgent;
   bool javaScriptEnabled;
+  bool debuggingEnabled;
   bool javaScriptCanOpenWindowsAutomatically;
   bool mediaPlaybackRequiresUserGesture;
   int textZoom;
@@ -32,7 +33,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions {
   List<ContentBlocker> contentBlockers;
 
   InAppWebViewOptions({this.useShouldOverrideUrlLoading = false, this.useOnLoadResource = false, this.useOnDownloadStart = false, this.useOnTargetBlank = false,
-    this.clearCache = false, this.userAgent = "", this.javaScriptEnabled = true, this.javaScriptCanOpenWindowsAutomatically = false,
+    this.clearCache = false, this.userAgent = "", this.javaScriptEnabled = true, this.debuggingEnabled = false, this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true, this.textZoom = 100, this.minimumFontSize, this.verticalScrollBarEnabled = true, this.horizontalScrollBarEnabled = true,
     this.resourceCustomSchemes = const [], this.contentBlockers = const []}) {
       if (this.minimumFontSize == null)

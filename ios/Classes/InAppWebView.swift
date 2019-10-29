@@ -202,7 +202,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
         scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
-
+        
+        
+        // options.debuggingEnabled is always enabled for iOS.
+        
         if (options?.clearCache)! {
             clearCache()
         }
@@ -745,6 +748,54 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
+        let host = challenge.protectionSpace.host
+        let realm = challenge.protectionSpace.realm
+        onReceivedHttpAuthRequest(host: host, realm: realm, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message)
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {
+                completionHandler(.performDefaultHandling, nil)
+            }
+            else {
+                //WKWebsiteDataStore.default()
+                //URLCredentialStorage()
+                var response: [String: Any]
+                if let r = result {
+                    response = r as! [String: Any]
+                    var action = response["action"] as? Int
+                    action = action != nil ? action : 0;
+                    switch action {
+                        case 0:
+                            completionHandler(.cancelAuthenticationChallenge, nil)
+                            break
+                        case 1:
+                            let username = response["username"] as! String
+                            let password = response["password"] as! String
+                            let permanentPersistence = response["permanentPersistence"] as? Bool ?? false
+                            let persistence = (permanentPersistence) ? URLCredential.Persistence.permanent : URLCredential.Persistence.forSession
+                            let credential = URLCredential(user: username, password: password, persistence: persistence)
+                            completionHandler(.useCredential, credential)
+                            break
+                        case 2:
+                            if let credential = challenge.proposedCredential {
+                                completionHandler(.useCredential, credential)
+                            }
+                            else {
+                                completionHandler(.performDefaultHandling, nil)
+                            }
+                            break
+                        default:
+                            completionHandler(.performDefaultHandling, nil)
+                    }
+                    return;
+                }
+                completionHandler(.performDefaultHandling, nil)
+            }
+        })
+    }
+    
     fileprivate func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
         let title = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
         let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
@@ -765,7 +816,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         onJsAlert(message: message, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message)
-                completionHandler()
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createAlertDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, completionHandler: completionHandler)
@@ -824,7 +874,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         onJsConfirm(message: message, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message)
-                completionHandler(false)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createConfirmDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, completionHandler: completionHandler)
@@ -898,7 +947,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         onJsPrompt(message: message, defaultValue: defaultValue, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message)
-                completionHandler(nil)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, value: nil, completionHandler: completionHandler)
@@ -1050,6 +1098,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         if let channel = getChannel() {
             channel.invokeMethod("onTargetBlank", arguments: arguments)
+        }
+    }
+    
+    public func onReceivedHttpAuthRequest(host: String, realm: String?, result: FlutterResult?) {
+        var arguments: [String: Any] = ["host": host, "realm": realm as Any]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onReceivedHttpAuthRequest", arguments: arguments, result: result)
         }
     }
     

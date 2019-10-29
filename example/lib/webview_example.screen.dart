@@ -81,10 +81,27 @@ class MyInappBrowser extends InAppBrowser {
  Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt(String origin) async {
    print("request Geolocation permission API");
  }
+
+ @override
+ Future<JsAlertResponse> onJsAlert(String message) async {
+   return new JsAlertResponse(handledByClient: false, message: "coma iam");
+ }
+
+ @override
+ Future<JsConfirmResponse> onJsConfirm(String message) {
+
+ }
+
+ @override
+ Future<JsPromptResponse> onJsPrompt(String message, String defaultValue) {
+
+ }
 }
 
 class WebviewExampleScreen extends StatefulWidget {
   final MyInappBrowser browser = new MyInappBrowser();
+  static BuildContext context = null;
+
   @override
   _WebviewExampleScreenState createState() => new _WebviewExampleScreenState();
 }
@@ -97,17 +114,19 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
 
   @override
   Widget build(BuildContext context) {
+    WebviewExampleScreen.context = context;
     return new Center(
       child: new RaisedButton(
           onPressed: ()  {
-            widget.browser.open(
-                url: "https://www.google.com/",
-                options: [
-                  InAppWebViewOptions(
-                      useShouldOverrideUrlLoading: true,
-                      useOnLoadResource: true,
-                  )
-                ]
+            widget.browser.openFile(
+              "assets/index.html",
+              //url: "https://www.google.com/",
+              options: [
+                InAppWebViewOptions(
+                    useShouldOverrideUrlLoading: true,
+                    useOnLoadResource: true,
+                )
+              ]
             );
           },
           child: Text("Open Webview Browser")),

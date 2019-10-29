@@ -428,31 +428,31 @@ class InAppWebViewController {
       case "onGeolocationPermissionsShowPrompt":
         String origin = call.arguments["origin"];
         if (_widget != null && _widget.onGeolocationPermissionsShowPrompt != null)
-          return (await _widget.onGeolocationPermissionsShowPrompt(this, origin)).toMap();
+          return (await _widget.onGeolocationPermissionsShowPrompt(this, origin))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onGeolocationPermissionsShowPrompt(origin)).toMap();
+          return (await _inAppBrowser.onGeolocationPermissionsShowPrompt(origin))?.toMap();
         break;
       case "onJsAlert":
         String message = call.arguments["message"];
         if (_widget != null && _widget.onJsAlert != null)
-          return (await _widget.onJsAlert(this, message)).toMap();
+          return (await _widget.onJsAlert(this, message))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsAlert(message)).toMap();
+          return (await _inAppBrowser.onJsAlert(message))?.toMap();
         break;
       case "onJsConfirm":
         String message = call.arguments["message"];
         if (_widget != null && _widget.onJsConfirm != null)
-          return (await _widget.onJsConfirm(this, message)).toMap();
+          return (await _widget.onJsConfirm(this, message))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsConfirm(message)).toMap();
+          return (await _inAppBrowser.onJsConfirm(message))?.toMap();
         break;
       case "onJsPrompt":
         String message = call.arguments["message"];
         String defaultValue = call.arguments["defaultValue"];
         if (_widget != null && _widget.onJsPrompt != null)
-          return (await _widget.onJsPrompt(this, message, defaultValue)).toMap();
+          return (await _widget.onJsPrompt(this, message, defaultValue))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsPrompt(message, defaultValue)).toMap();
+          return (await _inAppBrowser.onJsPrompt(message, defaultValue))?.toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];

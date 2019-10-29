@@ -112,65 +112,76 @@ public class InAppWebChromeClient extends WebChromeClient {
     getChannel().invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {
-        Map<String, Object> responseMap = (Map<String, Object>) response;
-        String responseMessage = (String) responseMap.get("message");
-        String confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-        boolean handledByClient = (boolean) responseMap.get("handledByClient");
-        if (handledByClient) {
-          Integer action = (Integer) responseMap.get("action");
-          action = action != null ? action : 1;
-          switch (action) {
-            case 0:
-              result.confirm();
-              break;
-            case 1:
-            default:
-              result.cancel();
-          }
-        } else {
-          String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
-          Log.d(LOG_TAG, alertMessage);
-          DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              result.confirm();
-              dialog.dismiss();
+        String responseMessage = null;
+        String confirmButtonTitle = null;
+
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          responseMessage = (String) responseMap.get("message");
+          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
+          if (handledByClient != null && handledByClient) {
+            Integer action = (Integer) responseMap.get("action");
+            action = action != null ? action : 1;
+            switch (action) {
+              case 0:
+                result.confirm();
+                break;
+              case 1:
+              default:
+                result.cancel();
             }
-          };
-
-          AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
-          alertDialogBuilder.setMessage(alertMessage);
-          if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
-            alertDialogBuilder.setPositiveButton(confirmButtonTitle, clickListener);
-          } else {
-            alertDialogBuilder.setPositiveButton(android.R.string.ok, clickListener);
+            return;
           }
-
-          alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-              result.cancel();
-              dialog.dismiss();
-            }
-          });
-
-          AlertDialog alertDialog = alertDialogBuilder.create();
-          alertDialog.show();
         }
+
+        createAlertDialog(view, message, result, responseMessage, confirmButtonTitle);
       }
 
       @Override
       public void error(String s, String s1, Object o) {
         Log.e(LOG_TAG, s + ", " + s1);
+        result.cancel();
       }
 
       @Override
       public void notImplemented() {
-
+        createAlertDialog(view, message, result, null, null);
       }
     });
 
     return true;
+  }
+
+  public void createAlertDialog(WebView view, String message, final JsResult result, String responseMessage, String confirmButtonTitle) {
+    String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+
+    DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        result.confirm();
+        dialog.dismiss();
+      }
+    };
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    alertDialogBuilder.setMessage(alertMessage);
+    if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+      alertDialogBuilder.setPositiveButton(confirmButtonTitle, clickListener);
+    } else {
+      alertDialogBuilder.setPositiveButton(android.R.string.ok, clickListener);
+    }
+
+    alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+      @Override
+      public void onCancel(DialogInterface dialog) {
+        result.cancel();
+        dialog.dismiss();
+      }
+    });
+
+    AlertDialog alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
   }
 
   @Override
@@ -184,77 +195,89 @@ public class InAppWebChromeClient extends WebChromeClient {
     getChannel().invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {
-        Map<String, Object> responseMap = (Map<String, Object>) response;
-        String responseMessage = (String) responseMap.get("message");
-        String confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-        String cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
-        boolean handledByClient = (boolean) responseMap.get("handledByClient");
-        if (handledByClient) {
-          Integer action = (Integer) responseMap.get("action");
-          action = action != null ? action : 1;
-          switch (action) {
-            case 0:
-              result.confirm();
-              break;
-            case 1:
-            default:
-              result.cancel();
-          }
-        } else {
-          String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
-          DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              result.confirm();
-              dialog.dismiss();
-            }
-          };
-          DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              result.cancel();
-              dialog.dismiss();
-            }
-          };
+        String responseMessage = null;
+        String confirmButtonTitle = null;
+        String cancelButtonTitle = null;
 
-          AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
-          alertDialogBuilder.setMessage(alertMessage);
-          if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
-            alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
-          } else {
-            alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
-          }
-          if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
-            alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
-          } else {
-            alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
-          }
-
-          alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-              result.cancel();
-              dialog.dismiss();
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          responseMessage = (String) responseMap.get("message");
+          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+          cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
+          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
+          if (handledByClient != null && handledByClient) {
+            Integer action = (Integer) responseMap.get("action");
+            action = action != null ? action : 1;
+            switch (action) {
+              case 0:
+                result.confirm();
+                break;
+              case 1:
+              default:
+                result.cancel();
             }
-          });
-
-          AlertDialog alertDialog = alertDialogBuilder.create();
-          alertDialog.show();
+            return;
+          }
         }
+
+        createConfirmDialog(view, message, result, responseMessage, confirmButtonTitle, cancelButtonTitle);
       }
 
       @Override
       public void error(String s, String s1, Object o) {
         Log.e(LOG_TAG, s + ", " + s1);
+        result.cancel();
       }
 
       @Override
       public void notImplemented() {
-
+        createConfirmDialog(view, message, result, null, null, null);
       }
     });
 
     return true;
+  }
+
+  public void createConfirmDialog(WebView view, String message, final JsResult result, String responseMessage, String confirmButtonTitle, String cancelButtonTitle) {
+    String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+    DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        result.confirm();
+        dialog.dismiss();
+      }
+    };
+    DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        result.cancel();
+        dialog.dismiss();
+      }
+    };
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    alertDialogBuilder.setMessage(alertMessage);
+    if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+      alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
+    } else {
+      alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
+    }
+    if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
+      alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
+    } else {
+      alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
+    }
+
+    alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+      @Override
+      public void onCancel(DialogInterface dialog) {
+        result.cancel();
+        dialog.dismiss();
+      }
+    });
+
+    AlertDialog alertDialog = alertDialogBuilder.create();
+    alertDialog.show();
   }
 
   @Override
@@ -269,97 +292,110 @@ public class InAppWebChromeClient extends WebChromeClient {
     getChannel().invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {
-        Map<String, Object> responseMap = (Map<String, Object>) response;
-        String responseMessage = (String) responseMap.get("message");
-        String responseDefaultValue = (String) responseMap.get("defaultValue");
-        String confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-        String cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
-        final String value = (String) responseMap.get("value");
-        boolean handledByClient = (boolean) responseMap.get("handledByClient");
-        if (handledByClient) {
-          Integer action = (Integer) responseMap.get("action");
-          action = action != null ? action : 1;
-          switch (action) {
-            case 0:
-              if (value != null)
+        String responseMessage = null;
+        String responseDefaultValue = null;
+        String confirmButtonTitle = null;
+        String cancelButtonTitle = null;
+        String value = null;
+
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          responseMessage = (String) responseMap.get("message");
+          responseDefaultValue = (String) responseMap.get("defaultValue");
+          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+          cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
+          value = (String) responseMap.get("value");
+          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
+          if (handledByClient != null && handledByClient) {
+            Integer action = (Integer) responseMap.get("action");
+            action = action != null ? action : 1;
+            switch (action) {
+              case 0:
                 result.confirm(value);
-              else
-                result.confirm();
-              break;
-            case 1:
-            default:
-              result.cancel();
-          }
-        } else {
-          FrameLayout layout = new FrameLayout(view.getContext());
-
-          final EditText input = new EditText(view.getContext());
-          input.setMaxLines(1);
-          input.setText((responseDefaultValue != null && !responseDefaultValue.isEmpty()) ? responseDefaultValue : defaultValue);
-          LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
-                  LinearLayout.LayoutParams.MATCH_PARENT,
-                  LinearLayout.LayoutParams.MATCH_PARENT);
-          input.setLayoutParams(lp);
-
-          layout.setPaddingRelative(45,15,45,0);
-          layout.addView(input);
-
-          String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
-          DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              String text = input.getText().toString();
-              result.confirm(value != null ? value : text);
-              dialog.dismiss();
+                break;
+              case 1:
+              default:
+                result.cancel();
             }
-          };
-          DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-              result.cancel();
-              dialog.dismiss();
-            }
-          };
-
-          AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
-          alertDialogBuilder.setMessage(alertMessage);
-          if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
-            alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
-          } else {
-            alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
+            return;
           }
-          if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
-            alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
-          } else {
-            alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
-          }
-
-          alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
-            @Override
-            public void onCancel(DialogInterface dialog) {
-              result.cancel();
-              dialog.dismiss();
-            }
-          });
-
-          AlertDialog alertDialog = alertDialogBuilder.create();
-          alertDialog.setView(layout);
-          alertDialog.show();
         }
+
+        createPromptDialog(view, message, defaultValue, result, responseMessage, responseDefaultValue, value, cancelButtonTitle, confirmButtonTitle);
       }
 
       @Override
       public void error(String s, String s1, Object o) {
         Log.e(LOG_TAG, s + ", " + s1);
+        result.cancel();
       }
 
       @Override
       public void notImplemented() {
-
+        createPromptDialog(view, message, defaultValue, result, null, null, null, null, null);
       }
     });
 
     return true;
+  }
+
+  public void createPromptDialog(WebView view, String message, String defaultValue, final JsPromptResult result, String responseMessage, String responseDefaultValue, String value, String cancelButtonTitle, String confirmButtonTitle) {
+    FrameLayout layout = new FrameLayout(view.getContext());
+
+    final EditText input = new EditText(view.getContext());
+    input.setMaxLines(1);
+    input.setText((responseDefaultValue != null && !responseDefaultValue.isEmpty()) ? responseDefaultValue : defaultValue);
+    LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams.MATCH_PARENT,
+            LinearLayout.LayoutParams.MATCH_PARENT);
+    input.setLayoutParams(lp);
+
+    layout.setPaddingRelative(45,15,45,0);
+    layout.addView(input);
+
+    String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+
+    final String finalValue = value;
+    DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        String text = input.getText().toString();
+        result.confirm(finalValue != null ? finalValue : text);
+        dialog.dismiss();
+      }
+    };
+    DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
+      @Override
+      public void onClick(DialogInterface dialog, int which) {
+        result.cancel();
+        dialog.dismiss();
+      }
+    };
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    alertDialogBuilder.setMessage(alertMessage);
+    if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+      alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
+    } else {
+      alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
+    }
+    if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
+      alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
+    } else {
+      alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
+    }
+
+    alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+      @Override
+      public void onCancel(DialogInterface dialog) {
+        result.cancel();
+        dialog.dismiss();
+      }
+    });
+
+    AlertDialog alertDialog = alertDialogBuilder.create();
+    alertDialog.setView(layout);
+    alertDialog.show();
   }
 
   @Override

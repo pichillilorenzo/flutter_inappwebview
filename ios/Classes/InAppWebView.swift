@@ -745,61 +745,198 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
-                 initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
-
-        let alertController = UIAlertController(title: message, message: nil,
+    fileprivate func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
+        let title = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
+        let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
+        let alertController = UIAlertController(title: title, message: nil,
                                                 preferredStyle: UIAlertController.Style.alert);
-
-        alertController.addAction(UIAlertAction(title: "OK", style: UIAlertAction.Style.default) {
+        
+        alertController.addAction(UIAlertAction(title: okButton, style: UIAlertAction.Style.default) {
             _ in completionHandler()}
         );
         
-        let presentingViewController = ((IABController != nil) ? IABController! : window!.rootViewController!)
+        let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window!.rootViewController!)
         presentingViewController.present(alertController, animated: true, completion: {})
+    }
+    
+    public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
+                 initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
+        
+        onJsAlert(message: message, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message)
+                completionHandler()
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {
+                self.createAlertDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, completionHandler: completionHandler)
+            }
+            else {
+                let response: [String: Any]
+                var responseMessage: String?;
+                var confirmButtonTitle: String?;
+                
+                if let r = result {
+                    response = r as! [String: Any]
+                    responseMessage = response["message"] as? String
+                    confirmButtonTitle = response["confirmButtonTitle"] as? String
+                    let handledByClient = response["handledByClient"] as? Bool
+                    if handledByClient != nil, handledByClient! {
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 1;
+                        switch action {
+                            case 0:
+                                completionHandler()
+                                break
+                            default:
+                                completionHandler()
+                        }
+                        return;
+                    }
+                }
+                
+                self.createAlertDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
+            }
+        })
+    }
+    
+    fileprivate func createConfirmDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, cancelButtonTitle: String?, completionHandler: @escaping (Bool) -> Void) {
+        let dialogMessage = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
+        let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
+        let cancelButton = cancelButtonTitle != nil && !cancelButtonTitle!.isEmpty ? cancelButtonTitle : NSLocalizedString("Cancel", comment: "")
+        
+        let alertController = UIAlertController(title: nil, message: dialogMessage, preferredStyle: .alert)
+        
+        alertController.addAction(UIAlertAction(title: okButton, style: .default, handler: { (action) in
+            completionHandler(true)
+        }))
+        
+        alertController.addAction(UIAlertAction(title: cancelButton, style: .cancel, handler: { (action) in
+            completionHandler(false)
+        }))
+        
+        let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window!.rootViewController!)
+        presentingViewController.present(alertController, animated: true, completion: nil)
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
-
-        let alertController = UIAlertController(title: nil, message: message, preferredStyle: .alert)
-
-        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            completionHandler(true)
-        }))
-
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
-            completionHandler(false)
-        }))
-
-        let presentingViewController = ((IABController != nil) ? IABController! : window!.rootViewController!)
-        presentingViewController.present(alertController, animated: true, completion: nil)
+        
+        onJsConfirm(message: message, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message)
+                completionHandler(false)
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {
+                self.createConfirmDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, completionHandler: completionHandler)
+            }
+            else {
+                let response: [String: Any]
+                var responseMessage: String?;
+                var confirmButtonTitle: String?;
+                var cancelButtonTitle: String?;
+                
+                if let r = result {
+                    response = r as! [String: Any]
+                    responseMessage = response["message"] as? String
+                    confirmButtonTitle = response["confirmButtonTitle"] as? String
+                    cancelButtonTitle = response["cancelButtonTitle"] as? String
+                    let handledByClient = response["handledByClient"] as? Bool
+                    if handledByClient != nil, handledByClient! {
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 1;
+                        switch action {
+                            case 0:
+                                completionHandler(true)
+                                break
+                            case 1:
+                                completionHandler(false)
+                                break
+                            default:
+                                completionHandler(false)
+                        }
+                        return;
+                    }
+                }
+                self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
+            }
+        })
     }
 
 
-    public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt prompt: String, defaultText: String?, initiatedByFrame frame: WKFrameInfo,
-                 completionHandler: @escaping (String?) -> Void) {
-
-        let alertController = UIAlertController(title: nil, message: prompt, preferredStyle: .alert)
-
+    fileprivate func createPromptDialog(message: String, defaultValue: String?, responseMessage: String?, confirmButtonTitle: String?, cancelButtonTitle: String?, value: String?, completionHandler: @escaping (String?) -> Void) {
+        let dialogMessage = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
+        let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
+        let cancelButton = cancelButtonTitle != nil && !cancelButtonTitle!.isEmpty ? cancelButtonTitle : NSLocalizedString("Cancel", comment: "")
+        
+        let alertController = UIAlertController(title: nil, message: dialogMessage, preferredStyle: .alert)
+        
         alertController.addTextField { (textField) in
-            textField.text = defaultText
+            textField.text = defaultValue
         }
-
-        alertController.addAction(UIAlertAction(title: "OK", style: .default, handler: { (action) in
-            if let text = alertController.textFields?.first?.text {
+        
+        alertController.addAction(UIAlertAction(title: okButton, style: .default, handler: { (action) in
+            if let v = value {
+                completionHandler(v)
+            }
+            else if let text = alertController.textFields?.first?.text {
                 completionHandler(text)
             } else {
-                completionHandler(defaultText)
+                completionHandler("")
             }
         }))
-
-        alertController.addAction(UIAlertAction(title: "Cancel", style: .cancel, handler: { (action) in
+        
+        alertController.addAction(UIAlertAction(title: cancelButton, style: .cancel, handler: { (action) in
             completionHandler(nil)
         }))
-
-        let presentingViewController = ((IABController != nil) ? IABController! : window!.rootViewController!)
+        
+        let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window!.rootViewController!)
         presentingViewController.present(alertController, animated: true, completion: nil)
+    }
+    
+    public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt message: String, defaultText defaultValue: String?, initiatedByFrame frame: WKFrameInfo,
+                 completionHandler: @escaping (String?) -> Void) {
+        onJsPrompt(message: message, defaultValue: defaultValue, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message)
+                completionHandler(nil)
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {
+                self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, value: nil, completionHandler: completionHandler)
+            }
+            else {
+                let response: [String: Any]
+                var responseMessage: String?;
+                var confirmButtonTitle: String?;
+                var cancelButtonTitle: String?;
+                var value: String?;
+                
+                if let r = result {
+                    response = r as! [String: Any]
+                    responseMessage = response["message"] as? String
+                    confirmButtonTitle = response["confirmButtonTitle"] as? String
+                    cancelButtonTitle = response["cancelButtonTitle"] as? String
+                    let handledByClient = response["handledByClient"] as? Bool
+                    value = response["value"] as? String;
+                    if handledByClient != nil, handledByClient! {
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 1;
+                        switch action {
+                            case 0:
+                                completionHandler(value)
+                                break
+                            case 1:
+                                completionHandler(nil)
+                                break
+                            default:
+                                completionHandler(nil)
+                        }
+                        return;
+                    }
+                }
+                
+                self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
+            }
+        })
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
@@ -913,6 +1050,36 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         if let channel = getChannel() {
             channel.invokeMethod("onTargetBlank", arguments: arguments)
+        }
+    }
+    
+    public func onJsAlert(message: String, result: FlutterResult?) {
+        var arguments: [String: Any] = ["message": message]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onJsAlert", arguments: arguments, result: result)
+        }
+    }
+    
+    public func onJsConfirm(message: String, result: FlutterResult?) {
+        var arguments: [String: Any] = ["message": message]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onJsConfirm", arguments: arguments, result: result)
+        }
+    }
+    
+    public func onJsPrompt(message: String, defaultValue: String?, result: FlutterResult?) {
+        var arguments: [String: Any] = ["message": message, "defaultValue": defaultValue as Any]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onJsPrompt", arguments: arguments, result: result)
         }
     }
     

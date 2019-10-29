@@ -15,6 +15,9 @@ import 'in_app_browser.dart';
 import 'channel_manager.dart';
 import 'webview_options.dart';
 
+/*
+* TODO: injectFileFromAssets, injectJavaScriptBeforeLoad
+*/
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
 ///The [mimeType] property specifies the format of the data.
@@ -107,33 +110,60 @@ class InAppWebView extends StatefulWidget {
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
   ///
-  ///**NOTE only for iOS**: In some cases, the [response.data] of a [response] with `text/assets` encoding could be empty.
+  ///**NOTE only for Android**: to be able to listen this event, you need also the enable javascript.
   final onWebViewLoadResourceCallback onLoadResource;
 
   ///Event fires when the [InAppWebView] scrolls.
+  ///
   ///[x] represents the current horizontal scroll origin in pixels.
+  ///
   ///[y] represents the current vertical scroll origin in pixels.
   final onWebViewScrollChangedCallback onScrollChanged;
 
   ///Event fires when [InAppWebView] recognizes and starts a downloadable file.
+  ///
   ///[url] represents the url of the file.
   final onDownloadStartCallback onDownloadStart;
 
   ///Event fires when the [InAppWebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
+  ///
   ///[scheme] represents the scheme of the url.
+  ///
   ///[url] represents the url of the request.
   final onLoadResourceCustomSchemeCallback onLoadResourceCustomScheme;
 
   ///Event fires when the [InAppWebView] tries to open a link with `target="_blank"`.
+  ///
   ///[url] represents the url of the link.
   final onTargetBlankCallback onTargetBlank;
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
   ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
   ///On non-secure origins geolocation requests are automatically denied.
+  ///
   ///[origin] represents the origin of the web content attempting to use the Geolocation API.
+  ///
   ///**NOTE**: available only for Android.
   final onGeolocationPermissionsShowPromptCallback onGeolocationPermissionsShowPrompt;
+
+  ///Event fires when javascript calls the `alert()` method to display an alert dialog.
+  ///If [JsAlertResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
+  ///
+  ///[message] represents the message to be displayed in the alert dialog.
+  final onJsAlertCallback onJsAlert;
+
+  ///Event fires when javascript calls the `confirm()` method to display a confirm dialog.
+  ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
+  ///
+  ///[message] represents the message to be displayed in the alert dialog.
+  final onJsConfirmCallback onJsConfirm;
+
+  ///Event fires when javascript calls the `prompt()` method to display a prompt dialog.
+  ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
+  ///
+  ///[message] represents the message to be displayed in the alert dialog.
+  ///[defaultValue] represents the default value displayed in the prompt dialog.
+  final onJsPromptCallback onJsPrompt;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -174,6 +204,9 @@ class InAppWebView extends StatefulWidget {
     this.onLoadResourceCustomScheme,
     this.onTargetBlank,
     this.onGeolocationPermissionsShowPrompt,
+    this.onJsAlert,
+    this.onJsConfirm,
+    this.onJsPrompt,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -269,16 +302,16 @@ class InAppWebViewController {
 
 
   InAppWebViewController(int id, InAppWebView widget) {
-    _id = id;
-    _channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
-    _channel.setMethodCallHandler(handleMethod);
-    _widget = widget;
+    this._id = id;
+    this._channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
+    this._channel.setMethodCallHandler(handleMethod);
+    this._widget = widget;
   }
 
   InAppWebViewController.fromInAppBrowser(String uuid, MethodChannel channel, InAppBrowser inAppBrowser) {
-    _inAppBrowserUuid = uuid;
-    _channel = channel;
-    _inAppBrowser = inAppBrowser;
+    this._inAppBrowserUuid = uuid;
+    this._channel = channel;
+    this._inAppBrowser = inAppBrowser;
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
@@ -398,6 +431,28 @@ class InAppWebViewController {
           return (await _widget.onGeolocationPermissionsShowPrompt(this, origin)).toMap();
         else if (_inAppBrowser != null)
           return (await _inAppBrowser.onGeolocationPermissionsShowPrompt(origin)).toMap();
+        break;
+      case "onJsAlert":
+        String message = call.arguments["message"];
+        if (_widget != null && _widget.onJsAlert != null)
+          return (await _widget.onJsAlert(this, message)).toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onJsAlert(message)).toMap();
+        break;
+      case "onJsConfirm":
+        String message = call.arguments["message"];
+        if (_widget != null && _widget.onJsConfirm != null)
+          return (await _widget.onJsConfirm(this, message)).toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onJsConfirm(message)).toMap();
+        break;
+      case "onJsPrompt":
+        String message = call.arguments["message"];
+        String defaultValue = call.arguments["defaultValue"];
+        if (_widget != null && _widget.onJsPrompt != null)
+          return (await _widget.onJsPrompt(this, message, defaultValue)).toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onJsPrompt(message, defaultValue)).toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
@@ -818,6 +873,52 @@ class InAppWebViewController {
     }
     return WebHistory(historyList, currentIndex);
   }
+
+  ///Starts Safe Browsing initialization.
+  ///
+  ///URL loads are not guaranteed to be protected by Safe Browsing until after the this method returns true.
+  ///Safe Browsing is not fully supported on all devices. For those devices this method will returns false.
+  ///
+  ///This should not be called if Safe Browsing has been disabled by manifest tag
+  ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
+  ///
+  ///**NOTE**: available only for Android.
+  Future<bool> startSafeBrowsing() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('startSafeBrowsing', args);
+  }
+
+  ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
+  ///
+  /// Each rule should take one of these:
+  ///| Rule | Example | Matches Subdomain |
+  ///| -- | -- | -- |
+  ///| HOSTNAME | example.com | Yes |
+  ///| .HOSTNAME | .example.com | No |
+  ///| IPV4_LITERAL | 192.168.1.1 | No |
+  ///| IPV6_LITERAL_WITH_BRACKETS | [10:20:30:40:50:60:70:80] | No |
+  ///
+  ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
+  ///
+  ///[hosts] represents the list of hosts. This value must never be null.
+  ///
+  ///**NOTE**: available only for Android.
+  Future<bool> setSafeBrowsingWhitelist(List<String> hosts) async {
+    assert(hosts != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('hosts', () => hosts);
+    return await _channel.invokeMethod('setSafeBrowsingWhitelist', args);
+  }
+
+
   ///Dispose/Destroy the WebView.
   Future<void> _dispose() async {
     await _channel.invokeMethod('dispose');

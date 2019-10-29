@@ -19,7 +19,6 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.RequiresApi;
 
-import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
@@ -27,8 +26,6 @@ import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayInputStream;
-import java.net.MalformedURLException;
-import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -301,6 +298,12 @@ public class InAppWebViewClient extends WebViewClient {
   public void onReceivedHttpAuthRequest(WebView view, HttpAuthHandler handler, String host, String realm) {
     // By default handle 401 like we'd normally do!
     super.onReceivedHttpAuthRequest(view, handler, host, realm);
+  }
+
+  @Override
+  public void onScaleChanged(WebView view, float oldScale, float newScale) {
+    final InAppWebView webView = (InAppWebView) view;
+    webView.scale = newScale;
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

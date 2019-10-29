@@ -192,12 +192,11 @@ public class ContentBlockerHandler {
         return checkUrl(webView, url, responseResourceType);
     }
 
-
     public ContentBlockerTriggerResourceType getResourceTypeFromUrl(InAppWebView webView, String url) {
         ContentBlockerTriggerResourceType responseResourceType = ContentBlockerTriggerResourceType.RAW;
 
-        // make an HTTP "HEAD" request to the server for that URL. This will not return the full content of the URL.
         if (url.startsWith("http://") || url.startsWith("https://")) {
+            // make an HTTP "HEAD" request to the server for that URL. This will not return the full content of the URL.
             Request mRequest = new Request.Builder().url(url).head().build();
             Response response = null;
             try {

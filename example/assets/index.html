@@ -55,8 +55,13 @@
             });
         });
         $(document).ready(function() {
-            console.log("jQuery ready");
+            alert("Alert Popup");
+            console.log(confirm("Press a button!"));
+            console.log(prompt("Please enter your name", "Harry Potter"));
 
+
+            console.log("jQuery ready");
+/*
             if ("geolocation" in navigator) {
                 console.log("Geolocation API enabled");
                 navigator.geolocation.getCurrentPosition(function(position) {
@@ -64,7 +69,7 @@
                 });
             } else {
                 console.log("No geolocation API");
-            }
+            }*/
         });
     </script>
 </body>

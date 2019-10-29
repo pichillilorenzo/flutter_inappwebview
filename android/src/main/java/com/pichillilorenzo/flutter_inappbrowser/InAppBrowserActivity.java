@@ -26,6 +26,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.app.FlutterActivity;
@@ -460,4 +461,17 @@ public class InAppBrowserActivity extends AppCompatActivity {
     return null;
   }
 
+  public void startSafeBrowsing(MethodChannel.Result result) {
+    if (webView != null)
+      webView.startSafeBrowsing(result);
+    else
+      result.success(false);
+  }
+
+  public void setSafeBrowsingWhitelist(List<String> hosts, MethodChannel.Result result) {
+    if (webView != null)
+      webView.setSafeBrowsingWhitelist(hosts, result);
+    else
+      result.success(false);
+  }
 }

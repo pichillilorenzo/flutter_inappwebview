@@ -195,7 +195,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null)
           webView.takeScreenshot(result);
         else
-          result.error(LOG_TAG, "webView is null", null);
+          result.success(null);
         break;
       case "setOptions":
         if (webView != null) {
@@ -211,6 +211,20 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "getCopyBackForwardList":
         result.success((webView != null) ? webView.getCopyBackForwardList() : null);
+        break;
+      case "startSafeBrowsing":
+        if (webView != null)
+          webView.startSafeBrowsing(result);
+        else
+          result.success(false);
+        break;
+      case "setSafeBrowsingWhitelist":
+        if (webView != null) {
+          List<String> hosts = (List<String>) call.argument("hosts");
+          webView.setSafeBrowsingWhitelist(hosts, result);
+        }
+        else
+          result.success(false);
         break;
       case "dispose":
         dispose();

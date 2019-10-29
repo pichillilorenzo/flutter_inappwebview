@@ -2,25 +2,37 @@ package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
+import android.webkit.JsPromptResult;
+import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+
+import androidx.appcompat.app.AlertDialog;
 
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
+import com.pichillilorenzo.flutter_inappbrowser.R;
 import com.pichillilorenzo.flutter_inappbrowser.RequestPermissionHandler;
+import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -87,6 +99,267 @@ public class InAppWebChromeClient extends WebChromeClient {
     this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
     ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
     decorView.setSystemUiVisibility(3846 | View.SYSTEM_UI_FLAG_LAYOUT_STABLE);
+  }
+
+  @Override
+  public boolean onJsAlert(final WebView view, String url, final String message,
+                           final JsResult result) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("message", message);
+
+    getChannel().invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        Map<String, Object> responseMap = (Map<String, Object>) response;
+        String responseMessage = (String) responseMap.get("message");
+        String confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+        boolean handledByClient = (boolean) responseMap.get("handledByClient");
+        if (handledByClient) {
+          Integer action = (Integer) responseMap.get("action");
+          action = action != null ? action : 1;
+          switch (action) {
+            case 0:
+              result.confirm();
+              break;
+            case 1:
+            default:
+              result.cancel();
+          }
+        } else {
+          String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+          Log.d(LOG_TAG, alertMessage);
+          DialogInterface.OnClickListener clickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              result.confirm();
+              dialog.dismiss();
+            }
+          };
+
+          AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+          alertDialogBuilder.setMessage(alertMessage);
+          if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+            alertDialogBuilder.setPositiveButton(confirmButtonTitle, clickListener);
+          } else {
+            alertDialogBuilder.setPositiveButton(android.R.string.ok, clickListener);
+          }
+
+          alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              result.cancel();
+              dialog.dismiss();
+            }
+          });
+
+          AlertDialog alertDialog = alertDialogBuilder.create();
+          alertDialog.show();
+        }
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.e(LOG_TAG, s + ", " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+
+      }
+    });
+
+    return true;
+  }
+
+  @Override
+  public boolean onJsConfirm(final WebView view, String url, final String message,
+                             final JsResult result) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("message", message);
+
+    getChannel().invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        Map<String, Object> responseMap = (Map<String, Object>) response;
+        String responseMessage = (String) responseMap.get("message");
+        String confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+        String cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
+        boolean handledByClient = (boolean) responseMap.get("handledByClient");
+        if (handledByClient) {
+          Integer action = (Integer) responseMap.get("action");
+          action = action != null ? action : 1;
+          switch (action) {
+            case 0:
+              result.confirm();
+              break;
+            case 1:
+            default:
+              result.cancel();
+          }
+        } else {
+          String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+          DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              result.confirm();
+              dialog.dismiss();
+            }
+          };
+          DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              result.cancel();
+              dialog.dismiss();
+            }
+          };
+
+          AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+          alertDialogBuilder.setMessage(alertMessage);
+          if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+            alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
+          } else {
+            alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
+          }
+          if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
+            alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
+          } else {
+            alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
+          }
+
+          alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              result.cancel();
+              dialog.dismiss();
+            }
+          });
+
+          AlertDialog alertDialog = alertDialogBuilder.create();
+          alertDialog.show();
+        }
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.e(LOG_TAG, s + ", " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+
+      }
+    });
+
+    return true;
+  }
+
+  @Override
+  public boolean onJsPrompt(final WebView view, String url, final String message,
+                            final String defaultValue, final JsPromptResult result) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("message", message);
+    obj.put("defaultValue", defaultValue);
+
+    getChannel().invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        Map<String, Object> responseMap = (Map<String, Object>) response;
+        String responseMessage = (String) responseMap.get("message");
+        String responseDefaultValue = (String) responseMap.get("defaultValue");
+        String confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+        String cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
+        final String value = (String) responseMap.get("value");
+        boolean handledByClient = (boolean) responseMap.get("handledByClient");
+        if (handledByClient) {
+          Integer action = (Integer) responseMap.get("action");
+          action = action != null ? action : 1;
+          switch (action) {
+            case 0:
+              if (value != null)
+                result.confirm(value);
+              else
+                result.confirm();
+              break;
+            case 1:
+            default:
+              result.cancel();
+          }
+        } else {
+          FrameLayout layout = new FrameLayout(view.getContext());
+
+          final EditText input = new EditText(view.getContext());
+          input.setMaxLines(1);
+          input.setText((responseDefaultValue != null && !responseDefaultValue.isEmpty()) ? responseDefaultValue : defaultValue);
+          LinearLayout.LayoutParams lp = new LinearLayout.LayoutParams(
+                  LinearLayout.LayoutParams.MATCH_PARENT,
+                  LinearLayout.LayoutParams.MATCH_PARENT);
+          input.setLayoutParams(lp);
+
+          layout.setPaddingRelative(45,15,45,0);
+          layout.addView(input);
+
+          String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+          DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              String text = input.getText().toString();
+              result.confirm(value != null ? value : text);
+              dialog.dismiss();
+            }
+          };
+          DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              result.cancel();
+              dialog.dismiss();
+            }
+          };
+
+          AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+          alertDialogBuilder.setMessage(alertMessage);
+          if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+            alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
+          } else {
+            alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
+          }
+          if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
+            alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
+          } else {
+            alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
+          }
+
+          alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+            @Override
+            public void onCancel(DialogInterface dialog) {
+              result.cancel();
+              dialog.dismiss();
+            }
+          });
+
+          AlertDialog alertDialog = alertDialogBuilder.create();
+          alertDialog.setView(layout);
+          alertDialog.show();
+        }
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.e(LOG_TAG, s + ", " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+
+      }
+    });
+
+    return true;
   }
 
   @Override

@@ -44,6 +44,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
                     let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                    print(blockRules)
                     WKContentRuleListStore.default().compileContentRuleList(
                         forIdentifier: "ContentBlockingRules",
                         encodedContentRuleList: blockRules) { (contentRuleList, error) in

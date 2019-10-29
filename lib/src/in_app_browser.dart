@@ -327,39 +327,72 @@ class InAppBrowser {
   }
 
   ///Event fires when the [InAppBrowser] webview scrolls.
+  ///
   ///[x] represents the current horizontal scroll origin in pixels.
+  ///
   ///[y] represents the current vertical scroll origin in pixels.
   void onScrollChanged(int x, int y) {
 
   }
 
   ///Event fires when [InAppBrowser] recognizes and starts a downloadable file.
+  ///
   ///[url] represents the url of the file.
   void onDownloadStart(String url) {
 
   }
 
   ///Event fires when the [InAppBrowser] webview finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
+  ///
   ///[scheme] represents the scheme of the url.
+  ///
   ///[url] represents the url of the request.
   Future<CustomSchemeResponse> onLoadResourceCustomScheme(String scheme, String url) {
 
   }
 
   ///Event fires when the [InAppBrowser] webview tries to open a link with `target="_blank"`.
+  ///
   ///[url] represents the url of the link.
   void onTargetBlank(String url) {
+
+  }
+
+  ///Event fires when javascript calls the `alert()` method to display an alert dialog.
+  ///If [JsAlertResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
+  ///
+  ///[message] represents the message to be displayed in the alert dialog.
+  Future<JsAlertResponse> onJsAlert(String message) {
+
+  }
+
+  ///Event fires when javascript calls the `confirm()` method to display a confirm dialog.
+  ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
+  ///
+  ///[message] represents the message to be displayed in the alert dialog.
+  Future<JsConfirmResponse> onJsConfirm(String message) {
+
+  }
+
+  ///Event fires when javascript calls the `prompt()` method to display a prompt dialog.
+  ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
+  ///
+  ///[message] represents the message to be displayed in the alert dialog.
+  ///[defaultValue] represents the default value displayed in the prompt dialog.
+  Future<JsPromptResponse> onJsPrompt(String message, String defaultValue) {
 
   }
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
   ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
   ///On non-secure origins geolocation requests are automatically denied.
+  ///
   ///[origin] represents the origin of the web content attempting to use the Geolocation API.
+  ///
   ///**NOTE**: available only for Android.
   Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt (String origin) {
 
-}
+  }
 
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
@@ -372,4 +405,5 @@ class InAppBrowser {
       throw Exception(['Error: ${ (message.isEmpty) ? '' : message + ' '}The browser is not opened.']);
     }
   }
+
 }

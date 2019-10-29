@@ -299,6 +299,12 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       case "getCopyBackForwardList":
         result.success(getCopyBackForwardList(uuid));
         break;
+      case "startSafeBrowsing":
+        startSafeBrowsing(uuid, result);
+        break;
+      case "setSafeBrowsingWhitelist":
+        setSafeBrowsingWhitelist(uuid, (List<String>) call.argument("hosts"), result);
+        break;
       default:
         result.notImplemented();
     }
@@ -668,4 +674,17 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     return null;
   }
 
+  public void startSafeBrowsing(String uuid, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.startSafeBrowsing(result);
+    result.success(false);
+  }
+
+  public void setSafeBrowsingWhitelist(String uuid, List<String> hosts, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.setSafeBrowsingWhitelist(hosts, result);
+    result.success(false);
+  }
 }

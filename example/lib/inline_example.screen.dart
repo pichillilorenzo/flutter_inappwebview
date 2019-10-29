@@ -32,6 +32,8 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
   String url = "";
   double progress = 0;
 
+  TextEditingController _textFieldController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
@@ -171,18 +173,18 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: new Text("Permission Geolocation API"),
-                    content: new Text("Can we use Geolocation API?"),
+                    title: Text("Permission Geolocation API"),
+                    content: Text("Can we use Geolocation API?"),
                     actions: <Widget>[
-                      new FlatButton(
-                        child: new Text("Close"),
+                      FlatButton(
+                        child: Text("Close"),
                         onPressed: () {
                           response = new GeolocationPermissionShowPromptResponse(origin, false, false);
                           Navigator.of(context).pop();
                         },
                       ),
-                      new FlatButton(
-                        child: new Text("Accept"),
+                      FlatButton(
+                        child: Text("Accept"),
                         onPressed: () {
                           response = new GeolocationPermissionShowPromptResponse(origin, true, true);
                           Navigator.of(context).pop();
@@ -194,7 +196,94 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               );
 
               return response;
-            }
+            },
+            onJsAlert: (InAppWebViewController controller, String message) async {
+              JsAlertResponseAction action;
+
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Text(message),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("Ok"),
+                        onPressed: () {
+                          action = JsAlertResponseAction.CONFIRM;
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              return new JsAlertResponse(handledByClient: true, action: action);
+            },
+            onJsConfirm: (InAppWebViewController controller, String message) async {
+              JsConfirmResponseAction action;
+
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    content: Text(message),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("Cancel"),
+                        onPressed: () {
+                          action = JsConfirmResponseAction.CANCEL;
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("Ok"),
+                        onPressed: () {
+                          action = JsConfirmResponseAction.CONFIRM;
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              return new JsConfirmResponse(handledByClient: true, action: action);
+            },
+            onJsPrompt: (InAppWebViewController controller, String message, String defaultValue) async {
+              JsPromptResponseAction action;
+              _textFieldController.text = defaultValue;
+
+              await showDialog(
+                context: context,
+                builder: (BuildContext context) {
+                  return AlertDialog(
+                    title: Text(message),
+                    content: TextField(
+                      controller: _textFieldController,
+                    ),
+                    actions: <Widget>[
+                      FlatButton(
+                        child: Text("Cancel"),
+                        onPressed: () {
+                          action = JsPromptResponseAction.CANCEL;
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                      FlatButton(
+                        child: Text("Ok"),
+                        onPressed: () {
+                          action = JsPromptResponseAction.CONFIRM;
+                          Navigator.of(context).pop();
+                        },
+                      ),
+                    ],
+                  );
+                },
+              );
+
+              return new JsPromptResponse(handledByClient: true, action: action, value: _textFieldController.text);
+            },
           ),
         ),
       ),

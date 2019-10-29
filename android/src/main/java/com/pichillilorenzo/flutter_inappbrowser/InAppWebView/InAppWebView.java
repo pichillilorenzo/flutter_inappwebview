@@ -12,6 +12,7 @@ import android.util.JsonToken;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
@@ -53,6 +54,7 @@ public class InAppWebView extends WebView {
   public InAppWebViewOptions options;
   public boolean isLoading = false;
   public OkHttpClient httpClient;
+  public float scale = getResources().getDisplayMetrics().density;
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
 
@@ -123,7 +125,7 @@ public class InAppWebView extends WebView {
 
   public void prepare() {
 
-    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity().getParent();
+    final Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity();
 
     boolean isFromInAppBrowserActivity = inAppBrowserActivity != null;
 
@@ -322,7 +324,6 @@ public class InAppWebView extends WebView {
     post(new Runnable() {
       @Override
       public void run() {
-        float scale = getResources().getDisplayMetrics().density; // getScale();
         int height = (int) (getContentHeight() * scale + 0.5);
 
         Bitmap b = Bitmap.createBitmap( getWidth(),
@@ -644,7 +645,6 @@ public class InAppWebView extends WebView {
                                   int oldt) {
     super.onScrollChanged(l, t, oldl, oldt);
 
-    float scale = getResources().getDisplayMetrics().density;
     int x = (int) (l/scale);
     int y = (int) (t/scale);
 
@@ -658,6 +658,33 @@ public class InAppWebView extends WebView {
 
   private MethodChannel getChannel() {
     return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
+  }
+
+  public void startSafeBrowsing(final MethodChannel.Result result) {
+    Activity activity = (inAppBrowserActivity != null) ? inAppBrowserActivity : registrar.activity();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+      startSafeBrowsing(activity.getApplicationContext(), new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean value) {
+          result.success(value);
+        }
+      });
+    } else {
+      result.success(false);
+    }
+  }
+
+  public void setSafeBrowsingWhitelist(List<String> hosts, final MethodChannel.Result result) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+      setSafeBrowsingWhitelist(hosts, new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean value) {
+          result.success(value);
+        }
+      });
+    } else {
+      result.success(false);
+    }
   }
 
   class DownloadStartListener implements DownloadListener {

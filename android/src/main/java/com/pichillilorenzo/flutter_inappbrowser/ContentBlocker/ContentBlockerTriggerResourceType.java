@@ -8,6 +8,7 @@ public enum ContentBlockerTriggerResourceType {
     FONT ("font"),
     SVG_DOCUMENT ("svg-document"),
     MEDIA ("media"),
+    POPUP ("popup"),
     RAW ("raw");
 
     private final String value;

@@ -1,6 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
-import 'in_app_webview.dart' show InAppWebViewController;
+import 'in_app_webview.dart';
 
 var uuidGenerator = new Uuid();
 
@@ -128,6 +128,95 @@ class GeolocationPermissionShowPromptResponse {
   }
 }
 
+
+class JsAlertResponseAction {
+  final int _value;
+  const JsAlertResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const CONFIRM = const JsAlertResponseAction._internal(0);
+}
+
+class JsAlertResponse {
+  String message;
+  String confirmButtonTitle;
+  bool handledByClient;
+  JsAlertResponseAction action;
+
+  JsAlertResponse({this.message = "", this.handledByClient = false, this.confirmButtonTitle = "", this.action = JsAlertResponseAction.CONFIRM});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "message": message,
+      "confirmButtonTitle": confirmButtonTitle,
+      "handledByClient": handledByClient,
+      "action": action?.toValue()
+    };
+  }
+}
+
+class JsConfirmResponseAction {
+  final int _value;
+  const JsConfirmResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const CONFIRM = const JsConfirmResponseAction._internal(0);
+  static const CANCEL = const JsConfirmResponseAction._internal(1);
+}
+
+class JsConfirmResponse {
+  String message;
+  String confirmButtonTitle;
+  String cancelButtonTitle;
+  bool handledByClient;
+  JsConfirmResponseAction action;
+
+  JsConfirmResponse({this.message = "", this.handledByClient = false, this.confirmButtonTitle = "", this.cancelButtonTitle = "", this.action = JsConfirmResponseAction.CANCEL});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "message": message,
+      "confirmButtonTitle": confirmButtonTitle,
+      "cancelButtonTitle": cancelButtonTitle,
+      "handledByClient": handledByClient,
+      "action": action?.toValue()
+    };
+  }
+}
+
+class JsPromptResponseAction {
+  final int _value;
+  const JsPromptResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const CONFIRM = const JsPromptResponseAction._internal(0);
+  static const CANCEL = const JsPromptResponseAction._internal(1);
+}
+
+class JsPromptResponse {
+  String message;
+  String defaultValue;
+  String confirmButtonTitle;
+  String cancelButtonTitle;
+  bool handledByClient;
+  String value;
+  JsPromptResponseAction action;
+
+  JsPromptResponse({this.message = "", this.defaultValue = "", this.handledByClient = false, this.confirmButtonTitle = "", this.cancelButtonTitle = "", this.value, this.action = JsPromptResponseAction.CANCEL});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "message": message,
+      "defaultValue": defaultValue,
+      "confirmButtonTitle": confirmButtonTitle,
+      "cancelButtonTitle": cancelButtonTitle,
+      "handledByClient": handledByClient,
+      "value": value,
+      "action": action?.toValue()
+    };
+  }
+}
+
 typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
 typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
@@ -141,3 +230,6 @@ typedef onDownloadStartCallback = void Function(InAppWebViewController controlle
 typedef onLoadResourceCustomSchemeCallback = Future<CustomSchemeResponse> Function(InAppWebViewController controller, String scheme, String url);
 typedef onTargetBlankCallback = void Function(InAppWebViewController controller, String url);
 typedef onGeolocationPermissionsShowPromptCallback = Future<GeolocationPermissionShowPromptResponse> Function(InAppWebViewController controller, String origin);
+typedef onJsAlertCallback = Future<JsAlertResponse> Function(InAppWebViewController controller, String message);
+typedef onJsConfirmCallback = Future<JsConfirmResponse> Function(InAppWebViewController controller, String message);
+typedef onJsPromptCallback = Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue);

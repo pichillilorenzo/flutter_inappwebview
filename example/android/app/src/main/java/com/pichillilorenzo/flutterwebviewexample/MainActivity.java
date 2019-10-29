@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappbrowserexample;
+package com.pichillilorenzo.flutterwebviewexample;
 
 import android.os.Bundle;
 import io.flutter.app.FlutterActivity;

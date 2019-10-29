@@ -447,7 +447,7 @@ public class InAppWebChromeClient extends WebChromeClient {
     obj.put("sourceURL", consoleMessage.sourceId());
     obj.put("lineNumber", consoleMessage.lineNumber());
     obj.put("message", consoleMessage.message());
-    obj.put("messageLevel", consoleMessage.messageLevel().toString());
+    obj.put("messageLevel", consoleMessage.messageLevel().ordinal());
     getChannel().invokeMethod("onConsoleMessage", obj);
     return true;
   }

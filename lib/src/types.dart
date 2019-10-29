@@ -18,9 +18,22 @@ typedef Future<dynamic> ListenerCallback(MethodCall call);
 ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
 typedef dynamic JavaScriptHandlerCallback(List<dynamic> arguments);
 
-///Enum representing the level of a console message.
-enum ConsoleMessageLevel {
-  DEBUG, ERROR, LOG, TIP, WARNING
+///Class representing the level of a console message.
+class ConsoleMessageLevel {
+  final int _value;
+  const ConsoleMessageLevel._internal(this._value);
+  static ConsoleMessageLevel fromValue(int value) {
+    if (value >= 0 && value <= 4)
+      return ConsoleMessageLevel._internal(value);
+    return null;
+  }
+  toValue() => _value;
+
+  static const TIP = const ConsoleMessageLevel._internal(0);
+  static const LOG = const ConsoleMessageLevel._internal(1);
+  static const WARNING = const ConsoleMessageLevel._internal(2);
+  static const ERROR = const ConsoleMessageLevel._internal(3);
+  static const DEBUG = const ConsoleMessageLevel._internal(4);
 }
 
 ///Public class representing a resource response of the [InAppBrowser] WebView.
@@ -217,6 +230,46 @@ class JsPromptResponse {
   }
 }
 
+class SafeBrowsingThreat {
+  final int _value;
+  const SafeBrowsingThreat._internal(this._value);
+  static SafeBrowsingThreat fromValue(int value) {
+    if (value >= 0 && value <= 4)
+      return SafeBrowsingThreat._internal(value);
+    return null;
+  }
+  toValue() => _value;
+
+  static const SAFE_BROWSING_THREAT_UNKNOWN = const SafeBrowsingThreat._internal(0);
+  static const SAFE_BROWSING_THREAT_MALWARE = const SafeBrowsingThreat._internal(1);
+  static const SAFE_BROWSING_THREAT_PHISHING = const SafeBrowsingThreat._internal(2);
+  static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE = const SafeBrowsingThreat._internal(3);
+  static const SAFE_BROWSING_THREAT_BILLING = const SafeBrowsingThreat._internal(4);
+}
+
+class SafeBrowsingResponseAction {
+  final int _value;
+  const SafeBrowsingResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const BACK_TO_SAFETY = const SafeBrowsingResponseAction._internal(0);
+  static const PROCEED = const SafeBrowsingResponseAction._internal(1);
+  static const SHOW_INTERSTITIAL = const SafeBrowsingResponseAction._internal(2);
+}
+class SafeBrowsingResponse {
+  bool report;
+  SafeBrowsingResponseAction action;
+
+  SafeBrowsingResponse({this.report = true, this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "report": report,
+      "action": action?.toValue()
+    };
+  }
+}
+
 typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
 typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
 typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
@@ -233,3 +286,4 @@ typedef onGeolocationPermissionsShowPromptCallback = Future<GeolocationPermissio
 typedef onJsAlertCallback = Future<JsAlertResponse> Function(InAppWebViewController controller, String message);
 typedef onJsConfirmCallback = Future<JsConfirmResponse> Function(InAppWebViewController controller, String message);
 typedef onJsPromptCallback = Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue);
+typedef onSafeBrowsingHitCallback = Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType);

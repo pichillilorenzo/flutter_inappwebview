@@ -162,8 +162,19 @@ class InAppWebView extends StatefulWidget {
   ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
+  ///
   ///[defaultValue] represents the default value displayed in the prompt dialog.
   final onJsPromptCallback onJsPrompt;
+
+  ///Event fires when the webview notifies that a loading URL has been flagged by Safe Browsing.
+  ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
+  ///
+  ///[url] represents the url of the request.
+  ///
+  ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
+  ///
+  ///**NOTE**: available only for Android.
+  final onSafeBrowsingHitCallback onSafeBrowsingHit;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -207,6 +218,7 @@ class InAppWebView extends StatefulWidget {
     this.onJsAlert,
     this.onJsConfirm,
     this.onJsPrompt,
+    this.onSafeBrowsingHit,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -370,13 +382,7 @@ class InAppWebViewController {
         String sourceURL = call.arguments["sourceURL"];
         int lineNumber = call.arguments["lineNumber"];
         String message = call.arguments["message"];
-        ConsoleMessageLevel messageLevel;
-        ConsoleMessageLevel.values.forEach((element) {
-          if ("ConsoleMessageLevel." + call.arguments["messageLevel"] == element.toString()) {
-            messageLevel = element;
-            return;
-          }
-        });
+        ConsoleMessageLevel messageLevel = ConsoleMessageLevel.fromValue(call.arguments["messageLevel"]);
         if (_widget != null && _widget.onConsoleMessage != null)
           _widget.onConsoleMessage(this, ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
         else if (_inAppBrowser != null)
@@ -453,6 +459,14 @@ class InAppWebViewController {
           return (await _widget.onJsPrompt(this, message, defaultValue))?.toMap();
         else if (_inAppBrowser != null)
           return (await _inAppBrowser.onJsPrompt(message, defaultValue))?.toMap();
+        break;
+      case "onSafeBrowsingHit":
+        String url = call.arguments["url"];
+        SafeBrowsingThreat threatType = SafeBrowsingThreat.fromValue(call.arguments["threatType"]);
+        if (_widget != null && _widget.onJsPrompt != null)
+          return (await _widget.onSafeBrowsingHit(this, url, threatType))?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onSafeBrowsingHit(url, threatType))?.toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
@@ -918,6 +932,17 @@ class InAppWebViewController {
     return await _channel.invokeMethod('setSafeBrowsingWhitelist', args);
   }
 
+  ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
+  ///
+  ///**NOTE**: available only for Android.
+  Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
+  }
 
   ///Dispose/Destroy the WebView.
   Future<void> _dispose() async {

@@ -18,6 +18,7 @@
 - Added new iOS WebView options: `applicationNameForUserAgent`, `isFraudulentWebsiteWarningEnabled`, `selectionGranularity`, `dataDetectorTypes`, `preferredContentMode`
 - Added `onGeolocationPermissionsShowPrompt` event and `GeolocationPermissionShowPromptResponse` class (available only for Android)
 - Added `startSafeBrowsing`, `setSafeBrowsingWhitelist` and `getSafeBrowsingPrivacyPolicyUrl` methods (available only for Android)
+- Added `onSafeBrowsingHit` event (available only for Android)
 - Added `onJsAlert`, `onJsConfirm` and `onJsPrompt` events to manage javascript popup dialogs
 
 ### BREAKING CHANGES

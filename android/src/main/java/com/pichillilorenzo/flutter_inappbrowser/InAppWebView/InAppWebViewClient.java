@@ -10,6 +10,7 @@ import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
+import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
@@ -304,6 +305,58 @@ public class InAppWebViewClient extends WebViewClient {
   public void onScaleChanged(WebView view, float oldScale, float newScale) {
     final InAppWebView webView = (InAppWebView) view;
     webView.scale = newScale;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.O_MR1)
+  @Override
+  public void onSafeBrowsingHit(final WebView view, WebResourceRequest request, int threatType, final SafeBrowsingResponse callback) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", request.getUrl().toString());
+    obj.put("threatType", threatType);
+
+    getChannel().invokeMethod("onSafeBrowsingHit", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          Boolean report = (Boolean) responseMap.get("report");
+          Integer action = (Integer) responseMap.get("action");
+
+          Log.d(LOG_TAG, "\n\nreport: " + report);
+          Log.d(LOG_TAG, "\n\naction: " + action);
+
+          report = report != null ? report : true;
+
+          if (action != null) {
+            switch (action) {
+              case 0:
+                callback.backToSafety(report);
+                return;
+              case 1:
+                callback.proceed(report);
+                return;
+              case 2:
+                callback.showInterstitial(report);
+                return;
+            }
+          }
+        }
+
+        callback.showInterstitial(true);
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.e(LOG_TAG, s + ", " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+        callback.showInterstitial(true);
+      }
+    });
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)

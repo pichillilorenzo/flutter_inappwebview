@@ -65,6 +65,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
           child: InAppWebView(
             //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
             //initialUrl: "https://flutter.dev/",
+            //initialUrl: "chrome://safe-browsing/match?type=malware",
             initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: [
@@ -88,6 +89,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 appCacheEnabled: true,
                 domStorageEnabled: true,
                 geolocationEnabled: true,
+                safeBrowsingEnabled: true,
                 //blockNetworkImage: true,
               ),
               iOSInAppWebViewOptions(
@@ -96,6 +98,9 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             ],
             onWebViewCreated: (InAppWebViewController controller) {
               webView = controller;
+
+              if (Platform.isAndroid)
+                webView.startSafeBrowsing();
 
               webView.addJavaScriptHandler('handlerFoo', (args) {
                 return new Foo(bar: 'bar_value', baz: 'baz_value');
@@ -142,7 +147,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 sourceURL: ${consoleMessage.sourceURL}
                 lineNumber: ${consoleMessage.lineNumber}
                 message: ${consoleMessage.message}
-                messageLevel: ${consoleMessage.messageLevel}
+                messageLevel: ${consoleMessage.messageLevel.toValue()}
               """);
             },
             onDownloadStart: (InAppWebViewController controller, String url) async {
@@ -209,6 +214,10 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               _textFieldController.text = defaultValue;
               JsPromptResponseAction action = await createPromptDialog(context, message);
               return new JsPromptResponse(handledByClient: true, action: action, value: _textFieldController.text);
+            },
+            onSafeBrowsingHit: (InAppWebViewController controller, String url, SafeBrowsingThreat threatType) async {
+              SafeBrowsingResponseAction action = SafeBrowsingResponseAction.BACK_TO_SAFETY;
+              return new SafeBrowsingResponse(report: true, action: action);
             },
           ),
         ),

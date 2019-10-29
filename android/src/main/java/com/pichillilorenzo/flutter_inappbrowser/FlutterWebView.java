@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappbrowser;
 import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
+import android.os.Build;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -225,6 +226,12 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         }
         else
           result.success(false);
+        break;
+      case "getSafeBrowsingPrivacyPolicyUrl":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
+          result.success(webView.getSafeBrowsingPrivacyPolicyUrl().toString());
+        } else
+          result.success(null);
         break;
       case "dispose":
         dispose();

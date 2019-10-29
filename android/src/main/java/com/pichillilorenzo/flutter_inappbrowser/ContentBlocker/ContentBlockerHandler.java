@@ -10,8 +10,12 @@ import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -41,11 +45,19 @@ public class ContentBlockerHandler {
         this.ruleList = newRuleList;
     }
 
-    public WebResourceResponse checkUrl(final InAppWebView webView, String url, ContentBlockerTriggerResourceType responseResourceType) throws URISyntaxException, InterruptedException {
+    public WebResourceResponse checkUrl(final InAppWebView webView, String url, ContentBlockerTriggerResourceType responseResourceType) throws URISyntaxException, InterruptedException, MalformedURLException {
         if (webView.options.contentBlockers == null)
             return null;
 
-        URI u = new URI(url);
+        URI u;
+        try {
+            u = new URI(url);
+        } catch (URISyntaxException e) {
+            String[] urlSplitted = url.split(":");
+            String scheme = urlSplitted[0];
+            URL tempUrl = new URL(url.replace(scheme, "https"));
+            u = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
+        }
         String host = u.getHost();
         int port = u.getPort();
         String scheme = u.getScheme();
@@ -182,12 +194,12 @@ public class ContentBlockerHandler {
         return null;
     }
 
-    public WebResourceResponse checkUrl(final InAppWebView webView, String url) throws URISyntaxException, InterruptedException {
+    public WebResourceResponse checkUrl(final InAppWebView webView, String url) throws URISyntaxException, InterruptedException, MalformedURLException {
         ContentBlockerTriggerResourceType responseResourceType = getResourceTypeFromUrl(webView, url);
         return checkUrl(webView, url, responseResourceType);
     }
 
-    public WebResourceResponse checkUrl(final InAppWebView webView, String url, String contentType) throws URISyntaxException, InterruptedException {
+    public WebResourceResponse checkUrl(final InAppWebView webView, String url, String contentType) throws URISyntaxException, InterruptedException, MalformedURLException {
         ContentBlockerTriggerResourceType responseResourceType = getResourceTypeFromContentType(contentType);
         return checkUrl(webView, url, responseResourceType);
     }

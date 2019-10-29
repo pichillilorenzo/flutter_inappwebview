@@ -63,7 +63,7 @@ class MyInappBrowser extends InAppBrowser {
       sourceURL: ${consoleMessage.sourceURL}
       lineNumber: ${consoleMessage.lineNumber}
       message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel}
+      messageLevel: ${consoleMessage.messageLevel.toValue()}
    """);
  }
 

@@ -127,7 +127,6 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions {
   bool safeBrowsingEnabled;
   bool transparentBackground;
   AndroidInAppWebViewMixedContentMode mixedContentMode;
-
   bool allowContentAccess;
   bool allowFileAccess;
   bool allowFileAccessFromFileURLs;
@@ -258,7 +257,6 @@ class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions {
   bool allowsInlineMediaPlayback;
   bool allowsPictureInPictureMediaPlayback;
   bool transparentBackground;
-
   String applicationNameForUserAgent;
   bool isFraudulentWebsiteWarningEnabled;
   iOSInAppWebViewSelectionGranularity selectionGranularity;
@@ -337,18 +335,47 @@ class AndroidInAppBrowserOptions implements BrowserOptions {
   }
 }
 
+class iOSInAppBrowserOptionsPresentationStyle {
+  final int _value;
+  const iOSInAppBrowserOptionsPresentationStyle._internal(this._value);
+  toValue() => _value;
+
+  static const FULL_SCREEN = const iOSInAppBrowserOptionsPresentationStyle._internal(0);
+  static const PAGE_SHEET = const iOSInAppBrowserOptionsPresentationStyle._internal(1);
+  static const FORM_SHEET = const iOSInAppBrowserOptionsPresentationStyle._internal(2);
+  static const CURRENT_CONTEXT = const iOSInAppBrowserOptionsPresentationStyle._internal(3);
+  static const CUSTOM = const iOSInAppBrowserOptionsPresentationStyle._internal(4);
+  static const OVER_FULL_SCREEN = const iOSInAppBrowserOptionsPresentationStyle._internal(5);
+  static const OVER_CURRENT_CONTEXT = const iOSInAppBrowserOptionsPresentationStyle._internal(6);
+  static const POPOVER = const iOSInAppBrowserOptionsPresentationStyle._internal(7);
+  static const NONE = const iOSInAppBrowserOptionsPresentationStyle._internal(8);
+  static const AUTOMATIC = const iOSInAppBrowserOptionsPresentationStyle._internal(9);
+}
+
+class iOSInAppBrowserOptionsTransitionStyle {
+  final int _value;
+  const iOSInAppBrowserOptionsTransitionStyle._internal(this._value);
+  toValue() => _value;
+
+  static const COVER_VERTICAL = const iOSInAppBrowserOptionsTransitionStyle._internal(0);
+  static const FLIP_HORIZONTAL = const iOSInAppBrowserOptionsTransitionStyle._internal(1);
+  static const CROSS_DISSOLVE = const iOSInAppBrowserOptionsTransitionStyle._internal(2);
+  static const PARTIAL_CURL = const iOSInAppBrowserOptionsTransitionStyle._internal(3);
+}
+
 class iOSInAppBrowserOptions implements BrowserOptions {
   bool toolbarBottom;
   String toolbarBottomBackgroundColor;
   bool toolbarBottomTranslucent;
   String closeButtonCaption;
   String closeButtonColor;
-  int presentationStyle; //default fullscreen
-  int transitionStyle; //default crossDissolve
+  iOSInAppBrowserOptionsPresentationStyle presentationStyle;
+  iOSInAppBrowserOptionsTransitionStyle transitionStyle;
   bool spinner;
 
   iOSInAppBrowserOptions({this.toolbarBottom = true, this.toolbarBottomBackgroundColor = "", this.toolbarBottomTranslucent = true, this.closeButtonCaption = "",
-    this.closeButtonColor = "", this.presentationStyle = 0, this.transitionStyle = 0, this.spinner = true});
+    this.closeButtonColor = "", this.presentationStyle = iOSInAppBrowserOptionsPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = iOSInAppBrowserOptionsTransitionStyle.COVER_VERTICAL, this.spinner = true});
 
   @override
   Map<String, dynamic> toMap() {
@@ -358,8 +385,8 @@ class iOSInAppBrowserOptions implements BrowserOptions {
       "toolbarBottomTranslucent": toolbarBottomTranslucent,
       "closeButtonCaption": closeButtonCaption,
       "closeButtonColor": closeButtonColor,
-      "presentationStyle": presentationStyle,
-      "transitionStyle": transitionStyle,
+      "presentationStyle": presentationStyle.toValue(),
+      "transitionStyle": transitionStyle.toValue(),
       "spinner": spinner,
     };
   }
@@ -392,28 +419,39 @@ class AndroidChromeCustomTabsOptions implements ChromeCustomTabsOptions {
   }
 }
 
+class iOSChromeCustomTabsOptionsDismissButtonStyle {
+  final int _value;
+  const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(this._value);
+  toValue() => _value;
+
+  static const DONE = const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(0);
+  static const CLOSE = const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(1);
+  static const CANCEL = const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(2);
+}
+
 class iOSChromeCustomTabsOptions implements ChromeCustomTabsOptions {
   bool entersReaderIfAvailable;
   bool barCollapsingEnabled;
-  int dismissButtonStyle; //default done
+  iOSChromeCustomTabsOptionsDismissButtonStyle dismissButtonStyle;
   String preferredBarTintColor;
   String preferredControlTintColor;
-  int presentationStyle; //default fullscreen
-  int transitionStyle; //default crossDissolve
+  iOSInAppBrowserOptionsPresentationStyle presentationStyle;
+  iOSInAppBrowserOptionsTransitionStyle transitionStyle;
 
-  iOSChromeCustomTabsOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = 0, this.preferredBarTintColor = "",
-    this.preferredControlTintColor = "", this.presentationStyle = 0, this.transitionStyle = 0});
+  iOSChromeCustomTabsOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = iOSChromeCustomTabsOptionsDismissButtonStyle.DONE,
+    this.preferredBarTintColor = "", this.preferredControlTintColor = "", this.presentationStyle = iOSInAppBrowserOptionsPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = iOSInAppBrowserOptionsTransitionStyle.COVER_VERTICAL});
 
   @override
   Map<String, dynamic> toMap() {
     return {
       "entersReaderIfAvailable": entersReaderIfAvailable,
       "barCollapsingEnabled": barCollapsingEnabled,
-      "dismissButtonStyle": dismissButtonStyle,
+      "dismissButtonStyle": dismissButtonStyle.toValue(),
       "preferredBarTintColor": preferredBarTintColor,
       "preferredControlTintColor": preferredControlTintColor,
-      "presentationStyle": presentationStyle,
-      "transitionStyle": transitionStyle,
+      "presentationStyle": presentationStyle.toValue(),
+      "transitionStyle": transitionStyle.toValue(),
     };
   }
 }

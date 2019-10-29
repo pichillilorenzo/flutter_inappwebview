@@ -394,6 +394,18 @@ class InAppBrowser {
 
   }
 
+  ///Event fires when the webview notifies that a loading URL has been flagged by Safe Browsing.
+  ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
+  ///
+  ///[url] represents the url of the request.
+  ///
+  ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
+  ///
+  ///**NOTE**: available only for Android.
+  Future<SafeBrowsingResponse> onSafeBrowsingHit(String url, SafeBrowsingThreat threatType) {
+
+  }
+
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
       throw Exception(['Error: ${ (message.isEmpty) ? '' : message + ' '}The browser is already opened.']);

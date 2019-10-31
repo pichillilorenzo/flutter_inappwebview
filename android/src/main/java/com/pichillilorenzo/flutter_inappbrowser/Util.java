@@ -5,8 +5,16 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 
+import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
+
 import java.io.IOException;
 import java.io.InputStream;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
@@ -23,12 +31,11 @@ public class Util {
 
   public static String getUrlAsset(PluginRegistry.Registrar registrar, String assetFilePath) throws IOException {
     String key = registrar.lookupKeyForAsset(assetFilePath);
-    AssetManager mg = registrar.activeContext().getResources().getAssets();
     InputStream is = null;
     IOException e = null;
 
     try {
-      is = mg.open(key);
+      is = getFileAsset(registrar, assetFilePath);
     } catch (IOException ex) {
       e = ex;
     } finally {
@@ -47,51 +54,98 @@ public class Util {
     return ANDROID_ASSET_URL + key;
   }
 
-    public static WaitFlutterResult invokeMethodAndWait(final MethodChannel channel, final String method, final Object arguments) throws InterruptedException {
-      final CountDownLatch latch = new CountDownLatch(1);
+  public static InputStream getFileAsset(PluginRegistry.Registrar registrar, String assetFilePath) throws IOException {
+    String key = registrar.lookupKeyForAsset(assetFilePath);
+    AssetManager mg = registrar.activeContext().getResources().getAssets();
+    return mg.open(key);
+  }
 
-      final Map<String, Object> flutterResultMap = new HashMap<>();
-      flutterResultMap.put("result", null);
-      flutterResultMap.put("error", null);
+  public static WaitFlutterResult invokeMethodAndWait(final MethodChannel channel, final String method, final Object arguments) throws InterruptedException {
+    final CountDownLatch latch = new CountDownLatch(1);
 
-      Handler handler = new Handler(Looper.getMainLooper());
-      handler.post(new Runnable() {
-        @Override
-        public void run() {
-          channel.invokeMethod(method, arguments, new MethodChannel.Result() {
-            @Override
-            public void success(Object result) {
-              flutterResultMap.put("result", result);
-              latch.countDown();
-            }
+    final Map<String, Object> flutterResultMap = new HashMap<>();
+    flutterResultMap.put("result", null);
+    flutterResultMap.put("error", null);
 
-            @Override
-            public void error(String s, String s1, Object o) {
-              flutterResultMap.put("error", "ERROR: " + s + " " + s1);
-              flutterResultMap.put("result", o);
-              latch.countDown();
-            }
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        channel.invokeMethod(method, arguments, new MethodChannel.Result() {
+          @Override
+          public void success(Object result) {
+            flutterResultMap.put("result", result);
+            latch.countDown();
+          }
 
-            @Override
-            public void notImplemented() {
-              latch.countDown();
-            }
-          });
-        }
-      });
+          @Override
+          public void error(String s, String s1, Object o) {
+            flutterResultMap.put("error", "ERROR: " + s + " " + s1);
+            flutterResultMap.put("result", o);
+            latch.countDown();
+          }
 
-      latch.await();
-
-      return new WaitFlutterResult(flutterResultMap.get("result"), (String) flutterResultMap.get("error"));
-    }
-
-    public static class WaitFlutterResult {
-      public Object result;
-      public String error;
-
-      public WaitFlutterResult(Object r, String e) {
-        result = r;
-        error = e;
+          @Override
+          public void notImplemented() {
+            latch.countDown();
+          }
+        });
       }
+    });
+
+    latch.await();
+
+    return new WaitFlutterResult(flutterResultMap.get("result"), (String) flutterResultMap.get("error"));
+  }
+
+  public static class WaitFlutterResult {
+    public Object result;
+    public String error;
+
+    public WaitFlutterResult(Object r, String e) {
+      result = r;
+      error = e;
     }
+  }
+
+  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(PluginRegistry.Registrar registrar, String certificatePath, String certificatePassword, String keyStoreType) {
+
+    PrivateKeyAndCertificates privateKeyAndCertificates = null;
+
+    try {
+      InputStream certificateFileStream = getFileAsset(registrar, certificatePath);
+
+      KeyStore keyStore = KeyStore.getInstance(keyStoreType);
+      keyStore.load(certificateFileStream, certificatePassword != null ? certificatePassword.toCharArray() : null);
+
+      Enumeration<String> aliases = keyStore.aliases();
+      String alias = aliases.nextElement();
+
+      Key key = keyStore.getKey(alias, certificatePassword.toCharArray());
+      if (key instanceof PrivateKey) {
+        PrivateKey privateKey = (PrivateKey)key;
+        Certificate cert = keyStore.getCertificate(alias);
+        X509Certificate[] certificates = new X509Certificate[1];
+        certificates[0] = (X509Certificate)cert;
+        privateKeyAndCertificates = new PrivateKeyAndCertificates(privateKey, certificates);
+      }
+      certificateFileStream.close();
+    } catch (Exception e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, e.getMessage());
+    }
+
+    return privateKeyAndCertificates;
+  }
+
+  public static class PrivateKeyAndCertificates {
+
+    public X509Certificate[] certificates;
+    public PrivateKey privateKey;
+
+    public PrivateKeyAndCertificates(PrivateKey privateKey, X509Certificate[] certificates) {
+      this.privateKey = privateKey;
+      this.certificates = certificates;
+    }
+  }
 }

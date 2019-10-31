@@ -13,16 +13,19 @@
 - Added `onLoadResourceCustomScheme` event and `resourceCustomSchemes` option to set custom schemes that WebView must handle to load resources
 - Added `onTargetBlank` event and `useOnTargetBlank` option to manage links with `target="_blank"`
 - Added `ContentBlocker`, `ContentBlockerTrigger` and `ContentBlockerAction` classes and the `contentBlockers` option that allows to define a set of rules to use to block content in the WebView
-- Added new WebView options: `minimumFontSize`, `debuggingEnabled`
+- Added new WebView options: `minimumFontSize`, `debuggingEnabled`, `preferredContentMode`
 - Added new Android WebView options: `allowContentAccess`, `allowFileAccess`, `allowFileAccessFromFileURLs`, `allowUniversalAccessFromFileURLs`, `appCacheEnabled`, `appCachePath`, `blockNetworkImage`, `blockNetworkLoads`, `cacheMode`, `cursiveFontFamily`, `defaultFixedFontSize`, `defaultFontSize`, `defaultTextEncodingName`, `disabledActionModeMenuItems`, `fantasyFontFamily`, `fixedFontFamily`, `forceDark`, `geolocationEnabled`, `layoutAlgorithm`, `loadWithOverviewMode`, `loadsImagesAutomatically`, `minimumLogicalFontSize`, `needInitialFocus`, `offscreenPreRaster`, `sansSerifFontFamily`, `serifFontFamily`, `standardFontFamily`
-- Added new iOS WebView options: `applicationNameForUserAgent`, `isFraudulentWebsiteWarningEnabled`, `selectionGranularity`, `dataDetectorTypes`, `preferredContentMode`
+- Added new iOS WebView options: `applicationNameForUserAgent`, `isFraudulentWebsiteWarningEnabled`, `selectionGranularity`, `dataDetectorTypes`
 - Added `onGeolocationPermissionsShowPrompt` event and `GeolocationPermissionShowPromptResponse` class (available only for Android)
 - Added `startSafeBrowsing`, `setSafeBrowsingWhitelist` and `getSafeBrowsingPrivacyPolicyUrl` methods (available only for Android)
+- Added `clearSslPreferences` and `clearClientCertPreferences` methods (available only for Android)
 - Added `onSafeBrowsingHit` event (available only for Android)
 - Added `onJsAlert`, `onJsConfirm` and `onJsPrompt` events to manage javascript popup dialogs
 - Added `onReceivedHttpAuthRequest` event
 - Added `clearCache()` method
 - Added `HttpAuthCredentialDatabase` class
+- Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
+
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class
@@ -30,7 +33,7 @@
 - Updated `ConsoleMessageLevel` class
 - Updated `onLoadResource` event
 - Updated `CookieManager` class
-- WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSChromeCustomTabsOptions`
+- WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSSafariOptions`
 
 ## 1.2.1
 

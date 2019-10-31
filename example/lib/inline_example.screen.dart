@@ -82,11 +82,11 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
             //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
-            //initialUrl: "https://flutter.dev/",
+            initialUrl: "https://flutter.dev/",
             //initialUrl: "chrome://safe-browsing/match?type=malware",
             //initialUrl: "http://192.168.1.20:8081/",
-            //initialUrl: "https://192.168.1.20:4433/authenticate",
-            initialFile: "assets/index.html",
+            //initialUrl: "https://192.168.1.20:4433/",
+            //initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: [
               InAppWebViewOptions(
@@ -95,15 +95,16 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 useOnTargetBlank: true,
                 //useOnLoadResource: true,
                 useOnDownloadStart: true,
+                preferredContentMode: InAppWebViewUserPreferredContentMode.DESKTOP,
                 resourceCustomSchemes: ["my-special-custom-scheme"],
-                contentBlockers: [
+                /*contentBlockers: [
                   ContentBlocker(
                       ContentBlockerTrigger(".*",
                           resourceType: [ContentBlockerTriggerResourceType.IMAGE, ContentBlockerTriggerResourceType.STYLE_SHEET],
                           ifTopUrl: ["https://getbootstrap.com/"]),
                       ContentBlockerAction(ContentBlockerActionType.BLOCK)
                   )
-                ]
+                ]*/
               ),
               AndroidInAppWebViewOptions(
                 databaseEnabled: true,
@@ -113,9 +114,6 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 safeBrowsingEnabled: true,
                 //blockNetworkImage: true,
               ),
-              iOSInAppWebViewOptions(
-                  preferredContentMode: iOSInAppWebViewUserPreferredContentMode.DESKTOP
-              )
             ],
             onWebViewCreated: (InAppWebViewController controller) {
               webView = controller;
@@ -140,6 +138,13 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onLoadStop: (InAppWebViewController controller, String url) async {
               print("stopped $url");
+              if (Platform.isAndroid) {
+                controller.clearSslPreferences();
+                controller.clearClientCertPreferences();
+              }
+//              controller.injectScriptCode("""
+//              document.getElementById("SEARCH_WORD" + 5).scrollIntoView();
+//              """);
             },
             onLoadError: (InAppWebViewController controller, String url, int code, String message) async {
               print("error $url: $code, $message");
@@ -241,10 +246,19 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               return new SafeBrowsingResponse(report: true, action: action);
             },
             onReceivedHttpAuthRequest: (InAppWebViewController controller, HttpAuthChallenge challenge) async {
-              print("HTTP AUTH REQUEST: " + challenge.protectionSpace.host + ", realm: " + challenge.protectionSpace.realm +
-                  ", previous failure count: " + challenge.previousFailureCount.toString());
+              print("HTTP AUTH REQUEST: ${challenge.protectionSpace.host}, realm: ${challenge.protectionSpace.realm}, previous failure count: ${challenge.previousFailureCount.toString()}");
 
               return new HttpAuthResponse(username: "USERNAME", password: "PASSWORD", action: HttpAuthResponseAction.USE_SAVED_HTTP_AUTH_CREDENTIALS, permanentPersistence: true);
+            },
+            onReceivedServerTrustAuthRequest: (InAppWebViewController controller, ServerTrustChallenge challenge) async {
+              print("SERVER TRUST AUTH REQUEST: ${challenge.protectionSpace.host}, SSL ERROR CODE: ${challenge.error.toString()}, MESSAGE: ${challenge.message}");
+
+              return new ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
+            },
+            onReceivedClientCertRequest: (InAppWebViewController controller, ClientCertChallenge challenge) async {
+              print("CLIENT CERT REQUEST: ${challenge.protectionSpace.host}");
+
+              return new ClientCertResponse(certificatePath: "assets/certificate.pfx", certificatePassword: "", androidKeyStoreType: "PKCS12", action: ClientCertResponseAction.PROCEED);
             },
           ),
         ),

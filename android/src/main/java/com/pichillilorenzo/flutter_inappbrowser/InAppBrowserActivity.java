@@ -9,6 +9,8 @@ import android.graphics.Picture;
 import android.graphics.drawable.ColorDrawable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -478,5 +480,23 @@ public class InAppBrowserActivity extends AppCompatActivity {
   public void clearCache() {
     if (webView != null)
       webView.clearAllCache();
+  }
+
+  public void clearSslPreferences() {
+    if (webView != null)
+      webView.clearSslPreferences();
+  }
+
+  public void clearClientCertPreferences(final MethodChannel.Result result) {
+    if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      webView.clearClientCertPreferences(new Runnable() {
+        @Override
+        public void run() {
+          result.success(true);
+        }
+      });
+    }
+    else
+      result.success(false);
   }
 }

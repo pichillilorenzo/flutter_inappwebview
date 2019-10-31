@@ -17,7 +17,6 @@ import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
-import android.webkit.WebView;
 
 import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappbrowser.ContentBlocker.ContentBlockerAction;
@@ -40,6 +39,8 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.OkHttpClient;
+
+import static com.pichillilorenzo.flutter_inappbrowser.InAppWebView.PreferredContentModeOptionType.*;
 
 final public class InAppWebView extends InputAwareWebView {
 
@@ -221,6 +222,18 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setSansSerifFontFamily(options.sansSerifFontFamily);
     settings.setSerifFontFamily(options.serifFontFamily);
     settings.setStandardFontFamily(options.standardFontFamily);
+    if (options.preferredContentMode != null) {
+      switch (fromValue(options.preferredContentMode)) {
+        case DESKTOP:
+          setDesktopMode(true);
+          break;
+        case MOBILE:
+          setDesktopMode(false);
+          break;
+        case RECOMMENDED:
+          break;
+      }
+    }
 
     contentBlockerHandler.getRuleList().clear();
     for (Map<String, Map<String, Object>> contentBlocker : options.contentBlockers) {
@@ -699,6 +712,24 @@ final public class InAppWebView extends InputAwareWebView {
       obj.put("url", url);
       getChannel().invokeMethod("onDownloadStart", obj);
     }
+  }
+
+  public void setDesktopMode(final boolean enabled) {
+    final WebSettings webSettings = getSettings();
+
+    final String newUserAgent;
+    if (enabled) {
+      newUserAgent = webSettings.getUserAgentString().replace("Mobile", "eliboM").replace("Android", "diordnA");
+    }
+    else {
+      newUserAgent = webSettings.getUserAgentString().replace("eliboM", "Mobile").replace("diordnA", "Android");
+    }
+
+    webSettings.setUserAgentString(newUserAgent);
+    webSettings.setUseWideViewPort(enabled);
+    webSettings.setLoadWithOverviewMode(enabled);
+    webSettings.setSupportZoom(enabled);
+    webSettings.setBuiltInZoomControls(enabled);
   }
 
   @Override

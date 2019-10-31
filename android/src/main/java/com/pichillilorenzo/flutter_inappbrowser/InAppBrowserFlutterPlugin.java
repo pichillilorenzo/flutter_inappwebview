@@ -311,6 +311,13 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         clearCache(uuid);
         result.success(true);
         break;
+      case "clearSslPreferences":
+        clearSslPreferences(uuid);
+        result.success(true);
+        break;
+      case "clearClientCertPreferences":
+        clearClientCertPreferences(uuid, result);
+        break;
       default:
         result.notImplemented();
     }
@@ -698,5 +705,18 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       inAppBrowserActivity.clearCache();
+  }
+
+  public void clearSslPreferences(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.clearSslPreferences();
+  }
+
+  private void clearClientCertPreferences(String uuid, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.clearClientCertPreferences(result);
+    result.success(false);
   }
 }

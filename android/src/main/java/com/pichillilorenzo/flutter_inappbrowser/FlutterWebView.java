@@ -93,7 +93,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   }
 
   @Override
-  public void onMethodCall(MethodCall call, Result result) {
+  public void onMethodCall(MethodCall call, final Result result) {
     String source;
     String urlFile;
     switch (call.method) {
@@ -249,6 +249,23 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null)
           webView.clearAllCache();
         result.success(true);
+        break;
+      case "clearSslPreferences":
+        if (webView != null)
+          webView.clearSslPreferences();
+        result.success(true);
+        break;
+      case "clearClientCertPreferences":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          webView.clearClientCertPreferences(new Runnable() {
+            @Override
+            public void run() {
+              result.success(true);
+            }
+          });
+        } else {
+          result.success(false);
+        }
         break;
       case "dispose":
         dispose();

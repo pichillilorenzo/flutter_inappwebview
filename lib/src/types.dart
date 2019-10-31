@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
@@ -337,6 +339,79 @@ class HttpAuthCredential {
 }
 
 ///
+class ServerTrustAuthResponseAction {
+  final int _value;
+  const ServerTrustAuthResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const CANCEL = const ServerTrustAuthResponseAction._internal(0);
+  static const PROCEED = const ServerTrustAuthResponseAction._internal(1);
+}
+
+///
+class ServerTrustAuthResponse {
+  ServerTrustAuthResponseAction action;
+
+  ServerTrustAuthResponse({this.action = ServerTrustAuthResponseAction.CANCEL});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": action?.toValue()
+    };
+  }
+}
+
+///
+class ServerTrustChallenge {
+  ProtectionSpace protectionSpace;
+  int error;
+  String message;
+  Uint8List serverCertificate;
+
+  ServerTrustChallenge({@required this.protectionSpace, @required this.error, this.message, this.serverCertificate}): assert(protectionSpace != null && error != null);
+}
+
+///
+class ClientCertResponseAction {
+  final int _value;
+  const ClientCertResponseAction._internal(this._value);
+  toValue() => _value;
+
+  static const CANCEL = const ClientCertResponseAction._internal(0);
+  static const PROCEED = const ClientCertResponseAction._internal(1);
+  static const IGNORE = const ClientCertResponseAction._internal(2);
+}
+
+///
+class ClientCertResponse {
+  String certificatePath;
+  String certificatePassword;
+  String androidKeyStoreType;
+  ClientCertResponseAction action;
+
+  ClientCertResponse({this.certificatePath, this.certificatePassword = "", this.androidKeyStoreType = "PKCS12", this.action = ClientCertResponseAction.CANCEL}) {
+    if (this.action == ClientCertResponseAction.PROCEED)
+      assert(certificatePath != null && certificatePath.isNotEmpty);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "certificatePath": certificatePath,
+      "certificatePassword": certificatePassword,
+      "androidKeyStoreType": androidKeyStoreType,
+      "action": action?.toValue()
+    };
+  }
+}
+
+///
+class ClientCertChallenge {
+  ProtectionSpace protectionSpace;
+
+  ClientCertChallenge({@required this.protectionSpace}): assert(protectionSpace != null);
+}
+
+///
 class AndroidInAppWebViewCacheMode {
   final int _value;
   const AndroidInAppWebViewCacheMode._internal(this._value);
@@ -421,14 +496,14 @@ class iOSInAppWebViewDataDetectorTypes {
 }
 
 ///
-class iOSInAppWebViewUserPreferredContentMode {
+class InAppWebViewUserPreferredContentMode {
   final int _value;
-  const iOSInAppWebViewUserPreferredContentMode._internal(this._value);
+  const InAppWebViewUserPreferredContentMode._internal(this._value);
   toValue() => _value;
 
-  static const RECOMMENDED = const iOSInAppWebViewUserPreferredContentMode._internal(0);
-  static const MOBILE = const iOSInAppWebViewUserPreferredContentMode._internal(1);
-  static const DESKTOP = const iOSInAppWebViewUserPreferredContentMode._internal(2);
+  static const RECOMMENDED = const InAppWebViewUserPreferredContentMode._internal(0);
+  static const MOBILE = const InAppWebViewUserPreferredContentMode._internal(1);
+  static const DESKTOP = const InAppWebViewUserPreferredContentMode._internal(2);
 }
 
 ///
@@ -490,3 +565,5 @@ typedef onJsConfirmCallback = Future<JsConfirmResponse> Function(InAppWebViewCon
 typedef onJsPromptCallback = Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue);
 typedef onSafeBrowsingHitCallback = Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType);
 typedef onReceivedHttpAuthRequestCallback = Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge);
+typedef onReceivedServerTrustAuthRequestCallback = Future<ServerTrustAuthResponse> Function(InAppWebViewController controller, ServerTrustChallenge challenge);
+typedef onReceivedClientCertRequestCallback = Future<ClientCertResponse> Function(InAppWebViewController controller, ClientCertChallenge challenge);

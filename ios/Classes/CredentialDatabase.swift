@@ -38,22 +38,25 @@ class CredentialDatabase: NSObject, FlutterPlugin {
                         "realm": protectionSpace.realm,
                         "port": protectionSpace.port
                         ] as [String : Any?]
-
+                    
                     var crendentials: [[String: String?]] = []
                     for c in credentials {
-                        let credential: [String: String?] = [
-                            "username": c.value.user,
-                            "password": c.value.password,
-                        ]
-                        crendentials.append(credential)
+                        if let username = c.value.user, let password = c.value.password {
+                            let credential: [String: String] = [
+                                "username": username,
+                                "password": password,
+                            ]
+                            crendentials.append(credential)
+                        }
                     }
                     
-                    let dict = [
-                        "protectionSpace": protectionSpaceDict,
-                        "credentials": crendentials
-                        ] as [String : Any]
-                    allCredentials.append(dict)
-                }
+                    if crendentials.count > 0 {
+                        let dict = [
+                            "protectionSpace": protectionSpaceDict,
+                            "credentials": crendentials
+                            ] as [String : Any]
+                        allCredentials.append(dict)
+                    }                }
                 result(allCredentials)
                 break
             case "getHttpAuthCredentials":
@@ -70,11 +73,13 @@ class CredentialDatabase: NSObject, FlutterPlugin {
                     if protectionSpace.host == host && protectionSpace.realm == realm &&
                     protectionSpace.protocol == urlProtocol && protectionSpace.port == urlPort {
                         for c in credentials {
-                            let credential: [String: String?] = [
-                                "username": c.value.user,
-                                "password": c.value.password,
-                            ]
-                            crendentials.append(credential)
+                            if let username = c.value.user, let password = c.value.password {
+                                let credential: [String: String] = [
+                                    "username": username,
+                                    "password": password,
+                                ]
+                                crendentials.append(credential)
+                            }
                         }
                         break
                     }
@@ -148,8 +153,11 @@ class CredentialDatabase: NSObject, FlutterPlugin {
                     protectionSpace.protocol == urlProtocol && protectionSpace.port == urlPort {
                         protectionSpaceCredential = protectionSpace
                         for c in credentials {
-                            credentialsToRemove.append(c.value)
+                            if let _ = c.value.user, let _ = c.value.password {
+                                credentialsToRemove.append(c.value)
+                            }
                         }
+                        break
                     }
                 }
                 

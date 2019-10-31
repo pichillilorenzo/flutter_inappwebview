@@ -35,11 +35,12 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   bool horizontalScrollBarEnabled;
   List<String> resourceCustomSchemes;
   List<ContentBlocker> contentBlockers;
+  InAppWebViewUserPreferredContentMode preferredContentMode;
 
   InAppWebViewOptions({this.useShouldOverrideUrlLoading = false, this.useOnLoadResource = false, this.useOnDownloadStart = false, this.useOnTargetBlank = false,
     this.clearCache = false, this.userAgent = "", this.javaScriptEnabled = true, this.debuggingEnabled = false, this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true, this.textZoom = 100, this.minimumFontSize, this.verticalScrollBarEnabled = true, this.horizontalScrollBarEnabled = true,
-    this.resourceCustomSchemes = const [], this.contentBlockers = const []}) {
+    this.resourceCustomSchemes = const [], this.contentBlockers = const [], this.preferredContentMode = InAppWebViewUserPreferredContentMode.RECOMMENDED}) {
       if (this.minimumFontSize == null)
         this.minimumFontSize = Platform.isAndroid ? 8 : 0;
     }
@@ -66,6 +67,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
       "resourceCustomSchemes": resourceCustomSchemes,
       "contentBlockers": contentBlockersMapList,
+      "preferredContentMode": preferredContentMode?.toValue()
     };
   }
 }
@@ -179,13 +181,11 @@ class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions, iOSOptio
   bool isFraudulentWebsiteWarningEnabled;
   iOSInAppWebViewSelectionGranularity selectionGranularity;
   List<iOSInAppWebViewDataDetectorTypes> dataDetectorTypes;
-  iOSInAppWebViewUserPreferredContentMode preferredContentMode;
 
   iOSInAppWebViewOptions({this.disallowOverScroll = false, this.enableViewportScale = false, this.suppressesIncrementalRendering = false, this.allowsAirPlayForMediaPlayback = true,
     this.allowsBackForwardNavigationGestures = true, this.allowsLinkPreview = true, this.ignoresViewportScaleLimits = false, this.allowsInlineMediaPlayback = false,
     this.allowsPictureInPictureMediaPlayback = true, this.transparentBackground = false, this.applicationNameForUserAgent = "", this.isFraudulentWebsiteWarningEnabled = true,
-    this.selectionGranularity = iOSInAppWebViewSelectionGranularity.DYNAMIC, this.dataDetectorTypes = const [iOSInAppWebViewDataDetectorTypes.NONE],
-    this.preferredContentMode = iOSInAppWebViewUserPreferredContentMode.RECOMMENDED
+    this.selectionGranularity = iOSInAppWebViewSelectionGranularity.DYNAMIC, this.dataDetectorTypes = const [iOSInAppWebViewDataDetectorTypes.NONE]
   });
 
   @override
@@ -209,8 +209,7 @@ class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions, iOSOptio
       "applicationNameForUserAgent": applicationNameForUserAgent,
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
       "selectionGranularity": selectionGranularity.toValue(),
-      "dataDetectorTypes": dataDetectorTypesList,
-      "preferredContentMode": preferredContentMode.toValue(),
+      "dataDetectorTypes": dataDetectorTypesList
     };
   }
 }

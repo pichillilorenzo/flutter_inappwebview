@@ -410,7 +410,17 @@ class InAppBrowser {
   ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
-  Future<HttpAuthResponse> onReceivedHttpAuthRequest(String url, HttpAuthChallenge challenge) {
+  Future<HttpAuthResponse> onReceivedHttpAuthRequest(HttpAuthChallenge challenge) {
+
+  }
+
+  ///
+  Future<ServerTrustAuthResponse> onReceivedServerTrustAuthRequest(ServerTrustChallenge challenge) {
+
+  }
+
+  ///
+  Future<ClientCertResponse> onReceivedClientCertRequest(ClientCertChallenge challenge) {
 
   }
 

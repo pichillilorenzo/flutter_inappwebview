@@ -82,6 +82,125 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 
 let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
 
+let searchJavascript = """
+var uiWebview_SearchResultCount = 0;
+
+/*!
+ @method     uiWebview_HighlightAllOccurencesOfStringForElement
+ @abstract   // helper function, recursively searches in elements and their child nodes
+ @discussion // helper function, recursively searches in elements and their child nodes
+
+ element    - HTML elements
+ keyword    - string to search
+ */
+
+function uiWebview_HighlightAllOccurencesOfStringForElement(element,keyword) {
+    if (element) {
+        if (element.nodeType == 3) {        // Text node
+
+            var count = 0;
+            var elementTmp = element;
+            while (true) {
+                var value = elementTmp.nodeValue;  // Search for keyword in text node
+                var idx = value.toLowerCase().indexOf(keyword);
+
+                if (idx < 0) break;
+
+                count++;
+                elementTmp = document.createTextNode(value.substr(idx+keyword.length));
+            }
+
+            uiWebview_SearchResultCount += count;
+
+            var index = uiWebview_SearchResultCount;
+            while (true) {
+                var value = element.nodeValue;  // Search for keyword in text node
+                var idx = value.toLowerCase().indexOf(keyword);
+
+                if (idx < 0) break;             // not found, abort
+
+                //we create a SPAN element for every parts of matched keywords
+                var span = document.createElement("span");
+                var text = document.createTextNode(value.substr(idx,keyword.length));
+                span.appendChild(text);
+
+                span.setAttribute("class","uiWebviewHighlight");
+                span.style.backgroundColor="yellow";
+                span.style.color="black";
+
+                index--;
+                span.setAttribute("id", "SEARCH_WORD"+(index));
+                //span.setAttribute("id", "SEARCH_WORD"+uiWebview_SearchResultCount);
+
+                //element.parentNode.setAttribute("id", "SEARCH_WORD"+uiWebview_SearchResultCount);
+
+                //uiWebview_SearchResultCount++;    // update the counter
+
+                text = document.createTextNode(value.substr(idx+keyword.length));
+                element.deleteData(idx, value.length - idx);
+
+                var next = element.nextSibling;
+                //alert(element.parentNode);
+                element.parentNode.insertBefore(span, next);
+                element.parentNode.insertBefore(text, next);
+                element = text;
+            }
+
+
+        } else if (element.nodeType == 1) { // Element node
+            if (element.style.display != "none" && element.nodeName.toLowerCase() != 'select') {
+                for (var i=element.childNodes.length-1; i>=0; i--) {
+                    uiWebview_HighlightAllOccurencesOfStringForElement(element.childNodes[i],keyword);
+                }
+            }
+        }
+    }
+}
+
+// the main entry point to start the search
+function uiWebview_HighlightAllOccurencesOfString(keyword) {
+    uiWebview_RemoveAllHighlights();
+    uiWebview_HighlightAllOccurencesOfStringForElement(document.body, keyword.toLowerCase());
+}
+
+// helper function, recursively removes the highlights in elements and their childs
+function uiWebview_RemoveAllHighlightsForElement(element) {
+    if (element) {
+        if (element.nodeType == 1) {
+            if (element.getAttribute("class") == "uiWebviewHighlight") {
+                var text = element.removeChild(element.firstChild);
+                element.parentNode.insertBefore(text,element);
+                element.parentNode.removeChild(element);
+                return true;
+            } else {
+                var normalize = false;
+                for (var i=element.childNodes.length-1; i>=0; i--) {
+                    if (uiWebview_RemoveAllHighlightsForElement(element.childNodes[i])) {
+                        normalize = true;
+                    }
+                }
+                if (normalize) {
+                    element.normalize();
+                }
+            }
+        }
+    }
+    return false;
+}
+
+// the main entry point to remove the highlights
+function uiWebview_RemoveAllHighlights() {
+    uiWebview_SearchResultCount = 0;
+    uiWebview_RemoveAllHighlightsForElement(document.body);
+}
+
+function uiWebview_ScrollTo(idx) {
+    var scrollTo = document.getElementById("SEARCH_WORD" + idx);
+    if (scrollTo) scrollTo.scrollIntoView();
+}
+
+"""
+
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
 
     var IABController: InAppBrowserWebViewController?
@@ -196,7 +315,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if #available(iOS 13.0, *) {
             configuration.preferences.isFraudulentWebsiteWarningEnabled = (options?.isFraudulentWebsiteWarningEnabled)!
-            configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: (options?.preferredContentMode)!)!
+            if options?.preferredContentMode != nil {
+                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: (options?.preferredContentMode)!)!
+            }
         } else {
             // Fallback on earlier versions
         }
@@ -209,6 +330,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.clearCache)! {
             clearCache()
         }
+        
+        evaluateJavaScript(searchJavascript, completionHandler: nil)
     }
     
     @available(iOS 10.0, *)
@@ -552,7 +675,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 
                 if error != nil {
                     let userInfo = (error! as NSError).userInfo
-                    self.onConsoleMessage(sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as? URL)?.absoluteString ?? "", lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: "ERROR")
+                    self.onConsoleMessage(sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as? URL)?.absoluteString ?? "", lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: 3)
                 }
                 
                 if value == nil {
@@ -731,6 +854,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             IABController!.forwardButton.isEnabled = canGoForward
             IABController!.spinner.stopAnimating()
         }
+        
+//        findAllAsync("Flutter", completionHandler: {(value, error) in
+//            if error != nil {
+//                print(error)
+//            } else if let foundOccurences: Int = value as! Int {
+//                print(foundOccurences)
+//                //self.findNext(to: foundOccurences - 4, completionHandler: nil)
+//            }
+//        })
     }
     
     public func webView(_ view: WKWebView,
@@ -752,8 +884,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        
-        print (challenge.protectionSpace.authenticationMethod)
         
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
@@ -812,6 +942,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                                 }
                                 break
                             default:
+                                InAppWebView.credentialsProposed = []
                                 completionHandler(.performDefaultHandling, nil)
                         }
                         return;
@@ -821,34 +952,143 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             })
         }
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
-            /// TODO: correspond to onSslError event of Android
-            completionHandler(.performDefaultHandling, nil)
-//            guard let serverTrust = challenge.protectionSpace.serverTrust else {
-//                completionHandler(.performDefaultHandling, nil)
-//                return
-//            }
-//            //if checkValidity(of: serverTrust) {
-//            if true {
-//                let exceptions = SecTrustCopyExceptions(serverTrust)
-//                SecTrustSetExceptions(serverTrust, exceptions)
-//                let credential = URLCredential(trust: serverTrust)
-//                completionHandler(.useCredential, credential)
-//            } else {
-//                // Show a UI here warning the user the server credentials are
-//                // invalid, and cancel the load.
-//                completionHandler(.cancelAuthenticationChallenge, nil)
-//            }
+
+            guard let serverTrust = challenge.protectionSpace.serverTrust else {
+                completionHandler(.performDefaultHandling, nil)
+                return
+            }
+
+            onReceivedServerTrustAuthRequest(challenge: challenge, result: {(result) -> Void in
+                if result is FlutterError {
+                    print((result as! FlutterError).message)
+                }
+                else if (result as? NSObject) == FlutterMethodNotImplemented {
+                    completionHandler(.performDefaultHandling, nil)
+                }
+                else {
+                    var response: [String: Any]
+                    if let r = result {
+                        response = r as! [String: Any]
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 0;
+                        switch action {
+                            case 0:
+                                InAppWebView.credentialsProposed = []
+                                completionHandler(.cancelAuthenticationChallenge, nil)
+                                break
+                            case 1:
+                                let exceptions = SecTrustCopyExceptions(serverTrust)
+                                SecTrustSetExceptions(serverTrust, exceptions)
+                                let credential = URLCredential(trust: serverTrust)
+                                completionHandler(.useCredential, credential)
+                                break
+                            default:
+                                InAppWebView.credentialsProposed = []
+                                completionHandler(.performDefaultHandling, nil)
+                        }
+                        return;
+                    }
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            })
         }
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodClientCertificate {
-            /// TODO: load certificates
-            completionHandler(.performDefaultHandling, nil)
+            onReceivedClientCertRequest(challenge: challenge, result: {(result) -> Void in
+                if result is FlutterError {
+                    print((result as! FlutterError).message)
+                }
+                else if (result as? NSObject) == FlutterMethodNotImplemented {
+                    completionHandler(.performDefaultHandling, nil)
+                }
+                else {
+                    var response: [String: Any]
+                    if let r = result {
+                        response = r as! [String: Any]
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 0;
+                        switch action {
+                            case 0:
+                                completionHandler(.cancelAuthenticationChallenge, nil)
+                                break
+                            case 1:
+                                let certificatePath = response["certificatePath"] as! String;
+                                let certificatePassword = response["certificatePassword"] as? String ?? "";
+                                
+                                let key = SwiftFlutterPlugin.instance!.registrar!.lookupKey(forAsset: certificatePath)
+                                let path = Bundle.main.path(forResource: key, ofType: nil)!
+                                let PKCS12Data = NSData(contentsOfFile: path)!
+                                
+                                if let identityAndTrust: IdentityAndTrust = self.extractIdentity(PKCS12Data: PKCS12Data, password: certificatePassword) {
+                                    let urlCredential: URLCredential = URLCredential(
+                                        identity: identityAndTrust.identityRef,
+                                        certificates: identityAndTrust.certArray as? [AnyObject],
+                                        persistence: URLCredential.Persistence.forSession);
+                                    completionHandler(.useCredential, urlCredential)
+                                } else {
+                                    completionHandler(.performDefaultHandling, nil)
+                                }
+                                break
+                            case 2:
+                                completionHandler(.cancelAuthenticationChallenge, nil)
+                                break
+                            default:
+                                completionHandler(.performDefaultHandling, nil)
+                        }
+                        return;
+                    }
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            })
         }
         else {
             completionHandler(.performDefaultHandling, nil)
         }
     }
     
-    fileprivate func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
+    struct IdentityAndTrust {
+
+        var identityRef:SecIdentity
+        var trust:SecTrust
+        var certArray:AnyObject
+    }
+
+    func extractIdentity(PKCS12Data:NSData, password: String) -> IdentityAndTrust? {
+        var identityAndTrust:IdentityAndTrust?
+        var securityError:OSStatus = errSecSuccess
+
+        var importResult: CFArray? = nil
+        securityError = SecPKCS12Import(
+            PKCS12Data as NSData,
+            [kSecImportExportPassphrase as String: password] as NSDictionary,
+            &importResult
+        )
+
+        if securityError == errSecSuccess {
+            let certItems:CFArray = importResult! as CFArray;
+            let certItemsArray:Array = certItems as Array
+            let dict:AnyObject? = certItemsArray.first;
+            if let certEntry:Dictionary = dict as? Dictionary<String, AnyObject> {
+                // grab the identity
+                let identityPointer:AnyObject? = certEntry["identity"];
+                let secIdentityRef:SecIdentity = (identityPointer as! SecIdentity?)!;
+                // grab the trust
+                let trustPointer:AnyObject? = certEntry["trust"];
+                let trustRef:SecTrust = trustPointer as! SecTrust;
+                // grab the cert
+                let chainPointer:AnyObject? = certEntry["chain"];
+                identityAndTrust = IdentityAndTrust(identityRef: secIdentityRef, trust: trustRef, certArray:  chainPointer!);
+            }
+        } else {
+            print("Security Error: " + securityError.description)
+            if #available(iOS 11.3, *) {
+                print(SecCopyErrorMessageString(securityError,nil))
+            }
+        }
+        return identityAndTrust;
+    }
+
+    
+    func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
         let title = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
         let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
         let alertController = UIAlertController(title: title, message: nil,
@@ -901,7 +1141,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         })
     }
     
-    fileprivate func createConfirmDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, cancelButtonTitle: String?, completionHandler: @escaping (Bool) -> Void) {
+    func createConfirmDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, cancelButtonTitle: String?, completionHandler: @escaping (Bool) -> Void) {
         let dialogMessage = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
         let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
         let cancelButton = cancelButtonTitle != nil && !cancelButtonTitle!.isEmpty ? cancelButtonTitle : NSLocalizedString("Cancel", comment: "")
@@ -963,8 +1203,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         })
     }
 
-
-    fileprivate func createPromptDialog(message: String, defaultValue: String?, responseMessage: String?, confirmButtonTitle: String?, cancelButtonTitle: String?, value: String?, completionHandler: @escaping (String?) -> Void) {
+    func createPromptDialog(message: String, defaultValue: String?, responseMessage: String?, confirmButtonTitle: String?, cancelButtonTitle: String?, value: String?, completionHandler: @escaping (String?) -> Void) {
         let dialogMessage = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
         let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
         let cancelButton = cancelButtonTitle != nil && !cancelButtonTitle!.isEmpty ? cancelButtonTitle : NSLocalizedString("Cancel", comment: "")
@@ -1169,6 +1408,49 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func onReceivedServerTrustAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
+        var serverCertificateData: NSData?
+        let serverTrust = challenge.protectionSpace.serverTrust!
+        if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
+            let serverCertificateCFData = SecCertificateCopyData(serverCertificate)
+            let data = CFDataGetBytePtr(serverCertificateCFData)
+            let size = CFDataGetLength(serverCertificateCFData)
+            serverCertificateData = NSData(bytes: data, length: size)
+        }
+        
+        var arguments: [String: Any?] = [
+            "host": challenge.protectionSpace.host,
+            "protocol": challenge.protectionSpace.protocol,
+            "realm": challenge.protectionSpace.realm,
+            "port": challenge.protectionSpace.port,
+            "previousFailureCount": challenge.previousFailureCount,
+            "serverCertificate": serverCertificateData,
+            "error": -1,
+            "message": "",
+        ]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, result: result)
+        }
+    }
+    
+    public func onReceivedClientCertRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
+        var arguments: [String: Any?] = [
+            "host": challenge.protectionSpace.host,
+            "protocol": challenge.protectionSpace.protocol,
+            "realm": challenge.protectionSpace.realm,
+            "port": challenge.protectionSpace.port
+        ]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onReceivedClientCertRequest", arguments: arguments, result: result)
+        }
+    }
+    
     public func onJsAlert(message: String, result: FlutterResult?) {
         var arguments: [String: Any] = ["message": message]
         if IABController != nil {
@@ -1199,7 +1481,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func onConsoleMessage(sourceURL: String, lineNumber: Int, message: String, messageLevel: String) {
+    public func onConsoleMessage(sourceURL: String, lineNumber: Int, message: String, messageLevel: Int) {
         var arguments: [String: Any] = ["sourceURL": sourceURL, "lineNumber": lineNumber, "message": message, "messageLevel": messageLevel]
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
@@ -1234,27 +1516,27 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         if message.name.starts(with: "console") {
-            var messageLevel = "LOG"
+            var messageLevel = 1
             switch (message.name) {
             case "consoleLog":
-                messageLevel = "LOG"
+                messageLevel = 1
                 break;
             case "consoleDebug":
                 // on Android, console.debug is TIP
-                messageLevel = "TIP"
+                messageLevel = 0
                 break;
             case "consoleError":
-                messageLevel = "ERROR"
+                messageLevel = 3
                 break;
             case "consoleInfo":
                 // on Android, console.info is LOG
-                messageLevel = "LOG"
+                messageLevel = 1
                 break;
             case "consoleWarn":
-                messageLevel = "WARNING"
+                messageLevel = 2
                 break;
             default:
-                messageLevel = "LOG"
+                messageLevel = 1
                 break;
             }
             onConsoleMessage(sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
@@ -1286,5 +1568,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     private func getChannel() -> FlutterMethodChannel? {
         return (IABController != nil) ? SwiftFlutterPlugin.instance!.channel! : ((IAWController != nil) ? IAWController!.channel! : nil);
+    }
+    
+    func findAllAsync(_ str: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+        let startSearch = "uiWebview_HighlightAllOccurencesOfString('\(str ?? "")'); uiWebview_SearchResultCount"
+        evaluateJavaScript(startSearch, completionHandler: completionHandler)
+    }
+
+    func findNext(to index: Int, completionHandler: ((Any?, Error?) -> Void)?) {
+        evaluateJavaScript("uiWebview_ScrollTo('\(index)')", completionHandler: completionHandler)
+    }
+
+    func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
+        evaluateJavaScript("uiWebview_RemoveAllHighlights()", completionHandler: completionHandler)
     }
 }

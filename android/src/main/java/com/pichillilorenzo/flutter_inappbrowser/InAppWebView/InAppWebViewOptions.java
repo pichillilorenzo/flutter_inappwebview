@@ -23,11 +23,12 @@ public class InAppWebViewOptions extends Options {
   public boolean javaScriptCanOpenWindowsAutomatically = false;
   public boolean mediaPlaybackRequiresUserGesture = true;
   public Integer textZoom = 100;
+  public Integer minimumFontSize = 8;
   public boolean verticalScrollBarEnabled = true;
   public boolean horizontalScrollBarEnabled = true;
   public List<String> resourceCustomSchemes = new ArrayList<>();
   public List<Map<String, Map<String, Object>>> contentBlockers = new ArrayList<>();
-  public Integer minimumFontSize = 8;
+  public Integer preferredContentMode = PreferredContentModeOptionType.RECOMMENDED.toValue();
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;

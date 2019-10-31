@@ -10,14 +10,13 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 
-import 'http_auth_credentials_database.dart';
 import 'types.dart';
 import 'in_app_browser.dart';
 import 'channel_manager.dart';
 import 'webview_options.dart';
 
 /*
-* TODO: injectFileFromAssets, injectJavaScriptBeforeLoad
+* TODO: injectJavaScriptBeforeLoad
 */
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
@@ -182,6 +181,12 @@ class InAppWebView extends StatefulWidget {
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
   final onReceivedHttpAuthRequestCallback onReceivedHttpAuthRequest;
 
+  ///
+  final onReceivedServerTrustAuthRequestCallback onReceivedServerTrustAuthRequest;
+
+  ///
+  final onReceivedClientCertRequestCallback onReceivedClientCertRequest;
+
   ///Initial url that will be loaded.
   final String initialUrl;
   ///Initial asset file that will be loaded. See [InAppWebView.loadFile()] for explanation.
@@ -226,6 +231,8 @@ class InAppWebView extends StatefulWidget {
     this.onJsPrompt,
     this.onSafeBrowsingHit,
     this.onReceivedHttpAuthRequest,
+    this.onReceivedServerTrustAuthRequest,
+    this.onReceivedClientCertRequest,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -487,7 +494,34 @@ class InAppWebViewController {
         if (_widget != null && _widget.onReceivedHttpAuthRequest != null)
           return (await _widget.onReceivedHttpAuthRequest(this, challenge))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onReceivedHttpAuthRequest(host, challenge))?.toMap();
+          return (await _inAppBrowser.onReceivedHttpAuthRequest(challenge))?.toMap();
+        break;
+      case "onReceivedServerTrustAuthRequest":
+        String host = call.arguments["host"];
+        String protocol = call.arguments["protocol"];
+        String realm = call.arguments["realm"];
+        int port = call.arguments["port"];
+        int error = call.arguments["error"];
+        String message = call.arguments["message"];
+        Uint8List serverCertificate = call.arguments["serverCertificate"];
+        var protectionSpace = ProtectionSpace(host: host, protocol: protocol, realm: realm, port: port);
+        var challenge = ServerTrustChallenge(protectionSpace: protectionSpace, error: error, message: message, serverCertificate: serverCertificate);
+        if (_widget != null && _widget.onReceivedServerTrustAuthRequest != null)
+          return (await _widget.onReceivedServerTrustAuthRequest(this, challenge))?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onReceivedServerTrustAuthRequest(challenge))?.toMap();
+        break;
+      case "onReceivedClientCertRequest":
+        String host = call.arguments["host"];
+        String protocol = call.arguments["protocol"];
+        String realm = call.arguments["realm"];
+        int port = call.arguments["port"];
+        var protectionSpace = ProtectionSpace(host: host, protocol: protocol, realm: realm, port: port);
+        var challenge = ClientCertChallenge(protectionSpace: protectionSpace);
+        if (_widget != null && _widget.onReceivedClientCertRequest != null)
+          return (await _widget.onReceivedClientCertRequest(this, challenge))?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onReceivedClientCertRequest(challenge))?.toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
@@ -847,7 +881,7 @@ class InAppWebViewController {
   }
 
   ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
-  ///__safeBrowsingEnabled__
+  ///
   ///**NOTE for iOS**: available from iOS 11.0+.
   Future<Uint8List> takeScreenshot() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -965,7 +999,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
   }
 
-  ///Clear all the webview's cache
+  ///Clears all the webview's cache
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -975,9 +1009,36 @@ class InAppWebViewController {
     await _channel.invokeMethod('clearCache', args);
   }
 
+  ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
+  ///
+  ///**NOTE**: available only for Android.
+  Future<void> clearSslPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('clearSslPreferences', args);
+  }
+
+  ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
+  ///Note that WebView automatically clears these preferences when the system keychain is updated.
+  ///The preferences are shared by all the WebViews that are created by the embedder application.
+  ///
+  ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
+  ///
+  ///**NOTE**: available only for Android.
+  Future<void> clearClientCertPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('clearClientCertPreferences', args);
+  }
+
   ///Dispose/Destroy the WebView.
   Future<void> _dispose() async {
     await _channel.invokeMethod('dispose');
   }
-
 }

@@ -259,6 +259,12 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
             case "getCopyBackForwardList":
                 result((webView != nil) ? webView!.getCopyBackForwardList() : nil)
                 break
+            case "clearCache":
+                if webView != nil {
+                    webView!.clearCache()
+                }
+                result(true)
+                break
             case "dispose":
                 dispose()
                 result(true)

@@ -245,6 +245,11 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         } else
           result.success(null);
         break;
+      case "clearCache":
+        if (webView != null)
+          webView.clearAllCache();
+        result.success(true);
+        break;
       case "dispose":
         dispose();
         result.success(true);

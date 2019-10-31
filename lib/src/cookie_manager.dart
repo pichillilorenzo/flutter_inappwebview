@@ -4,32 +4,34 @@ import 'package:flutter/services.dart';
 ///
 ///**NOTE for iOS**: available from iOS 11.0+.
 class CookieManager {
-  static bool _initialized = false;
+  static CookieManager _instance;
   static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser_cookiemanager');
 
-  static void _init () {
-    _channel.setMethodCallHandler(handleMethod);
-    _initialized = true;
+  static CookieManager instance() {
+    return (_instance != null) ? _instance : _init();
   }
 
-  static Future<dynamic> handleMethod(MethodCall call) async {
+  static CookieManager _init() {
+    _channel.setMethodCallHandler(_handleMethod);
+    _instance = new CookieManager();
+    return _instance;
+  }
+
+  static Future<dynamic> _handleMethod(MethodCall call) async {
   }
 
   ///Sets a cookie for the given [url]. Any existing cookie with the same [host], [path] and [name] will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
   ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null`, its default value will be the domain name of [url].
-  static Future<void> setCookie(String url, String name, String value,
+  Future<void> setCookie(String url, String name, String value,
       { String domain,
         String path = "/",
         int expiresDate,
         int maxAge,
         bool isSecure }) async {
-    if (!_initialized)
-      _init();
-
     if (domain == null)
-      domain = getDomainName(url);
+      domain = _getDomainName(url);
 
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
@@ -51,10 +53,7 @@ class CookieManager {
   }
 
   ///Gets all the cookies for the given [url].
-  static Future<List<Map<String, dynamic>>> getCookies(String url) async {
-    if (!_initialized)
-      _init();
-
+  Future<List<Map<String, dynamic>>> getCookies(String url) async {
     assert(url != null && url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -69,10 +68,7 @@ class CookieManager {
   }
 
   ///Gets a cookie by its [name] for the given [url].
-  static Future<Map<String, dynamic>> getCookie(String url, String name) async {
-    if (!_initialized)
-      _init();
-
+  Future<Map<String, dynamic>> getCookie(String url, String name) async {
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
 
@@ -92,12 +88,9 @@ class CookieManager {
   ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
-  static Future<void> deleteCookie(String url, String name, {String domain = "", String path = "/"}) async {
-    if (!_initialized)
-      _init();
-
+  Future<void> deleteCookie(String url, String name, {String domain = "", String path = "/"}) async {
     if (domain == null || domain.isEmpty)
-      domain = getDomainName(url);
+      domain = _getDomainName(url);
 
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
@@ -116,12 +109,9 @@ class CookieManager {
   ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
-  static Future<void> deleteCookies(String url, {String domain = "", String path = "/"}) async {
-    if (!_initialized)
-      _init();
-
+  Future<void> deleteCookies(String url, {String domain = "", String path = "/"}) async {
     if (domain == null || domain.isEmpty)
-      domain = getDomainName(url);
+      domain = _getDomainName(url);
 
     assert(url != null && url.isNotEmpty);
     assert(domain != null && url.isNotEmpty);
@@ -135,15 +125,12 @@ class CookieManager {
   }
 
   ///Removes all cookies.
-  static Future<void> deleteAllCookies() async {
-    if (!_initialized)
-      _init();
-
+  Future<void> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('deleteAllCookies', args);
   }
 
-  static String getDomainName(String url) {
+  String _getDomainName(String url) {
     Uri uri = Uri.parse(url);
     String domain = uri.host;
     if (domain == null)

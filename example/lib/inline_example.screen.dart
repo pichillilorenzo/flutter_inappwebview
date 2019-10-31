@@ -46,6 +46,24 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
 
   @override
   Widget build(BuildContext context) {
+//    HttpAuthCredentialDatabase.instance().clearAllAuthCredentials();
+//
+//    HttpAuthCredentialDatabase.instance().getHttpAuthCredentials(ProtectionSpace(host: "192.168.1.20", protocol: "http", realm: "Node", port: 8081)).then((credentials) {
+//      for (var credential in credentials )
+//        print("\n\nCREDENTIAL: ${credential.username} ${credential.password}\n\n");
+//    });
+//    HttpAuthCredentialDatabase.instance().getAllAuthCredentials().then((result) {
+//      for (var r in result) {
+//        ProtectionSpace protectionSpace = r["protectionSpace"];
+//        print("\n\nProtectionSpace: ${protectionSpace.protocol} ${protectionSpace.host}:");
+//        List<HttpAuthCredential> credentials = r["credentials"];
+//        for (var credential in credentials)
+//          print("\tCREDENTIAL: ${credential.username} ${credential.password}");
+//      }
+//    });
+//    HttpAuthCredentialDatabase.instance().setHttpAuthCredential(ProtectionSpace(host: "192.168.1.20", protocol: "http", realm: "Node", port: 8081), HttpAuthCredential(username: "user 1", password: "password 1"));
+//    HttpAuthCredentialDatabase.instance().setHttpAuthCredential(ProtectionSpace(host: "192.168.1.20", protocol: "http", realm: "Node", port: 8081), HttpAuthCredential(username: "user 2", password: "password 2"));
+
     return Container(
         child: Column(children: <Widget>[
       Container(
@@ -66,11 +84,13 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
             //initialUrl: "https://flutter.dev/",
             //initialUrl: "chrome://safe-browsing/match?type=malware",
+            //initialUrl: "http://192.168.1.20:8081/",
+            //initialUrl: "https://192.168.1.20:4433/authenticate",
             initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: [
               InAppWebViewOptions(
-                clearCache: true,
+                //clearCache: true,
                 useShouldOverrideUrlLoading: true,
                 useOnTargetBlank: true,
                 //useOnLoadResource: true,
@@ -152,12 +172,12 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               """);
             },
             onDownloadStart: (InAppWebViewController controller, String url) async {
-              /*final taskId = await FlutterDownloader.enqueue(
-                url: url,
-                savedDir: await _findLocalPath(),
-                showNotification: true, // show download progress in status bar (for Android)
-                openFileFromNotification: true, // click on notification to open downloaded file (for Android)
-              );*/
+//              final taskId = await FlutterDownloader.enqueue(
+//                url: url,
+//                savedDir: await _findLocalPath(),
+//                showNotification: true, // show download progress in status bar (for Android)
+//                openFileFromNotification: true, // click on notification to open downloaded file (for Android)
+//              );
             },
             onLoadResourceCustomScheme: (InAppWebViewController controller, String scheme, String url) async {
               if (scheme == "my-special-custom-scheme") {
@@ -219,6 +239,12 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             onSafeBrowsingHit: (InAppWebViewController controller, String url, SafeBrowsingThreat threatType) async {
               SafeBrowsingResponseAction action = SafeBrowsingResponseAction.BACK_TO_SAFETY;
               return new SafeBrowsingResponse(report: true, action: action);
+            },
+            onReceivedHttpAuthRequest: (InAppWebViewController controller, HttpAuthChallenge challenge) async {
+              print("HTTP AUTH REQUEST: " + challenge.protectionSpace.host + ", realm: " + challenge.protectionSpace.realm +
+                  ", previous failure count: " + challenge.previousFailureCount.toString());
+
+              return new HttpAuthResponse(username: "USERNAME", password: "PASSWORD", action: HttpAuthResponseAction.USE_SAVED_HTTP_AUTH_CREDENTIALS, permanentPersistence: true);
             },
           ),
         ),

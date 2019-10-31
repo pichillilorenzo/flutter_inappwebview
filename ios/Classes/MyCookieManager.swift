@@ -52,17 +52,17 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 let name = arguments!["name"] as! String
                 let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                MyCookieManager.deleteCookie(url: url, name: name, domain: domain, path: path, result: result);
+                MyCookieManager.deleteCookie(url: url, name: name, domain: domain, path: path, result: result)
                 break;
             case "deleteCookies":
                 let url = arguments!["url"] as! String
                 let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                MyCookieManager.deleteCookies(url: url, domain: domain, path: path, result: result);
+                MyCookieManager.deleteCookies(url: url, domain: domain, path: path, result: result)
                 break;
             case "deleteAllCookies":
-                MyCookieManager.deleteAllCookies(result: result);
-                break;
+                MyCookieManager.deleteAllCookies(result: result)
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

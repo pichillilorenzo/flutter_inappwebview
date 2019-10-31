@@ -22,10 +22,10 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.net.Uri;
@@ -45,7 +45,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler;
@@ -82,6 +81,9 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       instance = new InAppBrowserFlutterPlugin(registrar);
 
       new MyCookieManager(registrar);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        new CredentialDatabaseHandler(registrar);
+      }
 
       registrar
               .platformViewRegistry()
@@ -304,6 +306,10 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         break;
       case "setSafeBrowsingWhitelist":
         setSafeBrowsingWhitelist(uuid, (List<String>) call.argument("hosts"), result);
+        break;
+      case "clearCache":
+        clearCache(uuid);
+        result.success(true);
         break;
       default:
         result.notImplemented();
@@ -686,5 +692,11 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
     if (inAppBrowserActivity != null)
       inAppBrowserActivity.setSafeBrowsingWhitelist(hosts, result);
     result.success(false);
+  }
+
+  public void clearCache(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.clearCache();
   }
 }

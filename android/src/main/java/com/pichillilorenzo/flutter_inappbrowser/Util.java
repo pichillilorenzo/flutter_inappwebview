@@ -19,6 +19,8 @@ public class Util {
   static final String LOG_TAG = "Util";
   public static final String ANDROID_ASSET_URL = "file:///android_asset/";
 
+  private Util() {}
+
   public static String getUrlAsset(PluginRegistry.Registrar registrar, String assetFilePath) throws IOException {
     String key = registrar.lookupKeyForAsset(assetFilePath);
     AssetManager mg = registrar.activeContext().getResources().getAssets();

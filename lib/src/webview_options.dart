@@ -1,6 +1,10 @@
 import 'dart:io';
 
+import 'types.dart';
 import 'package:flutter_inappbrowser/src/content_blocker.dart';
+
+class AndroidOptions {}
+class iOSOptions {}
 
 class WebViewOptions {
   Map<String, dynamic> toMap() {
@@ -14,7 +18,7 @@ class BrowserOptions {
   }
 }
 
-class InAppWebViewOptions implements WebViewOptions, BrowserOptions {
+class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOptions, iOSOptions {
   bool useShouldOverrideUrlLoading;
   bool useOnLoadResource;
   bool useOnDownloadStart;
@@ -66,58 +70,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions {
   }
 }
 
-class AndroidInAppWebViewCacheMode {
-  final int _value;
-  const AndroidInAppWebViewCacheMode._internal(this._value);
-  toValue() => _value;
-
-  static const LOAD_DEFAULT = const AndroidInAppWebViewCacheMode._internal(-1);
-  static const LOAD_CACHE_ELSE_NETWORK = const AndroidInAppWebViewCacheMode._internal(1);
-  static const LOAD_NO_CACHE = const AndroidInAppWebViewCacheMode._internal(2);
-  static const LOAD_CACHE_ONLY = const AndroidInAppWebViewCacheMode._internal(3);
-}
-
-class AndroidInAppWebViewModeMenuItem {
-  final int _value;
-  const AndroidInAppWebViewModeMenuItem._internal(this._value);
-  toValue() => _value;
-
-  static const MENU_ITEM_NONE = const AndroidInAppWebViewModeMenuItem._internal(0);
-  static const MENU_ITEM_SHARE = const AndroidInAppWebViewModeMenuItem._internal(1);
-  static const MENU_ITEM_WEB_SEARCH = const AndroidInAppWebViewModeMenuItem._internal(2);
-  static const MENU_ITEM_PROCESS_TEXT = const AndroidInAppWebViewModeMenuItem._internal(4);
-}
-
-class AndroidInAppWebViewForceDark {
-  final int _value;
-  const AndroidInAppWebViewForceDark._internal(this._value);
-  toValue() => _value;
-
-  static const FORCE_DARK_OFF = const AndroidInAppWebViewForceDark._internal(0);
-  static const FORCE_DARK_AUTO = const AndroidInAppWebViewForceDark._internal(1);
-  static const FORCE_DARK_ON = const AndroidInAppWebViewForceDark._internal(2);
-}
-
-class AndroidInAppWebViewLayoutAlgorithm {
-  final String _value;
-  const AndroidInAppWebViewLayoutAlgorithm._internal(this._value);
-  toValue() => _value;
-
-  static const NORMAL = const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
-  static const TEXT_AUTOSIZING = const AndroidInAppWebViewLayoutAlgorithm._internal("TEXT_AUTOSIZING");
-}
-
-class AndroidInAppWebViewMixedContentMode {
-  final int _value;
-  const AndroidInAppWebViewMixedContentMode._internal(this._value);
-  toValue() => _value;
-
-  static const MIXED_CONTENT_ALWAYS_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(0);
-  static const MIXED_CONTENT_NEVER_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(1);
-  static const MIXED_CONTENT_COMPATIBILITY_MODE = const AndroidInAppWebViewMixedContentMode._internal(2);
-}
-
-class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions {
+class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOptions {
   bool clearSessionCache;
   bool builtInZoomControls;
   bool displayZoomControls;
@@ -211,43 +164,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions {
   }
 }
 
-class iOSInAppWebViewSelectionGranularity {
-  final int _value;
-  const iOSInAppWebViewSelectionGranularity._internal(this._value);
-  toValue() => _value;
-
-  static const CHARACTER = const iOSInAppWebViewSelectionGranularity._internal(0);
-  static const DYNAMIC = const iOSInAppWebViewSelectionGranularity._internal(1);
-}
-
-class iOSInAppWebViewDataDetectorTypes {
-  final String _value;
-  const iOSInAppWebViewDataDetectorTypes._internal(this._value);
-  toValue() => _value;
-
-  static const NONE = const iOSInAppWebViewDataDetectorTypes._internal("NONE");
-  static const PHONE_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
-  static const LINK = const iOSInAppWebViewDataDetectorTypes._internal("LINK");
-  static const ADDRESS = const iOSInAppWebViewDataDetectorTypes._internal("ADDRESS");
-  static const CALENDAR_EVENT = const iOSInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
-  static const TRACKING_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
-  static const FLIGHT_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
-  static const LOOKUP_SUGGESTION = const iOSInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
-  static const SPOTLIGHT_SUGGESTION = const iOSInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
-  static const ALL = const iOSInAppWebViewDataDetectorTypes._internal("ALL");
-}
-
-class iOSInAppWebViewUserPreferredContentMode {
-  final int _value;
-  const iOSInAppWebViewUserPreferredContentMode._internal(this._value);
-  toValue() => _value;
-
-  static const RECOMMENDED = const iOSInAppWebViewUserPreferredContentMode._internal(0);
-  static const MOBILE = const iOSInAppWebViewUserPreferredContentMode._internal(1);
-  static const DESKTOP = const iOSInAppWebViewUserPreferredContentMode._internal(2);
-}
-
-class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions {
+class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions, iOSOptions {
   bool disallowOverScroll;
   bool enableViewportScale;
   bool suppressesIncrementalRendering;
@@ -298,7 +215,7 @@ class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions {
   }
 }
 
-class InAppBrowserOptions implements BrowserOptions {
+class InAppBrowserOptions implements BrowserOptions, AndroidOptions, iOSOptions {
   bool hidden;
   bool toolbarTop;
   String toolbarTopBackgroundColor;
@@ -319,7 +236,7 @@ class InAppBrowserOptions implements BrowserOptions {
   }
 }
 
-class AndroidInAppBrowserOptions implements BrowserOptions {
+class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   bool hideTitleBar;
   bool closeOnCannotGoBack;
   bool progressBar;
@@ -336,47 +253,19 @@ class AndroidInAppBrowserOptions implements BrowserOptions {
   }
 }
 
-class iOSInAppBrowserOptionsPresentationStyle {
-  final int _value;
-  const iOSInAppBrowserOptionsPresentationStyle._internal(this._value);
-  toValue() => _value;
-
-  static const FULL_SCREEN = const iOSInAppBrowserOptionsPresentationStyle._internal(0);
-  static const PAGE_SHEET = const iOSInAppBrowserOptionsPresentationStyle._internal(1);
-  static const FORM_SHEET = const iOSInAppBrowserOptionsPresentationStyle._internal(2);
-  static const CURRENT_CONTEXT = const iOSInAppBrowserOptionsPresentationStyle._internal(3);
-  static const CUSTOM = const iOSInAppBrowserOptionsPresentationStyle._internal(4);
-  static const OVER_FULL_SCREEN = const iOSInAppBrowserOptionsPresentationStyle._internal(5);
-  static const OVER_CURRENT_CONTEXT = const iOSInAppBrowserOptionsPresentationStyle._internal(6);
-  static const POPOVER = const iOSInAppBrowserOptionsPresentationStyle._internal(7);
-  static const NONE = const iOSInAppBrowserOptionsPresentationStyle._internal(8);
-  static const AUTOMATIC = const iOSInAppBrowserOptionsPresentationStyle._internal(9);
-}
-
-class iOSInAppBrowserOptionsTransitionStyle {
-  final int _value;
-  const iOSInAppBrowserOptionsTransitionStyle._internal(this._value);
-  toValue() => _value;
-
-  static const COVER_VERTICAL = const iOSInAppBrowserOptionsTransitionStyle._internal(0);
-  static const FLIP_HORIZONTAL = const iOSInAppBrowserOptionsTransitionStyle._internal(1);
-  static const CROSS_DISSOLVE = const iOSInAppBrowserOptionsTransitionStyle._internal(2);
-  static const PARTIAL_CURL = const iOSInAppBrowserOptionsTransitionStyle._internal(3);
-}
-
-class iOSInAppBrowserOptions implements BrowserOptions {
+class iOSInAppBrowserOptions implements BrowserOptions, iOSOptions {
   bool toolbarBottom;
   String toolbarBottomBackgroundColor;
   bool toolbarBottomTranslucent;
   String closeButtonCaption;
   String closeButtonColor;
-  iOSInAppBrowserOptionsPresentationStyle presentationStyle;
-  iOSInAppBrowserOptionsTransitionStyle transitionStyle;
+  iOSWebViewOptionsPresentationStyle presentationStyle;
+  iOSWebViewOptionsTransitionStyle transitionStyle;
   bool spinner;
 
   iOSInAppBrowserOptions({this.toolbarBottom = true, this.toolbarBottomBackgroundColor = "", this.toolbarBottomTranslucent = true, this.closeButtonCaption = "",
-    this.closeButtonColor = "", this.presentationStyle = iOSInAppBrowserOptionsPresentationStyle.FULL_SCREEN,
-    this.transitionStyle = iOSInAppBrowserOptionsTransitionStyle.COVER_VERTICAL, this.spinner = true});
+    this.closeButtonColor = "", this.presentationStyle = iOSWebViewOptionsPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = iOSWebViewOptionsTransitionStyle.COVER_VERTICAL, this.spinner = true});
 
   @override
   Map<String, dynamic> toMap() {
@@ -393,13 +282,13 @@ class iOSInAppBrowserOptions implements BrowserOptions {
   }
 }
 
-class ChromeCustomTabsOptions {
+class ChromeSafariBrowserOptions {
   Map<String, dynamic> toMap() {
     return {};
   }
 }
 
-class AndroidChromeCustomTabsOptions implements ChromeCustomTabsOptions {
+class AndroidChromeCustomTabsOptions implements ChromeSafariBrowserOptions, AndroidOptions {
   bool addShareButton;
   bool showTitle;
   String toolbarBackgroundColor;
@@ -420,28 +309,18 @@ class AndroidChromeCustomTabsOptions implements ChromeCustomTabsOptions {
   }
 }
 
-class iOSChromeCustomTabsOptionsDismissButtonStyle {
-  final int _value;
-  const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(this._value);
-  toValue() => _value;
-
-  static const DONE = const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(0);
-  static const CLOSE = const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(1);
-  static const CANCEL = const iOSChromeCustomTabsOptionsDismissButtonStyle._internal(2);
-}
-
-class iOSChromeCustomTabsOptions implements ChromeCustomTabsOptions {
+class iOSSafariOptions implements ChromeSafariBrowserOptions, iOSOptions {
   bool entersReaderIfAvailable;
   bool barCollapsingEnabled;
-  iOSChromeCustomTabsOptionsDismissButtonStyle dismissButtonStyle;
+  iOSSafariOptionsDismissButtonStyle dismissButtonStyle;
   String preferredBarTintColor;
   String preferredControlTintColor;
-  iOSInAppBrowserOptionsPresentationStyle presentationStyle;
-  iOSInAppBrowserOptionsTransitionStyle transitionStyle;
+  iOSWebViewOptionsPresentationStyle presentationStyle;
+  iOSWebViewOptionsTransitionStyle transitionStyle;
 
-  iOSChromeCustomTabsOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = iOSChromeCustomTabsOptionsDismissButtonStyle.DONE,
-    this.preferredBarTintColor = "", this.preferredControlTintColor = "", this.presentationStyle = iOSInAppBrowserOptionsPresentationStyle.FULL_SCREEN,
-    this.transitionStyle = iOSInAppBrowserOptionsTransitionStyle.COVER_VERTICAL});
+  iOSSafariOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = iOSSafariOptionsDismissButtonStyle.DONE,
+    this.preferredBarTintColor = "", this.preferredControlTintColor = "", this.presentationStyle = iOSWebViewOptionsPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = iOSWebViewOptionsTransitionStyle.COVER_VERTICAL});
 
   @override
   Map<String, dynamic> toMap() {

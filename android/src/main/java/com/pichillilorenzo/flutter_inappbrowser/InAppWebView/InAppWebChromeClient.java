@@ -1,7 +1,5 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
-import android.Manifest;
-import android.app.Activity;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -9,9 +7,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.text.Html;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -31,8 +26,6 @@ import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.R;
-import com.pichillilorenzo.flutter_inappbrowser.RequestPermissionHandler;
-import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.util.HashMap;
 import java.util.Map;

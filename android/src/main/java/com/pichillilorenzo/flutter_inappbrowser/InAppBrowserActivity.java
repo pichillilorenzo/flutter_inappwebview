@@ -474,4 +474,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
     else
       result.success(false);
   }
+
+  public void clearCache() {
+    if (webView != null)
+      webView.clearAllCache();
+  }
 }

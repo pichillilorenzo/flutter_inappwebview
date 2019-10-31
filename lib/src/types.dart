@@ -1,5 +1,6 @@
 import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter/cupertino.dart';
 import 'in_app_webview.dart';
 
 var uuidGenerator = new Uuid();
@@ -141,7 +142,7 @@ class GeolocationPermissionShowPromptResponse {
   }
 }
 
-
+///
 class JsAlertResponseAction {
   final int _value;
   const JsAlertResponseAction._internal(this._value);
@@ -150,6 +151,7 @@ class JsAlertResponseAction {
   static const CONFIRM = const JsAlertResponseAction._internal(0);
 }
 
+///
 class JsAlertResponse {
   String message;
   String confirmButtonTitle;
@@ -168,6 +170,7 @@ class JsAlertResponse {
   }
 }
 
+///
 class JsConfirmResponseAction {
   final int _value;
   const JsConfirmResponseAction._internal(this._value);
@@ -177,6 +180,7 @@ class JsConfirmResponseAction {
   static const CANCEL = const JsConfirmResponseAction._internal(1);
 }
 
+///
 class JsConfirmResponse {
   String message;
   String confirmButtonTitle;
@@ -197,6 +201,7 @@ class JsConfirmResponse {
   }
 }
 
+///
 class JsPromptResponseAction {
   final int _value;
   const JsPromptResponseAction._internal(this._value);
@@ -206,6 +211,7 @@ class JsPromptResponseAction {
   static const CANCEL = const JsPromptResponseAction._internal(1);
 }
 
+///
 class JsPromptResponse {
   String message;
   String defaultValue;
@@ -230,6 +236,7 @@ class JsPromptResponse {
   }
 }
 
+///
 class SafeBrowsingThreat {
   final int _value;
   const SafeBrowsingThreat._internal(this._value);
@@ -247,6 +254,7 @@ class SafeBrowsingThreat {
   static const SAFE_BROWSING_THREAT_BILLING = const SafeBrowsingThreat._internal(4);
 }
 
+///
 class SafeBrowsingResponseAction {
   final int _value;
   const SafeBrowsingResponseAction._internal(this._value);
@@ -256,6 +264,8 @@ class SafeBrowsingResponseAction {
   static const PROCEED = const SafeBrowsingResponseAction._internal(1);
   static const SHOW_INTERSTITIAL = const SafeBrowsingResponseAction._internal(2);
 }
+
+///
 class SafeBrowsingResponse {
   bool report;
   SafeBrowsingResponseAction action;
@@ -270,6 +280,7 @@ class SafeBrowsingResponse {
   }
 }
 
+///
 class HttpAuthResponseAction {
   final int _value;
   const HttpAuthResponseAction._internal(this._value);
@@ -277,9 +288,10 @@ class HttpAuthResponseAction {
 
   static const CANCEL = const HttpAuthResponseAction._internal(0);
   static const PROCEED = const HttpAuthResponseAction._internal(1);
-  static const USE_HTTP_AUTH_USERNAME_PASSWORD = const HttpAuthResponseAction._internal(2);
+  static const USE_SAVED_HTTP_AUTH_CREDENTIALS = const HttpAuthResponseAction._internal(2);
 }
 
+///
 class HttpAuthResponse {
   String username;
   String password;
@@ -296,6 +308,168 @@ class HttpAuthResponse {
       "action": action?.toValue()
     };
   }
+}
+
+///
+class HttpAuthChallenge {
+  int previousFailureCount;
+  ProtectionSpace protectionSpace;
+
+  HttpAuthChallenge({@required this.previousFailureCount, @required this.protectionSpace}): assert(previousFailureCount != null && protectionSpace != null);
+}
+
+///
+class ProtectionSpace {
+  String host;
+  String protocol;
+  String realm;
+  int port;
+
+  ProtectionSpace({@required this.host, @required this.protocol, this.realm, this.port}): assert(host != null && protocol != null);
+}
+
+///
+class HttpAuthCredential {
+  String username;
+  String password;
+
+  HttpAuthCredential({@required this.username, @required this.password}): assert(username != null && password != null);
+}
+
+///
+class AndroidInAppWebViewCacheMode {
+  final int _value;
+  const AndroidInAppWebViewCacheMode._internal(this._value);
+  toValue() => _value;
+
+  static const LOAD_DEFAULT = const AndroidInAppWebViewCacheMode._internal(-1);
+  static const LOAD_CACHE_ELSE_NETWORK = const AndroidInAppWebViewCacheMode._internal(1);
+  static const LOAD_NO_CACHE = const AndroidInAppWebViewCacheMode._internal(2);
+  static const LOAD_CACHE_ONLY = const AndroidInAppWebViewCacheMode._internal(3);
+}
+
+///
+class AndroidInAppWebViewModeMenuItem {
+  final int _value;
+  const AndroidInAppWebViewModeMenuItem._internal(this._value);
+  toValue() => _value;
+
+  static const MENU_ITEM_NONE = const AndroidInAppWebViewModeMenuItem._internal(0);
+  static const MENU_ITEM_SHARE = const AndroidInAppWebViewModeMenuItem._internal(1);
+  static const MENU_ITEM_WEB_SEARCH = const AndroidInAppWebViewModeMenuItem._internal(2);
+  static const MENU_ITEM_PROCESS_TEXT = const AndroidInAppWebViewModeMenuItem._internal(4);
+}
+
+///
+class AndroidInAppWebViewForceDark {
+  final int _value;
+  const AndroidInAppWebViewForceDark._internal(this._value);
+  toValue() => _value;
+
+  static const FORCE_DARK_OFF = const AndroidInAppWebViewForceDark._internal(0);
+  static const FORCE_DARK_AUTO = const AndroidInAppWebViewForceDark._internal(1);
+  static const FORCE_DARK_ON = const AndroidInAppWebViewForceDark._internal(2);
+}
+
+///
+class AndroidInAppWebViewLayoutAlgorithm {
+  final String _value;
+  const AndroidInAppWebViewLayoutAlgorithm._internal(this._value);
+  toValue() => _value;
+
+  static const NORMAL = const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
+  static const TEXT_AUTOSIZING = const AndroidInAppWebViewLayoutAlgorithm._internal("TEXT_AUTOSIZING");
+}
+
+///
+class AndroidInAppWebViewMixedContentMode {
+  final int _value;
+  const AndroidInAppWebViewMixedContentMode._internal(this._value);
+  toValue() => _value;
+
+  static const MIXED_CONTENT_ALWAYS_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(0);
+  static const MIXED_CONTENT_NEVER_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(1);
+  static const MIXED_CONTENT_COMPATIBILITY_MODE = const AndroidInAppWebViewMixedContentMode._internal(2);
+}
+
+///
+class iOSInAppWebViewSelectionGranularity {
+  final int _value;
+  const iOSInAppWebViewSelectionGranularity._internal(this._value);
+  toValue() => _value;
+
+  static const CHARACTER = const iOSInAppWebViewSelectionGranularity._internal(0);
+  static const DYNAMIC = const iOSInAppWebViewSelectionGranularity._internal(1);
+}
+
+///
+class iOSInAppWebViewDataDetectorTypes {
+  final String _value;
+  const iOSInAppWebViewDataDetectorTypes._internal(this._value);
+  toValue() => _value;
+
+  static const NONE = const iOSInAppWebViewDataDetectorTypes._internal("NONE");
+  static const PHONE_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
+  static const LINK = const iOSInAppWebViewDataDetectorTypes._internal("LINK");
+  static const ADDRESS = const iOSInAppWebViewDataDetectorTypes._internal("ADDRESS");
+  static const CALENDAR_EVENT = const iOSInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
+  static const TRACKING_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
+  static const FLIGHT_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
+  static const LOOKUP_SUGGESTION = const iOSInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
+  static const SPOTLIGHT_SUGGESTION = const iOSInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+  static const ALL = const iOSInAppWebViewDataDetectorTypes._internal("ALL");
+}
+
+///
+class iOSInAppWebViewUserPreferredContentMode {
+  final int _value;
+  const iOSInAppWebViewUserPreferredContentMode._internal(this._value);
+  toValue() => _value;
+
+  static const RECOMMENDED = const iOSInAppWebViewUserPreferredContentMode._internal(0);
+  static const MOBILE = const iOSInAppWebViewUserPreferredContentMode._internal(1);
+  static const DESKTOP = const iOSInAppWebViewUserPreferredContentMode._internal(2);
+}
+
+///
+class iOSWebViewOptionsPresentationStyle {
+  final int _value;
+  const iOSWebViewOptionsPresentationStyle._internal(this._value);
+  toValue() => _value;
+
+  static const FULL_SCREEN = const iOSWebViewOptionsPresentationStyle._internal(0);
+  static const PAGE_SHEET = const iOSWebViewOptionsPresentationStyle._internal(1);
+  static const FORM_SHEET = const iOSWebViewOptionsPresentationStyle._internal(2);
+  static const CURRENT_CONTEXT = const iOSWebViewOptionsPresentationStyle._internal(3);
+  static const CUSTOM = const iOSWebViewOptionsPresentationStyle._internal(4);
+  static const OVER_FULL_SCREEN = const iOSWebViewOptionsPresentationStyle._internal(5);
+  static const OVER_CURRENT_CONTEXT = const iOSWebViewOptionsPresentationStyle._internal(6);
+  static const POPOVER = const iOSWebViewOptionsPresentationStyle._internal(7);
+  static const NONE = const iOSWebViewOptionsPresentationStyle._internal(8);
+  static const AUTOMATIC = const iOSWebViewOptionsPresentationStyle._internal(9);
+}
+
+///
+class iOSWebViewOptionsTransitionStyle {
+  final int _value;
+  const iOSWebViewOptionsTransitionStyle._internal(this._value);
+  toValue() => _value;
+
+  static const COVER_VERTICAL = const iOSWebViewOptionsTransitionStyle._internal(0);
+  static const FLIP_HORIZONTAL = const iOSWebViewOptionsTransitionStyle._internal(1);
+  static const CROSS_DISSOLVE = const iOSWebViewOptionsTransitionStyle._internal(2);
+  static const PARTIAL_CURL = const iOSWebViewOptionsTransitionStyle._internal(3);
+}
+
+///
+class iOSSafariOptionsDismissButtonStyle {
+  final int _value;
+  const iOSSafariOptionsDismissButtonStyle._internal(this._value);
+  toValue() => _value;
+
+  static const DONE = const iOSSafariOptionsDismissButtonStyle._internal(0);
+  static const CLOSE = const iOSSafariOptionsDismissButtonStyle._internal(1);
+  static const CANCEL = const iOSSafariOptionsDismissButtonStyle._internal(2);
 }
 
 typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
@@ -315,4 +489,4 @@ typedef onJsAlertCallback = Future<JsAlertResponse> Function(InAppWebViewControl
 typedef onJsConfirmCallback = Future<JsConfirmResponse> Function(InAppWebViewController controller, String message);
 typedef onJsPromptCallback = Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue);
 typedef onSafeBrowsingHitCallback = Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType);
-typedef onReceivedHttpAuthRequestCallback = Future<HttpAuthResponse> Function(InAppWebViewController controller, String url, String realm);
+typedef onReceivedHttpAuthRequestCallback = Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge);

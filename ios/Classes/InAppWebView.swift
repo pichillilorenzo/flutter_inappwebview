@@ -90,6 +90,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var currentURL: URL?
     var WKNavigationMap: [String: [String: Any]] = [:]
     var startPageTime: Int64 = 0
+    static var credentialsProposed: [URLCredential] = []
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, IAWController: FlutterWebViewController?) {
         super.init(frame: frame, configuration: configuration)
@@ -202,7 +203,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
         scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
-        
         
         // options.debuggingEnabled is always enabled for iOS.
         
@@ -721,6 +721,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         self.WKNavigationMap = [:]
         currentURL = url
+        InAppWebView.credentialsProposed = []
         onLoadStop(url: (currentURL?.absoluteString)!)
         evaluateJavaScript(platformReadyJS, completionHandler: nil)
         
@@ -739,6 +740,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
+        InAppWebView.credentialsProposed = []
+        
         onLoadError(url: (currentURL?.absoluteString)!, error: error)
         
         if IABController != nil {
@@ -749,51 +752,100 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
-        let host = challenge.protectionSpace.host
-        let realm = challenge.protectionSpace.realm
-        onReceivedHttpAuthRequest(host: host, realm: realm, result: {(result) -> Void in
-            if result is FlutterError {
-                print((result as! FlutterError).message)
-            }
-            else if (result as? NSObject) == FlutterMethodNotImplemented {
-                completionHandler(.performDefaultHandling, nil)
-            }
-            else {
-                //WKWebsiteDataStore.default()
-                //URLCredentialStorage()
-                var response: [String: Any]
-                if let r = result {
-                    response = r as! [String: Any]
-                    var action = response["action"] as? Int
-                    action = action != nil ? action : 0;
-                    switch action {
-                        case 0:
-                            completionHandler(.cancelAuthenticationChallenge, nil)
-                            break
-                        case 1:
-                            let username = response["username"] as! String
-                            let password = response["password"] as! String
-                            let permanentPersistence = response["permanentPersistence"] as? Bool ?? false
-                            let persistence = (permanentPersistence) ? URLCredential.Persistence.permanent : URLCredential.Persistence.forSession
-                            let credential = URLCredential(user: username, password: password, persistence: persistence)
-                            completionHandler(.useCredential, credential)
-                            break
-                        case 2:
-                            if let credential = challenge.proposedCredential {
-                                completionHandler(.useCredential, credential)
-                            }
-                            else {
-                                completionHandler(.performDefaultHandling, nil)
-                            }
-                            break
-                        default:
-                            completionHandler(.performDefaultHandling, nil)
-                    }
-                    return;
+        
+        print (challenge.protectionSpace.authenticationMethod)
+        
+        if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
+            let host = challenge.protectionSpace.host
+            let prot = challenge.protectionSpace.protocol
+            let realm = challenge.protectionSpace.realm
+            let port = challenge.protectionSpace.port
+            onReceivedHttpAuthRequest(challenge: challenge, result: {(result) -> Void in
+                if result is FlutterError {
+                    print((result as! FlutterError).message)
                 }
-                completionHandler(.performDefaultHandling, nil)
-            }
-        })
+                else if (result as? NSObject) == FlutterMethodNotImplemented {
+                    completionHandler(.performDefaultHandling, nil)
+                }
+                else {
+                    var response: [String: Any]
+                    if let r = result {
+                        response = r as! [String: Any]
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 0;
+                        switch action {
+                            case 0:
+                                InAppWebView.credentialsProposed = []
+                                completionHandler(.cancelAuthenticationChallenge, nil)
+                                break
+                            case 1:
+                                let username = response["username"] as! String
+                                let password = response["password"] as! String
+                                let permanentPersistence = response["permanentPersistence"] as? Bool ?? false
+                                let persistence = (permanentPersistence) ? URLCredential.Persistence.permanent : URLCredential.Persistence.forSession
+                                let credential = URLCredential(user: username, password: password, persistence: persistence)
+                                completionHandler(.useCredential, credential)
+                                break
+                            case 2:
+                                if InAppWebView.credentialsProposed.count == 0 {
+                                    for (protectionSpace, credentials) in CredentialDatabase.credentialStore!.allCredentials {
+                                        if protectionSpace.host == host && protectionSpace.realm == realm &&
+                                        protectionSpace.protocol == prot && protectionSpace.port == port {
+                                            for credential in credentials {
+                                                InAppWebView.credentialsProposed.append(credential.value)
+                                            }
+                                            break
+                                        }
+                                    }
+                                }
+                                if InAppWebView.credentialsProposed.count == 0, let credential = challenge.proposedCredential {
+                                    InAppWebView.credentialsProposed.append(credential)
+                                }
+                                
+                                if let credential = InAppWebView.credentialsProposed.popLast() {
+                                    completionHandler(.useCredential, credential)
+                                }
+                                else {
+                                    completionHandler(.performDefaultHandling, nil)
+                                }
+                                break
+                            default:
+                                completionHandler(.performDefaultHandling, nil)
+                        }
+                        return;
+                    }
+                    completionHandler(.performDefaultHandling, nil)
+                }
+            })
+        }
+        else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
+            /// TODO: correspond to onSslError event of Android
+            completionHandler(.performDefaultHandling, nil)
+//            guard let serverTrust = challenge.protectionSpace.serverTrust else {
+//                completionHandler(.performDefaultHandling, nil)
+//                return
+//            }
+//            //if checkValidity(of: serverTrust) {
+//            if true {
+//                let exceptions = SecTrustCopyExceptions(serverTrust)
+//                SecTrustSetExceptions(serverTrust, exceptions)
+//                let credential = URLCredential(trust: serverTrust)
+//                completionHandler(.useCredential, credential)
+//            } else {
+//                // Show a UI here warning the user the server credentials are
+//                // invalid, and cancel the load.
+//                completionHandler(.cancelAuthenticationChallenge, nil)
+//            }
+        }
+        else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodClientCertificate {
+            /// TODO: load certificates
+            completionHandler(.performDefaultHandling, nil)
+        }
+        else {
+            completionHandler(.performDefaultHandling, nil)
+        }
     }
     
     fileprivate func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
@@ -1101,8 +1153,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func onReceivedHttpAuthRequest(host: String, realm: String?, result: FlutterResult?) {
-        var arguments: [String: Any] = ["host": host, "realm": realm as Any]
+    public func onReceivedHttpAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
+        var arguments: [String: Any?] = [
+            "host": challenge.protectionSpace.host,
+            "protocol": challenge.protectionSpace.protocol,
+            "realm": challenge.protectionSpace.realm,
+            "port": challenge.protectionSpace.port,
+            "previousFailureCount": challenge.previousFailureCount
+        ]
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }

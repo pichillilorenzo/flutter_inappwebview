@@ -61,6 +61,8 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         } else {
             // Fallback on earlier versions
         }
+        
+        CredentialDatabase(registrar: registrar)
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -236,6 +238,10 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 break
             case "getCopyBackForwardList":
                 result(self.getCopyBackForwardList(uuid: uuid))
+                break
+            case "clearCache":
+                self.clearCache(uuid: uuid)
+                result(true)
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -744,6 +750,12 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             return webViewController!.webView.getCopyBackForwardList()
         }
         return nil
+    }
+    
+    func clearCache(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.clearCache()
+        }
     }
     
 }

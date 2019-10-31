@@ -1,12 +1,14 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.content.Intent;
+import android.content.res.AssetManager;
 import android.graphics.Bitmap;
 import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.util.Base64;
 import android.util.Log;
+import android.webkit.ClientCertRequest;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
@@ -17,29 +19,48 @@ import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
-import android.webkit.WebViewDatabase;
 
 import androidx.annotation.RequiresApi;
 
+import com.pichillilorenzo.flutter_inappbrowser.CredentialDatabase.Credential;
+import com.pichillilorenzo.flutter_inappbrowser.CredentialDatabase.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappbrowser.FlutterWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappbrowser.Util;
 
+import java.io.BufferedInputStream;
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.security.Key;
+import java.security.KeyStore;
+import java.security.PrivateKey;
+import java.security.cert.Certificate;
+import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
 
 public class InAppWebViewClient extends WebViewClient {
 
+  private X509Certificate[] mCertificates;
+  private PrivateKey mPrivateKey;
+
+
   protected static final String LOG_TAG = "IABWebViewClient";
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
   Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
   long startPageTime = 0;
+  private static int previousAuthRequestFailureCount = 0;
+  private static List<Credential> credentialsProposed = null;
 
   public InAppWebViewClient(Object obj) {
     super();
@@ -50,7 +71,7 @@ public class InAppWebViewClient extends WebViewClient {
     prepareStatusCodeMapping();
   }
 
-  private void prepareStatusCodeMapping () {
+  private void prepareStatusCodeMapping() {
     statusCodeMapping.put(100, "Continue");
     statusCodeMapping.put(101, "Switching Protocols");
     statusCodeMapping.put(200, "OK");
@@ -167,7 +188,6 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     return super.shouldOverrideUrlLoading(webView, url);
-
   }
 
 
@@ -208,6 +228,8 @@ public class InAppWebViewClient extends WebViewClient {
     super.onPageFinished(view, url);
 
     webView.isLoading = false;
+    previousAuthRequestFailureCount = 0;
+    credentialsProposed = null;
 
     // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -229,11 +251,10 @@ public class InAppWebViewClient extends WebViewClient {
         }
       });
 
-    }
-    else {
-      view.loadUrl("javascript:"+InAppWebView.consoleLogJS);
-      view.loadUrl("javascript:"+JavaScriptBridgeInterface.flutterInAppBroserJSClass);
-      view.loadUrl("javascript:"+InAppWebView.platformReadyJS);
+    } else {
+      view.loadUrl("javascript:" + InAppWebView.consoleLogJS);
+      view.loadUrl("javascript:" + JavaScriptBridgeInterface.flutterInAppBroserJSClass);
+      view.loadUrl("javascript:" + InAppWebView.platformReadyJS);
     }
 
     Map<String, Object> obj = new HashMap<>();
@@ -247,6 +268,8 @@ public class InAppWebViewClient extends WebViewClient {
     super.onReceivedError(view, errorCode, description, failingUrl);
 
     ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = false;
+    previousAuthRequestFailureCount = 0;
+    credentialsProposed = null;
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
@@ -258,7 +281,8 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
   public void onReceivedSslError(WebView view, SslErrorHandler handler, SslError error) {
-    super.onReceivedSslError(view, handler, error);
+    previousAuthRequestFailureCount = 0;
+    credentialsProposed = null;
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
@@ -291,6 +315,7 @@ public class InAppWebViewClient extends WebViewClient {
     getChannel().invokeMethod("onLoadError", obj);
 
     handler.cancel();
+    //handler.proceed();
   }
 
   /**
@@ -298,11 +323,34 @@ public class InAppWebViewClient extends WebViewClient {
    */
   @Override
   public void onReceivedHttpAuthRequest(final WebView view, final HttpAuthHandler handler, final String host, final String realm) {
+
+    URL url;
+    try {
+      url = new URL(view.getUrl());
+    } catch (MalformedURLException e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, e.getMessage());
+
+      credentialsProposed = null;
+      previousAuthRequestFailureCount = 0;
+
+      handler.cancel();
+      return;
+    }
+
+    final String protocol = url.getProtocol();
+    final int port = url.getPort();
+
+    previousAuthRequestFailureCount++;
+
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("host", host);
+    obj.put("protocol", protocol);
     obj.put("realm", realm);
+    obj.put("port", port);
+    obj.put("previousFailureCount", previousAuthRequestFailureCount);
 
     getChannel().invokeMethod("onReceivedHttpAuthRequest", obj, new MethodChannel.Result() {
       @Override
@@ -310,12 +358,11 @@ public class InAppWebViewClient extends WebViewClient {
         if (response != null) {
           Map<String, Object> responseMap = (Map<String, Object>) response;
           Integer action = (Integer) responseMap.get("action");
-
-          Log.d(LOG_TAG, "\n\naction: " + action);
-
           if (action != null) {
             switch (action) {
               case 0:
+                credentialsProposed = null;
+                previousAuthRequestFailureCount = 0;
                 handler.cancel();
                 return;
               case 1:
@@ -323,12 +370,20 @@ public class InAppWebViewClient extends WebViewClient {
                 String password = (String) responseMap.get("password");
                 Boolean permanentPersistence = (Boolean) responseMap.get("permanentPersistence");
                 if (permanentPersistence != null && permanentPersistence && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                  WebViewDatabase.getInstance(view.getContext()).setHttpAuthUsernamePassword(host, realm, username, password);
+                  CredentialDatabase.getInstance(view.getContext()).setHttpAuthCredential(host, protocol, realm, port, username, password);
                 }
                 handler.proceed(username, password);
                 return;
               case 2:
-                handler.useHttpAuthUsernamePassword();
+                if (credentialsProposed == null)
+                  credentialsProposed = CredentialDatabase.getInstance(view.getContext()).getHttpAuthCredentials(host, protocol, realm, port);
+                if (credentialsProposed.size() > 0) {
+                  Credential credential = credentialsProposed.remove(0);
+                  handler.proceed(credential.username, credential.password);
+                } else {
+                  handler.cancel();
+                }
+                //handler.useHttpAuthUsernamePassword();
                 return;
             }
           }
@@ -348,6 +403,50 @@ public class InAppWebViewClient extends WebViewClient {
       }
     });
   }
+
+//  private void loadCertificateAndPrivateKey(InAppWebView webView) {
+//
+//    try {
+//      String key1 = webView.registrar.lookupKeyForAsset("assets/certificate.pfx");
+//      AssetManager mg = webView.registrar.activeContext().getResources().getAssets();
+//      InputStream certificateFileStream = mg.open(key1);//getClass().getResourceAsStream();
+//
+//      KeyStore keyStore = KeyStore.getInstance("PKCS12");
+//      String password = "";
+//      keyStore.load(certificateFileStream, password != null ? password.toCharArray() : null);
+//
+//      Enumeration<String> aliases = keyStore.aliases();
+//      String alias = aliases.nextElement();
+//
+//      Key key = keyStore.getKey(alias, password.toCharArray());
+//      if (key instanceof PrivateKey) {
+//        mPrivateKey = (PrivateKey)key;
+//        Certificate cert = keyStore.getCertificate(alias);
+//        mCertificates = new X509Certificate[1];
+//        mCertificates[0] = (X509Certificate)cert;
+//      }
+//
+//      certificateFileStream.close();
+//
+//    } catch (Exception e) {
+//      e.printStackTrace();
+//      Log.e(LOG_TAG, e.getMessage());
+//    }
+//  }
+//
+//  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+//  @Override
+//  public void onReceivedClientCertRequest(WebView view, ClientCertRequest request) {
+//    Log.d(LOG_TAG, request.getHost());
+//    Log.d(LOG_TAG, request.getKeyTypes().toString());
+//    Log.d(LOG_TAG, request.getPort() + "");
+//    Log.d(LOG_TAG, request.getPrincipals().toString());
+//
+//    if (mCertificates == null || mPrivateKey == null) {
+//      loadCertificateAndPrivateKey((InAppWebView) view);
+//    }
+//    request.proceed(mPrivateKey, mCertificates);
+//  }
 
   @Override
   public void onScaleChanged(WebView view, float oldScale, float newScale) {
@@ -449,11 +548,13 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     WebResourceResponse response = null;
-    try {
-      response = webView.contentBlockerHandler.checkUrl(webView, url);
-    } catch (Exception e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
+    if (webView.contentBlockerHandler.getRuleList().size() > 0) {
+      try {
+        response = webView.contentBlockerHandler.checkUrl(webView, url);
+      } catch (Exception e) {
+        e.printStackTrace();
+        Log.e(LOG_TAG, e.getMessage());
+      }
     }
     return response;
   }

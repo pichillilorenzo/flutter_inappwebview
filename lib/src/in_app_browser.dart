@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappbrowser/src/webview_options.dart';
 
+import 'http_auth_credentials_database.dart';
 import 'types.dart';
 import 'channel_manager.dart';
 import 'in_app_webview.dart' show InAppWebViewController;
@@ -408,10 +409,8 @@ class InAppBrowser {
 
   ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
-  ///[host] represents the host requiring authentication.
-  ///
-  ///[realm] represents the realm for which authentication is required
-  Future<HttpAuthResponse> onReceivedHttpAuthRequest(String url, String realm) {
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
+  Future<HttpAuthResponse> onReceivedHttpAuthRequest(String url, HttpAuthChallenge challenge) {
 
   }
 

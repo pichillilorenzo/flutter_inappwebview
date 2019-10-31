@@ -10,6 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 
+import 'http_auth_credentials_database.dart';
 import 'types.dart';
 import 'in_app_browser.dart';
 import 'channel_manager.dart';
@@ -178,9 +179,7 @@ class InAppWebView extends StatefulWidget {
 
   ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
-  ///[host] represents the host requiring authentication.
-  ///
-  ///[realm] represents the realm for which authentication is required
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
   final onReceivedHttpAuthRequestCallback onReceivedHttpAuthRequest;
 
   ///Initial url that will be loaded.
@@ -251,7 +250,8 @@ class _InAppWebViewState extends State<InAppWebView> {
   Widget build(BuildContext context) {
     Map<String, dynamic> initialOptions = {};
     widget.initialOptions.forEach((webViewOption) {
-      initialOptions.addAll(webViewOption.toMap());
+      if ((Platform.isAndroid && webViewOption is AndroidOptions) || (Platform.isIOS && webViewOption is iOSOptions))
+        initialOptions.addAll(webViewOption.toMap());
     });
 
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -478,11 +478,16 @@ class InAppWebViewController {
         break;
       case "onReceivedHttpAuthRequest":
         String host = call.arguments["host"];
+        String protocol = call.arguments["protocol"];
         String realm = call.arguments["realm"];
+        int port = call.arguments["port"];
+        int previousFailureCount = call.arguments["previousFailureCount"];
+        var protectionSpace = ProtectionSpace(host: host, protocol: protocol, realm: realm, port: port);
+        var challenge = HttpAuthChallenge(previousFailureCount: previousFailureCount, protectionSpace: protectionSpace);
         if (_widget != null && _widget.onReceivedHttpAuthRequest != null)
-          return (await _widget.onReceivedHttpAuthRequest(this, host, realm))?.toMap();
+          return (await _widget.onReceivedHttpAuthRequest(this, challenge))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onReceivedHttpAuthRequest(host, realm))?.toMap();
+          return (await _inAppBrowser.onReceivedHttpAuthRequest(host, challenge))?.toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
@@ -958,6 +963,16 @@ class InAppWebViewController {
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     return await _channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
+  }
+
+  ///Clear all the webview's cache
+  Future<void> clearCache() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('clearCache', args);
   }
 
   ///Dispose/Destroy the WebView.

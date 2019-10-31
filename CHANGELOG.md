@@ -20,13 +20,16 @@
 - Added `startSafeBrowsing`, `setSafeBrowsingWhitelist` and `getSafeBrowsingPrivacyPolicyUrl` methods (available only for Android)
 - Added `onSafeBrowsingHit` event (available only for Android)
 - Added `onJsAlert`, `onJsConfirm` and `onJsPrompt` events to manage javascript popup dialogs
-- Fixed `InputConnection` error on Android
+- Added `onReceivedHttpAuthRequest` event
+- Added `clearCache()` method
+- Added `HttpAuthCredentialDatabase` class
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class
 - Updated `WebResourceResponse` class
 - Updated `ConsoleMessageLevel` class
 - Updated `onLoadResource` event
+- Updated `CookieManager` class
 - WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSChromeCustomTabsOptions`
 
 ## 1.2.1

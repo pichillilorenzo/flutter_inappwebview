@@ -83,11 +83,11 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
             //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
-            initialUrl: "https://github.com",
+            //initialUrl: "https://github.com",
             //initialUrl: "chrome://safe-browsing/match?type=malware",
             //initialUrl: "http://192.168.1.20:8081/",
             //initialUrl: "https://192.168.1.20:4433/",
-            //initialFile: "assets/index.html",
+            initialFile: "assets/index.html",
             initialHeaders: {},
             initialOptions: [
               InAppWebViewOptions(
@@ -143,8 +143,8 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 controller.clearSslPreferences();
                 controller.clearClientCertPreferences();
               }
-              //controller.findAllAsync("a");
-              controller.getFavicon();
+              //controller.findAllAsync("flutter");
+              print(await controller.getFavicons());
             },
             onLoadError: (InAppWebViewController controller, String url, int code, String message) async {
               print("error $url: $code, $message");

@@ -4,6 +4,7 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
@@ -15,8 +16,8 @@ import android.webkit.WebView;
  * https://github.com/flutter/plugins/blob/master/packages/webview_flutter/android/src/main/java/io/flutter/plugins/webviewflutter/InputAwareWebView.java
  */
 public class InputAwareWebView extends WebView {
+    private static final String LOG_TAG = "InputAwareWebView";
     public View containerView;
-
     private View threadedInputConnectionProxyView;
     private ThreadedInputConnectionProxyAdapterView proxyAdapterView;
 
@@ -38,6 +39,19 @@ public class InputAwareWebView extends WebView {
     public InputAwareWebView(Context context, AttributeSet attrs, int defaultStyle) {
         super(context, attrs, defaultStyle);
         this.containerView = null;
+    }
+
+    public void setContainerView(View containerView) {
+        this.containerView = containerView;
+
+        if (proxyAdapterView == null) {
+            return;
+        }
+
+        Log.w(LOG_TAG, "The containerView has changed while the proxyAdapterView exists.");
+        if (containerView != null) {
+            setInputConnectionTarget(proxyAdapterView);
+        }
     }
 
     /**
@@ -82,13 +96,17 @@ public class InputAwareWebView extends WebView {
      */
     @Override
     public boolean checkInputConnectionProxy(final View view) {
-        if (containerView == null)
-            return super.checkInputConnectionProxy(view);
         // Check to see if the view param is WebView's ThreadedInputConnectionProxyView.
         View previousProxy = threadedInputConnectionProxyView;
         threadedInputConnectionProxyView = view;
         if (previousProxy == view) {
             // This isn't a new ThreadedInputConnectionProxyView. Ignore it.
+            return super.checkInputConnectionProxy(view);
+        }
+        if (containerView == null) {
+            Log.e(
+                    LOG_TAG,
+                    "Can't create a proxy view because there's no container view. Text input may not work.");
             return super.checkInputConnectionProxy(view);
         }
 
@@ -115,8 +133,7 @@ public class InputAwareWebView extends WebView {
     @Override
     public void clearFocus() {
         super.clearFocus();
-        if (containerView != null)
-            resetInputConnection();
+        resetInputConnection();
     }
 
     /**
@@ -131,6 +148,10 @@ public class InputAwareWebView extends WebView {
             // No need to reset the InputConnection to the default thread if we've never changed it.
             return;
         }
+        if (containerView == null) {
+            Log.e(LOG_TAG, "Can't reset the input connection to the container view because there is none.");
+            return;
+        }
         setInputConnectionTarget(/*targetView=*/ containerView);
     }
 
@@ -143,6 +164,13 @@ public class InputAwareWebView extends WebView {
      * InputConnections should be created on.
      */
     private void setInputConnectionTarget(final View targetView) {
+        if (containerView == null) {
+            Log.e(
+                    LOG_TAG,
+                    "Can't set the input connection target because there is no containerView to use as a handler.");
+            return;
+        }
+
         targetView.requestFocus();
         containerView.post(
                 new Runnable() {

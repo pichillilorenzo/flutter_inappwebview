@@ -226,4 +226,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     return sdf.format(new Date(timestamp));
   }
 
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+  }
 }

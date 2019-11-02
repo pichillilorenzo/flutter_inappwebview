@@ -36,7 +36,7 @@ public class ChromeCustomTabsActivity extends Activity {
     options = new ChromeCustomTabsOptions();
     options.parse((HashMap<String, Object>) b.getSerializable("options"));
 
-    InAppBrowserFlutterPlugin.instance.chromeCustomTabsActivities.put(uuid, this);
+    InAppBrowserFlutterPlugin.inAppBrowser.chromeCustomTabsActivities.put(uuid, this);
 
     customTabActivityHelper = new CustomTabActivityHelper();
     builder = new CustomTabsIntent.Builder();
@@ -49,8 +49,8 @@ public class ChromeCustomTabsActivity extends Activity {
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("uuid", uuid);
-    InAppBrowserFlutterPlugin.instance.channel.invokeMethod("onChromeSafariBrowserOpened", obj);
-    InAppBrowserFlutterPlugin.instance.channel.invokeMethod("onChromeSafariBrowserLoaded", obj);
+    InAppBrowserFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserOpened", obj);
+    InAppBrowserFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserLoaded", obj);
   }
 
   private void prepareCustomTabs() {
@@ -86,7 +86,7 @@ public class ChromeCustomTabsActivity extends Activity {
       finish();
       Map<String, Object> obj = new HashMap<>();
       obj.put("uuid", uuid);
-      InAppBrowserFlutterPlugin.instance.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+      InAppBrowserFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
     }
   }
 

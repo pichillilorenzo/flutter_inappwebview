@@ -116,4 +116,8 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
     }
   }
 
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+  }
+
 }

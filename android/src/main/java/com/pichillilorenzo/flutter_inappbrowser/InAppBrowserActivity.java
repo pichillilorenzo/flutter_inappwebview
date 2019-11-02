@@ -1,6 +1,5 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
@@ -18,6 +17,9 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.WebChromeClient;
+import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
@@ -26,13 +28,10 @@ import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebViewOptions
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.app.FlutterActivity;
-import io.flutter.app.FlutterApplication;
 import io.flutter.plugin.common.MethodChannel;
 
 public class InAppBrowserActivity extends AppCompatActivity {
@@ -71,7 +70,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
     webViewOptions.parse(optionsMap);
     webView.options = webViewOptions;
 
-    InAppBrowserFlutterPlugin.instance.webViewActivities.put(uuid, this);
+    InAppBrowserFlutterPlugin.inAppBrowser.webViewActivities.put(uuid, this);
 
     actionBar = getSupportActionBar();
 
@@ -93,7 +92,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("uuid", uuid);
-    InAppBrowserFlutterPlugin.instance.channel.invokeMethod("onBrowserCreated", obj);
+    InAppBrowserFlutterPlugin.inAppBrowser.channel.invokeMethod("onBrowserCreated", obj);
 
   }
 
@@ -257,7 +256,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
       if (canGoBack())
         goBack();
       else if (options.closeOnCannotGoBack)
-        InAppBrowserFlutterPlugin.instance.close(this, uuid, null);
+        InAppBrowserFlutterPlugin.inAppBrowser.close(this, uuid, null);
       return true;
     }
     return super.onKeyDown(keyCode, event);
@@ -356,7 +355,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
   }
 
   public void closeButtonClicked(MenuItem item) {
-    InAppBrowserFlutterPlugin.instance.close(this, uuid, null);
+    InAppBrowserFlutterPlugin.inAppBrowser.close(this, uuid, null);
   }
 
   public byte[] takeScreenshot() {
@@ -521,5 +520,19 @@ public class InAppBrowserActivity extends AppCompatActivity {
     }
     else
       result.success(false);
+  }
+
+  public void dispose() {
+    if (webView != null) {
+      webView.setWebChromeClient(new WebChromeClient());
+      webView.setWebViewClient(new WebViewClient() {
+        public void onPageFinished(WebView view, String url) {
+          webView.dispose();
+          webView.destroy();
+          webView = null;
+        }
+      });
+      webView.loadUrl("about:blank");
+    }
   }
 }

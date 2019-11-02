@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class InAppWebViewOptions extends Options {
 
-  static final String LOG_TAG = "InAppWebViewOptions";
+  public static final String LOG_TAG = "InAppWebViewOptions";
 
   public boolean useShouldOverrideUrlLoading = false;
   public boolean useOnLoadResource = false;

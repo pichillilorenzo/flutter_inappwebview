@@ -289,10 +289,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(false);
         }
         break;
-      case "dispose":
-        dispose();
-        result.success(true);
-        break;
       default:
         result.notImplemented();
     }
@@ -300,10 +296,12 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
   @Override
   public void dispose() {
+    channel.setMethodCallHandler(null);
     if (webView != null) {
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {
+          webView.dispose();
           webView.destroy();
           webView = null;
         }
@@ -322,6 +320,14 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public void onInputConnectionUnlocked() {
     if (webView.inAppBrowserActivity == null)
       webView.unlockInputConnection();
+  }
+
+  public void onFlutterViewAttached(View flutterView) {
+    webView.setContainerView(flutterView);
+  }
+
+  public void onFlutterViewDetached() {
+    webView.setContainerView(null);
   }
 
 }

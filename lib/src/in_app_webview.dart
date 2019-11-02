@@ -10,9 +10,10 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 
+import 'package:html/parser.dart' show parse;
+
 import 'types.dart';
 import 'in_app_browser.dart';
-import 'channel_manager.dart';
 import 'webview_options.dart';
 
 /*
@@ -256,15 +257,6 @@ class _InAppWebViewState extends State<InAppWebView> {
   InAppWebViewController _controller;
 
   @override
-  void dispose() {
-    super.dispose();
-    if (_controller != null) {
-      _controller._dispose();
-      _controller = null;
-    }
-  }
-
-  @override
   Widget build(BuildContext context) {
     Map<String, dynamic> initialOptions = {};
     widget.initialOptions.forEach((webViewOption) {
@@ -273,7 +265,22 @@ class _InAppWebViewState extends State<InAppWebView> {
     });
 
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return GestureDetector(
+      return AndroidView(
+        viewType: 'com.pichillilorenzo/flutter_inappwebview',
+        onPlatformViewCreated: _onPlatformViewCreated,
+        gestureRecognizers: widget.gestureRecognizers,
+        layoutDirection: TextDirection.rtl,
+        creationParams: <String, dynamic>{
+          'initialUrl': widget.initialUrl,
+          'initialFile': widget.initialFile,
+          'initialData': widget.initialData?.toMap(),
+          'initialHeaders': widget.initialHeaders,
+          'initialOptions': initialOptions
+        },
+        creationParamsCodec: const StandardMessageCodec(),
+      );
+      // onLongPress issue: https://github.com/flutter/plugins/blob/f31d16a6ca0c4bd6849cff925a00b6823973696b/packages/webview_flutter/lib/src/webview_android.dart#L31
+      /*return GestureDetector(
         onLongPress: () {},
         excludeFromSemantics: true,
         child: AndroidView(
@@ -290,7 +297,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           },
           creationParamsCodec: const StandardMessageCodec(),
         ),
-      );
+      );*/
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
@@ -593,105 +600,146 @@ class InAppWebViewController {
     return await _channel.invokeMethod('getProgress', args);
   }
 
-  ///Gets the favicon for the current page.
-  Future<List<int>> getFavicon() async {
-    List<Favicon> favicons = [];
-    HttpClient client = new HttpClient();
-    var url = Uri.parse(await getUrl());
-
-    var htmlRequest = await client.getUrl(url);
-    var html = await (await htmlRequest.close()).transform(Utf8Decoder()).join();
-    /// TODO: parse HTML instead of using javascript code
-
-    try {
-      List<dynamic> faviconsJs = json.decode(await injectScriptCode("""
-function flutter_inappbrowser_ger_favicons() {
-	var favicons = [];
-	var links = document.getElementsByTagName('link');
-	for (var i = 0; i < links.length; i++) {
-		var link = links[i];
-		if (link.rel.indexOf("icon") >= 0) {
-            favicons.push({
-                rel: link.rel,
-                href: link.href,
-                sizes: link.sizes
-            });
-        }
+  ///Gets the content html of the page. It first tries to get the content through javascript.
+  ///If this doesn't work, it tries to get the content reading the file:
+  ///- checking if it is an asset (`file:///`) or
+  ///- downloading it using an `HttpClient` through the WebView's current url.
+  Future<String> getHtml() async {
+    var html = "";
+    Map<String, dynamic> options = await getOptions();
+    if (options != null && options["javaScriptEnabled"] == true) {
+      html = await injectScriptCode("window.document.getElementsByTagName('html')[0].outerHTML;");
+      if (html.isNotEmpty)
+        return html;
     }
-	return favicons;
-}
-flutter_inappbrowser_ger_favicons();
-    """));
-      for(Map<String, dynamic> favicon in faviconsJs) {
-        String sizes = favicon["sizes"];
-        if (sizes != null && sizes != "any") {
-          List<String> sizesSplitted = sizes.split(" ");
-          for (String size in sizesSplitted) {
-            int width = int.parse(size.split("x")[0]);
-            int height = int.parse(size.split("x")[1]);
-            favicons.add(Favicon(url: favicon["href"], rel: favicon["rel"], width: width, height: height));
-          }
-        } else {
-          favicons.add(Favicon(url: favicon["href"], rel: favicon["rel"], width: null, height: null));
-        }
 
+    var webviewUrl = await getUrl();
+    if (webviewUrl.startsWith("file:///")) {
+      var assetPathSplitted = webviewUrl.split("/flutter_assets/");
+      var assetPath = assetPathSplitted[assetPathSplitted.length - 1];
+      var bytes = await rootBundle.load(assetPath);
+      html = utf8.decode(bytes.buffer.asUint8List());
+    }
+    else {
+      HttpClient client = new HttpClient();
+      var url = Uri.parse(webviewUrl);
+      try {
+        var htmlRequest = await client.getUrl(url);
+        html = await (await htmlRequest.close()).transform(Utf8Decoder()).join();
+      } catch (e) {
+        print(e);
       }
-    } catch (e) {}
+    }
+    return html;
+  }
 
+  ///Gets the list of all favicons for the current page.
+  Future<List<Favicon>> getFavicons() async {
+    List<Favicon> favicons = [];
 
-    var completer = new Completer<List<int>>();
-    var faviconData = new List<int>();
+    HttpClient client = new HttpClient();
+    var webviewUrl = await getUrl();
+    var url = (webviewUrl.startsWith("file:///")) ? Uri.file(webviewUrl) : Uri.parse(webviewUrl);
+    String manifestUrl;
 
+    var html = await getHtml();
+    if (html.isEmpty) {
+        return favicons;
+    }
+
+    var assetPathBase;
+
+    if (webviewUrl.startsWith("file:///")) {
+      var assetPathSplitted = webviewUrl.split("/flutter_assets/");
+      assetPathBase = assetPathSplitted[0] + "/flutter_assets/";
+    }
+
+    // get all link html elements
+    var document = parse(html);
+    var links = document.getElementsByTagName('link');
+    for (var link in links) {
+      var attributes = link.attributes;
+      if (attributes["rel"] == "manifest") {
+        manifestUrl = attributes["href"];
+        if (!_isUrlAbsolute(manifestUrl)) {
+          if (manifestUrl.startsWith("/")) {
+            manifestUrl = manifestUrl.substring(1);
+          }
+          manifestUrl = ((assetPathBase == null) ? url.scheme + "://" + url.host + "/" : assetPathBase) + manifestUrl;
+        }
+        continue;
+      }
+      if (!attributes["rel"].contains("icon")) {
+        continue;
+      }
+      favicons.addAll(_createFavicons(url, assetPathBase, attributes["href"], attributes["rel"], attributes["sizes"], false));
+    }
+
+    // try to get /favicon.ico
     try {
       var faviconUrl = url.scheme + "://" + url.host + "/favicon.ico";
       await client.headUrl(Uri.parse(faviconUrl));
       favicons.add(Favicon(url: faviconUrl, rel: "shortcut icon"));
-    } catch(e) {}
-
-    var manifestRequest;
-    try {
-      var manifestJsonUrl = url.scheme + "://" + url.host + "/manifest.json";
-      manifestRequest = await client.getUrl(Uri.parse(manifestJsonUrl));
     } catch(e) {
-      /// TODO: find manifest throught rel="manifest"
+      print("/favicon.ico file not found: " + e.toString());
     }
 
-    if (manifestRequest) {
-      Map<String, dynamic> manifest = json.decode(await (await manifestRequest.close()).transform(Utf8Decoder()).join());
+    // try to get the manifest file
+    HttpClientRequest manifestRequest;
+    HttpClientResponse manifestResponse;
+    bool manifestFound = false;
+    if (manifestUrl == null) {
+      manifestUrl = url.scheme + "://" + url.host + "/manifest.json";
+    }
+    try {
+      manifestRequest = await client.getUrl(Uri.parse(manifestUrl));
+      manifestResponse = await manifestRequest.close();
+      manifestFound = manifestResponse.statusCode == 200 && manifestResponse.headers.contentType?.mimeType == "application/json";
+    } catch(e) {
+      print("Manifest file not found: " + e.toString());
+    }
+
+    if (manifestFound) {
+      Map<String, dynamic> manifest = json.decode(await manifestResponse.transform(Utf8Decoder()).join());
       if (manifest.containsKey("icons")) {
         for(Map<String, dynamic> icon in manifest["icons"]) {
-          String url = icon["src"];
-          List<String> urlSplitted = url.split("/");
-          String sizes = icon["sizes"];
-          String rel = (sizes != null) ? urlSplitted[urlSplitted.length - 1].replaceFirst("-" + sizes, "").split(" ")[0].split(".")[0] : null;
-          if (sizes != null && sizes != "any") {
-            List<String> sizesSplitted = sizes.split(" ");
-            for (String size in sizesSplitted) {
-              int width = int.parse(size.split("x")[0]);
-              int height = int.parse(size.split("x")[1]);
-              favicons.add(Favicon(url: url, rel: rel, width: width, height: height));
-            }
-          } else {
-            favicons.add(Favicon(url: url, rel: rel, width: null, height: null));
-          }
+          favicons.addAll(_createFavicons(url, assetPathBase, icon["src"], icon["rel"], icon["sizes"], true));
         }
       }
     }
 
-    //print(favicons);
+    return favicons;
+  }
 
-    // solution found here: https://stackoverflow.com/a/15750809/4637638
-    var googleFaviconUrl = Uri.parse("https://plus.google.com/_/favicon?domain_url=" + url.scheme + "://" + url.host);
-    client.getUrl(googleFaviconUrl).then((HttpClientRequest request) {
-      return request.close();
-    }).then((HttpClientResponse response) {
-      response.listen((List<int> data) {
-        faviconData = data;
-      }, onDone: () => completer.complete(faviconData));
-    }).catchError((error) {
-      completer.completeError(error);
-    });
-    return completer.future;
+  bool _isUrlAbsolute(String url) {
+    return url.startsWith("http://") || url.startsWith("https://");
+  }
+
+  List<Favicon> _createFavicons(Uri url, String assetPathBase, String urlIcon, String rel, String sizes, bool isManifest) {
+    List<Favicon> favicons = [];
+
+    List<String> urlSplitted = urlIcon.split("/");
+    if (!_isUrlAbsolute(urlIcon)) {
+      if (urlIcon.startsWith("/")) {
+        urlIcon = urlIcon.substring(1);
+      }
+      urlIcon = ((assetPathBase == null) ? url.scheme + "://" + url.host + "/" : assetPathBase) + urlIcon;
+    }
+    if (isManifest) {
+      rel = (sizes != null) ? urlSplitted[urlSplitted.length - 1].replaceFirst("-" + sizes, "").split(" ")[0].split(".")[0] : null;
+    }
+    if (sizes != null && sizes.isNotEmpty && sizes != "any") {
+      List<String> sizesSplitted = sizes.split(" ");
+      for (String size in sizesSplitted) {
+        int width = int.parse(size.split("x")[0]);
+        int height = int.parse(size.split("x")[1]);
+        favicons.add(Favicon(url: urlIcon, rel: rel, width: width, height: height));
+      }
+    } else {
+      favicons.add(Favicon(url: urlIcon, rel: rel, width: null, height: null));
+    }
+
+    return favicons;
   }
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
@@ -1001,7 +1049,6 @@ flutter_inappbrowser_ger_favicons();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     args.putIfAbsent('options', () => options);
-    args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
     await _channel.invokeMethod('setOptions', args);
   }
 
@@ -1012,9 +1059,9 @@ flutter_inappbrowser_ger_favicons();
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
-    args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
-    Map<dynamic, dynamic> options = await ChannelManager.channel.invokeMethod('getOptions', args);
-    options = options.cast<String, dynamic>();
+    Map<dynamic, dynamic> options = await _channel.invokeMethod('getOptions', args);
+    if (options != null)
+      options = options.cast<String, dynamic>();
     return options;
   }
 
@@ -1182,10 +1229,5 @@ flutter_inappbrowser_ger_favicons();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     await _channel.invokeMethod('clearMatches', args);
-  }
-
-  ///Dispose/Destroy the WebView.
-  Future<void> _dispose() async {
-    await _channel.invokeMethod('dispose');
   }
 }

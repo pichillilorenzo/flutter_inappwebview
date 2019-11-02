@@ -238,7 +238,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var IAWController: FlutterWebViewController?
     var options: InAppWebViewOptions?
     var currentURL: URL?
-    var WKNavigationMap: [String: [String: Any]] = [:]
     var startPageTime: Int64 = 0
     static var credentialsProposed: [URLCredential] = []
     
@@ -786,13 +785,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let app = UIApplication.shared
         
         if let url = navigationAction.request.url {
-            if url.absoluteString != url.absoluteString && (options?.useOnLoadResource)! {
-                WKNavigationMap[url.absoluteString] = [
-                    "startTime": currentTimeInMilliSeconds(),
-                    "request": navigationAction.request
-                ]
-            }
-            
             // Handle target="_blank"
             if navigationAction.targetFrame == nil && (options?.useOnTargetBlank)! {
                 onTargetBlank(url: url)
@@ -834,17 +826,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         
-//        if (options?.useOnLoadResource)! {
-//            if let url = navigationResponse.response.url {
-//                if WKNavigationMap[url.absoluteString] != nil {
-//                    let startResourceTime: Int64 = (WKNavigationMap[url.absoluteString]!["startTime"] as! Int64)
-//                    let startTime: Int64 = startResourceTime - startPageTime;
-//                    let duration: Int64 = currentTimeInMilliSeconds() - startResourceTime;
-//                    onLoadResource(response: navigationResponse.response, fromRequest: WKNavigationMap[url.absoluteString]!["request"] as? URLRequest, withData: Data(), startTime: startTime, duration: duration)
-//                }
-//            }
-//        }
-        
         if (options?.useOnDownloadStart)! {
             let mimeType = navigationResponse.response.mimeType
             if let url = navigationResponse.response.url {
@@ -875,7 +856,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
-        self.WKNavigationMap = [:]
         currentURL = url
         InAppWebView.credentialsProposed = []
         onLoadStop(url: (currentURL?.absoluteString)!)

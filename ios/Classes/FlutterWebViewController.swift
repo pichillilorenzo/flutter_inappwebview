@@ -301,25 +301,9 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 }
                 result(true)
                 break
-            case "dispose":
-                dispose()
-                result(true)
-                break
             default:
                 result(FlutterMethodNotImplemented)
                 break
-        }
-    }
-    
-    public func dispose() {
-        if webView != nil {
-            webView!.IABController = nil
-            webView!.IAWController = nil
-            webView!.uiDelegate = nil
-            webView!.navigationDelegate = nil
-            webView!.scrollView.delegate = nil
-            webView!.stopLoading()
-            webView = nil
         }
     }
 }

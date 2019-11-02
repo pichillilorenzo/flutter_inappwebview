@@ -686,7 +686,7 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.inAppBrowser.channel : flutterWebView.channel;
   }
 
   public void startSafeBrowsing(final MethodChannel.Result result) {
@@ -743,6 +743,11 @@ final public class InAppWebView extends InputAwareWebView {
     webSettings.setLoadWithOverviewMode(enabled);
     webSettings.setSupportZoom(enabled);
     webSettings.setBuiltInZoomControls(enabled);
+  }
+
+  @Override
+  public void dispose() {
+    super.dispose();
   }
 
   @Override

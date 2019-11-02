@@ -2,7 +2,7 @@ package com.pichillilorenzo.flutter_inappbrowser;
 
 public class InAppBrowserOptions extends Options {
 
-  static final String LOG_TAG = "InAppBrowserOptions";
+  public static final String LOG_TAG = "InAppBrowserOptions";
 
   public boolean hidden = false;
   public boolean toolbarTop = true;

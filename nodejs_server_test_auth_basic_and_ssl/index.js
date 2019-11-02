@@ -23,7 +23,16 @@ appHttps.get('/', (req, res) => {
 // `localhost`.
 
 	if (req.client.authorized) {
-		res.send(`Hello ${cert.subject.CN}, your certificate was issued by ${cert.issuer.CN}!`)
+		res.send(`
+            <html>
+                <head>
+                    <script src="/fakeResource" type="text/javascript"></script>
+                </head>
+                <body>
+                    <p>Hello ${cert.subject.CN}, your certificate was issued by ${cert.issuer.CN}!</p>
+                </body>
+            </html>
+        `)
 // They can still provide a certificate which is not accepted by us. Unfortunately, the `cert` object will be an empty
 // object instead of `null` if there is no certificate at all, so we have to check for a known field rather than
 // truthiness.
@@ -34,6 +43,13 @@ appHttps.get('/', (req, res) => {
 	} else {
 		res.status(401).send(`Sorry, but you need to provide a client certificate to continue.`)
 	}
+	res.end()
+})
+
+appHttps.get('/fakeResource', (req, res) => {
+    res.set("Content-Type", "text/javascript")
+	res.send(`alert("HI");`)
+	res.end()
 })
 
 // Let's create our HTTPS server and we're ready to go.

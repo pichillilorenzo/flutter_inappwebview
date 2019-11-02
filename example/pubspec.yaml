@@ -48,6 +48,7 @@ flutter:
     - assets/page-2.html
     - assets/css/
     - assets/images/
+    - assets/favicon.ico
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -1,9 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pichillilorenzo.flutter_inappbrowser">
-
-    <uses-permission android:name="android.permission.INTERNET" />
-
     <application>
         <activity android:theme="@style/AppTheme" android:name=".InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>
         <activity android:theme="@style/ThemeTransparent" android:name=".ChromeCustomTabs.ChromeCustomTabsActivity" android:configChanges="orientation|screenSize"></activity>

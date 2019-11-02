@@ -43,6 +43,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
     this.resourceCustomSchemes = const [], this.contentBlockers = const [], this.preferredContentMode = InAppWebViewUserPreferredContentMode.RECOMMENDED}) {
       if (this.minimumFontSize == null)
         this.minimumFontSize = Platform.isAndroid ? 8 : 0;
+      assert(!this.resourceCustomSchemes.contains("http") && !this.resourceCustomSchemes.contains("https"));
     }
 
   @override

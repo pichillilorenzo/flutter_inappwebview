@@ -26,6 +26,7 @@
 - Added `HttpAuthCredentialDatabase` class
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
 - Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
+- Added `getHtml` method
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class
@@ -34,6 +35,7 @@
 - Updated `onLoadResource` event
 - Updated `CookieManager` class
 - WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSSafariOptions`
+- Renamed `getFavicon` to `getFavicons`, now it returns a list of all favicons (`List<Favicon>`) found
 
 ## 1.2.1
 

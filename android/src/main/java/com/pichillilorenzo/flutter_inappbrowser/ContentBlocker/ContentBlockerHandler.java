@@ -7,18 +7,16 @@ import android.util.Log;
 import android.webkit.WebResourceResponse;
 
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
+import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayInputStream;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
@@ -163,8 +161,7 @@ public class ContentBlockerHandler {
                             Response response = null;
 
                             try {
-
-                                response = webView.httpClient.newCall(mRequest).execute();
+                                response = Util.getUnsafeOkHttpClient().newCall(mRequest).execute();
                                 byte[] dataBytes = response.body().bytes();
                                 InputStream dataStream = new ByteArrayInputStream(dataBytes);
 
@@ -195,7 +192,7 @@ public class ContentBlockerHandler {
     }
 
     public WebResourceResponse checkUrl(final InAppWebView webView, String url) throws URISyntaxException, InterruptedException, MalformedURLException {
-        ContentBlockerTriggerResourceType responseResourceType = getResourceTypeFromUrl(webView, url);
+        ContentBlockerTriggerResourceType responseResourceType = getResourceTypeFromUrl(url);
         return checkUrl(webView, url, responseResourceType);
     }
 
@@ -204,7 +201,7 @@ public class ContentBlockerHandler {
         return checkUrl(webView, url, responseResourceType);
     }
 
-    public ContentBlockerTriggerResourceType getResourceTypeFromUrl(InAppWebView webView, String url) {
+    public ContentBlockerTriggerResourceType getResourceTypeFromUrl(String url) {
         ContentBlockerTriggerResourceType responseResourceType = ContentBlockerTriggerResourceType.RAW;
 
         if (url.startsWith("http://") || url.startsWith("https://")) {
@@ -212,7 +209,7 @@ public class ContentBlockerHandler {
             Request mRequest = new Request.Builder().url(url).head().build();
             Response response = null;
             try {
-                response = webView.httpClient.newCall(mRequest).execute();
+                response = Util.getUnsafeOkHttpClient().newCall(mRequest).execute();
 
                 if (response.header("content-type") != null) {
                     String[] contentTypeSplitted = response.header("content-type").split(";");

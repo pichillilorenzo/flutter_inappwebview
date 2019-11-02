@@ -268,7 +268,8 @@ class InAppBrowser {
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
     Map<dynamic, dynamic> options = await ChannelManager.channel.invokeMethod('getOptions', args);
-    options = options.cast<String, dynamic>();
+    if (options != null)
+      options = options.cast<String, dynamic>();
     return options;
   }
 

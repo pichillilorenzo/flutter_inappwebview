@@ -5,14 +5,15 @@ author: Lorenzo Pichilli <pichillilorenzo@gmail.com>
 homepage: https://github.com/pichillilorenzo/flutter_inappbrowser
 
 environment:
-  sdk: ">=2.0.0-dev <3.0.0"
-  flutter: ">=0.10.1 <2.0.0"
+  sdk: ">=2.0.0-dev.68.0 <3.0.0"
+  flutter: ">=1.9.1+hotfix.5 <2.0.0"
 
 dependencies:
   flutter:
     sdk: flutter
   uuid: ^2.0.0
   mime: ^0.9.6+2
+  html: ^0.14.0+3
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

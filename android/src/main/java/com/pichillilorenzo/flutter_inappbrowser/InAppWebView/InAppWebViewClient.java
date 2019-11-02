@@ -224,7 +224,7 @@ public class InAppWebViewClient extends WebViewClient {
     previousAuthRequestFailureCount = 0;
     credentialsProposed = null;
 
-    // CB-10395 InAppBrowserFlutterPlugin's WebView not storing cookies reliable to local device storage
+    // CB-10395 InAppBrowser's WebView not storing cookies reliable to local device storage
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       CookieManager.getInstance().flush();
     } else {
@@ -667,7 +667,7 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
   private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.instance.channel : flutterWebView.channel;
+    return (inAppBrowserActivity != null) ? InAppBrowserFlutterPlugin.inAppBrowser.channel : flutterWebView.channel;
   }
 
 }

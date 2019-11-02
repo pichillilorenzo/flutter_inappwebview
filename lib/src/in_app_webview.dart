@@ -84,58 +84,58 @@ class InAppWebViewInitialData {
 class InAppWebView extends StatefulWidget {
 
   ///Event fires when the [InAppWebView] is created.
-  final onWebViewCreatedCallback onWebViewCreated;
+  final void Function(InAppWebViewController controller) onWebViewCreated;
 
   ///Event fires when the [InAppWebView] starts to load an [url].
-  final onWebViewLoadStartCallback onLoadStart;
+  final void Function(InAppWebViewController controller, String url) onLoadStart;
 
   ///Event fires when the [InAppWebView] finishes loading an [url].
-  final onWebViewLoadStopCallback onLoadStop;
+  final void Function(InAppWebViewController controller, String url) onLoadStop;
 
   ///Event fires when the [InAppWebView] encounters an error loading an [url].
-  final onWebViewLoadErrorCallback onLoadError;
+  final void Function(InAppWebViewController controller, String url, int code, String message) onLoadError;
 
   ///Event fires when the current [progress] of loading a page is changed.
-  final onWebViewProgressChangedCallback onProgressChanged;
+  final void Function(InAppWebViewController controller, int progress) onProgressChanged;
 
   ///Event fires when the [InAppWebView] receives a [ConsoleMessage].
-  final onWebViewConsoleMessageCallback onConsoleMessage;
+  final void Function(InAppWebViewController controller, ConsoleMessage consoleMessage) onConsoleMessage;
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
-  final shouldOverrideUrlLoadingCallback shouldOverrideUrlLoading;
+  final void Function(InAppWebViewController controller, String url) shouldOverrideUrlLoading;
 
   ///Event fires when the [InAppWebView] loads a resource.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
   ///
   ///**NOTE only for Android**: to be able to listen this event, you need also the enable javascript.
-  final onWebViewLoadResourceCallback onLoadResource;
+  final void Function(InAppWebViewController controller, WebResourceResponse response) onLoadResource;
 
   ///Event fires when the [InAppWebView] scrolls.
   ///
   ///[x] represents the current horizontal scroll origin in pixels.
   ///
   ///[y] represents the current vertical scroll origin in pixels.
-  final onWebViewScrollChangedCallback onScrollChanged;
+  final void Function(InAppWebViewController controller, int x, int y) onScrollChanged;
 
   ///Event fires when [InAppWebView] recognizes and starts a downloadable file.
   ///
   ///[url] represents the url of the file.
-  final onDownloadStartCallback onDownloadStart;
+  final void Function(InAppWebViewController controller, String url) onDownloadStart;
 
   ///Event fires when the [InAppWebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
   ///[scheme] represents the scheme of the url.
   ///
   ///[url] represents the url of the request.
-  final onLoadResourceCustomSchemeCallback onLoadResourceCustomScheme;
+  final Future<CustomSchemeResponse> Function(InAppWebViewController controller, String scheme, String url) onLoadResourceCustomScheme;
 
   ///Event fires when the [InAppWebView] tries to open a link with `target="_blank"`.
   ///
   ///[url] represents the url of the link.
-  final onTargetBlankCallback onTargetBlank;
+  final void Function(InAppWebViewController controller, String url) onTargetBlank;
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
   ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
@@ -144,19 +144,19 @@ class InAppWebView extends StatefulWidget {
   ///[origin] represents the origin of the web content attempting to use the Geolocation API.
   ///
   ///**NOTE**: available only for Android.
-  final onGeolocationPermissionsShowPromptCallback onGeolocationPermissionsShowPrompt;
+  final Future<GeolocationPermissionShowPromptResponse> Function(InAppWebViewController controller, String origin) onGeolocationPermissionsShowPrompt;
 
   ///Event fires when javascript calls the `alert()` method to display an alert dialog.
   ///If [JsAlertResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
-  final onJsAlertCallback onJsAlert;
+  final Future<JsAlertResponse> Function(InAppWebViewController controller, String message) onJsAlert;
 
   ///Event fires when javascript calls the `confirm()` method to display a confirm dialog.
   ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
-  final onJsConfirmCallback onJsConfirm;
+  final Future<JsConfirmResponse> Function(InAppWebViewController controller, String message) onJsConfirm;
 
   ///Event fires when javascript calls the `prompt()` method to display a prompt dialog.
   ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
@@ -164,7 +164,7 @@ class InAppWebView extends StatefulWidget {
   ///[message] represents the message to be displayed in the alert dialog.
   ///
   ///[defaultValue] represents the default value displayed in the prompt dialog.
-  final onJsPromptCallback onJsPrompt;
+  final Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue) onJsPrompt;
 
   ///Event fires when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
@@ -174,18 +174,28 @@ class InAppWebView extends StatefulWidget {
   ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
   ///
   ///**NOTE**: available only for Android.
-  final onSafeBrowsingHitCallback onSafeBrowsingHit;
+  final Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType) onSafeBrowsingHit;
 
   ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
-  final onReceivedHttpAuthRequestCallback onReceivedHttpAuthRequest;
+  final Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge) onReceivedHttpAuthRequest;
 
   ///
-  final onReceivedServerTrustAuthRequestCallback onReceivedServerTrustAuthRequest;
+  final Future<ServerTrustAuthResponse> Function(InAppWebViewController controller, ServerTrustChallenge challenge) onReceivedServerTrustAuthRequest;
 
   ///
-  final onReceivedClientCertRequestCallback onReceivedClientCertRequest;
+  final Future<ClientCertResponse> Function(InAppWebViewController controller, ClientCertChallenge challenge) onReceivedClientCertRequest;
+
+  ///Event fired as find-on-page operations progress.
+  ///The listener may be notified multiple times while the operation is underway, and the numberOfMatches value should not be considered final unless [isDoneCounting] is true.
+  ///
+  ///[activeMatchOrdinal] represents the zero-based ordinal of the currently selected match.
+  ///
+  ///[numberOfMatches] represents how many matches have been found.
+  ///
+  ///[isDoneCounting] whether the find operation has actually completed.
+  final void Function(InAppWebViewController controller, int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) onFindResultReceived;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -233,6 +243,7 @@ class InAppWebView extends StatefulWidget {
     this.onReceivedHttpAuthRequest,
     this.onReceivedServerTrustAuthRequest,
     this.onReceivedClientCertRequest,
+    this.onFindResultReceived,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -523,6 +534,15 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           return (await _inAppBrowser.onReceivedClientCertRequest(challenge))?.toMap();
         break;
+      case "onFindResultReceived":
+        int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
+        int numberOfMatches = call.arguments["numberOfMatches"];
+        bool isDoneCounting = call.arguments["isDoneCounting"];
+        if (_widget != null && _widget.onReceivedClientCertRequest != null)
+          _widget.onFindResultReceived(this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json
@@ -575,21 +595,102 @@ class InAppWebViewController {
 
   ///Gets the favicon for the current page.
   Future<List<int>> getFavicon() async {
-    var completer = new Completer<List<int>>();
-    var faviconData = new List<int>();
+    List<Favicon> favicons = [];
     HttpClient client = new HttpClient();
     var url = Uri.parse(await getUrl());
-    // solution found here: https://stackoverflow.com/a/15750809/4637638
-    var faviconUrl = Uri.parse("https://plus.google.com/_/favicon?domain_url=" + url.scheme + "://" + url.host);
 
-    client.getUrl(faviconUrl).then((HttpClientRequest request) {
+    var htmlRequest = await client.getUrl(url);
+    var html = await (await htmlRequest.close()).transform(Utf8Decoder()).join();
+    /// TODO: parse HTML instead of using javascript code
+
+    try {
+      List<dynamic> faviconsJs = json.decode(await injectScriptCode("""
+function flutter_inappbrowser_ger_favicons() {
+	var favicons = [];
+	var links = document.getElementsByTagName('link');
+	for (var i = 0; i < links.length; i++) {
+		var link = links[i];
+		if (link.rel.indexOf("icon") >= 0) {
+            favicons.push({
+                rel: link.rel,
+                href: link.href,
+                sizes: link.sizes
+            });
+        }
+    }
+	return favicons;
+}
+flutter_inappbrowser_ger_favicons();
+    """));
+      for(Map<String, dynamic> favicon in faviconsJs) {
+        String sizes = favicon["sizes"];
+        if (sizes != null && sizes != "any") {
+          List<String> sizesSplitted = sizes.split(" ");
+          for (String size in sizesSplitted) {
+            int width = int.parse(size.split("x")[0]);
+            int height = int.parse(size.split("x")[1]);
+            favicons.add(Favicon(url: favicon["href"], rel: favicon["rel"], width: width, height: height));
+          }
+        } else {
+          favicons.add(Favicon(url: favicon["href"], rel: favicon["rel"], width: null, height: null));
+        }
+
+      }
+    } catch (e) {}
+
+
+    var completer = new Completer<List<int>>();
+    var faviconData = new List<int>();
+
+    try {
+      var faviconUrl = url.scheme + "://" + url.host + "/favicon.ico";
+      await client.headUrl(Uri.parse(faviconUrl));
+      favicons.add(Favicon(url: faviconUrl, rel: "shortcut icon"));
+    } catch(e) {}
+
+    var manifestRequest;
+    try {
+      var manifestJsonUrl = url.scheme + "://" + url.host + "/manifest.json";
+      manifestRequest = await client.getUrl(Uri.parse(manifestJsonUrl));
+    } catch(e) {
+      /// TODO: find manifest throught rel="manifest"
+    }
+
+    if (manifestRequest) {
+      Map<String, dynamic> manifest = json.decode(await (await manifestRequest.close()).transform(Utf8Decoder()).join());
+      if (manifest.containsKey("icons")) {
+        for(Map<String, dynamic> icon in manifest["icons"]) {
+          String url = icon["src"];
+          List<String> urlSplitted = url.split("/");
+          String sizes = icon["sizes"];
+          String rel = (sizes != null) ? urlSplitted[urlSplitted.length - 1].replaceFirst("-" + sizes, "").split(" ")[0].split(".")[0] : null;
+          if (sizes != null && sizes != "any") {
+            List<String> sizesSplitted = sizes.split(" ");
+            for (String size in sizesSplitted) {
+              int width = int.parse(size.split("x")[0]);
+              int height = int.parse(size.split("x")[1]);
+              favicons.add(Favicon(url: url, rel: rel, width: width, height: height));
+            }
+          } else {
+            favicons.add(Favicon(url: url, rel: rel, width: null, height: null));
+          }
+        }
+      }
+    }
+
+    //print(favicons);
+
+    // solution found here: https://stackoverflow.com/a/15750809/4637638
+    var googleFaviconUrl = Uri.parse("https://plus.google.com/_/favicon?domain_url=" + url.scheme + "://" + url.host);
+    client.getUrl(googleFaviconUrl).then((HttpClientRequest request) {
       return request.close();
     }).then((HttpClientResponse response) {
       response.listen((List<int> data) {
         faviconData = data;
       }, onDone: () => completer.complete(faviconData));
+    }).catchError((error) {
+      completer.completeError(error);
     });
-
     return completer.future;
   }
 
@@ -1035,6 +1136,52 @@ class InAppWebViewController {
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     await _channel.invokeMethod('clearClientCertPreferences', args);
+  }
+
+  ///Finds all instances of find on the page and highlights them. Notifies [onFindResultReceived] listener.
+  ///
+  ///[find] represents the string to find.
+  ///
+  ///**NOTE**: on Android, it finds all instances asynchronously. Successive calls to this will cancel any pending searches.
+  ///
+  ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
+  Future<void> findAllAsync(String find) async {
+    assert(find != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('find', () => find);
+    await _channel.invokeMethod('findAllAsync', args);
+  }
+
+  ///Highlights and scrolls to the next match found by [findAllAsync()]. Notifies [onFindResultReceived] listener.
+  ///
+  ///[forward] represents the direction to search.
+  ///
+  ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
+  Future<void> findNext(bool forward) async {
+    assert(forward != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('forward', () => forward);
+    await _channel.invokeMethod('findNext', args);
+  }
+
+  ///Clears the highlighting surrounding text matches created by [findAllAsync()].
+  ///
+  ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
+  Future<void> clearMatches() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('clearMatches', args);
   }
 
   ///Dispose/Destroy the WebView.

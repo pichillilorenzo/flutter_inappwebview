@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:typed_data';
 
 import 'package:uuid/uuid.dart';
@@ -412,6 +413,20 @@ class ClientCertChallenge {
 }
 
 ///
+class Favicon {
+  String url;
+  String rel;
+  int width;
+  int height;
+
+  Favicon({@required this.url, this.rel, this.width, this.height}): assert(url != null);
+
+  String toString() {
+    return "url: $url, rel: $rel, width: $width, height: $height";
+  }
+}
+
+///
 class AndroidInAppWebViewCacheMode {
   final int _value;
   const AndroidInAppWebViewCacheMode._internal(this._value);
@@ -546,24 +561,3 @@ class iOSSafariOptionsDismissButtonStyle {
   static const CLOSE = const iOSSafariOptionsDismissButtonStyle._internal(1);
   static const CANCEL = const iOSSafariOptionsDismissButtonStyle._internal(2);
 }
-
-typedef onWebViewCreatedCallback = void Function(InAppWebViewController controller);
-typedef onWebViewLoadStartCallback = void Function(InAppWebViewController controller, String url);
-typedef onWebViewLoadStopCallback = void Function(InAppWebViewController controller, String url);
-typedef onWebViewLoadErrorCallback = void Function(InAppWebViewController controller, String url, int code, String message);
-typedef onWebViewProgressChangedCallback = void Function(InAppWebViewController controller, int progress);
-typedef onWebViewConsoleMessageCallback = void Function(InAppWebViewController controller, ConsoleMessage consoleMessage);
-typedef shouldOverrideUrlLoadingCallback = void Function(InAppWebViewController controller, String url);
-typedef onWebViewLoadResourceCallback = void Function(InAppWebViewController controller, WebResourceResponse response);
-typedef onWebViewScrollChangedCallback = void Function(InAppWebViewController controller, int x, int y);
-typedef onDownloadStartCallback = void Function(InAppWebViewController controller, String url);
-typedef onLoadResourceCustomSchemeCallback = Future<CustomSchemeResponse> Function(InAppWebViewController controller, String scheme, String url);
-typedef onTargetBlankCallback = void Function(InAppWebViewController controller, String url);
-typedef onGeolocationPermissionsShowPromptCallback = Future<GeolocationPermissionShowPromptResponse> Function(InAppWebViewController controller, String origin);
-typedef onJsAlertCallback = Future<JsAlertResponse> Function(InAppWebViewController controller, String message);
-typedef onJsConfirmCallback = Future<JsConfirmResponse> Function(InAppWebViewController controller, String message);
-typedef onJsPromptCallback = Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue);
-typedef onSafeBrowsingHitCallback = Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType);
-typedef onReceivedHttpAuthRequestCallback = Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge);
-typedef onReceivedServerTrustAuthRequestCallback = Future<ServerTrustAuthResponse> Function(InAppWebViewController controller, ServerTrustChallenge challenge);
-typedef onReceivedClientCertRequestCallback = Future<ClientCertResponse> Function(InAppWebViewController controller, ClientCertChallenge challenge);

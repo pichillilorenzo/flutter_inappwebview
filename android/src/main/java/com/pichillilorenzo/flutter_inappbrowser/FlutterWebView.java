@@ -94,8 +94,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
   @Override
   public void onMethodCall(MethodCall call, final Result result) {
-    String source;
-    String urlFile;
     switch (call.method) {
       case "getUrl":
         result.success((webView != null) ? webView.getUrl() : null);
@@ -108,22 +106,22 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "loadUrl":
         if (webView != null)
-          webView.loadUrl(call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+          webView.loadUrl((String) call.argument("url"), (Map<String, String>) call.argument("headers"), result);
         else
           result.success(false);
         break;
       case "postUrl":
         if (webView != null)
-          webView.postUrl(call.argument("url").toString(), (byte[]) call.argument("postData"), result);
+          webView.postUrl((String) call.argument("url"), (byte[]) call.argument("postData"), result);
         else
           result.success(false);
         break;
       case "loadData":
         {
-          String data = call.argument("data").toString();
-          String mimeType = call.argument("mimeType").toString();
-          String encoding = call.argument("encoding").toString();
-          String baseUrl = call.argument("baseUrl").toString();
+          String data = (String) call.argument("data");
+          String mimeType = (String) call.argument("mimeType");
+          String encoding = (String) call.argument("encoding");
+          String baseUrl = (String) call.argument("baseUrl");
 
           if (webView != null)
             webView.loadData(data, mimeType, encoding, baseUrl, result);
@@ -133,13 +131,13 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "loadFile":
         if (webView != null)
-          webView.loadFile(call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+          webView.loadFile((String) call.argument("url"), (Map<String, String>) call.argument("headers"), result);
         else
           result.success(false);
         break;
       case "injectScriptCode":
         if (webView != null) {
-          source = call.argument("source").toString();
+          String source = (String) call.argument("source");
           webView.injectScriptCode(source, result);
         }
         else {
@@ -148,21 +146,21 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "injectScriptFile":
         if (webView != null) {
-          urlFile = call.argument("urlFile").toString();
+          String urlFile = (String) call.argument("urlFile");
           webView.injectScriptFile(urlFile);
         }
         result.success(true);
         break;
       case "injectStyleCode":
         if (webView != null) {
-          source = call.argument("source").toString();
+          String source = (String) call.argument("source");
           webView.injectStyleCode(source);
         }
         result.success(true);
         break;
       case "injectStyleFile":
         if (webView != null) {
-          urlFile = call.argument("urlFile").toString();
+          String urlFile = (String) call.argument("urlFile");
           webView.injectStyleFile(urlFile);
         }
         result.success(true);
@@ -263,6 +261,30 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
               result.success(true);
             }
           });
+        } else {
+          result.success(false);
+        }
+        break;
+      case "findAllAsync":
+        if (webView != null) {
+          String find = (String) call.argument("find");
+          webView.findAllAsync(find);
+        }
+        result.success(true);
+        break;
+      case "findNext":
+        if (webView != null) {
+          Boolean forward = (Boolean) call.argument("forward");
+          webView.findNext(forward);
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "clearMatches":
+        if (webView != null) {
+          webView.clearMatches();
+          result.success(true);
         } else {
           result.success(false);
         }

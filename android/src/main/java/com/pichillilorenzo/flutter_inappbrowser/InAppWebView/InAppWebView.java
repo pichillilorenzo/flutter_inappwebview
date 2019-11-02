@@ -242,6 +242,19 @@ final public class InAppWebView extends InputAwareWebView {
       ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
       contentBlockerHandler.getRuleList().add(new ContentBlocker(trigger, action));
     }
+
+    setFindListener(new FindListener() {
+      @Override
+      public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
+        Map<String, Object> obj = new HashMap<>();
+        if (inAppBrowserActivity != null)
+          obj.put("uuid", inAppBrowserActivity.uuid);
+        obj.put("activeMatchOrdinal", activeMatchOrdinal);
+        obj.put("numberOfMatches", numberOfMatches);
+        obj.put("isDoneCounting", isDoneCounting);
+        getChannel().invokeMethod("onFindResultReceived", obj);
+      }
+    });
   }
 
   public void loadUrl(String url, MethodChannel.Result result) {

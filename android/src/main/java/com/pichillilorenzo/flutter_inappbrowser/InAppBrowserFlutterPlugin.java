@@ -103,7 +103,7 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       case "open":
         boolean isData = (boolean) call.argument("isData");
         if (!isData) {
-          final String url_final = call.argument("url").toString();
+          final String url_final = (String) call.argument("url");
 
           final boolean useChromeSafariBrowser = (boolean) call.argument("useChromeSafariBrowser");
 
@@ -174,10 +174,10 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
             @Override
             public void run() {
               HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
-              String data = call.argument("data").toString();
-              String mimeType = call.argument("mimeType").toString();
-              String encoding = call.argument("encoding").toString();
-              String baseUrl = call.argument("baseUrl").toString();
+              String data = (String) call.argument("data");
+              String mimeType = (String) call.argument("mimeType");
+              String encoding = (String) call.argument("encoding");
+              String baseUrl = (String) call.argument("baseUrl");
               openData(activity, uuid, options, data, mimeType, encoding, baseUrl);
               result.success(true);
             }
@@ -194,42 +194,42 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         result.success(getProgress(uuid));
         break;
       case "loadUrl":
-        loadUrl(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+        loadUrl(uuid, (String) call.argument("url"), (Map<String, String>) call.argument("headers"), result);
         break;
       case "postUrl":
-        postUrl(uuid, call.argument("url").toString(), (byte[]) call.argument("postData"), result);
+        postUrl(uuid, (String) call.argument("url"), (byte[]) call.argument("postData"), result);
         break;
       case "loadData":
         {
-          String data = call.argument("data").toString();
-          String mimeType = call.argument("mimeType").toString();
-          String encoding = call.argument("encoding").toString();
-          String baseUrl = call.argument("baseUrl").toString();
+          String data = (String) call.argument("data");
+          String mimeType = (String) call.argument("mimeType");
+          String encoding = (String) call.argument("encoding");
+          String baseUrl = (String) call.argument("baseUrl");
           loadData(uuid, data, mimeType, encoding, baseUrl, result);
         }
         break;
       case "loadFile":
-        loadFile(uuid, call.argument("url").toString(), (Map<String, String>) call.argument("headers"), result);
+        loadFile(uuid, (String) call.argument("url"), (Map<String, String>) call.argument("headers"), result);
         break;
       case "close":
         close(activity, uuid, result);
         break;
       case "injectScriptCode":
-        source = call.argument("source").toString();
+        source = (String) call.argument("source");
         injectScriptCode(uuid, source, result);
         break;
       case "injectScriptFile":
-        urlFile = call.argument("urlFile").toString();
+        urlFile = (String) call.argument("urlFile");
         injectScriptFile(uuid, urlFile);
         result.success(true);
         break;
       case "injectStyleCode":
-        source = call.argument("source").toString();
+        source = (String) call.argument("source");
         injectStyleCode(uuid, source);
         result.success(true);
         break;
       case "injectStyleFile":
-        urlFile = call.argument("urlFile").toString();
+        urlFile = (String) call.argument("urlFile");
         injectStyleFile(uuid, urlFile);
         result.success(true);
         break;
@@ -317,6 +317,18 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
         break;
       case "clearClientCertPreferences":
         clearClientCertPreferences(uuid, result);
+        break;
+      case "findAllAsync":
+        String find = (String) call.argument("find");
+        findAllAsync(uuid, find);
+        result.success(true);
+        break;
+      case "findNext":
+        Boolean forward = (Boolean) call.argument("forward");
+        findNext(uuid, forward, result);
+        break;
+      case "clearMatches":
+        clearMatches(uuid, result);
         break;
       default:
         result.notImplemented();
@@ -713,10 +725,30 @@ public class InAppBrowserFlutterPlugin implements MethodCallHandler {
       inAppBrowserActivity.clearSslPreferences();
   }
 
-  private void clearClientCertPreferences(String uuid, Result result) {
+  public void clearClientCertPreferences(String uuid, Result result) {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       inAppBrowserActivity.clearClientCertPreferences(result);
+    result.success(false);
+  }
+
+  public void findAllAsync(String uuid, String find) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.findAllAsync(find);
+  }
+
+  public void findNext(String uuid, Boolean forward, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.findNext(forward, result);
+    result.success(false);
+  }
+
+  public void clearMatches(String uuid, Result result) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.clearMatches(result);
     result.success(false);
   }
 }

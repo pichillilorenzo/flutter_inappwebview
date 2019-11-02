@@ -239,6 +239,18 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "getCopyBackForwardList":
                 result(self.getCopyBackForwardList(uuid: uuid))
                 break
+            case "findAllAsync":
+                let find = arguments!["find"] as! String
+                self.findAllAsync(uuid: uuid, find: find)
+                result(true)
+                break
+            case "findNext":
+                let forward = arguments!["forward"] as! Bool
+                self.findNext(uuid: uuid, forward: forward, result: result)
+                break
+            case "clearMatches":
+                self.clearMatches(uuid: uuid, result: result)
+                break
             case "clearCache":
                 self.clearCache(uuid: uuid)
                 result(true)
@@ -750,6 +762,40 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             return webViewController!.webView.getCopyBackForwardList()
         }
         return nil
+    }
+    
+    func findAllAsync(uuid: String, find: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.findAllAsync(find: find, completionHandler: nil)
+        }
+    }
+    
+    func findNext(uuid: String, forward: Bool, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.findNext(forward: forward, completionHandler: {(value, error) in
+                if error != nil {
+                    result(FlutterError(code: "FlutterWebViewController", message: error?.localizedDescription, details: nil))
+                    return
+                }
+                result(true)
+            })
+        } else {
+            result(false)
+        }
+    }
+    
+    func clearMatches(uuid: String, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.clearMatches(completionHandler: {(value, error) in
+                if error != nil {
+                    result(FlutterError(code: "FlutterWebViewController", message: error?.localizedDescription, details: nil))
+                    return
+                }
+                result(true)
+            })
+        } else {
+            result(false)
+        }
     }
     
     func clearCache(uuid: String) {

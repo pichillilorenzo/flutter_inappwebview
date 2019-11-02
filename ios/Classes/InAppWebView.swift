@@ -82,123 +82,154 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 
 let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
 
-let searchJavascript = """
-var uiWebview_SearchResultCount = 0;
+let findTextHighlightJS = """
+var wkwebview_SearchResultCount = 0;
+var wkwebview_CurrentHighlight = 0;
+var wkwebview_IsDoneCounting = false;
 
-/*!
- @method     uiWebview_HighlightAllOccurencesOfStringForElement
- @abstract   // helper function, recursively searches in elements and their child nodes
- @discussion // helper function, recursively searches in elements and their child nodes
+function wkwebview_FindAllAsyncForElement(element, keyword) {
+  if (element) {
+    if (element.nodeType == 3) {
+      // Text node
 
- element    - HTML elements
- keyword    - string to search
- */
+      var elementTmp = element;
+      while (true) {
+        var value = elementTmp.nodeValue; // Search for keyword in text node
+        var idx = value.toLowerCase().indexOf(keyword);
 
-function uiWebview_HighlightAllOccurencesOfStringForElement(element,keyword) {
-    if (element) {
-        if (element.nodeType == 3) {        // Text node
+        if (idx < 0) break;
 
-            var count = 0;
-            var elementTmp = element;
-            while (true) {
-                var value = elementTmp.nodeValue;  // Search for keyword in text node
-                var idx = value.toLowerCase().indexOf(keyword);
+        var span = document.createElement("span");
+        var text = document.createTextNode(value.substr(idx, keyword.length));
+        span.appendChild(text);
 
-                if (idx < 0) break;
+        span.setAttribute(
+          "id",
+          "WKWEBVIEW_SEARCH_WORD_" + wkwebview_SearchResultCount
+        );
+        span.setAttribute("class", "wkwebview_Highlight");
+        var backgroundColor = wkwebview_SearchResultCount == 0 ? "#FF9732" : "#FFFF00";
+        span.setAttribute("style", "color: #000 !important; background: " + backgroundColor + " !important; padding: 0px !important; margin: 0px !important; border: 0px !important;");
 
-                count++;
-                elementTmp = document.createTextNode(value.substr(idx+keyword.length));
-            }
+        text = document.createTextNode(value.substr(idx + keyword.length));
+        element.deleteData(idx, value.length - idx);
 
-            uiWebview_SearchResultCount += count;
+        var next = element.nextSibling;
+        element.parentNode.insertBefore(span, next);
+        element.parentNode.insertBefore(text, next);
+        element = text;
 
-            var index = uiWebview_SearchResultCount;
-            while (true) {
-                var value = element.nodeValue;  // Search for keyword in text node
-                var idx = value.toLowerCase().indexOf(keyword);
+        wkwebview_SearchResultCount++;
+        elementTmp = document.createTextNode(
+          value.substr(idx + keyword.length)
+        );
 
-                if (idx < 0) break;             // not found, abort
-
-                //we create a SPAN element for every parts of matched keywords
-                var span = document.createElement("span");
-                var text = document.createTextNode(value.substr(idx,keyword.length));
-                span.appendChild(text);
-
-                span.setAttribute("class","uiWebviewHighlight");
-                span.style.backgroundColor="yellow";
-                span.style.color="black";
-
-                index--;
-                span.setAttribute("id", "SEARCH_WORD"+(index));
-                //span.setAttribute("id", "SEARCH_WORD"+uiWebview_SearchResultCount);
-
-                //element.parentNode.setAttribute("id", "SEARCH_WORD"+uiWebview_SearchResultCount);
-
-                //uiWebview_SearchResultCount++;    // update the counter
-
-                text = document.createTextNode(value.substr(idx+keyword.length));
-                element.deleteData(idx, value.length - idx);
-
-                var next = element.nextSibling;
-                //alert(element.parentNode);
-                element.parentNode.insertBefore(span, next);
-                element.parentNode.insertBefore(text, next);
-                element = text;
-            }
-
-
-        } else if (element.nodeType == 1) { // Element node
-            if (element.style.display != "none" && element.nodeName.toLowerCase() != 'select') {
-                for (var i=element.childNodes.length-1; i>=0; i--) {
-                    uiWebview_HighlightAllOccurencesOfStringForElement(element.childNodes[i],keyword);
-                }
-            }
+        window.webkit.messageHandlers["findResultReceived"].postMessage(
+          JSON.stringify({
+            activeMatchOrdinal: wkwebview_CurrentHighlight,
+            numberOfMatches: wkwebview_SearchResultCount,
+            isDoneCounting: wkwebview_IsDoneCounting
+          })
+        );
+      }
+    } else if (element.nodeType == 1) {
+      // Element node
+      if (
+        element.style.display != "none" &&
+        element.nodeName.toLowerCase() != "select"
+      ) {
+        for (var i = element.childNodes.length - 1; i >= 0; i--) {
+          wkwebview_FindAllAsyncForElement(
+            element.childNodes[element.childNodes.length - 1 - i],
+            keyword
+          );
         }
+      }
     }
+  }
 }
 
 // the main entry point to start the search
-function uiWebview_HighlightAllOccurencesOfString(keyword) {
-    uiWebview_RemoveAllHighlights();
-    uiWebview_HighlightAllOccurencesOfStringForElement(document.body, keyword.toLowerCase());
+function wkwebview_FindAllAsync(keyword) {
+  wkwebview_ClearMatches();
+  wkwebview_FindAllAsyncForElement(document.body, keyword.toLowerCase());
+  wkwebview_IsDoneCounting = true;
+  window.webkit.messageHandlers["findResultReceived"].postMessage(
+    JSON.stringify({
+      activeMatchOrdinal: wkwebview_CurrentHighlight,
+      numberOfMatches: wkwebview_SearchResultCount,
+      isDoneCounting: wkwebview_IsDoneCounting
+    })
+  );
 }
 
 // helper function, recursively removes the highlights in elements and their childs
-function uiWebview_RemoveAllHighlightsForElement(element) {
-    if (element) {
-        if (element.nodeType == 1) {
-            if (element.getAttribute("class") == "uiWebviewHighlight") {
-                var text = element.removeChild(element.firstChild);
-                element.parentNode.insertBefore(text,element);
-                element.parentNode.removeChild(element);
-                return true;
-            } else {
-                var normalize = false;
-                for (var i=element.childNodes.length-1; i>=0; i--) {
-                    if (uiWebview_RemoveAllHighlightsForElement(element.childNodes[i])) {
-                        normalize = true;
-                    }
-                }
-                if (normalize) {
-                    element.normalize();
-                }
-            }
+function wkwebview_ClearMatchesForElement(element) {
+  if (element) {
+    if (element.nodeType == 1) {
+      if (element.getAttribute("class") == "wkwebview_Highlight") {
+        var text = element.removeChild(element.firstChild);
+        element.parentNode.insertBefore(text, element);
+        element.parentNode.removeChild(element);
+        return true;
+      } else {
+        var normalize = false;
+        for (var i = element.childNodes.length - 1; i >= 0; i--) {
+          if (wkwebview_ClearMatchesForElement(element.childNodes[i])) {
+            normalize = true;
+          }
         }
+        if (normalize) {
+          element.normalize();
+        }
+      }
     }
-    return false;
+  }
+  return false;
 }
 
 // the main entry point to remove the highlights
-function uiWebview_RemoveAllHighlights() {
-    uiWebview_SearchResultCount = 0;
-    uiWebview_RemoveAllHighlightsForElement(document.body);
+function wkwebview_ClearMatches() {
+  wkwebview_SearchResultCount = 0;
+  wkwebview_CurrentHighlight = 0;
+  wkwebview_ClearMatchesForElement(document.body);
 }
 
-function uiWebview_ScrollTo(idx) {
-    var scrollTo = document.getElementById("SEARCH_WORD" + idx);
-    if (scrollTo) scrollTo.scrollIntoView();
-}
+function wkwebview_FindNext(forward) {
+  if (wkwebview_SearchResultCount <= 0) return;
 
+  var idx = wkwebview_CurrentHighlight + (forward ? +1 : -1);
+  idx =
+    idx < 0
+      ? wkwebview_SearchResultCount - 1
+      : idx >= wkwebview_SearchResultCount
+      ? 0
+      : idx;
+  wkwebview_CurrentHighlight = idx;
+
+  var scrollTo = document.getElementById("WKWEBVIEW_SEARCH_WORD_" + idx);
+  if (scrollTo) {
+    var highlights = document.getElementsByClassName("wkwebview_Highlight");
+    for (var i = 0; i < highlights.length; i++) {
+      var span = highlights[i];
+      span.style.backgroundColor = "#FFFF00";
+    }
+    scrollTo.style.backgroundColor = "#FF9732";
+
+    scrollTo.scrollIntoView({
+      behavior: "auto",
+      block: "center"
+    });
+
+    window.webkit.messageHandlers["findResultReceived"].postMessage(
+      JSON.stringify({
+        activeMatchOrdinal: wkwebview_CurrentHighlight,
+        numberOfMatches: wkwebview_SearchResultCount,
+        isDoneCounting: wkwebview_IsDoneCounting
+      })
+    );
+  }
+}
 """
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
@@ -280,6 +311,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addUserScript(resourceObserverJSScript)
         configuration.userContentController.add(self, name: "resourceLoaded")
         
+        let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(findTextHighlightJSScript)
+        configuration.userContentController.add(self, name: "findResultReceived")
+        
         //keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
         
         configuration.suppressesIncrementalRendering = (options?.suppressesIncrementalRendering)!
@@ -330,8 +365,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.clearCache)! {
             clearCache()
         }
-        
-        evaluateJavaScript(searchJavascript, completionHandler: nil)
     }
     
     @available(iOS 10.0, *)
@@ -854,15 +887,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             IABController!.forwardButton.isEnabled = canGoForward
             IABController!.spinner.stopAnimating()
         }
-        
-//        findAllAsync("Flutter", completionHandler: {(value, error) in
-//            if error != nil {
-//                print(error)
-//            } else if let foundOccurences: Int = value as! Int {
-//                print(foundOccurences)
-//                //self.findNext(to: foundOccurences - 4, completionHandler: nil)
-//            }
-//        })
     }
     
     public func webView(_ view: WKWebView,
@@ -1342,6 +1366,20 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
+        var arguments: [String : Any] = [
+            "activeMatchOrdinal": activeMatchOrdinal,
+            "numberOfMatches": numberOfMatches,
+            "isDoneCounting": isDoneCounting
+        ]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onFindResultReceived", arguments: arguments)
+        }
+    }
+    
     public func onScrollChanged(x: Int, y: Int) {
         var arguments: [String: Any] = ["x": x, "y": y]
         if IABController != nil {
@@ -1563,6 +1601,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let _callHandlerID = body["_callHandlerID"] as! Int64
             let args = body["args"] as! String
             onCallJsHandler(handlerName: handlerName, _callHandlerID: _callHandlerID, args: args)
+        } else if message.name == "findResultReceived" {
+            if let resource = convertToDictionary(text: message.body as! String) {
+                let activeMatchOrdinal = resource["activeMatchOrdinal"] as! Int
+                let numberOfMatches = resource["numberOfMatches"] as! Int
+                let isDoneCounting = resource["isDoneCounting"] as! Bool
+                
+                self.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+            }
         }
     }
     
@@ -1570,16 +1616,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return (IABController != nil) ? SwiftFlutterPlugin.instance!.channel! : ((IAWController != nil) ? IAWController!.channel! : nil);
     }
     
-    func findAllAsync(_ str: String?, completionHandler: ((Any?, Error?) -> Void)?) {
-        let startSearch = "uiWebview_HighlightAllOccurencesOfString('\(str ?? "")'); uiWebview_SearchResultCount"
+    func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+        let startSearch = "wkwebview_FindAllAsync('\(find ?? "")');"
         evaluateJavaScript(startSearch, completionHandler: completionHandler)
     }
 
-    func findNext(to index: Int, completionHandler: ((Any?, Error?) -> Void)?) {
-        evaluateJavaScript("uiWebview_ScrollTo('\(index)')", completionHandler: completionHandler)
+    func findNext(forward: Bool, completionHandler: ((Any?, Error?) -> Void)?) {
+        evaluateJavaScript("wkwebview_FindNext(\(forward ? "true" : "false"));", completionHandler: completionHandler)
     }
 
     func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
-        evaluateJavaScript("uiWebview_RemoveAllHighlights()", completionHandler: completionHandler)
+        evaluateJavaScript("wkwebview_ClearMatches();", completionHandler: completionHandler)
     }
 }

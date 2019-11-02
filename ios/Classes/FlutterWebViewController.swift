@@ -259,6 +259,42 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
             case "getCopyBackForwardList":
                 result((webView != nil) ? webView!.getCopyBackForwardList() : nil)
                 break
+            case "findAllAsync":
+                if webView != nil {
+                    let find = arguments!["find"] as! String
+                    webView!.findAllAsync(find: find, completionHandler: nil)
+                    result(true)
+                } else {
+                    result(false)
+                }
+                break
+            case "findNext":
+                if webView != nil {
+                    let forward = arguments!["forward"] as! Bool
+                    webView!.findNext(forward: forward, completionHandler: {(value, error) in
+                        if error != nil {
+                            result(FlutterError(code: "FlutterWebViewController", message: error?.localizedDescription, details: nil))
+                            return
+                        }
+                        result(true)
+                    })
+                } else {
+                    result(false)
+                }
+                break
+            case "clearMatches":
+                if webView != nil {
+                    webView!.clearMatches(completionHandler: {(value, error) in
+                        if error != nil {
+                            result(FlutterError(code: "FlutterWebViewController", message: error?.localizedDescription, details: nil))
+                            return
+                        }
+                        result(true)
+                    })
+                } else {
+                    result(false)
+                }
+                break
             case "clearCache":
                 if webView != nil {
                     webView!.clearCache()

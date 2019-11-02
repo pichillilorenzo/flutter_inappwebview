@@ -4,7 +4,6 @@ import 'dart:collection';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappbrowser/src/webview_options.dart';
 
-import 'http_auth_credentials_database.dart';
 import 'types.dart';
 import 'channel_manager.dart';
 import 'in_app_webview.dart' show InAppWebViewController;
@@ -421,6 +420,18 @@ class InAppBrowser {
 
   ///
   Future<ClientCertResponse> onReceivedClientCertRequest(ClientCertChallenge challenge) {
+
+  }
+
+  ///Event fired as find-on-page operations progress.
+  ///The listener may be notified multiple times while the operation is underway, and the numberOfMatches value should not be considered final unless [isDoneCounting] is true.
+  ///
+  ///[activeMatchOrdinal] represents the zero-based ordinal of the currently selected match.
+  ///
+  ///[numberOfMatches] represents how many matches have been found.
+  ///
+  ///[isDoneCounting] whether the find operation has actually completed.
+  void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {
 
   }
 

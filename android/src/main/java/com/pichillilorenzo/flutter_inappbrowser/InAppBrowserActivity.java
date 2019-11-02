@@ -499,4 +499,27 @@ public class InAppBrowserActivity extends AppCompatActivity {
     else
       result.success(false);
   }
+
+  public void findAllAsync(String find) {
+    if (webView != null)
+      webView.findAllAsync(find);
+  }
+
+  public void findNext(Boolean forward, MethodChannel.Result result) {
+    if (webView != null) {
+      webView.findNext(forward);
+      result.success(true);
+    }
+    else
+      result.success(false);
+  }
+
+  public void clearMatches(MethodChannel.Result result) {
+    if (webView != null) {
+      webView.clearMatches();
+      result.success(true);
+    }
+    else
+      result.success(false);
+  }
 }

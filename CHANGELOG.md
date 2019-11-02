@@ -25,7 +25,7 @@
 - Added `clearCache()` method
 - Added `HttpAuthCredentialDatabase` class
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
-
+- Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class

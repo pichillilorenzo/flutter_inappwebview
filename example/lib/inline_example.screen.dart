@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
@@ -82,7 +83,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               BoxDecoration(border: Border.all(color: Colors.blueAccent)),
           child: InAppWebView(
             //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
-            initialUrl: "https://flutter.dev/",
+            initialUrl: "https://github.com",
             //initialUrl: "chrome://safe-browsing/match?type=malware",
             //initialUrl: "http://192.168.1.20:8081/",
             //initialUrl: "https://192.168.1.20:4433/",
@@ -142,9 +143,8 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 controller.clearSslPreferences();
                 controller.clearClientCertPreferences();
               }
-//              controller.injectScriptCode("""
-//              document.getElementById("SEARCH_WORD" + 5).scrollIntoView();
-//              """);
+              //controller.findAllAsync("a");
+              controller.getFavicon();
             },
             onLoadError: (InAppWebViewController controller, String url, int code, String message) async {
               print("error $url: $code, $message");
@@ -259,6 +259,9 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("CLIENT CERT REQUEST: ${challenge.protectionSpace.host}");
 
               return new ClientCertResponse(certificatePath: "assets/certificate.pfx", certificatePassword: "", androidKeyStoreType: "PKCS12", action: ClientCertResponseAction.PROCEED);
+            },
+            onFindResultReceived: (InAppWebViewController controller, int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) async {
+              print("Current highlighted: $activeMatchOrdinal, Number of matches found: $numberOfMatches, find operation completed: $isDoneCounting");
             },
           ),
         ),

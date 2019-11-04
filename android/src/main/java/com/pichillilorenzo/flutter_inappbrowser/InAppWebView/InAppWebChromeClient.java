@@ -519,9 +519,7 @@ public class InAppWebChromeClient extends WebChromeClient implements PluginRegis
     public boolean onShowFileChooser(
             WebView webView, ValueCallback<Uri[]> filePathCallback,
             FileChooserParams fileChooserParams) {
-        if (mUploadMessageArray == null) {
-            mUploadMessageArray = filePathCallback;
-        }
+        mUploadMessageArray = filePathCallback;
 
         Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
         contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);

@@ -10,11 +10,26 @@ class ContentBlocker {
       "action": action.toMap()
     };
   }
+
+  static ContentBlocker fromMap(Map<dynamic, Map<dynamic, dynamic>> map) {
+    return ContentBlocker(
+        ContentBlockerTrigger.fromMap(
+          Map<String, dynamic>.from(map["trigger"])
+        ),
+        ContentBlockerAction.fromMap(
+          Map<String, dynamic>.from(map["action"])
+        )
+      );
+  }
 }
 
 class ContentBlockerTriggerResourceType {
   final String _value;
   const ContentBlockerTriggerResourceType._internal(this._value);
+  static ContentBlockerTriggerResourceType fromValue(String value) {
+    return (["document", "image", "LINK", "style-sheet", "script", "font",
+      "media", "svg-document", "raw"].contains(value)) ? ContentBlockerTriggerResourceType._internal(value) : null;
+  }
   toValue() => _value;
 
   static const DOCUMENT = const ContentBlockerTriggerResourceType._internal('document');
@@ -30,6 +45,9 @@ class ContentBlockerTriggerResourceType {
 class ContentBlockerTriggerLoadType {
   final String _value;
   const ContentBlockerTriggerLoadType._internal(this._value);
+  static ContentBlockerTriggerLoadType fromValue(String value) {
+    return (["first-party", "third-party"].contains(value)) ? ContentBlockerTriggerLoadType._internal(value) : null;
+  }
   toValue() => _value;
 
   static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
@@ -90,11 +108,40 @@ class ContentBlockerTrigger {
 
     return map;
   }
+
+  static ContentBlockerTrigger fromMap(Map<String, dynamic> map) {
+    List<ContentBlockerTriggerResourceType> resourceType = [];
+    List<ContentBlockerTriggerLoadType> loadType = [];
+
+    List<String> resourceTypeStringList = List<String>.from(map["resource-type"] ?? []);
+    resourceTypeStringList.forEach((type) {
+      resourceType.add(ContentBlockerTriggerResourceType.fromValue(type));
+    });
+
+    List<String> loadTypeStringList = List<String>.from(map["load-type"] ?? []);
+    loadTypeStringList.forEach((type) {
+      loadType.add(ContentBlockerTriggerLoadType.fromValue(type));
+    });
+
+    return ContentBlockerTrigger(
+        map["url-filter"],
+        urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
+        ifDomain: List<String>.from(map["if-domain"] ?? []),
+        unlessDomain: List<String>.from(map["unless-domain"] ?? []),
+        resourceType: resourceType,
+        loadType: loadType,
+        ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
+        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? [])
+    );
+  }
 }
 
 class ContentBlockerActionType {
   final String _value;
   const ContentBlockerActionType._internal(this._value);
+  static ContentBlockerActionType fromValue(String value) {
+    return (["block", "css-display-none", "make-https"].contains(value)) ? ContentBlockerActionType._internal(value) : null;
+  }
   toValue() => _value;
 
   static const BLOCK = const ContentBlockerActionType._internal('block');
@@ -126,5 +173,12 @@ class ContentBlockerAction {
         .forEach(map.remove);
 
     return map;
+  }
+
+  static ContentBlockerAction fromMap(Map<String, dynamic> map) {
+    return ContentBlockerAction(
+        ContentBlockerActionType.fromValue(map["type"]),
+        selector: map["selector"]
+    );
   }
 }

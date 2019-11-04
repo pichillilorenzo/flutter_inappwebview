@@ -4,7 +4,8 @@ import 'dart:typed_data';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/cupertino.dart';
-import 'in_app_webview.dart';
+
+import 'webview_options.dart';
 
 var uuidGenerator = new Uuid();
 
@@ -27,7 +28,7 @@ class ConsoleMessageLevel {
   final int _value;
   const ConsoleMessageLevel._internal(this._value);
   static ConsoleMessageLevel fromValue(int value) {
-    if (value >= 0 && value <= 4)
+    if (value != null && value >= 0 && value <= 4)
       return ConsoleMessageLevel._internal(value);
     return null;
   }
@@ -42,7 +43,7 @@ class ConsoleMessageLevel {
 
 ///Public class representing a resource response of the [InAppBrowser] WebView.
 ///It is used by the method [InAppBrowser.onLoadResource()].
-class WebResourceResponse {
+class LoadedResource {
 
   ///A string representing the type of resource.
   String initiatorType;
@@ -53,27 +54,58 @@ class WebResourceResponse {
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
   double duration;
 
-  WebResourceResponse(this.initiatorType, this.url, this.startTime, this.duration);
+  LoadedResource(this.initiatorType, this.url, this.startTime, this.duration);
 
 }
 
-///Public class representing the response returned by the [onLoadResourceCustomScheme()] event of [InAppWebView].
+/*
+///Public class representing a resource request of the WebView.
+///It is used by the event [shouldInterceptRequest()].
+class WebResourceRequest {
+
+  String url;
+  Map<String, String> headers;
+  String method;
+
+  WebResourceRequest({@required this.url, @required this.headers, @required this.method});
+
+}
+
+///Public class representing a resource response of the WebView.
+///It is used by the event [shouldInterceptRequest()].
+class WebResourceResponse {
+  String contentType;
+  String contentEncoding;
+  Uint8List data;
+
+  WebResourceResponse({@required this.contentType, this.contentEncoding = "utf-8", @required this.data}): assert(contentType != null && contentEncoding != null && data != null);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "contentType": contentType,
+      "contentEncoding": contentEncoding,
+      "data": data
+    };
+  }
+}*/
+
+///Public class representing the response returned by the [onLoadResourceCustomScheme()] event.
 ///It allows to load a specific resource. The resource data must be encoded to `base64`.
 class CustomSchemeResponse {
   ///Data enconded to 'base64'.
-  String base64data;
+  Uint8List data;
   ///Content-Type of the data, such as `image/png`.
   String contentType;
   ///Content-Enconding of the data, such as `utf-8`.
   String contentEnconding;
 
-  CustomSchemeResponse(this.base64data, this.contentType, {this.contentEnconding = 'utf-8'});
+  CustomSchemeResponse(this.data, this.contentType, {this.contentEnconding = 'utf-8'});
 
   Map<String, dynamic> toJson() {
     return {
       'content-type': this.contentType,
       'content-encoding': this.contentEnconding,
-      'base64data': this.base64data
+      'data': this.data
     };
   }
 }
@@ -244,7 +276,7 @@ class SafeBrowsingThreat {
   final int _value;
   const SafeBrowsingThreat._internal(this._value);
   static SafeBrowsingThreat fromValue(int value) {
-    if (value >= 0 && value <= 4)
+    if (value != null && value >= 0 && value <= 4)
       return SafeBrowsingThreat._internal(value);
     return null;
   }
@@ -430,6 +462,11 @@ class Favicon {
 class AndroidInAppWebViewCacheMode {
   final int _value;
   const AndroidInAppWebViewCacheMode._internal(this._value);
+  static AndroidInAppWebViewCacheMode fromValue(int value) {
+    if (value != null && value >= 0 && value <= 3)
+      return AndroidInAppWebViewCacheMode._internal(value);
+    return null;
+  }
   toValue() => _value;
 
   static const LOAD_DEFAULT = const AndroidInAppWebViewCacheMode._internal(-1);
@@ -442,6 +479,11 @@ class AndroidInAppWebViewCacheMode {
 class AndroidInAppWebViewModeMenuItem {
   final int _value;
   const AndroidInAppWebViewModeMenuItem._internal(this._value);
+  static AndroidInAppWebViewModeMenuItem fromValue(int value) {
+    if (value != null && value >= 0 && value <= 4)
+      return AndroidInAppWebViewModeMenuItem._internal(value);
+    return null;
+  }
   toValue() => _value;
 
   static const MENU_ITEM_NONE = const AndroidInAppWebViewModeMenuItem._internal(0);
@@ -454,6 +496,11 @@ class AndroidInAppWebViewModeMenuItem {
 class AndroidInAppWebViewForceDark {
   final int _value;
   const AndroidInAppWebViewForceDark._internal(this._value);
+  static AndroidInAppWebViewForceDark fromValue(int value) {
+    if (value != null && value >= 0 && value <= 2)
+      return AndroidInAppWebViewForceDark._internal(value);
+    return null;
+  }
   toValue() => _value;
 
   static const FORCE_DARK_OFF = const AndroidInAppWebViewForceDark._internal(0);
@@ -465,6 +512,9 @@ class AndroidInAppWebViewForceDark {
 class AndroidInAppWebViewLayoutAlgorithm {
   final String _value;
   const AndroidInAppWebViewLayoutAlgorithm._internal(this._value);
+  static AndroidInAppWebViewLayoutAlgorithm fromValue(String value) {
+    return (["NORMAL", "TEXT_AUTOSIZING"].contains(value)) ? AndroidInAppWebViewLayoutAlgorithm._internal(value) : null;
+  }
   toValue() => _value;
 
   static const NORMAL = const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
@@ -475,6 +525,11 @@ class AndroidInAppWebViewLayoutAlgorithm {
 class AndroidInAppWebViewMixedContentMode {
   final int _value;
   const AndroidInAppWebViewMixedContentMode._internal(this._value);
+  static AndroidInAppWebViewMixedContentMode fromValue(int value) {
+    if (value != null && value >= 0 && value <= 2)
+      return AndroidInAppWebViewMixedContentMode._internal(value);
+    return null;
+  }
   toValue() => _value;
 
   static const MIXED_CONTENT_ALWAYS_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(0);
@@ -483,37 +538,51 @@ class AndroidInAppWebViewMixedContentMode {
 }
 
 ///
-class iOSInAppWebViewSelectionGranularity {
+class IosInAppWebViewSelectionGranularity {
   final int _value;
-  const iOSInAppWebViewSelectionGranularity._internal(this._value);
+  const IosInAppWebViewSelectionGranularity._internal(this._value);
+  static IosInAppWebViewSelectionGranularity fromValue(int value) {
+    if (value != null && value >= 0 && value <= 1)
+      return IosInAppWebViewSelectionGranularity._internal(value);
+    return null;
+  }
   toValue() => _value;
 
-  static const CHARACTER = const iOSInAppWebViewSelectionGranularity._internal(0);
-  static const DYNAMIC = const iOSInAppWebViewSelectionGranularity._internal(1);
+  static const CHARACTER = const IosInAppWebViewSelectionGranularity._internal(0);
+  static const DYNAMIC = const IosInAppWebViewSelectionGranularity._internal(1);
 }
 
 ///
-class iOSInAppWebViewDataDetectorTypes {
+class IosInAppWebViewDataDetectorTypes {
   final String _value;
-  const iOSInAppWebViewDataDetectorTypes._internal(this._value);
+  const IosInAppWebViewDataDetectorTypes._internal(this._value);
+  static IosInAppWebViewDataDetectorTypes fromValue(String value) {
+    return (["NONE", "PHONE_NUMBER", "LINK", "ADDRESS", "CALENDAR_EVENT", "TRACKING_NUMBER",
+      "TRACKING_NUMBER", "FLIGHT_NUMBER", "LOOKUP_SUGGESTION", "SPOTLIGHT_SUGGESTION", "ALL"].contains(value)) ? IosInAppWebViewDataDetectorTypes._internal(value) : null;
+  }
   toValue() => _value;
 
-  static const NONE = const iOSInAppWebViewDataDetectorTypes._internal("NONE");
-  static const PHONE_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
-  static const LINK = const iOSInAppWebViewDataDetectorTypes._internal("LINK");
-  static const ADDRESS = const iOSInAppWebViewDataDetectorTypes._internal("ADDRESS");
-  static const CALENDAR_EVENT = const iOSInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
-  static const TRACKING_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
-  static const FLIGHT_NUMBER = const iOSInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
-  static const LOOKUP_SUGGESTION = const iOSInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
-  static const SPOTLIGHT_SUGGESTION = const iOSInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
-  static const ALL = const iOSInAppWebViewDataDetectorTypes._internal("ALL");
+  static const NONE = const IosInAppWebViewDataDetectorTypes._internal("NONE");
+  static const PHONE_NUMBER = const IosInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
+  static const LINK = const IosInAppWebViewDataDetectorTypes._internal("LINK");
+  static const ADDRESS = const IosInAppWebViewDataDetectorTypes._internal("ADDRESS");
+  static const CALENDAR_EVENT = const IosInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
+  static const TRACKING_NUMBER = const IosInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
+  static const FLIGHT_NUMBER = const IosInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
+  static const LOOKUP_SUGGESTION = const IosInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
+  static const SPOTLIGHT_SUGGESTION = const IosInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+  static const ALL = const IosInAppWebViewDataDetectorTypes._internal("ALL");
 }
 
 ///
 class InAppWebViewUserPreferredContentMode {
   final int _value;
   const InAppWebViewUserPreferredContentMode._internal(this._value);
+  static InAppWebViewUserPreferredContentMode fromValue(int value) {
+    if (value != null && value >= 0 && value <= 2)
+      return InAppWebViewUserPreferredContentMode._internal(value);
+    return null;
+  }
   toValue() => _value;
 
   static const RECOMMENDED = const InAppWebViewUserPreferredContentMode._internal(0);
@@ -522,42 +591,84 @@ class InAppWebViewUserPreferredContentMode {
 }
 
 ///
-class iOSWebViewOptionsPresentationStyle {
+class IosWebViewOptionsPresentationStyle {
   final int _value;
-  const iOSWebViewOptionsPresentationStyle._internal(this._value);
+  const IosWebViewOptionsPresentationStyle._internal(this._value);
+  static IosWebViewOptionsPresentationStyle fromValue(int value) {
+    if (value != null && value >= 0 && value <= 9)
+      return IosWebViewOptionsPresentationStyle._internal(value);
+    return null;
+  }
   toValue() => _value;
 
-  static const FULL_SCREEN = const iOSWebViewOptionsPresentationStyle._internal(0);
-  static const PAGE_SHEET = const iOSWebViewOptionsPresentationStyle._internal(1);
-  static const FORM_SHEET = const iOSWebViewOptionsPresentationStyle._internal(2);
-  static const CURRENT_CONTEXT = const iOSWebViewOptionsPresentationStyle._internal(3);
-  static const CUSTOM = const iOSWebViewOptionsPresentationStyle._internal(4);
-  static const OVER_FULL_SCREEN = const iOSWebViewOptionsPresentationStyle._internal(5);
-  static const OVER_CURRENT_CONTEXT = const iOSWebViewOptionsPresentationStyle._internal(6);
-  static const POPOVER = const iOSWebViewOptionsPresentationStyle._internal(7);
-  static const NONE = const iOSWebViewOptionsPresentationStyle._internal(8);
-  static const AUTOMATIC = const iOSWebViewOptionsPresentationStyle._internal(9);
+  static const FULL_SCREEN = const IosWebViewOptionsPresentationStyle._internal(0);
+  static const PAGE_SHEET = const IosWebViewOptionsPresentationStyle._internal(1);
+  static const FORM_SHEET = const IosWebViewOptionsPresentationStyle._internal(2);
+  static const CURRENT_CONTEXT = const IosWebViewOptionsPresentationStyle._internal(3);
+  static const CUSTOM = const IosWebViewOptionsPresentationStyle._internal(4);
+  static const OVER_FULL_SCREEN = const IosWebViewOptionsPresentationStyle._internal(5);
+  static const OVER_CURRENT_CONTEXT = const IosWebViewOptionsPresentationStyle._internal(6);
+  static const POPOVER = const IosWebViewOptionsPresentationStyle._internal(7);
+  static const NONE = const IosWebViewOptionsPresentationStyle._internal(8);
+  static const AUTOMATIC = const IosWebViewOptionsPresentationStyle._internal(9);
 }
 
 ///
-class iOSWebViewOptionsTransitionStyle {
+class IosWebViewOptionsTransitionStyle {
   final int _value;
-  const iOSWebViewOptionsTransitionStyle._internal(this._value);
+  const IosWebViewOptionsTransitionStyle._internal(this._value);
+  static IosWebViewOptionsTransitionStyle fromValue(int value) {
+    if (value != null && value >= 0 && value <= 3)
+      return IosWebViewOptionsTransitionStyle._internal(value);
+    return null;
+  }
   toValue() => _value;
 
-  static const COVER_VERTICAL = const iOSWebViewOptionsTransitionStyle._internal(0);
-  static const FLIP_HORIZONTAL = const iOSWebViewOptionsTransitionStyle._internal(1);
-  static const CROSS_DISSOLVE = const iOSWebViewOptionsTransitionStyle._internal(2);
-  static const PARTIAL_CURL = const iOSWebViewOptionsTransitionStyle._internal(3);
+  static const COVER_VERTICAL = const IosWebViewOptionsTransitionStyle._internal(0);
+  static const FLIP_HORIZONTAL = const IosWebViewOptionsTransitionStyle._internal(1);
+  static const CROSS_DISSOLVE = const IosWebViewOptionsTransitionStyle._internal(2);
+  static const PARTIAL_CURL = const IosWebViewOptionsTransitionStyle._internal(3);
 }
 
 ///
-class iOSSafariOptionsDismissButtonStyle {
+class IosSafariOptionsDismissButtonStyle {
   final int _value;
-  const iOSSafariOptionsDismissButtonStyle._internal(this._value);
+  const IosSafariOptionsDismissButtonStyle._internal(this._value);
+  static IosSafariOptionsDismissButtonStyle fromValue(int value) {
+    if (value != null && value >= 0 && value <= 2)
+      return IosSafariOptionsDismissButtonStyle._internal(value);
+    return null;
+  }
   toValue() => _value;
 
-  static const DONE = const iOSSafariOptionsDismissButtonStyle._internal(0);
-  static const CLOSE = const iOSSafariOptionsDismissButtonStyle._internal(1);
-  static const CANCEL = const iOSSafariOptionsDismissButtonStyle._internal(2);
+  static const DONE = const IosSafariOptionsDismissButtonStyle._internal(0);
+  static const CLOSE = const IosSafariOptionsDismissButtonStyle._internal(1);
+  static const CANCEL = const IosSafariOptionsDismissButtonStyle._internal(2);
+}
+
+///
+class InAppWebViewWidgetOptions {
+  InAppWebViewOptions inAppWebViewOptions;
+  AndroidInAppWebViewOptions androidInAppWebViewOptions;
+  IosInAppWebViewOptions iosInAppWebViewOptions;
+
+  InAppWebViewWidgetOptions({this.inAppWebViewOptions, this.androidInAppWebViewOptions, this.iosInAppWebViewOptions});
+}
+
+///
+class InAppBrowserClassOptions {
+  InAppBrowserOptions inAppBrowserOptions;
+  AndroidInAppBrowserOptions androidInAppBrowserOptions;
+  IosInAppBrowserOptions iosInAppBrowserOptions;
+  InAppWebViewWidgetOptions inAppWebViewWidgetOptions;
+
+  InAppBrowserClassOptions({this.inAppBrowserOptions, this.androidInAppBrowserOptions, this.iosInAppBrowserOptions, this.inAppWebViewWidgetOptions});
+}
+
+///
+class ChromeSafariBrowserClassOptions {
+  AndroidChromeCustomTabsOptions androidChromeCustomTabsOptions;
+  IosSafariOptions iosSafariOptions;
+
+  ChromeSafariBrowserClassOptions({this.androidChromeCustomTabsOptions, this.iosSafariOptions});
 }

@@ -20,13 +20,13 @@ class CustomeSchemeHandler : NSObject, WKURLSchemeHandler {
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {}
                 else {
-                    let json: [String: String]
+                    let json: [String: Any]
                     if let r = result {
-                        json = r as! [String: String]
-                        let urlResponse = URLResponse(url: url, mimeType: json["content-type"], expectedContentLength: -1, textEncodingName: json["content-encoding"])
-                        let data = Data(base64Encoded: json["base64data"]!, options: .ignoreUnknownCharacters)
+                        json = r as! [String: Any]
+                        let urlResponse = URLResponse(url: url, mimeType: json["content-type"] as! String, expectedContentLength: -1, textEncodingName: json["content-encoding"] as! String)
+                        let data = json["data"] as! FlutterStandardTypedData
                         urlSchemeTask.didReceive(urlResponse)
-                        urlSchemeTask.didReceive(data!)
+                        urlSchemeTask.didReceive(data.data)
                         urlSchemeTask.didFinish()
                     }
                 }

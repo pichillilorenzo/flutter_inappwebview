@@ -24,6 +24,9 @@ flutter:
     androidPackage: com.pichillilorenzo.flutter_inappbrowser
     pluginClass: InAppBrowserFlutterPlugin
 
+  assets:
+    - packages/flutter_inappbrowser/t_rex_runner/t-rex.html
+    - packages/flutter_inappbrowser/t_rex_runner/t-rex.css
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg

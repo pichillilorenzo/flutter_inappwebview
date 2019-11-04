@@ -112,7 +112,7 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
   ///
   ///**NOTE only for Android**: to be able to listen this event, you need also the enable javascript.
-  final void Function(InAppWebViewController controller, WebResourceResponse response) onLoadResource;
+  final void Function(InAppWebViewController controller, LoadedResource resource) onLoadResource;
 
   ///Event fires when the [InAppWebView] scrolls.
   ///
@@ -207,7 +207,7 @@ class InAppWebView extends StatefulWidget {
   ///Initial headers that will be used.
   final Map<String, String> initialHeaders;
   ///Initial options that will be used.
-  final List<WebViewOptions> initialOptions;
+  final InAppWebViewWidgetOptions initialOptions;
   /// `gestureRecognizers` specifies which gestures should be consumed by the web view.
   /// It is possible for other gesture recognizers to be competing with the web view on pointer
   /// events, e.g if the web view is inside a [ListView] the [ListView] will want to handle
@@ -223,7 +223,7 @@ class InAppWebView extends StatefulWidget {
     this.initialFile,
     this.initialData,
     this.initialHeaders = const {},
-    this.initialOptions = const [],
+    this.initialOptions,
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
@@ -259,10 +259,11 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   Widget build(BuildContext context) {
     Map<String, dynamic> initialOptions = {};
-    widget.initialOptions.forEach((webViewOption) {
-      if ((Platform.isAndroid && webViewOption is AndroidOptions) || (Platform.isIOS && webViewOption is iOSOptions))
-        initialOptions.addAll(webViewOption.toMap());
-    });
+    initialOptions.addAll(widget.initialOptions.inAppWebViewOptions?.toMap() ?? {});
+    if (Platform.isAndroid)
+      initialOptions.addAll(widget.initialOptions.androidInAppWebViewOptions?.toMap() ?? {});
+    else if (Platform.isIOS)
+      initialOptions.addAll(widget.initialOptions.iosInAppWebViewOptions?.toMap() ?? {});
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       return AndroidView(
@@ -404,7 +405,7 @@ class InAppWebViewController {
         double startTime = call.arguments["startTime"];
         double duration = call.arguments["duration"];
 
-        var response = new WebResourceResponse(initiatorType, url, startTime, duration);
+        var response = new LoadedResource(initiatorType, url, startTime, duration);
 
         if (_widget != null && _widget.onLoadResource != null)
           _widget.onLoadResource(this, response);
@@ -606,8 +607,8 @@ class InAppWebViewController {
   ///- downloading it using an `HttpClient` through the WebView's current url.
   Future<String> getHtml() async {
     var html = "";
-    Map<String, dynamic> options = await getOptions();
-    if (options != null && options["javaScriptEnabled"] == true) {
+    InAppWebViewWidgetOptions options = await getOptions();
+    if (options != null && options.inAppWebViewOptions.javaScriptEnabled == true) {
       html = await injectScriptCode("window.document.getElementsByTagName('html')[0].outerHTML;");
       if (html.isNotEmpty)
         return html;
@@ -803,7 +804,7 @@ class InAppWebViewController {
   ///  uses-material-design: true
   ///
   ///  assets:
-  ///    - assets/index.html
+  ///    - assets/t-rex.html
   ///    - assets/css/
   ///    - assets/images/
   ///
@@ -812,7 +813,7 @@ class InAppWebViewController {
   ///Example of a `main.dart` file:
   ///```dart
   ///...
-  ///inAppBrowser.loadFile("assets/index.html");
+  ///inAppBrowser.loadFile("assets/t-rex.html");
   ///...
   ///```
   Future<void> loadFile(String assetFilePath, {Map<String, String> headers = const {}}) async {
@@ -1042,27 +1043,44 @@ class InAppWebViewController {
   }
 
   ///Sets the [InAppWebView] options with the new [options] and evaluates them.
-  Future<void> setOptions(Map<String, dynamic> options) async {
+  Future<void> setOptions(InAppWebViewWidgetOptions options) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
-    args.putIfAbsent('options', () => options);
+
+    Map<String, dynamic> optionsMap = {};
+    optionsMap.addAll(options.inAppWebViewOptions?.toMap() ?? {});
+    if (Platform.isAndroid)
+      optionsMap.addAll(options.androidInAppWebViewOptions?.toMap() ?? {});
+    else if (Platform.isIOS)
+      optionsMap.addAll(options.iosInAppWebViewOptions?.toMap() ?? {});
+
+    args.putIfAbsent('options', () => optionsMap);
     await _channel.invokeMethod('setOptions', args);
   }
 
-  ///Gets the current [InAppWebView] options. Returns `null` if the options are not setted yet.
-  Future<Map<String, dynamic>> getOptions() async {
+  ///Gets the current [InAppWebView] options. Returns the options with `null` value if they are not set yet.
+  Future<InAppWebViewWidgetOptions> getOptions() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
+
+    InAppWebViewWidgetOptions inAppWebViewWidgetOptions = InAppWebViewWidgetOptions();
     Map<dynamic, dynamic> options = await _channel.invokeMethod('getOptions', args);
-    if (options != null)
+    if (options != null) {
       options = options.cast<String, dynamic>();
-    return options;
+      inAppWebViewWidgetOptions.inAppWebViewOptions = InAppWebViewOptions.fromMap(options);
+      if (Platform.isAndroid)
+        inAppWebViewWidgetOptions.androidInAppWebViewOptions = AndroidInAppWebViewOptions.fromMap(options);
+      else if (Platform.isIOS)
+        inAppWebViewWidgetOptions.iosInAppWebViewOptions = IosInAppWebViewOptions.fromMap(options);
+    }
+
+    return inAppWebViewWidgetOptions;
   }
 
   ///Gets the WebHistory for this WebView. This contains the back/forward list for use in querying each item in the history stack.
@@ -1229,5 +1247,15 @@ class InAppWebViewController {
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     await _channel.invokeMethod('clearMatches', args);
+  }
+
+  ///Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerCss()].
+  Future<String> getTRexRunnerHtml() async {
+    return await rootBundle.loadString("packages/flutter_inappbrowser/t_rex_runner/t-rex.html");
+  }
+
+  ///Gets the css of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerHtml()].
+  Future<String> getTRexRunnerCss() async {
+    return await rootBundle.loadString("packages/flutter_inappbrowser/t_rex_runner/t-rex.css");
   }
 }

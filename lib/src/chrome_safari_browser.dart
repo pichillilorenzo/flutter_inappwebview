@@ -1,7 +1,7 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
-import 'package:flutter_inappbrowser/src/webview_options.dart';
 
 import 'types.dart';
 import 'channel_manager.dart';
@@ -70,19 +70,29 @@ class ChromeSafariBrowser {
   ///- __preferredControlTintColor__: Set the custom color of the control buttons on the navigation bar and the toolbar.
   ///- __presentationStyle__: Set the custom modal presentation style when presenting the WebView. The default value is `0 //fullscreen`. See [UIModalPresentationStyle](https://developer.apple.com/documentation/uikit/uimodalpresentationstyle) for all the available styles.
   ///- __transitionStyle__: Set to the custom transition style when presenting the WebView. The default value is `0 //crossDissolve`. See [UIModalTransitionStyle](https://developer.apple.com/documentation/uikit/uimodaltransitionStyle) for all the available styles.
-  Future<void> open(String url, {List<ChromeSafariBrowserOptions> options = const [], Map<String, String> headersFallback = const {}, List<BrowserOptions> optionsFallback = const []}) async {
+  Future<void> open(String url, {ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback}) async {
     assert(url != null && url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
     Map<String, dynamic> optionsMap = {};
-    options.forEach((webViewOption) {
-      optionsMap.addAll(webViewOption.toMap());
-    });
+    if (Platform.isAndroid)
+      optionsMap.addAll(options.androidChromeCustomTabsOptions?.toMap() ?? {});
+    else if (Platform.isIOS)
+      optionsMap.addAll(options.iosSafariOptions?.toMap() ?? {});
 
     Map<String, dynamic> optionsFallbackMap = {};
-    optionsFallback.forEach((webViewOption) {
-      optionsFallbackMap.addAll(webViewOption.toMap());
-    });
+    if (optionsFallback != null) {
+      optionsFallbackMap.addAll(optionsFallback.inAppBrowserOptions?.toMap() ?? {});
+      optionsFallbackMap.addAll(optionsFallback.inAppWebViewWidgetOptions?.inAppWebViewOptions?.toMap() ?? {});
+      if (Platform.isAndroid) {
+        optionsFallbackMap.addAll(optionsFallback.androidInAppBrowserOptions?.toMap() ?? {});
+        optionsFallbackMap.addAll(optionsFallback.inAppWebViewWidgetOptions?.androidInAppWebViewOptions?.toMap() ?? {});
+      }
+      else if (Platform.isIOS) {
+        optionsFallbackMap.addAll(optionsFallback.iosInAppBrowserOptions?.toMap() ?? {});
+        optionsFallbackMap.addAll(optionsFallback.inAppWebViewWidgetOptions?.iosInAppWebViewOptions?.toMap() ?? {});
+      }
+    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);

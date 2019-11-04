@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -89,33 +90,34 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             //initialUrl: "https://192.168.1.20:4433/",
             initialFile: "assets/index.html",
             initialHeaders: {},
-            initialOptions: [
-              InAppWebViewOptions(
+            initialOptions: InAppWebViewWidgetOptions(
+              inAppWebViewOptions: InAppWebViewOptions(
+                debuggingEnabled: true,
                 //clearCache: true,
                 useShouldOverrideUrlLoading: true,
                 useOnTargetBlank: true,
                 //useOnLoadResource: true,
                 useOnDownloadStart: true,
-                preferredContentMode: InAppWebViewUserPreferredContentMode.DESKTOP,
+                //preferredContentMode: InAppWebViewUserPreferredContentMode.DESKTOP,
                 resourceCustomSchemes: ["my-special-custom-scheme"],
-                /*contentBlockers: [
-                  ContentBlocker(
-                      ContentBlockerTrigger(".*",
-                          resourceType: [ContentBlockerTriggerResourceType.IMAGE, ContentBlockerTriggerResourceType.STYLE_SHEET],
-                          ifTopUrl: ["https://getbootstrap.com/"]),
-                      ContentBlockerAction(ContentBlockerActionType.BLOCK)
-                  )
-                ]*/
-              ),
-              AndroidInAppWebViewOptions(
+                contentBlockers: [
+                    ContentBlocker(
+                        ContentBlockerTrigger(".*",
+                            resourceType: [ContentBlockerTriggerResourceType.IMAGE, ContentBlockerTriggerResourceType.STYLE_SHEET],
+                            ifTopUrl: ["https://getbootstrap.com/"]),
+                        ContentBlockerAction(ContentBlockerActionType.BLOCK)
+                    )
+                  ]
+                ),
+              androidInAppWebViewOptions: AndroidInAppWebViewOptions(
                 databaseEnabled: true,
                 appCacheEnabled: true,
                 domStorageEnabled: true,
                 geolocationEnabled: true,
-                safeBrowsingEnabled: true,
+                //safeBrowsingEnabled: true,
                 //blockNetworkImage: true,
               ),
-            ],
+            ),
             onWebViewCreated: (InAppWebViewController controller) {
               webView = controller;
 
@@ -148,6 +150,28 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onLoadError: (InAppWebViewController controller, String url, int code, String message) async {
               print("error $url: $code, $message");
+
+              var tRexHtml = await controller.getTRexRunnerHtml();
+              var tRexCss = await controller.getTRexRunnerCss();
+
+              controller.loadData("""
+              <html>
+                <head>
+                  <meta charset="utf-8">
+                  <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
+                  <style>${tRexCss}</style>
+                </head>
+                <body>
+                  ${tRexHtml}
+                  <p>
+                    URL ${url} failed to load.
+                  </p>
+                  <p>
+                    Error: ${code}, ${message}
+                  </p>
+                </body>
+              </html>
+              """);
             },
             onProgressChanged:
                 (InAppWebViewController controller, int progress) {
@@ -159,7 +183,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("override $url");
               controller.loadUrl(url);
             },
-            onLoadResource: (InAppWebViewController controller, WebResourceResponse response) {
+            onLoadResource: (InAppWebViewController controller, LoadedResource response) {
               print("Resource type: '"+response.initiatorType + "' started at: " +
                   response.startTime.toString() +
                   "ms ---> duration: " +
@@ -187,8 +211,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             onLoadResourceCustomScheme: (InAppWebViewController controller, String scheme, String url) async {
               if (scheme == "my-special-custom-scheme") {
                 var bytes = await rootBundle.load("assets/" + url.replaceFirst("my-special-custom-scheme://", "", 0));
-                var asBase64 = base64.encode(bytes.buffer.asUint8List());
-                var response = new CustomSchemeResponse(asBase64, "image/svg+xml", contentEnconding: "utf-8");
+                var response = new CustomSchemeResponse(bytes.buffer.asUint8List(), "image/svg+xml", contentEnconding: "utf-8");
                 return response;
               }
               return null;

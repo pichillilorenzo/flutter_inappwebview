@@ -27,6 +27,7 @@
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
 - Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
 - Added `getHtml` method
+- Fun: added `getTRexRunnerHtml` and `getTRexRunnerCss` methods to get html (with javascript) and css to recreate the Chromium's t-rex runner game 
 
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class

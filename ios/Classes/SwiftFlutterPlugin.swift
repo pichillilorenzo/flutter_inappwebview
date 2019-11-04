@@ -47,6 +47,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     
     public init(with registrar: FlutterPluginRegistrar) {
         super.init()
+        
         self.registrar = registrar
         self.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
         registrar.addMethodCallDelegate(self, channel: channel!)

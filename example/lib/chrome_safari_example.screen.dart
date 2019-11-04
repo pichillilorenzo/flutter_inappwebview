@@ -36,10 +36,12 @@ class _ChromeSafariExampleScreenState extends State<ChromeSafariExampleScreen> {
     return new Center(
       child: new RaisedButton(
           onPressed: () async {
-            await widget.browser.open("https://flutter.dev/", options: [
-              AndroidChromeCustomTabsOptions(addShareButton: false),
-              iOSSafariOptions(barCollapsingEnabled: true)
-            ]);
+            await widget.browser.open("https://flutter.dev/",
+              options: ChromeSafariBrowserClassOptions(
+                androidChromeCustomTabsOptions: AndroidChromeCustomTabsOptions(addShareButton: false),
+                iosSafariOptions: IosSafariOptions(barCollapsingEnabled: true)
+              )
+            );
           },
           child: Text("Open Chrome Safari Browser")),
     );

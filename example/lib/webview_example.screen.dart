@@ -47,7 +47,7 @@ class MyInappBrowser extends InAppBrowser {
  }
 
  @override
- void onLoadResource(WebResourceResponse response) {
+ void onLoadResource(LoadedResource response) {
    print("Started at: " +
        response.startTime.toString() +
        "ms ---> duration: " +
@@ -121,12 +121,14 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
             widget.browser.openFile(
               "assets/index.html",
               //url: "https://www.google.com/",
-              options: [
-                InAppWebViewOptions(
+              options: InAppBrowserClassOptions(
+                inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(
+                  inAppWebViewOptions: InAppWebViewOptions(
                     useShouldOverrideUrlLoading: true,
                     useOnLoadResource: true,
+                  )
                 )
-              ]
+              )
             );
           },
           child: Text("Open Webview Browser")),

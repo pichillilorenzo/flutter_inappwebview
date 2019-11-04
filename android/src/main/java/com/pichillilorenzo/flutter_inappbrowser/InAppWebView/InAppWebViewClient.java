@@ -639,18 +639,18 @@ public class InAppWebViewClient extends WebViewClient {
         Log.e(LOG_TAG, flutterResult.error);
       }
       else if (flutterResult.result != null) {
-        Map<String, String> res = (Map<String, String>) flutterResult.result;
+        Map<String, Object> res = (Map<String, Object>) flutterResult.result;
         WebResourceResponse response = null;
         try {
-          response = webView.contentBlockerHandler.checkUrl(webView, url, res.get("content-type"));
+          response = webView.contentBlockerHandler.checkUrl(webView, url, res.get("content-type").toString());
         } catch (Exception e) {
           e.printStackTrace();
           Log.e(LOG_TAG, e.getMessage());
         }
         if (response != null)
           return response;
-        byte[] data = Base64.decode(res.get("base64data"), Base64.DEFAULT);
-        return new WebResourceResponse(res.get("content-type"), res.get("content-encoding"), new ByteArrayInputStream(data));
+        byte[] data = (byte[]) res.get("data");
+        return new WebResourceResponse(res.get("content-type").toString(), res.get("content-encoding").toString(), new ByteArrayInputStream(data));
       }
     }
 

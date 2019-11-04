@@ -4,11 +4,15 @@ import 'types.dart';
 import 'package:flutter_inappbrowser/src/content_blocker.dart';
 
 class AndroidOptions {}
-class iOSOptions {}
+class IosOptions {}
 
 class WebViewOptions {
   Map<String, dynamic> toMap() {
     return {};
+  }
+
+  static WebViewOptions fromMap(Map<String, dynamic> map) {
+    return null;
   }
 }
 
@@ -16,9 +20,23 @@ class BrowserOptions {
   Map<String, dynamic> toMap() {
     return {};
   }
+
+  static BrowserOptions fromMap(Map<String, dynamic> map) {
+    return null;
+  }
 }
 
-class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOptions, iOSOptions {
+class ChromeSafariBrowserOptions {
+  Map<String, dynamic> toMap() {
+    return {};
+  }
+
+  static ChromeSafariBrowserOptions fromMap(Map<String, dynamic> map) {
+    return null;
+  }
+}
+
+class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
   bool useShouldOverrideUrlLoading;
   bool useOnLoadResource;
   bool useOnDownloadStart;
@@ -61,6 +79,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "clearCache": clearCache,
       "userAgent": userAgent,
       "javaScriptEnabled": javaScriptEnabled,
+      "debuggingEnabled": debuggingEnabled,
       "javaScriptCanOpenWindowsAutomatically": javaScriptCanOpenWindowsAutomatically,
       "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
       "textZoom": textZoom,
@@ -70,6 +89,37 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "contentBlockers": contentBlockersMapList,
       "preferredContentMode": preferredContentMode?.toValue()
     };
+  }
+
+  @override
+  static InAppWebViewOptions fromMap(Map<String, dynamic> map) {
+    List<ContentBlocker> contentBlockers = [];
+    List<dynamic> contentBlockersMapList = map["contentBlockers"];
+    if (contentBlockersMapList != null) {
+      contentBlockersMapList.forEach((contentBlocker) {
+        contentBlockers.add(ContentBlocker.fromMap(
+            Map<dynamic, Map<dynamic, dynamic>>.from(Map<dynamic, dynamic>.from(contentBlocker))
+        ));
+      });
+    }
+
+    InAppWebViewOptions options = new InAppWebViewOptions();
+    options.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
+    options.useOnLoadResource = map["useOnLoadResource"];
+    options.useOnDownloadStart = map["useOnDownloadStart"];
+    options.useOnTargetBlank = map["useOnTargetBlank"];
+    options.clearCache = map["clearCache"];
+    options.userAgent = map["userAgent"];
+    options.javaScriptEnabled = map["javaScriptEnabled"];
+    options.javaScriptCanOpenWindowsAutomatically = map["javaScriptCanOpenWindowsAutomatically"];
+    options.mediaPlaybackRequiresUserGesture = map["mediaPlaybackRequiresUserGesture"];
+    options.textZoom = map["textZoom"];
+    options.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
+    options.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
+    options.resourceCustomSchemes = List<String>.from(map["resourceCustomSchemes"] ?? []);
+    options.contentBlockers = contentBlockers;
+    options.preferredContentMode = InAppWebViewUserPreferredContentMode.fromValue(map["preferredContentMode"]);
+    return options;
   }
 }
 
@@ -165,9 +215,52 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
       "standardFontFamily": standardFontFamily
     };
   }
+
+  @override
+  static AndroidInAppWebViewOptions fromMap(Map<String, dynamic> map) {
+    AndroidInAppWebViewOptions options = new AndroidInAppWebViewOptions();
+    options.clearSessionCache = map["clearSessionCache"];
+    options.builtInZoomControls = map["builtInZoomControls"];
+    options.displayZoomControls = map["displayZoomControls"];
+    options.supportZoom = map["supportZoom"];
+    options.databaseEnabled = map["databaseEnabled"];
+    options.domStorageEnabled = map["domStorageEnabled"];
+    options.useWideViewPort = map["useWideViewPort"];
+    options.safeBrowsingEnabled = map["safeBrowsingEnabled"];
+    options.transparentBackground = map["transparentBackground"];
+    options.mixedContentMode = AndroidInAppWebViewMixedContentMode.fromValue(map["mixedContentMode"]);
+    options.allowContentAccess = map["allowContentAccess"];
+    options.allowFileAccess = map["allowFileAccess"];
+    options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
+    options.allowUniversalAccessFromFileURLs = map["allowUniversalAccessFromFileURLs"];
+    options.appCacheEnabled = map["appCacheEnabled"];
+    options.appCachePath = map["appCachePath"];
+    options.blockNetworkImage = map["blockNetworkImage"];
+    options.blockNetworkLoads = map["blockNetworkLoads"];
+    options.cacheMode = AndroidInAppWebViewCacheMode.fromValue(map["cacheMode"]);
+    options.cursiveFontFamily = map["cursiveFontFamily"];
+    options.defaultFixedFontSize = map["defaultFixedFontSize"];
+    options.defaultFontSize = map["defaultFontSize"];
+    options.defaultTextEncodingName = map["defaultTextEncodingName"];
+    options.disabledActionModeMenuItems = AndroidInAppWebViewModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
+    options.fantasyFontFamily = map["fantasyFontFamily"];
+    options.fixedFontFamily = map["fixedFontFamily"];
+    options.forceDark = AndroidInAppWebViewForceDark.fromValue(map["forceDark"]);
+    options.geolocationEnabled = map["geolocationEnabled"];
+    options.layoutAlgorithm = AndroidInAppWebViewLayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
+    options.loadWithOverviewMode = map["loadWithOverviewMode"];
+    options.loadsImagesAutomatically = map["loadsImagesAutomatically"];
+    options.minimumLogicalFontSize = map["minimumLogicalFontSize"];
+    options.needInitialFocus = map["needInitialFocus"];
+    options.offscreenPreRaster = map["offscreenPreRaster"];
+    options.sansSerifFontFamily = map["sansSerifFontFamily"];
+    options.serifFontFamily = map["serifFontFamily"];
+    options.standardFontFamily = map["standardFontFamily"];
+    return options;
+  }
 }
 
-class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions, iOSOptions {
+class IosInAppWebViewOptions implements WebViewOptions, BrowserOptions, IosOptions {
   bool disallowOverScroll;
   bool enableViewportScale;
   bool suppressesIncrementalRendering;
@@ -180,13 +273,13 @@ class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions, iOSOptio
   bool transparentBackground;
   String applicationNameForUserAgent;
   bool isFraudulentWebsiteWarningEnabled;
-  iOSInAppWebViewSelectionGranularity selectionGranularity;
-  List<iOSInAppWebViewDataDetectorTypes> dataDetectorTypes;
+  IosInAppWebViewSelectionGranularity selectionGranularity;
+  List<IosInAppWebViewDataDetectorTypes> dataDetectorTypes;
 
-  iOSInAppWebViewOptions({this.disallowOverScroll = false, this.enableViewportScale = false, this.suppressesIncrementalRendering = false, this.allowsAirPlayForMediaPlayback = true,
+  IosInAppWebViewOptions({this.disallowOverScroll = false, this.enableViewportScale = false, this.suppressesIncrementalRendering = false, this.allowsAirPlayForMediaPlayback = true,
     this.allowsBackForwardNavigationGestures = true, this.allowsLinkPreview = true, this.ignoresViewportScaleLimits = false, this.allowsInlineMediaPlayback = false,
     this.allowsPictureInPictureMediaPlayback = true, this.transparentBackground = false, this.applicationNameForUserAgent = "", this.isFraudulentWebsiteWarningEnabled = true,
-    this.selectionGranularity = iOSInAppWebViewSelectionGranularity.DYNAMIC, this.dataDetectorTypes = const [iOSInAppWebViewDataDetectorTypes.NONE]
+    this.selectionGranularity = IosInAppWebViewSelectionGranularity.DYNAMIC, this.dataDetectorTypes = const [IosInAppWebViewDataDetectorTypes.NONE]
   });
 
   @override
@@ -213,9 +306,35 @@ class iOSInAppWebViewOptions implements WebViewOptions, BrowserOptions, iOSOptio
       "dataDetectorTypes": dataDetectorTypesList
     };
   }
+
+  @override
+  static IosInAppWebViewOptions fromMap(Map<String, dynamic> map) {
+    List<IosInAppWebViewDataDetectorTypes> dataDetectorTypes = [];
+    List<String> dataDetectorTypesList = List<String>.from(map["dataDetectorTypes"] ?? []);
+    dataDetectorTypesList.forEach((dataDetectorType) {
+      dataDetectorTypes.add(IosInAppWebViewDataDetectorTypes.fromValue(dataDetectorType));
+    });
+
+    IosInAppWebViewOptions options = new IosInAppWebViewOptions();
+    options.disallowOverScroll = map["disallowOverScroll"];
+    options.enableViewportScale = map["enableViewportScale"];
+    options.suppressesIncrementalRendering = map["suppressesIncrementalRendering"];
+    options.allowsAirPlayForMediaPlayback = map["allowsAirPlayForMediaPlayback"];
+    options.allowsBackForwardNavigationGestures = map["allowsBackForwardNavigationGestures"];
+    options.allowsLinkPreview = map["allowsLinkPreview"];
+    options.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
+    options.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
+    options.allowsPictureInPictureMediaPlayback = map["allowsPictureInPictureMediaPlayback"];
+    options.transparentBackground = map["transparentBackground"];
+    options.applicationNameForUserAgent = map["applicationNameForUserAgent"];
+    options.isFraudulentWebsiteWarningEnabled = map["isFraudulentWebsiteWarningEnabled"];
+    options.selectionGranularity = IosInAppWebViewSelectionGranularity.fromValue(map["selectionGranularity"]);
+    options.dataDetectorTypes = dataDetectorTypes;
+    return options;
+  }
 }
 
-class InAppBrowserOptions implements BrowserOptions, AndroidOptions, iOSOptions {
+class InAppBrowserOptions implements BrowserOptions, AndroidOptions, IosOptions {
   bool hidden;
   bool toolbarTop;
   String toolbarTopBackgroundColor;
@@ -231,8 +350,19 @@ class InAppBrowserOptions implements BrowserOptions, AndroidOptions, iOSOptions 
       "toolbarTop": toolbarTop,
       "toolbarTopBackgroundColor": toolbarTopBackgroundColor,
       "toolbarTopFixedTitle": toolbarTopFixedTitle,
-      "hideUrlBar": hideUrlBar,
+      "hideUrlBar": hideUrlBar
     };
+  }
+
+  @override
+  static InAppBrowserOptions fromMap(Map<String, dynamic> map) {
+    InAppBrowserOptions options = new InAppBrowserOptions();
+    options.hidden = map["hidden"];
+    options.toolbarTop = map["toolbarTop"];
+    options.toolbarTopBackgroundColor = map["toolbarTopBackgroundColor"];
+    options.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
+    options.hideUrlBar = map["hideUrlBar"];
+    return options;
   }
 }
 
@@ -251,21 +381,30 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
       "progressBar": progressBar,
     };
   }
+
+  @override
+  static AndroidInAppBrowserOptions fromMap(Map<String, dynamic> map) {
+    AndroidInAppBrowserOptions options = new AndroidInAppBrowserOptions();
+    options.hideTitleBar = map["hideTitleBar"];
+    options.closeOnCannotGoBack = map["closeOnCannotGoBack"];
+    options.progressBar = map["progressBar"];
+    return options;
+  }
 }
 
-class iOSInAppBrowserOptions implements BrowserOptions, iOSOptions {
+class IosInAppBrowserOptions implements BrowserOptions, IosOptions {
   bool toolbarBottom;
   String toolbarBottomBackgroundColor;
   bool toolbarBottomTranslucent;
   String closeButtonCaption;
   String closeButtonColor;
-  iOSWebViewOptionsPresentationStyle presentationStyle;
-  iOSWebViewOptionsTransitionStyle transitionStyle;
+  IosWebViewOptionsPresentationStyle presentationStyle;
+  IosWebViewOptionsTransitionStyle transitionStyle;
   bool spinner;
 
-  iOSInAppBrowserOptions({this.toolbarBottom = true, this.toolbarBottomBackgroundColor = "", this.toolbarBottomTranslucent = true, this.closeButtonCaption = "",
-    this.closeButtonColor = "", this.presentationStyle = iOSWebViewOptionsPresentationStyle.FULL_SCREEN,
-    this.transitionStyle = iOSWebViewOptionsTransitionStyle.COVER_VERTICAL, this.spinner = true});
+  IosInAppBrowserOptions({this.toolbarBottom = true, this.toolbarBottomBackgroundColor = "", this.toolbarBottomTranslucent = true, this.closeButtonCaption = "",
+    this.closeButtonColor = "", this.presentationStyle = IosWebViewOptionsPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = IosWebViewOptionsTransitionStyle.COVER_VERTICAL, this.spinner = true});
 
   @override
   Map<String, dynamic> toMap() {
@@ -277,14 +416,22 @@ class iOSInAppBrowserOptions implements BrowserOptions, iOSOptions {
       "closeButtonColor": closeButtonColor,
       "presentationStyle": presentationStyle.toValue(),
       "transitionStyle": transitionStyle.toValue(),
-      "spinner": spinner,
+      "spinner": spinner
     };
   }
-}
 
-class ChromeSafariBrowserOptions {
-  Map<String, dynamic> toMap() {
-    return {};
+  @override
+  static IosInAppBrowserOptions fromMap(Map<String, dynamic> map) {
+    IosInAppBrowserOptions options = new IosInAppBrowserOptions();
+    options.toolbarBottom = map["toolbarBottom"];
+    options.toolbarBottomBackgroundColor = map["toolbarBottomBackgroundColor"];
+    options.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
+    options.closeButtonCaption = map["closeButtonCaption"];
+    options.closeButtonColor = map["closeButtonColor"];
+    options.presentationStyle = IosWebViewOptionsPresentationStyle.fromValue(map["presentationStyle"]);
+    options.transitionStyle = IosWebViewOptionsTransitionStyle.fromValue(map["transitionStyle"]);
+    options.spinner = map["spinner"];
+    return options;
   }
 }
 
@@ -304,23 +451,34 @@ class AndroidChromeCustomTabsOptions implements ChromeSafariBrowserOptions, Andr
       "showTitle": showTitle,
       "toolbarBackgroundColor": toolbarBackgroundColor,
       "enableUrlBarHiding": enableUrlBarHiding,
-      "instantAppsEnabled": instantAppsEnabled,
+      "instantAppsEnabled": instantAppsEnabled
     };
+  }
+
+  @override
+  static AndroidChromeCustomTabsOptions fromMap(Map<String, dynamic> map) {
+    AndroidChromeCustomTabsOptions options = new AndroidChromeCustomTabsOptions();
+    options.addShareButton = map["addShareButton"];
+    options.showTitle = map["showTitle"];
+    options.toolbarBackgroundColor = map["toolbarBackgroundColor"];
+    options.enableUrlBarHiding = map["enableUrlBarHiding"];
+    options.instantAppsEnabled = map["instantAppsEnabled"];
+    return options;
   }
 }
 
-class iOSSafariOptions implements ChromeSafariBrowserOptions, iOSOptions {
+class IosSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   bool entersReaderIfAvailable;
   bool barCollapsingEnabled;
-  iOSSafariOptionsDismissButtonStyle dismissButtonStyle;
+  IosSafariOptionsDismissButtonStyle dismissButtonStyle;
   String preferredBarTintColor;
   String preferredControlTintColor;
-  iOSWebViewOptionsPresentationStyle presentationStyle;
-  iOSWebViewOptionsTransitionStyle transitionStyle;
+  IosWebViewOptionsPresentationStyle presentationStyle;
+  IosWebViewOptionsTransitionStyle transitionStyle;
 
-  iOSSafariOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = iOSSafariOptionsDismissButtonStyle.DONE,
-    this.preferredBarTintColor = "", this.preferredControlTintColor = "", this.presentationStyle = iOSWebViewOptionsPresentationStyle.FULL_SCREEN,
-    this.transitionStyle = iOSWebViewOptionsTransitionStyle.COVER_VERTICAL});
+  IosSafariOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = IosSafariOptionsDismissButtonStyle.DONE,
+    this.preferredBarTintColor = "", this.preferredControlTintColor = "", this.presentationStyle = IosWebViewOptionsPresentationStyle.FULL_SCREEN,
+    this.transitionStyle = IosWebViewOptionsTransitionStyle.COVER_VERTICAL});
 
   @override
   Map<String, dynamic> toMap() {
@@ -331,7 +489,20 @@ class iOSSafariOptions implements ChromeSafariBrowserOptions, iOSOptions {
       "preferredBarTintColor": preferredBarTintColor,
       "preferredControlTintColor": preferredControlTintColor,
       "presentationStyle": presentationStyle.toValue(),
-      "transitionStyle": transitionStyle.toValue(),
+      "transitionStyle": transitionStyle.toValue()
     };
+  }
+
+  @override
+  static IosSafariOptions fromMap(Map<String, dynamic> map) {
+    IosSafariOptions options = new IosSafariOptions();
+    options.entersReaderIfAvailable = map["entersReaderIfAvailable"];
+    options.barCollapsingEnabled = map["barCollapsingEnabled"];
+    options.dismissButtonStyle = IosSafariOptionsDismissButtonStyle.fromValue(map["dismissButtonStyle"]);
+    options.preferredBarTintColor = map["preferredBarTintColor"];
+    options.preferredControlTintColor = map["preferredControlTintColor"];
+    options.presentationStyle = IosWebViewOptionsPresentationStyle.fromValue(map["presentationStyle"]);
+    options.transitionStyle = IosWebViewOptionsTransitionStyle.fromValue(map["transitionStyle"]);
+    return options;
   }
 }

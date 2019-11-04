@@ -118,7 +118,7 @@ public class ContentBlockerHandler {
                 if (!trigger.ifTopUrl.isEmpty()) {
                     boolean matchFound = false;
                     for (String topUrl : trigger.ifTopUrl) {
-                        if (webViewUrl[0].equals(topUrl)) {
+                        if (webViewUrl[0].startsWith(topUrl)) {
                             matchFound = true;
                             break;
                         }
@@ -128,7 +128,7 @@ public class ContentBlockerHandler {
                 }
                 if (!trigger.unlessTopUrl.isEmpty()) {
                     for (String topUrl : trigger.unlessTopUrl)
-                        if (webViewUrl[0].equals(topUrl))
+                        if (webViewUrl[0].startsWith(topUrl))
                             return null;
                 }
 

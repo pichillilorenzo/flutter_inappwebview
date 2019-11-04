@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_inappbrowser/src/webview_options.dart';
@@ -102,14 +103,22 @@ class InAppBrowser {
   ///    - __allowsInlineMediaPlayback__: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls. For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
   ///    - __allowsPictureInPictureMediaPlayback__: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
   ///    - __spinner__: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
-  Future<void> open({String url = "about:blank", Map<String, String> headers = const {}, List<BrowserOptions> options = const []}) async {
+  Future<void> open({String url = "about:blank", Map<String, String> headers = const {}, InAppBrowserClassOptions options}) async {
     assert(url != null && url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
     Map<String, dynamic> optionsMap = {};
-    options.forEach((webViewOption) {
-      optionsMap.addAll(webViewOption.toMap());
-    });
+
+    optionsMap.addAll(options.inAppBrowserOptions?.toMap() ?? {});
+    optionsMap.addAll(options.inAppWebViewWidgetOptions?.inAppWebViewOptions?.toMap() ?? {});
+    if (Platform.isAndroid) {
+      optionsMap.addAll(options.androidInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.androidInAppWebViewOptions?.toMap() ?? {});
+    }
+    else if (Platform.isIOS) {
+      optionsMap.addAll(options.iosInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.iosInAppWebViewOptions?.toMap() ?? {});
+    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -140,7 +149,7 @@ class InAppBrowser {
   ///  uses-material-design: true
   ///
   ///  assets:
-  ///    - assets/index.html
+  ///    - assets/t-rex.html
   ///    - assets/css/
   ///    - assets/images/
   ///
@@ -149,17 +158,25 @@ class InAppBrowser {
   ///Example of a `main.dart` file:
   ///```dart
   ///...
-  ///inAppBrowser.openFile("assets/index.html");
+  ///inAppBrowser.openFile("assets/t-rex.html");
   ///...
   ///```
-  Future<void> openFile(String assetFilePath, {Map<String, String> headers = const {}, List<BrowserOptions> options = const []}) async {
+  Future<void> openFile(String assetFilePath, {Map<String, String> headers = const {}, InAppBrowserClassOptions options}) async {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $assetFilePath!');
 
     Map<String, dynamic> optionsMap = {};
-    options.forEach((webViewOption) {
-      optionsMap.addAll(webViewOption.toMap());
-    });
+
+    optionsMap.addAll(options.inAppBrowserOptions?.toMap() ?? {});
+    optionsMap.addAll(options.inAppWebViewWidgetOptions?.inAppWebViewOptions?.toMap() ?? {});
+    if (Platform.isAndroid) {
+      optionsMap.addAll(options.androidInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.androidInAppWebViewOptions?.toMap() ?? {});
+    }
+    else if (Platform.isIOS) {
+      optionsMap.addAll(options.iosInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.iosInAppWebViewOptions?.toMap() ?? {});
+    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -176,13 +193,21 @@ class InAppBrowser {
   ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
   ///The [mimeType] parameter specifies the format of the data.
   ///The [encoding] parameter specifies the encoding of the data.
-  Future<void> openData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", List<BrowserOptions> options = const []}) async {
+  Future<void> openData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", InAppBrowserClassOptions options}) async {
     assert(data != null);
 
     Map<String, dynamic> optionsMap = {};
-    options.forEach((webViewOption) {
-      optionsMap.addAll(webViewOption.toMap());
-    });
+
+    optionsMap.addAll(options.inAppBrowserOptions?.toMap() ?? {});
+    optionsMap.addAll(options.inAppWebViewWidgetOptions?.inAppWebViewOptions?.toMap() ?? {});
+    if (Platform.isAndroid) {
+      optionsMap.addAll(options.androidInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.androidInAppWebViewOptions?.toMap() ?? {});
+    }
+    else if (Platform.isIOS) {
+      optionsMap.addAll(options.iosInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.iosInAppWebViewOptions?.toMap() ?? {});
+    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -246,13 +271,21 @@ class InAppBrowser {
   }
 
   ///Sets the [InAppBrowser] options with the new [options] and evaluates them.
-  Future<void> setOptions(List<BrowserOptions> options) async {
+  Future<void> setOptions(InAppBrowserClassOptions options) async {
     this.throwIsNotOpened();
 
     Map<String, dynamic> optionsMap = {};
-    options.forEach((webViewOption) {
-      optionsMap.addAll(webViewOption.toMap());
-    });
+
+    optionsMap.addAll(options.inAppBrowserOptions?.toMap() ?? {});
+    optionsMap.addAll(options.inAppWebViewWidgetOptions?.inAppWebViewOptions?.toMap() ?? {});
+    if (Platform.isAndroid) {
+      optionsMap.addAll(options.androidInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.androidInAppWebViewOptions?.toMap() ?? {});
+    }
+    else if (Platform.isIOS) {
+      optionsMap.addAll(options.iosInAppBrowserOptions?.toMap() ?? {});
+      optionsMap.addAll(options.inAppWebViewWidgetOptions?.iosInAppWebViewOptions?.toMap() ?? {});
+    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -262,15 +295,29 @@ class InAppBrowser {
   }
 
   ///Gets the current [InAppBrowser] options as a `Map`. Returns `null` if the options are not setted yet.
-  Future<Map<String, dynamic>> getOptions() async {
+  Future<InAppBrowserClassOptions> getOptions() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
+
+    InAppBrowserClassOptions inAppBrowserClassOptions = InAppBrowserClassOptions();
     Map<dynamic, dynamic> options = await ChannelManager.channel.invokeMethod('getOptions', args);
-    if (options != null)
+    if (options != null) {
       options = options.cast<String, dynamic>();
-    return options;
+      inAppBrowserClassOptions.inAppBrowserOptions = InAppBrowserOptions.fromMap(options);
+      inAppBrowserClassOptions.inAppWebViewWidgetOptions.inAppWebViewOptions = InAppWebViewOptions.fromMap(options);
+      if (Platform.isAndroid) {
+        inAppBrowserClassOptions.androidInAppBrowserOptions = AndroidInAppBrowserOptions.fromMap(options);
+        inAppBrowserClassOptions.inAppWebViewWidgetOptions.androidInAppWebViewOptions = AndroidInAppWebViewOptions.fromMap(options);
+      }
+      else if (Platform.isIOS) {
+        inAppBrowserClassOptions.iosInAppBrowserOptions = IosInAppBrowserOptions.fromMap(options);
+        inAppBrowserClassOptions.inAppWebViewWidgetOptions.iosInAppWebViewOptions = IosInAppWebViewOptions.fromMap(options);
+      }
+    }
+
+    return inAppBrowserClassOptions;
   }
 
   ///Returns `true` if the [InAppBrowser] instance is opened, otherwise `false`.
@@ -323,7 +370,7 @@ class InAppBrowser {
   ///Event fires when the [InAppBrowser] webview loads a resource.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
-  void onLoadResource(WebResourceResponse response) {
+  void onLoadResource(LoadedResource resource) {
 
   }
 

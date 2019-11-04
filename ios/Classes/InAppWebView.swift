@@ -8,6 +8,7 @@
 import Flutter
 import Foundation
 import WebKit
+import WKWebViewWithURLProtocol
 
 func currentTimeInMilliSeconds() -> Int64 {
     let currentDate = Date()
@@ -242,6 +243,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     static var credentialsProposed: [URLCredential] = []
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, IAWController: FlutterWebViewController?) {
+        
         super.init(frame: frame, configuration: configuration)
         self.IABController = IABController
         self.IAWController = IAWController

@@ -3,6 +3,7 @@
 const express = require('express')
 var https = require('https')
 const auth = require('basic-auth')
+const app = express()
 const appHttps = express()
 const appAuthBasic = express()
 const fs = require('fs')
@@ -78,6 +79,40 @@ appAuthBasic.get("/", (req, res) => {
       </body>
     </html>
   `);
+  res.end()
 })
 
 appAuthBasic.listen(8081)
+
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded());
+
+// Parse JSON bodies (as sent by API clients)
+app.use(express.json());
+
+app.get("/", (req, res) => {
+  res.send(`
+    <html>
+      <head>
+      </head>
+      <body>
+        <p>HELLO</p>
+      </body>
+    </html>
+  `);
+  res.end()
+})
+
+app.post("/test-post", (req, res) => {
+  res.send(`
+    <html>
+      <head>
+      </head>
+      <body>
+        <p>HELLO ${req.body.name}!</p>
+      </body>
+    </html>
+  `);
+  res.end()
+})
+app.listen(8082)

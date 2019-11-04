@@ -14,9 +14,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
     var webView: InAppWebView?
     var viewId: Int64 = 0
     var channel: FlutterMethodChannel?
-    
+
     init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: NSDictionary) {
         super.init()
+        
         self.registrar = registrar
         self.viewId = viewId
         

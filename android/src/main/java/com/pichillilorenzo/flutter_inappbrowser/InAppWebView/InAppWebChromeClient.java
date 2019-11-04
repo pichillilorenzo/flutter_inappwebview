@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
 import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -521,18 +522,23 @@ public class InAppWebChromeClient extends WebChromeClient implements PluginRegis
             FileChooserParams fileChooserParams) {
         mUploadMessageArray = filePathCallback;
 
-        Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-        contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-        contentSelectionIntent.setType("*/*");
-        Intent[] intentArray;
-        intentArray = new Intent[0];
+        try {
+            Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+            contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+            contentSelectionIntent.setType("*/*");
+            Intent[] intentArray;
+            intentArray = new Intent[0];
 
-        Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-        chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-        chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-        chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-        ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
-        return super.onShowFileChooser(webView, filePathCallback, fileChooserParams);
+            Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+            chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+            chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
+            chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+            ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
+        } catch (ActivityNotFoundException e) {
+            e.printStackTrace();
+            return false;
+        }
+        return true;
     }
 
     private MethodChannel getChannel() {

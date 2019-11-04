@@ -532,7 +532,7 @@ public class InAppWebChromeClient extends WebChromeClient implements PluginRegis
         chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
         chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
         ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
-        return true;
+        return super.onShowFileChooser(webView, filePathCallback, fileChooserParams);
     }
 
     private MethodChannel getChannel() {

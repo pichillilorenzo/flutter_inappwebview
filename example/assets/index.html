@@ -31,6 +31,9 @@
                 <option value="1">option 1</option>
                 <option value="2">option 2</option>
             </select>
+            <button onclick="testHistoryPush1()">History Push 1</button>
+            <button onclick="testHistoryPush2()">History Push 2</button>
+            <button onclick="testLocationHref()">Location Href</button>
             <p>
                 <img src="https://via.placeholder.com/100x50" alt="placeholder 100x50">
             </p>
@@ -51,6 +54,27 @@
     </div>
 
     <script>
+
+        var state = { 'page_id': 1, 'user_id': 5 };
+        function testHistoryPush1() {
+            var randomNumber = 100 * Math.random();
+            var title = 'Hello World ' + randomNumber;
+            var url = 'hello-foo-' + randomNumber + '.html';
+            history.pushState(state, title, url);
+        }
+
+        function testHistoryPush2() {
+            var randomNumber = 100 * Math.random();
+            var title = 'Hello World ' + randomNumber;
+            var url = 'hello-bar-' + randomNumber + '.html';
+            history.replaceState(state, title, url);
+        }
+
+        function testLocationHref() {
+            var randomNumber = 100 * Math.random();
+            window.location = "#foo-" + randomNumber;
+        }
+
         window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
             console.log("ready");
 

@@ -27,7 +27,8 @@
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
 - Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
 - Added `getHtml`, `injectJavascriptFileFromAsset` and `injectCSSFileFromAsset` methods
-- Added `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgressEvent` and `shouldInterceptFetchRequest` events with `useShouldInterceptAjaxRequest` and `useShouldInterceptFetchRequest` webview options
+- Added `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgress` and `shouldInterceptFetchRequest` events with `useShouldInterceptAjaxRequest` and `useShouldInterceptFetchRequest` webview options
+- Added `onNavigationStateChange` event
 - Fun: added `getTRexRunnerHtml` and `getTRexRunnerCss` methods to get html (with javascript) and css to recreate the Chromium's t-rex runner game 
 
 ### BREAKING CHANGES

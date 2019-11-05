@@ -49,9 +49,9 @@ public class InAppWebViewClient extends WebViewClient {
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
   Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
-  long startPageTime = 0;
   private static int previousAuthRequestFailureCount = 0;
   private static List<Credential> credentialsProposed = null;
+  private String onPageStartedURL = "";
 
   public InAppWebViewClient(Object obj) {
     super();
@@ -145,9 +145,9 @@ public class InAppWebViewClient extends WebViewClient {
       webView.loadUrl("javascript:" + InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", ""));
     }
 
+    onPageStartedURL = url;
     super.onPageStarted(view, url, favicon);
 
-    startPageTime = System.currentTimeMillis();
     webView.isLoading = true;
     if (inAppBrowserActivity != null && inAppBrowserActivity.searchView != null && !url.equals(inAppBrowserActivity.searchView.getQuery().toString())) {
       inAppBrowserActivity.searchView.setQuery(url, false);
@@ -194,6 +194,21 @@ public class InAppWebViewClient extends WebViewClient {
     getChannel().invokeMethod("onLoadStop", obj);
   }
 
+  @Override
+  public void doUpdateVisitedHistory (WebView view, String url, boolean isReload) {
+    super.doUpdateVisitedHistory(view, url, isReload);
+
+    if (!isReload && !url.equals(onPageStartedURL)) {
+      onPageStartedURL = "";
+      Map<String, Object> obj = new HashMap<>();
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
+      obj.put("url", url);
+      getChannel().invokeMethod("onNavigationStateChange", obj);
+    }
+  }
+
+  @Override
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
     super.onReceivedError(view, errorCode, description, failingUrl);
 

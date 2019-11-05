@@ -483,6 +483,36 @@ class InAppBrowser {
 
   }
 
+  ///
+  Future<AjaxRequest> shouldInterceptAjaxRequest(AjaxRequest ajaxRequest) {
+
+  }
+
+  ///
+  Future<AjaxRequestAction> onAjaxReadyStateChange(AjaxRequest ajaxRequest) {
+
+  }
+
+  ///
+  Future<AjaxRequestAction> onAjaxProgress(AjaxRequest ajaxRequest) {
+
+}
+
+  ///
+  Future<FetchRequest> shouldInterceptFetchRequest(FetchRequest fetchRequest) {
+
+  }
+
+  ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of
+  ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event.
+  ///
+  ///Also, the event is fired when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
+  ///
+  ///[url] represents the new url.
+  void onNavigationStateChange(String url) {
+
+  }
+
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
       throw Exception(['Error: ${ (message.isEmpty) ? '' : message + ' '}The browser is already opened.']);

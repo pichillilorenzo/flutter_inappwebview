@@ -702,6 +702,16 @@ class AjaxRequestAction {
 
   static const ABORT = const AjaxRequestAction._internal(0);
   static const PROCEED = const AjaxRequestAction._internal(1);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": _value,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
 }
 
 ///

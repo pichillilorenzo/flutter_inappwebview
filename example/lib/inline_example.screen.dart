@@ -300,16 +300,22 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onAjaxReadyStateChange: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
               print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.responseHeaders}");
-              return null;
+              return AjaxRequestAction.ABORT;
             },
-            onAjaxProgressEvent: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
+            onAjaxProgress: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
               print("AJAX EVENT: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.event.type}, LOADED: ${ajaxRequest.event.loaded}, ${ajaxRequest.responseHeaders}");
-              return null;
+              return AjaxRequestAction.ABORT;
             },
             shouldInterceptFetchRequest: (InAppWebViewController controller, FetchRequest fetchRequest) async {
               print("FETCH REQUEST: ${fetchRequest.method} - ${fetchRequest.url}");
               fetchRequest.action = FetchRequestAction.ABORT;
               return fetchRequest;
+            },
+            onNavigationStateChange: (InAppWebViewController controller, String url) async {
+              print("NAVIGATION STATE CHANGE: ${url}");
+              setState(() {
+                this.url = url;
+              });
             },
           ),
         ),

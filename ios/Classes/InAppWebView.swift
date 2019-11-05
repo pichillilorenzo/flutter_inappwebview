@@ -124,7 +124,7 @@ function wkwebview_FindAllAsyncForElement(element, keyword) {
           value.substr(idx + keyword.length)
         );
 
-        window.webkit.messageHandlers["findResultReceived"].postMessage(
+        window.webkit.messageHandlers["onFindResultReceived"].postMessage(
           JSON.stringify({
             activeMatchOrdinal: wkwebview_CurrentHighlight,
             numberOfMatches: wkwebview_SearchResultCount,
@@ -154,7 +154,7 @@ function wkwebview_FindAllAsync(keyword) {
   wkwebview_ClearMatches();
   wkwebview_FindAllAsyncForElement(document.body, keyword.toLowerCase());
   wkwebview_IsDoneCounting = true;
-  window.webkit.messageHandlers["findResultReceived"].postMessage(
+  window.webkit.messageHandlers["onFindResultReceived"].postMessage(
     JSON.stringify({
       activeMatchOrdinal: wkwebview_CurrentHighlight,
       numberOfMatches: wkwebview_SearchResultCount,
@@ -221,7 +221,7 @@ function wkwebview_FindNext(forward) {
       block: "center"
     });
 
-    window.webkit.messageHandlers["findResultReceived"].postMessage(
+    window.webkit.messageHandlers["onFindResultReceived"].postMessage(
       JSON.stringify({
         activeMatchOrdinal: wkwebview_CurrentHighlight,
         numberOfMatches: wkwebview_SearchResultCount,
@@ -291,9 +291,9 @@ let interceptAjaxRequestsJS = """
         lengthComputable: e.lengthComputable
       }
     };
-    window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgressEvent', ajaxRequest).then(function(result) {
+    window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgress', ajaxRequest).then(function(result) {
       if (result != null) {
-        switch (result.action) {
+        switch (result) {
           case 0:
             self.abort();
             return;
@@ -334,7 +334,7 @@ let interceptAjaxRequestsJS = """
       };
       window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {
         if (result != null) {
-          switch (result.action) {
+          switch (result) {
             case 0:
               self.abort();
               return;
@@ -457,6 +457,35 @@ let interceptFetchRequestsJS = """
 })(window.fetch);
 """
 
+let interceptNavigationStateChangeJS = """
+(function(window, document, history) {
+  history.pushState = (function(f) {
+    return function pushState(){
+      var ret = f.apply(this, arguments);
+      window.dispatchEvent(new Event('pushstate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+  })(history.pushState);
+  history.replaceState = ( function(f) {
+    return function replaceState(){
+      var ret = f.apply(this, arguments);
+      window.dispatchEvent(new Event('replacestate'));
+      window.dispatchEvent(new Event('locationchange'));
+      return ret;
+    };
+  })(history.replaceState);
+  window.addEventListener('popstate',function() {
+    window.dispatchEvent(new Event('locationchange'));
+  });
+  window.addEventListener('locationchange', function() {
+    window.webkit.messageHandlers["onNavigationStateChange"].postMessage(JSON.stringify({
+      url: document.location.href
+    }));
+  });
+})(window, window.document, window.history);
+"""
+
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
 
     var IABController: InAppBrowserWebViewController?
@@ -539,7 +568,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(findTextHighlightJSScript)
-        configuration.userContentController.add(self, name: "findResultReceived")
+        configuration.userContentController.add(self, name: "onFindResultReceived")
+        
+        let interceptNavigationStateChangeJSScript = WKUserScript(source: interceptNavigationStateChangeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(interceptNavigationStateChangeJSScript)
+        configuration.userContentController.add(self, name: "onNavigationStateChange")
+        
         
         if (options?.useShouldInterceptAjaxRequest)! {
             let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -659,7 +693,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?,
                                change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "estimatedProgress" {
+        if keyPath == #keyPath(WKWebView.estimatedProgress) {
             let progress = Int(estimatedProgress * 100)
             onProgressChanged(progress: progress)
         }
@@ -1595,6 +1629,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func onNavigationStateChange(url: String) {
+        var arguments: [String : Any] = [
+            "url": url
+        ]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onNavigationStateChange", arguments: arguments)
+        }
+    }
+    
     public func onScrollChanged(x: Int, y: Int) {
         var arguments: [String: Any] = ["x": x, "y": y]
         if IABController != nil {
@@ -1800,7 +1846,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let _callHandlerID = body["_callHandlerID"] as! Int64
             let args = body["args"] as! String
             onCallJsHandler(handlerName: handlerName, _callHandlerID: _callHandlerID, args: args)
-        } else if message.name == "findResultReceived" {
+        } else if message.name == "onFindResultReceived" {
             if let resource = convertToDictionary(text: message.body as! String) {
                 let activeMatchOrdinal = resource["activeMatchOrdinal"] as! Int
                 let numberOfMatches = resource["numberOfMatches"] as! Int
@@ -1808,6 +1854,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 
                 self.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
             }
+        } else if message.name == "onNavigationStateChange" {
+            if let resource = convertToDictionary(text: message.body as! String) {
+                let url = resource["url"] as! String
+                
+                self.onNavigationStateChange(url: url)
+            }
+           
         }
     }
     

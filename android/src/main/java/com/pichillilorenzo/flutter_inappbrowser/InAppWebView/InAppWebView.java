@@ -154,9 +154,9 @@ final public class InAppWebView extends InputAwareWebView {
           "        lengthComputable: e.lengthComputable" +
           "      }" +
           "    };" +
-          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxProgressEvent', ajaxRequest).then(function(result) {" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxProgress', ajaxRequest).then(function(result) {" +
           "      if (result != null) {" +
-          "        switch (result.action) {" +
+          "        switch (result) {" +
           "          case 0:" +
           "            self.abort();" +
           "            return;" +
@@ -197,7 +197,7 @@ final public class InAppWebView extends InputAwareWebView {
           "      };" +
           "      window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {" +
           "        if (result != null) {" +
-          "          switch (result.action) {" +
+          "          switch (result) {" +
           "            case 0:" +
           "              self.abort();" +
           "              return;" +

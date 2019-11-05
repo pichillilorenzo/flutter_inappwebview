@@ -179,13 +179,21 @@ class InAppWebView extends StatefulWidget {
   final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) shouldInterceptAjaxRequest;
 
   ///
-  final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
+  final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
 
   ///
-  final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgressEvent;
+  final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgress;
 
   ///
   final Future<FetchRequest> Function(InAppWebViewController controller, FetchRequest fetchRequest) shouldInterceptFetchRequest;
+
+  ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of
+  ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event.
+  ///
+  ///Also, the event is fired when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
+  ///
+  ///[url] represents the new url.
+  final void Function(InAppWebViewController controller, String url) onNavigationStateChange;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -236,8 +244,9 @@ class InAppWebView extends StatefulWidget {
     this.onFindResultReceived,
     this.shouldInterceptAjaxRequest,
     this.onAjaxReadyStateChange,
-    this.onAjaxProgressEvent,
+    this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
+    this.onNavigationStateChange,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -531,6 +540,13 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           _inAppBrowser.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
         break;
+      case "onNavigationStateChange":
+        String url = call.arguments["url"];
+        if (_widget != null && _widget.onNavigationStateChange != null)
+          _widget.onNavigationStateChange(this, url);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onNavigationStateChange(url);
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json
@@ -566,8 +582,8 @@ class InAppWebViewController {
 
             if (_widget != null && _widget.shouldInterceptAjaxRequest != null)
               return jsonEncode(await _widget.shouldInterceptAjaxRequest(this, request));
-            //else if (_inAppBrowser != null)
-            //  return jsonEncode(await _inAppBrowser.shouldInterceptAjaxRequest(request));
+            else if (_inAppBrowser != null)
+              return jsonEncode(await _inAppBrowser.shouldInterceptAjaxRequest(request));
             return null;
           case "onAjaxReadyStateChange":
             Map<dynamic, dynamic> argMap = args[0];
@@ -593,10 +609,10 @@ class InAppWebViewController {
 
             if (_widget != null && _widget.onAjaxReadyStateChange != null)
               return jsonEncode(await _widget.onAjaxReadyStateChange(this, request));
-            //else if (_inAppBrowser != null)
-            //  return jsonEncode(await _inAppBrowser.onAjaxReadyStateChange(request));
+            else if (_inAppBrowser != null)
+              return jsonEncode(await _inAppBrowser.onAjaxReadyStateChange(request));
             return null;
-          case "onAjaxProgressEvent":
+          case "onAjaxProgress":
             Map<dynamic, dynamic> argMap = args[0];
             dynamic data = argMap["data"];
             String method = argMap["method"];
@@ -621,10 +637,10 @@ class InAppWebViewController {
                 withCredentials: withCredentials, headers: headers, readyState: AjaxRequestReadyState.fromValue(readyState), status: status, responseURL: responseURL,
                 responseType: responseType, responseText: responseText, statusText: statusText, responseHeaders: responseHeaders, event: event);
 
-            if (_widget != null && _widget.onAjaxProgressEvent != null)
-              return jsonEncode(await _widget.onAjaxProgressEvent(this, request));
-            //else if (_inAppBrowser != null)
-            //  return jsonEncode(await _inAppBrowser.onAjaxProgressEvent(request));
+            if (_widget != null && _widget.onAjaxProgress != null)
+              return jsonEncode(await _widget.onAjaxProgress(this, request));
+            else if (_inAppBrowser != null)
+              return jsonEncode(await _inAppBrowser.onAjaxProgress(request));
             return null;
           case "shouldInterceptFetchRequest":
             Map<dynamic, dynamic> argMap = args[0];
@@ -646,8 +662,8 @@ class InAppWebViewController {
 
             if (_widget != null && _widget.shouldInterceptFetchRequest != null)
               return jsonEncode(await _widget.shouldInterceptFetchRequest(this, request));
-            //else if (_inAppBrowser != null)
-            //  return jsonEncode(await _inAppBrowser.shouldInterceptFetchRequest(request));
+            else if (_inAppBrowser != null)
+              return jsonEncode(await _inAppBrowser.shouldInterceptFetchRequest(request));
             return null;
         }
 

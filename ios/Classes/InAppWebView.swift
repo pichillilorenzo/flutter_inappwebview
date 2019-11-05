@@ -463,7 +463,7 @@ let interceptNavigationStateChangeJS = """
     return function pushState(){
       var ret = f.apply(this, arguments);
       window.dispatchEvent(new Event('pushstate'));
-      window.dispatchEvent(new Event('locationchange'));
+      window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
       return ret;
     };
   })(history.pushState);
@@ -471,14 +471,14 @@ let interceptNavigationStateChangeJS = """
     return function replaceState(){
       var ret = f.apply(this, arguments);
       window.dispatchEvent(new Event('replacestate'));
-      window.dispatchEvent(new Event('locationchange'));
+      window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
       return ret;
     };
   })(history.replaceState);
   window.addEventListener('popstate',function() {
-    window.dispatchEvent(new Event('locationchange'));
+    window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
   });
-  window.addEventListener('locationchange', function() {
+  window.addEventListener('_flutter_inappbrowser_locationchange', function() {
     window.webkit.messageHandlers["onNavigationStateChange"].postMessage(JSON.stringify({
       url: document.location.href
     }));

@@ -16,7 +16,7 @@ import 'types.dart';
 import 'in_app_browser.dart';
 import 'webview_options.dart';
 
-const javaScriptHandlersNameForbidden = ["onLoadResource", "shouldInterceptAjaxRequest", "onAjaxReadyStateChange", "onAjaxEvent"];
+const javaScriptHandlerForbiddenNames = ["onLoadResource", "shouldInterceptAjaxRequest", "onAjaxReadyStateChange", "onAjaxProgress", "shouldInterceptFetchRequest"];
 
 ///InAppWebView Widget class.
 ///
@@ -1144,7 +1144,7 @@ class InAppWebViewController {
   ///  """);
   ///```
   void addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
-    assert(!javaScriptHandlersNameForbidden.contains(handlerName));
+    assert(!javaScriptHandlerForbiddenNames.contains(handlerName));
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
 

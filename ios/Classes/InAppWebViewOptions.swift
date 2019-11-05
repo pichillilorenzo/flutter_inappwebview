@@ -26,6 +26,8 @@ public class InAppWebViewOptions: Options {
     var resourceCustomSchemes: [String] = []
     var contentBlockers: [[String: [String : Any]]] = []
     var minimumFontSize = 0;
+    var useShouldInterceptAjaxRequest = false
+    var useShouldInterceptFetchRequest = false
 
     var disallowOverScroll = false
     var enableViewportScale = false

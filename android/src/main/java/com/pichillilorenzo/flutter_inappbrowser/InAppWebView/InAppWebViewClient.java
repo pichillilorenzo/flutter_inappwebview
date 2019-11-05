@@ -7,7 +7,6 @@ import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Base64;
 import android.util.Log;
 import android.webkit.ClientCertRequest;
 import android.webkit.CookieManager;
@@ -15,7 +14,6 @@ import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
-import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -61,60 +59,7 @@ public class InAppWebViewClient extends WebViewClient {
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
-    prepareStatusCodeMapping();
   }
-
-  private void prepareStatusCodeMapping() {
-    statusCodeMapping.put(100, "Continue");
-    statusCodeMapping.put(101, "Switching Protocols");
-    statusCodeMapping.put(200, "OK");
-    statusCodeMapping.put(201, "Created");
-    statusCodeMapping.put(202, "Accepted");
-    statusCodeMapping.put(203, "Non-Authoritative Information");
-    statusCodeMapping.put(204, "No Content");
-    statusCodeMapping.put(205, "Reset Content");
-    statusCodeMapping.put(206, "Partial Content");
-    statusCodeMapping.put(300, "Multiple Choices");
-    statusCodeMapping.put(301, "Moved Permanently");
-    statusCodeMapping.put(302, "Found");
-    statusCodeMapping.put(303, "See Other");
-    statusCodeMapping.put(304, "Not Modified");
-    statusCodeMapping.put(307, "Temporary Redirect");
-    statusCodeMapping.put(308, "Permanent Redirect");
-    statusCodeMapping.put(400, "Bad Request");
-    statusCodeMapping.put(401, "Unauthorized");
-    statusCodeMapping.put(403, "Forbidden");
-    statusCodeMapping.put(404, "Not Found");
-    statusCodeMapping.put(405, "Method Not Allowed");
-    statusCodeMapping.put(406, "Not Acceptable");
-    statusCodeMapping.put(407, "Proxy Authentication Required");
-    statusCodeMapping.put(408, "Request Timeout");
-    statusCodeMapping.put(409, "Conflict");
-    statusCodeMapping.put(410, "Gone");
-    statusCodeMapping.put(411, "Length Required");
-    statusCodeMapping.put(412, "Precondition Failed");
-    statusCodeMapping.put(413, "Payload Too Large");
-    statusCodeMapping.put(414, "URI Too Long");
-    statusCodeMapping.put(415, "Unsupported Media Type");
-    statusCodeMapping.put(416, "Range Not Satisfiable");
-    statusCodeMapping.put(417, "Expectation Failed");
-    statusCodeMapping.put(418, "I'm a teapot");
-    statusCodeMapping.put(422, "Unprocessable Entity");
-    statusCodeMapping.put(425, "Too Early");
-    statusCodeMapping.put(426, "Upgrade Required");
-    statusCodeMapping.put(428, "Precondition Required");
-    statusCodeMapping.put(429, "Too Many Requests");
-    statusCodeMapping.put(431, "Request Header Fields Too Large");
-    statusCodeMapping.put(451, "Unavailable For Legal Reasons");
-    statusCodeMapping.put(500, "Internal Server Error");
-    statusCodeMapping.put(501, "Not Implemented");
-    statusCodeMapping.put(502, "Bad Gateway");
-    statusCodeMapping.put(503, "Service Unavailable");
-    statusCodeMapping.put(504, "Gateway Timeout");
-    statusCodeMapping.put(505, "HTTP Version Not Supported");
-    statusCodeMapping.put(511, "Network Authentication Required");
-  }
-
   @Override
   public boolean shouldOverrideUrlLoading(WebView webView, String url) {
 
@@ -183,21 +128,22 @@ public class InAppWebViewClient extends WebViewClient {
     return super.shouldOverrideUrlLoading(webView, url);
   }
 
-
-  /*
-   * onPageStarted fires the LOAD_START_EVENT
-   *
-   * @param view
-   * @param url
-   * @param favicon
-   */
   @Override
   public void onPageStarted(WebView view, String url, Bitmap favicon) {
 
     InAppWebView webView = (InAppWebView) view;
 
-    if (webView.options.useOnLoadResource)
-      webView.loadUrl("javascript:" + webView.resourceObserverJS.replaceAll("[\r\n]+", ""));
+    webView.loadUrl("javascript:" + InAppWebView.consoleLogJS.replaceAll("[\r\n]+", ""));
+    webView.loadUrl("javascript:" + JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", ""));
+    if (webView.options.useShouldInterceptAjaxRequest) {
+      webView.loadUrl("javascript:" + InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", ""));
+    }
+    if (webView.options.useShouldInterceptFetchRequest) {
+      webView.loadUrl("javascript:" + InAppWebView.interceptFetchRequestsJS.replaceAll("[\r\n]+", ""));
+    }
+    if (webView.options.useOnLoadResource) {
+      webView.loadUrl("javascript:" + InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", ""));
+    }
 
     super.onPageStarted(view, url, favicon);
 
@@ -215,8 +161,8 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
 
-  public void onPageFinished(final WebView view, String url) {
-    InAppWebView webView = (InAppWebView) view;
+  public void onPageFinished(WebView view, String url) {
+    final InAppWebView webView = (InAppWebView) view;
 
     super.onPageFinished(view, url);
 
@@ -236,18 +182,9 @@ public class InAppWebViewClient extends WebViewClient {
     view.requestFocus();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      view.evaluateJavascript(InAppWebView.consoleLogJS, null);
-      view.evaluateJavascript(JavaScriptBridgeInterface.flutterInAppBroserJSClass, new ValueCallback<String>() {
-        @Override
-        public void onReceiveValue(String value) {
-          view.evaluateJavascript(InAppWebView.platformReadyJS, null);
-        }
-      });
-
+      webView.evaluateJavascript(InAppWebView.platformReadyJS, (MethodChannel.Result) null);
     } else {
-      view.loadUrl("javascript:" + InAppWebView.consoleLogJS);
-      view.loadUrl("javascript:" + JavaScriptBridgeInterface.flutterInAppBroserJSClass);
-      view.loadUrl("javascript:" + InAppWebView.platformReadyJS);
+      webView.loadUrl("javascript:" + InAppWebView.platformReadyJS.replaceAll("[\r\n]+", ""));
     }
 
     Map<String, Object> obj = new HashMap<>();

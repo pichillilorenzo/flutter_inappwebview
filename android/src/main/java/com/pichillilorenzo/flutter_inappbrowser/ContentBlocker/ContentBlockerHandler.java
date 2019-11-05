@@ -21,6 +21,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 
+import io.flutter.plugin.common.MethodChannel;
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -145,7 +146,7 @@ public class ContentBlockerHandler {
                             @Override
                             public void run() {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    webView.evaluateJavascript(jsScript, null);
+                                    webView.evaluateJavascript(jsScript, (MethodChannel.Result) null);
                                 } else {
                                     webView.loadUrl("javascript:" + jsScript);
                                 }

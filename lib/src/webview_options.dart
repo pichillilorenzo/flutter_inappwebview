@@ -54,11 +54,14 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   List<String> resourceCustomSchemes;
   List<ContentBlocker> contentBlockers;
   InAppWebViewUserPreferredContentMode preferredContentMode;
+  bool useShouldInterceptAjaxRequest;
+  bool useShouldInterceptFetchRequest;
 
   InAppWebViewOptions({this.useShouldOverrideUrlLoading = false, this.useOnLoadResource = false, this.useOnDownloadStart = false, this.useOnTargetBlank = false,
     this.clearCache = false, this.userAgent = "", this.javaScriptEnabled = true, this.debuggingEnabled = false, this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true, this.textZoom = 100, this.minimumFontSize, this.verticalScrollBarEnabled = true, this.horizontalScrollBarEnabled = true,
-    this.resourceCustomSchemes = const [], this.contentBlockers = const [], this.preferredContentMode = InAppWebViewUserPreferredContentMode.RECOMMENDED}) {
+    this.resourceCustomSchemes = const [], this.contentBlockers = const [], this.preferredContentMode = InAppWebViewUserPreferredContentMode.RECOMMENDED,
+    this.useShouldInterceptAjaxRequest = false, this.useShouldInterceptFetchRequest = false}) {
       if (this.minimumFontSize == null)
         this.minimumFontSize = Platform.isAndroid ? 8 : 0;
       assert(!this.resourceCustomSchemes.contains("http") && !this.resourceCustomSchemes.contains("https"));
@@ -87,7 +90,9 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
       "resourceCustomSchemes": resourceCustomSchemes,
       "contentBlockers": contentBlockersMapList,
-      "preferredContentMode": preferredContentMode?.toValue()
+      "preferredContentMode": preferredContentMode?.toValue(),
+      "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
+      "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest
     };
   }
 

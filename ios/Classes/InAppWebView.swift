@@ -8,7 +8,6 @@
 import Flutter
 import Foundation
 import WebKit
-import WKWebViewWithURLProtocol
 
 func currentTimeInMilliSeconds() -> Int64 {
     let currentDate = Date()
@@ -27,9 +26,11 @@ func convertToDictionary(text: String) -> [String: Any]? {
     return nil
 }
 
+let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
+
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
 let consoleLogJS = """
-(function() {
+(function(console) {
     var oldLogs = {
         'consoleLog': console.log,
         'consoleDebug': console.debug,
@@ -54,21 +55,19 @@ let consoleLogJS = """
             }
         })(k);
     }
-})();
+})(window.console);
 """
 
 let resourceObserverJS = """
 (function() {
     var observer = new PerformanceObserver(function(list) {
         list.getEntries().forEach(function(entry) {
-            window.webkit.messageHandlers['resourceLoaded'].postMessage(JSON.stringify(entry));
+            window.\(JAVASCRIPT_BRIDGE_NAME).callHandler("onLoadResource", entry);
         });
     });
     observer.observe({entryTypes: ['resource']});
 })();
 """
-
-let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
 
 let javaScriptBridgeJS = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = {};
@@ -233,6 +232,231 @@ function wkwebview_FindNext(forward) {
 }
 """
 
+let interceptAjaxRequestsJS = """
+(function(ajax) {
+  var send = ajax.prototype.send;
+  var open = ajax.prototype.open;
+  var setRequestHeader = ajax.prototype.setRequestHeader;
+  ajax.prototype._flutter_inappbrowser_url = null;
+  ajax.prototype._flutter_inappbrowser_method = null;
+  ajax.prototype._flutter_inappbrowser_isAsync = null;
+  ajax.prototype._flutter_inappbrowser_user = null;
+  ajax.prototype._flutter_inappbrowser_password = null;
+  ajax.prototype._flutter_inappbrowser_password = null;
+  ajax.prototype._flutter_inappbrowser_request_headers = {};
+  ajax.prototype.open = function(method, url, isAsync, user, password) {
+    isAsync = (isAsync != null) ? isAsync : true;
+    this._flutter_inappbrowser_url = url;
+    this._flutter_inappbrowser_method = method;
+    this._flutter_inappbrowser_isAsync = isAsync;
+    this._flutter_inappbrowser_user = user;
+    this._flutter_inappbrowser_password = password;
+    open.call(this, method, url, isAsync, user, password);
+  };
+  ajax.prototype.setRequestHeader = function(header, value) {
+    this._flutter_inappbrowser_request_headers[header] = value;
+    setRequestHeader.call(this, header, value);
+  };
+  function handleEvent(e) {
+    var self = this;
+    var headers = this.getAllResponseHeaders();
+    var responseHeaders = {};
+    if (headers != null) {
+      var arr = headers.trim().split(/[\\r\\n]+/);
+      arr.forEach(function (line) {
+        var parts = line.split(': ');
+        var header = parts.shift();
+        var value = parts.join(': ');
+        responseHeaders[header] = value;
+      });
+    }
+    var ajaxRequest = {
+      method: this._flutter_inappbrowser_method,
+      url: this._flutter_inappbrowser_url,
+      isAsync: this._flutter_inappbrowser_isAsync,
+      user: this._flutter_inappbrowser_user,
+      password: this._flutter_inappbrowser_password,
+      withCredentials: this.withCredentials,
+      headers: this._flutter_inappbrowser_request_headers,
+      readyState: this.readyState,
+      status: this.status,
+      responseURL: this.responseURL,
+      responseType: this.responseType,
+      responseText: this.responseText,
+      statusText: this.statusText,
+      responseHeaders, responseHeaders,
+      event: {
+        type: e.type,
+        loaded: e.loaded,
+        lengthComputable: e.lengthComputable
+      }
+    };
+    window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgressEvent', ajaxRequest).then(function(result) {
+      if (result != null) {
+        switch (result.action) {
+          case 0:
+            self.abort();
+            return;
+        };
+      }
+    });
+  };
+  ajax.prototype.send = function(data) {
+    var self = this;
+    var onreadystatechange = this.onreadystatechange;
+    this.onreadystatechange = function() {
+      var headers = this.getAllResponseHeaders();
+      var responseHeaders = {};
+      if (headers != null) {
+        var arr = headers.trim().split(/[\\r\\n]+/);
+        arr.forEach(function (line) {
+          var parts = line.split(': ');
+          var header = parts.shift();
+          var value = parts.join(': ');
+          responseHeaders[header] = value;
+        });
+      }
+      var ajaxRequest = {
+        method: this._flutter_inappbrowser_method,
+        url: this._flutter_inappbrowser_url,
+        isAsync: this._flutter_inappbrowser_isAsync,
+        user: this._flutter_inappbrowser_user,
+        password: this._flutter_inappbrowser_password,
+        withCredentials: this.withCredentials,
+        headers: this._flutter_inappbrowser_request_headers,
+        readyState: this.readyState,
+        status: this.status,
+        responseURL: this.responseURL,
+        responseType: this.responseType,
+        responseText: this.responseText,
+        statusText: this.statusText,
+        responseHeaders: responseHeaders
+      };
+      window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {
+        if (result != null) {
+          switch (result.action) {
+            case 0:
+              self.abort();
+              return;
+          };
+        }
+        if (onreadystatechange != null) {
+          onreadystatechange();
+        }
+      });
+    };
+    this.addEventListener('loadstart', handleEvent);
+    this.addEventListener('load', handleEvent);
+    this.addEventListener('loadend', handleEvent);
+    this.addEventListener('progress', handleEvent);
+    this.addEventListener('error', handleEvent);
+    this.addEventListener('abort', handleEvent);
+    var ajaxRequest = {
+      data: data,
+      method: this._flutter_inappbrowser_method,
+      url: this._flutter_inappbrowser_url,
+      isAsync: this._flutter_inappbrowser_isAsync,
+      user: this._flutter_inappbrowser_user,
+      password: this._flutter_inappbrowser_password,
+      withCredentials: this.withCredentials,
+      headers: this._flutter_inappbrowser_request_headers
+    };
+    window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {
+      if (result != null) {
+        switch (result.action) {
+          case 0:
+            self.abort();
+            return;
+        };
+        data = result.data;
+        self.withCredentials = result.withCredentials;
+        for (var header in result.headers) {
+          var value = result.headers[header];
+          self.setRequestHeader(header, value);
+        };
+        if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {
+          self.abort();
+          self.open(result.method, result.url, result.isAsync, result.user, result.password);
+          return;
+        }
+      }
+      send.call(self, data);
+    });
+  };
+})(window.XMLHttpRequest);
+"""
+
+let interceptFetchRequestsJS = """
+(function(fetch) {
+  if (fetch == null) {
+    return;
+  }
+  window.fetch = function(resource, init) {
+    var fetchRequest = {
+      url: null,
+      method: null,
+      headers: null,
+      body: null,
+      mode: null,
+      credentials: null,
+      cache: null,
+      redirect: null,
+      referrer: null,
+      referrerPolicy: null,
+      integrity: null,
+      keepalive: null
+    };
+    if (resource instanceof Request) {
+      fetchRequest.url = resource.url;
+      fetchRequest.method = resource.method;
+      fetchRequest.headers = resource.headers;
+      fetchRequest.body = resource.body;
+      fetchRequest.mode = resource.mode;
+      fetchRequest.credentials = resource.credentials;
+      fetchRequest.cache = resource.cache;
+      fetchRequest.redirect = resource.redirect;
+      fetchRequest.referrer = resource.referrer;
+      fetchRequest.referrerPolicy = resource.referrerPolicy;
+      fetchRequest.integrity = resource.integrity;
+      fetchRequest.keepalive = resource.keepalive;
+    } else {
+      fetchRequest.url = resource;
+      if (init != null) {
+        fetchRequest.method = init.method;
+        fetchRequest.headers = init.headers;
+        fetchRequest.body = init.body;
+        fetchRequest.mode = init.mode;
+        fetchRequest.credentials = init.credentials;
+        fetchRequest.cache = init.cache;
+        fetchRequest.redirect = init.redirect;
+        fetchRequest.referrer = init.referrer;
+        fetchRequest.referrerPolicy = init.referrerPolicy;
+        fetchRequest.integrity = init.integrity;
+        fetchRequest.keepalive = init.keepalive;
+      }
+    }
+    return window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptFetchRequest', fetchRequest).then(function(result) {
+      if (result != null) {
+        switch (result.action) {
+          case 0:
+            var controller = new AbortController();
+            if (init != null) {
+              init.signal = controller.signal;
+            } else {
+              init = {
+                signal: controller.signal
+              };
+            }
+            controller.abort();
+            break;
+        }
+      }
+      return fetch(resource, init);
+    });
+  };
+})(window.fetch);
+"""
+
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
 
     var IABController: InAppBrowserWebViewController?
@@ -308,13 +532,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
         configuration.userContentController.add(self, name: "callHandler")
         
-        let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(resourceObserverJSScript)
-        configuration.userContentController.add(self, name: "resourceLoaded")
+        if (options?.useOnLoadResource)! {
+            let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(resourceObserverJSScript)
+        }
         
         let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(findTextHighlightJSScript)
         configuration.userContentController.add(self, name: "findResultReceived")
+        
+        if (options?.useShouldInterceptAjaxRequest)! {
+            let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
+        }
+        
+        if (options?.useShouldInterceptFetchRequest)! {
+            let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
+        }
+        
         
         //keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
         
@@ -548,6 +784,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             evaluateJavaScript(jscript, completionHandler: nil)
         }
         
+        if newOptionsMap["useOnLoadResource"] != nil && options?.useOnLoadResource != newOptions.useOnLoadResource && newOptions.useOnLoadResource {
+            evaluateJavaScript(resourceObserverJS, completionHandler: nil)
+        }
+        
+        if newOptionsMap["useShouldInterceptAjaxRequest"] != nil && options?.useShouldInterceptAjaxRequest != newOptions.useShouldInterceptAjaxRequest && newOptions.useShouldInterceptAjaxRequest {
+            evaluateJavaScript(interceptAjaxRequestsJS, completionHandler: nil)
+        }
+        
+        if newOptionsMap["useShouldInterceptFetchRequest"] != nil && options?.useShouldInterceptFetchRequest != newOptions.useShouldInterceptFetchRequest && newOptions.useShouldInterceptFetchRequest {
+            evaluateJavaScript(interceptFetchRequestsJS, completionHandler: nil)
+        }
+        
         if newOptionsMap["mediaPlaybackRequiresUserGesture"] != nil && options?.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture {
             if #available(iOS 10.0, *) {
                 configuration.mediaTypesRequiringUserActionForPlayback = (newOptions.mediaPlaybackRequiresUserGesture) ? .all : []
@@ -734,22 +982,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func injectScriptCode(source: String, result: FlutterResult?) {
+    public func evaluateJavascript(source: String, result: FlutterResult?) {
         let jsWrapper = "(function(){return JSON.stringify(eval(%@));})();"
         injectDeferredObject(source: source, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectScriptFile(urlFile: String) {
+    public func injectJavascriptFileFromUrl(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
         injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectStyleCode(source: String) {
+    public func injectCSSCode(source: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
         injectDeferredObject(source: source, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectStyleFile(urlFile: String) {
+    public func injectCSSFileFromUrl(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
         injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
     }
@@ -1333,21 +1581,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func onLoadResource(initiatorType: String, url: String, startTime: Double, duration: Double) {
-        var arguments: [String : Any] = [
-            "initiatorType": initiatorType,
-            "url": url,
-            "startTime": startTime,
-            "duration": duration
-        ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadResource", arguments: arguments)
-        }
-    }
-    
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         var arguments: [String : Any] = [
             "activeMatchOrdinal": activeMatchOrdinal,
@@ -1560,22 +1793,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 break;
             }
             onConsoleMessage(sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
-        }
-        else if message.name == "resourceLoaded" && (options?.useOnLoadResource)! {
-            if let resource = convertToDictionary(text: message.body as! String) {
-                // escape special chars
-                let resourceName = (resource["name"] as! String).addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed)
-                
-                let url = URL(string: resourceName!)!
-                if !UIApplication.shared.canOpenURL(url) {
-                    return
-                }
-                let initiatorType = resource["initiatorType"] as! String
-                let startTime = resource["startTime"] as! Double
-                let duration = resource["duration"] as! Double
-                
-                self.onLoadResource(initiatorType: initiatorType, url: url.absoluteString, startTime: startTime, duration: duration)
-            }
         }
         else if message.name == "callHandler" {
             let body = message.body as! [String: Any]

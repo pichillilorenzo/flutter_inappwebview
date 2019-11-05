@@ -61,7 +61,7 @@ public class JavaScriptBridgeInterface {
               return;
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-              webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", null);
+              webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", (MethodChannel.Result) null);
             }
             else {
               webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
@@ -80,42 +80,6 @@ public class JavaScriptBridgeInterface {
         });
       }
     });
-  }
-
-  @JavascriptInterface
-  public void _resourceLoaded(String json) {
-    try {
-
-      JSONObject jsonObject = new JSONObject(json);
-
-      final Map<String, Object> obj = new HashMap<>();
-
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
-
-      String initiatorType = jsonObject.getString("initiatorType");
-      String url = jsonObject.getString("name");
-      Double startTime = jsonObject.getDouble("startTime");
-      Double duration = jsonObject.getDouble("duration");
-
-      obj.put("initiatorType", initiatorType);
-      obj.put("url", url);
-      obj.put("startTime", startTime);
-      obj.put("duration", duration);
-
-      // java.lang.RuntimeException: Methods marked with @UiThread must be executed on the main thread.
-      // https://github.com/pichillilorenzo/flutter_inappbrowser/issues/98
-      final Handler handler = new Handler(Looper.getMainLooper());
-      handler.post(new Runnable() {
-        @Override
-        public void run() {
-          getChannel().invokeMethod("onLoadResource", obj);
-        }
-      });
-
-    } catch (final JSONException e) {
-      Log.e(LOG_TAG, "Json parsing error: " + e.getMessage());
-    }
   }
 
   private MethodChannel getChannel() {

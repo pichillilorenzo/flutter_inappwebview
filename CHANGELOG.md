@@ -26,7 +26,8 @@
 - Added `HttpAuthCredentialDatabase` class
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
 - Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
-- Added `getHtml` method
+- Added `getHtml`, `injectJavascriptFileFromAsset` and `injectCSSFileFromAsset` methods
+- Added `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgressEvent` and `shouldInterceptFetchRequest` events with `useShouldInterceptAjaxRequest` and `useShouldInterceptFetchRequest` webview options
 - Fun: added `getTRexRunnerHtml` and `getTRexRunnerCss` methods to get html (with javascript) and css to recreate the Chromium's t-rex runner game 
 
 ### BREAKING CHANGES
@@ -37,6 +38,10 @@
 - Updated `CookieManager` class
 - WebView options are now available with the new corresponding classes: `InAppWebViewOptions`, `AndroidInAppWebViewOptions`, `iOSInAppWebViewOptions`, `InAppBrowserOptions`, `AndroidInAppBrowserOptions`, `iOSInAppBrowserOptions`, `AndroidChromeCustomTabsOptions` and `iOSSafariOptions`
 - Renamed `getFavicon` to `getFavicons`, now it returns a list of all favicons (`List<Favicon>`) found
+- Renamed `injectScriptFile` to `injectJavascriptFileFromUrl`
+- Renamed `injectScriptCode` to `evaluateJavascript`
+- Renamed `injectStyleCode` to `injectCSSCode`
+- Renamed `injectStyleFile` to `injectCSSFileFromUrl`
 
 ## 1.2.1
 

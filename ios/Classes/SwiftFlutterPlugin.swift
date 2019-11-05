@@ -195,19 +195,19 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                     result(false)
                 }
                 break
-            case "injectScriptCode":
-                self.injectScriptCode(uuid: uuid, arguments: arguments!, result: result)
+            case "evaluateJavascript":
+                self.evaluateJavascript(uuid: uuid, arguments: arguments!, result: result)
                 break
-            case "injectScriptFile":
-                self.injectScriptFile(uuid: uuid, arguments: arguments!)
+            case "injectJavascriptFileFromUrl":
+                self.injectJavascriptFileFromUrl(uuid: uuid, arguments: arguments!)
                 result(true)
                 break
-            case "injectStyleCode":
-                self.injectStyleCode(uuid: uuid, arguments: arguments!)
+            case "injectCSSCode":
+                self.injectCSSCode(uuid: uuid, arguments: arguments!)
                 result(true)
                 break
-            case "injectStyleFile":
-                self.injectStyleFile(uuid: uuid, arguments: arguments!)
+            case "injectCSSFileFromUrl":
+                self.injectCSSFileFromUrl(uuid: uuid, arguments: arguments!)
                 result(true)
                 break
             case "takeScreenshot":
@@ -665,30 +665,30 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    public func injectScriptCode(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
+    public func evaluateJavascript(uuid: String, arguments: NSDictionary, result: @escaping FlutterResult) {
         if let webViewController = self.webViewControllers[uuid] {
-            webViewController!.webView.injectScriptCode(source: arguments["source"] as! String, result: result)
+            webViewController!.webView.evaluateJavascript(source: arguments["source"] as! String, result: result)
         }
         else {
             result(FlutterError(code: "InAppBrowserFlutterPlugin", message: "webView is null", details: nil))
         }
     }
     
-    public func injectScriptFile(uuid: String, arguments: NSDictionary) {
+    public func injectJavascriptFileFromUrl(uuid: String, arguments: NSDictionary) {
         if let webViewController = self.webViewControllers[uuid] {
-            webViewController!.webView.injectScriptFile(urlFile: arguments["urlFile"] as! String)
+            webViewController!.webView.injectJavascriptFileFromUrl(urlFile: arguments["urlFile"] as! String)
         }
     }
     
-    public func injectStyleCode(uuid: String, arguments: NSDictionary) {
+    public func injectCSSCode(uuid: String, arguments: NSDictionary) {
         if let webViewController = self.webViewControllers[uuid] {
-            webViewController!.webView.injectStyleCode(source: arguments["source"] as! String)
+            webViewController!.webView.injectCSSCode(source: arguments["source"] as! String)
         }
     }
     
-    public func injectStyleFile(uuid: String, arguments: NSDictionary) {
+    public func injectCSSFileFromUrl(uuid: String, arguments: NSDictionary) {
         if let webViewController = self.webViewControllers[uuid] {
-            webViewController!.webView.injectStyleFile(urlFile: arguments["urlFile"] as! String)
+            webViewController!.webView.injectCSSFileFromUrl(urlFile: arguments["urlFile"] as! String)
         }
     }
     

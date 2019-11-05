@@ -16,30 +16,7 @@ import 'types.dart';
 import 'in_app_browser.dart';
 import 'webview_options.dart';
 
-/*
-* TODO: injectJavaScriptBeforeLoad
-*/
-
-///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
-///The [mimeType] property specifies the format of the data.
-///The [encoding] property specifies the encoding of the data.
-class InAppWebViewInitialData {
-  String data;
-  String mimeType;
-  String encoding;
-  String baseUrl;
-
-  InAppWebViewInitialData(this.data, {this.mimeType = "text/html", this.encoding = "utf8", this.baseUrl = "about:blank"});
-
-  Map<String, String> toMap() {
-    return {
-      "data": data,
-      "mimeType": mimeType,
-      "encoding": encoding,
-      "baseUrl": baseUrl
-    };
-  }
-}
+const javaScriptHandlersNameForbidden = ["onLoadResource", "shouldInterceptAjaxRequest", "onAjaxReadyStateChange", "onAjaxEvent"];
 
 ///InAppWebView Widget class.
 ///
@@ -64,7 +41,7 @@ class InAppWebViewInitialData {
 ///  - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
 ///  - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
 ///  - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
-///  - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
+///  - __databaseEnabled__: Set to `true` if you want injectScriptFilethe database storage API is enabled. The default value is `false`.
 ///  - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
 ///  - __useWideViewPort__: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport. When the value of the setting is false, the layout width is always set to the width of the WebView control in device-independent (CSS) pixels. When the value is true and the page contains the viewport meta tag, the value of the width specified in the tag is used. If the page does not contain the tag or does not provide a width, then a wide viewport will be used. The default value is `true`.
 ///  - __safeBrowsingEnabled__: Set to `true` if you want the Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links. The default value is `true`.
@@ -198,6 +175,18 @@ class InAppWebView extends StatefulWidget {
   ///[isDoneCounting] whether the find operation has actually completed.
   final void Function(InAppWebViewController controller, int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) onFindResultReceived;
 
+  ///
+  final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) shouldInterceptAjaxRequest;
+
+  ///
+  final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
+
+  ///
+  final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgressEvent;
+
+  ///
+  final Future<FetchRequest> Function(InAppWebViewController controller, FetchRequest fetchRequest) shouldInterceptFetchRequest;
+
   ///Initial url that will be loaded.
   final String initialUrl;
   ///Initial asset file that will be loaded. See [InAppWebView.loadFile()] for explanation.
@@ -245,6 +234,10 @@ class InAppWebView extends StatefulWidget {
     this.onReceivedServerTrustAuthRequest,
     this.onReceivedClientCertRequest,
     this.onFindResultReceived,
+    this.shouldInterceptAjaxRequest,
+    this.onAjaxReadyStateChange,
+    this.onAjaxProgressEvent,
+    this.shouldInterceptFetchRequest,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -399,19 +392,6 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           _inAppBrowser.shouldOverrideUrlLoading(url);
         break;
-      case "onLoadResource":
-        String initiatorType = call.arguments["initiatorType"];
-        String url = call.arguments["url"];
-        double startTime = call.arguments["startTime"];
-        double duration = call.arguments["duration"];
-
-        var response = new LoadedResource(initiatorType, url, startTime, duration);
-
-        if (_widget != null && _widget.onLoadResource != null)
-          _widget.onLoadResource(this, response);
-        else if (_inAppBrowser != null)
-          _inAppBrowser.onLoadResource(response);
-        break;
       case "onConsoleMessage":
         String sourceURL = call.arguments["sourceURL"];
         int lineNumber = call.arguments["lineNumber"];
@@ -555,6 +535,122 @@ class InAppWebViewController {
         String handlerName = call.arguments["handlerName"];
         // decode args to json
         List<dynamic> args = jsonDecode(call.arguments["args"]);
+
+        switch(handlerName) {
+          case "onLoadResource":
+            Map<dynamic, dynamic> argMap = args[0];
+            String initiatorType = argMap["initiatorType"];
+            String url = argMap["name"];
+            double startTime = argMap["startTime"] is int ? argMap["startTime"].toDouble() : argMap["startTime"];
+            double duration = argMap["duration"] is int ? argMap["duration"].toDouble() : argMap["duration"];
+
+            var response = new LoadedResource(initiatorType, url, startTime, duration);
+
+            if (_widget != null && _widget.onLoadResource != null)
+              _widget.onLoadResource(this, response);
+            else if (_inAppBrowser != null)
+              _inAppBrowser.onLoadResource(response);
+            return null;
+          case "shouldInterceptAjaxRequest":
+            Map<dynamic, dynamic> argMap = args[0];
+            dynamic data = argMap["data"];
+            String method = argMap["method"];
+            String url = argMap["url"];
+            bool isAsync = argMap["isAsync"];
+            String user = argMap["user"];
+            String password = argMap["password"];
+            bool withCredentials = argMap["withCredentials"];
+            Map<dynamic, dynamic> headers = argMap["headers"];
+
+            var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password, withCredentials: withCredentials, headers: headers);
+
+            if (_widget != null && _widget.shouldInterceptAjaxRequest != null)
+              return jsonEncode(await _widget.shouldInterceptAjaxRequest(this, request));
+            //else if (_inAppBrowser != null)
+            //  return jsonEncode(await _inAppBrowser.shouldInterceptAjaxRequest(request));
+            return null;
+          case "onAjaxReadyStateChange":
+            Map<dynamic, dynamic> argMap = args[0];
+            dynamic data = argMap["data"];
+            String method = argMap["method"];
+            String url = argMap["url"];
+            bool isAsync = argMap["isAsync"];
+            String user = argMap["user"];
+            String password = argMap["password"];
+            bool withCredentials = argMap["withCredentials"];
+            Map<dynamic, dynamic> headers = argMap["headers"];
+            int readyState = argMap["readyState"];
+            int status = argMap["status"];
+            String responseURL = argMap["responseURL"];
+            String responseType = argMap["responseType"];
+            String responseText = argMap["responseText"];
+            String statusText = argMap["statusText"];
+            Map<dynamic, dynamic> responseHeaders = argMap["responseHeaders"];
+
+            var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password,
+                withCredentials: withCredentials, headers: headers, readyState: AjaxRequestReadyState.fromValue(readyState), status: status, responseURL: responseURL,
+                responseType: responseType, responseText: responseText, statusText: statusText, responseHeaders: responseHeaders);
+
+            if (_widget != null && _widget.onAjaxReadyStateChange != null)
+              return jsonEncode(await _widget.onAjaxReadyStateChange(this, request));
+            //else if (_inAppBrowser != null)
+            //  return jsonEncode(await _inAppBrowser.onAjaxReadyStateChange(request));
+            return null;
+          case "onAjaxProgressEvent":
+            Map<dynamic, dynamic> argMap = args[0];
+            dynamic data = argMap["data"];
+            String method = argMap["method"];
+            String url = argMap["url"];
+            bool isAsync = argMap["isAsync"];
+            String user = argMap["user"];
+            String password = argMap["password"];
+            bool withCredentials = argMap["withCredentials"];
+            Map<dynamic, dynamic> headers = argMap["headers"];
+            int readyState = argMap["readyState"];
+            int status = argMap["status"];
+            String responseURL = argMap["responseURL"];
+            String responseType = argMap["responseType"];
+            String responseText = argMap["responseText"];
+            String statusText = argMap["statusText"];
+            Map<dynamic, dynamic> responseHeaders = argMap["responseHeaders"];
+            Map<dynamic, dynamic> eventMap = argMap["event"];
+
+            AjaxRequestEvent event = AjaxRequestEvent(lengthComputable: eventMap["lengthComputable"], loaded: eventMap["loaded"], type: AjaxRequestEventType.fromValue(eventMap["type"]));
+
+            var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password,
+                withCredentials: withCredentials, headers: headers, readyState: AjaxRequestReadyState.fromValue(readyState), status: status, responseURL: responseURL,
+                responseType: responseType, responseText: responseText, statusText: statusText, responseHeaders: responseHeaders, event: event);
+
+            if (_widget != null && _widget.onAjaxProgressEvent != null)
+              return jsonEncode(await _widget.onAjaxProgressEvent(this, request));
+            //else if (_inAppBrowser != null)
+            //  return jsonEncode(await _inAppBrowser.onAjaxProgressEvent(request));
+            return null;
+          case "shouldInterceptFetchRequest":
+            Map<dynamic, dynamic> argMap = args[0];
+            String url = argMap["url"];
+            String method = argMap["method"];
+            Map<dynamic, dynamic> headers = argMap["headers"];
+            dynamic body = argMap["body"];
+            String mode = argMap["mode"];
+            String credentials = argMap["credentials"];
+            String cache = argMap["cache"];
+            String redirect = argMap["redirect"];
+            String referrer = argMap["referrer"];
+            String referrerPolicy = argMap["referrerPolicy"];
+            String integrity = argMap["integrity"];
+            bool keepalive = argMap["keepalive"];
+
+            var request = new FetchRequest(url: url, method: method, headers: headers, body: body, mode: mode, credentials: credentials,
+                cache: cache, redirect: redirect, referrer: referrer, referrerPolicy: referrerPolicy, integrity: integrity, keepalive: keepalive);
+
+            if (_widget != null && _widget.shouldInterceptFetchRequest != null)
+              return jsonEncode(await _widget.shouldInterceptFetchRequest(this, request));
+            //else if (_inAppBrowser != null)
+            //  return jsonEncode(await _inAppBrowser.shouldInterceptFetchRequest(request));
+            return null;
+        }
+
         if (javaScriptHandlersMap.containsKey(handlerName)) {
           // convert result to json
           try {
@@ -609,7 +705,7 @@ class InAppWebViewController {
     var html = "";
     InAppWebViewWidgetOptions options = await getOptions();
     if (options != null && options.inAppWebViewOptions.javaScriptEnabled == true) {
-      html = await injectScriptCode("window.document.getElementsByTagName('html')[0].outerHTML;");
+      html = await evaluateJavascript("window.document.getElementsByTagName('html')[0].outerHTML;");
       if (html.isNotEmpty)
         return html;
     }
@@ -828,7 +924,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('loadFile', args);
   }
 
-  ///Reloads the [InAppWebView] window.
+  ///Reloads the [InAppWebView].
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -838,7 +934,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('reload', args);
   }
 
-  ///Goes back in the history of the [InAppWebView] window.
+  ///Goes back in the history of the [InAppWebView].
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -858,7 +954,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('canGoBack', args);
   }
 
-  ///Goes forward in the history of the [InAppWebView] window.
+  ///Goes forward in the history of the [InAppWebView].
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -929,41 +1025,47 @@ class InAppWebViewController {
     await _channel.invokeMethod('stopLoading', args);
   }
 
-  ///Injects JavaScript code into the [InAppWebView] window and returns the result of the evaluation.
-  Future<String> injectScriptCode(String source) async {
+  ///Evaluates JavaScript code into the [InAppWebView] and returns the result of the evaluation.
+  Future<String> evaluateJavascript(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     args.putIfAbsent('source', () => source);
-    return await _channel.invokeMethod('injectScriptCode', args);
+    return await _channel.invokeMethod('evaluateJavascript', args);
   }
 
-  ///Injects a JavaScript file into the [InAppWebView] window.
-  Future<void> injectScriptFile(String urlFile) async {
+  ///Injects an external JavaScript file into the [InAppWebView] from a defined url.
+  Future<void> injectJavascriptFileFromUrl(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     args.putIfAbsent('urlFile', () => urlFile);
-    await _channel.invokeMethod('injectScriptFile', args);
+    await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
+  }
+  
+  ///Injects a JavaScript file into the [InAppWebView] from the flutter assets directory.
+  Future<void> injectJavascriptFileFromAsset(String assetFilePath) async {
+    String source = await rootBundle.loadString(assetFilePath);
+    await evaluateJavascript(source);
   }
 
-  ///Injects CSS into the [InAppWebView] window.
-  Future<void> injectStyleCode(String source) async {
+  ///Injects CSS into the [InAppWebView].
+  Future<void> injectCSSCode(String source) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     args.putIfAbsent('source', () => source);
-    await _channel.invokeMethod('injectStyleCode', args);
+    await _channel.invokeMethod('injectCSSCode', args);
   }
 
-  ///Injects a CSS file into the [InAppWebView] window.
-  Future<void> injectStyleFile(String urlFile) async {
+  ///Injects an external CSS file into the [InAppWebView] from a defined url.
+  Future<void> injectCSSFileFromUrl(String urlFile) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
@@ -971,6 +1073,12 @@ class InAppWebViewController {
     }
     args.putIfAbsent('urlFile', () => urlFile);
     await _channel.invokeMethod('injectStyleFile', args);
+  }
+
+  ///Injects a CSS file into the [InAppWebView] from the flutter assets directory.
+  Future<void> injectCSSFileFromAsset(String assetFilePath) async {
+    String source = await rootBundle.loadString(assetFilePath);
+    await injectCSSCode(source);
   }
 
   ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
@@ -1020,6 +1128,7 @@ class InAppWebViewController {
   ///  """);
   ///```
   void addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
+    assert(!javaScriptHandlersNameForbidden.contains(handlerName));
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
 

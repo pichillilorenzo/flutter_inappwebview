@@ -29,6 +29,8 @@ public class InAppWebViewOptions extends Options {
   public List<String> resourceCustomSchemes = new ArrayList<>();
   public List<Map<String, Map<String, Object>>> contentBlockers = new ArrayList<>();
   public Integer preferredContentMode = PreferredContentModeOptionType.RECOMMENDED.toValue();
+  public Boolean useShouldInterceptAjaxRequest = false;
+  public Boolean useShouldInterceptFetchRequest = false;
 
   public boolean clearSessionCache = false;
   public boolean builtInZoomControls = false;

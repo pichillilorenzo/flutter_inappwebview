@@ -1,11 +1,9 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
-import android.Manifest;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
-import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.webkit.WebChromeClient;
@@ -15,20 +13,19 @@ import android.webkit.WebViewClient;
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.DisplayListenerProxy;
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebView;
 import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InAppWebViewOptions;
-import com.pichillilorenzo.flutter_inappbrowser.InAppWebView.InputAwareWebView;
 
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
-import static io.flutter.plugin.common.MethodChannel.Result;
 import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.platform.PlatformView;
+
+import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;
+import static io.flutter.plugin.common.MethodChannel.Result;
 
 public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
@@ -135,33 +132,33 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         else
           result.success(false);
         break;
-      case "injectScriptCode":
+      case "evaluateJavascript":
         if (webView != null) {
           String source = (String) call.argument("source");
-          webView.injectScriptCode(source, result);
+          webView.evaluateJavascript(source, result);
         }
         else {
           result.success("");
         }
         break;
-      case "injectScriptFile":
+      case "injectJavascriptFileFromUrl":
         if (webView != null) {
           String urlFile = (String) call.argument("urlFile");
-          webView.injectScriptFile(urlFile);
+          webView.injectJavascriptFileFromUrl(urlFile);
         }
         result.success(true);
         break;
-      case "injectStyleCode":
+      case "injectCSSCode":
         if (webView != null) {
           String source = (String) call.argument("source");
-          webView.injectStyleCode(source);
+          webView.injectCSSCode(source);
         }
         result.success(true);
         break;
-      case "injectStyleFile":
+      case "injectCSSFileFromUrl":
         if (webView != null) {
           String urlFile = (String) call.argument("urlFile");
-          webView.injectStyleFile(urlFile);
+          webView.injectCSSFileFromUrl(urlFile);
         }
         result.success(true);
         break;
@@ -312,13 +309,13 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
   @Override
   public void onInputConnectionLocked() {
-    if (webView.inAppBrowserActivity == null)
+    if (webView != null && webView.inAppBrowserActivity == null)
       webView.lockInputConnection();
   }
 
   @Override
   public void onInputConnectionUnlocked() {
-    if (webView.inAppBrowserActivity == null)
+    if (webView != null && webView.inAppBrowserActivity == null)
       webView.unlockInputConnection();
   }
 

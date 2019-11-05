@@ -58,6 +58,27 @@ class LoadedResource {
 
 }
 
+///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
+///The [mimeType] property specifies the format of the data.
+///The [encoding] property specifies the encoding of the data.
+class InAppWebViewInitialData {
+  String data;
+  String mimeType;
+  String encoding;
+  String baseUrl;
+
+  InAppWebViewInitialData(this.data, {this.mimeType = "text/html", this.encoding = "utf8", this.baseUrl = "about:blank"});
+
+  Map<String, String> toMap() {
+    return {
+      "data": data,
+      "mimeType": mimeType,
+      "encoding": encoding,
+      "baseUrl": baseUrl
+    };
+  }
+}
+
 /*
 ///Public class representing a resource request of the WebView.
 ///It is used by the event [shouldInterceptRequest()].
@@ -671,4 +692,163 @@ class ChromeSafariBrowserClassOptions {
   IosSafariOptions iosSafariOptions;
 
   ChromeSafariBrowserClassOptions({this.androidChromeCustomTabsOptions, this.iosSafariOptions});
+}
+
+///
+class AjaxRequestAction {
+  final int _value;
+  const AjaxRequestAction._internal(this._value);
+  toValue() => _value;
+
+  static const ABORT = const AjaxRequestAction._internal(0);
+  static const PROCEED = const AjaxRequestAction._internal(1);
+}
+
+///
+class AjaxRequestEventType {
+  final String _value;
+  const AjaxRequestEventType._internal(this._value);
+  static AjaxRequestEventType fromValue(String value) {
+    return (["loadstart", "load", "loadend", "progress", "error", "abort"].contains(value)) ? AjaxRequestEventType._internal(value) : null;
+  }
+  toValue() => _value;
+  String toString() => _value;
+
+  static const LOADSTART = const AjaxRequestEventType._internal("loadstart");
+  static const LOAD = const AjaxRequestEventType._internal("load");
+  static const LOADEND = const AjaxRequestEventType._internal("loadend");
+  static const PROGRESS = const AjaxRequestEventType._internal("progress");
+  static const ERROR = const AjaxRequestEventType._internal("error");
+  static const ABORT = const AjaxRequestEventType._internal("abort");
+}
+
+///
+class AjaxRequestEvent {
+  AjaxRequestEventType type;
+  int loaded;
+  bool lengthComputable;
+
+  AjaxRequestEvent({this.type, this.loaded, this.lengthComputable});
+}
+
+///
+class AjaxRequestReadyState {
+  final int _value;
+  const AjaxRequestReadyState._internal(this._value);
+  static AjaxRequestReadyState fromValue(int value) {
+    if (value != null && value >= 0 && value <= 4)
+      return AjaxRequestReadyState._internal(value);
+    return null;
+  }
+  toValue() => _value;
+  String toString() => _value.toString();
+
+  static const UNSENT = const AjaxRequestReadyState._internal(0);
+  static const OPENED = const AjaxRequestReadyState._internal(1);
+  static const HEADERS_RECEIVED = const AjaxRequestReadyState._internal(2);
+  static const LOADING = const AjaxRequestReadyState._internal(3);
+  static const DONE = const AjaxRequestReadyState._internal(4);
+}
+
+///
+class AjaxRequest {
+  dynamic data;
+  String method;
+  String url;
+  bool isAsync;
+  String user;
+  String password;
+  bool withCredentials;
+  Map<dynamic, dynamic> headers;
+  AjaxRequestReadyState readyState;
+  int status;
+  String responseURL;
+  String responseType;
+  String responseText;
+  String statusText;
+  Map<dynamic, dynamic> responseHeaders;
+  AjaxRequestEvent event;
+  AjaxRequestAction action;
+
+  AjaxRequest({this.data, this.method, this.url, this.isAsync, this.user, this.password,
+    this.withCredentials, this.headers, this.readyState, this.status, this.responseURL, this.responseType,
+    this.responseText, this.statusText, this.responseHeaders, this.event, this.action = AjaxRequestAction.PROCEED});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "data": data,
+      "method": method,
+      "url": url,
+      "isAsync": isAsync,
+      "user": user,
+      "password": password,
+      "withCredentials": withCredentials,
+      "headers": headers,
+      "readyState": readyState?.toValue(),
+      "status": status,
+      "responseURL": responseURL,
+      "responseType": responseType,
+      "responseText": responseText,
+      "statusText": statusText,
+      "responseHeaders": responseHeaders,
+      "action": action?.toValue()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+}
+
+///
+class FetchRequestAction {
+  final int _value;
+  const FetchRequestAction._internal(this._value);
+  toValue() => _value;
+
+  static const ABORT = const FetchRequestAction._internal(0);
+  static const PROCEED = const FetchRequestAction._internal(1);
+}
+
+///
+class FetchRequest {
+  String url;
+  String method;
+  Map<dynamic, dynamic> headers;
+  dynamic body;
+  String mode;
+  String credentials;
+  String cache;
+  String redirect;
+  String referrer;
+  String referrerPolicy;
+  String integrity;
+  bool keepalive;
+  FetchRequestAction action;
+
+  FetchRequest({this.url, this.method, this.headers, this.body, this.mode, this.credentials,
+    this.cache, this.redirect, this.referrer, this.referrerPolicy, this.integrity, this.keepalive,
+    this.action = FetchRequestAction.PROCEED});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url,
+      "method": method,
+      "headers": headers,
+      "body": body,
+      "mode": mode,
+      "credentials": credentials,
+      "cache": cache,
+      "redirect": redirect,
+      "referrer": referrer,
+      "referrerPolicy": referrerPolicy,
+      "integrity": integrity,
+      "keepalive": keepalive,
+      "action": action?.toValue()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
 }

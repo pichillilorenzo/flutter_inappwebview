@@ -59,7 +59,7 @@ final public class InAppWebView extends InputAwareWebView {
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
 
-  static final String consoleLogJS = "(function() {" +
+  static final String consoleLogJS = "(function(console) {" +
           "   var oldLogs = {" +
           "       'log': console.log," +
           "       'debug': console.debug," +
@@ -83,18 +83,240 @@ final public class InAppWebView extends InputAwareWebView {
           "           }" +
           "       })(k);" +
           "   }" +
-          "})();";
+          "})(window.console);";
 
   static final String resourceObserverJS = "(function() {" +
           "   var observer = new PerformanceObserver(function(list) {" +
           "       list.getEntries().forEach(function(entry) {" +
-          "         window." + JavaScriptBridgeInterface.name + "._resourceLoaded(JSON.stringify(entry));" +
+          "         window." + JavaScriptBridgeInterface.name + ".callHandler('onLoadResource', entry);" +
           "       });" +
           "   });" +
           "   observer.observe({entryTypes: ['resource']});" +
           "})();";
 
   static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
+
+  static final String interceptAjaxRequestsJS = "(function(ajax) {" +
+          "  var send = ajax.prototype.send;" +
+          "  var open = ajax.prototype.open;" +
+          "  var setRequestHeader = ajax.prototype.setRequestHeader;" +
+          "  ajax.prototype._flutter_inappbrowser_url = null;" +
+          "  ajax.prototype._flutter_inappbrowser_method = null;" +
+          "  ajax.prototype._flutter_inappbrowser_isAsync = null;" +
+          "  ajax.prototype._flutter_inappbrowser_user = null;" +
+          "  ajax.prototype._flutter_inappbrowser_password = null;" +
+          "  ajax.prototype._flutter_inappbrowser_password = null;" +
+          "  ajax.prototype._flutter_inappbrowser_request_headers = {};" +
+          "  ajax.prototype.open = function(method, url, isAsync, user, password) {" +
+          "    isAsync = (isAsync != null) ? isAsync : true;" +
+          "    this._flutter_inappbrowser_url = url;" +
+          "    this._flutter_inappbrowser_method = method;" +
+          "    this._flutter_inappbrowser_isAsync = isAsync;" +
+          "    this._flutter_inappbrowser_user = user;" +
+          "    this._flutter_inappbrowser_password = password;" +
+          "    open.call(this, method, url, isAsync, user, password);" +
+          "  };" +
+          "  ajax.prototype.setRequestHeader = function(header, value) {" +
+          "    this._flutter_inappbrowser_request_headers[header] = value;" +
+          "    setRequestHeader.call(this, header, value);" +
+          "  };" +
+          "  function handleEvent(e) {" +
+          "    var self = this;" +
+          "    var headers = this.getAllResponseHeaders();" +
+          "    var responseHeaders = {};" +
+          "    if (headers != null) {" +
+          "      var arr = headers.trim().split(/[\\r\\n]+/);" +
+          "      arr.forEach(function (line) {" +
+          "        var parts = line.split(': ');" +
+          "        var header = parts.shift();" +
+          "        var value = parts.join(': ');" +
+          "        responseHeaders[header] = value;" +
+          "      });" +
+          "    }" +
+          "    var ajaxRequest = {" +
+          "      method: this._flutter_inappbrowser_method," +
+          "      url: this._flutter_inappbrowser_url," +
+          "      isAsync: this._flutter_inappbrowser_isAsync," +
+          "      user: this._flutter_inappbrowser_user," +
+          "      password: this._flutter_inappbrowser_password," +
+          "      withCredentials: this.withCredentials," +
+          "      headers: this._flutter_inappbrowser_request_headers," +
+          "      readyState: this.readyState," +
+          "      status: this.status," +
+          "      responseURL: this.responseURL," +
+          "      responseType: this.responseType," +
+          "      responseText: this.responseText," +
+          "      statusText: this.statusText," +
+          "      responseHeaders, responseHeaders," +
+          "      event: {" +
+          "        type: e.type," +
+          "        loaded: e.loaded," +
+          "        lengthComputable: e.lengthComputable" +
+          "      }" +
+          "    };" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxProgressEvent', ajaxRequest).then(function(result) {" +
+          "      if (result != null) {" +
+          "        switch (result.action) {" +
+          "          case 0:" +
+          "            self.abort();" +
+          "            return;" +
+          "        };" +
+          "      }" +
+          "    });" +
+          "  };" +
+          "  ajax.prototype.send = function(data) {" +
+          "    var self = this;" +
+          "    var onreadystatechange = this.onreadystatechange;" +
+          "    this.onreadystatechange = function() {" +
+          "      var headers = this.getAllResponseHeaders();" +
+          "      var responseHeaders = {};" +
+          "      if (headers != null) {" +
+          "        var arr = headers.trim().split(/[\\r\\n]+/);" +
+          "        arr.forEach(function (line) {" +
+          "          var parts = line.split(': ');" +
+          "          var header = parts.shift();" +
+          "          var value = parts.join(': ');" +
+          "          responseHeaders[header] = value;" +
+          "        });" +
+          "      }" +
+          "      var ajaxRequest = {" +
+          "        method: this._flutter_inappbrowser_method," +
+          "        url: this._flutter_inappbrowser_url," +
+          "        isAsync: this._flutter_inappbrowser_isAsync," +
+          "        user: this._flutter_inappbrowser_user," +
+          "        password: this._flutter_inappbrowser_password," +
+          "        withCredentials: this.withCredentials," +
+          "        headers: this._flutter_inappbrowser_request_headers," +
+          "        readyState: this.readyState," +
+          "        status: this.status," +
+          "        responseURL: this.responseURL," +
+          "        responseType: this.responseType," +
+          "        responseText: this.responseText," +
+          "        statusText: this.statusText," +
+          "        responseHeaders: responseHeaders" +
+          "      };" +
+          "      window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {" +
+          "        if (result != null) {" +
+          "          switch (result.action) {" +
+          "            case 0:" +
+          "              self.abort();" +
+          "              return;" +
+          "          };" +
+          "        }" +
+          "        if (onreadystatechange != null) {" +
+          "          onreadystatechange();" +
+          "        }" +
+          "      });" +
+          "    };" +
+          "    this.addEventListener('loadstart', handleEvent);" +
+          "    this.addEventListener('load', handleEvent);" +
+          "    this.addEventListener('loadend', handleEvent);" +
+          "    this.addEventListener('progress', handleEvent);" +
+          "    this.addEventListener('error', handleEvent);" +
+          "    this.addEventListener('abort', handleEvent);" +
+          "    var ajaxRequest = {" +
+          "      data: data," +
+          "      method: this._flutter_inappbrowser_method," +
+          "      url: this._flutter_inappbrowser_url," +
+          "      isAsync: this._flutter_inappbrowser_isAsync," +
+          "      user: this._flutter_inappbrowser_user," +
+          "      password: this._flutter_inappbrowser_password," +
+          "      withCredentials: this.withCredentials," +
+          "      headers: this._flutter_inappbrowser_request_headers" +
+          "    };" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {" +
+          "      if (result != null) {" +
+          "        switch (result.action) {" +
+          "          case 0:" +
+          "            self.abort();" +
+          "            return;" +
+          "        };" +
+          "        data = result.data;" +
+          "        self.withCredentials = result.withCredentials;" +
+          "        for (var header in result.headers) {" +
+          "          var value = result.headers[header];" +
+          "          self.setRequestHeader(header, value);" +
+          "        };" +
+          "        if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {" +
+          "          self.abort();" +
+          "          self.open(result.method, result.url, result.isAsync, result.user, result.password);" +
+          "          return;" +
+          "        }" +
+          "      }" +
+          "      send.call(self, data);" +
+          "    });" +
+          "  };" +
+          "})(window.XMLHttpRequest);";
+
+  static final String interceptFetchRequestsJS = "(function(fetch) {" +
+          "  if (fetch == null) {" +
+          "    return;" +
+          "  }" +
+          "  window.fetch = function(resource, init) {" +
+          "    var fetchRequest = {" +
+          "      url: null," +
+          "      method: null," +
+          "      headers: null," +
+          "      body: null," +
+          "      mode: null," +
+          "      credentials: null," +
+          "      cache: null," +
+          "      redirect: null," +
+          "      referrer: null," +
+          "      referrerPolicy: null," +
+          "      integrity: null," +
+          "      keepalive: null" +
+          "    };" +
+          "    if (resource instanceof Request) {" +
+          "      fetchRequest.url = resource.url;" +
+          "      fetchRequest.method = resource.method;" +
+          "      fetchRequest.headers = resource.headers;" +
+          "      fetchRequest.body = resource.body;" +
+          "      fetchRequest.mode = resource.mode;" +
+          "      fetchRequest.credentials = resource.credentials;" +
+          "      fetchRequest.cache = resource.cache;" +
+          "      fetchRequest.redirect = resource.redirect;" +
+          "      fetchRequest.referrer = resource.referrer;" +
+          "      fetchRequest.referrerPolicy = resource.referrerPolicy;" +
+          "      fetchRequest.integrity = resource.integrity;" +
+          "      fetchRequest.keepalive = resource.keepalive;" +
+          "    } else {" +
+          "      fetchRequest.url = resource;" +
+          "      if (init != null) {" +
+          "        fetchRequest.method = init.method;" +
+          "        fetchRequest.headers = init.headers;" +
+          "        fetchRequest.body = init.body;" +
+          "        fetchRequest.mode = init.mode;" +
+          "        fetchRequest.credentials = init.credentials;" +
+          "        fetchRequest.cache = init.cache;" +
+          "        fetchRequest.redirect = init.redirect;" +
+          "        fetchRequest.referrer = init.referrer;" +
+          "        fetchRequest.referrerPolicy = init.referrerPolicy;" +
+          "        fetchRequest.integrity = init.integrity;" +
+          "        fetchRequest.keepalive = init.keepalive;" +
+          "      }" +
+          "    }" +
+          "    return window." + JavaScriptBridgeInterface.name + ".callHandler('shouldInterceptFetchRequest', fetchRequest).then(function(result) {" +
+          "      if (result != null) {" +
+          "        switch (result.action) {" +
+          "          case 0:" +
+          "            var controller = new AbortController();" +
+          "            if (init != null) {" +
+          "              init.signal = controller.signal;" +
+          "            } else {" +
+          "              init = {" +
+          "                signal: controller.signal" +
+          "              };" +
+          "            }" +
+          "            controller.abort();" +
+          "            break;" +
+          "        }" +
+          "      }" +
+          "      return fetch(resource, init);" +
+          "    });" +
+          "  };" +
+          "})(window.fetch);";
+
 
   public InAppWebView(Context context) {
     super(context);
@@ -624,22 +846,22 @@ final public class InAppWebView extends InputAwareWebView {
     });
   }
 
-  public void injectScriptCode(String source, MethodChannel.Result result) {
+  public void evaluateJavascript(String source, MethodChannel.Result result) {
     String jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
     injectDeferredObject(source, jsWrapper, result);
   }
 
-  public void injectScriptFile(String urlFile) {
+  public void injectJavascriptFileFromUrl(String urlFile) {
     String jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
     injectDeferredObject(urlFile, jsWrapper, null);
   }
 
-  public void injectStyleCode(String source) {
+  public void injectCSSCode(String source) {
     String jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
     injectDeferredObject(source, jsWrapper, null);
   }
 
-  public void injectStyleFile(String urlFile) {
+  public void injectCSSFileFromUrl(String urlFile) {
     String jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
     injectDeferredObject(urlFile, jsWrapper, null);
   }

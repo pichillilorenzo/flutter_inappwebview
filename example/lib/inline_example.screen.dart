@@ -289,7 +289,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("Current highlighted: $activeMatchOrdinal, Number of matches found: $numberOfMatches, find operation completed: $isDoneCounting");
             },
             shouldInterceptAjaxRequest: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
+              //print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
 //              ajaxRequest.method = "GET";
 //              ajaxRequest.url = "http://192.168.1.20:8082/test-download-file";
 //              ajaxRequest.headers = {
@@ -299,16 +299,17 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               return null;
             },
             onAjaxReadyStateChange: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.responseHeaders}");
-              return AjaxRequestAction.ABORT;
+              //print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.responseHeaders}");
+              return AjaxRequestAction.PROCEED;
             },
             onAjaxProgress: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              print("AJAX EVENT: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.event.type}, LOADED: ${ajaxRequest.event.loaded}, ${ajaxRequest.responseHeaders}");
-              return AjaxRequestAction.ABORT;
+              //print("AJAX EVENT: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.event.type}, LOADED: ${ajaxRequest.event.loaded}, ${ajaxRequest.responseHeaders}");
+              return AjaxRequestAction.PROCEED;
             },
             shouldInterceptFetchRequest: (InAppWebViewController controller, FetchRequest fetchRequest) async {
-              print("FETCH REQUEST: ${fetchRequest.method} - ${fetchRequest.url}");
+              print("FETCH REQUEST: ${fetchRequest.method} - ${fetchRequest.url}, headers: ${fetchRequest.headers}");
               fetchRequest.action = FetchRequestAction.ABORT;
+              print(fetchRequest.body);
               return fetchRequest;
             },
             onNavigationStateChange: (InAppWebViewController controller, String url) async {

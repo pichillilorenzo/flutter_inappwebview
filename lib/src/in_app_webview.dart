@@ -647,9 +647,9 @@ class InAppWebViewController {
             String url = argMap["url"];
             String method = argMap["method"];
             Map<dynamic, dynamic> headers = argMap["headers"];
-            dynamic body = argMap["body"];
+            Uint8List body = Uint8List.fromList(argMap["body"].cast<int>());
             String mode = argMap["mode"];
-            String credentials = argMap["credentials"];
+            FetchRequestCredential credentials = FetchRequest.createFetchRequestCredentialFromMap(argMap["credentials"]);
             String cache = argMap["cache"];
             String redirect = argMap["redirect"];
             String referrer = argMap["referrer"];

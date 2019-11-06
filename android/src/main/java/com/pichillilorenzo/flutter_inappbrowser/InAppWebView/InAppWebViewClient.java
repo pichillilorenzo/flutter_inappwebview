@@ -14,6 +14,7 @@ import android.webkit.CookieSyncManager;
 import android.webkit.HttpAuthHandler;
 import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
+import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
@@ -182,7 +183,7 @@ public class InAppWebViewClient extends WebViewClient {
     view.requestFocus();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      webView.evaluateJavascript(InAppWebView.platformReadyJS, (MethodChannel.Result) null);
+      webView.evaluateJavascript(InAppWebView.platformReadyJS, (ValueCallback<String>) null);
     } else {
       webView.loadUrl("javascript:" + InAppWebView.platformReadyJS.replaceAll("[\r\n]+", ""));
     }

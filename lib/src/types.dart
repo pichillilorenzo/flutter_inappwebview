@@ -821,13 +821,82 @@ class FetchRequestAction {
 }
 
 ///
+class FetchRequestCredential {
+  String type;
+
+  FetchRequestCredential({this.type});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "type": type
+    };
+  }
+}
+
+///
+class FetchRequestCredentialDefault extends FetchRequestCredential {
+  String value;
+
+  FetchRequestCredentialDefault({type, this.value}): super(type: type);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "type": type,
+      "value": value,
+    };
+  }
+}
+
+///
+class FetchRequestFederatedCredential extends FetchRequestCredential {
+  dynamic id;
+  String name;
+  String protocol;
+  String provider;
+  String iconURL;
+
+  FetchRequestFederatedCredential({type, this.id, this.name, this.protocol, this.provider, this.iconURL}): super(type: type);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "type": type,
+      "id": id,
+      "name": name,
+      "protocol": protocol,
+      "provider": provider,
+      "iconURL": iconURL
+    };
+  }
+}
+
+///
+class FetchRequestPasswordCredential extends FetchRequestCredential {
+  dynamic id;
+  String name;
+  String password;
+  String iconURL;
+
+  FetchRequestPasswordCredential({type, this.id, this.name, this.password, this.iconURL}): super(type: type);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "type": type,
+      "id": id,
+      "name": name,
+      "password": password,
+      "iconURL": iconURL
+    };
+  }
+}
+
+///
 class FetchRequest {
   String url;
   String method;
-  Map<dynamic, dynamic> headers;
-  dynamic body;
+  Map<String, dynamic> headers;
+  Uint8List body;
   String mode;
-  String credentials;
+  FetchRequestCredential credentials;
   String cache;
   String redirect;
   String referrer;
@@ -847,7 +916,7 @@ class FetchRequest {
       "headers": headers,
       "body": body,
       "mode": mode,
-      "credentials": credentials,
+      "credentials": credentials?.toMap(),
       "cache": cache,
       "redirect": redirect,
       "referrer": referrer,
@@ -860,5 +929,20 @@ class FetchRequest {
 
   Map<String, dynamic> toJson() {
     return this.toMap();
+  }
+
+  static FetchRequestCredential createFetchRequestCredentialFromMap(credentialsMap) {
+    if (credentialsMap != null) {
+      if (credentialsMap["type"] == "default") {
+        return FetchRequestCredentialDefault(type: credentialsMap["type"], value: credentialsMap["value"]);
+      } else if (credentialsMap["type"] == "federated") {
+        return FetchRequestFederatedCredential(type: credentialsMap["type"], id: credentialsMap["id"], name: credentialsMap["name"],
+            protocol: credentialsMap["protocol"], provider: credentialsMap["provider"], iconURL: credentialsMap["iconURL"]);
+      } else if (credentialsMap["type"] == "password") {
+        return FetchRequestPasswordCredential(type: credentialsMap["type"], id: credentialsMap["id"], name: credentialsMap["name"],
+            password: credentialsMap["password"], iconURL: credentialsMap["iconURL"]);
+      }
+    }
+    return null;
   }
 }

@@ -302,6 +302,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 }
                 result(true)
                 break
+            case "removeFromSuperview":
+                webView!.removeFromSuperview()
+                result(true)
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

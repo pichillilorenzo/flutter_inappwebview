@@ -499,19 +499,28 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setDatabaseEnabled(options.databaseEnabled);
     settings.setDomStorageEnabled(options.domStorageEnabled);
 
-    if (!options.userAgent.isEmpty())
+    if (options.userAgent != null && !options.userAgent.isEmpty())
       settings.setUserAgentString(options.userAgent);
+    else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+      settings.setUserAgentString(WebSettings.getDefaultUserAgent(getContext()));
+
+    if (options.applicationNameForUserAgent != null && !options.applicationNameForUserAgent.isEmpty()) {
+      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        String userAgent = (options.userAgent != null && !options.userAgent.isEmpty()) ? options.userAgent :WebSettings.getDefaultUserAgent(getContext());
+        String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
+        settings.setUserAgentString(userAgentWithApplicationName);
+      }
+    }
 
     if (options.clearCache)
       clearAllCache();
     else if (options.clearSessionCache)
       CookieManager.getInstance().removeSessionCookie();
 
-    // Enable Thirdparty Cookies on >=Android 5.0 device
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-      CookieManager.getInstance().setAcceptThirdPartyCookies(this, true);
+      CookieManager.getInstance().setAcceptThirdPartyCookies(this, options.thirdPartyCookiesEnabled);
 
-    settings.setLoadWithOverviewMode(true);
+    settings.setLoadWithOverviewMode(options.loadWithOverviewMode);
     settings.setUseWideViewPort(options.useWideViewPort);
     settings.setSupportZoom(options.supportZoom);
     settings.setTextZoom(options.textZoom);
@@ -528,8 +537,8 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setAllowFileAccess(options.allowFileAccess);
     settings.setAllowFileAccessFromFileURLs(options.allowFileAccessFromFileURLs);
     settings.setAllowUniversalAccessFromFileURLs(options.allowUniversalAccessFromFileURLs);
-    settings.setAppCacheEnabled(options.appCacheEnabled);
-    if (options.appCachePath != null && !options.appCachePath.isEmpty() && options.appCacheEnabled)
+    setCacheEnabled(options.cacheEnabled);
+    if (options.appCachePath != null && !options.appCachePath.isEmpty() && options.cacheEnabled)
       settings.setAppCachePath(options.appCachePath);
     settings.setBlockNetworkImage(options.blockNetworkImage);
     settings.setBlockNetworkLoads(options.blockNetworkLoads);
@@ -548,7 +557,6 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setGeolocationEnabled(options.geolocationEnabled);
     if (options.layoutAlgorithm != null)
       settings.setLayoutAlgorithm(options.layoutAlgorithm);
-    settings.setLoadWithOverviewMode(options.loadWithOverviewMode);
     settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
     settings.setMinimumFontSize(options.minimumFontSize);
     settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
@@ -570,6 +578,13 @@ final public class InAppWebView extends InputAwareWebView {
           break;
       }
     }
+    settings.setSaveFormData(options.saveFormData);
+    if (options.incognito)
+      setIncognito(true);
+    if (options.hardwareAcceleration)
+      setLayerType(View.LAYER_TYPE_HARDWARE, null);
+    else
+      setLayerType(View.LAYER_TYPE_SOFTWARE, null);
 
     contentBlockerHandler.getRuleList().clear();
     for (Map<String, Map<String, Object>> contentBlocker : options.contentBlockers) {
@@ -591,6 +606,49 @@ final public class InAppWebView extends InputAwareWebView {
         getChannel().invokeMethod("onFindResultReceived", obj);
       }
     });
+  }
+
+  public void setIncognito(boolean enabled) {
+    WebSettings settings = getSettings();
+    if (enabled) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        CookieManager.getInstance().removeAllCookies(null);
+      } else {
+        CookieManager.getInstance().removeAllCookie();
+      }
+
+      // Disable caching
+      settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+      settings.setAppCacheEnabled(false);
+      clearHistory();
+      clearCache(true);
+
+      // No form data or autofill enabled
+      clearFormData();
+      settings.setSavePassword(false);
+      settings.setSaveFormData(false);
+    }
+    else {
+      settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+      settings.setAppCacheEnabled(true);
+      settings.setSavePassword(true);
+      settings.setSaveFormData(true);
+    }
+  }
+
+  public void setCacheEnabled(boolean enabled) {
+    WebSettings settings = getSettings();
+    if (enabled) {
+      Context ctx = getContext();
+      if (ctx != null) {
+        settings.setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        settings.setCacheMode(WebSettings.LOAD_DEFAULT);
+        settings.setAppCacheEnabled(true);
+      }
+    } else {
+      settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
+      settings.setAppCacheEnabled(false);
+    }
   }
 
   public void loadUrl(String url, MethodChannel.Result result) {
@@ -780,10 +838,21 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("userAgent") != null && !options.userAgent.equals(newOptions.userAgent) && !newOptions.userAgent.isEmpty())
       settings.setUserAgentString(newOptions.userAgent);
 
+    if (newOptionsMap.get("applicationNameForUserAgent") != null && !options.applicationNameForUserAgent.equals(newOptions.applicationNameForUserAgent) && !newOptions.applicationNameForUserAgent.isEmpty()) {
+      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+        String userAgent = (newOptions.userAgent != null && !newOptions.userAgent.isEmpty()) ? newOptions.userAgent : WebSettings.getDefaultUserAgent(getContext());
+        String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
+        settings.setUserAgentString(userAgentWithApplicationName);
+      }
+    }
+
     if (newOptionsMap.get("clearCache") != null && newOptions.clearCache)
       clearAllCache();
     else if (newOptionsMap.get("clearSessionCache") != null && newOptions.clearSessionCache)
       CookieManager.getInstance().removeSessionCookie();
+
+    if (newOptionsMap.get("thirdPartyCookiesEnabled") != null && options.thirdPartyCookiesEnabled != newOptions.thirdPartyCookiesEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+      CookieManager.getInstance().setAcceptThirdPartyCookies(this, newOptions.thirdPartyCookiesEnabled);
 
     if (newOptionsMap.get("useWideViewPort") != null && options.useWideViewPort != newOptions.useWideViewPort)
       settings.setUseWideViewPort(newOptions.useWideViewPort);
@@ -835,12 +904,11 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("allowUniversalAccessFromFileURLs") != null && options.allowUniversalAccessFromFileURLs != newOptions.allowUniversalAccessFromFileURLs)
       settings.setAllowUniversalAccessFromFileURLs(newOptions.allowUniversalAccessFromFileURLs);
 
-    if (newOptionsMap.get("appCacheEnabled") != null && options.appCacheEnabled != newOptions.appCacheEnabled)
-      settings.setAppCacheEnabled(newOptions.appCacheEnabled);
+    if (newOptionsMap.get("cacheEnabled") != null && options.cacheEnabled != newOptions.cacheEnabled)
+      setCacheEnabled(newOptions.cacheEnabled);
 
     if (newOptionsMap.get("appCachePath") != null && !options.appCachePath.equals(newOptions.appCachePath))
-      if (newOptions.appCacheEnabled)
-        settings.setAppCachePath(newOptions.appCachePath);
+      settings.setAppCachePath(newOptions.appCachePath);
 
     if (newOptionsMap.get("blockNetworkImage") != null && options.blockNetworkImage != newOptions.blockNetworkImage)
       settings.setBlockNetworkImage(newOptions.blockNetworkImage);
@@ -910,6 +978,19 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("standardFontFamily") != null && !options.standardFontFamily.equals(newOptions.standardFontFamily))
       settings.setStandardFontFamily(newOptions.standardFontFamily);
+
+    if (newOptionsMap.get("saveFormData") != null && options.saveFormData != newOptions.saveFormData)
+      settings.setSaveFormData(newOptions.saveFormData);
+
+    if (newOptionsMap.get("incognito") != null && options.incognito != newOptions.incognito)
+      setIncognito(newOptions.incognito);
+
+    if (newOptionsMap.get("hardwareAcceleration") != null && options.hardwareAcceleration != newOptions.hardwareAcceleration) {
+      if (newOptions.hardwareAcceleration)
+        setLayerType(View.LAYER_TYPE_HARDWARE, null);
+      else
+        setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
 
     if (newOptions.contentBlockers != null) {
       contentBlockerHandler.getRuleList().clear();

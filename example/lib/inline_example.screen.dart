@@ -93,7 +93,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             initialOptions: InAppWebViewWidgetOptions(
               inAppWebViewOptions: InAppWebViewOptions(
                 debuggingEnabled: true,
-                clearCache: true,
+                //clearCache: true,
                 useShouldOverrideUrlLoading: true,
                 useOnTargetBlank: true,
                 useOnLoadResource: true,
@@ -113,7 +113,6 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 ),
               androidInAppWebViewOptions: AndroidInAppWebViewOptions(
                 databaseEnabled: true,
-                appCacheEnabled: true,
                 domStorageEnabled: true,
                 geolocationEnabled: true,
                 //safeBrowsingEnabled: true,

@@ -43,6 +43,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   bool useOnTargetBlank;
   bool clearCache;
   String userAgent;
+  String applicationNameForUserAgent;
   bool javaScriptEnabled;
   bool debuggingEnabled;
   bool javaScriptCanOpenWindowsAutomatically;
@@ -56,12 +57,15 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   InAppWebViewUserPreferredContentMode preferredContentMode;
   bool useShouldInterceptAjaxRequest;
   bool useShouldInterceptFetchRequest;
+  bool incognito;
+  bool cacheEnabled;
+  bool transparentBackground;
 
   InAppWebViewOptions({this.useShouldOverrideUrlLoading = false, this.useOnLoadResource = false, this.useOnDownloadStart = false, this.useOnTargetBlank = false,
-    this.clearCache = false, this.userAgent = "", this.javaScriptEnabled = true, this.debuggingEnabled = false, this.javaScriptCanOpenWindowsAutomatically = false,
+    this.clearCache = false, this.userAgent = "", this.applicationNameForUserAgent = "", this.javaScriptEnabled = true, this.debuggingEnabled = false, this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true, this.textZoom = 100, this.minimumFontSize, this.verticalScrollBarEnabled = true, this.horizontalScrollBarEnabled = true,
     this.resourceCustomSchemes = const [], this.contentBlockers = const [], this.preferredContentMode = InAppWebViewUserPreferredContentMode.RECOMMENDED,
-    this.useShouldInterceptAjaxRequest = false, this.useShouldInterceptFetchRequest = false}) {
+    this.useShouldInterceptAjaxRequest = false, this.useShouldInterceptFetchRequest = false, this.incognito = false, this.cacheEnabled = true, this.transparentBackground = false}) {
       if (this.minimumFontSize == null)
         this.minimumFontSize = Platform.isAndroid ? 8 : 0;
       assert(!this.resourceCustomSchemes.contains("http") && !this.resourceCustomSchemes.contains("https"));
@@ -81,6 +85,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "useOnTargetBlank": useOnTargetBlank,
       "clearCache": clearCache,
       "userAgent": userAgent,
+      "applicationNameForUserAgent": applicationNameForUserAgent,
       "javaScriptEnabled": javaScriptEnabled,
       "debuggingEnabled": debuggingEnabled,
       "javaScriptCanOpenWindowsAutomatically": javaScriptCanOpenWindowsAutomatically,
@@ -92,7 +97,10 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "contentBlockers": contentBlockersMapList,
       "preferredContentMode": preferredContentMode?.toValue(),
       "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
-      "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest
+      "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
+      "incognito": incognito,
+      "cacheEnabled": cacheEnabled,
+      "transparentBackground": transparentBackground
     };
   }
 
@@ -115,7 +123,9 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
     options.useOnTargetBlank = map["useOnTargetBlank"];
     options.clearCache = map["clearCache"];
     options.userAgent = map["userAgent"];
+    options.applicationNameForUserAgent = map["applicationNameForUserAgent"];
     options.javaScriptEnabled = map["javaScriptEnabled"];
+    options.debuggingEnabled = map["debuggingEnabled"];
     options.javaScriptCanOpenWindowsAutomatically = map["javaScriptCanOpenWindowsAutomatically"];
     options.mediaPlaybackRequiresUserGesture = map["mediaPlaybackRequiresUserGesture"];
     options.textZoom = map["textZoom"];
@@ -124,6 +134,11 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
     options.resourceCustomSchemes = List<String>.from(map["resourceCustomSchemes"] ?? []);
     options.contentBlockers = contentBlockers;
     options.preferredContentMode = InAppWebViewUserPreferredContentMode.fromValue(map["preferredContentMode"]);
+    options.useShouldInterceptAjaxRequest = map["useShouldInterceptAjaxRequest"];
+    options.useShouldInterceptFetchRequest = map["useShouldInterceptFetchRequest"];
+    options.incognito = map["incognito"];
+    options.cacheEnabled = map["cacheEnabled"];
+    options.transparentBackground = map["transparentBackground"];
     return options;
   }
 }
@@ -137,13 +152,11 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
   bool domStorageEnabled;
   bool useWideViewPort;
   bool safeBrowsingEnabled;
-  bool transparentBackground;
   AndroidInAppWebViewMixedContentMode mixedContentMode;
   bool allowContentAccess;
   bool allowFileAccess;
   bool allowFileAccessFromFileURLs;
   bool allowUniversalAccessFromFileURLs;
-  bool appCacheEnabled;
   String appCachePath;
   bool blockNetworkImage;
   bool blockNetworkLoads;
@@ -166,16 +179,19 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
   String sansSerifFontFamily;
   String serifFontFamily;
   String standardFontFamily;
+  bool saveFormData;
+  bool thirdPartyCookiesEnabled;
+  bool hardwareAcceleration;
 
   AndroidInAppWebViewOptions({this.clearSessionCache = false, this.builtInZoomControls = false, this.displayZoomControls = false, this.supportZoom = true, this.databaseEnabled = false,
-    this.domStorageEnabled = false, this.useWideViewPort = true, this.safeBrowsingEnabled = true, this.transparentBackground = false, this.mixedContentMode,
+    this.domStorageEnabled = false, this.useWideViewPort = true, this.safeBrowsingEnabled = true, this.mixedContentMode,
     this.allowContentAccess = true, this.allowFileAccess = true, this.allowFileAccessFromFileURLs = true, this.allowUniversalAccessFromFileURLs = true,
-    this.appCacheEnabled = true, this.appCachePath, this.blockNetworkImage = false, this.blockNetworkLoads = false, this.cacheMode = AndroidInAppWebViewCacheMode.LOAD_DEFAULT,
+    this.appCachePath, this.blockNetworkImage = false, this.blockNetworkLoads = false, this.cacheMode = AndroidInAppWebViewCacheMode.LOAD_DEFAULT,
     this.cursiveFontFamily = "cursive", this.defaultFixedFontSize = 16, this.defaultFontSize = 16, this.defaultTextEncodingName = "UTF-8",
     this.disabledActionModeMenuItems, this.fantasyFontFamily = "fantasy", this.fixedFontFamily = "monospace", this.forceDark = AndroidInAppWebViewForceDark.FORCE_DARK_OFF,
     this.geolocationEnabled = true, this.layoutAlgorithm, this.loadWithOverviewMode = true, this.loadsImagesAutomatically = true,
     this.minimumLogicalFontSize = 8, this.needInitialFocus = true, this.offscreenPreRaster = false, this.sansSerifFontFamily = "sans-serif", this.serifFontFamily = "sans-serif",
-    this.standardFontFamily = "sans-serif"
+    this.standardFontFamily = "sans-serif", this.saveFormData = true, this.thirdPartyCookiesEnabled = true, this.hardwareAcceleration = true
   });
 
   @override
@@ -189,13 +205,11 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
       "domStorageEnabled": domStorageEnabled,
       "useWideViewPort": useWideViewPort,
       "safeBrowsingEnabled": safeBrowsingEnabled,
-      "transparentBackground": transparentBackground,
       "mixedContentMode": mixedContentMode?.toValue(),
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
       "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
       "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
-      "appCacheEnabled": appCacheEnabled,
       "appCachePath": appCachePath,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
@@ -217,7 +231,10 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
       "offscreenPreRaster": offscreenPreRaster,
       "sansSerifFontFamily": sansSerifFontFamily,
       "serifFontFamily": serifFontFamily,
-      "standardFontFamily": standardFontFamily
+      "standardFontFamily": standardFontFamily,
+      "saveFormData": saveFormData,
+      "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
+      "hardwareAcceleration": hardwareAcceleration
     };
   }
 
@@ -232,13 +249,11 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
     options.domStorageEnabled = map["domStorageEnabled"];
     options.useWideViewPort = map["useWideViewPort"];
     options.safeBrowsingEnabled = map["safeBrowsingEnabled"];
-    options.transparentBackground = map["transparentBackground"];
     options.mixedContentMode = AndroidInAppWebViewMixedContentMode.fromValue(map["mixedContentMode"]);
     options.allowContentAccess = map["allowContentAccess"];
     options.allowFileAccess = map["allowFileAccess"];
     options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
     options.allowUniversalAccessFromFileURLs = map["allowUniversalAccessFromFileURLs"];
-    options.appCacheEnabled = map["appCacheEnabled"];
     options.appCachePath = map["appCachePath"];
     options.blockNetworkImage = map["blockNetworkImage"];
     options.blockNetworkLoads = map["blockNetworkLoads"];
@@ -261,6 +276,9 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
     options.sansSerifFontFamily = map["sansSerifFontFamily"];
     options.serifFontFamily = map["serifFontFamily"];
     options.standardFontFamily = map["standardFontFamily"];
+    options.saveFormData = map["saveFormData"];
+    options.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
+    options.hardwareAcceleration = map["hardwareAcceleration"];
     return options;
   }
 }
@@ -275,16 +293,15 @@ class IosInAppWebViewOptions implements WebViewOptions, BrowserOptions, IosOptio
   bool ignoresViewportScaleLimits;
   bool allowsInlineMediaPlayback;
   bool allowsPictureInPictureMediaPlayback;
-  bool transparentBackground;
-  String applicationNameForUserAgent;
   bool isFraudulentWebsiteWarningEnabled;
   IosInAppWebViewSelectionGranularity selectionGranularity;
   List<IosInAppWebViewDataDetectorTypes> dataDetectorTypes;
+  bool sharedCookiesEnabled;
 
   IosInAppWebViewOptions({this.disallowOverScroll = false, this.enableViewportScale = false, this.suppressesIncrementalRendering = false, this.allowsAirPlayForMediaPlayback = true,
     this.allowsBackForwardNavigationGestures = true, this.allowsLinkPreview = true, this.ignoresViewportScaleLimits = false, this.allowsInlineMediaPlayback = false,
-    this.allowsPictureInPictureMediaPlayback = true, this.transparentBackground = false, this.applicationNameForUserAgent = "", this.isFraudulentWebsiteWarningEnabled = true,
-    this.selectionGranularity = IosInAppWebViewSelectionGranularity.DYNAMIC, this.dataDetectorTypes = const [IosInAppWebViewDataDetectorTypes.NONE]
+    this.allowsPictureInPictureMediaPlayback = true, this.isFraudulentWebsiteWarningEnabled = true,
+    this.selectionGranularity = IosInAppWebViewSelectionGranularity.DYNAMIC, this.dataDetectorTypes = const [IosInAppWebViewDataDetectorTypes.NONE], this.sharedCookiesEnabled = false
   });
 
   @override
@@ -304,11 +321,10 @@ class IosInAppWebViewOptions implements WebViewOptions, BrowserOptions, IosOptio
       "ignoresViewportScaleLimits": ignoresViewportScaleLimits,
       "allowsInlineMediaPlayback": allowsInlineMediaPlayback,
       "allowsPictureInPictureMediaPlayback": allowsPictureInPictureMediaPlayback,
-      "transparentBackground": transparentBackground,
-      "applicationNameForUserAgent": applicationNameForUserAgent,
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
       "selectionGranularity": selectionGranularity.toValue(),
-      "dataDetectorTypes": dataDetectorTypesList
+      "dataDetectorTypes": dataDetectorTypesList,
+      "sharedCookiesEnabled": sharedCookiesEnabled
     };
   }
 
@@ -330,11 +346,10 @@ class IosInAppWebViewOptions implements WebViewOptions, BrowserOptions, IosOptio
     options.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
     options.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
     options.allowsPictureInPictureMediaPlayback = map["allowsPictureInPictureMediaPlayback"];
-    options.transparentBackground = map["transparentBackground"];
-    options.applicationNameForUserAgent = map["applicationNameForUserAgent"];
     options.isFraudulentWebsiteWarningEnabled = map["isFraudulentWebsiteWarningEnabled"];
     options.selectionGranularity = IosInAppWebViewSelectionGranularity.fromValue(map["selectionGranularity"]);
     options.dataDetectorTypes = dataDetectorTypes;
+    options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
     return options;
   }
 }

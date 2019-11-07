@@ -26,6 +26,19 @@ func convertToDictionary(text: String) -> [String: Any]? {
     return nil
 }
 
+func JSONStringify(value: Any, prettyPrinted: Bool = false) -> String {
+    let options: JSONSerialization.WritingOptions = prettyPrinted ? .prettyPrinted : .init(rawValue: 0)
+    if JSONSerialization.isValidJSONObject(value) {
+        let data = try? JSONSerialization.data(withJSONObject: value, options: options)
+        if data != nil {
+            if let string = String(data: data!, encoding: .utf8) {
+                return string
+            }
+        }
+    }
+    return ""
+}
+
 let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
 
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
@@ -662,7 +675,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
-        
         let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(consoleLogJSScript)
         configuration.userContentController.add(self, name: "consoleLog")
@@ -699,18 +711,39 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
         }
         
+        if #available(iOS 9.0, *) {
+            if ((options?.incognito)!) {
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            } else if ((options?.cacheEnabled)!) {
+                configuration.websiteDataStore = WKWebsiteDataStore.default()
+            }
+        }
         
-        //keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
+        if #available(iOS 11.0, *) {
+            if((options?.sharedCookiesEnabled)!) {
+                // More info to sending cookies with WKWebView
+                // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+                // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+                // See also https://forums.developer.apple.com/thread/97194
+                // check if websiteDataStore has not been initialized before
+                if(!(options?.incognito)! && !(options?.cacheEnabled)!) {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
+                }
+            }
+        }
         
         configuration.suppressesIncrementalRendering = (options?.suppressesIncrementalRendering)!
         allowsBackForwardNavigationGestures = (options?.allowsBackForwardNavigationGestures)!
         if #available(iOS 9.0, *) {
             allowsLinkPreview = (options?.allowsLinkPreview)!
             configuration.allowsPictureInPictureMediaPlayback = (options?.allowsPictureInPictureMediaPlayback)!
-            if ((options?.applicationNameForUserAgent)! != "") {
+            if (options?.applicationNameForUserAgent != nil && (options?.applicationNameForUserAgent)! != "") {
                 configuration.applicationNameForUserAgent = (options?.applicationNameForUserAgent)!
             }
-            if ((options?.userAgent)! != "") {
+            if (options?.userAgent != nil && (options?.userAgent)! != "") {
                 customUserAgent = (options?.userAgent)!
             }
         }
@@ -927,6 +960,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
+        if #available(iOS 9.0, *) {
+            if (newOptionsMap["incognito"] != nil && options?.incognito != newOptions.incognito && newOptions.incognito) {
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            } else if (newOptionsMap["cacheEnabled"] != nil && options?.cacheEnabled != newOptions.cacheEnabled && newOptions.cacheEnabled) {
+                configuration.websiteDataStore = WKWebsiteDataStore.default()
+            }
+        }
+        
+        if #available(iOS 11.0, *) {
+            if (newOptionsMap["sharedCookiesEnabled"] != nil && options?.sharedCookiesEnabled != newOptions.sharedCookiesEnabled && newOptions.sharedCookiesEnabled) {
+                if(!newOptions.incognito && !newOptions.cacheEnabled) {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
+                }
+            }
+        }
+        
         if newOptionsMap["enableViewportScale"] != nil && options?.enableViewportScale != newOptions.enableViewportScale && newOptions.enableViewportScale {
             let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
             evaluateJavaScript(jscript, completionHandler: nil)
@@ -959,10 +1011,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if newOptionsMap["allowsInlineMediaPlayback"] != nil && options?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
             configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
         }
-        
-        //        if newOptionsMap["keyboardDisplayRequiresUserAction"] != nil && browserOptions?.keyboardDisplayRequiresUserAction != newOptions.keyboardDisplayRequiresUserAction {
-        //            self.webView.keyboardDisplayRequiresUserAction = newOptions.keyboardDisplayRequiresUserAction
-        //        }
         
         if newOptionsMap["suppressesIncrementalRendering"] != nil && options?.suppressesIncrementalRendering != newOptions.suppressesIncrementalRendering {
             configuration.suppressesIncrementalRendering = newOptions.suppressesIncrementalRendering
@@ -1996,5 +2044,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 
     func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
         evaluateJavaScript("wkwebview_ClearMatches();", completionHandler: completionHandler)
+    }
+    
+    public override func removeFromSuperview() {
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleError")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleInfo")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn")
+        configuration.userContentController.removeScriptMessageHandler(forName: "callHandler")
+        configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
+        configuration.userContentController.removeScriptMessageHandler(forName: "onNavigationStateChange")
+        configuration.userContentController.removeAllUserScripts()
+        removeObserver(self, forKeyPath: "estimatedProgress")
+        super.removeFromSuperview()
+        uiDelegate = nil
+        navigationDelegate = nil
+        scrollView.delegate = nil
+        IAWController?.channel?.setMethodCallHandler(nil)
+        IABController?.webView = nil
+        IAWController?.webView = nil
     }
 }

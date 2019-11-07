@@ -325,6 +325,13 @@ class _InAppWebViewState extends State<InAppWebView> {
     super.didUpdateWidget(oldWidget);
   }
 
+  @override
+  void dispose(){
+    super.dispose();
+    if (Platform.isIOS)
+      _controller._channel.invokeMethod('removeFromSuperview');
+  }
+
   void _onPlatformViewCreated(int id) {
     _controller = InAppWebViewController(id, widget);
     if (widget.onWebViewCreated != null) {

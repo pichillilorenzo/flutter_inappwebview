@@ -1,5 +1,7 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
+import android.annotation.TargetApi;
+import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,7 +35,10 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
-public class InAppWebChromeClient extends WebChromeClient {
+import static android.app.Activity.RESULT_CANCELED;
+import static android.app.Activity.RESULT_OK;
+
+public class InAppWebChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
   private PluginRegistry.Registrar registrar;
@@ -56,18 +61,18 @@ public class InAppWebChromeClient extends WebChromeClient {
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
+
+    registrar.addActivityResultListener(this);
   }
 
-  public Bitmap getDefaultVideoPoster()
-  {
+  public Bitmap getDefaultVideoPoster() {
     if (mCustomView == null) {
       return null;
     }
     return BitmapFactory.decodeResource(this.registrar.activeContext().getResources(), 2130837573);
   }
 
-  public void onHideCustomView()
-  {
+  public void onHideCustomView() {
     View decorView = this.registrar.activity().getWindow().getDecorView();
     ((FrameLayout) decorView).removeView(this.mCustomView);
     this.mCustomView = null;
@@ -77,10 +82,8 @@ public class InAppWebChromeClient extends WebChromeClient {
     this.mCustomViewCallback = null;
   }
 
-  public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback)
-  {
-    if (this.mCustomView != null)
-    {
+  public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback) {
+    if (this.mCustomView != null) {
       onHideCustomView();
       return;
     }
@@ -343,7 +346,7 @@ public class InAppWebChromeClient extends WebChromeClient {
             LinearLayout.LayoutParams.MATCH_PARENT);
     input.setLayoutParams(lp);
 
-    layout.setPaddingRelative(45,15,45,0);
+    layout.setPaddingRelative(45, 15, 45, 0);
     layout.addView(input);
 
     String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
@@ -392,8 +395,7 @@ public class InAppWebChromeClient extends WebChromeClient {
   }
 
   @Override
-  public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, android.os.Message resultMsg)
-  {
+  public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, android.os.Message resultMsg) {
     WebView.HitTestResult result = view.getHitTestResult();
     String data = result.getExtra();
     Map<String, Object> obj = new HashMap<>();
@@ -405,7 +407,7 @@ public class InAppWebChromeClient extends WebChromeClient {
   }
 
   @Override
-  public void onGeolocationPermissionsShowPrompt (final String origin, final GeolocationPermissions.Callback callback) {
+  public void onGeolocationPermissionsShowPrompt(final String origin, final GeolocationPermissions.Callback callback) {
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
@@ -415,19 +417,19 @@ public class InAppWebChromeClient extends WebChromeClient {
       public void success(Object o) {
         Map<String, Object> response = (Map<String, Object>) o;
         if (response != null)
-          callback.invoke((String) response.get("origin"),(Boolean) response.get("allow"),(Boolean) response.get("retain"));
+          callback.invoke((String) response.get("origin"), (Boolean) response.get("allow"), (Boolean) response.get("retain"));
         else
-          callback.invoke(origin,false,false);
+          callback.invoke(origin, false, false);
       }
 
       @Override
       public void error(String s, String s1, Object o) {
-        callback.invoke(origin,false,false);
+        callback.invoke(origin, false, false);
       }
 
       @Override
       public void notImplemented() {
-        callback.invoke(origin,false,false);
+        callback.invoke(origin, false, false);
       }
     });
   }
@@ -518,23 +520,33 @@ public class InAppWebChromeClient extends WebChromeClient {
   public boolean onShowFileChooser(
           WebView webView, ValueCallback<Uri[]> filePathCallback,
           FileChooserParams fileChooserParams) {
-    if (mUploadMessageArray != null) {
-      mUploadMessageArray.onReceiveValue(null);
-    }
     mUploadMessageArray = filePathCallback;
+    try {
+      Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
+      contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
+      contentSelectionIntent.setType("*/*");
+      Intent[] intentArray;
+      intentArray = new Intent[0];
 
-    Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-    contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-    contentSelectionIntent.setType("*/*");
-    Intent[] intentArray;
-    intentArray = new Intent[0];
-
-    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-    chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-    chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
+      Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+      chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
+      chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
+      chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
+      ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
+    } catch (ActivityNotFoundException e) {
+      e.printStackTrace();
+      return false;
+    }
     return true;
+  }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  @Override
+  public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
+    if (requestCode == FILECHOOSER_RESULTCODE && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED)) {
+      mUploadMessageArray.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+    }
+    return false;
   }
 
   private MethodChannel getChannel() {

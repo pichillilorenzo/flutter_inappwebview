@@ -134,7 +134,7 @@ class CustomSchemeResponse {
 ///Public class representing a JavaScript console message from WebCore.
 ///This could be a issued by a call to one of the console logging functions (e.g. console.log('...')) or a JavaScript error on the page.
 ///
-///To receive notifications of these messages, override the [InAppBrowser.onConsoleMessage()] function.
+///To receive notifications of these messages, use the [onConsoleMessage] event.
 class ConsoleMessage {
 
   String sourceURL = "";
@@ -198,7 +198,7 @@ class GeolocationPermissionShowPromptResponse {
   }
 }
 
-///
+///JsAlertResponseAction class used by [JsAlertResponse] class.
 class JsAlertResponseAction {
   final int _value;
   const JsAlertResponseAction._internal(this._value);
@@ -207,11 +207,15 @@ class JsAlertResponseAction {
   static const CONFIRM = const JsAlertResponseAction._internal(0);
 }
 
-///
+///JsAlertResponse class represents the response used by the [onJsAlert] event to control a JavaScript alert dialog.
 class JsAlertResponse {
+  ///Message to be displayed in the window.
   String message;
+  ///Title of the confirm button.
   String confirmButtonTitle;
+  ///Whether the client will handle the alert dialog.
   bool handledByClient;
+  ///Action used to confirm that the user hit confirm button.
   JsAlertResponseAction action;
 
   JsAlertResponse({this.message = "", this.handledByClient = false, this.confirmButtonTitle = "", this.action = JsAlertResponseAction.CONFIRM});
@@ -226,7 +230,7 @@ class JsAlertResponse {
   }
 }
 
-///
+///JsConfirmResponseAction class used by [JsConfirmResponse] class.
 class JsConfirmResponseAction {
   final int _value;
   const JsConfirmResponseAction._internal(this._value);
@@ -236,12 +240,17 @@ class JsConfirmResponseAction {
   static const CANCEL = const JsConfirmResponseAction._internal(1);
 }
 
-///
+///JsConfirmResponse class represents the response used by the [onJsConfirm] event to control a JavaScript confirm dialog.
 class JsConfirmResponse {
+  ///Message to be displayed in the window.
   String message;
+  ///Title of the confirm button.
   String confirmButtonTitle;
+  ///Title of the cancel button.
   String cancelButtonTitle;
+  ///Whether the client will handle the confirm dialog.
   bool handledByClient;
+  ///Action used to confirm that the user hit confirm or cancel button.
   JsConfirmResponseAction action;
 
   JsConfirmResponse({this.message = "", this.handledByClient = false, this.confirmButtonTitle = "", this.cancelButtonTitle = "", this.action = JsConfirmResponseAction.CANCEL});
@@ -257,7 +266,7 @@ class JsConfirmResponse {
   }
 }
 
-///
+///JsPromptResponseAction class used by [JsPromptResponse] class.
 class JsPromptResponseAction {
   final int _value;
   const JsPromptResponseAction._internal(this._value);
@@ -267,14 +276,21 @@ class JsPromptResponseAction {
   static const CANCEL = const JsPromptResponseAction._internal(1);
 }
 
-///
+///JsPromptResponse class represents the response used by the [onJsPrompt] event to control a JavaScript prompt dialog.
 class JsPromptResponse {
+  ///Message to be displayed in the window.
   String message;
+  ///The default value displayed in the prompt dialog.
   String defaultValue;
+  ///Title of the confirm button.
   String confirmButtonTitle;
+  ///Title of the cancel button.
   String cancelButtonTitle;
+  ///Whether the client will handle the prompt dialog.
   bool handledByClient;
+  ///Value of the prompt dialog.
   String value;
+  ///Action used to confirm that the user hit confirm or cancel button.
   JsPromptResponseAction action;
 
   JsPromptResponse({this.message = "", this.defaultValue = "", this.handledByClient = false, this.confirmButtonTitle = "", this.cancelButtonTitle = "", this.value, this.action = JsPromptResponseAction.CANCEL});
@@ -310,7 +326,7 @@ class SafeBrowsingThreat {
   static const SAFE_BROWSING_THREAT_BILLING = const SafeBrowsingThreat._internal(4);
 }
 
-///
+///SafeBrowsingResponseAction class used by [SafeBrowsingResponse] class.
 class SafeBrowsingResponseAction {
   final int _value;
   const SafeBrowsingResponseAction._internal(this._value);

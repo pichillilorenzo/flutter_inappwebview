@@ -66,6 +66,8 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   bool javaScriptCanOpenWindowsAutomatically;
   ///Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 10.0+.
   bool mediaPlaybackRequiresUserGesture;
   ///Sets the minimum font size. The default value is `8` for Android, `0` for iOS.
   int minimumFontSize;
@@ -74,8 +76,12 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   ///Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
   bool horizontalScrollBarEnabled;
   ///List of custom schemes that the WebView must handle. Use the [onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
+  ///
+  ///**NOTE**: available on iOS 11.0+.
   List<String> resourceCustomSchemes;
   ///List of [ContentBlocker] that are a set of rules used to block content in the browser window.
+  ///
+  ///**NOTE**: available on iOS 11.0+.
   List<ContentBlocker> contentBlockers;
   ///Sets the content mode that the WebView needs to use. The default value is [InAppWebViewUserPreferredContentMode.RECOMMENDED].
   ///
@@ -176,6 +182,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   }
 }
 
+///This class represents all the Android-only WebView options available.
 class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOptions {
   ///Sets the text zoom of the page in percent. The default is `100`.
   int textZoom;
@@ -400,19 +407,51 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
   }
 }
 
+///This class represents all the iOS-only WebView options available.
 class IosInAppWebViewOptions implements WebViewOptions, BrowserOptions, IosOptions {
+  ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   bool disallowOverScroll;
+  ///Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
   bool enableViewportScale;
+  ///Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
   bool suppressesIncrementalRendering;
+  ///Set to `true` to allow AirPlay. The default value is `true`.
   bool allowsAirPlayForMediaPlayback;
+  ///Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
   bool allowsBackForwardNavigationGestures;
+  ///Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 9.0+.
   bool allowsLinkPreview;
+  ///Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
+  ///The ignoresViewportScaleLimits property overrides the `user-scalable` HTML property in a webpage. The default value is `false`.
   bool ignoresViewportScaleLimits;
+  ///Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls.
+  ///For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
   bool allowsInlineMediaPlayback;
+  ///Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 9.0+.
   bool allowsPictureInPictureMediaPlayback;
+  ///A Boolean value indicating whether warnings should be shown for suspected fraudulent content such as phishing or malware.
+  ///According to the official documentation, this feature is currently available in the following region: China.
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 13.0+.
   bool isFraudulentWebsiteWarningEnabled;
+  ///The level of granularity with which the user can interactively select content in the web view.
+  ///The default value is [IosInAppWebViewSelectionGranularity.DYNAMIC]
   IosInAppWebViewSelectionGranularity selectionGranularity;
+  ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
+  ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [IosInAppWebViewDataDetectorTypes.LINK].
+  ///The default value is [IosInAppWebViewDataDetectorTypes.NONE].
+  ///
+  ///**NOTE**: available on iOS 10.0+.
   List<IosInAppWebViewDataDetectorTypes> dataDetectorTypes;
+  ///Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: available on iOS 11.0+.
   bool sharedCookiesEnabled;
 
   IosInAppWebViewOptions({this.disallowOverScroll = false, this.enableViewportScale = false, this.suppressesIncrementalRendering = false, this.allowsAirPlayForMediaPlayback = true,
@@ -471,14 +510,19 @@ class IosInAppWebViewOptions implements WebViewOptions, BrowserOptions, IosOptio
   }
 }
 
+///This class represents all the cross-platform [InAppBrowser] options available.
 class InAppBrowserOptions implements BrowserOptions, AndroidOptions, IosOptions {
+  ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
+  ///The default value is `false`.
   bool hidden;
+  ///Set to `false` to hide the toolbar at the top of the WebView. The default value is `true`.
   bool toolbarTop;
+  ///Set the custom background color of the toolbar at the top.
   String toolbarTopBackgroundColor;
-  String toolbarTopFixedTitle;
+  ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
   bool hideUrlBar;
 
-  InAppBrowserOptions({this.hidden = false, this.toolbarTop = true, this.toolbarTopBackgroundColor = "", this.toolbarTopFixedTitle = "", this.hideUrlBar = false});
+  InAppBrowserOptions({this.hidden = false, this.toolbarTop = true, this.toolbarTopBackgroundColor = "", this.hideUrlBar = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -486,7 +530,6 @@ class InAppBrowserOptions implements BrowserOptions, AndroidOptions, IosOptions 
       "hidden": hidden,
       "toolbarTop": toolbarTop,
       "toolbarTopBackgroundColor": toolbarTopBackgroundColor,
-      "toolbarTopFixedTitle": toolbarTopFixedTitle,
       "hideUrlBar": hideUrlBar
     };
   }
@@ -497,23 +540,29 @@ class InAppBrowserOptions implements BrowserOptions, AndroidOptions, IosOptions 
     options.hidden = map["hidden"];
     options.toolbarTop = map["toolbarTop"];
     options.toolbarTopBackgroundColor = map["toolbarTopBackgroundColor"];
-    options.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
     options.hideUrlBar = map["hideUrlBar"];
     return options;
   }
 }
 
+///This class represents all the Android-only [InAppBrowser] options available.
 class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
+  ///Set to `true` if you want the title should be displayed. The default value is `false`.
   bool hideTitleBar;
+  ///Set the action bar's title.
+  String toolbarTopFixedTitle;
+  ///Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
   bool closeOnCannotGoBack;
+  ///Set to `false` to hide the progress bar at the bottom of the toolbar at the top. The default value is `true`.
   bool progressBar;
 
-  AndroidInAppBrowserOptions({this.hideTitleBar = true, this.closeOnCannotGoBack = true, this.progressBar = true});
+  AndroidInAppBrowserOptions({this.hideTitleBar = true, this.toolbarTopFixedTitle = "", this.closeOnCannotGoBack = true, this.progressBar = true});
 
   @override
   Map<String, dynamic> toMap() {
     return {
       "hideTitleBar": hideTitleBar,
+      "toolbarTopFixedTitle": toolbarTopFixedTitle,
       "closeOnCannotGoBack": closeOnCannotGoBack,
       "progressBar": progressBar,
     };
@@ -523,20 +572,30 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   static AndroidInAppBrowserOptions fromMap(Map<String, dynamic> map) {
     AndroidInAppBrowserOptions options = new AndroidInAppBrowserOptions();
     options.hideTitleBar = map["hideTitleBar"];
+    options.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
     options.closeOnCannotGoBack = map["closeOnCannotGoBack"];
     options.progressBar = map["progressBar"];
     return options;
   }
 }
 
+///This class represents all the iOS-only [InAppBrowser] options available.
 class IosInAppBrowserOptions implements BrowserOptions, IosOptions {
+  ///Set to `false` to hide the toolbar at the bottom of the WebView. The default value is `true`.
   bool toolbarBottom;
+  ///Set the custom background color of the toolbar at the bottom.
   String toolbarBottomBackgroundColor;
+  ///Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
   bool toolbarBottomTranslucent;
+  ///Set the custom text for the close button.
   String closeButtonCaption;
+  ///Set the custom color for the close button.
   String closeButtonColor;
+  ///Set the custom modal presentation style when presenting the WebView. The default value is [IosWebViewOptionsPresentationStyle.FULL_SCREEN].
   IosWebViewOptionsPresentationStyle presentationStyle;
+  ///Set to the custom transition style when presenting the WebView. The default value is [IosWebViewOptionsTransitionStyle.COVER_VERTICAL].
   IosWebViewOptionsTransitionStyle transitionStyle;
+  ///Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
   bool spinner;
 
   IosInAppBrowserOptions({this.toolbarBottom = true, this.toolbarBottomBackgroundColor = "", this.toolbarBottomTranslucent = true, this.closeButtonCaption = "",
@@ -572,11 +631,17 @@ class IosInAppBrowserOptions implements BrowserOptions, IosOptions {
   }
 }
 
+///This class represents all the Android-only [ChromeSafariBrowser] options available.
 class AndroidChromeCustomTabsOptions implements ChromeSafariBrowserOptions, AndroidOptions {
+  ///Set to `false` if you don't want the default share button. The default value is `true`.
   bool addShareButton;
+  ///Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
   bool showTitle;
+  ///Set the custom background color of the toolbar.
   String toolbarBackgroundColor;
+  ///Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
   bool enableUrlBarHiding;
+  ///Set to `true` to enable Instant Apps. The default value is `false`.
   bool instantAppsEnabled;
 
   AndroidChromeCustomTabsOptions({this.addShareButton = true, this.showTitle = true, this.toolbarBackgroundColor = "", this.enableUrlBarHiding = false, this.instantAppsEnabled = false});
@@ -604,13 +669,21 @@ class AndroidChromeCustomTabsOptions implements ChromeSafariBrowserOptions, Andr
   }
 }
 
+///This class represents all the iOS-only [ChromeSafariBrowser] options available.
 class IosSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
+  ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
   bool entersReaderIfAvailable;
+  ///Set to `true` to enable bar collapsing. The default value is `false`.
   bool barCollapsingEnabled;
+  ///Set the custom style for the dismiss button. The default value is [IosSafariOptionsDismissButtonStyle.DONE].
   IosSafariOptionsDismissButtonStyle dismissButtonStyle;
+  ///Set the custom background color of the navigation bar and the toolbar.
   String preferredBarTintColor;
+  ///Set the custom color of the control buttons on the navigation bar and the toolbar.
   String preferredControlTintColor;
+  ///Set the custom modal presentation style when presenting the WebView. The default value is [IosWebViewOptionsPresentationStyle.FULL_SCREEN].
   IosWebViewOptionsPresentationStyle presentationStyle;
+  ///Set to the custom transition style when presenting the WebView. The default value is [IosWebViewOptionsTransitionStyle.COVER_VERTICAL].
   IosWebViewOptionsTransitionStyle transitionStyle;
 
   IosSafariOptions({this.entersReaderIfAvailable = false, this.barCollapsingEnabled = false, this.dismissButtonStyle = IosSafariOptionsDismissButtonStyle.DONE,

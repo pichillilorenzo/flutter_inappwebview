@@ -161,33 +161,33 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                     result(false)
                 }
                 break
-            case "injectScriptCode":
+            case "evaluateJavascript":
                 if webView != nil {
                     let source = (arguments!["source"] as? String)!
-                    webView!.injectScriptCode(source: source, result: result)
+                    webView!.evaluateJavascript(source: source, result: result)
                 }
                 else {
                     result("")
                 }
                 break
-            case "injectScriptFile":
+            case "injectJavascriptFileFromUrl":
                 if webView != nil {
                     let urlFile = (arguments!["urlFile"] as? String)!
-                    webView!.injectScriptFile(urlFile: urlFile)
+                    webView!.injectJavascriptFileFromUrl(urlFile: urlFile)
                 }
                 result(true)
                 break
-            case "injectStyleCode":
+            case "injectCSSCode":
                 if webView != nil {
                     let source = (arguments!["source"] as? String)!
-                    webView!.injectStyleCode(source: source)
+                    webView!.injectCSSCode(source: source)
                 }
                 result(true)
                 break
-            case "injectStyleFile":
+            case "injectCSSFileFromUrl":
                 if webView != nil {
                     let urlFile = (arguments!["urlFile"] as? String)!
-                    webView!.injectStyleFile(urlFile: urlFile)
+                    webView!.injectCSSFileFromUrl(urlFile: urlFile)
                 }
                 result(true)
                 break
@@ -300,6 +300,10 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 if webView != nil {
                     webView!.clearCache()
                 }
+                result(true)
+                break
+            case "removeFromSuperview":
+                webView!.removeFromSuperview()
                 result(true)
                 break
             default:

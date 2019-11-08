@@ -8,7 +8,6 @@
 import Flutter
 import Foundation
 import WebKit
-import WKWebViewWithURLProtocol
 
 func currentTimeInMilliSeconds() -> Int64 {
     let currentDate = Date()
@@ -27,9 +26,24 @@ func convertToDictionary(text: String) -> [String: Any]? {
     return nil
 }
 
+func JSONStringify(value: Any, prettyPrinted: Bool = false) -> String {
+    let options: JSONSerialization.WritingOptions = prettyPrinted ? .prettyPrinted : .init(rawValue: 0)
+    if JSONSerialization.isValidJSONObject(value) {
+        let data = try? JSONSerialization.data(withJSONObject: value, options: options)
+        if data != nil {
+            if let string = String(data: data!, encoding: .utf8) {
+                return string
+            }
+        }
+    }
+    return ""
+}
+
+let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
+
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
 let consoleLogJS = """
-(function() {
+(function(console) {
     var oldLogs = {
         'consoleLog': console.log,
         'consoleDebug': console.debug,
@@ -54,21 +68,8 @@ let consoleLogJS = """
             }
         })(k);
     }
-})();
+})(window.console);
 """
-
-let resourceObserverJS = """
-(function() {
-    var observer = new PerformanceObserver(function(list) {
-        list.getEntries().forEach(function(entry) {
-            window.webkit.messageHandlers['resourceLoaded'].postMessage(JSON.stringify(entry));
-        });
-    });
-    observer.observe({entryTypes: ['resource']});
-})();
-"""
-
-let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
 
 let javaScriptBridgeJS = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = {};
@@ -125,7 +126,7 @@ function wkwebview_FindAllAsyncForElement(element, keyword) {
           value.substr(idx + keyword.length)
         );
 
-        window.webkit.messageHandlers["findResultReceived"].postMessage(
+        window.webkit.messageHandlers["onFindResultReceived"].postMessage(
           JSON.stringify({
             activeMatchOrdinal: wkwebview_CurrentHighlight,
             numberOfMatches: wkwebview_SearchResultCount,
@@ -155,7 +156,7 @@ function wkwebview_FindAllAsync(keyword) {
   wkwebview_ClearMatches();
   wkwebview_FindAllAsyncForElement(document.body, keyword.toLowerCase());
   wkwebview_IsDoneCounting = true;
-  window.webkit.messageHandlers["findResultReceived"].postMessage(
+  window.webkit.messageHandlers["onFindResultReceived"].postMessage(
     JSON.stringify({
       activeMatchOrdinal: wkwebview_CurrentHighlight,
       numberOfMatches: wkwebview_SearchResultCount,
@@ -222,7 +223,7 @@ function wkwebview_FindNext(forward) {
       block: "center"
     });
 
-    window.webkit.messageHandlers["findResultReceived"].postMessage(
+    window.webkit.messageHandlers["onFindResultReceived"].postMessage(
       JSON.stringify({
         activeMatchOrdinal: wkwebview_CurrentHighlight,
         numberOfMatches: wkwebview_SearchResultCount,
@@ -231,6 +232,385 @@ function wkwebview_FindNext(forward) {
     );
   }
 }
+"""
+
+let variableForOnLoadResourceJS = "window._flutter_inappbrowser_useOnLoadResource"
+let enableVariableForOnLoadResourceJS = "\(variableForOnLoadResourceJS) = $PLACEHOLDER_VALUE;"
+
+let resourceObserverJS = """
+(function() {
+    var observer = new PerformanceObserver(function(list) {
+        list.getEntries().forEach(function(entry) {
+            if (window.\(variableForOnLoadResourceJS) == null || window.\(variableForOnLoadResourceJS) == true) {
+                window.\(JAVASCRIPT_BRIDGE_NAME).callHandler("onLoadResource", entry);
+            }
+        });
+    });
+    observer.observe({entryTypes: ['resource']});
+})();
+"""
+
+let variableForShouldInterceptAjaxRequestJS = "window._flutter_inappbrowser_useShouldInterceptAjaxRequest"
+let enableVariableForShouldInterceptAjaxRequestJS = "\(variableForShouldInterceptAjaxRequestJS) = $PLACEHOLDER_VALUE;"
+
+let interceptAjaxRequestsJS = """
+(function(ajax) {
+  var send = ajax.prototype.send;
+  var open = ajax.prototype.open;
+  var setRequestHeader = ajax.prototype.setRequestHeader;
+  ajax.prototype._flutter_inappbrowser_url = null;
+  ajax.prototype._flutter_inappbrowser_method = null;
+  ajax.prototype._flutter_inappbrowser_isAsync = null;
+  ajax.prototype._flutter_inappbrowser_user = null;
+  ajax.prototype._flutter_inappbrowser_password = null;
+  ajax.prototype._flutter_inappbrowser_password = null;
+  ajax.prototype._flutter_inappbrowser_already_onreadystatechange_wrapped = false;
+  ajax.prototype._flutter_inappbrowser_request_headers = {};
+  ajax.prototype.open = function(method, url, isAsync, user, password) {
+    isAsync = (isAsync != null) ? isAsync : true;
+    this._flutter_inappbrowser_url = url;
+    this._flutter_inappbrowser_method = method;
+    this._flutter_inappbrowser_isAsync = isAsync;
+    this._flutter_inappbrowser_user = user;
+    this._flutter_inappbrowser_password = password;
+    open.call(this, method, url, isAsync, user, password);
+  };
+  ajax.prototype.setRequestHeader = function(header, value) {
+    this._flutter_inappbrowser_request_headers[header] = value;
+    setRequestHeader.call(this, header, value);
+  };
+  function handleEvent(e) {
+    var self = this;
+    if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
+      var headers = this.getAllResponseHeaders();
+      var responseHeaders = {};
+      if (headers != null) {
+        var arr = headers.trim().split(/[\\r\\n]+/);
+        arr.forEach(function (line) {
+          var parts = line.split(': ');
+          var header = parts.shift();
+          var value = parts.join(': ');
+          responseHeaders[header] = value;
+        });
+      }
+      var ajaxRequest = {
+        method: this._flutter_inappbrowser_method,
+        url: this._flutter_inappbrowser_url,
+        isAsync: this._flutter_inappbrowser_isAsync,
+        user: this._flutter_inappbrowser_user,
+        password: this._flutter_inappbrowser_password,
+        withCredentials: this.withCredentials,
+        headers: this._flutter_inappbrowser_request_headers,
+        readyState: this.readyState,
+        status: this.status,
+        responseURL: this.responseURL,
+        responseType: this.responseType,
+        responseText: this.responseText,
+        statusText: this.statusText,
+        responseHeaders, responseHeaders,
+        event: {
+          type: e.type,
+          loaded: e.loaded,
+          lengthComputable: e.lengthComputable
+        }
+      };
+      window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgress', ajaxRequest).then(function(result) {
+        if (result != null) {
+          switch (result) {
+            case 0:
+              self.abort();
+              return;
+          };
+        }
+      });
+    }
+  };
+  ajax.prototype.send = function(data) {
+    var self = this;
+    if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
+      if (!this._flutter_inappbrowser_already_onreadystatechange_wrapped) {
+        this._flutter_inappbrowser_already_onreadystatechange_wrapped = true;
+        var onreadystatechange = this.onreadystatechange;
+        this.onreadystatechange = function() {
+          if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
+            var headers = this.getAllResponseHeaders();
+            var responseHeaders = {};
+            if (headers != null) {
+              var arr = headers.trim().split(/[\\r\\n]+/);
+              arr.forEach(function (line) {
+                var parts = line.split(': ');
+                var header = parts.shift();
+                var value = parts.join(': ');
+                responseHeaders[header] = value;
+              });
+            }
+            var ajaxRequest = {
+              method: this._flutter_inappbrowser_method,
+              url: this._flutter_inappbrowser_url,
+              isAsync: this._flutter_inappbrowser_isAsync,
+              user: this._flutter_inappbrowser_user,
+              password: this._flutter_inappbrowser_password,
+              withCredentials: this.withCredentials,
+              headers: this._flutter_inappbrowser_request_headers,
+              readyState: this.readyState,
+              status: this.status,
+              responseURL: this.responseURL,
+              responseType: this.responseType,
+              responseText: this.responseText,
+              statusText: this.statusText,
+              responseHeaders: responseHeaders
+            };
+            window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {
+              if (result != null) {
+                switch (result) {
+                  case 0:
+                    self.abort();
+                    return;
+                };
+              }
+              if (onreadystatechange != null) {
+                onreadystatechange();
+              }
+            });
+          } else if (onreadystatechange != null) {
+            onreadystatechange();
+          }
+        };
+      }
+      this.addEventListener('loadstart', handleEvent);
+      this.addEventListener('load', handleEvent);
+      this.addEventListener('loadend', handleEvent);
+      this.addEventListener('progress', handleEvent);
+      this.addEventListener('error', handleEvent);
+      this.addEventListener('abort', handleEvent);
+      var ajaxRequest = {
+        data: data,
+        method: this._flutter_inappbrowser_method,
+        url: this._flutter_inappbrowser_url,
+        isAsync: this._flutter_inappbrowser_isAsync,
+        user: this._flutter_inappbrowser_user,
+        password: this._flutter_inappbrowser_password,
+        withCredentials: this.withCredentials,
+        headers: this._flutter_inappbrowser_request_headers
+      };
+      window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {
+        if (result != null) {
+          switch (result.action) {
+            case 0:
+              self.abort();
+              return;
+          };
+          data = result.data;
+          self.withCredentials = result.withCredentials;
+          for (var header in result.headers) {
+            var value = result.headers[header];
+            self.setRequestHeader(header, value);
+          };
+          if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {
+            self.abort();
+            self.open(result.method, result.url, result.isAsync, result.user, result.password);
+            return;
+          }
+        }
+        send.call(self, data);
+      });
+    } else {
+      send.call(this, data);
+    }
+  };
+})(window.XMLHttpRequest);
+"""
+
+let variableForShouldInterceptFetchRequestsJS = "window._flutter_inappbrowser_useShouldInterceptFetchRequest"
+let enableVariableForShouldInterceptFetchRequestsJS = "\(variableForShouldInterceptFetchRequestsJS) = $PLACEHOLDER_VALUE;"
+
+let interceptFetchRequestsJS = """
+(function(fetch) {
+  if (fetch == null) {
+    return;
+  }
+  function convertHeadersToJson(headers) {
+    var headersObj = {};
+    for (var header of headers.keys()) {
+      var value = headers.get(header);
+      headersObj[header] = value;
+    }
+    return headersObj;
+  }
+  function convertJsonToHeaders(headersJson) {
+    return new Headers(headersJson);
+  }
+  function convertBodyToArray(body) {
+    return new Response(body).arrayBuffer().then(function(arrayBuffer) {
+      var arr = Array.from(new Uint8Array(arrayBuffer));
+      return arr;
+    })
+  }
+  function convertArrayIntBodyToUint8Array(arrayIntBody) {
+    return new Uint8Array(arrayIntBody);
+  }
+  function convertCredentialsToJson(credentials) {
+    var credentialsObj = {};
+    if (window.FederatedCredential != null && credentials instanceof FederatedCredential) {
+      credentialsObj.type = credentials.type;
+      credentialsObj.id = credentials.id;
+      credentialsObj.name = credentials.name;
+      credentialsObj.protocol = credentials.protocol;
+      credentialsObj.provider = credentials.provider;
+      credentialsObj.iconURL = credentials.iconURL;
+    } else if (window.PasswordCredential != null && credentials instanceof PasswordCredential) {
+      credentialsObj.type = credentials.type;
+      credentialsObj.id = credentials.id;
+      credentialsObj.name = credentials.name;
+      credentialsObj.password = credentials.password;
+      credentialsObj.iconURL = credentials.iconURL;
+    } else {
+      credentialsObj.type = 'default';
+      credentialsObj.value = credentials;
+    }
+  }
+  function convertJsonToCredential(credentialsJson) {
+    var credentials;
+    if (window.FederatedCredential != null && credentialsJson.type === 'federated') {
+      credentials = new FederatedCredential({
+        id: credentialsJson.id,
+        name: credentialsJson.name,
+        protocol: credentialsJson.protocol,
+        provider: credentialsJson.provider,
+        iconURL: credentialsJson.iconURL
+      });
+    } else if (window.PasswordCredential != null && credentialsJson.type === 'password') {
+      credentials = new PasswordCredential({
+        id: credentialsJson.id,
+        name: credentialsJson.name,
+        password: credentialsJson.password,
+        iconURL: credentialsJson.iconURL
+      });
+    } else {
+      credentials = credentialsJson;
+    }
+    return credentials;
+  }
+  window.fetch = async function(resource, init) {
+    if (window.\(variableForShouldInterceptFetchRequestsJS) == null || window.\(variableForShouldInterceptFetchRequestsJS) == true) {
+      var fetchRequest = {
+        url: null,
+        method: null,
+        headers: null,
+        body: null,
+        mode: null,
+        credentials: null,
+        cache: null,
+        redirect: null,
+        referrer: null,
+        referrerPolicy: null,
+        integrity: null,
+        keepalive: null
+      };
+      if (resource instanceof Request) {
+        fetchRequest.url = resource.url;
+        fetchRequest.method = resource.method;
+        fetchRequest.headers = resource.headers;
+        fetchRequest.body = resource.body;
+        fetchRequest.mode = resource.mode;
+        fetchRequest.credentials = resource.credentials;
+        fetchRequest.cache = resource.cache;
+        fetchRequest.redirect = resource.redirect;
+        fetchRequest.referrer = resource.referrer;
+        fetchRequest.referrerPolicy = resource.referrerPolicy;
+        fetchRequest.integrity = resource.integrity;
+        fetchRequest.keepalive = resource.keepalive;
+      } else {
+        fetchRequest.url = resource;
+        if (init != null) {
+          fetchRequest.method = init.method;
+          fetchRequest.headers = init.headers;
+          fetchRequest.body = init.body;
+          fetchRequest.mode = init.mode;
+          fetchRequest.credentials = init.credentials;
+          fetchRequest.cache = init.cache;
+          fetchRequest.redirect = init.redirect;
+          fetchRequest.referrer = init.referrer;
+          fetchRequest.referrerPolicy = init.referrerPolicy;
+          fetchRequest.integrity = init.integrity;
+          fetchRequest.keepalive = init.keepalive;
+        }
+      }
+      if (fetchRequest.headers instanceof Headers) {
+        fetchRequest.headers = convertHeadersToJson(fetchRequest.headers);
+      }
+      fetchRequest.credentials = convertCredentialsToJson(fetchRequest.credentials);
+      return convertBodyToArray(fetchRequest.body).then(function(body) {
+        fetchRequest.body = body;
+        return window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptFetchRequest', fetchRequest).then(function(result) {
+          if (result != null) {
+            switch (result.action) {
+              case 0:
+                var controller = new AbortController();
+                if (init != null) {
+                  init.signal = controller.signal;
+                } else {
+                  init = {
+                    signal: controller.signal
+                  };
+                }
+                controller.abort();
+                break;
+            }
+            var resultResource = (result.resource != null) ? result.resource : resource;
+            var resultInit = init;
+            if (result.init != null) {
+              resultInit.method = result.method;
+              resultInit.headers = convertJsonToHeaders(result.headers);
+              resultInit.body = convertArrayIntBodyToUint8Array(result.body);
+              resultInit.mode = result.mode;
+              resultInit.credentials = convertJsonToCredential(result.credentials);
+              resultInit.cache = result.cache;
+              resultInit.redirect = result.redirect;
+              resultInit.referrer = result.referrer;
+              resultInit.referrerPolicy = result.referrerPolicy;
+              resultInit.integrity = result.integrity;
+              resultInit.keepalive = result.keepalive;
+            }
+            return fetch(resultResource, resultInit);
+          }
+          return fetch(resource, init);
+        });
+      });
+    } else {
+      return fetch(resource, init);
+    }
+  };
+})(window.fetch);
+"""
+
+let interceptNavigationStateChangeJS = """
+(function(window, document, history) {
+  history.pushState = (function(f) {
+    return function pushState(){
+      var ret = f.apply(this, arguments);
+      window.dispatchEvent(new Event('pushstate'));
+      window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
+      return ret;
+    };
+  })(history.pushState);
+  history.replaceState = ( function(f) {
+    return function replaceState(){
+      var ret = f.apply(this, arguments);
+      window.dispatchEvent(new Event('replacestate'));
+      window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
+      return ret;
+    };
+  })(history.replaceState);
+  window.addEventListener('popstate',function() {
+    window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
+  });
+  window.addEventListener('_flutter_inappbrowser_locationchange', function() {
+    window.webkit.messageHandlers["onNavigationStateChange"].postMessage(JSON.stringify({
+      url: document.location.href
+    }));
+  });
+})(window, window.document, window.history);
 """
 
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler {
@@ -295,7 +675,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let jscriptWebkitTouchCallout = WKUserScript(source: "document.body.style.webkitTouchCallout='none';", injectionTime: .atDocumentEnd, forMainFrameOnly: true)
         configuration.userContentController.addUserScript(jscriptWebkitTouchCallout)
         
-        
         let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(consoleLogJSScript)
         configuration.userContentController.add(self, name: "consoleLog")
@@ -308,25 +687,63 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
         configuration.userContentController.add(self, name: "callHandler")
         
-        let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(resourceObserverJSScript)
-        configuration.userContentController.add(self, name: "resourceLoaded")
+        if (options?.useOnLoadResource)! {
+            let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(resourceObserverJSScript)
+        }
         
         let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(findTextHighlightJSScript)
-        configuration.userContentController.add(self, name: "findResultReceived")
+        configuration.userContentController.add(self, name: "onFindResultReceived")
         
-        //keyboardDisplayRequiresUserAction = browserOptions?.keyboardDisplayRequiresUserAction
+        let interceptNavigationStateChangeJSScript = WKUserScript(source: interceptNavigationStateChangeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(interceptNavigationStateChangeJSScript)
+        configuration.userContentController.add(self, name: "onNavigationStateChange")
+        
+        
+        if (options?.useShouldInterceptAjaxRequest)! {
+            let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
+        }
+        
+        if (options?.useShouldInterceptFetchRequest)! {
+            let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
+        }
+        
+        if #available(iOS 9.0, *) {
+            if ((options?.incognito)!) {
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            } else if ((options?.cacheEnabled)!) {
+                configuration.websiteDataStore = WKWebsiteDataStore.default()
+            }
+        }
+        
+        if #available(iOS 11.0, *) {
+            if((options?.sharedCookiesEnabled)!) {
+                // More info to sending cookies with WKWebView
+                // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+                // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+                // See also https://forums.developer.apple.com/thread/97194
+                // check if websiteDataStore has not been initialized before
+                if(!(options?.incognito)! && !(options?.cacheEnabled)!) {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
+                }
+            }
+        }
         
         configuration.suppressesIncrementalRendering = (options?.suppressesIncrementalRendering)!
         allowsBackForwardNavigationGestures = (options?.allowsBackForwardNavigationGestures)!
         if #available(iOS 9.0, *) {
             allowsLinkPreview = (options?.allowsLinkPreview)!
             configuration.allowsPictureInPictureMediaPlayback = (options?.allowsPictureInPictureMediaPlayback)!
-            if ((options?.applicationNameForUserAgent)! != "") {
+            if (options?.applicationNameForUserAgent != nil && (options?.applicationNameForUserAgent)! != "") {
                 configuration.applicationNameForUserAgent = (options?.applicationNameForUserAgent)!
             }
-            if ((options?.userAgent)! != "") {
+            if (options?.userAgent != nil && (options?.userAgent)! != "") {
                 customUserAgent = (options?.userAgent)!
             }
         }
@@ -423,7 +840,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?,
                                change: [NSKeyValueChangeKey : Any]?, context: UnsafeMutableRawPointer?) {
-        if keyPath == "estimatedProgress" {
+        if keyPath == #keyPath(WKWebView.estimatedProgress) {
             let progress = Int(estimatedProgress * 100)
             onProgressChanged(progress: progress)
         }
@@ -543,9 +960,43 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
+        if #available(iOS 9.0, *) {
+            if (newOptionsMap["incognito"] != nil && options?.incognito != newOptions.incognito && newOptions.incognito) {
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            } else if (newOptionsMap["cacheEnabled"] != nil && options?.cacheEnabled != newOptions.cacheEnabled && newOptions.cacheEnabled) {
+                configuration.websiteDataStore = WKWebsiteDataStore.default()
+            }
+        }
+        
+        if #available(iOS 11.0, *) {
+            if (newOptionsMap["sharedCookiesEnabled"] != nil && options?.sharedCookiesEnabled != newOptions.sharedCookiesEnabled && newOptions.sharedCookiesEnabled) {
+                if(!newOptions.incognito && !newOptions.cacheEnabled) {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
+                }
+            }
+        }
+        
         if newOptionsMap["enableViewportScale"] != nil && options?.enableViewportScale != newOptions.enableViewportScale && newOptions.enableViewportScale {
             let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
             evaluateJavaScript(jscript, completionHandler: nil)
+        }
+        
+        if newOptionsMap["useOnLoadResource"] != nil && options?.useOnLoadResource != newOptions.useOnLoadResource && newOptions.useOnLoadResource {
+            let placeholderValue = newOptions.useOnLoadResource ? "true" : "false"
+            evaluateJavaScript(enableVariableForOnLoadResourceJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue), completionHandler: nil)
+        }
+        
+        if newOptionsMap["useShouldInterceptAjaxRequest"] != nil && options?.useShouldInterceptAjaxRequest != newOptions.useShouldInterceptAjaxRequest && newOptions.useShouldInterceptAjaxRequest {
+            let placeholderValue = newOptions.useShouldInterceptAjaxRequest ? "true" : "false"
+            evaluateJavaScript(enableVariableForShouldInterceptAjaxRequestJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue), completionHandler: nil)
+        }
+        
+        if newOptionsMap["useShouldInterceptFetchRequest"] != nil && options?.useShouldInterceptFetchRequest != newOptions.useShouldInterceptFetchRequest && newOptions.useShouldInterceptFetchRequest {
+            let placeholderValue = newOptions.useShouldInterceptFetchRequest ? "true" : "false"
+            evaluateJavaScript(enableVariableForShouldInterceptFetchRequestsJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue), completionHandler: nil)
         }
         
         if newOptionsMap["mediaPlaybackRequiresUserGesture"] != nil && options?.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture {
@@ -560,10 +1011,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if newOptionsMap["allowsInlineMediaPlayback"] != nil && options?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
             configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
         }
-        
-        //        if newOptionsMap["keyboardDisplayRequiresUserAction"] != nil && browserOptions?.keyboardDisplayRequiresUserAction != newOptions.keyboardDisplayRequiresUserAction {
-        //            self.webView.keyboardDisplayRequiresUserAction = newOptions.keyboardDisplayRequiresUserAction
-        //        }
         
         if newOptionsMap["suppressesIncrementalRendering"] != nil && options?.suppressesIncrementalRendering != newOptions.suppressesIncrementalRendering {
             configuration.suppressesIncrementalRendering = newOptions.suppressesIncrementalRendering
@@ -734,22 +1181,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func injectScriptCode(source: String, result: FlutterResult?) {
+    public func evaluateJavascript(source: String, result: FlutterResult?) {
         let jsWrapper = "(function(){return JSON.stringify(eval(%@));})();"
         injectDeferredObject(source: source, withWrapper: jsWrapper, result: result)
     }
     
-    public func injectScriptFile(urlFile: String) {
+    public func injectJavascriptFileFromUrl(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
         injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectStyleCode(source: String) {
+    public func injectCSSCode(source: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
         injectDeferredObject(source: source, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectStyleFile(urlFile: String) {
+    public func injectCSSFileFromUrl(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
         injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
     }
@@ -1333,21 +1780,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func onLoadResource(initiatorType: String, url: String, startTime: Double, duration: Double) {
-        var arguments: [String : Any] = [
-            "initiatorType": initiatorType,
-            "url": url,
-            "startTime": startTime,
-            "duration": duration
-        ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadResource", arguments: arguments)
-        }
-    }
-    
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         var arguments: [String : Any] = [
             "activeMatchOrdinal": activeMatchOrdinal,
@@ -1359,6 +1791,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         if let channel = getChannel() {
             channel.invokeMethod("onFindResultReceived", arguments: arguments)
+        }
+    }
+    
+    public func onNavigationStateChange(url: String) {
+        var arguments: [String : Any] = [
+            "url": url
+        ]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onNavigationStateChange", arguments: arguments)
         }
     }
     
@@ -1561,29 +2005,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             onConsoleMessage(sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
         }
-        else if message.name == "resourceLoaded" && (options?.useOnLoadResource)! {
-            if let resource = convertToDictionary(text: message.body as! String) {
-                // escape special chars
-                let resourceName = (resource["name"] as! String).addingPercentEncoding(withAllowedCharacters:NSCharacterSet.urlQueryAllowed)
-                
-                let url = URL(string: resourceName!)!
-                if !UIApplication.shared.canOpenURL(url) {
-                    return
-                }
-                let initiatorType = resource["initiatorType"] as! String
-                let startTime = resource["startTime"] as! Double
-                let duration = resource["duration"] as! Double
-                
-                self.onLoadResource(initiatorType: initiatorType, url: url.absoluteString, startTime: startTime, duration: duration)
-            }
-        }
         else if message.name == "callHandler" {
             let body = message.body as! [String: Any]
             let handlerName = body["handlerName"] as! String
             let _callHandlerID = body["_callHandlerID"] as! Int64
             let args = body["args"] as! String
             onCallJsHandler(handlerName: handlerName, _callHandlerID: _callHandlerID, args: args)
-        } else if message.name == "findResultReceived" {
+        } else if message.name == "onFindResultReceived" {
             if let resource = convertToDictionary(text: message.body as! String) {
                 let activeMatchOrdinal = resource["activeMatchOrdinal"] as! Int
                 let numberOfMatches = resource["numberOfMatches"] as! Int
@@ -1591,6 +2019,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 
                 self.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
             }
+        } else if message.name == "onNavigationStateChange" {
+            if let resource = convertToDictionary(text: message.body as! String) {
+                let url = resource["url"] as! String
+                
+                self.onNavigationStateChange(url: url)
+            }
+           
         }
     }
     
@@ -1609,5 +2044,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 
     func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
         evaluateJavaScript("wkwebview_ClearMatches();", completionHandler: completionHandler)
+    }
+    
+    public override func removeFromSuperview() {
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleError")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleInfo")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn")
+        configuration.userContentController.removeScriptMessageHandler(forName: "callHandler")
+        configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
+        configuration.userContentController.removeScriptMessageHandler(forName: "onNavigationStateChange")
+        configuration.userContentController.removeAllUserScripts()
+        removeObserver(self, forKeyPath: "estimatedProgress")
+        super.removeFromSuperview()
+        uiDelegate = nil
+        navigationDelegate = nil
+        scrollView.delegate = nil
+        IAWController?.channel?.setMethodCallHandler(nil)
+        IABController?.webView = nil
+        IAWController?.webView = nil
     }
 }

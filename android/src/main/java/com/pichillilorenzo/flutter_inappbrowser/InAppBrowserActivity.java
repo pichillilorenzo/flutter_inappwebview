@@ -434,26 +434,26 @@ public class InAppBrowserActivity extends AppCompatActivity {
     return optionsMap;
   }
 
-  public void injectScriptCode(String source, MethodChannel.Result result) {
+  public void evaluateJavascript(String source, MethodChannel.Result result) {
     if (webView != null)
-      webView.injectScriptCode(source, result);
+      webView.evaluateJavascript(source, result);
     else
       result.success("");
   }
 
-  public void injectScriptFile(String urlFile) {
+  public void injectJavascriptFileFromUrl(String urlFile) {
     if (webView != null)
-      webView.injectScriptFile(urlFile);
+      webView.injectJavascriptFileFromUrl(urlFile);
   }
 
-  public void injectStyleCode(String source) {
+  public void injectCSSCode(String source) {
     if (webView != null)
-      webView.injectStyleCode(source);
+      webView.injectCSSCode(source);
   }
 
-  public void injectStyleFile(String urlFile) {
+  public void injectCSSFileFromUrl(String urlFile) {
     if (webView != null)
-      webView.injectStyleFile(urlFile);
+      webView.injectCSSFileFromUrl(urlFile);
   }
 
   public HashMap<String, Object> getCopyBackForwardList() {

@@ -1,12 +1,14 @@
 // Example of the server https is taken from here: https://engineering.circle.com/https-authorized-certs-with-node-js-315e548354a2
 // Conversion of client1-crt.pem to certificate.pfx: https://stackoverflow.com/a/38408666/4637638
 const express = require('express')
-var https = require('https')
+const https = require('https')
+const cors = require('cors')
 const auth = require('basic-auth')
 const app = express()
 const appHttps = express()
 const appAuthBasic = express()
 const fs = require('fs')
+const path = require('path')
 
 var options = { 
   key: fs.readFileSync('server-key.pem'), 
@@ -17,6 +19,7 @@ var options = {
 };
 
 appHttps.get('/', (req, res) => {
+  console.log(JSON.stringify(req.headers))
 	const cert = req.connection.getPeerCertificate()
 
 // The `req.client.authorized` flag will be true if the certificate is valid and was issued by a CA we white-listed
@@ -48,7 +51,8 @@ appHttps.get('/', (req, res) => {
 })
 
 appHttps.get('/fakeResource', (req, res) => {
-    res.set("Content-Type", "text/javascript")
+  console.log(JSON.stringify(req.headers))
+  res.set("Content-Type", "text/javascript")
 	res.send(`alert("HI");`)
 	res.end()
 })
@@ -70,6 +74,7 @@ appAuthBasic.use((req, res, next) => {
 })
 
 appAuthBasic.get("/", (req, res) => {
+  console.log(JSON.stringify(req.headers))
   res.send(`
     <html>
       <head>
@@ -87,10 +92,13 @@ appAuthBasic.listen(8081)
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded());
 
+app.use(cors());
+
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
 
 app.get("/", (req, res) => {
+  console.log(JSON.stringify(req.headers))
   res.send(`
     <html>
       <head>
@@ -104,6 +112,7 @@ app.get("/", (req, res) => {
 })
 
 app.post("/test-post", (req, res) => {
+  console.log(JSON.stringify(req.headers))
   res.send(`
     <html>
       <head>
@@ -115,4 +124,27 @@ app.post("/test-post", (req, res) => {
   `);
   res.end()
 })
+
+app.post("/test-ajax-post", (req, res) => {
+  console.log(JSON.stringify(req.headers))
+  res.set("Content-Type", "application/json")
+  res.send(JSON.stringify({
+    "name": req.body.name,
+    "key2": "value2"
+  }))
+  res.end()
+})
+
+app.get("/test-download-file", (req, res) => {
+  console.log(JSON.stringify(req.headers))
+  const filePath = path.join(__dirname, 'assets', 'flutter_logo.png');
+  const stat = fs.statSync(filePath);
+  const file = fs.readFileSync(filePath, 'binary');
+  res.setHeader('Content-Length', stat.size);
+  res.setHeader('Content-Type', 'image/png');
+  res.setHeader('Content-Disposition', 'attachment; filename=flutter_logo.png');
+  res.write(file, 'binary');
+  res.end();
+})
+
 app.listen(8082)

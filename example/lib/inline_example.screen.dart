@@ -96,8 +96,10 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 //clearCache: true,
                 useShouldOverrideUrlLoading: true,
                 useOnTargetBlank: true,
-                //useOnLoadResource: true,
+                useOnLoadResource: true,
                 useOnDownloadStart: true,
+                useShouldInterceptAjaxRequest: true,
+                useShouldInterceptFetchRequest: true,
                 //preferredContentMode: InAppWebViewUserPreferredContentMode.DESKTOP,
                 resourceCustomSchemes: ["my-special-custom-scheme"],
                 contentBlockers: [
@@ -111,7 +113,6 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 ),
               androidInAppWebViewOptions: AndroidInAppWebViewOptions(
                 databaseEnabled: true,
-                appCacheEnabled: true,
                 domStorageEnabled: true,
                 geolocationEnabled: true,
                 //safeBrowsingEnabled: true,
@@ -285,6 +286,36 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             onFindResultReceived: (InAppWebViewController controller, int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) async {
               print("Current highlighted: $activeMatchOrdinal, Number of matches found: $numberOfMatches, find operation completed: $isDoneCounting");
+            },
+            shouldInterceptAjaxRequest: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
+              //print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
+//              ajaxRequest.method = "GET";
+//              ajaxRequest.url = "http://192.168.1.20:8082/test-download-file";
+//              ajaxRequest.headers = {
+//                "Custom-Header": "Custom-Value"
+//              };
+//              return ajaxRequest;
+              return null;
+            },
+            onAjaxReadyStateChange: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
+              //print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.responseHeaders}");
+              return AjaxRequestAction.PROCEED;
+            },
+            onAjaxProgress: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
+              //print("AJAX EVENT: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.event.type}, LOADED: ${ajaxRequest.event.loaded}, ${ajaxRequest.responseHeaders}");
+              return AjaxRequestAction.PROCEED;
+            },
+            shouldInterceptFetchRequest: (InAppWebViewController controller, FetchRequest fetchRequest) async {
+              print("FETCH REQUEST: ${fetchRequest.method} - ${fetchRequest.url}, headers: ${fetchRequest.headers}");
+              fetchRequest.action = FetchRequestAction.ABORT;
+              print(fetchRequest.body);
+              return fetchRequest;
+            },
+            onNavigationStateChange: (InAppWebViewController controller, String url) async {
+              print("NAVIGATION STATE CHANGE: ${url}");
+              setState(() {
+                this.url = url;
+              });
             },
           ),
         ),

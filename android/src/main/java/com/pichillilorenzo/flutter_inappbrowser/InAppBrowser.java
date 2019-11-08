@@ -192,23 +192,23 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
       case "close":
         close(activity, uuid, result);
         break;
-      case "injectScriptCode":
+      case "evaluateJavascript":
         source = (String) call.argument("source");
-        injectScriptCode(uuid, source, result);
+        evaluateJavascript(uuid, source, result);
         break;
-      case "injectScriptFile":
+      case "injectJavascriptFileFromUrl":
         urlFile = (String) call.argument("urlFile");
-        injectScriptFile(uuid, urlFile);
+        injectJavascriptFileFromUrl(uuid, urlFile);
         result.success(true);
         break;
-      case "injectStyleCode":
+      case "injectCSSCode":
         source = (String) call.argument("source");
-        injectStyleCode(uuid, source);
+        injectCSSCode(uuid, source);
         result.success(true);
         break;
-      case "injectStyleFile":
+      case "injectCSSFileFromUrl":
         urlFile = (String) call.argument("urlFile");
-        injectStyleFile(uuid, urlFile);
+        injectCSSFileFromUrl(uuid, urlFile);
         result.success(true);
         break;
       case "show":
@@ -314,33 +314,33 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
 
   }
 
-  private void injectScriptCode(String uuid, String source, final Result result) {
+  private void evaluateJavascript(String uuid, String source, final Result result) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
-      inAppBrowserActivity.injectScriptCode(source, result);
+      inAppBrowserActivity.evaluateJavascript(source, result);
     } else {
       Log.d(LOG_TAG, "webView is null");
     }
   }
 
-  private void injectScriptFile(String uuid, String urlFile) {
+  private void injectJavascriptFileFromUrl(String uuid, String urlFile) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
-      inAppBrowserActivity.injectScriptFile(urlFile);
+      inAppBrowserActivity.injectJavascriptFileFromUrl(urlFile);
     }
   }
 
-  private void injectStyleCode(String uuid, String source) {
+  private void injectCSSCode(String uuid, String source) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
-      inAppBrowserActivity.injectStyleCode(source);
+      inAppBrowserActivity.injectCSSCode(source);
     }
   }
 
-  private void injectStyleFile(String uuid, String urlFile) {
+  private void injectCSSFileFromUrl(String uuid, String urlFile) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
-      inAppBrowserActivity.injectStyleFile(urlFile);
+      inAppBrowserActivity.injectCSSFileFromUrl(urlFile);
     }
   }
 

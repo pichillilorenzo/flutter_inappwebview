@@ -31,6 +31,11 @@
                 <option value="1">option 1</option>
                 <option value="2">option 2</option>
             </select>
+            <input type="file">
+            <input type="file" accept="image/*" capture>
+            <button onclick="testHistoryPush1()">History Push 1</button>
+            <button onclick="testHistoryPush2()">History Push 2</button>
+            <button onclick="testLocationHref()">Location Href</button>
             <p>
                 <img src="https://via.placeholder.com/100x50" alt="placeholder 100x50">
             </p>
@@ -51,27 +56,82 @@
     </div>
 
     <script>
+
+        var state = { 'page_id': 1, 'user_id': 5 };
+        function testHistoryPush1() {
+            var randomNumber = 100 * Math.random();
+            var title = 'Hello World ' + randomNumber;
+            var url = 'hello-foo-' + randomNumber + '.html';
+            history.pushState(state, title, url);
+        }
+
+        function testHistoryPush2() {
+            var randomNumber = 100 * Math.random();
+            var title = 'Hello World ' + randomNumber;
+            var url = 'hello-bar-' + randomNumber + '.html';
+            history.replaceState(state, title, url);
+        }
+
+        function testLocationHref() {
+            var randomNumber = 100 * Math.random();
+            window.location = "#foo-" + randomNumber;
+        }
+
         window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
             console.log("ready");
 
             window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
-                console.log(result, typeof result);
-                console.log(JSON.stringify(result), result.bar);
+                //console.log(result, typeof result);
+                //console.log(JSON.stringify(result), result.bar);
             });
 
             window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
-                console.log(result, typeof result);
-                console.log(JSON.stringify(result));
+                //console.log(result, typeof result);
+                //console.log(JSON.stringify(result));
             });
         });
         $(document).ready(function() {
+
+            console.log("jQuery ready");
+
+            var xhttp = new XMLHttpRequest();
+            xhttp.addEventListener("load", function() {
+              console.log(this.responseText);
+            });
+            xhttp.open("POST", "http://192.168.1.20:8082/test-ajax-post");
+            xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
+            xhttp.send("name=Lorenzo");
+
+            var xhttp2 = new XMLHttpRequest();
+            xhttp2.open("GET", "http://192.168.1.20:8082/test-download-file");
+            xhttp2.send();
+
+            fetch(new Request("http://192.168.1.20:8082/test-download-file")).then(function(response) {
+                console.log(response);
+            }).catch(function(error) {
+                console.error("ERROR: " + error);
+            });
+
+            fetch("http://192.168.1.20:8082/test-ajax-post", {
+                method: 'POST',
+                body: JSON.stringify({
+                    name: 'Lorenzo Fetch API'
+                }),
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            }).then(function(response) {
+                console.log(response);
+            }).catch(function(error) {
+                console.error("ERROR: " + error);
+            });
+
             /*
             alert("Alert Popup");
             console.log(confirm("Press a button!"));
             console.log(prompt("Please enter your name", "Lorenzo"));
             */
 
-            console.log("jQuery ready");
             /*
             if ("geolocation" in navigator) {
                 console.log("Geolocation API enabled");

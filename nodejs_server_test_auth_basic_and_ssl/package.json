@@ -10,6 +10,7 @@
   "license": "ISC",
   "dependencies": {
     "basic-auth": "latest",
+    "cors": "^2.8.5",
     "express": "latest",
     "https": "latest"
   }

@@ -8,6 +8,8 @@
 - Merge "Fix abstract method error && swift version error" [#155](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/155) (thanks to [AlexVincent525](https://github.com/AlexVincent525))
 - Merge "migrating to swift 5.0" [#162](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/162) (thanks to [fattiger00](https://github.com/fattiger00))
 - Merge "Update readme example" [#178](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/178) (thanks to [SebastienBtr](https://github.com/SebastienBtr))
+- Merge "handle choose file callback in android" [#183](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/183) (thanks to [crazecoder](https://github.com/crazecoder))
+- Merge "add initialScale in android" [#186](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/186) (thanks to [crazecoder](https://github.com/crazecoder))
 - Added `horizontalScrollBarEnabled` and `verticalScrollBarEnabled` options to enable/disable the corresponding scrollbar of the WebView [#165](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/165)
 - Added `onDownloadStart` event and `useOnDownloadStart` option: event fires when the WebView recognizes and starts a downloadable file.
 - Added `onLoadResourceCustomScheme` event and `resourceCustomSchemes` option to set custom schemes that WebView must handle to load resources

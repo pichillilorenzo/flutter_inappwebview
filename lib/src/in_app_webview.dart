@@ -41,7 +41,7 @@ const javaScriptHandlerForbiddenNames = ["onLoadResource", "shouldInterceptAjaxR
 ///  - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
 ///  - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
 ///  - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
-///  - __databaseEnabled__: Set to `true` if you want injectScriptFilethe database storage API is enabled. The default value is `false`.
+///  - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
 ///  - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
 ///  - __useWideViewPort__: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport. When the value of the setting is false, the layout width is always set to the width of the WebView control in device-independent (CSS) pixels. When the value is true and the page contains the viewport meta tag, the value of the width specified in the tag is used. If the page does not contain the tag or does not provide a width, then a wide viewport will be used. The default value is `true`.
 ///  - __safeBrowsingEnabled__: Set to `true` if you want the Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links. The default value is `true`.
@@ -81,14 +81,12 @@ class InAppWebView extends StatefulWidget {
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldOverrideUrlLoading] option to `true`.
   final void Function(InAppWebViewController controller, String url) shouldOverrideUrlLoading;
 
   ///Event fires when the [InAppWebView] loads a resource.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
-  ///
-  ///**NOTE only for Android**: to be able to listen this event, you need also the enable javascript.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnLoadResource] and [InAppWebViewOptions.javaScriptEnabled] options to `true`.
   final void Function(InAppWebViewController controller, LoadedResource resource) onLoadResource;
 
   ///Event fires when the [InAppWebView] scrolls.
@@ -101,6 +99,8 @@ class InAppWebView extends StatefulWidget {
   ///Event fires when [InAppWebView] recognizes and starts a downloadable file.
   ///
   ///[url] represents the url of the file.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnDownloadStart] option to `true`.
   final void Function(InAppWebViewController controller, String url) onDownloadStart;
 
   ///Event fires when the [InAppWebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
@@ -113,6 +113,8 @@ class InAppWebView extends StatefulWidget {
   ///Event fires when the [InAppWebView] tries to open a link with `target="_blank"`.
   ///
   ///[url] represents the url of the link.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnTargetBlank] option to `true`.
   final void Function(InAppWebViewController controller, String url) onTargetBlank;
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
@@ -154,15 +156,23 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE**: available only for Android.
   final Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType) onSafeBrowsingHit;
 
-  ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
+  ///Event fires when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
-  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [HttpAuthChallenge].
   final Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge) onReceivedHttpAuthRequest;
 
+  ///Event fires when the WebView need to perform server trust authentication (certificate validation).
+  ///The host application must return either [ServerTrustAuthResponse.CANCEL] or [ServerTrustAuthResponse.PROCEED].
   ///
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
   final Future<ServerTrustAuthResponse> Function(InAppWebViewController controller, ServerTrustChallenge challenge) onReceivedServerTrustAuthRequest;
 
+  ///Notify the host application to handle a SSL client certificate request.
+  ///Webview stores the response in memory (for the life of the application) if [ClientCertResponseAction.PROCEED] or [ClientCertResponseAction.CANCEL]
+  ///is called and does not call [onReceivedClientCertRequest] again for the same host and port pair.
+  ///Note that, multiple layers in chromium network stack might be caching the responses.
   ///
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ClientCertChallenge].
   final Future<ClientCertResponse> Function(InAppWebViewController controller, ClientCertChallenge challenge) onReceivedClientCertRequest;
 
   ///Event fired as find-on-page operations progress.
@@ -175,16 +185,36 @@ class InAppWebView extends StatefulWidget {
   ///[isDoneCounting] whether the find operation has actually completed.
   final void Function(InAppWebViewController controller, int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) onFindResultReceived;
 
+  ///Event fired when an `XMLHttpRequest` is sent to a server.
+  ///It gives the host application a chance to take control over the request before sending it.
   ///
+  ///[ajaxRequest] represents the `XMLHttpRequest`.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
   final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) shouldInterceptAjaxRequest;
 
+  ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
+  ///It gives the host application a chance to abort the request.
   ///
+  ///[ajaxRequest] represents the [XMLHttpRequest].
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
 
+  ///Event fired as an `XMLHttpRequest` progress.
+  ///It gives the host application a chance to abort the request.
   ///
+  ///[ajaxRequest] represents the [XMLHttpRequest].
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgress;
 
+  ///Event fired when an request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
+  ///It gives the host application a chance to take control over the request before sending it.
   ///
+  ///[fetchRequest] represents a resource request.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptFetchRequest] option to `true`.
   final Future<FetchRequest> Function(InAppWebViewController controller, FetchRequest fetchRequest) shouldInterceptFetchRequest;
 
   ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of

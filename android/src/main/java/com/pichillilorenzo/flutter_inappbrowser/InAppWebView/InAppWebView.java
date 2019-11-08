@@ -560,9 +560,7 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
     settings.setMinimumFontSize(options.minimumFontSize);
     settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
-    if(options.initialScale != null)
-        setInitialScale(options.initialScale);
-
+    setInitialScale(options.initialScale);
     settings.setNeedInitialFocus(options.needInitialFocus);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
       settings.setOffscreenPreRaster(options.offscreenPreRaster);
@@ -575,9 +573,8 @@ final public class InAppWebView extends InputAwareWebView {
           setDesktopMode(true);
           break;
         case MOBILE:
-          setDesktopMode(false);
-          break;
         case RECOMMENDED:
+          setDesktopMode(false);
           break;
       }
     }
@@ -984,6 +981,18 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("standardFontFamily") != null && !options.standardFontFamily.equals(newOptions.standardFontFamily))
       settings.setStandardFontFamily(newOptions.standardFontFamily);
+
+    if (newOptionsMap.get("preferredContentMode") != null && !options.preferredContentMode.equals(newOptions.preferredContentMode)) {
+      switch (fromValue(newOptions.preferredContentMode)) {
+        case DESKTOP:
+          setDesktopMode(true);
+          break;
+        case MOBILE:
+        case RECOMMENDED:
+          setDesktopMode(false);
+          break;
+      }
+    }
 
     if (newOptionsMap.get("saveFormData") != null && options.saveFormData != newOptions.saveFormData)
       settings.setSaveFormData(newOptions.saveFormData);

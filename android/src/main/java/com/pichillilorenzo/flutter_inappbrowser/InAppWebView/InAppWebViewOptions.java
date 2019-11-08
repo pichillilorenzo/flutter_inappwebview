@@ -23,7 +23,6 @@ public class InAppWebViewOptions extends Options {
   public Boolean debuggingEnabled = false;
   public Boolean javaScriptCanOpenWindowsAutomatically = false;
   public Boolean mediaPlaybackRequiresUserGesture = true;
-  public Integer textZoom = 100;
   public Integer minimumFontSize = 8;
   public Boolean verticalScrollBarEnabled = true;
   public Boolean horizontalScrollBarEnabled = true;
@@ -36,6 +35,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean cacheEnabled = true;
   public Boolean transparentBackground = false;
 
+  public Integer textZoom = 100;
   public Boolean clearSessionCache = false;
   public Boolean builtInZoomControls = false;
   public Boolean displayZoomControls = false;
@@ -66,7 +66,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean loadWithOverviewMode = true;
   public Boolean loadsImagesAutomatically = true;
   public Integer minimumLogicalFontSize = 8;
-  public Integer initialScale;
+  public Integer initialScale = 0;
   public Boolean needInitialFocus = true;
   public Boolean offscreenPreRaster = false;
   public String sansSerifFontFamily = "sans-serif";

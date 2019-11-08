@@ -362,14 +362,14 @@ class InAppBrowser {
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set `useShouldOverrideUrlLoading` option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldOverrideUrlLoading] option to `true`.
   void shouldOverrideUrlLoading(String url) {
 
   }
 
   ///Event fires when the [InAppBrowser] webview loads a resource.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set `useOnLoadResource` option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnLoadResource] and [InAppWebViewOptions.javaScriptEnabled] options to `true`.
   void onLoadResource(LoadedResource resource) {
 
   }
@@ -386,6 +386,8 @@ class InAppBrowser {
   ///Event fires when [InAppBrowser] recognizes and starts a downloadable file.
   ///
   ///[url] represents the url of the file.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnDownloadStart] option to `true`.
   void onDownloadStart(String url) {
 
   }
@@ -402,6 +404,8 @@ class InAppBrowser {
   ///Event fires when the [InAppBrowser] webview tries to open a link with `target="_blank"`.
   ///
   ///[url] represents the url of the link.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnTargetBlank] option to `true`.
   void onTargetBlank(String url) {
 
   }
@@ -454,19 +458,27 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when a WebView received an HTTP authentication request. The default behavior is to cancel the request.
+  ///Event fires when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
-  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the auth challenge.
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [HttpAuthChallenge].
   Future<HttpAuthResponse> onReceivedHttpAuthRequest(HttpAuthChallenge challenge) {
 
   }
 
+  ///Event fires when the WebView need to perform server trust authentication (certificate validation).
+  ///The host application must return either [ServerTrustAuthResponse.CANCEL] or [ServerTrustAuthResponse.PROCEED].
   ///
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
   Future<ServerTrustAuthResponse> onReceivedServerTrustAuthRequest(ServerTrustChallenge challenge) {
 
   }
 
+  ///Notify the host application to handle a SSL client certificate request.
+  ///Webview stores the response in memory (for the life of the application) if [ClientCertResponseAction.PROCEED] or [ClientCertResponseAction.CANCEL]
+  ///is called and does not call [onReceivedClientCertRequest] again for the same host and port pair.
+  ///Note that, multiple layers in chromium network stack might be caching the responses.
   ///
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ClientCertChallenge].
   Future<ClientCertResponse> onReceivedClientCertRequest(ClientCertChallenge challenge) {
 
   }
@@ -483,22 +495,42 @@ class InAppBrowser {
 
   }
 
+  ///Event fired when an `XMLHttpRequest` is sent to a server.
+  ///It gives the host application a chance to take control over the request before sending it.
   ///
+  ///[ajaxRequest] represents the `XMLHttpRequest`.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
   Future<AjaxRequest> shouldInterceptAjaxRequest(AjaxRequest ajaxRequest) {
 
   }
 
+  ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
+  ///It gives the host application a chance to abort the request.
   ///
+  ///[ajaxRequest] represents the [XMLHttpRequest].
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
   Future<AjaxRequestAction> onAjaxReadyStateChange(AjaxRequest ajaxRequest) {
 
   }
 
+  ///Event fired as an `XMLHttpRequest` progress.
+  ///It gives the host application a chance to abort the request.
   ///
+  ///[ajaxRequest] represents the [XMLHttpRequest].
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
   Future<AjaxRequestAction> onAjaxProgress(AjaxRequest ajaxRequest) {
 
-}
+  }
 
+  ///Event fired when an request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
+  ///It gives the host application a chance to take control over the request before sending it.
   ///
+  ///[fetchRequest] represents a resource request.
+  ///
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptFetchRequest] option to `true`.
   Future<FetchRequest> shouldInterceptFetchRequest(FetchRequest fetchRequest) {
 
   }

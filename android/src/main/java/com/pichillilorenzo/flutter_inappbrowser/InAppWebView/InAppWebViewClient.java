@@ -32,6 +32,8 @@ import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateEncodingException;
@@ -563,14 +565,21 @@ public class InAppWebViewClient extends WebViewClient {
     });
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   @Override
-  public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+  public WebResourceResponse shouldInterceptRequest(WebView view, final String url) {
 
     final InAppWebView webView = (InAppWebView) view;
 
-    final String url = request.getUrl().toString();
-    String scheme = request.getUrl().getScheme();
+    URI uri;
+    try {
+      uri = new URI(url);
+    } catch (URISyntaxException e) {
+      e.printStackTrace();
+      Log.e(LOG_TAG, e.getMessage());
+      return null;
+    }
+
+    String scheme = uri.getScheme();
 
     if (webView.options.resourceCustomSchemes != null && webView.options.resourceCustomSchemes.contains(scheme)) {
       final Map<String, Object> obj = new HashMap<>();
@@ -617,6 +626,13 @@ public class InAppWebViewClient extends WebViewClient {
       }
     }
     return response;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  @Override
+  public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
+    String url = request.getUrl().toString();
+    return shouldInterceptRequest(view, url);
   }
 
   private MethodChannel getChannel() {

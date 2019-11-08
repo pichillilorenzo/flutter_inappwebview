@@ -560,6 +560,9 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
     settings.setMinimumFontSize(options.minimumFontSize);
     settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
+    if(options.initialScale != null)
+        setInitialScale(options.initialScale);
+
     settings.setNeedInitialFocus(options.needInitialFocus);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
       settings.setOffscreenPreRaster(options.offscreenPreRaster);
@@ -962,6 +965,9 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("minimumLogicalFontSize") != null && !options.minimumLogicalFontSize.equals(newOptions.minimumLogicalFontSize))
       settings.setMinimumLogicalFontSize(newOptions.minimumLogicalFontSize);
+
+    if (newOptionsMap.get("initialScale") != null && !options.initialScale.equals(newOptions.initialScale))
+        setInitialScale(newOptions.initialScale);
 
     if (newOptionsMap.get("needInitialFocus") != null && options.needInitialFocus != newOptions.needInitialFocus)
       settings.setNeedInitialFocus(newOptions.needInitialFocus);

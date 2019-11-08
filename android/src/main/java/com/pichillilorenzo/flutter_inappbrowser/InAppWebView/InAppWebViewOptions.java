@@ -66,6 +66,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean loadWithOverviewMode = true;
   public Boolean loadsImagesAutomatically = true;
   public Integer minimumLogicalFontSize = 8;
+  public Integer initialScale;
   public Boolean needInitialFocus = true;
   public Boolean offscreenPreRaster = false;
   public String sansSerifFontFamily = "sans-serif";

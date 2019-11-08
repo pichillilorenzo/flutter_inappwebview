@@ -174,6 +174,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
   bool loadWithOverviewMode;
   bool loadsImagesAutomatically;
   int minimumLogicalFontSize;
+  int initialScale;
   bool needInitialFocus;
   bool offscreenPreRaster;
   String sansSerifFontFamily;
@@ -191,7 +192,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
     this.disabledActionModeMenuItems, this.fantasyFontFamily = "fantasy", this.fixedFontFamily = "monospace", this.forceDark = AndroidInAppWebViewForceDark.FORCE_DARK_OFF,
     this.geolocationEnabled = true, this.layoutAlgorithm, this.loadWithOverviewMode = true, this.loadsImagesAutomatically = true,
     this.minimumLogicalFontSize = 8, this.needInitialFocus = true, this.offscreenPreRaster = false, this.sansSerifFontFamily = "sans-serif", this.serifFontFamily = "sans-serif",
-    this.standardFontFamily = "sans-serif", this.saveFormData = true, this.thirdPartyCookiesEnabled = true, this.hardwareAcceleration = true
+    this.standardFontFamily = "sans-serif", this.saveFormData = true, this.thirdPartyCookiesEnabled = true, this.hardwareAcceleration = true, this.initialScale
   });
 
   @override
@@ -227,6 +228,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
       "loadWithOverviewMode": loadWithOverviewMode,
       "loadsImagesAutomatically": loadsImagesAutomatically,
       "minimumLogicalFontSize": minimumLogicalFontSize,
+      "initialScale": initialScale,
       "needInitialFocus": needInitialFocus,
       "offscreenPreRaster": offscreenPreRaster,
       "sansSerifFontFamily": sansSerifFontFamily,
@@ -271,6 +273,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
     options.loadWithOverviewMode = map["loadWithOverviewMode"];
     options.loadsImagesAutomatically = map["loadsImagesAutomatically"];
     options.minimumLogicalFontSize = map["minimumLogicalFontSize"];
+    options.initialScale = map["initialScale"];
     options.needInitialFocus = map["needInitialFocus"];
     options.offscreenPreRaster = map["offscreenPreRaster"];
     options.sansSerifFontFamily = map["sansSerifFontFamily"];

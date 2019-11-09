@@ -162,7 +162,7 @@ class InAppWebView extends StatefulWidget {
   final Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge) onReceivedHttpAuthRequest;
 
   ///Event fires when the WebView need to perform server trust authentication (certificate validation).
-  ///The host application must return either [ServerTrustAuthResponse.CANCEL] or [ServerTrustAuthResponse.PROCEED].
+  ///The host application must return either [ServerTrustAuthResponse] instance with [ServerTrustAuthResponseAction.CANCEL] or [ServerTrustAuthResponseAction.PROCEED].
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
   final Future<ServerTrustAuthResponse> Function(InAppWebViewController controller, ServerTrustChallenge challenge) onReceivedServerTrustAuthRequest;
@@ -668,7 +668,7 @@ class InAppWebViewController {
             Map<dynamic, dynamic> responseHeaders = argMap["responseHeaders"];
             Map<dynamic, dynamic> eventMap = argMap["event"];
 
-            AjaxRequestEvent event = AjaxRequestEvent(lengthComputable: eventMap["lengthComputable"], loaded: eventMap["loaded"], type: AjaxRequestEventType.fromValue(eventMap["type"]));
+            AjaxRequestEvent event = AjaxRequestEvent(lengthComputable: eventMap["lengthComputable"], loaded: eventMap["loaded"], total: eventMap["total"], type: AjaxRequestEventType.fromValue(eventMap["type"]));
 
             var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password,
                 withCredentials: withCredentials, headers: headers, readyState: AjaxRequestReadyState.fromValue(readyState), status: status, responseURL: responseURL,

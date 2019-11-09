@@ -83,7 +83,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   ///
   ///**NOTE**: available on iOS 11.0+.
   List<ContentBlocker> contentBlockers;
-  ///Sets the content mode that the WebView needs to use. The default value is [InAppWebViewUserPreferredContentMode.RECOMMENDED].
+  ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [InAppWebViewUserPreferredContentMode.RECOMMENDED].
   ///
   ///**NOTE**: available on iOS 13.0+.
   InAppWebViewUserPreferredContentMode preferredContentMode;
@@ -676,10 +676,16 @@ class IosSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   ///Set to `true` to enable bar collapsing. The default value is `false`.
   bool barCollapsingEnabled;
   ///Set the custom style for the dismiss button. The default value is [IosSafariOptionsDismissButtonStyle.DONE].
+  ///
+  ///**NOTE**: available on iOS 11.0+.
   IosSafariOptionsDismissButtonStyle dismissButtonStyle;
   ///Set the custom background color of the navigation bar and the toolbar.
+  ///
+  ///**NOTE**: available on iOS 10.0+.
   String preferredBarTintColor;
   ///Set the custom color of the control buttons on the navigation bar and the toolbar.
+  ///
+  ///**NOTE**: available on iOS 10.0+.
   String preferredControlTintColor;
   ///Set the custom modal presentation style when presenting the WebView. The default value is [IosWebViewOptionsPresentationStyle.FULL_SCREEN].
   IosWebViewOptionsPresentationStyle presentationStyle;

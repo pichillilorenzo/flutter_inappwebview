@@ -312,6 +312,7 @@ let interceptAjaxRequestsJS = """
           type: e.type,
           loaded: e.loaded,
           lengthComputable: e.lengthComputable
+          total: e.total
         }
       };
       window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgress', ajaxRequest).then(function(result) {
@@ -383,6 +384,7 @@ let interceptAjaxRequestsJS = """
       this.addEventListener('progress', handleEvent);
       this.addEventListener('error', handleEvent);
       this.addEventListener('abort', handleEvent);
+      this.addEventListener('timeout', handleEvent);
       var ajaxRequest = {
         data: data,
         method: this._flutter_inappbrowser_method,
@@ -557,7 +559,7 @@ let interceptFetchRequestsJS = """
                 controller.abort();
                 break;
             }
-            var resultResource = (result.resource != null) ? result.resource : resource;
+            var resultResource = (result.url != null) ? result.url : resource;
             var resultInit = init;
             if (result.init != null) {
               resultInit.method = result.method;

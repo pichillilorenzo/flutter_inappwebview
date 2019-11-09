@@ -15,7 +15,13 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserActivity.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppWebView/InAppWebView.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppWebView/InAppWebView.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppWebView/InAppWebViewOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppWebView/InAppWebViewOptions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/Options.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/Options.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppWebView.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppWebView.swift" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/in_app_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_browser.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/in_app_webview.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_webview.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/src/types.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/types.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/lib/src/webview_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/webview_options.dart" afterDir="false" />
     </list>
@@ -40,8 +46,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/src/in_app_webview.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="354">
-              <caret line="146" column="124" selection-start-line="146" selection-start-column="114" selection-end-line="146" selection-end-column="124" />
+            <state relative-caret-position="200">
+              <caret line="214" column="18" selection-start-line="214" selection-start-column="6" selection-end-line="214" selection-end-column="18" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -52,8 +58,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/lib/src/types.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="259">
-              <caret line="325" column="84" lean-forward="true" selection-start-line="325" selection-start-column="84" selection-end-line="325" selection-end-column="84" />
+            <state relative-caret-position="209">
+              <caret line="1155" column="33" lean-forward="true" selection-start-line="1155" selection-start-column="33" selection-end-line="1155" selection-end-column="33" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -62,10 +68,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/inline_example.screen.dart">
+        <entry file="file://$PROJECT_DIR$/lib/src/http_auth_credentials_database.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="207">
-              <caret line="295" column="18" selection-start-line="295" selection-start-column="18" selection-end-line="295" selection-end-column="18" />
+            <state relative-caret-position="-569">
+              <caret line="6" column="32" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="32" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
               </folding>
@@ -74,10 +80,34 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+        <entry file="file://$PROJECT_DIR$/lib/src/content_blocker.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="15">
+              <caret line="128" column="36" selection-start-line="128" selection-start-column="18" selection-end-line="128" selection-end-column="36" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/src/cookie_manager.dart">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="315">
-              <caret line="21" column="54" lean-forward="true" selection-start-line="21" selection-start-column="54" selection-end-line="21" selection-end-column="54" />
+              <caret line="21" column="9" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/lib/src/chrome_safari_browser.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="1065">
+              <caret line="71" column="133" selection-start-line="71" selection-start-column="28" selection-end-line="71" selection-end-column="133" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+              </folding>
             </state>
           </provider>
         </entry>
@@ -94,36 +124,36 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>onNavigationStateChange</find>
-      <find>shouldInterceptFetchRequest</find>
-      <find>scheme</find>
-      <find>applicationNameForUserAgent</find>
-      <find>cacheMOde</find>
-      <find>inco</find>
-      <find>cacheEna</find>
-      <find>appCacheEnabled</find>
-      <find>appC</find>
-      <find>cache</find>
-      <find>customScheme</find>
-      <find>transparentBackground</find>
-      <find>ClientCertResponse</find>
-      <find>shouldO</find>
-      <find>useShouldOverrideUrlLoading</find>
-      <find>**NOTE**: In order to be able to li</find>
-      <find>XMLHttpRequest</find>
-      <find>nDownloadStart</find>
-      <find>ServerTrustAuthResponse</find>
-      <find>verticalScrollBarEnabled</find>
-      <find>mixedContentMode</find>
-      <find>eWideViewPort</find>
-      <find>initialScale</find>
       <find>mediaPlaybackRequiresUserGesture</find>
       <find>onDow</find>
       <find>toolbarTopFixedTitle</find>
       <find>resourceCustomSchemes</find>
       <find>JsAlertResponse</find>
-      <find>InAppWebViewUserPreferredContentMode</find>
       <find>JsConfirmResponse</find>
+      <find>InAppWebViewUserPreferredContentMode</find>
+      <find>onSag</find>
+      <find>ServerTrustAuthResponse</find>
+      <find>ClientCertResponse</find>
+      <find>weBVIEWCONTROL</find>
+      <find>getFa</find>
+      <find>supportZoom</find>
+      <find>layou</find>
+      <find>HttpAuthCredential</find>
+      <find>layoutA</find>
+      <find>AndroidInAppWebViewForceDark</find>
+      <find>AndroidInAppWebViewModeMenuItem</find>
+      <find>AndroidInAppWebViewMixedContentMode</find>
+      <find>IosInAppWebViewSelectionGranularity</find>
+      <find>preferredContent</find>
+      <find>IosWebViewOptionsPresentationStyle</find>
+      <find>AndroidInAppWebViewCacheMode</find>
+      <find>Action</find>
+      <find>IosSafariOptionsDismissButtonStyle</find>
+      <find>method</find>
+      <find>AjaxRequestEvent</find>
+      <find>withCredentials</find>
+      <find>FetchRequest</find>
+      <find>current</find>
     </findStrings>
     <replaceStrings>
       <replace>activity.getPreferences(0)</replace>
@@ -197,8 +227,8 @@
         <option value="$PROJECT_DIR$/example/lib/inline_example.screen.dart" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/lib/src/in_app_browser.dart" />
-        <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
         <option value="$PROJECT_DIR$/lib/src/webview_options.dart" />
+        <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
         <option value="$PROJECT_DIR$/lib/src/types.dart" />
       </list>
     </option>
@@ -464,7 +494,7 @@
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50692225" side_tool="true" weight="0.38445595" />
       <window_info anchor="bottom" id="Version Control" order="9" weight="0.32953367" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49533224" visible="true" weight="0.34196892" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.49533224" visible="true" weight="0.307772" />
       <window_info anchor="bottom" id="Messages" order="11" weight="0.3253886" />
       <window_info anchor="bottom" id="Dependency Viewer" order="12" weight="0.32800853" />
       <window_info anchor="bottom" id="Logcat" order="13" weight="0.32953367" />
@@ -516,26 +546,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="12" column="9" selection-start-line="12" selection-start-column="9" selection-end-line="12" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/http_auth_credentials_database.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="40">
-          <caret line="21" column="9" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/cookie_manager.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="198">
-          <caret line="21" column="9" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
@@ -638,13 +648,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/content_blocker.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-206">
-          <caret line="128" column="36" selection-start-line="128" selection-start-column="18" selection-end-line="128" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/chrome_safari_example.screen.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="600">
@@ -699,37 +702,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="315">
-          <caret line="21" column="54" lean-forward="true" selection-start-line="21" selection-start-column="54" selection-end-line="21" selection-end-column="54" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/in_app_browser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="506">
-          <caret line="104" column="123" lean-forward="true" selection-start-line="104" selection-start-column="24" selection-end-line="104" selection-end-column="123" />
+        <state relative-caret-position="189">
+          <caret line="468" column="167" selection-start-line="468" selection-start-column="167" selection-end-line="468" selection-end-column="167" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/chrome_safari_browser.dart">
+    <entry file="file://$PROJECT_DIR$/lib/src/content_blocker.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="507">
-          <caret line="71" column="133" selection-start-line="71" selection-start-column="28" selection-end-line="71" selection-end-column="133" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="15">
+          <caret line="128" column="36" selection-start-line="128" selection-start-column="18" selection-end-line="128" selection-end-column="36" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/webview_options.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="321">
-          <caret line="685" column="139" selection-start-line="685" selection-start-column="139" selection-end-line="685" selection-end-column="139" />
+        <state relative-caret-position="-48">
+          <caret line="687" column="38" selection-start-line="687" selection-start-column="38" selection-end-line="687" selection-end-column="38" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
@@ -746,10 +739,47 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="54" lean-forward="true" selection-start-line="21" selection-start-column="54" selection-end-line="21" selection-end-column="54" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/cookie_manager.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="315">
+          <caret line="21" column="9" selection-start-line="21" selection-start-column="9" selection-end-line="21" selection-end-column="9" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/chrome_safari_browser.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1065">
+          <caret line="71" column="133" selection-start-line="71" selection-start-column="28" selection-end-line="71" selection-end-column="133" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/http_auth_credentials_database.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-569">
+          <caret line="6" column="32" selection-start-line="6" selection-start-column="6" selection-end-line="6" selection-end-column="32" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/in_app_webview.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="354">
-          <caret line="146" column="124" selection-start-line="146" selection-start-column="114" selection-end-line="146" selection-end-column="124" />
+        <state relative-caret-position="200">
+          <caret line="214" column="18" selection-start-line="214" selection-start-column="6" selection-end-line="214" selection-end-column="18" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
@@ -758,8 +788,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/types.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="259">
-          <caret line="325" column="84" lean-forward="true" selection-start-line="325" selection-start-column="84" selection-end-line="325" selection-end-column="84" />
+        <state relative-caret-position="209">
+          <caret line="1155" column="33" lean-forward="true" selection-start-line="1155" selection-start-column="33" selection-end-line="1155" selection-end-column="33" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>

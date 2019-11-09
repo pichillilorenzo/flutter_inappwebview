@@ -466,7 +466,7 @@ class InAppBrowser {
   }
 
   ///Event fires when the WebView need to perform server trust authentication (certificate validation).
-  ///The host application must return either [ServerTrustAuthResponse.CANCEL] or [ServerTrustAuthResponse.PROCEED].
+  ///The host application must return either [ServerTrustAuthResponse] instance with [ServerTrustAuthResponseAction.CANCEL] or [ServerTrustAuthResponseAction.PROCEED].
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
   Future<ServerTrustAuthResponse> onReceivedServerTrustAuthRequest(ServerTrustChallenge challenge) {

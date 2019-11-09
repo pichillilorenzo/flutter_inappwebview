@@ -162,6 +162,7 @@ final public class InAppWebView extends InputAwareWebView {
           "          type: e.type," +
           "          loaded: e.loaded," +
           "          lengthComputable: e.lengthComputable" +
+          "          total: e.total" +
           "        }" +
           "      };" +
           "      window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxProgress', ajaxRequest).then(function(result) {" +
@@ -233,6 +234,7 @@ final public class InAppWebView extends InputAwareWebView {
           "      this.addEventListener('progress', handleEvent);" +
           "      this.addEventListener('error', handleEvent);" +
           "      this.addEventListener('abort', handleEvent);" +
+          "      this.addEventListener('timeout', handleEvent);" +
           "      var ajaxRequest = {" +
           "        data: data," +
           "        method: this._flutter_inappbrowser_method," +
@@ -405,7 +407,7 @@ final public class InAppWebView extends InputAwareWebView {
           "                controller.abort();" +
           "                break;" +
           "            }" +
-          "            var resultResource = (result.resource != null) ? result.resource : resource;" +
+          "            var resultResource = (result.url != null) ? result.url : resource;" +
           "            var resultInit = init;" +
           "            if (result.init != null) {" +
           "              resultInit.method = result.method;" +
@@ -555,8 +557,13 @@ final public class InAppWebView extends InputAwareWebView {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.forceDark != null)
       settings.setForceDark(options.forceDark);
     settings.setGeolocationEnabled(options.geolocationEnabled);
-    if (options.layoutAlgorithm != null)
-      settings.setLayoutAlgorithm(options.layoutAlgorithm);
+    if (options.layoutAlgorithm != null) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && options.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+        settings.setLayoutAlgorithm(options.layoutAlgorithm);
+      } else {
+        settings.setLayoutAlgorithm(options.layoutAlgorithm);
+      }
+    }
     settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
     settings.setMinimumFontSize(options.minimumFontSize);
     settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
@@ -948,8 +955,13 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("geolocationEnabled") != null && options.geolocationEnabled != newOptions.geolocationEnabled)
       settings.setGeolocationEnabled(newOptions.geolocationEnabled);
 
-    if (newOptionsMap.get("layoutAlgorithm") != null && options.layoutAlgorithm != newOptions.layoutAlgorithm)
-      settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+    if (newOptionsMap.get("layoutAlgorithm") != null && options.layoutAlgorithm != newOptions.layoutAlgorithm) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && newOptions.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+        settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+      } else {
+        settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+      }
+    }
 
     if (newOptionsMap.get("loadWithOverviewMode") != null && options.loadWithOverviewMode != newOptions.loadWithOverviewMode)
       settings.setLoadWithOverviewMode(newOptions.loadWithOverviewMode);

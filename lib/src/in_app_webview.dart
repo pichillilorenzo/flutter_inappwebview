@@ -578,8 +578,9 @@ class InAppWebViewController {
             String password = argMap["password"];
             bool withCredentials = argMap["withCredentials"];
             Map<dynamic, dynamic> headers = argMap["headers"];
+            String responseType = argMap["responseType"];
 
-            var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password, withCredentials: withCredentials, headers: headers);
+            var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password, withCredentials: withCredentials, headers: headers, responseType: responseType);
 
             if (_widget != null && _widget.shouldInterceptAjaxRequest != null)
               return jsonEncode(await _widget.shouldInterceptAjaxRequest(this, request));
@@ -600,13 +601,15 @@ class InAppWebViewController {
             int status = argMap["status"];
             String responseURL = argMap["responseURL"];
             String responseType = argMap["responseType"];
+            dynamic response = argMap["response"];
             String responseText = argMap["responseText"];
+            String responseXML = argMap["responseXML"];
             String statusText = argMap["statusText"];
             Map<dynamic, dynamic> responseHeaders = argMap["responseHeaders"];
 
             var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password,
                 withCredentials: withCredentials, headers: headers, readyState: AjaxRequestReadyState.fromValue(readyState), status: status, responseURL: responseURL,
-                responseType: responseType, responseText: responseText, statusText: statusText, responseHeaders: responseHeaders);
+                responseType: responseType, response: response, responseText: responseText, responseXML: responseXML, statusText: statusText, responseHeaders: responseHeaders);
 
             if (_widget != null && _widget.onAjaxReadyStateChange != null)
               return jsonEncode(await _widget.onAjaxReadyStateChange(this, request));
@@ -627,7 +630,9 @@ class InAppWebViewController {
             int status = argMap["status"];
             String responseURL = argMap["responseURL"];
             String responseType = argMap["responseType"];
+            dynamic response = argMap["response"];
             String responseText = argMap["responseText"];
+            String responseXML = argMap["responseXML"];
             String statusText = argMap["statusText"];
             Map<dynamic, dynamic> responseHeaders = argMap["responseHeaders"];
             Map<dynamic, dynamic> eventMap = argMap["event"];
@@ -636,7 +641,7 @@ class InAppWebViewController {
 
             var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password,
                 withCredentials: withCredentials, headers: headers, readyState: AjaxRequestReadyState.fromValue(readyState), status: status, responseURL: responseURL,
-                responseType: responseType, responseText: responseText, statusText: statusText, responseHeaders: responseHeaders, event: event);
+                responseType: responseType, response: response, responseText: responseText, responseXML: responseXML, statusText: statusText, responseHeaders: responseHeaders, event: event);
 
             if (_widget != null && _widget.onAjaxProgress != null)
               return jsonEncode(await _widget.onAjaxProgress(this, request));
@@ -1106,14 +1111,6 @@ class InAppWebViewController {
   ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
   ///
-  ///In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
-  ///This event will be dispatch as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
-  ///```javascript
-  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
-  ///     console.log("ready");
-  ///   });
-  ///```
-  ///
   ///`window.flutter_inappbrowser.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
   ///that can be used to get the json result returned by [JavaScriptHandlerCallback].
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
@@ -1121,7 +1118,6 @@ class InAppWebViewController {
   ///So, on the JavaScript side, to get data coming from the Dart side, you will use:
   ///```html
   ///<script>
-  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
   ///     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
   ///       console.log(result, typeof result);
   ///       console.log(JSON.stringify(result));
@@ -1131,18 +1127,7 @@ class InAppWebViewController {
   ///       console.log(result, typeof result);
   ///       console.log(JSON.stringify(result));
   ///     });
-  ///   });
   ///</script>
-  ///```
-  ///
-  ///Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
-  ///```dart
-  ///  // Inject JavaScript that will receive data back from Flutter
-  ///  inAppWebViewController.injectScriptCode("""
-  ///    window.flutter_inappbrowser.callHandler('test', 'Text from Javascript').then(function(result) {
-  ///      console.log(result);
-  ///    });
-  ///  """);
   ///```
   void addJavaScriptHandler({@required String handlerName, @required JavaScriptHandlerCallback callback}) {
     assert(!javaScriptHandlerForbiddenNames.contains(handlerName));

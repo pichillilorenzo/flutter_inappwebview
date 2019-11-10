@@ -184,12 +184,6 @@ public class InAppWebViewClient extends WebViewClient {
     view.clearFocus();
     view.requestFocus();
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      webView.evaluateJavascript(InAppWebView.platformReadyJS, (ValueCallback<String>) null);
-    } else {
-      webView.loadUrl("javascript:" + InAppWebView.platformReadyJS.replaceAll("[\r\n]+", ""));
-    }
-
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);

@@ -938,7 +938,7 @@ class AjaxRequestReadyState {
 
 ///AjaxRequest class represents a JavaScript [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 class AjaxRequest {
-  ///Data passed to as a parameter to the `XMLHttpRequest.send()` method.
+  ///Data passed as a parameter to the `XMLHttpRequest.send()` method.
   dynamic data;
   ///The HTTP request method of the `XMLHttpRequest` request.
   String method;
@@ -969,8 +969,12 @@ class AjaxRequest {
   ///It also lets the author change the [response type](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType).
   ///If an empty string is set as the value of responseType, the default value of text is used.
   String responseType;
+  ///The response's body content. The content-type depends on the [AjaxRequest.reponseType].
+  dynamic response;
   ///The text received from a server following a request being sent.
   String responseText;
+  ///The HTML or XML string retrieved by the request or null if the request was unsuccessful, has not yet been sent, or if the data can't be parsed as XML or HTML.
+  String responseXML;
   ///A String containing the response's status message as returned by the HTTP server.
   ///Unlike [AjaxRequest.status] which indicates a numerical status code, this property contains the text of the response status, such as "OK" or "Not Found".
   ///If the request's readyState is in [AjaxRequestReadyState.UNSENT] or [AjaxRequestReadyState.OPENED] state, the value of statusText will be an empty string.
@@ -985,7 +989,7 @@ class AjaxRequest {
 
   AjaxRequest({this.data, this.method, this.url, this.isAsync, this.user, this.password,
     this.withCredentials, this.headers, this.readyState, this.status, this.responseURL, this.responseType,
-    this.responseText, this.statusText, this.responseHeaders, this.event, this.action = AjaxRequestAction.PROCEED});
+    this.response, this.responseText, this.responseXML, this.statusText, this.responseHeaders, this.event, this.action = AjaxRequestAction.PROCEED});
 
   Map<String, dynamic> toMap() {
     return {
@@ -1001,7 +1005,9 @@ class AjaxRequest {
       "status": status,
       "responseURL": responseURL,
       "responseType": responseType,
+      "response": response,
       "responseText": responseText,
+      "responseXML": responseXML,
       "statusText": statusText,
       "responseHeaders": responseHeaders,
       "action": action?.toValue()

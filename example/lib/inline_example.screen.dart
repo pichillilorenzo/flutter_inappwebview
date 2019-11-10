@@ -290,16 +290,19 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             shouldInterceptAjaxRequest: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
               print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
+              if (ajaxRequest.url == "http://192.168.1.20:8082/test-ajax-post") {
+                ajaxRequest.responseType = 'json';
+              }
 //              ajaxRequest.method = "GET";
 //              ajaxRequest.url = "http://192.168.1.20:8082/test-download-file";
 //              ajaxRequest.headers = {
 //                "Custom-Header": "Custom-Value"
 //              };
 //              return ajaxRequest;
-              return null;
+              return ajaxRequest;
             },
             onAjaxReadyStateChange: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.responseHeaders}");
+              print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.response}, ${ajaxRequest.responseHeaders}");
               return AjaxRequestAction.PROCEED;
             },
             onAjaxProgress: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {

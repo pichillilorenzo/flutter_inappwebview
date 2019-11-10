@@ -77,26 +77,23 @@
             window.location = "#foo-" + randomNumber;
         }
 
-        window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
-            console.log("ready");
-
-            window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
-                //console.log(result, typeof result);
-                //console.log(JSON.stringify(result), result.bar);
-            });
-
-            window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
-                //console.log(result, typeof result);
-                //console.log(JSON.stringify(result));
-            });
+        window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
+            console.log(result, typeof result);
+            console.log(JSON.stringify(result), result.bar);
         });
+
+        window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
+            console.log(result, typeof result);
+            console.log(JSON.stringify(result));
+        });
+
         $(document).ready(function() {
 
             console.log("jQuery ready");
 
             var xhttp = new XMLHttpRequest();
             xhttp.addEventListener("load", function() {
-              console.log(this.responseText);
+              console.log(this.response);
             });
             xhttp.open("POST", "http://192.168.1.20:8082/test-ajax-post");
             xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

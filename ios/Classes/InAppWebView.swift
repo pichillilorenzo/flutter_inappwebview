@@ -82,8 +82,6 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 }
 """
 
-let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
-
 let findTextHighlightJS = """
 var wkwebview_SearchResultCount = 0;
 var wkwebview_CurrentHighlight = 0;
@@ -266,6 +264,29 @@ let interceptAjaxRequestsJS = """
   ajax.prototype._flutter_inappbrowser_password = null;
   ajax.prototype._flutter_inappbrowser_already_onreadystatechange_wrapped = false;
   ajax.prototype._flutter_inappbrowser_request_headers = {};
+  function convertRequestResponse(request, callback) {
+    if (request.response != null && request.responseType != null) {
+      switch (request.responseType) {
+        case 'arraybuffer':
+          callback(new Uint8Array(request.response));
+          return;
+        case 'blob':
+          const reader = new FileReader();
+          reader.addEventListener('loadend', function() {
+            callback(new Uint8Array(reader.result));
+          });
+          reader.readAsArrayBuffer(blob);
+          return;
+        case 'document':
+          callback(request.response.documentElement.outerHTML);
+          return;
+        case 'json':
+          callback(request.response);
+          return;
+      };
+    }
+    callback(null);
+  };
   ajax.prototype.open = function(method, url, isAsync, user, password) {
     isAsync = (isAsync != null) ? isAsync : true;
     this._flutter_inappbrowser_url = url;
@@ -293,36 +314,40 @@ let interceptAjaxRequestsJS = """
           responseHeaders[header] = value;
         });
       }
-      var ajaxRequest = {
-        method: this._flutter_inappbrowser_method,
-        url: this._flutter_inappbrowser_url,
-        isAsync: this._flutter_inappbrowser_isAsync,
-        user: this._flutter_inappbrowser_user,
-        password: this._flutter_inappbrowser_password,
-        withCredentials: this.withCredentials,
-        headers: this._flutter_inappbrowser_request_headers,
-        readyState: this.readyState,
-        status: this.status,
-        responseURL: this.responseURL,
-        responseType: this.responseType,
-        responseText: this.responseText,
-        statusText: this.statusText,
-        responseHeaders, responseHeaders,
-        event: {
-          type: e.type,
-          loaded: e.loaded,
-          lengthComputable: e.lengthComputable,
-          total: e.total
-        }
-      };
-      window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgress', ajaxRequest).then(function(result) {
-        if (result != null) {
-          switch (result) {
-            case 0:
-              self.abort();
-              return;
-          };
-        }
+      convertRequestResponse(this, function(response) {
+        var ajaxRequest = {
+          method: self._flutter_inappbrowser_method,
+          url: self._flutter_inappbrowser_url,
+          isAsync: self._flutter_inappbrowser_isAsync,
+          user: self._flutter_inappbrowser_user,
+          password: self._flutter_inappbrowser_password,
+          withCredentials: self.withCredentials,
+          headers: self._flutter_inappbrowser_request_headers,
+          readyState: self.readyState,
+          status: self.status,
+          responseURL: self.responseURL,
+          responseType: self.responseType,
+          response: response,
+          responseText: (self.responseType == 'text' || self.responseType == '') ? self.responseText : null,
+          responseXML: (self.responseType == 'document' && self.responseXML != null) ? self.responseXML.documentElement.outerHTML : null,
+          statusText: self.statusText,
+          responseHeaders, responseHeaders,
+          event: {
+            type: e.type,
+            loaded: e.loaded,
+            lengthComputable: e.lengthComputable,
+            total: e.total
+          }
+        };
+        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxProgress', ajaxRequest).then(function(result) {
+          if (result != null) {
+            switch (result) {
+              case 0:
+                self.abort();
+                return;
+            };
+          }
+        });
       });
     }
   };
@@ -345,33 +370,37 @@ let interceptAjaxRequestsJS = """
                 responseHeaders[header] = value;
               });
             }
-            var ajaxRequest = {
-              method: this._flutter_inappbrowser_method,
-              url: this._flutter_inappbrowser_url,
-              isAsync: this._flutter_inappbrowser_isAsync,
-              user: this._flutter_inappbrowser_user,
-              password: this._flutter_inappbrowser_password,
-              withCredentials: this.withCredentials,
-              headers: this._flutter_inappbrowser_request_headers,
-              readyState: this.readyState,
-              status: this.status,
-              responseURL: this.responseURL,
-              responseType: this.responseType,
-              responseText: this.responseText,
-              statusText: this.statusText,
-              responseHeaders: responseHeaders
-            };
-            window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {
-              if (result != null) {
-                switch (result) {
-                  case 0:
-                    self.abort();
-                    return;
-                };
-              }
-              if (onreadystatechange != null) {
-                onreadystatechange();
-              }
+            convertRequestResponse(this, function(response) {
+              var ajaxRequest = {
+                method: self._flutter_inappbrowser_method,
+                url: self._flutter_inappbrowser_url,
+                isAsync: self._flutter_inappbrowser_isAsync,
+                user: self._flutter_inappbrowser_user,
+                password: self._flutter_inappbrowser_password,
+                withCredentials: self.withCredentials,
+                headers: self._flutter_inappbrowser_request_headers,
+                readyState: self.readyState,
+                status: self.status,
+                responseURL: self.responseURL,
+                responseType: self.responseType,
+                response: response,
+                responseText: (self.responseType == 'text' || self.responseType == '') ? self.responseText : null,
+                responseXML: (self.responseType == 'document' && self.responseXML != null) ? self.responseXML.documentElement.outerHTML : null,
+                statusText: self.statusText,
+                responseHeaders: responseHeaders
+              };
+              window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {
+                if (result != null) {
+                  switch (result) {
+                    case 0:
+                      self.abort();
+                      return;
+                  };
+                }
+                if (onreadystatechange != null) {
+                  onreadystatechange();
+                }
+              });
             });
           } else if (onreadystatechange != null) {
             onreadystatechange();
@@ -393,7 +422,8 @@ let interceptAjaxRequestsJS = """
         user: this._flutter_inappbrowser_user,
         password: this._flutter_inappbrowser_password,
         withCredentials: this.withCredentials,
-        headers: this._flutter_inappbrowser_request_headers
+        headers: this._flutter_inappbrowser_request_headers,
+        responseType: this.responseType
       };
       window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {
         if (result != null) {
@@ -404,6 +434,9 @@ let interceptAjaxRequestsJS = """
           };
           data = result.data;
           self.withCredentials = result.withCredentials;
+          if (result.responseType != null) {
+            self.responseType = result.responseType;
+          };
           for (var header in result.headers) {
             var value = result.headers[header];
             self.setRequestHeader(header, value);
@@ -1310,7 +1343,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         currentURL = url
         InAppWebView.credentialsProposed = []
         onLoadStop(url: (currentURL?.absoluteString)!)
-        evaluateJavaScript(platformReadyJS, completionHandler: nil)
         
         if IABController != nil {
             IABController!.updateUrlTextField(url: (currentURL?.absoluteString)!)

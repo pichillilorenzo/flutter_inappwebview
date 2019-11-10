@@ -311,7 +311,7 @@ let interceptAjaxRequestsJS = """
         event: {
           type: e.type,
           loaded: e.loaded,
-          lengthComputable: e.lengthComputable
+          lengthComputable: e.lengthComputable,
           total: e.total
         }
       };

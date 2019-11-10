@@ -84,17 +84,20 @@ public class InAppWebViewOptions extends Options {
   @Override
   public Object onParse(Map.Entry<String, Object> pair) {
     if (pair.getKey().equals("layoutAlgorithm")) {
-      switch ((String) pair.getValue()) {
-        case "NORMAL":
-          pair.setValue(NORMAL);
-          return pair;
-        case "TEXT_AUTOSIZING":
-          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-            return pair.setValue(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
-          } else {
+      String value = (String) pair.getValue();
+      if (value != null) {
+        switch (value) {
+          case "NORMAL":
             pair.setValue(NORMAL);
-          }
-          return pair;
+            return pair;
+          case "TEXT_AUTOSIZING":
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+              return pair.setValue(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
+            } else {
+              pair.setValue(NORMAL);
+            }
+            return pair;
+        }
       }
     }
     return super.onParse(pair);
@@ -105,14 +108,16 @@ public class InAppWebViewOptions extends Options {
     if (field.getName().equals("layoutAlgorithm")) {
       try {
         WebSettings.LayoutAlgorithm value = (WebSettings.LayoutAlgorithm) field.get(this);
-        switch (value) {
-          case NORMAL:
-            return "NORMAL";
-          default:
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && value.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
-              return "TEXT_AUTOSIZING";
-            }
-            return "NORMAL";
+        if (value != null) {
+          switch (value) {
+            case NORMAL:
+              return "NORMAL";
+            default:
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && value.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+                return "TEXT_AUTOSIZING";
+              }
+              return "NORMAL";
+          }
         }
       } catch (IllegalAccessException e) {
         Log.d(LOG_TAG, e.getMessage());

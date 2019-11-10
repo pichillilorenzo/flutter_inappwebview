@@ -1,3 +1,4 @@
+///
 class ContentBlocker {
   ContentBlockerTrigger trigger;
   ContentBlockerAction action;
@@ -23,6 +24,7 @@ class ContentBlocker {
   }
 }
 
+///
 class ContentBlockerTriggerResourceType {
   final String _value;
   const ContentBlockerTriggerResourceType._internal(this._value);
@@ -42,6 +44,7 @@ class ContentBlockerTriggerResourceType {
   static const RAW = const ContentBlockerTriggerResourceType._internal('raw');
 }
 
+///
 class ContentBlockerTriggerLoadType {
   final String _value;
   const ContentBlockerTriggerLoadType._internal(this._value);
@@ -54,6 +57,7 @@ class ContentBlockerTriggerLoadType {
   static const THIRD_PARTY = const ContentBlockerTriggerLoadType._internal('third-party');
 }
 
+///
 class ContentBlockerTrigger {
   String urlFilter;
   bool urlFilterIsCaseSensitive;
@@ -136,6 +140,7 @@ class ContentBlockerTrigger {
   }
 }
 
+///
 class ContentBlockerActionType {
   final String _value;
   const ContentBlockerActionType._internal(this._value);
@@ -149,6 +154,7 @@ class ContentBlockerActionType {
   static const MAKE_HTTPS = const ContentBlockerActionType._internal('make-https');
 }
 
+///
 class ContentBlockerAction {
   ContentBlockerActionType type;
   String selector;

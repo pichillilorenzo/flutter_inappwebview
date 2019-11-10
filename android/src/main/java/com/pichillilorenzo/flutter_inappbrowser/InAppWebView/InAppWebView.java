@@ -161,7 +161,7 @@ final public class InAppWebView extends InputAwareWebView {
           "        event: {" +
           "          type: e.type," +
           "          loaded: e.loaded," +
-          "          lengthComputable: e.lengthComputable" +
+          "          lengthComputable: e.lengthComputable," +
           "          total: e.total" +
           "        }" +
           "      };" +

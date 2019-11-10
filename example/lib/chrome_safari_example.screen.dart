@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-  MyChromeSafariBrowser(browserFallback) : super(browserFallback);
+  MyChromeSafariBrowser(browserFallback) : super(bFallback: browserFallback);
   @override
   void onOpened() {
     print("ChromeSafari browser opened");
@@ -36,7 +36,7 @@ class _ChromeSafariExampleScreenState extends State<ChromeSafariExampleScreen> {
     return new Center(
       child: new RaisedButton(
           onPressed: () async {
-            await widget.browser.open("https://flutter.dev/",
+            await widget.browser.open(url: "https://flutter.dev/",
               options: ChromeSafariBrowserClassOptions(
                 androidChromeCustomTabsOptions: AndroidChromeCustomTabsOptions(addShareButton: false),
                 iosSafariOptions: IosSafariOptions(barCollapsingEnabled: true)

@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:uuid/uuid.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 
 import 'webview_options.dart';
 
@@ -54,7 +54,7 @@ class LoadedResource {
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
   double duration;
 
-  LoadedResource(this.initiatorType, this.url, this.startTime, this.duration);
+  LoadedResource({this.initiatorType, this.url, this.startTime, this.duration});
 
 }
 
@@ -67,7 +67,7 @@ class InAppWebViewInitialData {
   String encoding;
   String baseUrl;
 
-  InAppWebViewInitialData(this.data, {this.mimeType = "text/html", this.encoding = "utf8", this.baseUrl = "about:blank"});
+  InAppWebViewInitialData({@required this.data, this.mimeType = "text/html", this.encoding = "utf8", this.baseUrl = "about:blank"});
 
   Map<String, String> toMap() {
     return {
@@ -120,7 +120,7 @@ class CustomSchemeResponse {
   ///Content-Enconding of the data, such as `utf-8`.
   String contentEnconding;
 
-  CustomSchemeResponse(this.data, this.contentType, {this.contentEnconding = 'utf-8'});
+  CustomSchemeResponse({@required this.data, @required this.contentType, this.contentEnconding = 'utf-8'});
 
   Map<String, dynamic> toJson() {
     return {
@@ -137,25 +137,24 @@ class CustomSchemeResponse {
 ///To receive notifications of these messages, use the [onConsoleMessage] event.
 class ConsoleMessage {
 
-  String sourceURL = "";
-  int lineNumber = 1;
-  String message = "";
-  ConsoleMessageLevel messageLevel = ConsoleMessageLevel.LOG;
+  String sourceURL;
+  int lineNumber;
+  String message;
+  ConsoleMessageLevel messageLevel;
 
-  ConsoleMessage(this.sourceURL, this.lineNumber, this.message, this.messageLevel);
+  ConsoleMessage({this.sourceURL = "", this.lineNumber = 1, this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
 }
 
 ///WebHistory class.
 ///
 ///This class contains a snapshot of the current back/forward list for a WebView.
 class WebHistory {
-  List<WebHistoryItem> _list;
   ///List of all [WebHistoryItem]s.
-  List<WebHistoryItem> get list => _list;
+  List<WebHistoryItem> list;
   ///Index of the current [WebHistoryItem].
   int currentIndex;
 
-  WebHistory(this._list, this.currentIndex);
+  WebHistory({this.list, this.currentIndex});
 }
 
 ///WebHistoryItem class.
@@ -173,7 +172,7 @@ class WebHistoryItem {
   ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
   int offset;
 
-  WebHistoryItem(this.originalUrl, this.title, this.url, this.index, this.offset);
+  WebHistoryItem({this.originalUrl, this.title, this.url, this.index, this.offset});
 }
 
 ///GeolocationPermissionPromptResponse class.
@@ -187,7 +186,7 @@ class GeolocationPermissionShowPromptResponse {
   ///Whether the permission should be retained beyond the lifetime of a page currently being displayed by a WebView
   bool retain;
 
-  GeolocationPermissionShowPromptResponse(this.origin, this.allow, this.retain);
+  GeolocationPermissionShowPromptResponse({this.origin, this.allow, this.retain});
 
   Map<String, dynamic> toMap() {
     return {

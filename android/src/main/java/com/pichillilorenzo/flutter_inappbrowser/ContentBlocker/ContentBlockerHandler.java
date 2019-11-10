@@ -155,7 +155,7 @@ public class ContentBlockerHandler {
                         break;
 
                     case MAKE_HTTPS:
-                        if (url.startsWith("http://")) {
+                        if (scheme.equals("http") && (port == -1 || port == 80)) {
                             String urlHttps = url.replace("http://", "https://");
 
                             Request mRequest = new Request.Builder().url(urlHttps).build();

@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 ///Manages the cookies used by WebView instances.
@@ -26,8 +27,8 @@ class CookieManager {
   ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null`, its default value will be the domain name of [url].
-  Future<void> setCookie(String url, String name, String value,
-      { String domain,
+  Future<void> setCookie({@required String url, @required String name, @required String value,
+        String domain,
         String path = "/",
         int expiresDate,
         int maxAge,
@@ -55,7 +56,7 @@ class CookieManager {
   }
 
   ///Gets all the cookies for the given [url].
-  Future<List<Map<String, dynamic>>> getCookies(String url) async {
+  Future<List<Map<String, dynamic>>> getCookies({@required String url}) async {
     assert(url != null && url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -70,7 +71,7 @@ class CookieManager {
   }
 
   ///Gets a cookie by its [name] for the given [url].
-  Future<Map<String, dynamic>> getCookie(String url, String name) async {
+  Future<Map<String, dynamic>> getCookie({@required String url, @required String name}) async {
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
 
@@ -90,7 +91,7 @@ class CookieManager {
   ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
-  Future<void> deleteCookie(String url, String name, {String domain = "", String path = "/"}) async {
+  Future<void> deleteCookie({@required String url, @required String name, String domain = "", String path = "/"}) async {
     if (domain == null || domain.isEmpty)
       domain = _getDomainName(url);
 
@@ -111,7 +112,7 @@ class CookieManager {
   ///
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
-  Future<void> deleteCookies(String url, {String domain = "", String path = "/"}) async {
+  Future<void> deleteCookies({@required String url, String domain = "", String path = "/"}) async {
     if (domain == null || domain.isEmpty)
       domain = _getDomainName(url);
 

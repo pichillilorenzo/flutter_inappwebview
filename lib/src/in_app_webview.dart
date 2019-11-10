@@ -21,44 +21,6 @@ const javaScriptHandlerForbiddenNames = ["onLoadResource", "shouldInterceptAjaxR
 ///InAppWebView Widget class.
 ///
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
-///
-///All platforms support these options:
-///  - __useShouldOverrideUrlLoading__: Set to `true` to be able to listen at the [InAppWebView.shouldOverrideUrlLoading()] event. The default value is `false`.
-///  - __useOnLoadResource__: Set to `true` to be able to listen at the [InAppWebView.onLoadResource()] event. The default value is `false`.
-///  - __useOnDownloadStart__: Set to `true` to be able to listen at the [InAppWebView.onDownloadStart()] event. The default value is `false`.
-///  - __useOnTargetBlank__: Set to `true` to be able to listen at the [InAppWebView.onTargetBlank()] event. The default value is `false`.
-///  - __clearCache__: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
-///  - __userAgent___: Set the custom WebView's user-agent.
-///  - __javaScriptEnabled__: Set to `true` to enable JavaScript. The default value is `true`.
-///  - __javaScriptCanOpenWindowsAutomatically__: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
-///  - __mediaPlaybackRequiresUserGesture__: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
-///  - __transparentBackground__: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
-///  - __resourceCustomSchemes__: List of custom schemes that [InAppWebView] must handle. Use the [InAppWebView.onLoadResourceCustomScheme()] event to intercept resource requests with custom scheme.
-///
-///  **Android** supports these additional options:
-///
-///  - __clearSessionCache__: Set to `true` to have the session cookie cache cleared before the new window is opened.
-///  - __builtInZoomControls__: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
-///  - __displayZoomControls__: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
-///  - __supportZoom__: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
-///  - __databaseEnabled__: Set to `true` if you want the database storage API is enabled. The default value is `false`.
-///  - __domStorageEnabled__: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
-///  - __useWideViewPort__: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport. When the value of the setting is false, the layout width is always set to the width of the WebView control in device-independent (CSS) pixels. When the value is true and the page contains the viewport meta tag, the value of the width specified in the tag is used. If the page does not contain the tag or does not provide a width, then a wide viewport will be used. The default value is `true`.
-///  - __safeBrowsingEnabled__: Set to `true` if you want the Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links. The default value is `true`.
-///  - __textZoom__: Set text scaling of the WebView. The default value is `100`.
-///  - __mixedContentMode__: Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin. By default, apps that target `Build.VERSION_CODES.KITKAT` or below default to `MIXED_CONTENT_ALWAYS_ALLOW`. Apps targeting `Build.VERSION_CODES.LOLLIPOP` default to `MIXED_CONTENT_NEVER_ALLOW`. The preferred and most secure mode of operation for the WebView is `MIXED_CONTENT_NEVER_ALLOW` and use of `MIXED_CONTENT_ALWAYS_ALLOW` is strongly discouraged.
-///
-///  **iOS** supports these additional options:
-///
-///  - __disallowOverScroll__: Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
-///  - __enableViewportScale__: Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
-///  - __suppressesIncrementalRendering__: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory.. The default value is `false`.
-///  - __allowsAirPlayForMediaPlayback__: Set to `true` to allow AirPlay. The default value is `true`.
-///  - __allowsBackForwardNavigationGestures__: Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
-///  - __allowsLinkPreview__: Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
-///  - __ignoresViewportScaleLimits__: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent. The ignoresViewportScaleLimits property overrides the `user-scalable` HTML property in a webpage. The default value is `false`.
-///  - __allowsInlineMediaPlayback__: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls. For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
-///  - __allowsPictureInPictureMediaPlayback__: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
 class InAppWebView extends StatefulWidget {
 
   ///Event fires when the [InAppWebView] is created.
@@ -379,6 +341,7 @@ class InAppWebViewController {
   InAppWebView _widget;
   MethodChannel _channel;
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap = HashMap<String, JavaScriptHandlerCallback>();
+  // ignore: unused_field
   bool _isOpened = false;
   // ignore: unused_field
   int _id;
@@ -443,10 +406,11 @@ class InAppWebViewController {
         int lineNumber = call.arguments["lineNumber"];
         String message = call.arguments["message"];
         ConsoleMessageLevel messageLevel = ConsoleMessageLevel.fromValue(call.arguments["messageLevel"]);
+        ConsoleMessage consoleMessage = ConsoleMessage(sourceURL: sourceURL, lineNumber: lineNumber, message: message, messageLevel: messageLevel);
         if (_widget != null && _widget.onConsoleMessage != null)
-          _widget.onConsoleMessage(this, ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
+          _widget.onConsoleMessage(this, consoleMessage);
         else if (_inAppBrowser != null)
-          _inAppBrowser.onConsoleMessage(ConsoleMessage(sourceURL, lineNumber, message, messageLevel));
+          _inAppBrowser.onConsoleMessage(consoleMessage);
         break;
       case "onScrollChanged":
         int x = call.arguments["x"];
@@ -597,7 +561,7 @@ class InAppWebViewController {
             double startTime = argMap["startTime"] is int ? argMap["startTime"].toDouble() : argMap["startTime"];
             double duration = argMap["duration"] is int ? argMap["duration"].toDouble() : argMap["duration"];
 
-            var response = new LoadedResource(initiatorType, url, startTime, duration);
+            var response = new LoadedResource(initiatorType: initiatorType, url: url, startTime: startTime, duration: duration);
 
             if (_widget != null && _widget.onLoadResource != null)
               _widget.onLoadResource(this, response);
@@ -758,7 +722,7 @@ class InAppWebViewController {
     var html = "";
     InAppWebViewWidgetOptions options = await getOptions();
     if (options != null && options.inAppWebViewOptions.javaScriptEnabled == true) {
-      html = await evaluateJavascript("window.document.getElementsByTagName('html')[0].outerHTML;");
+      html = await evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
       if (html.isNotEmpty)
         return html;
     }
@@ -893,7 +857,7 @@ class InAppWebViewController {
   }
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
-  Future<void> loadUrl(String url, {Map<String, String> headers = const {}}) async {
+  Future<void> loadUrl({@required String url, Map<String, String> headers = const {}}) async {
     assert(url != null && url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -906,7 +870,7 @@ class InAppWebViewController {
   }
 
   ///Loads the given [url] with [postData] using `POST` method into this WebView.
-  Future<void> postUrl(String url, Uint8List postData) async {
+  Future<void> postUrl({@required String url, @required Uint8List postData}) async {
     assert(url != null && url.isNotEmpty);
     assert(postData != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -922,7 +886,7 @@ class InAppWebViewController {
   ///Loads the given [data] into this WebView, using [baseUrl] as the base URL for the content.
   ///The [mimeType] parameter specifies the format of the data.
   ///The [encoding] parameter specifies the encoding of the data.
-  Future<void> loadData(String data, {String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank"}) async {
+  Future<void> loadData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank"}) async {
     assert(data != null);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -965,7 +929,7 @@ class InAppWebViewController {
   ///inAppBrowser.loadFile("assets/t-rex.html");
   ///...
   ///```
-  Future<void> loadFile(String assetFilePath, {Map<String, String> headers = const {}}) async {
+  Future<void> loadFile({@required String assetFilePath, Map<String, String> headers = const {}}) async {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1028,7 +992,7 @@ class InAppWebViewController {
   }
 
   ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
-  Future<void> goBackOrForward(int steps) async {
+  Future<void> goBackOrForward({@required int steps}) async {
     assert(steps != null);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1040,8 +1004,8 @@ class InAppWebViewController {
     await _channel.invokeMethod('goBackOrForward', args);
   }
 
-  ///Returns a boolean value indicating whether the [InAppWebView] can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
-  Future<bool> canGoBackOrForward(int steps) async {
+  ///Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
+  Future<bool> canGoBackOrForward({@required int steps}) async {
     assert(steps != null);
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1054,11 +1018,11 @@ class InAppWebViewController {
   }
 
   ///Navigates to a [WebHistoryItem] from the back-forward [WebHistory.list] and sets it as the current item.
-  Future<void> goTo(WebHistoryItem historyItem) async {
-    await goBackOrForward(historyItem.offset);
+  Future<void> goTo({@required WebHistoryItem historyItem}) async {
+    await goBackOrForward(steps: historyItem.offset);
   }
 
-  ///Check if the Web View of the [InAppWebView] instance is in a loading state.
+  ///Check if the WebView instance is in a loading state.
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1068,7 +1032,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('isLoading', args);
   }
 
-  ///Stops the Web View of the [InAppWebView] instance from loading.
+  ///Stops the WebView from loading.
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1078,8 +1042,8 @@ class InAppWebViewController {
     await _channel.invokeMethod('stopLoading', args);
   }
 
-  ///Evaluates JavaScript code into the [InAppWebView] and returns the result of the evaluation.
-  Future<String> evaluateJavascript(String source) async {
+  ///Evaluates JavaScript code into the WebView and returns the result of the evaluation.
+  Future<String> evaluateJavascript({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
@@ -1089,8 +1053,8 @@ class InAppWebViewController {
     return await _channel.invokeMethod('evaluateJavascript', args);
   }
 
-  ///Injects an external JavaScript file into the [InAppWebView] from a defined url.
-  Future<void> injectJavascriptFileFromUrl(String urlFile) async {
+  ///Injects an external JavaScript file into the WebView from a defined url.
+  Future<void> injectJavascriptFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
@@ -1100,14 +1064,14 @@ class InAppWebViewController {
     await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
   }
   
-  ///Injects a JavaScript file into the [InAppWebView] from the flutter assets directory.
-  Future<void> injectJavascriptFileFromAsset(String assetFilePath) async {
+  ///Injects a JavaScript file into the WebView from the flutter assets directory.
+  Future<void> injectJavascriptFileFromAsset({@required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
-    await evaluateJavascript(source);
+    await evaluateJavascript(source: source);
   }
 
-  ///Injects CSS into the [InAppWebView].
-  Future<void> injectCSSCode(String source) async {
+  ///Injects CSS into the WebView.
+  Future<void> injectCSSCode({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
@@ -1117,8 +1081,8 @@ class InAppWebViewController {
     await _channel.invokeMethod('injectCSSCode', args);
   }
 
-  ///Injects an external CSS file into the [InAppWebView] from a defined url.
-  Future<void> injectCSSFileFromUrl(String urlFile) async {
+  ///Injects an external CSS file into the WebView from a defined url.
+  Future<void> injectCSSFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
@@ -1128,10 +1092,10 @@ class InAppWebViewController {
     await _channel.invokeMethod('injectStyleFile', args);
   }
 
-  ///Injects a CSS file into the [InAppWebView] from the flutter assets directory.
-  Future<void> injectCSSFileFromAsset(String assetFilePath) async {
+  ///Injects a CSS file into the WebView from the flutter assets directory.
+  Future<void> injectCSSFileFromAsset({@required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
-    await injectCSSCode(source);
+    await injectCSSCode(source: source);
   }
 
   ///Adds a JavaScript message handler [callback] ([JavaScriptHandlerCallback]) that listen to post messages sent from JavaScript by the handler with name [handlerName].
@@ -1180,7 +1144,7 @@ class InAppWebViewController {
   ///    });
   ///  """);
   ///```
-  void addJavaScriptHandler(String handlerName, JavaScriptHandlerCallback callback) {
+  void addJavaScriptHandler({@required String handlerName, @required JavaScriptHandlerCallback callback}) {
     assert(!javaScriptHandlerForbiddenNames.contains(handlerName));
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
@@ -1188,7 +1152,7 @@ class InAppWebViewController {
   ///Removes a JavaScript message handler previously added with the [addJavaScriptHandler()] associated to [handlerName] key.
   ///Returns the value associated with [handlerName] before it was removed.
   ///Returns `null` if [handlerName] was not found.
-  JavaScriptHandlerCallback removeJavaScriptHandler(String handlerName) {
+  JavaScriptHandlerCallback removeJavaScriptHandler({@required String handlerName}) {
     return this.javaScriptHandlersMap.remove(handlerName);
   }
 
@@ -1204,8 +1168,8 @@ class InAppWebViewController {
     return await _channel.invokeMethod('takeScreenshot', args);
   }
 
-  ///Sets the [InAppWebView] options with the new [options] and evaluates them.
-  Future<void> setOptions(InAppWebViewWidgetOptions options) async {
+  ///Sets the WebView options with the new [options] and evaluates them.
+  Future<void> setOptions({@required InAppWebViewWidgetOptions options}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
@@ -1223,7 +1187,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('setOptions', args);
   }
 
-  ///Gets the current [InAppWebView] options. Returns the options with `null` value if they are not set yet.
+  ///Gets the current WebView options. Returns the options with `null` value if they are not set yet.
   Future<InAppWebViewWidgetOptions> getOptions() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1266,9 +1230,9 @@ class InAppWebViewController {
     List<WebHistoryItem> historyList = List();
     for(var i = 0; i < historyListMap.length; i++) {
       LinkedHashMap<dynamic, dynamic> historyItem = historyListMap[i];
-      historyList.add(WebHistoryItem(historyItem["originalUrl"], historyItem["title"], historyItem["url"], i, i - currentIndex));
+      historyList.add(WebHistoryItem(originalUrl: historyItem["originalUrl"], title: historyItem["title"], url: historyItem["url"], index: i, offset: i - currentIndex));
     }
-    return WebHistory(historyList, currentIndex);
+    return WebHistory(list: historyList, currentIndex: currentIndex);
   }
 
   ///Starts Safe Browsing initialization.
@@ -1304,7 +1268,7 @@ class InAppWebViewController {
   ///[hosts] represents the list of hosts. This value must never be null.
   ///
   ///**NOTE**: available only for Android.
-  Future<bool> setSafeBrowsingWhitelist(List<String> hosts) async {
+  Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
     assert(hosts != null);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1372,7 +1336,7 @@ class InAppWebViewController {
   ///**NOTE**: on Android, it finds all instances asynchronously. Successive calls to this will cancel any pending searches.
   ///
   ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
-  Future<void> findAllAsync(String find) async {
+  Future<void> findAllAsync({@required String find}) async {
     assert(find != null);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1388,7 +1352,7 @@ class InAppWebViewController {
   ///[forward] represents the direction to search.
   ///
   ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
-  Future<void> findNext(bool forward) async {
+  Future<void> findNext({@required bool forward}) async {
     assert(forward != null);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {

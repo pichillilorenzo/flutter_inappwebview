@@ -85,8 +85,6 @@ final public class InAppWebView extends InputAwareWebView {
           "   }" +
           "})(window.console);";
 
-  static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
-
   static final String variableForOnLoadResourceJS = "window._flutter_inappbrowser_useOnLoadResource";
   static final String enableVariableForOnLoadResourceJS = variableForOnLoadResourceJS + " = $PLACEHOLDER_VALUE;";
 
@@ -116,6 +114,29 @@ final public class InAppWebView extends InputAwareWebView {
           "  ajax.prototype._flutter_inappbrowser_password = null;" +
           "  ajax.prototype._flutter_inappbrowser_already_onreadystatechange_wrapped = false;" +
           "  ajax.prototype._flutter_inappbrowser_request_headers = {};" +
+          "  function convertRequestResponse(request, callback) {" +
+          "    if (request.response != null && request.responseType != null) {" +
+          "      switch (request.responseType) {" +
+          "        case 'arraybuffer':" +
+          "          callback(new Uint8Array(request.response));" +
+          "          return;" +
+          "        case 'blob':" +
+          "          const reader = new FileReader();" +
+          "          reader.addEventListener('loadend', function() {  " +
+          "            callback(new Uint8Array(reader.result));" +
+          "          });" +
+          "          reader.readAsArrayBuffer(blob);" +
+          "          return;" +
+          "        case 'document':" +
+          "          callback(request.response.documentElement.outerHTML);" +
+          "          return;" +
+          "        case 'json':" +
+          "          callback(request.response);" +
+          "          return;" +
+          "      };" +
+          "    }" +
+          "    callback(null);" +
+          "  };" +
           "  ajax.prototype.open = function(method, url, isAsync, user, password) {" +
           "    isAsync = (isAsync != null) ? isAsync : true;" +
           "    this._flutter_inappbrowser_url = url;" +
@@ -143,35 +164,40 @@ final public class InAppWebView extends InputAwareWebView {
           "          responseHeaders[header] = value;" +
           "        });" +
           "      }" +
-          "      var ajaxRequest = {" +
-          "        method: this._flutter_inappbrowser_method," +
-          "        url: this._flutter_inappbrowser_url," +
-          "        isAsync: this._flutter_inappbrowser_isAsync," +
-          "        user: this._flutter_inappbrowser_user," +
-          "        password: this._flutter_inappbrowser_password," +
-          "        withCredentials: this.withCredentials," +
-          "        headers: this._flutter_inappbrowser_request_headers," +
-          "        readyState: this.readyState," +
-          "        status: this.status," +
-          "        responseURL: this.responseURL," +
-          "        responseType: this.responseType," +
-          "        responseText: this.responseText," +
-          "        statusText: this.statusText," +
-          "        responseHeaders, responseHeaders," +
-          "        event: {" +
-          "          type: e.type," +
-          "          loaded: e.loaded," +
-          "          lengthComputable: e.lengthComputable" +
-          "        }" +
-          "      };" +
-          "      window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxProgress', ajaxRequest).then(function(result) {" +
-          "        if (result != null) {" +
-          "          switch (result) {" +
-          "            case 0:" +
-          "              self.abort();" +
-          "              return;" +
-          "          };" +
-          "        }" +
+          "      convertRequestResponse(this, function(response) {" +
+          "        var ajaxRequest = {" +
+          "          method: self._flutter_inappbrowser_method," +
+          "          url: self._flutter_inappbrowser_url," +
+          "          isAsync: self._flutter_inappbrowser_isAsync," +
+          "          user: self._flutter_inappbrowser_user," +
+          "          password: self._flutter_inappbrowser_password," +
+          "          withCredentials: self.withCredentials," +
+          "          headers: self._flutter_inappbrowser_request_headers," +
+          "          readyState: self.readyState," +
+          "          status: self.status," +
+          "          responseURL: self.responseURL," +
+          "          responseType: self.responseType," +
+          "          response: response," +
+          "          responseText: (self.responseType == 'text' || self.responseType == '') ? self.responseText : null," +
+          "          responseXML: (self.responseType == 'document' && self.responseXML != null) ? self.responseXML.documentElement.outerHTML : null," +
+          "          statusText: self.statusText," +
+          "          responseHeaders, responseHeaders," +
+          "          event: {" +
+          "            type: e.type," +
+          "            loaded: e.loaded," +
+          "            lengthComputable: e.lengthComputable," +
+          "            total: e.total" +
+          "          }" +
+          "        };" +
+          "        window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxProgress', ajaxRequest).then(function(result) {" +
+          "          if (result != null) {" +
+          "            switch (result) {" +
+          "              case 0:" +
+          "                self.abort();" +
+          "                return;" +
+          "            };" +
+          "          }" +
+          "        });" +
           "      });" +
           "    }" +
           "  };" +
@@ -194,33 +220,37 @@ final public class InAppWebView extends InputAwareWebView {
           "                responseHeaders[header] = value;" +
           "              });" +
           "            }" +
-          "            var ajaxRequest = {" +
-          "              method: this._flutter_inappbrowser_method," +
-          "              url: this._flutter_inappbrowser_url," +
-          "              isAsync: this._flutter_inappbrowser_isAsync," +
-          "              user: this._flutter_inappbrowser_user," +
-          "              password: this._flutter_inappbrowser_password," +
-          "              withCredentials: this.withCredentials," +
-          "              headers: this._flutter_inappbrowser_request_headers," +
-          "              readyState: this.readyState," +
-          "              status: this.status," +
-          "              responseURL: this.responseURL," +
-          "              responseType: this.responseType," +
-          "              responseText: this.responseText," +
-          "              statusText: this.statusText," +
-          "              responseHeaders: responseHeaders" +
-          "            };" +
-          "            window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {" +
-          "              if (result != null) {" +
-          "                switch (result) {" +
-          "                  case 0:" +
-          "                    self.abort();" +
-          "                    return;" +
-          "                };" +
-          "              }" +
-          "              if (onreadystatechange != null) {" +
-          "                onreadystatechange();" +
-          "              }" +
+          "            convertRequestResponse(this, function(response) {" +
+          "              var ajaxRequest = {" +
+          "                method: self._flutter_inappbrowser_method," +
+          "                url: self._flutter_inappbrowser_url," +
+          "                isAsync: self._flutter_inappbrowser_isAsync," +
+          "                user: self._flutter_inappbrowser_user," +
+          "                password: self._flutter_inappbrowser_password," +
+          "                withCredentials: self.withCredentials," +
+          "                headers: self._flutter_inappbrowser_request_headers," +
+          "                readyState: self.readyState," +
+          "                status: self.status," +
+          "                responseURL: self.responseURL," +
+          "                responseType: self.responseType," +
+          "                response: response," +
+          "                responseText: (self.responseType == 'text' || self.responseType == '') ? self.responseText : null," +
+          "                responseXML: (self.responseType == 'document' && self.responseXML != null) ? self.responseXML.documentElement.outerHTML : null," +
+          "                statusText: self.statusText," +
+          "                responseHeaders: responseHeaders" +
+          "              };" +
+          "              window." + JavaScriptBridgeInterface.name + ".callHandler('onAjaxReadyStateChange', ajaxRequest).then(function(result) {" +
+          "                if (result != null) {" +
+          "                  switch (result) {" +
+          "                    case 0:" +
+          "                      self.abort();" +
+          "                      return;" +
+          "                  };" +
+          "                }" +
+          "                if (onreadystatechange != null) {" +
+          "                  onreadystatechange();" +
+          "                }" +
+          "              });" +
           "            });" +
           "          } else if (onreadystatechange != null) {" +
           "            onreadystatechange();" +
@@ -233,6 +263,7 @@ final public class InAppWebView extends InputAwareWebView {
           "      this.addEventListener('progress', handleEvent);" +
           "      this.addEventListener('error', handleEvent);" +
           "      this.addEventListener('abort', handleEvent);" +
+          "      this.addEventListener('timeout', handleEvent);" +
           "      var ajaxRequest = {" +
           "        data: data," +
           "        method: this._flutter_inappbrowser_method," +
@@ -241,7 +272,8 @@ final public class InAppWebView extends InputAwareWebView {
           "        user: this._flutter_inappbrowser_user," +
           "        password: this._flutter_inappbrowser_password," +
           "        withCredentials: this.withCredentials," +
-          "        headers: this._flutter_inappbrowser_request_headers" +
+          "        headers: this._flutter_inappbrowser_request_headers," +
+          "        responseType: this.responseType" +
           "      };" +
           "      window." + JavaScriptBridgeInterface.name + ".callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {" +
           "        if (result != null) {" +
@@ -252,6 +284,9 @@ final public class InAppWebView extends InputAwareWebView {
           "          };" +
           "          data = result.data;" +
           "          self.withCredentials = result.withCredentials;" +
+          "          if (result.responseType != null) {" +
+          "            self.responseType = result.responseType;" +
+          "          };" +
           "          for (var header in result.headers) {" +
           "            var value = result.headers[header];" +
           "            self.setRequestHeader(header, value);" +
@@ -405,7 +440,7 @@ final public class InAppWebView extends InputAwareWebView {
           "                controller.abort();" +
           "                break;" +
           "            }" +
-          "            var resultResource = (result.resource != null) ? result.resource : resource;" +
+          "            var resultResource = (result.url != null) ? result.url : resource;" +
           "            var resultInit = init;" +
           "            if (result.init != null) {" +
           "              resultInit.method = result.method;" +
@@ -555,14 +590,17 @@ final public class InAppWebView extends InputAwareWebView {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.forceDark != null)
       settings.setForceDark(options.forceDark);
     settings.setGeolocationEnabled(options.geolocationEnabled);
-    if (options.layoutAlgorithm != null)
-      settings.setLayoutAlgorithm(options.layoutAlgorithm);
+    if (options.layoutAlgorithm != null) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && options.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+        settings.setLayoutAlgorithm(options.layoutAlgorithm);
+      } else {
+        settings.setLayoutAlgorithm(options.layoutAlgorithm);
+      }
+    }
     settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
     settings.setMinimumFontSize(options.minimumFontSize);
     settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
-    if(options.initialScale != null)
-        setInitialScale(options.initialScale);
-
+    setInitialScale(options.initialScale);
     settings.setNeedInitialFocus(options.needInitialFocus);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
       settings.setOffscreenPreRaster(options.offscreenPreRaster);
@@ -575,9 +613,8 @@ final public class InAppWebView extends InputAwareWebView {
           setDesktopMode(true);
           break;
         case MOBILE:
-          setDesktopMode(false);
-          break;
         case RECOMMENDED:
+          setDesktopMode(false);
           break;
       }
     }
@@ -951,8 +988,13 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("geolocationEnabled") != null && options.geolocationEnabled != newOptions.geolocationEnabled)
       settings.setGeolocationEnabled(newOptions.geolocationEnabled);
 
-    if (newOptionsMap.get("layoutAlgorithm") != null && options.layoutAlgorithm != newOptions.layoutAlgorithm)
-      settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+    if (newOptionsMap.get("layoutAlgorithm") != null && options.layoutAlgorithm != newOptions.layoutAlgorithm) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && newOptions.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+        settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+      } else {
+        settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+      }
+    }
 
     if (newOptionsMap.get("loadWithOverviewMode") != null && options.loadWithOverviewMode != newOptions.loadWithOverviewMode)
       settings.setLoadWithOverviewMode(newOptions.loadWithOverviewMode);
@@ -984,6 +1026,18 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("standardFontFamily") != null && !options.standardFontFamily.equals(newOptions.standardFontFamily))
       settings.setStandardFontFamily(newOptions.standardFontFamily);
+
+    if (newOptionsMap.get("preferredContentMode") != null && !options.preferredContentMode.equals(newOptions.preferredContentMode)) {
+      switch (fromValue(newOptions.preferredContentMode)) {
+        case DESKTOP:
+          setDesktopMode(true);
+          break;
+        case MOBILE:
+        case RECOMMENDED:
+          setDesktopMode(false);
+          break;
+      }
+    }
 
     if (newOptionsMap.get("saveFormData") != null && options.saveFormData != newOptions.saveFormData)
       settings.setSaveFormData(newOptions.saveFormData);

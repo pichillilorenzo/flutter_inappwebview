@@ -1,12 +1,17 @@
 package com.pichillilorenzo.flutter_inappbrowser.InAppWebView;
 
+import android.os.Build;
+import android.util.Log;
 import android.webkit.WebSettings;
 
 import com.pichillilorenzo.flutter_inappbrowser.Options;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+
+import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
 public class InAppWebViewOptions extends Options {
 
@@ -23,7 +28,6 @@ public class InAppWebViewOptions extends Options {
   public Boolean debuggingEnabled = false;
   public Boolean javaScriptCanOpenWindowsAutomatically = false;
   public Boolean mediaPlaybackRequiresUserGesture = true;
-  public Integer textZoom = 100;
   public Integer minimumFontSize = 8;
   public Boolean verticalScrollBarEnabled = true;
   public Boolean horizontalScrollBarEnabled = true;
@@ -36,6 +40,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean cacheEnabled = true;
   public Boolean transparentBackground = false;
 
+  public Integer textZoom = 100;
   public Boolean clearSessionCache = false;
   public Boolean builtInZoomControls = false;
   public Boolean displayZoomControls = false;
@@ -66,7 +71,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean loadWithOverviewMode = true;
   public Boolean loadsImagesAutomatically = true;
   public Integer minimumLogicalFontSize = 8;
-  public Integer initialScale;
+  public Integer initialScale = 0;
   public Boolean needInitialFocus = true;
   public Boolean offscreenPreRaster = false;
   public String sansSerifFontFamily = "sans-serif";
@@ -75,4 +80,49 @@ public class InAppWebViewOptions extends Options {
   public Boolean saveFormData = true;
   public Boolean thirdPartyCookiesEnabled = true;
   public Boolean hardwareAcceleration = true;
+
+  @Override
+  public Object onParse(Map.Entry<String, Object> pair) {
+    if (pair.getKey().equals("layoutAlgorithm")) {
+      String value = (String) pair.getValue();
+      if (value != null) {
+        switch (value) {
+          case "NORMAL":
+            pair.setValue(NORMAL);
+            return pair;
+          case "TEXT_AUTOSIZING":
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+              return pair.setValue(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
+            } else {
+              pair.setValue(NORMAL);
+            }
+            return pair;
+        }
+      }
+    }
+    return super.onParse(pair);
+  }
+
+  @Override
+  public Object onGetHashMap(Field field) {
+    if (field.getName().equals("layoutAlgorithm")) {
+      try {
+        WebSettings.LayoutAlgorithm value = (WebSettings.LayoutAlgorithm) field.get(this);
+        if (value != null) {
+          switch (value) {
+            case NORMAL:
+              return "NORMAL";
+            default:
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && value.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+                return "TEXT_AUTOSIZING";
+              }
+              return "NORMAL";
+          }
+        }
+      } catch (IllegalAccessException e) {
+        Log.d(LOG_TAG, e.getMessage());
+      }
+    }
+    return super.onGetHashMap(field);
+  }
 }

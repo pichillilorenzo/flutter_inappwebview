@@ -117,10 +117,10 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (!options.toolbarTop)
       actionBar.hide();
 
-    if (!options.toolbarTopBackgroundColor.isEmpty())
+    if (options.toolbarTopBackgroundColor != null && !options.toolbarTopBackgroundColor.isEmpty())
       actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(options.toolbarTopBackgroundColor)));
 
-    if (!options.toolbarTopFixedTitle.isEmpty())
+    if (options.toolbarTopFixedTitle != null && !options.toolbarTopFixedTitle.isEmpty())
       actionBar.setTitle(options.toolbarTopFixedTitle);
 
   }

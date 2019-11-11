@@ -3,7 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
-class MyInappBrowser extends InAppBrowser {
+class MyInAppBrowser extends InAppBrowser {
 
  @override
  Future onBrowserCreated() async {
@@ -43,7 +43,7 @@ class MyInappBrowser extends InAppBrowser {
  @override
  void shouldOverrideUrlLoading(String url) {
    print("\n\n override $url\n\n");
-   this.webViewController.loadUrl(url);
+   this.webViewController.loadUrl(url: url);
  }
 
  @override
@@ -75,11 +75,13 @@ class MyInappBrowser extends InAppBrowser {
  @override
  Future<CustomSchemeResponse> onLoadResourceCustomScheme(String scheme, String url) async {
    print("custom scheme: " + scheme);
+   return null;
  }
 
  @override
  Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt(String origin) async {
    print("request Geolocation permission API");
+   return null;
  }
 
  @override
@@ -89,18 +91,18 @@ class MyInappBrowser extends InAppBrowser {
 
  @override
  Future<JsConfirmResponse> onJsConfirm(String message) {
-
+   return null;
  }
 
  @override
  Future<JsPromptResponse> onJsPrompt(String message, String defaultValue) {
-
+   return null;
  }
 }
 
 class WebviewExampleScreen extends StatefulWidget {
-  final MyInappBrowser browser = new MyInappBrowser();
-  static BuildContext context = null;
+  final MyInAppBrowser browser = new MyInAppBrowser();
+  static BuildContext context;
 
   @override
   _WebviewExampleScreenState createState() => new _WebviewExampleScreenState();
@@ -119,7 +121,7 @@ class _WebviewExampleScreenState extends State<WebviewExampleScreen> {
       child: new RaisedButton(
           onPressed: ()  {
             widget.browser.openFile(
-              "assets/index.html",
+              assetFilePath: "assets/index.html",
               //url: "https://www.google.com/",
               options: InAppBrowserClassOptions(
                 inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(

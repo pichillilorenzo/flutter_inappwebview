@@ -15,8 +15,9 @@ public class Options {
     Iterator it = options.entrySet().iterator();
     while (it.hasNext()) {
       Map.Entry<String, Object> pair = (Map.Entry<String, Object>) it.next();
+      Object value = this.onParse(pair);
       try {
-        this.getClass().getDeclaredField(pair.getKey()).set(this, pair.getValue());
+        this.getClass().getDeclaredField(pair.getKey()).set(this, value);
       } catch (NoSuchFieldException e) {
         Log.d(LOG_TAG, e.getMessage());
       } catch (IllegalAccessException e) {
@@ -26,16 +27,25 @@ public class Options {
     return this;
   }
 
+  public Object onParse(Map.Entry<String, Object> pair) {
+    return pair.getValue();
+  }
+
   public HashMap<String, Object> getHashMap() {
     HashMap<String, Object> options = new HashMap<>();
-    for (Field f : this.getClass().getDeclaredFields()) {
-      try {
-        options.put(f.getName(), f.get(this));
-      } catch (IllegalAccessException e) {
-        Log.d(LOG_TAG, e.getMessage());
-      }
+    for (Field field : this.getClass().getDeclaredFields()) {
+      options.put(field.getName(), onGetHashMap(field));
     }
     return options;
+  }
+
+  public Object onGetHashMap(Field field) {
+    try {
+      return field.get(this);
+    } catch (IllegalAccessException e) {
+      Log.d(LOG_TAG, e.getMessage());
+    }
+    return null;
   }
 
 }

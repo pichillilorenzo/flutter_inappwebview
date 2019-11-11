@@ -104,10 +104,11 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                 resourceCustomSchemes: ["my-special-custom-scheme"],
                 contentBlockers: [
                     ContentBlocker(
-                        ContentBlockerTrigger(".*",
+                        trigger: ContentBlockerTrigger(
+                            urlFilter: ".*",
                             resourceType: [ContentBlockerTriggerResourceType.IMAGE, ContentBlockerTriggerResourceType.STYLE_SHEET],
                             ifTopUrl: ["https://getbootstrap.com/"]),
-                        ContentBlockerAction(ContentBlockerActionType.BLOCK)
+                        action: ContentBlockerAction(type: ContentBlockerActionType.BLOCK)
                     )
                   ]
                 ),
@@ -125,11 +126,11 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               if (Platform.isAndroid)
                 webView.startSafeBrowsing();
 
-              webView.addJavaScriptHandler('handlerFoo', (args) {
+              webView.addJavaScriptHandler(handlerName:'handlerFoo', callback: (args) {
                 return new Foo(bar: 'bar_value', baz: 'baz_value');
               });
 
-              webView.addJavaScriptHandler('handlerFooWithArgs', (args) {
+              webView.addJavaScriptHandler(handlerName: 'handlerFooWithArgs', callback: (args) {
                 print(args);
                 return [args[0] + 5, !args[1], args[2][0], args[3]['foo']];
               });
@@ -155,20 +156,20 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               var tRexHtml = await controller.getTRexRunnerHtml();
               var tRexCss = await controller.getTRexRunnerCss();
 
-              controller.loadData("""
+              controller.loadData(data: """
               <html>
                 <head>
                   <meta charset="utf-8">
                   <meta name="viewport" content="width=device-width, initial-scale=1.0,maximum-scale=1.0, user-scalable=no">
-                  <style>${tRexCss}</style>
+                  <style>$tRexCss</style>
                 </head>
                 <body>
-                  ${tRexHtml}
+                  $tRexHtml
                   <p>
-                    URL ${url} failed to load.
+                    URL $url failed to load.
                   </p>
                   <p>
-                    Error: ${code}, ${message}
+                    Error: $code, $message
                   </p>
                 </body>
               </html>
@@ -182,7 +183,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             },
             shouldOverrideUrlLoading: (InAppWebViewController controller, String url) {
               print("override $url");
-              controller.loadUrl(url);
+              controller.loadUrl(url: url);
             },
             onLoadResource: (InAppWebViewController controller, LoadedResource response) {
               print("Resource type: '"+response.initiatorType + "' started at: " +
@@ -212,14 +213,14 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             onLoadResourceCustomScheme: (InAppWebViewController controller, String scheme, String url) async {
               if (scheme == "my-special-custom-scheme") {
                 var bytes = await rootBundle.load("assets/" + url.replaceFirst("my-special-custom-scheme://", "", 0));
-                var response = new CustomSchemeResponse(bytes.buffer.asUint8List(), "image/svg+xml", contentEnconding: "utf-8");
+                var response = new CustomSchemeResponse(data: bytes.buffer.asUint8List(), contentType: "image/svg+xml", contentEnconding: "utf-8");
                 return response;
               }
               return null;
             },
             onTargetBlank: (InAppWebViewController controller, String url) {
               print("target _blank: " + url);
-              controller.loadUrl(url);
+              controller.loadUrl(url: url);
             },
             onGeolocationPermissionsShowPrompt: (InAppWebViewController controller, String origin) async {
               GeolocationPermissionShowPromptResponse response;
@@ -234,14 +235,14 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
                       FlatButton(
                         child: Text("Close"),
                         onPressed: () {
-                          response = new GeolocationPermissionShowPromptResponse(origin, false, false);
+                          response = new GeolocationPermissionShowPromptResponse(origin: origin, allow: false, retain: false);
                           Navigator.of(context).pop();
                         },
                       ),
                       FlatButton(
                         child: Text("Accept"),
                         onPressed: () {
-                          response = new GeolocationPermissionShowPromptResponse(origin, true, true);
+                          response = new GeolocationPermissionShowPromptResponse(origin: origin, allow: true, retain: true);
                           Navigator.of(context).pop();
                         },
                       ),
@@ -288,21 +289,24 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("Current highlighted: $activeMatchOrdinal, Number of matches found: $numberOfMatches, find operation completed: $isDoneCounting");
             },
             shouldInterceptAjaxRequest: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              //print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
+              print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
+              if (ajaxRequest.url == "http://192.168.1.20:8082/test-ajax-post") {
+                ajaxRequest.responseType = 'json';
+              }
 //              ajaxRequest.method = "GET";
 //              ajaxRequest.url = "http://192.168.1.20:8082/test-download-file";
 //              ajaxRequest.headers = {
 //                "Custom-Header": "Custom-Value"
 //              };
 //              return ajaxRequest;
-              return null;
+              return ajaxRequest;
             },
             onAjaxReadyStateChange: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              //print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.responseHeaders}");
+              print("AJAX READY STATE CHANGE: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.status}, ${ajaxRequest.readyState}, ${ajaxRequest.responseType}, ${ajaxRequest.responseText}, ${ajaxRequest.response}, ${ajaxRequest.responseHeaders}");
               return AjaxRequestAction.PROCEED;
             },
             onAjaxProgress: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              //print("AJAX EVENT: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.event.type}, LOADED: ${ajaxRequest.event.loaded}, ${ajaxRequest.responseHeaders}");
+              print("AJAX EVENT: ${ajaxRequest.method} - ${ajaxRequest.url}, ${ajaxRequest.event.type}, LOADED: ${ajaxRequest.event.loaded}, ${ajaxRequest.responseHeaders}");
               return AjaxRequestAction.PROCEED;
             },
             shouldInterceptFetchRequest: (InAppWebViewController controller, FetchRequest fetchRequest) async {
@@ -312,7 +316,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               return fetchRequest;
             },
             onNavigationStateChange: (InAppWebViewController controller, String url) async {
-              print("NAVIGATION STATE CHANGE: ${url}");
+              print("NAVIGATION STATE CHANGE: $url");
               setState(() {
                 this.url = url;
               });

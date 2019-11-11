@@ -45,7 +45,7 @@ class InAppLocalhostServer {
           var body = List<int>();
           var path = request.requestedUri.path;
           path = (path.startsWith('/')) ? path.substring(1) : path;
-          path += (path.endsWith('/')) ? 't-rex.html' : '';
+          path += (path.endsWith('/')) ? 'index.html' : '';
 
           try {
             body = (await rootBundle.load(path))

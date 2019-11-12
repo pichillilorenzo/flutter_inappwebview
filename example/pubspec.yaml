@@ -26,6 +26,7 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  ansicolor: 1.0.2
 
   flutter_inappbrowser:
       path: ../

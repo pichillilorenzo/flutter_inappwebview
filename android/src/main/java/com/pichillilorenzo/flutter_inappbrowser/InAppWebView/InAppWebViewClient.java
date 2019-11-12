@@ -567,10 +567,17 @@ public class InAppWebViewClient extends WebViewClient {
     URI uri;
     try {
       uri = new URI(url);
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
-      return null;
+    } catch (URISyntaxException uriExpection) {
+      String[] urlSplitted = url.split(":");
+      String scheme = urlSplitted[0];
+      try {
+        URL tempUrl = new URL(url.replace(scheme, "https"));
+        uri = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
+      } catch (Exception e) {
+        e.printStackTrace();
+        Log.d(LOG_TAG, e.getMessage());
+        return null;
+      }
     }
 
     String scheme = uri.getScheme();

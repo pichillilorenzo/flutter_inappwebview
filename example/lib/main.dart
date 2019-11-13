@@ -25,9 +25,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-  InAppWebViewController webView;
-  String url = "";
-  double progress = 0;
 
   @override
   void initState() {

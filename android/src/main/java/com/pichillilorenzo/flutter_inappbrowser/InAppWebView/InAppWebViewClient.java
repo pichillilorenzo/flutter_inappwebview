@@ -136,16 +136,23 @@ public class InAppWebViewClient extends WebViewClient {
 
     InAppWebView webView = (InAppWebView) view;
 
-    webView.loadUrl("javascript:" + InAppWebView.consoleLogJS.replaceAll("[\r\n]+", ""));
-    webView.loadUrl("javascript:" + JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", ""));
+    String js = InAppWebView.consoleLogJS.replaceAll("[\r\n]+", "");
+    js += JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", "");
+
     if (webView.options.useShouldInterceptAjaxRequest) {
-      webView.loadUrl("javascript:" + InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", ""));
+      js += InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", "");
     }
     if (webView.options.useShouldInterceptFetchRequest) {
-      webView.loadUrl("javascript:" + InAppWebView.interceptFetchRequestsJS.replaceAll("[\r\n]+", ""));
+      js += InAppWebView.interceptFetchRequestsJS.replaceAll("[\r\n]+", "");
     }
     if (webView.options.useOnLoadResource) {
-      webView.loadUrl("javascript:" + InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", ""));
+      js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      webView.evaluateJavascript(js, (ValueCallback<String>) null);
+    } else {
+      webView.loadUrl("javascript:" + js);
     }
 
     onPageStartedURL = url;
@@ -183,6 +190,14 @@ public class InAppWebViewClient extends WebViewClient {
     // https://issues.apache.org/jira/browse/CB-11248
     view.clearFocus();
     view.requestFocus();
+
+    String js = InAppWebView.platformReadyJS.replaceAll("[\r\n]+", "");
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      webView.evaluateJavascript(js, (ValueCallback<String>) null);
+    } else {
+      webView.loadUrl("javascript:" + js);
+    }
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)

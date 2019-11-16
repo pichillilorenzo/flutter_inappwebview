@@ -22,14 +22,13 @@ dependencies:
   flutter_downloader: ^1.3.2
   path_provider: ^1.4.0
   permission_handler: ^3.3.0
+  flutter_inappbrowser:
+    path: ../
 
 dev_dependencies:
-  flutter_test:
+  flutter_driver:
     sdk: flutter
-  ansicolor: 1.0.2
-
-  flutter_inappbrowser:
-      path: ../
+  test: any
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -50,6 +49,14 @@ flutter:
     - assets/css/
     - assets/images/
     - assets/favicon.ico
+    - test_assets/certificate.pfx
+    - test_assets/in_app_webview_initial_file_test.html
+    - test_assets/in_app_webview_on_load_resource_test.html
+    - test_assets/in_app_webview_javascript_handler_test.html
+    - test_assets/in_app_webview_ajax_test.html
+    - test_assets/css/
+    - test_assets/images/
+    - test_assets/favicon.ico
 
   # To add assets to your application, add an assets section, like this:
   # assets:

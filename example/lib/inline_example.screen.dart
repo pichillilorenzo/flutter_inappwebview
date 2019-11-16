@@ -289,9 +289,10 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
               print("Current highlighted: $activeMatchOrdinal, Number of matches found: $numberOfMatches, find operation completed: $isDoneCounting");
             },
             shouldInterceptAjaxRequest: (InAppWebViewController controller, AjaxRequest ajaxRequest) async {
-              print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}");
+              print("AJAX REQUEST: ${ajaxRequest.method} - ${ajaxRequest.url}, DATA: ${ajaxRequest.data}, headers: ${ajaxRequest.headers}");
               if (ajaxRequest.url == "http://192.168.1.20:8082/test-ajax-post") {
                 ajaxRequest.responseType = 'json';
+                ajaxRequest.data = "firstname=Lorenzo&lastname=Pichilli";
               }
 //              ajaxRequest.method = "GET";
 //              ajaxRequest.url = "http://192.168.1.20:8082/test-download-file";

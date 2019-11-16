@@ -85,6 +85,8 @@ final public class InAppWebView extends InputAwareWebView {
           "   }" +
           "})(window.console);";
 
+  static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
+
   static final String variableForOnLoadResourceJS = "window._flutter_inappbrowser_useOnLoadResource";
   static final String enableVariableForOnLoadResourceJS = variableForOnLoadResourceJS + " = $PLACEHOLDER_VALUE;";
 
@@ -148,7 +150,6 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "  ajax.prototype.setRequestHeader = function(header, value) {" +
           "    this._flutter_inappbrowser_request_headers[header] = value;" +
-          "    setRequestHeader.call(this, header, value);" +
           "  };" +
           "  function handleEvent(e) {" +
           "    var self = this;" +
@@ -289,7 +290,11 @@ final public class InAppWebView extends InputAwareWebView {
           "          };" +
           "          for (var header in result.headers) {" +
           "            var value = result.headers[header];" +
-          "            self.setRequestHeader(header, value);" +
+          "            self._flutter_inappbrowser_request_headers[header] = value;" +
+          "          };" +
+          "          for (var header in self._flutter_inappbrowser_request_headers) {" +
+          "            var value = self._flutter_inappbrowser_request_headers[header];" +
+          "            setRequestHeader.call(self, header, value);" +
           "          };" +
           "          if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {" +
           "            self.abort();" +

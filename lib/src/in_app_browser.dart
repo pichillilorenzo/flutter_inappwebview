@@ -97,7 +97,7 @@ class InAppBrowser {
   ///  uses-material-design: true
   ///
   ///  assets:
-  ///    - assets/t-rex.html
+  ///    - assets/index.html
   ///    - assets/css/
   ///    - assets/images/
   ///
@@ -106,7 +106,7 @@ class InAppBrowser {
   ///Example of a `main.dart` file:
   ///```dart
   ///...
-  ///inAppBrowser.openFile("assets/t-rex.html");
+  ///inAppBrowser.openFile("assets/index.html");
   ///...
   ///```
   ///

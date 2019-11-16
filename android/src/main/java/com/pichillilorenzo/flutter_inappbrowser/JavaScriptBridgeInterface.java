@@ -28,7 +28,7 @@ public class JavaScriptBridgeInterface {
     "return new Promise(function(resolve, reject) {" +
     "  window." + name + "[_callHandlerID] = resolve;" +
     "});" +
-  "}";
+  "};";
 
   public JavaScriptBridgeInterface(Object obj) {
     if (obj instanceof InAppBrowserActivity)

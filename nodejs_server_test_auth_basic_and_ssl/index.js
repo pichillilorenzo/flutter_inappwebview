@@ -113,6 +113,7 @@ app.get("/", (req, res) => {
 
 app.post("/test-post", (req, res) => {
   console.log(JSON.stringify(req.headers))
+  console.log(JSON.stringify(req.body))
   res.send(`
     <html>
       <head>
@@ -127,10 +128,12 @@ app.post("/test-post", (req, res) => {
 
 app.post("/test-ajax-post", (req, res) => {
   console.log(JSON.stringify(req.headers))
+  console.log(JSON.stringify(req.body))
   res.set("Content-Type", "application/json")
   res.send(JSON.stringify({
-    "name": req.body.name,
-    "key2": "value2"
+    "firstname": req.body.firstname,
+    "lastname": req.body.lastname,
+    "fullname": req.body.firstname + " " + req.body.lastname,
   }))
   res.end()
 })

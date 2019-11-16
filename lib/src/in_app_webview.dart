@@ -153,6 +153,10 @@ class InAppWebView extends StatefulWidget {
   ///[ajaxRequest] represents the `XMLHttpRequest`.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
+  ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
+  ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
+  ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
   final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) shouldInterceptAjaxRequest;
 
   ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
@@ -161,6 +165,10 @@ class InAppWebView extends StatefulWidget {
   ///[ajaxRequest] represents the [XMLHttpRequest].
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
+  ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
+  ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
+  ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
 
   ///Event fired as an `XMLHttpRequest` progress.
@@ -169,6 +177,10 @@ class InAppWebView extends StatefulWidget {
   ///[ajaxRequest] represents the [XMLHttpRequest].
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
+  ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
+  ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
+  ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgress;
 
   ///Event fired when an request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
@@ -177,6 +189,10 @@ class InAppWebView extends StatefulWidget {
   ///[fetchRequest] represents a resource request.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptFetchRequest] option to `true`.
+  ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
+  ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
+  ///used to intercept fetch requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
   final Future<FetchRequest> Function(InAppWebViewController controller, FetchRequest fetchRequest) shouldInterceptFetchRequest;
 
   ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of
@@ -922,7 +938,7 @@ class InAppWebViewController {
   ///  uses-material-design: true
   ///
   ///  assets:
-  ///    - assets/t-rex.html
+  ///    - assets/index.html
   ///    - assets/css/
   ///    - assets/images/
   ///
@@ -931,7 +947,7 @@ class InAppWebViewController {
   ///Example of a `main.dart` file:
   ///```dart
   ///...
-  ///inAppBrowser.loadFile("assets/t-rex.html");
+  ///inAppBrowser.loadFile("assets/index.html");
   ///...
   ///```
   Future<void> loadFile({@required String assetFilePath, Map<String, String> headers = const {}}) async {
@@ -1111,6 +1127,14 @@ class InAppWebViewController {
   ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
   ///
+  ///In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
+  ///This event will be dispatch as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
+  ///```javascript
+  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+  ///     console.log("ready");
+  ///   });
+  ///```
+  ///
   ///`window.flutter_inappbrowser.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
   ///that can be used to get the json result returned by [JavaScriptHandlerCallback].
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
@@ -1118,6 +1142,7 @@ class InAppWebViewController {
   ///So, on the JavaScript side, to get data coming from the Dart side, you will use:
   ///```html
   ///<script>
+  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
   ///     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
   ///       console.log(result, typeof result);
   ///       console.log(JSON.stringify(result));
@@ -1127,7 +1152,18 @@ class InAppWebViewController {
   ///       console.log(result, typeof result);
   ///       console.log(JSON.stringify(result));
   ///     });
+  ///   });
   ///</script>
+  ///```
+  ///
+  ///Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
+  ///```dart
+  ///  // Inject JavaScript that will receive data back from Flutter
+  ///  inAppWebViewController.evaluateJavascript(source: """
+  ///    window.flutter_inappbrowser.callHandler('test', 'Text from Javascript').then(function(result) {
+  ///      console.log(result);
+  ///    });
+  ///  """);
   ///```
   void addJavaScriptHandler({@required String handlerName, @required JavaScriptHandlerCallback callback}) {
     assert(!javaScriptHandlerForbiddenNames.contains(handlerName));

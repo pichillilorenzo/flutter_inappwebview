@@ -45,7 +45,6 @@
 - Renamed `injectScriptCode` to `evaluateJavascript`
 - Renamed `injectStyleCode` to `injectCSSCode`
 - Renamed `injectStyleFile` to `injectCSSFileFromUrl`
-- No need to listen to `window.addEventListener("flutterInAppBrowserPlatformReady", fuction(){ })` javascript event anymore to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` to use the JavaScript message handlers
 
 ## 1.2.1
 

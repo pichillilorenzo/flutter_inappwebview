@@ -39,6 +39,12 @@ class ConsoleMessageLevel {
   static const WARNING = const ConsoleMessageLevel._internal(2);
   static const ERROR = const ConsoleMessageLevel._internal(3);
   static const DEBUG = const ConsoleMessageLevel._internal(4);
+
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///Public class representing a resource response of the [InAppBrowser] WebView.
@@ -204,6 +210,11 @@ class JsAlertResponseAction {
   toValue() => _value;
 
   static const CONFIRM = const JsAlertResponseAction._internal(0);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///JsAlertResponse class represents the response used by the [onJsAlert] event to control a JavaScript alert dialog.
@@ -237,6 +248,11 @@ class JsConfirmResponseAction {
 
   static const CONFIRM = const JsConfirmResponseAction._internal(0);
   static const CANCEL = const JsConfirmResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///JsConfirmResponse class represents the response used by the [onJsConfirm] event to control a JavaScript confirm dialog.
@@ -273,6 +289,11 @@ class JsPromptResponseAction {
 
   static const CONFIRM = const JsPromptResponseAction._internal(0);
   static const CANCEL = const JsPromptResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///JsPromptResponse class represents the response used by the [onJsPrompt] event to control a JavaScript prompt dialog.
@@ -323,6 +344,11 @@ class SafeBrowsingThreat {
   static const SAFE_BROWSING_THREAT_PHISHING = const SafeBrowsingThreat._internal(2);
   static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE = const SafeBrowsingThreat._internal(3);
   static const SAFE_BROWSING_THREAT_BILLING = const SafeBrowsingThreat._internal(4);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///SafeBrowsingResponseAction class used by [SafeBrowsingResponse] class.
@@ -337,6 +363,11 @@ class SafeBrowsingResponseAction {
   static const PROCEED = const SafeBrowsingResponseAction._internal(1);
   ///Display the default interstitial.
   static const SHOW_INTERSTITIAL = const SafeBrowsingResponseAction._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///SafeBrowsingResponse class represents the response used by the [onSafeBrowsingHit] event.
@@ -369,6 +400,11 @@ class HttpAuthResponseAction {
   static const PROCEED = const HttpAuthResponseAction._internal(1);
   ///Uses the credentials stored for the current host.
   static const USE_SAVED_HTTP_AUTH_CREDENTIALS = const HttpAuthResponseAction._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///HttpAuthResponse class represents the response used by the [onReceivedHttpAuthRequest] event.
@@ -442,6 +478,11 @@ class ServerTrustAuthResponseAction {
   static const CANCEL = const ServerTrustAuthResponseAction._internal(0);
   ///Instructs the WebView to proceed with the authentication challenge.
   static const PROCEED = const ServerTrustAuthResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///ServerTrustAuthResponse class represents the response used by the [onReceivedServerTrustAuthRequest] event.
@@ -489,6 +530,11 @@ class ClientCertResponseAction {
   static const PROCEED = const ClientCertResponseAction._internal(1);
   ///Ignore the request for now.
   static const IGNORE = const ClientCertResponseAction._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///ClientCertResponse class represents the response used by the [onReceivedClientCertRequest] event.
@@ -564,6 +610,11 @@ class AndroidInAppWebViewCacheMode {
   static const LOAD_NO_CACHE = const AndroidInAppWebViewCacheMode._internal(2);
   ///Don't use the network, load from the cache.
   static const LOAD_CACHE_ONLY = const AndroidInAppWebViewCacheMode._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///AndroidInAppWebViewModeMenuItem class represents an Android-specific class used to disable the action mode menu items.
@@ -587,6 +638,11 @@ class AndroidInAppWebViewModeMenuItem {
   static const MENU_ITEM_WEB_SEARCH = const AndroidInAppWebViewModeMenuItem._internal(2);
   ///Disable all the action mode menu items for text processing.
   static const MENU_ITEM_PROCESS_TEXT = const AndroidInAppWebViewModeMenuItem._internal(4);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///AndroidInAppWebViewForceDark class represents an Android-specific class used to indicate the force dark mode.
@@ -609,6 +665,11 @@ class AndroidInAppWebViewForceDark {
   static const FORCE_DARK_AUTO = const AndroidInAppWebViewForceDark._internal(1);
   ///Unconditionally enable force dark. In this mode WebView content will always be rendered so as to emulate a dark theme.
   static const FORCE_DARK_ON = const AndroidInAppWebViewForceDark._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///AndroidInAppWebViewLayoutAlgorithm class represents an Android-specific class used to set the underlying layout algorithm.
@@ -627,6 +688,11 @@ class AndroidInAppWebViewLayoutAlgorithm {
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING = const AndroidInAppWebViewLayoutAlgorithm._internal("TEXT_AUTOSIZING");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///AndroidInAppWebViewMixedContentMode class represents an Android-specific class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
@@ -654,6 +720,11 @@ class AndroidInAppWebViewMixedContentMode {
   ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
   ///For highest security, apps are recommended to use [AndroidInAppWebViewMixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
   static const MIXED_CONTENT_COMPATIBILITY_MODE = const AndroidInAppWebViewMixedContentMode._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///IosInAppWebViewSelectionGranularity class represents an iOS-specific class used to set the level of granularity with which the user can interactively select content in the web view.
@@ -671,6 +742,11 @@ class IosInAppWebViewSelectionGranularity {
   static const DYNAMIC = const IosInAppWebViewSelectionGranularity._internal(0);
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER = const IosInAppWebViewSelectionGranularity._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///IosInAppWebViewDataDetectorTypes class represents an iOS-specific class used to specify a dataDetectoryTypes value that adds interactivity to web content that matches the value.
@@ -705,6 +781,11 @@ class IosInAppWebViewDataDetectorTypes {
   static const SPOTLIGHT_SUGGESTION = const IosInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
   ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
   static const ALL = const IosInAppWebViewDataDetectorTypes._internal("ALL");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///InAppWebViewUserPreferredContentMode class represents the content mode to prefer when loading and rendering a webpage.
@@ -724,6 +805,11 @@ class InAppWebViewUserPreferredContentMode {
   static const MOBILE = const InAppWebViewUserPreferredContentMode._internal(1);
   ///Represents content targeting desktop browsers.
   static const DESKTOP = const InAppWebViewUserPreferredContentMode._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///IosWebViewOptionsPresentationStyle class represents an iOS-specific class used to specify the modal presentation style when presenting a view controller.
@@ -759,6 +845,11 @@ class IosWebViewOptionsPresentationStyle {
   ///
   ///**NOTE**: available on iOS 13.0+.
   static const AUTOMATIC = const IosWebViewOptionsPresentationStyle._internal(9);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///IosWebViewOptionsTransitionStyle class represents an iOS-specific class used to specify the transition style when presenting a view controller.
@@ -786,6 +877,11 @@ class IosWebViewOptionsTransitionStyle {
   ///On dismissal, the curled up page unfurls itself back on top of the presented view.
   ///A view controller presented using this transition is itself prevented from presenting any additional view controllers.
   static const PARTIAL_CURL = const IosWebViewOptionsTransitionStyle._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///IosWebViewOptionsTransitionStyle class represents an iOS-specific class used to set the custom style for the dismiss button.
@@ -807,6 +903,11 @@ class IosSafariOptionsDismissButtonStyle {
   static const CLOSE = const IosSafariOptionsDismissButtonStyle._internal(1);
   ///Makes the button title the localized string "Cancel".
   static const CANCEL = const IosSafariOptionsDismissButtonStyle._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///InAppWebViewWidgetOptions class represents the options that can be used for an [InAppWebView].
@@ -856,6 +957,11 @@ class AjaxRequestAction {
   ///Proceeds with the current [AjaxRequest].
   static const PROCEED = const AjaxRequestAction._internal(1);
 
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
   Map<String, dynamic> toMap() {
     return {
       "action": _value,
@@ -892,6 +998,11 @@ class AjaxRequestEventType {
   static const ABORT = const AjaxRequestEventType._internal("abort");
   ///The TIMEOUT event is fired when progression is terminated due to preset time expiring.
   static const TIMEOUT = const AjaxRequestEventType._internal("timeout");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///AjaxRequestEvent class used by [AjaxRequest] class. It represents events measuring progress of an [AjaxRequest].
@@ -934,6 +1045,11 @@ class AjaxRequestReadyState {
   static const LOADING = const AjaxRequestReadyState._internal(3);
   ///The operation is complete.
   static const DONE = const AjaxRequestReadyState._internal(4);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///AjaxRequest class represents a JavaScript [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
@@ -1029,6 +1145,11 @@ class FetchRequestAction {
   static const ABORT = const FetchRequestAction._internal(0);
   ///Proceeds with the fetch request.
   static const PROCEED = const FetchRequestAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///FetchRequestCredential class is an interface for [FetchRequestCredentialDefault], [FetchRequestFederatedCredential] and [FetchRequestPasswordCredential] classes.

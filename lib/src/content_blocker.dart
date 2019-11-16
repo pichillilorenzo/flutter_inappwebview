@@ -53,6 +53,11 @@ class ContentBlockerTriggerResourceType {
   static const SVG_DOCUMENT = const ContentBlockerTriggerResourceType._internal('svg-document');
   ///Any untyped load
   static const RAW = const ContentBlockerTriggerResourceType._internal('raw');
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///ContentBlockerTriggerLoadType class represents the possible load type for a [ContentBlockerTrigger].
@@ -68,6 +73,11 @@ class ContentBlockerTriggerLoadType {
   static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
   ///THIRD_PARTY is triggered if the resource is not from the same domain as the main page resource.
   static const THIRD_PARTY = const ContentBlockerTriggerLoadType._internal('third-party');
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///Trigger of the content blocker. The trigger tells to the WebView when to perform the corresponding action.
@@ -187,6 +197,11 @@ class ContentBlockerActionType {
   static const CSS_DISPLAY_NONE = const ContentBlockerActionType._internal('css-display-none');
   ///Changes a URL from http to https. URLs with a specified (nondefault) port and links using other protocols are unaffected.
   static const MAKE_HTTPS = const ContentBlockerActionType._internal('make-https');
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }
 
 ///Action associated to the trigger. The action tells to the WebView what to do when the trigger is matched.

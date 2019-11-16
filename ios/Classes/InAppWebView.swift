@@ -82,6 +82,8 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 }
 """
 
+let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
+
 let findTextHighlightJS = """
 var wkwebview_SearchResultCount = 0;
 var wkwebview_CurrentHighlight = 0;
@@ -298,7 +300,6 @@ let interceptAjaxRequestsJS = """
   };
   ajax.prototype.setRequestHeader = function(header, value) {
     this._flutter_inappbrowser_request_headers[header] = value;
-    setRequestHeader.call(this, header, value);
   };
   function handleEvent(e) {
     var self = this;
@@ -439,7 +440,11 @@ let interceptAjaxRequestsJS = """
           };
           for (var header in result.headers) {
             var value = result.headers[header];
-            self.setRequestHeader(header, value);
+            self._flutter_inappbrowser_request_headers[header] = value;
+          };
+          for (var header in self._flutter_inappbrowser_request_headers) {
+            var value = self._flutter_inappbrowser_request_headers[header];
+            setRequestHeader.call(self, header, value);
           };
           if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {
             self.abort();
@@ -1342,6 +1347,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         currentURL = url
         InAppWebView.credentialsProposed = []
+        evaluateJavaScript(platformReadyJS, completionHandler: nil)
         onLoadStop(url: (currentURL?.absoluteString)!)
         
         if IABController != nil {

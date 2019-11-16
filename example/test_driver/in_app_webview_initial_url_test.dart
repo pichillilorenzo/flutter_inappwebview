@@ -2,34 +2,38 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
-import 'util_test.dart';
 import 'custom_widget_test.dart';
+import 'main_test.dart';
+import 'util_test.dart';
 
-class InAppWebViewInitialFileTest extends WidgetTest {
-  InAppWebViewInitialFileTest(): super(name: "InAppWebViewInitialFileTest");
+class InAppWebViewInitialUrlTest extends WidgetTest {
+  final InAppWebViewInitialUrlTestState state = InAppWebViewInitialUrlTestState();
 
   @override
-  _InAppWebViewInitialFileTestState createState() => new _InAppWebViewInitialFileTestState();
+  InAppWebViewInitialUrlTestState createState() => state;
 }
 
-class _InAppWebViewInitialFileTestState extends State<InAppWebViewInitialFileTest> {
-  InAppWebViewController webView;
+class InAppWebViewInitialUrlTestState extends WidgetTestState {
   String initialUrl = "https://flutter.dev/";
+  String appBarTitle = "InAppWebViewInitialUrlTest";
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          title: Text('InAppWebViewInitialFileTest'),
-        ),
+        appBar: myAppBar(state: this, title: appBarTitle),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialFile: "assets/index.html",
+                    initialUrl: initialUrl,
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(),
+                    initialOptions: InAppWebViewWidgetOptions(
+                        inAppWebViewOptions: InAppWebViewOptions(
+                            clearCache: true,
+                            debuggingEnabled: true
+                        )
+                    ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },
@@ -37,8 +41,10 @@ class _InAppWebViewInitialFileTestState extends State<InAppWebViewInitialFileTes
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
-                      customAssert(widget: widget, name: "initialFile", value: true);
-                      nextTest(context: context);
+                      setState(() {
+                        appBarTitle = url;
+                      });
+                      nextTest(context: context, state: this);
                     },
                   ),
                 ),

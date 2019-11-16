@@ -156,7 +156,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) shouldInterceptAjaxRequest;
 
   ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
@@ -168,7 +168,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
 
   ///Event fired as an `XMLHttpRequest` progress.
@@ -180,7 +180,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgress;
 
   ///Event fired when an request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).

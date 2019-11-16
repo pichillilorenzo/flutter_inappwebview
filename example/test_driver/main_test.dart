@@ -4,9 +4,11 @@ import 'package:flutter/material.dart';
 
 import 'custom_widget_test.dart';
 import 'in_app_webview_ajax_test.dart';
+import 'in_app_webview_fetch_test.dart';
 import 'in_app_webview_initial_file_test.dart';
 import 'in_app_webview_initial_url_test.dart';
 import 'in_app_webview_javascript_handler_test.dart';
+import 'in_app_webview_on_load_resource_custom_scheme_test.dart';
 import 'in_app_webview_on_load_resource_test.dart';
 
 List<String> testRoutes = [];
@@ -17,6 +19,8 @@ Map<String, WidgetBuilder> buildRoutes({@required BuildContext context}) {
     '/InAppWebViewOnLoadResourceTest': (context) => InAppWebViewOnLoadResourceTest(),
     '/InAppWebViewJavaScriptHandlerTest': (context) => InAppWebViewJavaScriptHandlerTest(),
     '/InAppWebViewAjaxTest': (context) => InAppWebViewAjaxTest(),
+    '/InAppWebViewOnLoadResourceCustomSchemeTest': (context) => InAppWebViewOnLoadResourceCustomSchemeTest(),
+    '/InAppWebViewFetchTest': (context) => InAppWebViewFetchTest(),
   };
   routes.forEach((k, v) => testRoutes.add(k));
   return routes;

@@ -445,22 +445,44 @@ final public class InAppWebView extends InputAwareWebView {
           "                controller.abort();" +
           "                break;" +
           "            }" +
-          "            var resultResource = (result.url != null) ? result.url : resource;" +
-          "            var resultInit = init;" +
-          "            if (result.init != null) {" +
-          "              resultInit.method = result.method;" +
-          "              resultInit.headers = convertJsonToHeaders(result.headers);" +
-          "              resultInit.body = convertArrayIntBodyToUint8Array(result.body);" +
-          "              resultInit.mode = result.mode;" +
-          "              resultInit.credentials = convertJsonToCredential(result.credentials);" +
-          "              resultInit.cache = result.cache;" +
-          "              resultInit.redirect = result.redirect;" +
-          "              resultInit.referrer = result.referrer;" +
-          "              resultInit.referrerPolicy = result.referrerPolicy;" +
-          "              resultInit.integrity = result.integrity;" +
-          "              resultInit.keepalive = result.keepalive;" +
+          "            resource = (result.url != null) ? result.url : resource;" +
+          "            if (init == null) {" +
+          "              init = {};" +
           "            }" +
-          "            return fetch(resultResource, resultInit);" +
+          "            if (result.method != null && result.method.length > 0) {" +
+          "              init.method = result.method;" +
+          "            }" +
+          "            if (result.headers != null && Object.keys(result.headers).length > 0) {" +
+          "              init.headers = convertJsonToHeaders(result.headers);" +
+          "            }" +
+          "            if (result.body != null && result.body.length > 0)   {" +
+          "              init.body = convertArrayIntBodyToUint8Array(result.body);" +
+          "            }" +
+          "            if (result.mode != null && result.mode.length > 0) {" +
+          "              init.mode = result.mode;" +
+          "            }" +
+          "            if (result.credentials != null) {" +
+          "              init.credentials = convertJsonToCredential(result.credentials);" +
+          "            }" +
+          "            if (result.cache != null && result.cache.length > 0) {" +
+          "              init.cache = result.cache;" +
+          "            }" +
+          "            if (result.redirect != null && result.redirect.length > 0) {" +
+          "              init.redirect = result.redirect;" +
+          "            }" +
+          "            if (result.referrer != null && result.referrer.length > 0) {" +
+          "              init.referrer = result.referrer;" +
+          "            }" +
+          "            if (result.referrerPolicy != null && result.referrerPolicy.length > 0) {" +
+          "              init.referrerPolicy = result.referrerPolicy;" +
+          "            }" +
+          "            if (result.integrity != null && result.integrity.length > 0) {" +
+          "              init.integrity = result.integrity;" +
+          "            }" +
+          "            if (result.keepalive != null) {" +
+          "              init.keepalive = result.keepalive;" +
+          "            }" +
+          "            return fetch(resource, init);" +
           "          }" +
           "          return fetch(resource, init);" +
           "        });" +

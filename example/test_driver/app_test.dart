@@ -1,7 +1,6 @@
 // Imports the Flutter Driver API.
 import 'dart:async';
 
-import 'package:flutter/cupertino.dart';
 import 'package:flutter_driver/flutter_driver.dart';
 import 'package:test/test.dart';
 
@@ -22,21 +21,14 @@ void main() {
       }
     });
 
-    myTest({@required String name, @required Function callback, Timeout timeout}) {
-      timeout = (timeout == null) ? new Timeout(new Duration(minutes: 5)) : timeout;
-      test(name, () async {
-        await Future.delayed(const Duration(milliseconds: 2000));
-        callback();
-      }, timeout: timeout);
-    }
-
     //
     // IMPORTANT NOTE!!!
     // These tests need to follow the same order of "var routes" in "buildRoutes()" function
     // defined in main_test.dart
     //
 
-    myTest(name: 'InAppWebViewInitialUrlTest', callback: () async {
+    test('InAppWebViewInitialUrlTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
       final appBarTitle = find.byValueKey('AppBarTitle');
 
       while((await driver.getText(appBarTitle)) == "InAppWebViewInitialUrlTest") {
@@ -45,9 +37,10 @@ void main() {
 
       String url = await driver.getText(appBarTitle);
       expect(url, "https://flutter.dev/");
-    });
+    }, timeout: new Timeout(new Duration(minutes: 5)));
 
-    myTest(name: 'InAppWebViewInitialFileTest', callback: () async {
+    test('InAppWebViewInitialFileTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
       final appBarTitle = find.byValueKey('AppBarTitle');
 
       while((await driver.getText(appBarTitle)) == "InAppWebViewInitialFileTest") {
@@ -56,9 +49,10 @@ void main() {
 
       String title = await driver.getText(appBarTitle);
       expect(title, "true");
-    });
+    }, timeout: new Timeout(new Duration(minutes: 5)));
 
-    myTest(name: 'InAppWebViewOnLoadResourceTest', callback: () async {
+    test('InAppWebViewOnLoadResourceTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
       List<String> resourceList = [
         "https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css",
         "https://code.jquery.com/jquery-3.3.1.min.js",
@@ -71,13 +65,13 @@ void main() {
       }
 
       String title = await driver.getText(appBarTitle);
-      print(title);
       for (String resource in resourceList) {
         expect(true, title.contains(resource));
       }
-    });
+    }, timeout: new Timeout(new Duration(minutes: 5)));
 
-    myTest(name: 'InAppWebViewJavaScriptHandlerTest', callback: () async {
+    test('InAppWebViewJavaScriptHandlerTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
       final appBarTitle = find.byValueKey('AppBarTitle');
 
       while((await driver.getText(appBarTitle)) == "InAppWebViewJavaScriptHandlerTest") {
@@ -86,9 +80,10 @@ void main() {
 
       String title = await driver.getText(appBarTitle);
       expect(true, !title.contains("false"));
-    });
+    }, timeout: new Timeout(new Duration(minutes: 5)));
 
-    myTest(name: 'InAppWebViewAjaxTest', callback: () async {
+    test('InAppWebViewAjaxTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
       final appBarTitle = find.byValueKey('AppBarTitle');
 
       while((await driver.getText(appBarTitle)) == "InAppWebViewAjaxTest") {
@@ -97,6 +92,31 @@ void main() {
 
       String title = await driver.getText(appBarTitle);
       expect(title, "Lorenzo Pichilli Lorenzo Pichilli");
-    });
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewOnLoadResourceCustomSchemeTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnLoadResourceCustomSchemeTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String title = await driver.getText(appBarTitle);
+      expect(title, "true");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewFetchTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewFetchTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String title = await driver.getText(appBarTitle);
+      expect(true, title.contains("Lorenzo Pichilli") && title.contains("200"));
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
   });
 }

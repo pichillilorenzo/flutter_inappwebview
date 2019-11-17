@@ -60,8 +60,6 @@ class MyInAppBrowser extends InAppBrowser {
  void onConsoleMessage(ConsoleMessage consoleMessage) {
    print("""
     console output:
-      sourceURL: ${consoleMessage.sourceURL}
-      lineNumber: ${consoleMessage.lineNumber}
       message: ${consoleMessage.message}
       messageLevel: ${consoleMessage.messageLevel.toValue()}
    """);

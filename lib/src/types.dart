@@ -33,13 +33,27 @@ class ConsoleMessageLevel {
     return null;
   }
   toValue() => _value;
+  toString() {
+    switch(_value) {
+      case 0:
+        return "TIP";
+      case 2:
+        return "WARNING";
+      case 3:
+        return "ERROR";
+      case 4:
+        return "DEBUG";
+      case 1:
+      default:
+        return "LOG";
+    }
+  }
 
   static const TIP = const ConsoleMessageLevel._internal(0);
   static const LOG = const ConsoleMessageLevel._internal(1);
   static const WARNING = const ConsoleMessageLevel._internal(2);
   static const ERROR = const ConsoleMessageLevel._internal(3);
   static const DEBUG = const ConsoleMessageLevel._internal(4);
-
 
   bool operator ==(value) => value == _value;
 
@@ -143,12 +157,10 @@ class CustomSchemeResponse {
 ///To receive notifications of these messages, use the [onConsoleMessage] event.
 class ConsoleMessage {
 
-  String sourceURL;
-  int lineNumber;
   String message;
   ConsoleMessageLevel messageLevel;
 
-  ConsoleMessage({this.sourceURL = "", this.lineNumber = 1, this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
+  ConsoleMessage({this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
 }
 
 ///WebHistory class.

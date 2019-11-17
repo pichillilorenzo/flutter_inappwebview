@@ -1204,48 +1204,35 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func injectDeferredObject(source: String, withWrapper jsWrapper: String, result: FlutterResult?) {
-        let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
-        let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
-        if sourceArrayString != nil {
+    public func injectDeferredObject(source: String, withWrapper jsWrapper: String?, result: FlutterResult?) {
+        var jsToInject = source
+        if let wrapper = jsWrapper {
+            let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
+            let sourceArrayString = String(data: jsonData!, encoding: String.Encoding.utf8)
             let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.count ?? 0) - 2))
-            let jsToInject = String(format: jsWrapper, sourceString!)
-            
-            evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
-                if result == nil {
-                    return
-                }
-                
-                if error != nil {
-                    let userInfo = (error! as NSError).userInfo
-                    self.onConsoleMessage(sourceURL: (userInfo["WKJavaScriptExceptionSourceURL"] as? URL)?.absoluteString ?? "", lineNumber: userInfo["WKJavaScriptExceptionLineNumber"] as! Int, message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: 3)
-                }
-                
-                if value == nil {
-                    result!("")
-                    return
-                }
-                
-                do {
-                    let data: Data = ("[" + String(describing: value!) + "]").data(using: String.Encoding.utf8, allowLossyConversion: false)!
-                    let json: Array<Any> = try JSONSerialization.jsonObject(with: data, options: []) as! Array<Any>
-                    if json[0] is String {
-                        result!(json[0])
-                    }
-                    else {
-                        result!(value)
-                    }
-                } catch let error as NSError {
-                    result!(FlutterError(code: "InAppBrowserFlutterPlugin", message: "Failed to load: \(error.localizedDescription)", details: error))
-                }
-                
-            })
+            jsToInject = String(format: wrapper, sourceString!)
         }
+        evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
+            if result == nil {
+                return
+            }
+            
+            if error != nil {
+                let userInfo = (error! as NSError).userInfo
+                self.onConsoleMessage(message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: 3)
+            }
+            
+            if value == nil {
+                result!("")
+                return
+            }
+            
+            result!(value)
+        })
     }
     
     public func evaluateJavascript(source: String, result: FlutterResult?) {
-        let jsWrapper = "(function(){return JSON.stringify(eval(%@));})();"
-        injectDeferredObject(source: source, withWrapper: jsWrapper, result: result)
+        injectDeferredObject(source: source, withWrapper: nil, result: result)
     }
     
     public func injectJavascriptFileFromUrl(urlFile: String) {
@@ -2007,8 +1994,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func onConsoleMessage(sourceURL: String, lineNumber: Int, message: String, messageLevel: Int) {
-        var arguments: [String: Any] = ["sourceURL": sourceURL, "lineNumber": lineNumber, "message": message, "messageLevel": messageLevel]
+    public func onConsoleMessage(message: String, messageLevel: Int) {
+        var arguments: [String: Any] = ["message": message, "messageLevel": messageLevel]
         if IABController != nil {
             arguments["uuid"] = IABController!.uuid
         }
@@ -2065,7 +2052,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 messageLevel = 1
                 break;
             }
-            onConsoleMessage(sourceURL: "", lineNumber: 1, message: message.body as! String, messageLevel: messageLevel)
+            onConsoleMessage(message: message.body as! String, messageLevel: messageLevel)
         }
         else if message.name == "callHandler" {
             let body = message.body as! [String: Any]

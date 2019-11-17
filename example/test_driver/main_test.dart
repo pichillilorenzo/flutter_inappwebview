@@ -8,8 +8,12 @@ import 'in_app_webview_fetch_test.dart';
 import 'in_app_webview_initial_file_test.dart';
 import 'in_app_webview_initial_url_test.dart';
 import 'in_app_webview_javascript_handler_test.dart';
+import 'in_app_webview_on_console_message_test.dart';
+import 'in_app_webview_on_download_start_test.dart';
 import 'in_app_webview_on_load_resource_custom_scheme_test.dart';
 import 'in_app_webview_on_load_resource_test.dart';
+import 'in_app_webview_on_target_blank_test.dart';
+import 'in_app_webview_should_override_url_loading_test.dart';
 
 List<String> testRoutes = [];
 Map<String, WidgetBuilder> buildRoutes({@required BuildContext context}) {
@@ -21,6 +25,11 @@ Map<String, WidgetBuilder> buildRoutes({@required BuildContext context}) {
     '/InAppWebViewAjaxTest': (context) => InAppWebViewAjaxTest(),
     '/InAppWebViewOnLoadResourceCustomSchemeTest': (context) => InAppWebViewOnLoadResourceCustomSchemeTest(),
     '/InAppWebViewFetchTest': (context) => InAppWebViewFetchTest(),
+    '/InAppWebViewFetchTest': (context) => InAppWebViewFetchTest(),
+    '/InAppWebViewShouldOverrideUrlLoadingTest': (context) => InAppWebViewShouldOverrideUrlLoadingTest(),
+    '/InAppWebViewOnConsoleMessageTest': (context) => InAppWebViewOnConsoleMessageTest(),
+    '/InAppWebViewOnDownloadStartTest': (context) => InAppWebViewOnDownloadStartTest(),
+    '/InAppWebViewOnTargetBlankTest': (context) => InAppWebViewOnTargetBlankTest(),
   };
   routes.forEach((k, v) => testRoutes.add(k));
   return routes;

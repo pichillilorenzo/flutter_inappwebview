@@ -93,7 +93,7 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             initialOptions: InAppWebViewWidgetOptions(
               inAppWebViewOptions: InAppWebViewOptions(
                 debuggingEnabled: true,
-                //clearCache: true,
+                clearCache: true,
                 useShouldOverrideUrlLoading: true,
                 useOnTargetBlank: true,
                 useOnLoadResource: true,
@@ -196,10 +196,8 @@ class _InlineExampleScreenState extends State<InlineExampleScreen> {
             onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
               print("""
               console output:
-                sourceURL: ${consoleMessage.sourceURL}
-                lineNumber: ${consoleMessage.lineNumber}
                 message: ${consoleMessage.message}
-                messageLevel: ${consoleMessage.messageLevel.toValue()}
+                messageLevel: ${consoleMessage.messageLevel.toString()}
               """);
             },
             onDownloadStart: (InAppWebViewController controller, String url) async {

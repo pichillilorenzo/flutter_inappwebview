@@ -1097,15 +1097,13 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void injectDeferredObject(String source, String jsWrapper, final MethodChannel.Result result) {
-    String scriptToInject;
+    String scriptToInject = source;
     if (jsWrapper != null) {
       org.json.JSONArray jsonEsc = new org.json.JSONArray();
       jsonEsc.put(source);
       String jsonRepr = jsonEsc.toString();
       String jsonSourceString = jsonRepr.substring(1, jsonRepr.length() - 1);
       scriptToInject = String.format(jsWrapper, jsonSourceString);
-    } else {
-      scriptToInject = source;
     }
     final String finalScriptToInject = scriptToInject;
     ( (inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity ).runOnUiThread(new Runnable() {
@@ -1120,37 +1118,7 @@ final public class InAppWebView extends InputAwareWebView {
             public void onReceiveValue(String s) {
               if (result == null)
                 return;
-
-              JsonReader reader = new JsonReader(new StringReader(s));
-
-              // Must set lenient to parse single values
-              reader.setLenient(true);
-
-              try {
-                String msg;
-                if (reader.peek() == JsonToken.STRING) {
-                  msg = reader.nextString();
-
-                  JsonReader reader2 = new JsonReader(new StringReader(msg));
-                  reader2.setLenient(true);
-
-                  if (reader2.peek() == JsonToken.STRING)
-                    msg = reader2.nextString();
-
-                  result.success(msg);
-                } else {
-                  result.success("");
-                }
-
-              } catch (IOException e) {
-                Log.e(LOG_TAG, "IOException", e);
-              } finally {
-                try {
-                  reader.close();
-                } catch (IOException e) {
-                  // NOOP
-                }
-              }
+              result.success(s);
             }
           });
         }
@@ -1159,8 +1127,7 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void evaluateJavascript(String source, MethodChannel.Result result) {
-    String jsWrapper = "(function(){return JSON.stringify(eval(%s));})();";
-    injectDeferredObject(source, jsWrapper, result);
+    injectDeferredObject(source, null, result);
   }
 
   public void injectJavascriptFileFromUrl(String urlFile) {

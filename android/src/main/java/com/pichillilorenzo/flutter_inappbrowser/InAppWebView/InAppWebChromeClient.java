@@ -439,8 +439,6 @@ public class InAppWebChromeClient extends WebChromeClient implements PluginRegis
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
-    obj.put("sourceURL", consoleMessage.sourceId());
-    obj.put("lineNumber", consoleMessage.lineNumber());
     obj.put("message", consoleMessage.message());
     obj.put("messageLevel", consoleMessage.messageLevel().ordinal());
     getChannel().invokeMethod("onConsoleMessage", obj);

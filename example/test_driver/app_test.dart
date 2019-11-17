@@ -118,5 +118,53 @@ void main() {
       expect(true, title.contains("Lorenzo Pichilli") && title.contains("200"));
     }, timeout: new Timeout(new Duration(minutes: 5)));
 
+    test('InAppWebViewShouldOverrideUrlLoadingTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewShouldOverrideUrlLoadingTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String url = await driver.getText(appBarTitle);
+      expect(url, "https://flutter.dev/");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewOnConsoleMessageTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnConsoleMessageTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String title = await driver.getText(appBarTitle);
+      expect(title, "message LOG");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewOnDownloadStartTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnDownloadStartTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String url = await driver.getText(appBarTitle);
+      expect(url, "http://192.168.1.20:8082/test-download-file");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewOnTargetBlankTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnTargetBlankTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String url = await driver.getText(appBarTitle);
+      expect(url, "https://flutter.dev/");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
   });
 }

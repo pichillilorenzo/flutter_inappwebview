@@ -418,11 +418,9 @@ class InAppWebViewController {
           _inAppBrowser.shouldOverrideUrlLoading(url);
         break;
       case "onConsoleMessage":
-        String sourceURL = call.arguments["sourceURL"];
-        int lineNumber = call.arguments["lineNumber"];
         String message = call.arguments["message"];
         ConsoleMessageLevel messageLevel = ConsoleMessageLevel.fromValue(call.arguments["messageLevel"]);
-        ConsoleMessage consoleMessage = ConsoleMessage(sourceURL: sourceURL, lineNumber: lineNumber, message: message, messageLevel: messageLevel);
+        ConsoleMessage consoleMessage = ConsoleMessage(message: message, messageLevel: messageLevel);
         if (_widget != null && _widget.onConsoleMessage != null)
           _widget.onConsoleMessage(this, consoleMessage);
         else if (_inAppBrowser != null)
@@ -744,7 +742,7 @@ class InAppWebViewController {
     InAppWebViewWidgetOptions options = await getOptions();
     if (options != null && options.inAppWebViewOptions.javaScriptEnabled == true) {
       html = await evaluateJavascript(source: "window.document.getElementsByTagName('html')[0].outerHTML;");
-      if (html.isNotEmpty)
+      if (html != null && html.isNotEmpty)
         return html;
     }
 
@@ -1064,14 +1062,17 @@ class InAppWebViewController {
   }
 
   ///Evaluates JavaScript code into the WebView and returns the result of the evaluation.
-  Future<String> evaluateJavascript({@required String source}) async {
+  Future<dynamic> evaluateJavascript({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
       _inAppBrowser.throwIsNotOpened();
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     args.putIfAbsent('source', () => source);
-    return await _channel.invokeMethod('evaluateJavascript', args);
+    var data = await _channel.invokeMethod('evaluateJavascript', args);
+    if (data != null && Platform.isAndroid)
+      data = json.decode(data);
+    return data;
   }
 
   ///Injects an external JavaScript file into the WebView from a defined url.

@@ -36,6 +36,7 @@
 ### BREAKING CHANGES
 - Deleted `WebResourceRequest` class
 - Updated `WebResourceResponse` class
+- Updated `ConsoleMessage` class
 - Updated `ConsoleMessageLevel` class
 - Updated `onLoadResource` event
 - Updated `CookieManager` class

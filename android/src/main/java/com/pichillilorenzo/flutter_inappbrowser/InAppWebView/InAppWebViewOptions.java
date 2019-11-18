@@ -39,6 +39,8 @@ public class InAppWebViewOptions extends Options {
   public Boolean incognito = false;
   public Boolean cacheEnabled = true;
   public Boolean transparentBackground = false;
+  public Boolean disableVerticalScroll = false;
+  public Boolean disableHorizontalScroll = false;
 
   public Integer textZoom = 100;
   public Boolean clearSessionCache = false;

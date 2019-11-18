@@ -32,6 +32,8 @@ public class InAppWebViewOptions: Options {
     var incognito = false
     var cacheEnabled = true
     var transparentBackground = false
+    var disableVerticalScroll = false
+    var disableHorizontalScroll = false
 
     var disallowOverScroll = false
     var enableViewportScale = false

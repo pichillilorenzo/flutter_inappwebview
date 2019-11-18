@@ -101,12 +101,17 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
   bool cacheEnabled;
   ///Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
   bool transparentBackground;
+  ///Set to `true` to disable vertical scroll. The default value is `false`.
+  bool disableVerticalScroll;
+  ///Set to `true` to disable horizontal scroll. The default value is `false`.
+  bool disableHorizontalScroll;
 
   InAppWebViewOptions({this.useShouldOverrideUrlLoading = false, this.useOnLoadResource = false, this.useOnDownloadStart = false, this.useOnTargetBlank = false,
     this.clearCache = false, this.userAgent = "", this.applicationNameForUserAgent = "", this.javaScriptEnabled = true, this.debuggingEnabled = false, this.javaScriptCanOpenWindowsAutomatically = false,
     this.mediaPlaybackRequiresUserGesture = true, this.minimumFontSize, this.verticalScrollBarEnabled = true, this.horizontalScrollBarEnabled = true,
     this.resourceCustomSchemes = const [], this.contentBlockers = const [], this.preferredContentMode = InAppWebViewUserPreferredContentMode.RECOMMENDED,
-    this.useShouldInterceptAjaxRequest = false, this.useShouldInterceptFetchRequest = false, this.incognito = false, this.cacheEnabled = true, this.transparentBackground = false}) {
+    this.useShouldInterceptAjaxRequest = false, this.useShouldInterceptFetchRequest = false, this.incognito = false, this.cacheEnabled = true, this.transparentBackground = false,
+    this.disableVerticalScroll = false, this.disableHorizontalScroll = false}) {
       if (this.minimumFontSize == null)
         this.minimumFontSize = Platform.isAndroid ? 8 : 0;
       assert(!this.resourceCustomSchemes.contains("http") && !this.resourceCustomSchemes.contains("https"));
@@ -140,7 +145,9 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
       "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
       "incognito": incognito,
       "cacheEnabled": cacheEnabled,
-      "transparentBackground": transparentBackground
+      "transparentBackground": transparentBackground,
+      "disableVerticalScroll": disableVerticalScroll,
+      "disableHorizontalScroll": disableHorizontalScroll
     };
   }
 
@@ -178,6 +185,8 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
     options.incognito = map["incognito"];
     options.cacheEnabled = map["cacheEnabled"];
     options.transparentBackground = map["transparentBackground"];
+    options.disableVerticalScroll = map["disableVerticalScroll"];
+    options.disableHorizontalScroll = map["disableHorizontalScroll"];
     return options;
   }
 }

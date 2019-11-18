@@ -3,9 +3,9 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
-import 'package:flutter_inappbrowser_example/chrome_safari_example.screen.dart';
-import 'package:flutter_inappbrowser_example/inline_example.screen.dart';
-import 'package:flutter_inappbrowser_example/webview_example.screen.dart';
+import 'package:flutter_inappbrowser_example/chrome_safari_browser_example.screen.dart';
+import 'package:flutter_inappbrowser_example/in_app_webiew_example.screen.dart';
+import 'package:flutter_inappbrowser_example/in_app_browser_example.screen.dart';
 
 import 'package:flutter_downloader/flutter_downloader.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -39,32 +39,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: DefaultTabController(
-        length: 3,
-        child: Scaffold(
-          appBar: AppBar(
-            title: Text('Tabs Demo'),
-          ),
-          body: TabBarView(
-            children: [
-              WebviewExampleScreen(),
-              ChromeSafariExampleScreen(),
-              InlineExampleScreen(),
-            ],
-          ),
-          bottomNavigationBar: Container(
-            color: Theme.of(context).primaryColor,
-            child: TabBar(
-              indicatorColor: Colors.white,
-              tabs: [
-                Tab(text: "Webview"),
-                Tab(text: "Chrome/Safari"),
-                Tab(
-                  text: "Inline",
-                ),
-              ],
-            ),
-          ))),
+      initialRoute: '/',
+      routes: {
+        '/': (context) => InAppWebViewExampleScreen(),
+        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+        '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
+      }
     );
   }
 }

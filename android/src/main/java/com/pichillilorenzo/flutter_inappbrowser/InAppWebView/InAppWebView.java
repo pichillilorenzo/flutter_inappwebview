@@ -10,6 +10,7 @@ import android.util.AttributeSet;
 import android.util.JsonReader;
 import android.util.JsonToken;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
@@ -677,6 +678,50 @@ final public class InAppWebView extends InputAwareWebView {
         getChannel().invokeMethod("onFindResultReceived", obj);
       }
     });
+
+    setVerticalScrollBarEnabled(!options.disableVerticalScroll);
+    setHorizontalScrollBarEnabled(!options.disableHorizontalScroll);
+    setOnTouchListener(new View.OnTouchListener() {
+      float m_downX;
+      float m_downY;
+
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+
+        if (event.getPointerCount() > 1) {
+          //Multi touch detected
+          return true;
+        }
+
+        if (options.disableHorizontalScroll && options.disableVerticalScroll) {
+          return (event.getAction() == MotionEvent.ACTION_MOVE);
+        }
+        else if (options.disableHorizontalScroll || options.disableVerticalScroll) {
+          switch (event.getAction()) {
+            case MotionEvent.ACTION_DOWN: {
+              // save the x
+              m_downX = event.getX();
+              // save the y
+              m_downY = event.getY();
+              break;
+            }
+            case MotionEvent.ACTION_MOVE:
+            case MotionEvent.ACTION_CANCEL:
+            case MotionEvent.ACTION_UP: {
+              if (options.disableHorizontalScroll) {
+                // set x so that it doesn't move
+                event.setLocation(m_downX, event.getY());
+              } else {
+                // set y so that it doesn't move
+                event.setLocation(event.getX(), m_downY);
+              }
+              break;
+            }
+          }
+        }
+        return false;
+      }
+    });
   }
 
   public void setIncognito(boolean enabled) {
@@ -1092,6 +1137,12 @@ final public class InAppWebView extends InputAwareWebView {
         contentBlockerHandler.getRuleList().add(new ContentBlocker(trigger, action));
       }
     }
+
+    if (newOptionsMap.get("disableVerticalScroll") != null && options.disableVerticalScroll != newOptions.disableVerticalScroll)
+      setVerticalScrollBarEnabled(!newOptions.disableVerticalScroll);
+
+    if (newOptionsMap.get("disableHorizontalScroll") != null && options.disableHorizontalScroll != newOptions.disableHorizontalScroll)
+      setHorizontalScrollBarEnabled(!newOptions.disableHorizontalScroll);
 
     options = newOptions;
   }

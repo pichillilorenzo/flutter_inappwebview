@@ -687,6 +687,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var currentURL: URL?
     var startPageTime: Int64 = 0
     static var credentialsProposed: [URLCredential] = []
+    var lastScrollX: CGFloat = 0
+    var lastScrollY: CGFloat = 0
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, IAWController: FlutterWebViewController?) {
         
@@ -843,6 +845,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
         scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
+        scrollView.showsVerticalScrollIndicator = !(options?.disableVerticalScroll)!
+        scrollView.showsHorizontalScrollIndicator = !(options?.disableHorizontalScroll)!
         
         // options.debuggingEnabled is always enabled for iOS.
         
@@ -1135,6 +1139,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         if newOptionsMap["horizontalScrollBarEnabled"] != nil && options?.horizontalScrollBarEnabled != newOptions.horizontalScrollBarEnabled {
             scrollView.showsHorizontalScrollIndicator = newOptions.horizontalScrollBarEnabled
+        }
+        
+        if newOptionsMap["disableVerticalScroll"] != nil && options?.disableVerticalScroll != newOptions.disableVerticalScroll {
+            scrollView.showsVerticalScrollIndicator = !newOptions.disableVerticalScroll
+        }
+        if newOptionsMap["disableHorizontalScroll"] != nil && options?.disableHorizontalScroll != newOptions.disableHorizontalScroll {
+            scrollView.showsHorizontalScrollIndicator = !newOptions.disableHorizontalScroll
         }
         
         if #available(iOS 9.0, *) {
@@ -1785,12 +1796,29 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let disableVerticalScroll = options?.disableVerticalScroll ?? false
+        let disableHorizontalScroll = options?.disableHorizontalScroll ?? false
+        if disableVerticalScroll && disableHorizontalScroll {
+            scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY);
+        }
+        else if disableVerticalScroll {
+            if (scrollView.contentOffset.y >= 0 || scrollView.contentOffset.y < 0) {
+                scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: lastScrollY);
+            }
+        }
+        else if disableHorizontalScroll {
+            if (scrollView.contentOffset.x >= 0 || scrollView.contentOffset.x < 0) {
+                scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y);
+            }
+        }
         if navigationDelegate != nil {
             let x = Int(scrollView.contentOffset.x / scrollView.contentScaleFactor)
             let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
             onScrollChanged(x: x, y: y)
         }
         setNeedsLayout()
+        lastScrollX = scrollView.contentOffset.x
+        lastScrollY = scrollView.contentOffset.y
     }
     
     public func onLoadStart(url: String) {

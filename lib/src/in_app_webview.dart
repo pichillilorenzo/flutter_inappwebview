@@ -591,7 +591,7 @@ class InAppWebViewController {
             String user = argMap["user"];
             String password = argMap["password"];
             bool withCredentials = argMap["withCredentials"];
-            Map<dynamic, dynamic> headers = argMap["headers"];
+            AjaxRequestHeaders headers = AjaxRequestHeaders(argMap["headers"]);
             String responseType = argMap["responseType"];
 
             var request = new AjaxRequest(data: data, method: method, url: url, isAsync: isAsync, user: user, password: password, withCredentials: withCredentials, headers: headers, responseType: responseType);
@@ -610,7 +610,7 @@ class InAppWebViewController {
             String user = argMap["user"];
             String password = argMap["password"];
             bool withCredentials = argMap["withCredentials"];
-            Map<dynamic, dynamic> headers = argMap["headers"];
+            AjaxRequestHeaders headers = AjaxRequestHeaders(argMap["headers"]);
             int readyState = argMap["readyState"];
             int status = argMap["status"];
             String responseURL = argMap["responseURL"];
@@ -639,7 +639,7 @@ class InAppWebViewController {
             String user = argMap["user"];
             String password = argMap["password"];
             bool withCredentials = argMap["withCredentials"];
-            Map<dynamic, dynamic> headers = argMap["headers"];
+            AjaxRequestHeaders headers = AjaxRequestHeaders(argMap["headers"]);
             int readyState = argMap["readyState"];
             int status = argMap["status"];
             String responseURL = argMap["responseURL"];

@@ -146,10 +146,12 @@ final public class InAppWebView extends InputAwareWebView {
           "    this._flutter_inappbrowser_isAsync = isAsync;" +
           "    this._flutter_inappbrowser_user = user;" +
           "    this._flutter_inappbrowser_password = password;" +
+          "    this._flutter_inappbrowser_request_headers = {};" +
           "    open.call(this, method, url, isAsync, user, password);" +
           "  };" +
           "  ajax.prototype.setRequestHeader = function(header, value) {" +
           "    this._flutter_inappbrowser_request_headers[header] = value;" +
+          "    setRequestHeader.call(this, header, value);" +
           "  };" +
           "  function handleEvent(e) {" +
           "    var self = this;" +
@@ -290,10 +292,12 @@ final public class InAppWebView extends InputAwareWebView {
           "          };" +
           "          for (var header in result.headers) {" +
           "            var value = result.headers[header];" +
-          "            self._flutter_inappbrowser_request_headers[header] = value;" +
-          "          };" +
-          "          for (var header in self._flutter_inappbrowser_request_headers) {" +
-          "            var value = self._flutter_inappbrowser_request_headers[header];" +
+          "            var flutter_inappbrowser_value = self._flutter_inappbrowser_request_headers[header];" +
+          "            if (flutter_inappbrowser_value == null) {" +
+          "              self._flutter_inappbrowser_request_headers[header] = value;" +
+          "            } else {" +
+          "              self._flutter_inappbrowser_request_headers[header] += ', ' + value;" +
+          "            }" +
           "            setRequestHeader.call(self, header, value);" +
           "          };" +
           "          if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {" +

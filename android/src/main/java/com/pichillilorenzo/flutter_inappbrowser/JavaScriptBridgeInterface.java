@@ -39,7 +39,7 @@ public class JavaScriptBridgeInterface {
   }
 
   @JavascriptInterface
-  public void _callHandler(String handlerName, final String _callHandlerID, String args) {
+  public void _callHandler(final String handlerName, final String _callHandlerID, String args) {
     final Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
@@ -62,10 +62,10 @@ public class JavaScriptBridgeInterface {
               return;
             }
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-              webView.evaluateJavascript("window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];", (ValueCallback<String>) null);
+              webView.evaluateJavascript("if(window." + name + "[" + _callHandlerID + "] != null) {window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];}", (ValueCallback<String>) null);
             }
             else {
-              webView.loadUrl("javascript:window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];");
+              webView.loadUrl("javascript:if(window." + name + "[" + _callHandlerID + "] != null) {window." + name + "[" + _callHandlerID + "](" + json + "); delete window." + name + "[" + _callHandlerID + "];}");
             }
           }
 

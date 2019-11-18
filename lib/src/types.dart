@@ -1064,6 +1064,31 @@ class AjaxRequestReadyState {
   int get hashCode => _value.hashCode;
 }
 
+///AjaxRequestHeaders class represents the HTTP headers of an [AjaxRequest].
+class AjaxRequestHeaders {
+  Map<dynamic, dynamic> _headers;
+  Map<String, dynamic> _newHeaders = {};
+
+  AjaxRequestHeaders(this._headers);
+
+  ///Gets the HTTP headers of the [AjaxRequest].
+  Map<dynamic, dynamic> getHeaders() {
+    return this._headers;
+  }
+
+  ///Sets/updates an HTTP header of the [AjaxRequest]. If there is already an existing [header] with the same name, the values are merged into one single request header.
+  ///For security reasons, some headers can only be controlled by the user agent.
+  ///These headers include the [forbidden header names](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_header_name)
+  ///and [forbidden response header names](https://developer.mozilla.org/en-US/docs/Glossary/Forbidden_response_header_name).
+  void setRequestHeader(String header, String value) {
+    _newHeaders[header] = value;
+  }
+
+  Map<String, dynamic> toMap() {
+    return _newHeaders;
+  }
+}
+
 ///AjaxRequest class represents a JavaScript [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 class AjaxRequest {
   ///Data passed as a parameter to the `XMLHttpRequest.send()` method.
@@ -1084,7 +1109,7 @@ class AjaxRequest {
   ///In addition, this flag is also used to indicate when cookies are to be ignored in the response. The default is false.
   bool withCredentials;
   ///The HTTP request headers.
-  Map<dynamic, dynamic> headers;
+  AjaxRequestHeaders headers;
   ///The state of the `XMLHttpRequest` request.
   AjaxRequestReadyState readyState;
   ///The numerical HTTP [status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) of the `XMLHttpRequest`'s response.
@@ -1128,7 +1153,7 @@ class AjaxRequest {
       "user": user,
       "password": password,
       "withCredentials": withCredentials,
-      "headers": headers,
+      "headers": headers?.toMap(),
       "readyState": readyState?.toValue(),
       "status": status,
       "responseURL": responseURL,

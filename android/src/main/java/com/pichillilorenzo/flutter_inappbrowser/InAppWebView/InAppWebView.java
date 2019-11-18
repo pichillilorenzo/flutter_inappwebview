@@ -1167,6 +1167,7 @@ final public class InAppWebView extends InputAwareWebView {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
           // This action will have the side-effect of blurring the currently focused element
           loadUrl("javascript:" + finalScriptToInject);
+          result.success("");
         } else {
           evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
             @Override

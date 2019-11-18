@@ -201,6 +201,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   }
                   //controller.findAllAsync("flutter");
                   print(await controller.getFavicons());
+                  print(await CookieManager.instance().getCookies(url: url));
                 },
                 onLoadError: (InAppWebViewController controller, String url,
                     int code, String message) async {

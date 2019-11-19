@@ -113,7 +113,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     
     override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
-            let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
+            let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions, webViewProcessPool: SwiftFlutterPlugin.webViewProcessPool)
             self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, IAWController: nil)
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()

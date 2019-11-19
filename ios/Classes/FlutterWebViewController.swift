@@ -28,7 +28,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         
         let options = InAppWebViewOptions()
         options.parse(options: initialOptions)
-        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options)
+        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options, webViewProcessPool: SwiftFlutterPlugin.webViewProcessPool)
         
         webView = InAppWebView(frame: frame, configuration: preWebviewConfiguration, IABController: nil, IAWController: self)
         let channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(viewId)

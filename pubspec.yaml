@@ -1,6 +1,6 @@
 name: flutter_inappbrowser
 description: A Flutter plugin that allows you to add an inline webview or open an in-app browser window (inspired by the popular cordova-plugin-inappbrowser).
-version: 1.2.1
+version: 1.2.2
 author: Lorenzo Pichilli <pichillilorenzo@gmail.com>
 homepage: https://github.com/pichillilorenzo/flutter_inappbrowser
 

@@ -1,3 +1,8 @@
+## 1.2.2
+
+- Merge "added a shared WKProcessPool for webview instances" [#198](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/198) (thanks to [robertcnst](https://github.com/robertcnst))
+- Fixed iOS setCookie.
+
 ## 1.2.1
 
 - Merge "Add new option to control the contentMode in Android platform" [#101](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/101) (thanks to [DreamBuddy](https://github.com/DreamBuddy))

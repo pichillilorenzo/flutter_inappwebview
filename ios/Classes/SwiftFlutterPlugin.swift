@@ -38,6 +38,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     static var registrar: FlutterPluginRegistrar?
     static var channel: FlutterMethodChannel?
     
+    static let webViewProcessPool: WKProcessPool = WKProcessPool()
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
     

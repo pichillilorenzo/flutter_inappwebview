@@ -191,8 +191,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public static func preWKWebViewConfiguration(options: InAppWebViewOptions?) -> WKWebViewConfiguration {
+    public static func preWKWebViewConfiguration(options: InAppWebViewOptions?, webViewProcessPool: WKProcessPool) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
+        configuration.processPool = webViewProcessPool
         
         if #available(iOS 10.0, *) {
             configuration.mediaTypesRequiringUserActionForPlayback = ((options?.mediaPlaybackRequiresUserGesture)!) ? .all : []

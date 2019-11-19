@@ -886,6 +886,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public static func preWKWebViewConfiguration(options: InAppWebViewOptions?) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         
+        configuration.processPool = WKProcessPoolManager.sharedProcessPool
+        
         if #available(iOS 10.0, *) {
             configuration.mediaTypesRequiringUserActionForPlayback = ((options?.mediaPlaybackRequiresUserGesture)!) ? .all : []
         } else {
@@ -1811,7 +1813,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y);
             }
         }
-        if navigationDelegate != nil {
+        if navigationDelegate != nil && !(disableVerticalScroll && disableHorizontalScroll) {
             let x = Int(scrollView.contentOffset.x / scrollView.contentScaleFactor)
             let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
             onScrollChanged(x: x, y: y)
@@ -2125,6 +2127,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 
     func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
         evaluateJavaScript("wkwebview_ClearMatches();", completionHandler: completionHandler)
+    }
+    
+    func scrollTo(x: Int, y: Int) {
+        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    }
+    
+    func scrollBy(x: Int, y: Int) {
+        let newX = CGFloat(x) + scrollView.contentOffset.x
+        let newY = CGFloat(y) + scrollView.contentOffset.y
+        scrollView.setContentOffset(CGPoint(x: newX, y: newY), animated: false)
     }
     
     public override func removeFromSuperview() {

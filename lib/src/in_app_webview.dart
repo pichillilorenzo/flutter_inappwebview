@@ -336,8 +336,6 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   void dispose(){
     super.dispose();
-    if (Platform.isIOS)
-      _controller._channel.invokeMethod('removeFromSuperview');
   }
 
   void _onPlatformViewCreated(int id) {
@@ -1406,4 +1404,44 @@ class InAppWebViewController {
   Future<String> getTRexRunnerCss() async {
     return await rootBundle.loadString("packages/flutter_inappbrowser/t_rex_runner/t-rex.css");
   }
+
+  ///Scrolls the WebView to the position.
+  ///
+  ///[x] represents the x position to scroll to.
+  ///
+  ///[y] represents the y position to scroll to.
+  Future<void> scrollTo({@required int x, @required int y}) async {
+    assert(x != null && y != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('x', () => x);
+    args.putIfAbsent('y', () => y);
+    await _channel.invokeMethod('scrollTo', args);
+  }
+
+  ///Moves the scrolled position of the WebView.
+  ///
+  ///[x] represents the amount of pixels to scroll by horizontally.
+  ///
+  ///[y] represents the amount of pixels to scroll by vertically.
+  Future<void> scrollBy({@required int x, @required int y}) async {
+    assert(x != null && y != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('x', () => x);
+    args.putIfAbsent('y', () => y);
+    await _channel.invokeMethod('scrollBy', args);
+  }
+
+  /*Future<void> dispose() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (Platform.isIOS)
+      await _channel.invokeMethod('removeFromSuperview', args);
+  }*/
 }

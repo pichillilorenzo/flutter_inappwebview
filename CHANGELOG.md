@@ -24,11 +24,10 @@
 - Added `onSafeBrowsingHit` event (available only for Android)
 - Added `onJsAlert`, `onJsConfirm` and `onJsPrompt` events to manage javascript popup dialogs
 - Added `onReceivedHttpAuthRequest` event
-- Added `clearCache()` method
+- Added `clearCache`, `scrollTo`, `scrollBy`, `getHtml`, `injectJavascriptFileFromAsset` and `injectCSSFileFromAsset` methods method
 - Added `HttpAuthCredentialDatabase` class
 - Added `onReceivedServerTrustAuthRequest` and `onReceivedClientCertRequest` events to manage SSL requests
 - Added `onFindResultReceived` event, `findAllAsync`, `findNext` and `clearMatches` methods 
-- Added `getHtml`, `injectJavascriptFileFromAsset` and `injectCSSFileFromAsset` methods
 - Added `shouldInterceptAjaxRequest`, `onAjaxReadyStateChange`, `onAjaxProgress` and `shouldInterceptFetchRequest` events with `useShouldInterceptAjaxRequest` and `useShouldInterceptFetchRequest` webview options
 - Added `onNavigationStateChange` event
 - Fun: added `getTRexRunnerHtml` and `getTRexRunnerCss` methods to get html (with javascript) and css to recreate the Chromium's t-rex runner game 

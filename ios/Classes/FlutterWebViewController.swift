@@ -302,6 +302,22 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 }
                 result(true)
                 break
+            case "scrollTo":
+                if webView != nil {
+                    let x = arguments!["x"] as! Int
+                    let y = arguments!["y"] as! Int
+                    webView!.scrollTo(x: x, y: y)
+                }
+                result(true)
+                break
+            case "scrollBy":
+                if webView != nil {
+                    let x = arguments!["x"] as! Int
+                    let y = arguments!["y"] as! Int
+                    webView!.scrollBy(x: x, y: y)
+                }
+                result(true)
+                break
             case "removeFromSuperview":
                 webView!.removeFromSuperview()
                 result(true)

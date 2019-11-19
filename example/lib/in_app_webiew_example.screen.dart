@@ -83,18 +83,21 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 title: Text('InAppBrowser'),
                 onTap: () {
                   Navigator.popAndPushNamed(context, '/InAppBrowser');
+                  dispose();
                 },
               ),
               ListTile(
                 title: Text('ChromeSafariBrowser'),
                 onTap: () {
                   Navigator.popAndPushNamed(context, '/ChromeSafariBrowser');
+                  dispose();
                 },
               ),
               ListTile(
                 title: Text('InAppWebView'),
                 onTap: () {
                   Navigator.popAndPushNamed(context, '/');
+                  dispose();
                 },
               ),
             ],
@@ -119,11 +122,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
               child: InAppWebView(
                 //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
-                //initialUrl: "https://github.com",
+                initialUrl: "https://github.com",
                 //initialUrl: "chrome://safe-browsing/match?type=malware",
                 //initialUrl: "http://192.168.1.20:8081/",
                 //initialUrl: "https://192.168.1.20:4433/",
-                initialFile: "assets/index.html",
+                //initialFile: "assets/index.html",
                 initialHeaders: {},
                 initialOptions: InAppWebViewWidgetOptions(
                   inAppWebViewOptions: InAppWebViewOptions(
@@ -131,12 +134,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       //disableHorizontalScroll: false,
                       debuggingEnabled: true,
                       clearCache: true,
-                      useShouldOverrideUrlLoading: true,
+                      //useShouldOverrideUrlLoading: true,
                       useOnTargetBlank: true,
-                      useOnLoadResource: true,
-                      useOnDownloadStart: true,
-                      useShouldInterceptAjaxRequest: true,
-                      useShouldInterceptFetchRequest: true,
+                      //useOnLoadResource: true,
+                      //useOnDownloadStart: true,
+                      //useShouldInterceptAjaxRequest: true,
+                      //useShouldInterceptFetchRequest: true,
                       //preferredContentMode: InAppWebViewUserPreferredContentMode.DESKTOP,
                       resourceCustomSchemes: [
                         "my-special-custom-scheme"
@@ -192,8 +195,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     this.url = url;
                   });
                 },
-                onLoadStop:
-                    (InAppWebViewController controller, String url) async {
+                onLoadStop: (InAppWebViewController controller, String url) async {
                   print("stopped $url");
                   if (Platform.isAndroid) {
                     controller.clearSslPreferences();
@@ -202,6 +204,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   //controller.findAllAsync("flutter");
                   print(await controller.getFavicons());
                   print(await CookieManager.instance().getCookies(url: url));
+                  //await CookieManager.instance().setCookie(url: url, name: "myCookie", value: "myValue");
+                  //print(await CookieManager.instance().getCookies(url: url));
+                  //await Future.delayed(const Duration(milliseconds: 2000));
+                  //controller.scrollTo(x: 0, y: 500);
+                  //await Future.delayed(const Duration(milliseconds: 2000));
+                  //controller.scrollBy(x: 0, y: 150);
+                },
+                onScrollChanged: (InAppWebViewController controller, int x, int y) {
+                  //print("\nSCROLLED\n");
                 },
                 onLoadError: (InAppWebViewController controller, String url,
                     int code, String message) async {

@@ -286,6 +286,22 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(false);
         }
         break;
+      case "scrollTo":
+        if (webView != null) {
+          Integer x = (Integer) call.argument("x");
+          Integer y = (Integer) call.argument("y");
+          webView.scrollTo(x, y);
+        }
+        result.success(true);
+        break;
+      case "scrollBy":
+        if (webView != null) {
+          Integer x = (Integer) call.argument("x");
+          Integer y = (Integer) call.argument("y");
+          webView.scrollBy(x, y);
+        }
+        result.success(true);
+        break;
       default:
         result.notImplemented();
     }

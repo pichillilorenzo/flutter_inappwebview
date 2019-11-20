@@ -40,10 +40,7 @@ class InAppWebViewOnConsoleMessageTestState extends WidgetTestState {
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
-                      setState(() {
-                        appBarTitle = "true";
-                      });
-                      nextTest(context: context, state: this);
+
                     },
                     onConsoleMessage: (InAppWebViewController controller, ConsoleMessage consoleMessage) {
                       setState(() {

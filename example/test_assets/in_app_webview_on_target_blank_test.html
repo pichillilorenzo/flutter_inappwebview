@@ -8,11 +8,9 @@
     </head>
     <body>
         <h1>InAppWebViewOnTargetBlankTest</h1>
-        <a id="target-blank" href="https://flutter.dev/">target blank</a>
+        <a id="target-blank" href="https://flutter.dev/" target="_blank">target blank</a>
         <script>
-            window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
-                document.querySelector("#target-blank").click();
-            });
+            document.querySelector('#target-blank').click();
         </script>
     </body>
 </html>

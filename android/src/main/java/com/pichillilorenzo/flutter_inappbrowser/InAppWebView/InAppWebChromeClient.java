@@ -9,6 +9,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ConsoleMessage;
@@ -18,6 +19,7 @@ import android.webkit.JsResult;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
+import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
@@ -395,12 +397,40 @@ public class InAppWebChromeClient extends WebChromeClient implements PluginRegis
   }
 
   @Override
-  public boolean onCreateWindow(WebView view, boolean dialog, boolean userGesture, android.os.Message resultMsg) {
-    WebView.HitTestResult result = view.getHitTestResult();
-    String data = result.getExtra();
-    Map<String, Object> obj = new HashMap<>();
+  public boolean onCreateWindow(WebView view, boolean isDialog, boolean userGesture, final Message resultMsg) {
+    final Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+
+    WebView.HitTestResult result = view.getHitTestResult();
+    String data = result.getExtra();
+
+    if (data == null) {
+      // to get the URL, create a temp weview
+      final WebView newWebView = new WebView(view.getContext());
+      // disable javascript
+      newWebView.getSettings().setJavaScriptEnabled(false);
+      newWebView.setWebViewClient(new WebViewClient(){
+        @Override
+        public void onPageStarted(WebView v, String url, Bitmap favicon) {
+          super.onPageStarted(v, url, favicon);
+
+          obj.put("url", url);
+          getChannel().invokeMethod("onTargetBlank", obj);
+
+          // stop webview loading
+          v.stopLoading();
+
+          // this will throw the error "Application attempted to call on a destroyed AwAutofillManager" that will kill the webview.
+          // that's ok.
+          v.destroy();
+        }
+      });
+      ((WebView.WebViewTransport)resultMsg.obj).setWebView(newWebView);
+      resultMsg.sendToTarget();
+      return true;
+    }
+
     obj.put("url", data);
     getChannel().invokeMethod("onTargetBlank", obj);
     return false;

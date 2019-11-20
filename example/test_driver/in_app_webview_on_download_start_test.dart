@@ -25,7 +25,7 @@ class InAppWebViewOnDownloadStartTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialFile: "test_assets/in_app_webview_on_downlaod_start_test.html",
+                    initialFile: "test_assets/in_app_webview_on_download_start_test.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(

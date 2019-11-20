@@ -10,6 +10,7 @@ import 'in_app_webview_initial_url_test.dart';
 import 'in_app_webview_javascript_handler_test.dart';
 import 'in_app_webview_on_console_message_test.dart';
 import 'in_app_webview_on_download_start_test.dart';
+import 'in_app_webview_on_js_dialog_test.dart';
 import 'in_app_webview_on_load_resource_custom_scheme_test.dart';
 import 'in_app_webview_on_load_resource_test.dart';
 import 'in_app_webview_on_target_blank_test.dart';
@@ -30,6 +31,7 @@ Map<String, WidgetBuilder> buildRoutes({@required BuildContext context}) {
     '/InAppWebViewOnConsoleMessageTest': (context) => InAppWebViewOnConsoleMessageTest(),
     '/InAppWebViewOnDownloadStartTest': (context) => InAppWebViewOnDownloadStartTest(),
     '/InAppWebViewOnTargetBlankTest': (context) => InAppWebViewOnTargetBlankTest(),
+    '/InAppWebViewOnJsDialogTest': (context) => InAppWebViewOnJsDialogTest(),
   };
   routes.forEach((k, v) => testRoutes.add(k));
   return routes;

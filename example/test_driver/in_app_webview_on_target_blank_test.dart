@@ -31,7 +31,8 @@ class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
                         inAppWebViewOptions: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true,
-                            useOnTargetBlank: true
+                            useOnTargetBlank: true,
+                            javaScriptCanOpenWindowsAutomatically: true,
                         )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
@@ -41,13 +42,15 @@ class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
-
+                      if (url == "https://flutter.dev/") {
+                        setState(() {
+                          appBarTitle = url;
+                        });
+                        nextTest(context: context, state: this);
+                      }
                     },
                     onTargetBlank: (InAppWebViewController controller, String url) {
-                      setState(() {
-                        appBarTitle = url;
-                      });
-                      nextTest(context: context, state: this);
+                      controller.loadUrl(url: url);
                     },
                   ),
                 ),

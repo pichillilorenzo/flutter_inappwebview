@@ -42,6 +42,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   @override
   void dispose() {
     super.dispose();
+    _textFieldController.dispose();
   }
 
   @override
@@ -122,11 +123,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
               child: InAppWebView(
                 //initialUrl: "https://www.youtube.com/embed/M7lc1UVf-VE?playsinline=1",
-                initialUrl: "https://github.com",
+                //initialUrl: "https://github.com",
                 //initialUrl: "chrome://safe-browsing/match?type=malware",
                 //initialUrl: "http://192.168.1.20:8081/",
                 //initialUrl: "https://192.168.1.20:4433/",
-                //initialFile: "assets/index.html",
+                initialFile: "assets/index.html",
                 initialHeaders: {},
                 initialOptions: InAppWebViewWidgetOptions(
                   inAppWebViewOptions: InAppWebViewOptions(

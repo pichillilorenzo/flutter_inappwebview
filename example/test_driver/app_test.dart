@@ -12,6 +12,7 @@ void main() {
     // Connect to the Flutter driver before running any tests.
     setUpAll(() async {
       driver = await FlutterDriver.connect();
+      await driver.setTextEntryEmulation(enabled: true);
     });
 
     // Close the connection to the driver after the tests have completed.
@@ -164,6 +165,45 @@ void main() {
 
       String url = await driver.getText(appBarTitle);
       expect(url, "https://flutter.dev/");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewOnJsDialogTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+      final alertButtonOk = find.byValueKey('AlertButtonOk');
+      final confirmButtonCancel = find.byValueKey('ConfirmButtonCancel');
+      final confirmButtonOk = find.byValueKey('ConfirmButtonOk');
+      final promptTextField = find.byValueKey('PromptTextField');
+      final promptButtonCancel = find.byValueKey('PromptButtonCancel');
+      final promptButtonOk = find.byValueKey('PromptButtonOk');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnJsDialogTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      await driver.tap(alertButtonOk);
+
+      String title = await driver.getText(appBarTitle);
+      expect(title, "alert");
+
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      await driver.tap(confirmButtonOk);
+
+      title = await driver.getText(appBarTitle);
+      expect(title, "confirm true");
+
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      await driver.tap(promptTextField);
+      await driver.enterText("new value");
+      await driver.waitFor(find.text("new value"));
+
+      await driver.tap(promptButtonOk);
+
+      title = await driver.getText(appBarTitle);
+      expect(title, "prompt new value");
+
     }, timeout: new Timeout(new Duration(minutes: 5)));
 
   });

@@ -14,7 +14,6 @@ class InAppWebViewShouldOverrideUrlLoadingTest extends WidgetTest {
 }
 
 class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
-  String url = "https://flutter.dev/";
   String appBarTitle = "InAppWebViewShouldOverrideUrlLoadingTest";
 
   @override
@@ -26,7 +25,7 @@ class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialUrl: "https://www.google.com/",
+                    initialFile: "test_assets/in_app_webview_initial_file_test.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -42,13 +41,17 @@ class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
-                      setState(() {
-                        appBarTitle = url;
-                      });
-                      nextTest(context: context, state: this);
+                      if (url == "https://flutter.dev/") {
+                        setState(() {
+                          appBarTitle = url;
+                        });
+                        nextTest(context: context, state: this);
+                      } else {
+                        controller.evaluateJavascript(source: "document.querySelector('#link').click();");
+                      }
                     },
                     shouldOverrideUrlLoading: (InAppWebViewController controller, String url) {
-                      controller.loadUrl(url: url);
+                      controller.loadUrl(url: "https://flutter.dev/");
                     },
                   ),
                 ),

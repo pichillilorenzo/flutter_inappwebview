@@ -32,8 +32,9 @@ class ConsoleMessageLevel {
       return ConsoleMessageLevel._internal(value);
     return null;
   }
-  toValue() => _value;
-  toString() {
+  int toValue() => _value;
+  @override
+  String toString() {
     switch(_value) {
       case 0:
         return "TIP";
@@ -219,7 +220,7 @@ class GeolocationPermissionShowPromptResponse {
 class JsAlertResponseAction {
   final int _value;
   const JsAlertResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   static const CONFIRM = const JsAlertResponseAction._internal(0);
 
@@ -256,7 +257,7 @@ class JsAlertResponse {
 class JsConfirmResponseAction {
   final int _value;
   const JsConfirmResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   static const CONFIRM = const JsConfirmResponseAction._internal(0);
   static const CANCEL = const JsConfirmResponseAction._internal(1);
@@ -297,7 +298,7 @@ class JsConfirmResponse {
 class JsPromptResponseAction {
   final int _value;
   const JsPromptResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   static const CONFIRM = const JsPromptResponseAction._internal(0);
   static const CANCEL = const JsPromptResponseAction._internal(1);
@@ -349,7 +350,22 @@ class SafeBrowsingThreat {
       return SafeBrowsingThreat._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "SAFE_BROWSING_THREAT_MALWARE";
+      case 2:
+        return "SAFE_BROWSING_THREAT_PHISHING";
+      case 3:
+        return "SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE";
+      case 4:
+        return "SAFE_BROWSING_THREAT_BILLING";
+      case 0:
+      default:
+        return "SAFE_BROWSING_THREAT_UNKNOWN";
+    }
+  }
 
   static const SAFE_BROWSING_THREAT_UNKNOWN = const SafeBrowsingThreat._internal(0);
   static const SAFE_BROWSING_THREAT_MALWARE = const SafeBrowsingThreat._internal(1);
@@ -367,7 +383,7 @@ class SafeBrowsingThreat {
 class SafeBrowsingResponseAction {
   final int _value;
   const SafeBrowsingResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   ///Act as if the user clicked the "back to safety" button.
   static const BACK_TO_SAFETY = const SafeBrowsingResponseAction._internal(0);
@@ -404,7 +420,7 @@ class SafeBrowsingResponse {
 class HttpAuthResponseAction {
   final int _value;
   const HttpAuthResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   ///Instructs the WebView to cancel the authentication request.
   static const CANCEL = const HttpAuthResponseAction._internal(0);
@@ -484,7 +500,7 @@ class HttpAuthCredential {
 class ServerTrustAuthResponseAction {
   final int _value;
   const ServerTrustAuthResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   ///Instructs the WebView to cancel the authentication challenge.
   static const CANCEL = const ServerTrustAuthResponseAction._internal(0);
@@ -534,7 +550,7 @@ class ServerTrustChallenge {
 class ClientCertResponseAction {
   final int _value;
   const ClientCertResponseAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   ///Cancel this request.
   static const CANCEL = const ClientCertResponseAction._internal(0);
@@ -611,7 +627,21 @@ class AndroidInAppWebViewCacheMode {
       return AndroidInAppWebViewCacheMode._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "LOAD_CACHE_ELSE_NETWORK";
+      case 2:
+        return "LOAD_NO_CACHE";
+      case 3:
+        return "LOAD_CACHE_ONLY";
+      case -1:
+      default:
+        return "LOAD_DEFAULT";
+    }
+  }
 
   ///Default cache usage mode. If the navigation type doesn't impose any specific behavior,
   ///use cached resources when they are available and not expired, otherwise load resources from the network.
@@ -640,7 +670,21 @@ class AndroidInAppWebViewModeMenuItem {
       return AndroidInAppWebViewModeMenuItem._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "MENU_ITEM_SHARE";
+      case 2:
+        return "MENU_ITEM_WEB_SEARCH";
+      case 4:
+        return "MENU_ITEM_PROCESS_TEXT";
+      case 0:
+      default:
+        return "MENU_ITEM_NONE";
+    }
+  }
 
   ///No menu items should be disabled.
   static const MENU_ITEM_NONE = const AndroidInAppWebViewModeMenuItem._internal(0);
@@ -668,7 +712,19 @@ class AndroidInAppWebViewForceDark {
       return AndroidInAppWebViewForceDark._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "FORCE_DARK_AUTO";
+      case 2:
+        return "FORCE_DARK_ON";
+      case 0:
+      default:
+        return "FORCE_DARK_OFF";
+    }
+  }
 
   ///Disable force dark, irrespective of the force dark mode of the WebView parent.
   ///In this mode, WebView content will always be rendered as-is, regardless of whether native views are being automatically darkened.
@@ -691,7 +747,9 @@ class AndroidInAppWebViewLayoutAlgorithm {
   static AndroidInAppWebViewLayoutAlgorithm fromValue(String value) {
     return (["NORMAL", "TEXT_AUTOSIZING"].contains(value)) ? AndroidInAppWebViewLayoutAlgorithm._internal(value) : null;
   }
-  toValue() => _value;
+  String toValue() => _value;
+  @override
+  String toString() => _value;
 
   ///NORMAL means no rendering changes. This is the recommended choice for maximum compatibility across different platforms and Android versions.
   static const NORMAL = const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
@@ -718,7 +776,19 @@ class AndroidInAppWebViewMixedContentMode {
       return AndroidInAppWebViewMixedContentMode._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "MIXED_CONTENT_NEVER_ALLOW";
+      case 2:
+        return "MIXED_CONTENT_COMPATIBILITY_MODE";
+      case 0:
+      default:
+        return "MIXED_CONTENT_ALWAYS_ALLOW";
+    }
+  }
 
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
@@ -748,7 +818,17 @@ class IosInAppWebViewSelectionGranularity {
       return IosInAppWebViewSelectionGranularity._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "CHARACTER";
+      case 0:
+      default:
+        return "DYNAMIC";
+    }
+  }
 
   ///Selection granularity varies automatically based on the selection.
   static const DYNAMIC = const IosInAppWebViewSelectionGranularity._internal(0);
@@ -771,7 +851,9 @@ class IosInAppWebViewDataDetectorTypes {
     return (["NONE", "PHONE_NUMBER", "LINK", "ADDRESS", "CALENDAR_EVENT", "TRACKING_NUMBER",
       "TRACKING_NUMBER", "FLIGHT_NUMBER", "LOOKUP_SUGGESTION", "SPOTLIGHT_SUGGESTION", "ALL"].contains(value)) ? IosInAppWebViewDataDetectorTypes._internal(value) : null;
   }
-  toValue() => _value;
+  String toValue() => _value;
+  @override
+  String toString() => _value;
 
   ///No detection is performed.
   static const NONE = const IosInAppWebViewDataDetectorTypes._internal("NONE");
@@ -809,7 +891,19 @@ class InAppWebViewUserPreferredContentMode {
       return InAppWebViewUserPreferredContentMode._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "MOBILE";
+      case 2:
+        return "DESKTOP";
+      case 0:
+      default:
+        return "RECOMMENDED";
+    }
+  }
 
   ///The recommended content mode for the current platform.
   static const RECOMMENDED = const InAppWebViewUserPreferredContentMode._internal(0);
@@ -833,7 +927,33 @@ class IosWebViewOptionsPresentationStyle {
       return IosWebViewOptionsPresentationStyle._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "PAGE_SHEET";
+      case 2:
+        return "FORM_SHEET";
+      case 3:
+        return "CURRENT_CONTEXT";
+      case 4:
+        return "CUSTOM";
+      case 5:
+        return "OVER_FULL_SCREEN";
+      case 6:
+        return "OVER_CURRENT_CONTEXT";
+      case 7:
+        return "POPOVER";
+      case 8:
+        return "NONE";
+      case 9:
+        return "AUTOMATIC";
+      case 0:
+      default:
+        return "FULL_SCREEN";
+    }
+  }
 
   ///A presentation style in which the presented view covers the screen.
   static const FULL_SCREEN = const IosWebViewOptionsPresentationStyle._internal(0);
@@ -873,7 +993,21 @@ class IosWebViewOptionsTransitionStyle {
       return IosWebViewOptionsTransitionStyle._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "FLIP_HORIZONTAL";
+      case 2:
+        return "CROSS_DISSOLVE";
+      case 3:
+        return "PARTIAL_CURL";
+      case 0:
+      default:
+        return "COVER_VERTICAL";
+    }
+  }
 
   ///When the view controller is presented, its view slides up from the bottom of the screen.
   ///On dismissal, the view slides back down. This is the default transition style.
@@ -907,7 +1041,19 @@ class IosSafariOptionsDismissButtonStyle {
       return IosSafariOptionsDismissButtonStyle._internal(value);
     return null;
   }
-  toValue() => _value;
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "CLOSE";
+      case 2:
+        return "CANCEL";
+      case 0:
+      default:
+        return "DONE";
+    }
+  }
 
   ///Makes the button title the localized string "Done".
   static const DONE = const IosSafariOptionsDismissButtonStyle._internal(0);
@@ -962,7 +1108,7 @@ class ChromeSafariBrowserClassOptions {
 class AjaxRequestAction {
   final int _value;
   const AjaxRequestAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   ///Aborts the current [AjaxRequest].
   static const ABORT = const AjaxRequestAction._internal(0);
@@ -992,7 +1138,7 @@ class AjaxRequestEventType {
   static AjaxRequestEventType fromValue(String value) {
     return (["loadstart", "load", "loadend", "progress", "error", "abort"].contains(value)) ? AjaxRequestEventType._internal(value) : null;
   }
-  toValue() => _value;
+  String toValue() => _value;
   String toString() => _value;
 
   ///The LOADSTART event is fired when a request has started to load data.
@@ -1044,8 +1190,23 @@ class AjaxRequestReadyState {
       return AjaxRequestReadyState._internal(value);
     return null;
   }
-  toValue() => _value;
-  String toString() => _value.toString();
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch(_value) {
+      case 1:
+        return "OPENED";
+      case 2:
+        return "HEADERS_RECEIVED";
+      case 3:
+        return "LOADING";
+      case 4:
+        return "DONE";
+      case 0:
+      default:
+        return "UNSENT";
+    }
+  }
 
   ///Client has been created. `XMLHttpRequest.open()` not called yet.
   static const UNSENT = const AjaxRequestReadyState._internal(0);
@@ -1176,7 +1337,7 @@ class AjaxRequest {
 class FetchRequestAction {
   final int _value;
   const FetchRequestAction._internal(this._value);
-  toValue() => _value;
+  int toValue() => _value;
 
   ///Aborts the fetch request.
   static const ABORT = const FetchRequestAction._internal(0);

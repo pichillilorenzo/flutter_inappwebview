@@ -64,10 +64,19 @@ https.createServer(options, appHttps).listen(4433)
 appAuthBasic.use((req, res, next) => {
   let user = auth(req)
 
-  if (user === undefined || user['name'] !== 'user 1' || user['pass'] !== 'password 1') {
+  if (user === undefined || user['name'] !== 'USERNAME' || user['pass'] !== 'PASSWORD') {
     res.statusCode = 401
     res.setHeader('WWW-Authenticate', 'Basic realm="Node"')
-    res.end('Unauthorized')
+    res.send(`
+        <html>
+          <head>
+          </head>
+          <body>
+            <h1>Unauthorized</h1>
+          </body>
+        </html>
+      `);
+    res.end()
   } else {
     next()
   }
@@ -80,7 +89,7 @@ appAuthBasic.get("/", (req, res) => {
       <head>
       </head>
       <body>
-        <p>HELLO</p>
+        <h1>Authorized</h1>
       </body>
     </html>
   `);

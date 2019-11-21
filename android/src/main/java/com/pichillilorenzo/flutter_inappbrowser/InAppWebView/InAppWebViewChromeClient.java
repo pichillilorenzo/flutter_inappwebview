@@ -40,7 +40,7 @@ import io.flutter.plugin.common.PluginRegistry;
 import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
-public class InAppWebChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener {
+public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
   private PluginRegistry.Registrar registrar;
@@ -56,7 +56,7 @@ public class InAppWebChromeClient extends WebChromeClient implements PluginRegis
   private int mOriginalOrientation;
   private int mOriginalSystemUiVisibility;
 
-  public InAppWebChromeClient(Object obj, PluginRegistry.Registrar registrar) {
+  public InAppWebViewChromeClient(Object obj, PluginRegistry.Registrar registrar) {
     super();
     this.registrar = registrar;
     if (obj instanceof InAppBrowserActivity)

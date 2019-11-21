@@ -301,6 +301,19 @@ class InAppBrowser {
 
   }
 
+  ///Event fires when the [InAppBrowser] main page receives an HTTP error.
+  ///
+  ///[url] represents the url of the main page that received the HTTP error.
+  ///
+  ///[statusCode] represents the status code of the response. HTTP errors have status codes >= 400.
+  ///
+  ///[description] represents the description of the HTTP error. On iOS, it is always an empty string.
+  ///
+  ///**NOTE**: available on Android 23+.
+  void onLoadHttpError(String url, int statusCode, String description) {
+
+  }
+
   ///Event fires when the current [progress] (range 0-100) of loading a page is changed.
   void onProgressChanged(int progress) {
 

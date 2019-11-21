@@ -7,8 +7,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
 import android.util.AttributeSet;
-import android.util.JsonReader;
-import android.util.JsonToken;
 import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
@@ -31,7 +29,6 @@ import com.pichillilorenzo.flutter_inappbrowser.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.io.StringReader;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -52,7 +49,7 @@ final public class InAppWebView extends InputAwareWebView {
   public FlutterWebView flutterWebView;
   public int id;
   public InAppWebViewClient inAppWebViewClient;
-  public InAppWebChromeClient inAppWebChromeClient;
+  public InAppWebViewChromeClient inAppWebViewChromeClient;
   public InAppWebViewOptions options;
   public boolean isLoading = false;
   public OkHttpClient httpClient;
@@ -538,8 +535,8 @@ final public class InAppWebView extends InputAwareWebView {
 
     addJavascriptInterface(new JavaScriptBridgeInterface((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView), JavaScriptBridgeInterface.name);
 
-    inAppWebChromeClient = new InAppWebChromeClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView, this.registrar);
-    setWebChromeClient(inAppWebChromeClient);
+    inAppWebViewChromeClient = new InAppWebViewChromeClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView, this.registrar);
+    setWebChromeClient(inAppWebViewChromeClient);
 
     inAppWebViewClient = new InAppWebViewClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
     setWebViewClient(inAppWebViewClient);

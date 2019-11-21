@@ -83,22 +83,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               ListTile(
                 title: Text('InAppBrowser'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/InAppBrowser');
-                  dispose();
+                  Navigator.pushReplacementNamed(context, '/InAppBrowser');
                 },
               ),
               ListTile(
                 title: Text('ChromeSafariBrowser'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/ChromeSafariBrowser');
-                  dispose();
+                  Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
                 },
               ),
               ListTile(
                 title: Text('InAppWebView'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/');
-                  dispose();
+                  Navigator.pushReplacementNamed(context, '/');
                 },
               ),
             ],
@@ -163,7 +160,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     databaseEnabled: true,
                     domStorageEnabled: true,
                     geolocationEnabled: true,
-                    //safeBrowsingEnabled: true,
+                    safeBrowsingEnabled: true,
                     //blockNetworkImage: true,
                   ),
                 ),
@@ -240,6 +237,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     </body>
                   </html>
                   """);
+                },
+                onLoadHttpError: (InAppWebViewController controller, String url,
+                    int statusCode, String description) async {
+                  print("HTTP error $url: $statusCode, $description");
                 },
                 onProgressChanged:
                     (InAppWebViewController controller, int progress) {
@@ -364,7 +365,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 onSafeBrowsingHit: (InAppWebViewController controller,
                     String url, SafeBrowsingThreat threatType) async {
                   SafeBrowsingResponseAction action =
-                      SafeBrowsingResponseAction.BACK_TO_SAFETY;
+                      SafeBrowsingResponseAction.SHOW_INTERSTITIAL;
                   return new SafeBrowsingResponse(report: true, action: action);
                 },
                 onReceivedHttpAuthRequest: (InAppWebViewController controller,
@@ -376,7 +377,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       username: "USERNAME",
                       password: "PASSWORD",
                       action: HttpAuthResponseAction
-                          .USE_SAVED_HTTP_AUTH_CREDENTIALS,
+                          .PROCEED,
                       permanentPersistence: true);
                 },
                 onReceivedServerTrustAuthRequest:

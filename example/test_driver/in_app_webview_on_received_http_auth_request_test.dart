@@ -6,16 +6,16 @@ import 'custom_widget_test.dart';
 import 'main_test.dart';
 import 'util_test.dart';
 
-class InAppWebViewInitialUrlTest extends WidgetTest {
-  final InAppWebViewInitialUrlTestState state = InAppWebViewInitialUrlTestState();
+class InAppWebViewOnReceivedHttpAuthRequestTest extends WidgetTest {
+  final InAppWebViewOnReceivedHttpAuthRequestTestState state = InAppWebViewOnReceivedHttpAuthRequestTestState();
 
   @override
-  InAppWebViewInitialUrlTestState createState() => state;
+  InAppWebViewOnReceivedHttpAuthRequestTestState createState() => state;
 }
 
-class InAppWebViewInitialUrlTestState extends WidgetTestState {
+class InAppWebViewOnReceivedHttpAuthRequestTestState extends WidgetTestState {
 
-  String appBarTitle = "InAppWebViewInitialUrlTest";
+  String appBarTitle = "InAppWebViewOnReceivedHttpAuthRequestTest";
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +26,7 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialUrl: "https://flutter.dev/",
+                    initialUrl: "http://192.168.1.20:8081/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -40,11 +40,19 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
                     onLoadStart: (InAppWebViewController controller, String url) {
 
                     },
-                    onLoadStop: (InAppWebViewController controller, String url) {
+                    onLoadStop: (InAppWebViewController controller, String url) async {
+                      String h1Content = await controller.evaluateJavascript(source: "document.body.querySelector('h1').textContent");
                       setState(() {
-                        appBarTitle = url;
+                        appBarTitle = h1Content;
                       });
                       nextTest(context: context, state: this);
+                    },
+                    onReceivedHttpAuthRequest: (InAppWebViewController controller, HttpAuthChallenge challenge) async {
+                      return new HttpAuthResponse(
+                          username: "USERNAME",
+                          password: "PASSWORD",
+                          action: HttpAuthResponseAction.PROCEED,
+                          permanentPersistence: true);
                     },
                   ),
                 ),

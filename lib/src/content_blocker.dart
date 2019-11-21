@@ -42,7 +42,9 @@ class ContentBlockerTriggerResourceType {
     return (["document", "image", "style-sheet", "script", "font",
       "media", "svg-document", "raw"].contains(value)) ? ContentBlockerTriggerResourceType._internal(value) : null;
   }
-  toValue() => _value;
+  String toValue() => _value;
+  @override
+  String toString() => _value;
 
   static const DOCUMENT = const ContentBlockerTriggerResourceType._internal('document');
   static const IMAGE = const ContentBlockerTriggerResourceType._internal('image');
@@ -67,7 +69,9 @@ class ContentBlockerTriggerLoadType {
   static ContentBlockerTriggerLoadType fromValue(String value) {
     return (["first-party", "third-party"].contains(value)) ? ContentBlockerTriggerLoadType._internal(value) : null;
   }
-  toValue() => _value;
+  String toValue() => _value;
+  @override
+  String toString() => _value;
 
   ///FIRST_PARTY is triggered only if the resource has the same scheme, domain, and port as the main page resource.
   static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
@@ -187,7 +191,9 @@ class ContentBlockerActionType {
   static ContentBlockerActionType fromValue(String value) {
     return (["block", "css-display-none", "make-https"].contains(value)) ? ContentBlockerActionType._internal(value) : null;
   }
-  toValue() => _value;
+  String toValue() => _value;
+  @override
+  String toString() => _value;
 
   ///Stops loading of the resource. If the resource was cached, the cache is ignored.
   static const BLOCK = const ContentBlockerActionType._internal('block');

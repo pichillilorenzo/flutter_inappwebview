@@ -35,6 +35,17 @@ class InAppWebView extends StatefulWidget {
   ///Event fires when the [InAppWebView] encounters an error loading an [url].
   final void Function(InAppWebViewController controller, String url, int code, String message) onLoadError;
 
+  ///Event fires when the [InAppWebView] main page receives an HTTP error.
+  ///
+  ///[url] represents the url of the main page that received the HTTP error.
+  ///
+  ///[statusCode] represents the status code of the response. HTTP errors have status codes >= 400.
+  ///
+  ///[description] represents the description of the HTTP error. On iOS, it is always an empty string.
+  ///
+  ///**NOTE**: available on Android 23+.
+  final void Function(InAppWebViewController controller, String url, int statusCode, String description) onLoadHttpError;
+
   ///Event fires when the current [progress] of loading a page is changed.
   final void Function(InAppWebViewController controller, int progress) onProgressChanged;
 
@@ -233,6 +244,7 @@ class InAppWebView extends StatefulWidget {
     this.onLoadStart,
     this.onLoadStop,
     this.onLoadError,
+    this.onLoadHttpError,
     this.onConsoleMessage,
     this.onProgressChanged,
     this.shouldOverrideUrlLoading,
@@ -401,6 +413,15 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           _inAppBrowser.onLoadError(url, code, message);
         break;
+      case "onLoadHttpError":
+        String url = call.arguments["url"];
+        int statusCode = call.arguments["statusCode"];
+        String description = call.arguments["description"];
+        if (_widget != null && _widget.onLoadHttpError != null)
+          _widget.onLoadHttpError(this, url, statusCode, description);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onLoadHttpError(url, statusCode, description);
+        break;
       case "onProgressChanged":
         int progress = call.arguments["progress"];
         if (_widget != null && _widget.onProgressChanged != null)
@@ -499,7 +520,7 @@ class InAppWebViewController {
       case "onSafeBrowsingHit":
         String url = call.arguments["url"];
         SafeBrowsingThreat threatType = SafeBrowsingThreat.fromValue(call.arguments["threatType"]);
-        if (_widget != null && _widget.onJsPrompt != null)
+        if (_widget != null && _widget.onSafeBrowsingHit != null)
           return (await _widget.onSafeBrowsingHit(this, url, threatType))?.toMap();
         else if (_inAppBrowser != null)
           return (await _inAppBrowser.onSafeBrowsingHit(url, threatType))?.toMap();
@@ -548,7 +569,7 @@ class InAppWebViewController {
         int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
         int numberOfMatches = call.arguments["numberOfMatches"];
         bool isDoneCounting = call.arguments["isDoneCounting"];
-        if (_widget != null && _widget.onReceivedClientCertRequest != null)
+        if (_widget != null && _widget.onFindResultReceived != null)
           _widget.onFindResultReceived(this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
         else if (_inAppBrowser != null)
           _inAppBrowser.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);

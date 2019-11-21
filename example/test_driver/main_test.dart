@@ -13,6 +13,8 @@ import 'in_app_webview_on_download_start_test.dart';
 import 'in_app_webview_on_js_dialog_test.dart';
 import 'in_app_webview_on_load_resource_custom_scheme_test.dart';
 import 'in_app_webview_on_load_resource_test.dart';
+import 'in_app_webview_on_received_http_auth_request_test.dart';
+import 'in_app_webview_on_safe_browsing_hit_test.dart';
 import 'in_app_webview_on_target_blank_test.dart';
 import 'in_app_webview_should_override_url_loading_test.dart';
 
@@ -32,6 +34,8 @@ Map<String, WidgetBuilder> buildRoutes({@required BuildContext context}) {
     '/InAppWebViewOnDownloadStartTest': (context) => InAppWebViewOnDownloadStartTest(),
     '/InAppWebViewOnTargetBlankTest': (context) => InAppWebViewOnTargetBlankTest(),
     '/InAppWebViewOnJsDialogTest': (context) => InAppWebViewOnJsDialogTest(),
+    '/InAppWebViewOnSafeBrowsingHitTest': (context) => InAppWebViewOnSafeBrowsingHitTest(),
+    '/InAppWebViewOnReceivedHttpAuthRequestTest': (context) => InAppWebViewOnReceivedHttpAuthRequestTest(),
   };
   routes.forEach((k, v) => testRoutes.add(k));
   return routes;

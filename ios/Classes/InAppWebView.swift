@@ -1340,6 +1340,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        if navigationResponse.isForMainFrame, let response = navigationResponse.response as? HTTPURLResponse {
+            if response.statusCode >= 400 {
+                onLoadHttpError(url: response.url!.absoluteString, statusCode: response.statusCode, description: "")
+            }
+        }
         
         if (options?.useOnDownloadStart)! {
             let mimeType = navigationResponse.response.mimeType
@@ -1427,7 +1432,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         switch action {
                             case 0:
                                 InAppWebView.credentialsProposed = []
-                                completionHandler(.cancelAuthenticationChallenge, nil)
+                                // used .performDefaultHandling to mantain consistency with Android
+                                // because .cancelAuthenticationChallenge will call webView(_:didFail:withError:)
+                                completionHandler(.performDefaultHandling, nil)
+                                //completionHandler(.cancelAuthenticationChallenge, nil)
                                 break
                             case 1:
                                 let username = response["username"] as! String
@@ -1850,6 +1858,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         if let channel = getChannel() {
             channel.invokeMethod("onLoadError", arguments: arguments)
+        }
+    }
+    
+    public func onLoadHttpError(url: String, statusCode: Int, description: String) {
+        var arguments: [String: Any] = ["url": url, "statusCode": statusCode, "description": description]
+        if IABController != nil {
+            arguments["uuid"] = IABController!.uuid
+        }
+        if let channel = getChannel() {
+            channel.invokeMethod("onLoadHttpError", arguments: arguments)
         }
     }
     

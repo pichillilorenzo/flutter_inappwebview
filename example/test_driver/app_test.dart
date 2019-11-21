@@ -206,5 +206,29 @@ void main() {
 
     }, timeout: new Timeout(new Duration(minutes: 5)));
 
+    test('InAppWebViewOnSafeBrowsingHitTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnSafeBrowsingHitTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String url = await driver.getText(appBarTitle);
+      expect(url, "chrome://safe-browsing/match?type=malware");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
+    test('InAppWebViewOnReceivedHttpAuthRequestTest', () async {
+      await Future.delayed(const Duration(milliseconds: 2000));
+      final appBarTitle = find.byValueKey('AppBarTitle');
+
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnReceivedHttpAuthRequestTest") {
+        await Future.delayed(const Duration(milliseconds: 1000));
+      }
+
+      String title = await driver.getText(appBarTitle);
+      expect(title, "Authorized");
+    }, timeout: new Timeout(new Duration(minutes: 5)));
+
   });
 }

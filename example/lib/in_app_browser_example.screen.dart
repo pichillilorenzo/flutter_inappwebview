@@ -133,19 +133,19 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
               ListTile(
                 title: Text('InAppBrowser'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/InAppBrowser');
+                  Navigator.pushReplacementNamed(context, '/InAppBrowser');
                 },
               ),
               ListTile(
                 title: Text('ChromeSafariBrowser'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/ChromeSafariBrowser');
+                  Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
                 },
               ),
               ListTile(
                 title: Text('InAppWebView'),
                 onTap: () {
-                  Navigator.popAndPushNamed(context, '/');
+                  Navigator.pushReplacementNamed(context, '/');
                 },
               ),
             ],

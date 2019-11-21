@@ -237,6 +237,21 @@ public class InAppWebViewClient extends WebViewClient {
     getChannel().invokeMethod("onLoadError", obj);
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  @Override
+  public void onReceivedHttpError (WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+    super.onReceivedHttpError(view, request, errorResponse);
+    if(request.isForMainFrame()) {
+      Map<String, Object> obj = new HashMap<>();
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
+      obj.put("url", request.getUrl().toString());
+      obj.put("statusCode", errorResponse.getStatusCode());
+      obj.put("description", errorResponse.getReasonPhrase());
+      getChannel().invokeMethod("onLoadHttpError", obj);
+    }
+  }
+
   /**
    * On received http auth request.
    */
@@ -297,7 +312,8 @@ public class InAppWebViewClient extends WebViewClient {
                 } else {
                   handler.cancel();
                 }
-                //handler.useHttpAuthUsernamePassword();
+                // used custom CredentialDatabase!
+                // handler.useHttpAuthUsernamePassword();
                 return;
               case 0:
               default:

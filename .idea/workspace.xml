@@ -16,14 +16,15 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappbrowser/InAppBrowserFlutterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/assets/index.html" beforeDir="false" afterPath="$PROJECT_DIR$/example/assets/index.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/Flutter/flutter_export_environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/Flutter/flutter_export_environment.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/chrome_safari_browser_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/chrome_safari_browser_example.screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/assets/certificate.pfx" beforeDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/example/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.yaml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/chrome_safari_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/chrome_safari_browser.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/cookie_manager.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/cookie_manager.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/in_app_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_browser.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/in_app_webview.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_webview.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/webview_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/webview_options.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -43,11 +44,25 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="Pixel_3_XL_API_24" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/README.md">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="349">
+              <caret line="303" column="38" lean-forward="true" selection-start-line="303" selection-start-column="38" selection-end-line="303" selection-end-column="38" />
+              <folding>
+                <element signature="e#0#20#0" expanded="true" />
+                <element signature="e#0#39#0" expanded="true" />
+                <element signature="e#0#39#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/src/in_app_webview.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7854">
-              <caret line="1362" column="38" selection-start-line="1362" selection-start-column="38" selection-end-line="1362" selection-end-column="38" />
+            <state relative-caret-position="325">
+              <caret line="1176" column="41" selection-start-line="1176" selection-start-column="41" selection-end-line="1176" selection-end-column="41" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -56,58 +71,10 @@
         </entry>
       </file>
       <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart">
+        <entry file="file://$PROJECT_DIR$/pubspec.yaml">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="219">
-              <caret line="33" column="24" selection-start-line="33" selection-start-column="24" selection-end-line="33" selection-end-column="24" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="195">
-              <caret line="13" column="11" selection-start-line="13" selection-start-column="11" selection-end-line="13" selection-end-column="11" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/chrome_safari_browser_example.screen.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="345">
-              <caret line="23" selection-start-line="23" selection-end-line="23" />
-              <folding>
-                <element signature="e#0#39#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/example/assets/index.html">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="180">
-              <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="130">
-              <caret line="16" column="15" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="15" />
-              <folding>
-                <element signature="e#0#20#0" expanded="true" />
-              </folding>
+            <state relative-caret-position="120">
+              <caret line="8" column="36" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="36" />
             </state>
           </provider>
         </entry>
@@ -124,22 +91,6 @@
   </component>
   <component name="FindInProjectRecents">
     <findStrings>
-      <find>onReceivedHttpAuthRequest</find>
-      <find>onLoadHtt</find>
-      <find>onLoadError</find>
-      <find>startSafeBrowsing</find>
-      <find>onSafeBrowsingHit</find>
-      <find>dispose</find>
-      <find>onSafe</find>
-      <find>192.1</find>
-      <find>flutter</find>
-      <find>InAppWebView</find>
-      <find>onFindResultReceived</find>
-      <find>highlighted</find>
-      <find>onLoadErr</find>
-      <find>InAppWebViewInitialFileTest</find>
-      <find>InAppWebViewInitialDataTest</find>
-      <find>Fetch</find>
       <find>OnLoadHttpError</find>
       <find>ONnaviga</find>
       <find>InAppWebViewOnNavigationChangeTest</find>
@@ -154,12 +105,29 @@
       <find>InAppWebViewOnConsoleMessageTest</find>
       <find>Change:</find>
       <find>InAppWebViewOnScrollChangedTest</find>
+      <find>for Android</find>
+      <find>Event fired</find>
+      <find>an re</find>
+      <find>Event fires</find>
+      <find>only for Android.</find>
+      <find>isOpened</find>
+      <find>initialScale</find>
+      <find>e spinner when the WebView is loading a page. The default value i</find>
+      <find>reload</find>
+      <find>methods</find>
+      <find>class</find>
+      <find>HttpAuthCredentialDatabase</find>
+      <find>###</find>
+      <find>#####</find>
+      <find>loadFile</find>
+      <find>window.</find>
     </findStrings>
     <replaceStrings>
       <replace>activity.getPreferences(0)</replace>
       <replace>Log.</replace>
       <replace>com.pichillilorenzo.flutter_inappbrowser</replace>
       <replace>flutter_inappbrowser</replace>
+      <replace>Event fired</replace>
     </replaceStrings>
     <dirStrings>
       <dir>$PROJECT_DIR$/example/android</dir>
@@ -171,9 +139,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/example/test_assets/in_app_webview_on_target_blank_test.html" />
-        <option value="$PROJECT_DIR$/CHANGELOG.md" />
-        <option value="$PROJECT_DIR$/lib/src/in_app_browser.dart" />
         <option value="$PROJECT_DIR$/tool/env.dart" />
         <option value="$PROJECT_DIR$/nodejs_server_test_auth_basic_and_ssl/index.js" />
         <option value="$PROJECT_DIR$/example/test_assets/in_app_webview_on_navigation_change_test.html" />
@@ -182,10 +147,8 @@
         <option value="$PROJECT_DIR$/example/test_assets/in_app_webview_on_navigation_state_change_test.html" />
         <option value="$PROJECT_DIR$/lib/src/content_blocker.dart" />
         <option value="$PROJECT_DIR$/lib/src/types.dart" />
-        <option value="$PROJECT_DIR$/lib/src/cookie_manager.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/app.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/util_test.dart" />
-        <option value="$PROJECT_DIR$/lib/src/webview_options.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/custom_widget_test.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/in_app_webview_initial_url_test.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/in_app_webview_ajax_test.dart" />
@@ -215,13 +178,18 @@
         <option value="$PROJECT_DIR$/example/test_driver/in_app_webview_ssl_request_test.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/in_app_webview_http_auth_credential_database_test.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/in_app_webview_on_load_http_error_test.dart" />
-        <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
-        <option value="$PROJECT_DIR$/example/pubspec.yaml" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
-        <option value="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" />
         <option value="$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart" />
         <option value="$PROJECT_DIR$/example/lib/chrome_safari_browser_example.screen.dart" />
         <option value="$PROJECT_DIR$/example/assets/index.html" />
+        <option value="$PROJECT_DIR$/example/pubspec.yaml" />
+        <option value="$PROJECT_DIR$/lib/src/webview_options.dart" />
+        <option value="$PROJECT_DIR$/lib/src/in_app_browser.dart" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
+        <option value="$PROJECT_DIR$/lib/src/chrome_safari_browser.dart" />
+        <option value="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" />
+        <option value="$PROJECT_DIR$/lib/src/cookie_manager.dart" />
+        <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
       </list>
     </option>
   </component>
@@ -276,29 +244,13 @@
           <select />
         </subPane>
       </pane>
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="assets" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="example" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
@@ -313,18 +265,12 @@
             </path>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
-              <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="tool" type="462c0819:PsiDirectoryNode" />
-            </path>
-            <path>
-              <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="External Libraries" type="cb654da1:ExternalLibrariesNode" />
             </path>
           </expand>
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -486,7 +432,7 @@
       <window_info id="Resources Explorer" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32745314" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49478307" visible="true" weight="0.4580311" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49478307" weight="0.4580311" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.34196892" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -494,7 +440,7 @@
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50532484" side_tool="true" weight="0.35751295" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4946752" weight="0.38860103" />
+      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4946752" visible="true" weight="0.38860103" />
       <window_info anchor="bottom" id="Logcat" order="11" weight="0.32953367" />
       <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4968051" weight="0.33782384" />
       <window_info anchor="bottom" id="Dependency Viewer" order="13" weight="0.32800853" />
@@ -524,41 +470,6 @@
     </ignored-roots>
   </component>
   <component name="editorHistoryManager">
-    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
-      <provider selected="true" editor-type-id="text-editor" />
-    </entry>
-    <entry file="file://$PROJECT_DIR$/test.sh">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="90">
-          <caret line="6" selection-start-line="6" selection-end-line="6" selection-end-column="38" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$USER_HOME$/flutter/packages/flutter/lib/src/widgets/framework.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-654">
-          <caret line="936" column="15" selection-start-line="936" selection-start-column="15" selection-end-line="936" selection-end-column="15" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/content_blocker.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2025">
-          <caret line="135" column="1" selection-start-line="135" selection-start-column="1" selection-end-line="135" selection-end-column="1" />
-          <folding>
-            <element signature="e#0#41#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/cookie_manager.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="633">
-          <caret line="71" column="19" selection-start-line="71" selection-start-column="19" selection-end-line="71" selection-end-column="19" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/test_driver/util_test.dart" />
     <entry file="file://$USER_HOME$/flutter/packages/flutter_driver/lib/src/driver/driver.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="177">
@@ -566,30 +477,10 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/webview_options.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="283">
-          <caret line="322" column="61" selection-start-line="322" selection-start-column="49" selection-end-line="322" selection-end-column="61" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/example/test_driver/in_app_webview_ajax_test.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="180">
           <caret line="23" column="30" selection-start-line="23" selection-start-column="30" selection-end-line="23" selection-end-column="30" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/test_driver/in_app_webview_initial_url_test.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="202">
-          <caret line="21" column="30" lean-forward="true" selection-start-line="21" selection-start-column="30" selection-end-line="21" selection-end-column="30" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
@@ -897,65 +788,25 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/test.dart">
+    <entry file="file://$PROJECT_DIR$/example/lib/test.dart" />
+    <entry file="file://$PROJECT_DIR$/example/assets/index.html">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5596">
-          <folding>
-            <element signature="e#0#16431#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/in_app_localhost_server.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-845">
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="180">
+          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/example/pubspec.yaml">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="330">
-          <caret line="22" column="23" selection-start-line="22" selection-start-column="23" selection-end-line="22" selection-end-column="23" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/lib/src/in_app_webview.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7854">
-          <caret line="1362" column="38" selection-start-line="1362" selection-start-column="38" selection-end-line="1362" selection-end-column="38" />
-          <folding>
-            <element signature="e#0#17#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="130">
-          <caret line="16" column="15" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="15" />
-          <folding>
-            <element signature="e#0#20#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="219">
-          <caret line="33" column="24" selection-start-line="33" selection-start-column="24" selection-end-line="33" selection-end-column="24" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
+        <state relative-caret-position="319">
+          <caret line="43" column="9" selection-start-line="43" selection-start-column="9" selection-end-line="43" selection-end-column="9" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="195">
-          <caret line="13" column="11" selection-start-line="13" selection-start-column="11" selection-end-line="13" selection-end-column="11" />
+        <state relative-caret-position="135">
+          <caret line="9" column="25" selection-start-line="9" selection-start-column="9" selection-end-line="9" selection-end-column="25" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
           </folding>
@@ -964,18 +815,126 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/example/lib/chrome_safari_browser_example.screen.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="345">
-          <caret line="23" selection-start-line="23" selection-end-line="23" />
+        <state relative-caret-position="75">
+          <caret line="5" selection-start-line="5" selection-end-line="22" selection-end-column="1" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/assets/index.html">
+    <entry file="file://$PROJECT_DIR$/lib/src/in_app_browser.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="180">
-          <caret line="12" column="26" selection-start-line="12" selection-start-column="26" selection-end-line="12" selection-end-column="26" />
+        <state relative-caret-position="178">
+          <caret line="278" column="2" selection-start-line="278" selection-start-column="2" selection-end-line="278" selection-end-column="80" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/chrome_safari_browser.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="397">
+          <caret line="105" column="3" selection-start-line="92" selection-start-column="2" selection-end-line="105" selection-end-column="3" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/test_driver/in_app_webview_initial_url_test.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="202">
+          <caret line="21" column="30" selection-start-line="21" selection-start-column="30" selection-end-line="21" selection-end-column="30" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="528">
+          <caret line="57" column="11" selection-start-line="57" selection-start-column="11" selection-end-line="57" selection-end-column="11" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/in_app_localhost_server.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-65">
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/cookie_manager.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="14" column="45" lean-forward="true" selection-start-line="14" selection-start-column="5" selection-end-line="14" selection-end-column="45" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="35" column="22" lean-forward="true" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/http_auth_credentials_database.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="366">
+          <caret line="96" column="65" lean-forward="true" selection-start-line="96" selection-start-column="5" selection-end-line="96" selection-end-column="65" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/webview_options.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="141">
+          <caret line="606" column="95" selection-start-line="606" selection-start-column="30" selection-end-line="606" selection-end-column="95" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/pubspec.yaml">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="120">
+          <caret line="8" column="36" selection-start-line="8" selection-start-column="11" selection-end-line="8" selection-end-column="36" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/lib/src/in_app_webview.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="325">
+          <caret line="1176" column="41" selection-start-line="1176" selection-start-column="41" selection-end-line="1176" selection-end-column="41" />
+          <folding>
+            <element signature="e#0#17#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/README.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="349">
+          <caret line="303" column="38" lean-forward="true" selection-start-line="303" selection-start-column="38" selection-end-line="303" selection-end-column="38" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+            <element signature="e#0#39#0" expanded="true" />
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>

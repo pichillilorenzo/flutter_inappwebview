@@ -42,7 +42,6 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/certificate.pfx
     - assets/index.html
     - assets/page-1.html
     - assets/page-2.html

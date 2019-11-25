@@ -23,19 +23,19 @@ const javaScriptHandlerForbiddenNames = ["onLoadResource", "shouldInterceptAjaxR
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
 class InAppWebView extends StatefulWidget {
 
-  ///Event fires when the [InAppWebView] is created.
+  ///Event fired when the [InAppWebView] is created.
   final void Function(InAppWebViewController controller) onWebViewCreated;
 
-  ///Event fires when the [InAppWebView] starts to load an [url].
+  ///Event fired when the [InAppWebView] starts to load an [url].
   final void Function(InAppWebViewController controller, String url) onLoadStart;
 
-  ///Event fires when the [InAppWebView] finishes loading an [url].
+  ///Event fired when the [InAppWebView] finishes loading an [url].
   final void Function(InAppWebViewController controller, String url) onLoadStop;
 
-  ///Event fires when the [InAppWebView] encounters an error loading an [url].
+  ///Event fired when the [InAppWebView] encounters an error loading an [url].
   final void Function(InAppWebViewController controller, String url, int code, String message) onLoadError;
 
-  ///Event fires when the [InAppWebView] main page receives an HTTP error.
+  ///Event fired when the [InAppWebView] main page receives an HTTP error.
   ///
   ///[url] represents the url of the main page that received the HTTP error.
   ///
@@ -46,10 +46,10 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE**: available on Android 23+.
   final void Function(InAppWebViewController controller, String url, int statusCode, String description) onLoadHttpError;
 
-  ///Event fires when the current [progress] of loading a page is changed.
+  ///Event fired when the current [progress] of loading a page is changed.
   final void Function(InAppWebViewController controller, int progress) onProgressChanged;
 
-  ///Event fires when the [InAppWebView] receives a [ConsoleMessage].
+  ///Event fired when the [InAppWebView] receives a [ConsoleMessage].
   final void Function(InAppWebViewController controller, ConsoleMessage consoleMessage) onConsoleMessage;
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
@@ -57,33 +57,33 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldOverrideUrlLoading] option to `true`.
   final void Function(InAppWebViewController controller, String url) shouldOverrideUrlLoading;
 
-  ///Event fires when the [InAppWebView] loads a resource.
+  ///Event fired when the [InAppWebView] loads a resource.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnLoadResource] and [InAppWebViewOptions.javaScriptEnabled] options to `true`.
   final void Function(InAppWebViewController controller, LoadedResource resource) onLoadResource;
 
-  ///Event fires when the [InAppWebView] scrolls.
+  ///Event fired when the [InAppWebView] scrolls.
   ///
   ///[x] represents the current horizontal scroll origin in pixels.
   ///
   ///[y] represents the current vertical scroll origin in pixels.
   final void Function(InAppWebViewController controller, int x, int y) onScrollChanged;
 
-  ///Event fires when [InAppWebView] recognizes and starts a downloadable file.
+  ///Event fired when [InAppWebView] recognizes and starts a downloadable file.
   ///
   ///[url] represents the url of the file.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnDownloadStart] option to `true`.
   final void Function(InAppWebViewController controller, String url) onDownloadStart;
 
-  ///Event fires when the [InAppWebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
+  ///Event fired when the [InAppWebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
   ///[scheme] represents the scheme of the url.
   ///
   ///[url] represents the url of the request.
   final Future<CustomSchemeResponse> Function(InAppWebViewController controller, String scheme, String url) onLoadResourceCustomScheme;
 
-  ///Event fires when the [InAppWebView] tries to open a link with `target="_blank"`.
+  ///Event fired when the [InAppWebView] tries to open a link with `target="_blank"`.
   ///
   ///[url] represents the url of the link.
   ///
@@ -96,22 +96,22 @@ class InAppWebView extends StatefulWidget {
   ///
   ///[origin] represents the origin of the web content attempting to use the Geolocation API.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available only on Android.
   final Future<GeolocationPermissionShowPromptResponse> Function(InAppWebViewController controller, String origin) onGeolocationPermissionsShowPrompt;
 
-  ///Event fires when javascript calls the `alert()` method to display an alert dialog.
+  ///Event fired when javascript calls the `alert()` method to display an alert dialog.
   ///If [JsAlertResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
   final Future<JsAlertResponse> Function(InAppWebViewController controller, String message) onJsAlert;
 
-  ///Event fires when javascript calls the `confirm()` method to display a confirm dialog.
+  ///Event fired when javascript calls the `confirm()` method to display a confirm dialog.
   ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
   final Future<JsConfirmResponse> Function(InAppWebViewController controller, String message) onJsConfirm;
 
-  ///Event fires when javascript calls the `prompt()` method to display a prompt dialog.
+  ///Event fired when javascript calls the `prompt()` method to display a prompt dialog.
   ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
@@ -119,22 +119,22 @@ class InAppWebView extends StatefulWidget {
   ///[defaultValue] represents the default value displayed in the prompt dialog.
   final Future<JsPromptResponse> Function(InAppWebViewController controller, String message, String defaultValue) onJsPrompt;
 
-  ///Event fires when the webview notifies that a loading URL has been flagged by Safe Browsing.
+  ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
   ///[url] represents the url of the request.
   ///
   ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available only on Android.
   final Future<SafeBrowsingResponse> Function(InAppWebViewController controller, String url, SafeBrowsingThreat threatType) onSafeBrowsingHit;
 
-  ///Event fires when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
+  ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [HttpAuthChallenge].
   final Future<HttpAuthResponse> Function(InAppWebViewController controller, HttpAuthChallenge challenge) onReceivedHttpAuthRequest;
 
-  ///Event fires when the WebView need to perform server trust authentication (certificate validation).
+  ///Event fired when the WebView need to perform server trust authentication (certificate validation).
   ///The host application must return either [ServerTrustAuthResponse] instance with [ServerTrustAuthResponseAction.CANCEL] or [ServerTrustAuthResponseAction.PROCEED].
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
@@ -194,7 +194,7 @@ class InAppWebView extends StatefulWidget {
   ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgress;
 
-  ///Event fired when an request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
+  ///Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
   ///It gives the host application a chance to take control over the request before sending it.
   ///
   ///[fetchRequest] represents a resource request.
@@ -979,7 +979,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('loadFile', args);
   }
 
-  ///Reloads the [InAppWebView].
+  ///Reloads the WebView.
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -989,7 +989,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('reload', args);
   }
 
-  ///Goes back in the history of the [InAppWebView].
+  ///Goes back in the history of the WebView.
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -999,7 +999,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('goBack', args);
   }
 
-  ///Returns a boolean value indicating whether the [InAppWebView] can move backward.
+  ///Returns a boolean value indicating whether the WebView can move backward.
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1009,7 +1009,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('canGoBack', args);
   }
 
-  ///Goes forward in the history of the [InAppWebView].
+  ///Goes forward in the history of the WebView.
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1019,7 +1019,7 @@ class InAppWebViewController {
     await _channel.invokeMethod('goForward', args);
   }
 
-  ///Returns a boolean value indicating whether the [InAppWebView] can move forward.
+  ///Returns a boolean value indicating whether the WebView can move forward.
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1148,7 +1148,7 @@ class InAppWebViewController {
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
   ///
   ///In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
-  ///This event will be dispatch as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
+  ///This event will be dispatched as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
   ///```javascript
   ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
   ///     console.log("ready");
@@ -1164,13 +1164,11 @@ class InAppWebViewController {
   ///<script>
   ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
   ///     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
-  ///       console.log(result, typeof result);
-  ///       console.log(JSON.stringify(result));
+  ///       console.log(result);
   ///     });
   ///
   ///     window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
-  ///       console.log(result, typeof result);
-  ///       console.log(JSON.stringify(result));
+  ///       console.log(result);
   ///     });
   ///   });
   ///</script>
@@ -1284,7 +1282,7 @@ class InAppWebViewController {
   ///This should not be called if Safe Browsing has been disabled by manifest tag
   ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
   ///
-  ///**NOTE**: available on Android 27+.
+  ///**NOTE**: available only on Android 27+.
   Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1308,7 +1306,7 @@ class InAppWebViewController {
   ///
   ///[hosts] represents the list of hosts. This value must never be null.
   ///
-  ///**NOTE**: available on Android 27+.
+  ///**NOTE**: available only on Android 27+.
   Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
     assert(hosts != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1322,7 +1320,7 @@ class InAppWebViewController {
 
   ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
   ///
-  ///**NOTE**: available on Android 27+.
+  ///**NOTE**: available only on Android 27+.
   Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1332,7 +1330,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
   }
 
-  ///Clears all the webview's cache
+  ///Clears all the webview's cache.
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {

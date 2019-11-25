@@ -193,7 +193,7 @@ class InAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOpti
 
 ///This class represents all the Android-only WebView options available.
 class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, AndroidOptions {
-  ///Sets the text zoom of the page in percent. The default is `100`.
+  ///Sets the text zoom of the page in percent. The default value is `100`.
   int textZoom;
   ///Set to `true` to have the session cookie cache cleared before the new window is opened.
   bool clearSessionCache;
@@ -278,7 +278,7 @@ class AndroidInAppWebViewOptions implements WebViewOptions, BrowserOptions, Andr
   bool loadsImagesAutomatically;
   ///Sets the minimum logical font size. The default is `8`.
   int minimumLogicalFontSize;
-  ///Sets the initial scale for this WebView. 0 means default.The behavior for the default scale depends on the state of [useWideViewPort] and [loadWithOverviewMode].
+  ///Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of [useWideViewPort] and [loadWithOverviewMode].
   ///If the content fits into the WebView control by width, then the zoom is set to 100%. For wide content, the behavior depends on the state of [loadWithOverviewMode].
   ///If its value is true, the content will be zoomed out to be fit by width into the WebView control, otherwise not.
   ///If initial scale is greater than 0, WebView starts with this value as initial scale.

@@ -105,6 +105,7 @@ class ChromeSafariBrowser {
 
   }
 
+  ///Returns `true` if the [ChromeSafariBrowser] instance is opened, otherwise `false`.
   bool isOpened() {
     return this._isOpened;
   }

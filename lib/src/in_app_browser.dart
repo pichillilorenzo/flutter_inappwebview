@@ -281,27 +281,32 @@ class InAppBrowser {
     return this._isOpened;
   }
 
-  ///Event fires when the [InAppBrowser] is created.
+  ///Event fired when the [InAppBrowser] is created.
   void onBrowserCreated() {
 
   }
 
-  ///Event fires when the [InAppBrowser] starts to load an [url].
+  ///Event fired when the [InAppBrowser] window is closed.
+  void onExit() {
+
+  }
+
+  ///Event fired when the [InAppBrowser] starts to load an [url].
   void onLoadStart(String url) {
 
   }
 
-  ///Event fires when the [InAppBrowser] finishes loading an [url].
+  ///Event fired when the [InAppBrowser] finishes loading an [url].
   void onLoadStop(String url) {
 
   }
 
-  ///Event fires when the [InAppBrowser] encounters an error loading an [url].
+  ///Event fired when the [InAppBrowser] encounters an error loading an [url].
   void onLoadError(String url, int code, String message) {
 
   }
 
-  ///Event fires when the [InAppBrowser] main page receives an HTTP error.
+  ///Event fired when the [InAppBrowser] main page receives an HTTP error.
   ///
   ///[url] represents the url of the main page that received the HTTP error.
   ///
@@ -314,17 +319,12 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the current [progress] (range 0-100) of loading a page is changed.
+  ///Event fired when the current [progress] (range 0-100) of loading a page is changed.
   void onProgressChanged(int progress) {
 
   }
 
-  ///Event fires when the [InAppBrowser] window is closed.
-  void onExit() {
-
-  }
-
-  ///Event fires when the [InAppBrowser] webview receives a [ConsoleMessage].
+  ///Event fired when the [InAppBrowser] webview receives a [ConsoleMessage].
   void onConsoleMessage(ConsoleMessage consoleMessage) {
 
   }
@@ -336,14 +336,14 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the [InAppBrowser] webview loads a resource.
+  ///Event fired when the [InAppBrowser] webview loads a resource.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnLoadResource] and [InAppWebViewOptions.javaScriptEnabled] options to `true`.
   void onLoadResource(LoadedResource resource) {
 
   }
 
-  ///Event fires when the [InAppBrowser] webview scrolls.
+  ///Event fired when the [InAppBrowser] webview scrolls.
   ///
   ///[x] represents the current horizontal scroll origin in pixels.
   ///
@@ -352,7 +352,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when [InAppBrowser] recognizes and starts a downloadable file.
+  ///Event fired when [InAppBrowser] recognizes and starts a downloadable file.
   ///
   ///[url] represents the url of the file.
   ///
@@ -361,7 +361,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the [InAppBrowser] webview finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
+  ///Event fired when the [InAppBrowser] webview finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
   ///[scheme] represents the scheme of the url.
   ///
@@ -371,7 +371,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the [InAppBrowser] webview tries to open a link with `target="_blank"`.
+  ///Event fired when the [InAppBrowser] webview tries to open a link with `target="_blank"`.
   ///
   ///[url] represents the url of the link.
   ///
@@ -386,13 +386,13 @@ class InAppBrowser {
   ///
   ///[origin] represents the origin of the web content attempting to use the Geolocation API.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available only on Android.
   // ignore: missing_return
   Future<GeolocationPermissionShowPromptResponse> onGeolocationPermissionsShowPrompt (String origin) {
 
   }
 
-  ///Event fires when javascript calls the `alert()` method to display an alert dialog.
+  ///Event fired when javascript calls the `alert()` method to display an alert dialog.
   ///If [JsAlertResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
@@ -401,7 +401,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when javascript calls the `confirm()` method to display a confirm dialog.
+  ///Event fired when javascript calls the `confirm()` method to display a confirm dialog.
   ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
@@ -410,7 +410,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when javascript calls the `prompt()` method to display a prompt dialog.
+  ///Event fired when javascript calls the `prompt()` method to display a prompt dialog.
   ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
   ///
   ///[message] represents the message to be displayed in the alert dialog.
@@ -420,20 +420,20 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the webview notifies that a loading URL has been flagged by Safe Browsing.
+  ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
   ///[url] represents the url of the request.
   ///
   ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available only on Android.
   // ignore: missing_return
   Future<SafeBrowsingResponse> onSafeBrowsingHit(String url, SafeBrowsingThreat threatType) {
 
   }
 
-  ///Event fires when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
+  ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [HttpAuthChallenge].
   // ignore: missing_return
@@ -441,7 +441,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fires when the WebView need to perform server trust authentication (certificate validation).
+  ///Event fired when the WebView need to perform server trust authentication (certificate validation).
   ///The host application must return either [ServerTrustAuthResponse] instance with [ServerTrustAuthResponseAction.CANCEL] or [ServerTrustAuthResponseAction.PROCEED].
   ///
   ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [ServerTrustChallenge].
@@ -506,7 +506,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fired when an request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
+  ///Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
   ///It gives the host application a chance to take control over the request before sending it.
   ///
   ///[fetchRequest] represents a resource request.

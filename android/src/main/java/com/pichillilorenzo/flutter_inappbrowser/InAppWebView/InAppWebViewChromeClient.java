@@ -46,13 +46,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private PluginRegistry.Registrar registrar;
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
-  private ValueCallback<Uri[]> mUploadMessageArray;
   private ValueCallback<Uri> mUploadMessage;
   private final static int FILECHOOSER_RESULTCODE = 1;
 
   private View mCustomView;
   private WebChromeClient.CustomViewCallback mCustomViewCallback;
-  protected FrameLayout mFullscreenContainer;
   private int mOriginalOrientation;
   private int mOriginalSystemUiVisibility;
 
@@ -545,10 +543,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   //For Android 5.0+
-  public boolean onShowFileChooser(
-          WebView webView, ValueCallback<Uri[]> filePathCallback,
-          FileChooserParams fileChooserParams) {
-    mUploadMessageArray = filePathCallback;
+  public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+    InAppBrowserFlutterPlugin.uploadMessageArray = filePathCallback;
     try {
       Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
       contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
@@ -572,9 +568,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == FILECHOOSER_RESULTCODE && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED)) {
-      mUploadMessageArray.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+      InAppBrowserFlutterPlugin.uploadMessageArray.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
     }
-    return false;
+    return true;
   }
 
   private MethodChannel getChannel() {

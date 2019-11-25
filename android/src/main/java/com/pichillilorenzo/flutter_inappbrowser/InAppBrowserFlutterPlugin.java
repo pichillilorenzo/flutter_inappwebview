@@ -1,6 +1,8 @@
 package com.pichillilorenzo.flutter_inappbrowser;
 
+import android.net.Uri;
 import android.os.Build;
+import android.webkit.ValueCallback;
 
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
@@ -15,6 +17,8 @@ public class InAppBrowserFlutterPlugin implements FlutterPlugin {
   public static InAppBrowser inAppBrowser;
   public static MyCookieManager myCookieManager;
   public static CredentialDatabaseHandler credentialDatabaseHandler;
+  public static ValueCallback<Uri[]> uploadMessageArray;
+
 
   public InAppBrowserFlutterPlugin() {}
 
@@ -61,5 +65,6 @@ public class InAppBrowserFlutterPlugin implements FlutterPlugin {
       credentialDatabaseHandler.dispose();
       credentialDatabaseHandler = null;
     }
+    uploadMessageArray = null;
   }
 }

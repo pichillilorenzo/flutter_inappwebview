@@ -1,14 +1,7 @@
-import 'dart:async';
-import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
-
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:path_provider/path_provider.dart';
-import 'package:flutter/services.dart' show rootBundle;
+
+import 'main.dart';
 
 class InAppWebViewExampleScreen extends StatefulWidget {
   @override
@@ -20,7 +13,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
-  CookieManager cookieManager = CookieManager.instance();
 
   TextEditingController _textFieldController = TextEditingController();
 
@@ -42,37 +34,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             title: Text(
           "InAppWebView",
         )),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                child: Text('flutter_inappbrowser example'),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-              ),
-              ListTile(
-                title: Text('InAppBrowser'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/InAppBrowser');
-                },
-              ),
-              ListTile(
-                title: Text('ChromeSafariBrowser'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
-                },
-              ),
-              ListTile(
-                title: Text('InAppWebView'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/');
-                },
-              ),
-            ],
-          ),
-        ),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Container(

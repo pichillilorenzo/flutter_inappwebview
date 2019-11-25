@@ -19,7 +19,6 @@ public class InAppBrowserFlutterPlugin implements FlutterPlugin {
   public static CredentialDatabaseHandler credentialDatabaseHandler;
   public static ValueCallback<Uri[]> uploadMessageArray;
 
-
   public InAppBrowserFlutterPlugin() {}
 
   public static void registerWith(PluginRegistry.Registrar registrar) {

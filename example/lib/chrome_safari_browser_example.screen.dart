@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
+import 'main.dart';
+
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
   MyChromeSafariBrowser(browserFallback) : super(bFallback: browserFallback);
 
@@ -43,48 +45,15 @@ class _ChromeSafariBrowserExampleScreenState
             title: Text(
           "ChromeSafariBrowser",
         )),
-        drawer: Drawer(
-          child: ListView(
-            padding: EdgeInsets.zero,
-            children: <Widget>[
-              DrawerHeader(
-                child: Text('flutter_inappbrowser example'),
-                decoration: BoxDecoration(
-                  color: Colors.blue,
-                ),
-              ),
-              ListTile(
-                title: Text('InAppBrowser'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/InAppBrowser');
-                },
-              ),
-              ListTile(
-                title: Text('ChromeSafariBrowser'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
-                },
-              ),
-              ListTile(
-                title: Text('InAppWebView'),
-                onTap: () {
-                  Navigator.pushReplacementNamed(context, '/');
-                },
-              ),
-            ],
-          ),
-        ),
+        drawer: myDrawer(context: context),
         body: Center(
           child: RaisedButton(
               onPressed: () async {
                 await widget.browser.open(
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
-                        androidChromeCustomTabsOptions:
-                            AndroidChromeCustomTabsOptions(
-                                addShareButton: false),
-                        iosSafariOptions:
-                            IosSafariOptions(barCollapsingEnabled: true)));
+                        androidChromeCustomTabsOptions: AndroidChromeCustomTabsOptions(addShareButton: false),
+                        iosSafariOptions: IosSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),
         ));

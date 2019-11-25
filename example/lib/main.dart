@@ -7,16 +7,45 @@ import 'package:flutter_inappbrowser_example/chrome_safari_browser_example.scree
 import 'package:flutter_inappbrowser_example/in_app_webiew_example.screen.dart';
 import 'package:flutter_inappbrowser_example/in_app_browser_example.screen.dart';
 
-import 'package:flutter_downloader/flutter_downloader.dart';
-import 'package:permission_handler/permission_handler.dart';
-
 // InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
 Future main() async {
   // await localhostServer.start();
-  // await FlutterDownloader.initialize();
-  await PermissionHandler().requestPermissions([PermissionGroup.locationAlways]);
   runApp(new MyApp());
+}
+
+Drawer myDrawer({@required BuildContext context}) {
+  return Drawer(
+    child: ListView(
+      padding: EdgeInsets.zero,
+      children: <Widget>[
+        DrawerHeader(
+          child: Text('flutter_inappbrowser example'),
+          decoration: BoxDecoration(
+            color: Colors.blue,
+          ),
+        ),
+        ListTile(
+          title: Text('InAppBrowser'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/InAppBrowser');
+          },
+        ),
+        ListTile(
+          title: Text('ChromeSafariBrowser'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+          },
+        ),
+        ListTile(
+          title: Text('InAppWebView'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/');
+          },
+        ),
+      ],
+    ),
+  );
 }
 
 class MyApp extends StatefulWidget {

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'main_test.dart';
-import 'util_test.dart';
 import 'custom_widget_test.dart';
 
 class InAppWebViewInitialFileTest extends WidgetTest {
@@ -19,7 +18,9 @@ class InAppWebViewInitialFileTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
@@ -43,7 +44,6 @@ class InAppWebViewInitialFileTestState extends WidgetTestState {
                       setState(() {
                         appBarTitle = "true";
                       });
-                      nextTest(context: context, state: this);
                     },
                   ),
                 ),

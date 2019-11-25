@@ -66,6 +66,9 @@ public class ContentBlockerHandler {
         for (ContentBlocker contentBlocker : ruleListCopy) {
             ContentBlockerTrigger trigger =  contentBlocker.trigger;
             List<ContentBlockerTriggerResourceType> resourceTypes = trigger.resourceType;
+            if (resourceTypes.contains(ContentBlockerTriggerResourceType.IMAGE) && !resourceTypes.contains(ContentBlockerTriggerResourceType.SVG_DOCUMENT)) {
+                resourceTypes.add(ContentBlockerTriggerResourceType.SVG_DOCUMENT);
+            }
 
             ContentBlockerAction action = contentBlocker.action;
 
@@ -173,6 +176,7 @@ public class ContentBlockerHandler {
                                         ? contentTypeSplitted[1].replace("charset=", "").trim()
                                         : "utf-8";
 
+                                response.body().close();
                                 response.close();
 
                                 return new WebResourceResponse(contentType, encoding, dataStream);
@@ -180,6 +184,7 @@ public class ContentBlockerHandler {
                             } catch (Exception e) {
                                 e.printStackTrace();
                                 if (response != null) {
+                                    response.body().close();
                                     response.close();
                                 }
                                 Log.e(LOG_TAG, e.getMessage());
@@ -220,12 +225,14 @@ public class ContentBlockerHandler {
                             ? contentTypeSplitted[1].replace("charset=", "").trim()
                             : "utf-8";
 
+                    response.body().close();
                     response.close();
                     responseResourceType = getResourceTypeFromContentType(contentType);
                 }
 
             } catch (Exception e) {
                 if (response != null) {
+                    response.body().close();
                     response.close();
                 }
                 e.printStackTrace();

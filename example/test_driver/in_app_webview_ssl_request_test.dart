@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
@@ -6,16 +8,16 @@ import 'custom_widget_test.dart';
 import 'main_test.dart';
 import '.env.dart';
 
-class InAppWebViewOnReceivedHttpAuthRequestTest extends WidgetTest {
-  final InAppWebViewOnReceivedHttpAuthRequestTestState state = InAppWebViewOnReceivedHttpAuthRequestTestState();
+class InAppWebViewSslRequestTest extends WidgetTest {
+  final InAppWebViewSslRequestTestState state = InAppWebViewSslRequestTestState();
 
   @override
-  InAppWebViewOnReceivedHttpAuthRequestTestState createState() => state;
+  InAppWebViewSslRequestTestState createState() => state;
 }
 
-class InAppWebViewOnReceivedHttpAuthRequestTestState extends WidgetTestState {
+class InAppWebViewSslRequestTestState extends WidgetTestState {
 
-  String appBarTitle = "InAppWebViewOnReceivedHttpAuthRequestTest";
+  String appBarTitle = "InAppWebViewSslRequestTest";
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +30,7 @@ class InAppWebViewOnReceivedHttpAuthRequestTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialUrl: "http://${environment["NODE_SERVER_IP"]}:8081/",
+                    initialUrl: "https://${environment["NODE_SERVER_IP"]}:4433/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -48,12 +50,15 @@ class InAppWebViewOnReceivedHttpAuthRequestTestState extends WidgetTestState {
                         appBarTitle = h1Content;
                       });
                     },
-                    onReceivedHttpAuthRequest: (InAppWebViewController controller, HttpAuthChallenge challenge) async {
-                      return new HttpAuthResponse(
-                          username: "USERNAME",
-                          password: "PASSWORD",
-                          action: HttpAuthResponseAction.PROCEED,
-                          permanentPersistence: true);
+                    onReceivedServerTrustAuthRequest: (InAppWebViewController controller, ServerTrustChallenge challenge) async {
+                      return new ServerTrustAuthResponse(action: ServerTrustAuthResponseAction.PROCEED);
+                    },
+                    onReceivedClientCertRequest: (InAppWebViewController controller, ClientCertChallenge challenge) async {
+                      return new ClientCertResponse(
+                          certificatePath: "test_assets/certificate.pfx",
+                          certificatePassword: "",
+                          androidKeyStoreType: "PKCS12",
+                          action: ClientCertResponseAction.PROCEED);
                     },
                   ),
                 ),

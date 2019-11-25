@@ -6,7 +6,6 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'custom_widget_test.dart';
 import 'main_test.dart';
-import 'util_test.dart';
 
 class InAppWebViewOnSafeBrowsingHitTest extends WidgetTest {
   final InAppWebViewOnSafeBrowsingHitTestState state = InAppWebViewOnSafeBrowsingHitTestState();
@@ -22,13 +21,15 @@ class InAppWebViewOnSafeBrowsingHitTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialUrl: "chrome://safe-browsing/match?type=malware",
+                    initialUrl: (Platform.isAndroid) ? "chrome://safe-browsing/match?type=malware" : "https://flutter.dev/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -38,8 +39,6 @@ class InAppWebViewOnSafeBrowsingHitTestState extends WidgetTestState {
                             debuggingEnabled: true
                         ),
                         androidInAppWebViewOptions: AndroidInAppWebViewOptions(
-                          databaseEnabled: true,
-                          domStorageEnabled: true,
                           safeBrowsingEnabled: true,
                         ),
                     ),
@@ -55,7 +54,6 @@ class InAppWebViewOnSafeBrowsingHitTestState extends WidgetTestState {
                       setState(() {
                         appBarTitle = url;
                       });
-                      nextTest(context: context, state: this);
                     },
                     onSafeBrowsingHit: (InAppWebViewController controller, String url, SafeBrowsingThreat threatType) async {
                       return SafeBrowsingResponse(report: true, action: SafeBrowsingResponseAction.PROCEED);

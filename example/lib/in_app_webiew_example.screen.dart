@@ -31,6 +31,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewController webView;
   String url = "";
   double progress = 0;
+  CookieManager cookieManager = CookieManager.instance();
 
   TextEditingController _textFieldController = TextEditingController();
 
@@ -124,7 +125,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 //initialUrl: "chrome://safe-browsing/match?type=malware",
                 //initialUrl: "http://192.168.1.20:8081/",
                 //initialUrl: "https://192.168.1.20:4433/",
-                initialFile: "assets/index.html",
+                //initialFile: "assets/index.html",
+                initialUrl: "https://flutter.dev/",
                 initialHeaders: {},
                 initialOptions: InAppWebViewWidgetOptions(
                   inAppWebViewOptions: InAppWebViewOptions(
@@ -134,7 +136,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       clearCache: true,
                       //useShouldOverrideUrlLoading: true,
                       useOnTargetBlank: true,
-                      //useOnLoadResource: true,
+                      useOnLoadResource: true,
                       //useOnDownloadStart: true,
                       //useShouldInterceptAjaxRequest: true,
                       //useShouldInterceptFetchRequest: true,
@@ -151,7 +153,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                                   ContentBlockerTriggerResourceType.STYLE_SHEET
                                 ],
                                 ifTopUrl: [
-                                  "https://getbootstrap.com/"
+                                  "https://flutter.dev/"
                                 ]),
                             action: ContentBlockerAction(
                                 type: ContentBlockerActionType.BLOCK))
@@ -195,11 +197,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 },
                 onLoadStop: (InAppWebViewController controller, String url) async {
                   print("stopped $url");
+
                   if (Platform.isAndroid) {
                     controller.clearSslPreferences();
                     controller.clearClientCertPreferences();
                   }
-                  //controller.findAllAsync("flutter");
+                  //controller.findAllAsync(find: "InAppWebView");
+                  //controller.findAllAsync(find: "InAppWebViewInitialFileTest");
                   print(await controller.getFavicons());
                   print(await CookieManager.instance().getCookies(url: url));
                   //await CookieManager.instance().setCookie(url: url, name: "myCookie", value: "myValue");

@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'main_test.dart';
-import 'util_test.dart';
 import 'custom_widget_test.dart';
+import '.env.dart';
 
 class InAppWebViewOnDownloadStartTest extends WidgetTest {
   final InAppWebViewOnDownloadStartTestState state = InAppWebViewOnDownloadStartTestState();
@@ -19,13 +19,34 @@ class InAppWebViewOnDownloadStartTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialFile: "test_assets/in_app_webview_on_download_start_test.html",
+                    initialData: InAppWebViewInitialData(data: """
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>InAppWebViewOnDownloadStartTest</title>
+    </head>
+    <body>
+        <h1>InAppWebViewOnDownloadStartTest</h1>
+        <a id="download-file" href="http://${environment["NODE_SERVER_IP"]}:8082/test-download-file">download file</a>
+        <script>
+            window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+                document.querySelector("#download-file").click();
+            });
+        </script>
+    </body>
+</html>
+                    """),
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -47,7 +68,6 @@ class InAppWebViewOnDownloadStartTestState extends WidgetTestState {
                       setState(() {
                         appBarTitle = url;
                       });
-                      nextTest(context: context, state: this);
                     },
                   ),
                 ),

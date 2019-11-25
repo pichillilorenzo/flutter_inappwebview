@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'main_test.dart';
-import 'util_test.dart';
 import 'custom_widget_test.dart';
 
 class Foo {
@@ -34,7 +33,9 @@ class InAppWebViewJavaScriptHandlerTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
@@ -64,7 +65,6 @@ class InAppWebViewJavaScriptHandlerTestState extends WidgetTestState {
                         appBarTitle += " " + (args[3] is Map).toString();
                         appBarTitle += " " + (args[4] is Map).toString();
                         setState(() { });
-                        nextTest(context: context, state: this);
                       });
 
                     },

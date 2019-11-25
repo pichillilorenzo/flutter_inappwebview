@@ -1500,3 +1500,90 @@ class FetchRequest {
     return null;
   }
 }
+
+///ContentBlockerTriggerResourceType class represents the possible resource type defined for a [ContentBlockerTrigger].
+class ContentBlockerTriggerResourceType {
+  final String _value;
+  const ContentBlockerTriggerResourceType._internal(this._value);
+  static ContentBlockerTriggerResourceType fromValue(String value) {
+    return (["document", "image", "style-sheet", "script", "font",
+      "media", "svg-document", "raw"].contains(value)) ? ContentBlockerTriggerResourceType._internal(value) : null;
+  }
+  String toValue() => _value;
+  @override
+  String toString() => _value;
+
+  static const DOCUMENT = const ContentBlockerTriggerResourceType._internal('document');
+  static const IMAGE = const ContentBlockerTriggerResourceType._internal('image');
+  static const STYLE_SHEET = const ContentBlockerTriggerResourceType._internal('style-sheet');
+  static const SCRIPT = const ContentBlockerTriggerResourceType._internal('script');
+  static const FONT = const ContentBlockerTriggerResourceType._internal('font');
+  static const MEDIA = const ContentBlockerTriggerResourceType._internal('media');
+  static const SVG_DOCUMENT = const ContentBlockerTriggerResourceType._internal('svg-document');
+  ///Any untyped load
+  static const RAW = const ContentBlockerTriggerResourceType._internal('raw');
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+
+///ContentBlockerTriggerLoadType class represents the possible load type for a [ContentBlockerTrigger].
+class ContentBlockerTriggerLoadType {
+  final String _value;
+  const ContentBlockerTriggerLoadType._internal(this._value);
+  static ContentBlockerTriggerLoadType fromValue(String value) {
+    return (["first-party", "third-party"].contains(value)) ? ContentBlockerTriggerLoadType._internal(value) : null;
+  }
+  String toValue() => _value;
+  @override
+  String toString() => _value;
+
+  ///FIRST_PARTY is triggered only if the resource has the same scheme, domain, and port as the main page resource.
+  static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
+  ///THIRD_PARTY is triggered if the resource is not from the same domain as the main page resource.
+  static const THIRD_PARTY = const ContentBlockerTriggerLoadType._internal('third-party');
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///ContentBlockerActionType class represents the kind of action that can be used with a [ContentBlockerTrigger].
+class ContentBlockerActionType {
+  final String _value;
+  const ContentBlockerActionType._internal(this._value);
+  static ContentBlockerActionType fromValue(String value) {
+    return (["block", "css-display-none", "make-https"].contains(value)) ? ContentBlockerActionType._internal(value) : null;
+  }
+  String toValue() => _value;
+  @override
+  String toString() => _value;
+
+  ///Stops loading of the resource. If the resource was cached, the cache is ignored.
+  static const BLOCK = const ContentBlockerActionType._internal('block');
+  ///Hides elements of the page based on a CSS selector. A selector field contains the selector list. Any matching element has its display property set to none, which hides it.
+  ///
+  ///**NOTE**: on Android, JavaScript must be enabled.
+  static const CSS_DISPLAY_NONE = const ContentBlockerActionType._internal('css-display-none');
+  ///Changes a URL from http to https. URLs with a specified (nondefault) port and links using other protocols are unaffected.
+  static const MAKE_HTTPS = const ContentBlockerActionType._internal('make-https');
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Cookie class represents a cookie returned by the [CookieManager].
+class Cookie {
+  ///The name;
+  String name;
+  ///The value;
+  dynamic value;
+
+  Cookie({@required this.name, @required this.value});
+}

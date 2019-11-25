@@ -1,5 +1,4 @@
 import 'package:flutter_driver/driver_extension.dart';
-import 'app_test.dart';
 import 'main_test.dart' as app;
 
 void main() {

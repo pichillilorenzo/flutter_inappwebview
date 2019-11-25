@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'main_test.dart';
-import 'util_test.dart';
 import 'custom_widget_test.dart';
 
 class InAppWebViewOnTargetBlankTest extends WidgetTest {
@@ -19,7 +18,9 @@ class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
@@ -46,7 +47,6 @@ class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
                         setState(() {
                           appBarTitle = url;
                         });
-                        nextTest(context: context, state: this);
                       }
                     },
                     onTargetBlank: (InAppWebViewController controller, String url) {

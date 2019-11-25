@@ -5,21 +5,15 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 import 'main_test.dart';
 import 'custom_widget_test.dart';
 
-class InAppWebViewOnLoadResourceTest extends WidgetTest {
-  final InAppWebViewOnLoadResourceTestState state = InAppWebViewOnLoadResourceTestState();
+class InAppWebViewOnNavigationStateChangeTest extends WidgetTest {
+  final InAppWebViewOnNavigationStateChangeTestState state = InAppWebViewOnNavigationStateChangeTestState();
 
   @override
-  InAppWebViewOnLoadResourceTestState createState() => state;
+  InAppWebViewOnNavigationStateChangeTestState createState() => state;
 }
 
-class InAppWebViewOnLoadResourceTestState extends WidgetTestState {
-  List<String> resourceList = [
-    "https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css",
-    "https://code.jquery.com/jquery-3.3.1.min.js",
-    "https://via.placeholder.com/100x50"
-  ];
-  int countResources = 0;
-  String appBarTitle = "InAppWebViewOnLoadResourceTest";
+class InAppWebViewOnNavigationStateChangeTestState extends WidgetTestState {
+  String appBarTitle = "InAppWebViewOnNavigationStateChangeTest";
 
   @override
   Widget build(BuildContext context) {
@@ -32,13 +26,12 @@ class InAppWebViewOnLoadResourceTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialFile: "test_assets/in_app_webview_on_load_resource_test.html",
+                    initialUrl: "https://flutter.dev/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
-                          clearCache: true,
-                          debuggingEnabled: true,
-                          useOnLoadResource: true
+                            clearCache: true,
+                            debuggingEnabled: true
                         )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
@@ -48,15 +41,27 @@ class InAppWebViewOnLoadResourceTestState extends WidgetTestState {
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
+                      controller.evaluateJavascript(source: """
+var state = {}
+var title = ''
+var url = 'first-push';
+history.pushState(state, title, url);
 
+setTimeout(function() {
+    var url = 'second-push';
+    history.pushState(state, title, url);
+}, 100);
+""");
                     },
-                    onLoadResource: (InAppWebViewController controller, LoadedResource response) {
-                      appBarTitle = (appBarTitle == "InAppWebViewOnLoadResourceTest") ? response.url : appBarTitle + " " + response.url;
-                      countResources++;
-                      if (countResources == resourceList.length) {
-                        setState(() {  });
+                    onNavigationStateChange: (InAppWebViewController controller, String url) async {
+                      if (url.endsWith("second-push")) {
+                        setState(() {
+                          appBarTitle += " " + url;
+                        });
+                      } else {
+                        appBarTitle = url;
                       }
-                    }
+                    },
                   ),
                 ),
               ),

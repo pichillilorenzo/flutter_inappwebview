@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'main_test.dart';
-import 'util_test.dart';
 import 'custom_widget_test.dart';
+import '.env.dart';
 
 class InAppWebViewFetchTest extends WidgetTest {
   final InAppWebViewFetchTestState state = InAppWebViewFetchTestState();
@@ -23,13 +23,56 @@ class InAppWebViewFetchTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialFile: "test_assets/in_app_webview_fetch_test.html",
+                    initialData: InAppWebViewInitialData(data: """
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>InAppWebViewFetchTest</title>
+    </head>
+    <body>
+        <h1>InAppWebViewFetchTest</h1>
+        <script>
+          window.addEventListener('flutterInAppBrowserPlatformReady', function(event) {
+            fetch(new Request("http://${environment["NODE_SERVER_IP"]}:8082/test-download-file")).then(function(response) {
+                window.flutter_inappbrowser.callHandler('fetchGet', response.status);
+            }).catch(function(error) {
+                window.flutter_inappbrowser.callHandler('fetchGet', "ERROR: " + error);
+            });
+
+            fetch("http://${environment["NODE_SERVER_IP"]}:8082/test-ajax-post", {
+                method: 'POST',
+                body: JSON.stringify({
+                    firstname: 'Foo',
+                    lastname: 'Bar'
+                }),
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+            }).then(function(response) {
+                response.json().then(function(value) {
+					window.flutter_inappbrowser.callHandler('fetchPost', value);
+				}).catch(function(error) {
+				    window.flutter_inappbrowser.callHandler('fetchPost', "ERROR: " + error);
+				});
+            }).catch(function(error) {
+                window.flutter_inappbrowser.callHandler('fetchPost', "ERROR: " + error);
+            });
+          });
+        </script>
+    </body>
+</html>
+                    """),
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -79,7 +122,6 @@ class InAppWebViewFetchTestState extends WidgetTestState {
     testsDone++;
     if (testsDone == totTests) {
       setState(() {  });
-      nextTest(context: context, state: this);
     }
   }
 }

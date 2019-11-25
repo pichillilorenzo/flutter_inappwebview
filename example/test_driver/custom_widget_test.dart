@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
@@ -14,6 +15,7 @@ class WidgetTest extends StatefulWidget {
 }
 
 class WidgetTestState extends State<WidgetTest> {
+  final GlobalKey<ScaffoldState> scaffoldKey = new GlobalKey<ScaffoldState>();
   InAppWebViewController webView;
   String appBarTitle;
 

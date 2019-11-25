@@ -5,16 +5,17 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 import 'custom_widget_test.dart';
 import 'main_test.dart';
 
-class InAppWebViewInitialUrlTest extends WidgetTest {
-  final InAppWebViewInitialUrlTestState state = InAppWebViewInitialUrlTestState();
+class InAppWebViewOnScrollChangedTest extends WidgetTest {
+  final InAppWebViewOnScrollChangedTestState state = InAppWebViewOnScrollChangedTestState();
 
   @override
-  InAppWebViewInitialUrlTestState createState() => state;
+  InAppWebViewOnScrollChangedTestState createState() => state;
 }
 
-class InAppWebViewInitialUrlTestState extends WidgetTestState {
+class InAppWebViewOnScrollChangedTestState extends WidgetTestState {
 
-  String appBarTitle = "InAppWebViewInitialUrlTest";
+  String appBarTitle = "InAppWebViewOnScrollChangedTest";
+  bool scrolled = false;
 
   @override
   Widget build(BuildContext context) {
@@ -42,9 +43,15 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
-                      setState(() {
-                        appBarTitle = url;
-                      });
+                      controller.scrollTo(x: 0, y: 500);
+                    },
+                    onScrollChanged: (InAppWebViewController controller, int x, int y) {
+                      if (!scrolled) {
+                        scrolled = true;
+                        setState(() {
+                          appBarTitle = "true";
+                        });
+                      }
                     },
                   ),
                 ),

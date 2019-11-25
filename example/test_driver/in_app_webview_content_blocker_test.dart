@@ -5,16 +5,16 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 import 'custom_widget_test.dart';
 import 'main_test.dart';
 
-class InAppWebViewInitialUrlTest extends WidgetTest {
-  final InAppWebViewInitialUrlTestState state = InAppWebViewInitialUrlTestState();
+class InAppWebViewContentBlockerTest extends WidgetTest {
+  final InAppWebViewContentBlockerTestState state = InAppWebViewContentBlockerTestState();
 
   @override
-  InAppWebViewInitialUrlTestState createState() => state;
+  InAppWebViewContentBlockerTestState createState() => state;
 }
 
-class InAppWebViewInitialUrlTestState extends WidgetTestState {
+class InAppWebViewContentBlockerTestState extends WidgetTestState {
 
-  String appBarTitle = "InAppWebViewInitialUrlTest";
+  String appBarTitle = "InAppWebViewContentBlockerTest";
 
   @override
   Widget build(BuildContext context) {
@@ -32,7 +32,21 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
                             clearCache: true,
-                            debuggingEnabled: true
+                            debuggingEnabled: true,
+                            contentBlockers: [
+                              ContentBlocker(
+                                  trigger: ContentBlockerTrigger(
+                                      urlFilter: ".*",
+                                      resourceType: [
+                                        ContentBlockerTriggerResourceType.IMAGE,
+                                        ContentBlockerTriggerResourceType.STYLE_SHEET
+                                      ],
+                                      ifTopUrl: [
+                                        "https://flutter.dev/"
+                                      ]),
+                                  action: ContentBlockerAction(
+                                      type: ContentBlockerActionType.BLOCK))
+                            ]
                         )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
@@ -43,7 +57,7 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
                       setState(() {
-                        appBarTitle = url;
+                        appBarTitle = "true";
                       });
                     },
                   ),

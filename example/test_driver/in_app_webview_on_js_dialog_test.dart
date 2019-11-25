@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'main_test.dart';
-import 'util_test.dart';
 import 'custom_widget_test.dart';
 
 class InAppWebViewOnJsDialogTest extends WidgetTest {
@@ -27,7 +26,9 @@ class InAppWebViewOnJsDialogTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
@@ -54,7 +55,6 @@ class InAppWebViewOnJsDialogTestState extends WidgetTestState {
                         setState(() {
                           appBarTitle = "prompt " + args[0];
                         });
-                        nextTest(context: context, state: this);
                       });
                     },
                     onLoadStart: (InAppWebViewController controller, String url) {

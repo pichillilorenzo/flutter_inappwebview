@@ -5,16 +5,16 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 import 'custom_widget_test.dart';
 import 'main_test.dart';
 
-class InAppWebViewInitialUrlTest extends WidgetTest {
-  final InAppWebViewInitialUrlTestState state = InAppWebViewInitialUrlTestState();
+class InAppWebViewOnLoadErrorTest extends WidgetTest {
+  final InAppWebViewOnLoadErrorTestState state = InAppWebViewOnLoadErrorTestState();
 
   @override
-  InAppWebViewInitialUrlTestState createState() => state;
+  InAppWebViewOnLoadErrorTestState createState() => state;
 }
 
-class InAppWebViewInitialUrlTestState extends WidgetTestState {
+class InAppWebViewOnLoadErrorTestState extends WidgetTestState {
 
-  String appBarTitle = "InAppWebViewInitialUrlTest";
+  String appBarTitle = "InAppWebViewOnLoadErrorTest";
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialUrl: "https://flutter.dev/",
+                    initialUrl: "http://not-existing-domain.org/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
@@ -42,10 +42,13 @@ class InAppWebViewInitialUrlTestState extends WidgetTestState {
 
                     },
                     onLoadStop: (InAppWebViewController controller, String url) {
-                      setState(() {
-                        appBarTitle = url;
-                      });
+
                     },
+                    onLoadError: (InAppWebViewController controller, String url, int code, String message) async {
+                      setState(() {
+                        appBarTitle = code.toString();
+                      });
+                    }
                   ),
                 ),
               ),

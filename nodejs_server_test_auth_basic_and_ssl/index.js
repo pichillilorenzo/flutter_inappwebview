@@ -22,43 +22,55 @@ appHttps.get('/', (req, res) => {
   console.log(JSON.stringify(req.headers))
 	const cert = req.connection.getPeerCertificate()
 
-// The `req.client.authorized` flag will be true if the certificate is valid and was issued by a CA we white-listed
-// earlier in `opts.ca`. We display the name of our user (CN = Common Name) and the name of the issuer, which is
-// `localhost`.
+  // The `req.client.authorized` flag will be true if the certificate is valid and was issued by a CA we white-listed
+  // earlier in `opts.ca`. We display the name of our user (CN = Common Name) and the name of the issuer, which is
+  // `localhost`.
 
 	if (req.client.authorized) {
 		res.send(`
-            <html>
-                <head>
-                    <script src="/fakeResource" type="text/javascript"></script>
-                </head>
-                <body>
-                    <p>Hello ${cert.subject.CN}, your certificate was issued by ${cert.issuer.CN}!</p>
-                </body>
-            </html>
-        `)
-// They can still provide a certificate which is not accepted by us. Unfortunately, the `cert` object will be an empty
-// object instead of `null` if there is no certificate at all, so we have to check for a known field rather than
-// truthiness.
+      <html>
+        <head>
+        </head>
+        <body>
+          <h1>Authorized</h1>
+        </body>
+      </html>
+    `);
+  // They can still provide a certificate which is not accepted by us. Unfortunately, the `cert` object will be an empty
+  // object instead of `null` if there is no certificate at all, so we have to check for a known field rather than
+  // truthiness.
 
 	} else if (cert.subject) {
-		res.status(403).send(`Sorry ${cert.subject.CN}, certificates from ${cert.issuer.CN} are not welcome here.`)
-// And last, they can come to us with no certificate at all:
+    console.log(`Sorry ${cert.subject.CN}, certificates from ${cert.issuer.CN} are not welcome here.`);
+		res.status(403).send(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <h1>Forbidden</h1>
+        </body>
+      </html>
+    `);
+  // And last, they can come to us with no certificate at all:
 	} else {
-		res.status(401).send(`Sorry, but you need to provide a client certificate to continue.`)
+	  console.log(`Sorry, but you need to provide a client certificate to continue.`)
+		res.status(401).send(`
+      <html>
+        <head>
+        </head>
+        <body>
+          <h1>Unauthorized</h1>
+        </body>
+      </html>
+    `);
 	}
-	res.end()
-})
-
-appHttps.get('/fakeResource', (req, res) => {
-  console.log(JSON.stringify(req.headers))
-  res.set("Content-Type", "text/javascript")
-	res.send(`alert("HI");`)
 	res.end()
 })
 
 // Let's create our HTTPS server and we're ready to go.
 https.createServer(options, appHttps).listen(4433)
+
+
 
 // Ensure this is before any other middleware or routes
 appAuthBasic.use((req, res, next) => {
@@ -97,6 +109,8 @@ appAuthBasic.get("/", (req, res) => {
 })
 
 appAuthBasic.listen(8081)
+
+
 
 // Parse URL-encoded bodies (as sent by HTML forms)
 app.use(express.urlencoded());

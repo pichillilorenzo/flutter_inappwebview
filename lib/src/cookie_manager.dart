@@ -3,6 +3,8 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import 'types.dart';
+
 ///Manages the cookies used by WebView instances.
 ///
 ///**NOTE for iOS**: available from iOS 11.0+.
@@ -56,22 +58,22 @@ class CookieManager {
   }
 
   ///Gets all the cookies for the given [url].
-  Future<List<Map<String, dynamic>>> getCookies({@required String url}) async {
+  Future<List<Cookie>> getCookies({@required String url}) async {
     assert(url != null && url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
-    List<dynamic> cookies = await _channel.invokeMethod('getCookies', args);
-    cookies = cookies.cast<Map<dynamic, dynamic>>();
-    for(var i = 0; i < cookies.length; i++) {
-      cookies[i] = cookies[i].cast<String, dynamic>();
+    List<dynamic> cookieListMap = await _channel.invokeMethod('getCookies', args);
+    cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
+    List<Cookie> cookies = [];
+    for(var i = 0; i < cookieListMap.length; i++) {
+      cookies.add(Cookie(name: cookieListMap[i]["name"], value: cookieListMap[i]["value"]));
     }
-    cookies = cookies.cast<Map<String, dynamic>>();
     return cookies;
   }
 
   ///Gets a cookie by its [name] for the given [url].
-  Future<Map<String, dynamic>> getCookie({@required String url, @required String name}) async {
+  Future<Cookie> getCookie({@required String url, @required String name}) async {
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
 
@@ -82,7 +84,7 @@ class CookieManager {
     for(var i = 0; i < cookies.length; i++) {
       cookies[i] = cookies[i].cast<String, dynamic>();
       if (cookies[i]["name"] == name)
-        return cookies[i];
+        return Cookie(name: cookies[i]["name"], value: cookies[i]["value"]);
     }
     return null;
   }

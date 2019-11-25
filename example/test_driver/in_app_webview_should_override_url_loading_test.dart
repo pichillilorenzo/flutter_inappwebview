@@ -4,7 +4,6 @@ import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
 
 import 'custom_widget_test.dart';
 import 'main_test.dart';
-import 'util_test.dart';
 
 class InAppWebViewShouldOverrideUrlLoadingTest extends WidgetTest {
   final InAppWebViewShouldOverrideUrlLoadingTestState state = InAppWebViewShouldOverrideUrlLoadingTestState();
@@ -19,7 +18,9 @@ class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        key: this.scaffoldKey,
         appBar: myAppBar(state: this, title: appBarTitle),
+        drawer: myDrawer(context: context),
         body: Container(
             child: Column(children: <Widget>[
               Expanded(
@@ -45,7 +46,6 @@ class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
                         setState(() {
                           appBarTitle = url;
                         });
-                        nextTest(context: context, state: this);
                       } else {
                         controller.evaluateJavascript(source: "document.querySelector('#link').click();");
                       }

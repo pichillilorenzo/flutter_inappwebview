@@ -9,6 +9,7 @@ about: Something is crashing or not working as intended
 **App version:**  <!-- Add branch if necessary -->  
 **Android version:**  <!-- If customize ROM, write which -->  
 **Device information:**  <!-- Manufacturer and model -->  
+**Flutter version:**  <!-- Flutter version used -->  
 
 ## Description
 

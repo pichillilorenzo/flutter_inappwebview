@@ -1284,7 +1284,7 @@ class InAppWebViewController {
   ///This should not be called if Safe Browsing has been disabled by manifest tag
   ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available on Android 27+.
   Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1308,7 +1308,7 @@ class InAppWebViewController {
   ///
   ///[hosts] represents the list of hosts. This value must never be null.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available on Android 27+.
   Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
     assert(hosts != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1322,7 +1322,7 @@ class InAppWebViewController {
 
   ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available on Android 27+.
   Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1344,7 +1344,7 @@ class InAppWebViewController {
 
   ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available only on Android.
   Future<void> clearSslPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1360,7 +1360,7 @@ class InAppWebViewController {
   ///
   ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
   ///
-  ///**NOTE**: available only for Android.
+  ///**NOTE**: available on Android 21+.
   Future<void> clearClientCertPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {

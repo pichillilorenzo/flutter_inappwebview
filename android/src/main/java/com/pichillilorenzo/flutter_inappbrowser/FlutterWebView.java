@@ -36,14 +36,12 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public final MethodChannel channel;
   public final Registrar registrar;
 
-  public FlutterWebView(Registrar registrar, int id, HashMap<String, Object> params, View containerView) {
-
+  public FlutterWebView(Registrar registrar, final Context context, int id, HashMap<String, Object> params, View containerView) {
     this.registrar = registrar;
     this.activity = registrar.activity();
 
     DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
-    DisplayManager displayManager =
-            (DisplayManager) this.registrar.context().getSystemService(Context.DISPLAY_SERVICE);
+    DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
     displayListenerProxy.onPreWebViewInitialization(displayManager);
 
     String initialUrl = (String) params.get("initialUrl");
@@ -55,7 +53,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
 
-    webView = new InAppWebView(registrar, this, id, options, containerView);
+    webView = new InAppWebView(registrar, context, this, id, options, containerView);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     webView.prepare();

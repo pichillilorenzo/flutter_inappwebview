@@ -508,8 +508,8 @@ final public class InAppWebView extends InputAwareWebView {
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(PluginRegistry.Registrar registrar, Object obj, int id, InAppWebViewOptions options, View containerView) {
-    super(registrar.activeContext(), containerView);
+  public InAppWebView(PluginRegistry.Registrar registrar, Context context, Object obj, int id, InAppWebViewOptions options, View containerView) {
+    super(context, containerView);
     this.registrar = registrar;
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;

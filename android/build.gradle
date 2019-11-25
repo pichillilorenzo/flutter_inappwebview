@@ -29,9 +29,20 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
 
         vectorDrawables.useSupportLibrary = true
+        consumerProguardFiles 'proguard-rules.pro'
     }
     lintOptions {
         disable 'InvalidPackage'
+    }
+    buildTypes {
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
     dependencies {
         implementation 'androidx.webkit:webkit:1.0.0'

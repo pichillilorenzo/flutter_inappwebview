@@ -15,16 +15,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/assets/certificate.pfx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/chrome_safari_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/chrome_safari_browser.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/cookie_manager.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/cookie_manager.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/in_app_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_browser.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/in_app_webview.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_webview.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/webview_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/webview_options.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -47,8 +38,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="349">
-              <caret line="303" column="38" lean-forward="true" selection-start-line="303" selection-start-column="38" selection-end-line="303" selection-end-column="38" />
+            <state relative-caret-position="204">
+              <caret line="428" column="42" lean-forward="true" selection-start-line="428" selection-start-column="42" selection-end-line="428" selection-end-column="42" />
               <folding>
                 <element signature="e#0#20#0" expanded="true" />
                 <element signature="e#0#39#0" expanded="true" />
@@ -65,6 +56,18 @@
               <caret line="1176" column="41" selection-start-line="1176" selection-start-column="41" selection-end-line="1176" selection-end-column="41" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="-31">
+              <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
+              <folding>
+                <element signature="e#0#39#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -188,8 +191,8 @@
         <option value="$PROJECT_DIR$/lib/src/chrome_safari_browser.dart" />
         <option value="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" />
         <option value="$PROJECT_DIR$/lib/src/cookie_manager.dart" />
-        <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
+        <option value="$PROJECT_DIR$/README.md" />
       </list>
     </option>
   </component>
@@ -255,13 +258,13 @@
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
-              <item name="lib" type="462c0819:PsiDirectoryNode" />
+              <item name="example" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
               <item name="flutter_inappbrowser" type="462c0819:PsiDirectoryNode" />
+              <item name="example" type="462c0819:PsiDirectoryNode" />
               <item name="lib" type="462c0819:PsiDirectoryNode" />
-              <item name="src" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="flutter_inappbrowser" type="b2602c69:ProjectViewProjectNode" />
@@ -421,7 +424,7 @@
     <frame x="0" y="23" width="1920" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6177474" visible="true" weight="0.20766774" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6177474" visible="true" weight="0.20766774" />
       <window_info id="Structure" order="1" sideWeight="0.38225257" side_tool="true" weight="0.2087327" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
@@ -440,7 +443,7 @@
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50532484" side_tool="true" weight="0.35751295" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4946752" visible="true" weight="0.38860103" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.4946752" visible="true" weight="0.38860103" />
       <window_info anchor="bottom" id="Logcat" order="11" weight="0.32953367" />
       <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4968051" weight="0.33782384" />
       <window_info anchor="bottom" id="Dependency Viewer" order="13" weight="0.32800853" />
@@ -879,16 +882,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="35" column="22" lean-forward="true" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
-          <folding>
-            <element signature="e#0#39#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/http_auth_credentials_database.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="366">
@@ -926,10 +919,20 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-31">
+          <caret line="35" column="22" selection-start-line="35" selection-start-column="22" selection-end-line="35" selection-end-column="22" />
+          <folding>
+            <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="349">
-          <caret line="303" column="38" lean-forward="true" selection-start-line="303" selection-start-column="38" selection-end-line="303" selection-end-column="38" />
+        <state relative-caret-position="204">
+          <caret line="428" column="42" lean-forward="true" selection-start-line="428" selection-start-column="42" selection-end-line="428" selection-end-column="42" />
           <folding>
             <element signature="e#0#20#0" expanded="true" />
             <element signature="e#0#39#0" expanded="true" />

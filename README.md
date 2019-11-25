@@ -424,7 +424,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onLoadStart`: Event fired when the InAppWebView starts to load an url.
 * `onLoadStop`: Event fired when the InAppWebView finishes loading an url.
 * `onLoadError`: Event fired when the InAppWebView encounters an error loading an url.
-* `onLoadHttpError`: vent fires when the InAppWebView main page receives an HTTP error.
+* `onLoadHttpError`: Event fired when the InAppWebView main page receives an HTTP error.
 * `onProgressChanged`: Event fired when the current progress of loading a page is changed.
 * `onConsoleMessage`: Event fired when the InAppWebView receives a ConsoleMessage.
 * `shouldOverrideUrlLoading`: Give the host application a chance to take control when a URL is about to be loaded in the current WebView.

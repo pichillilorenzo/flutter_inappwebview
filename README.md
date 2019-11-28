@@ -447,6 +447,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress.
 * `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
 * `onNavigationStateChange`: Event fired when the navigation state of the InAppWebView changes.
+* `onPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 
 ### `InAppBrowser` class
 

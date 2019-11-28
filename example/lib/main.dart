@@ -68,12 +68,12 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      initialRoute: '/',
-      routes: {
-        '/': (context) => InAppWebViewExampleScreen(),
-        '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-        '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
-      }
+        initialRoute: '/',
+        routes: {
+          '/': (context) => InAppWebViewExampleScreen(),
+          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+          '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
+        }
     );
   }
 }

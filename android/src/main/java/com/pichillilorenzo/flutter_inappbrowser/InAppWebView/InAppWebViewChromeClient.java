@@ -16,6 +16,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -31,7 +32,10 @@ import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappbrowser.InAppBrowserFlutterPlugin;
 import com.pichillilorenzo.flutter_inappbrowser.R;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -571,6 +575,53 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       InAppBrowserFlutterPlugin.uploadMessageArray.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
     }
     return true;
+  }
+
+  @Override
+  public void onPermissionRequest(final PermissionRequest request) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      Map<String, Object> obj = new HashMap<>();
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
+      obj.put("origin", request.getOrigin().toString());
+      obj.put("resources", Arrays.asList(request.getResources()));
+      getChannel().invokeMethod("onPermissionRequest", obj, new MethodChannel.Result() {
+        @Override
+        public void success(Object response) {
+          if (response != null) {
+            Map<String, Object> responseMap = (Map<String, Object>) response;
+            Integer action = (Integer) responseMap.get("action");
+            List<String> resourceList = (List<String>) responseMap.get("resources");
+            if (resourceList == null)
+              resourceList = new ArrayList<String>();
+            String[] resources = new String[resourceList.size()];
+            resources = resourceList.toArray(resources);
+            if (action != null) {
+              switch (action) {
+                case 1:
+                  request.grant(resources);
+                  return;
+                case 0:
+                default:
+                  request.deny();
+                  return;
+              }
+            }
+          }
+          request.deny();
+        }
+
+        @Override
+        public void error(String s, String s1, Object o) {
+          Log.e(LOG_TAG, s + ", " + s1);
+        }
+
+        @Override
+        public void notImplemented() {
+          request.deny();
+        }
+      });
+    }
   }
 
   private MethodChannel getChannel() {

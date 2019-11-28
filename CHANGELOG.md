@@ -1,3 +1,7 @@
+## 2.0.1
+
+- Added `onPermissionRequest` event. This event is fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
+
 ## 2.0.0
 
 - Merge "Avoid null pointer exception after webview is disposed" [#116](https://github.com/pichillilorenzo/flutter_inappbrowser/pull/116) (thanks to [robsonfingo](https://github.com/robsonfingo))

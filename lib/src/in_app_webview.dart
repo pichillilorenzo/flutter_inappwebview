@@ -214,6 +214,15 @@ class InAppWebView extends StatefulWidget {
   ///[url] represents the new url.
   final void Function(InAppWebViewController controller, String url) onNavigationStateChange;
 
+  ///Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied.
+  ///
+  ///[origin] represents the origin of the web page which is trying to access the restricted resources.
+  ///
+  ///[resources] represents the array of resources the web content wants to access.
+  ///
+  ///**NOTE**: available only on Android 23+.
+  final Future<PermissionRequestResponse> Function(InAppWebViewController controller, String origin, List<String> resources) onPermissionRequest;
+
   ///Initial url that will be loaded.
   final String initialUrl;
   ///Initial asset file that will be loaded. See [InAppWebView.loadFile()] for explanation.
@@ -267,6 +276,7 @@ class InAppWebView extends StatefulWidget {
     this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
     this.onNavigationStateChange,
+    this.onPermissionRequest,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -580,6 +590,14 @@ class InAppWebViewController {
           _widget.onNavigationStateChange(this, url);
         else if (_inAppBrowser != null)
           _inAppBrowser.onNavigationStateChange(url);
+        break;
+      case "onPermissionRequest":
+        String origin = call.arguments["origin"];
+        List<String> resources = call.arguments["resources"].cast<String>();
+        if (_widget != null && _widget.onPermissionRequest != null)
+          return (await _widget.onPermissionRequest(this, origin, resources))?.toMap();
+        /*else if (_inAppBrowser != null)
+          return (await  _inAppBrowser.onPermissionRequest(origin, resources))?.toMap();*/
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];

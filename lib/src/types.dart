@@ -145,9 +145,9 @@ class CustomSchemeResponse {
 
   Map<String, dynamic> toJson() {
     return {
-      'content-type': this.contentType,
-      'content-encoding': this.contentEnconding,
-      'data': this.data
+      'content-type': contentType,
+      'content-encoding': contentEnconding,
+      'data': data
     };
   }
 }
@@ -1586,4 +1586,38 @@ class Cookie {
   dynamic value;
 
   Cookie({@required this.name, @required this.value});
+}
+
+///PermissionRequestResponseAction class used by [PermissionRequestResponse] class.
+class PermissionRequestResponseAction {
+  final int _value;
+  const PermissionRequestResponseAction._internal(this._value);
+  int toValue() => _value;
+
+  ///Denies the request.
+  static const DENY = const PermissionRequestResponseAction._internal(0);
+  ///Grants origin the permission to access the given resources.
+  static const GRANT = const PermissionRequestResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///PermissionRequestResponse class represents the response used by the [onPermissionRequest] event.
+class PermissionRequestResponse {
+  ///Resources granted to be accessed by origin.
+  List<String> resources;
+  ///Indicate the [PermissionRequestResponseAction] to take in response of a permission request.
+  PermissionRequestResponseAction action;
+
+  PermissionRequestResponse({this.resources = const [], this.action = PermissionRequestResponseAction.DENY});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "resources": resources,
+      "action": action?.toValue()
+    };
+  }
 }

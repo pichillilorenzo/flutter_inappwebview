@@ -214,7 +214,7 @@ class InAppWebView extends StatefulWidget {
   ///[url] represents the new url.
   final void Function(InAppWebViewController controller, String url) onNavigationStateChange;
 
-  ///Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied.
+  ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
   ///
   ///[origin] represents the origin of the web page which is trying to access the restricted resources.
   ///
@@ -596,8 +596,8 @@ class InAppWebViewController {
         List<String> resources = call.arguments["resources"].cast<String>();
         if (_widget != null && _widget.onPermissionRequest != null)
           return (await _widget.onPermissionRequest(this, origin, resources))?.toMap();
-        /*else if (_inAppBrowser != null)
-          return (await  _inAppBrowser.onPermissionRequest(origin, resources))?.toMap();*/
+        else if (_inAppBrowser != null)
+          return (await  _inAppBrowser.onPermissionRequest(origin, resources))?.toMap();
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];

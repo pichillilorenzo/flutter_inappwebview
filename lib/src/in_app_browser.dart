@@ -420,7 +420,7 @@ class InAppBrowser {
 
   }
 
-  ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
+  ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
   ///[url] represents the url of the request.
@@ -517,13 +517,24 @@ class InAppBrowser {
 
   }
 
-  ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of
+  ///Event fired when the navigation state of the WebView changes throught the usage of
   ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event.
   ///
   ///Also, the event is fired when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
   ///
   ///[url] represents the new url.
   void onNavigationStateChange(String url) {
+
+  }
+
+  ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
+  ///
+  ///[origin] represents the origin of the web page which is trying to access the restricted resources.
+  ///
+  ///[resources] represents the array of resources the web content wants to access.
+  ///
+  ///**NOTE**: available only on Android 23+.
+  Future<PermissionRequestResponse> onPermissionRequest(String origin, List<String> resources) {
 
   }
 

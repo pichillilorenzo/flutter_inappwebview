@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main_test.dart';
 import 'custom_widget_test.dart';
@@ -43,11 +43,11 @@ class InAppWebViewFetchTestState extends WidgetTestState {
     <body>
         <h1>InAppWebViewFetchTest</h1>
         <script>
-          window.addEventListener('flutterInAppBrowserPlatformReady', function(event) {
+          window.addEventListener('flutterInAppWebViewPlatformReady', function(event) {
             fetch(new Request("http://${environment["NODE_SERVER_IP"]}:8082/test-download-file")).then(function(response) {
-                window.flutter_inappbrowser.callHandler('fetchGet', response.status);
+                window.flutter_inappwebview.callHandler('fetchGet', response.status);
             }).catch(function(error) {
-                window.flutter_inappbrowser.callHandler('fetchGet', "ERROR: " + error);
+                window.flutter_inappwebview.callHandler('fetchGet', "ERROR: " + error);
             });
 
             fetch("http://${environment["NODE_SERVER_IP"]}:8082/test-ajax-post", {
@@ -61,12 +61,12 @@ class InAppWebViewFetchTestState extends WidgetTestState {
                 }
             }).then(function(response) {
                 response.json().then(function(value) {
-					window.flutter_inappbrowser.callHandler('fetchPost', value);
+					window.flutter_inappwebview.callHandler('fetchPost', value);
 				}).catch(function(error) {
-				    window.flutter_inappbrowser.callHandler('fetchPost', "ERROR: " + error);
+				    window.flutter_inappwebview.callHandler('fetchPost', "ERROR: " + error);
 				});
             }).catch(function(error) {
-                window.flutter_inappbrowser.callHandler('fetchPost', "ERROR: " + error);
+                window.flutter_inappwebview.callHandler('fetchPost', "ERROR: " + error);
             });
           });
         </script>

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main_test.dart';
 import 'custom_widget_test.dart';
@@ -58,7 +58,7 @@ class InAppWebViewInitialDataTestState extends WidgetTestState {
                 <p>
                     <img src="https://via.placeholder.com/100x50" alt="placeholder 100x50">
                 </p>
-                <a id="link" href="https://github.com/pichillilorenzo/flutter_inappbrowser">flutter_inappbrowser</a>
+                <a id="link" href="https://github.com/pichillilorenzo/flutter_inappwebview">flutter_inappwebview</a>
             </main>
         </div>
     </body>

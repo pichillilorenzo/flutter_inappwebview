@@ -167,7 +167,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequest> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) shouldInterceptAjaxRequest;
 
   ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
@@ -179,7 +179,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxReadyStateChange;
 
   ///Event fired as an `XMLHttpRequest` progress.
@@ -191,7 +191,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the ajax requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(InAppWebViewController controller, AjaxRequest ajaxRequest) onAjaxProgress;
 
   ///Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
@@ -203,7 +203,7 @@ class InAppWebView extends StatefulWidget {
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept fetch requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
-  ///Inside the `window.addEventListener("flutterInAppBrowserPlatformReady")` event, the fetch requests will be intercept for sure.
+  ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the fetch requests will be intercept for sure.
   final Future<FetchRequest> Function(InAppWebViewController controller, FetchRequest fetchRequest) shouldInterceptFetchRequest;
 
   ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of
@@ -347,7 +347,7 @@ class _InAppWebViewState extends State<InAppWebView> {
       );
     }
     return Text(
-        '$defaultTargetPlatform is not yet supported by the flutter_inappbrowser plugin');
+        '$defaultTargetPlatform is not yet supported by the flutter_inappwebview plugin');
   }
 
   @override
@@ -1162,30 +1162,30 @@ class InAppWebViewController {
   ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
   ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
   ///
-  ///The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+  ///The JavaScript function that can be used to call the handler is `window.flutter_inappwebview.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
   ///The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
   ///
-  ///In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
+  ///In order to call `window.flutter_inappwebview.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppWebViewPlatformReady`.
   ///This event will be dispatched as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
   ///```javascript
-  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+  ///   window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
   ///     console.log("ready");
   ///   });
   ///```
   ///
-  ///`window.flutter_inappbrowser.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+  ///`window.flutter_inappwebview.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
   ///that can be used to get the json result returned by [JavaScriptHandlerCallback].
   ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
   ///
   ///So, on the JavaScript side, to get data coming from the Dart side, you will use:
   ///```html
   ///<script>
-  ///   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
-  ///     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
+  ///   window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
+  ///     window.flutter_inappwebview.callHandler('handlerFoo').then(function(result) {
   ///       console.log(result);
   ///     });
   ///
-  ///     window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
+  ///     window.flutter_inappwebview.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
   ///       console.log(result);
   ///     });
   ///   });
@@ -1196,7 +1196,7 @@ class InAppWebViewController {
   ///```dart
   ///  // Inject JavaScript that will receive data back from Flutter
   ///  inAppWebViewController.evaluateJavascript(source: """
-  ///    window.flutter_inappbrowser.callHandler('test', 'Text from Javascript').then(function(result) {
+  ///    window.flutter_inappwebview.callHandler('test', 'Text from Javascript').then(function(result) {
   ///      console.log(result);
   ///    });
   ///  """);
@@ -1434,12 +1434,12 @@ class InAppWebViewController {
 
   ///Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerCss()].
   Future<String> getTRexRunnerHtml() async {
-    return await rootBundle.loadString("packages/flutter_inappbrowser/t_rex_runner/t-rex.html");
+    return await rootBundle.loadString("packages/flutter_inappwebview/t_rex_runner/t-rex.html");
   }
 
   ///Gets the css of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerHtml()].
   Future<String> getTRexRunnerCss() async {
-    return await rootBundle.loadString("packages/flutter_inappbrowser/t_rex_runner/t-rex.css");
+    return await rootBundle.loadString("packages/flutter_inappwebview/t_rex_runner/t-rex.css");
   }
 
   ///Scrolls the WebView to the position.

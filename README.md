@@ -1,6 +1,6 @@
-# Flutter InAppBrowser Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappbrowser&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappbrowser)
+# Flutter InAppBrowser Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 
-[![Pub](https://img.shields.io/pub/v/flutter_inappbrowser.svg)](https://pub.dartlang.org/packages/flutter_inappbrowser)
+[![Pub](https://img.shields.io/pub/v/flutter_inappwebview.svg)](https://pub.dartlang.org/packages/flutter_inappwebview)
 [![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://stackoverflow.com/questions/tagged/flutter?sort=votes)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](/LICENSE)
 
@@ -26,11 +26,11 @@ Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development
 
 If you are starting a new fresh app, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```
-=== BUILD TARGET flutter_inappbrowser OF PROJECT Pods WITH CONFIGURATION Debug ===
+=== BUILD TARGET flutter_inappwebview OF PROJECT Pods WITH CONFIGURATION Debug ===
 The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2, 5.0. This setting can be set in the build settings editor.
 ```
 
-If you still have this problem, try to edit iOS `Podfile` like this (see [#15](https://github.com/pichillilorenzo/flutter_inappbrowser/issues/15)):
+If you still have this problem, try to edit iOS `Podfile` like this (see [#15](https://github.com/pichillilorenzo/flutter_inappwebview/issues/15)):
 ```
 target 'Runner' do
   use_frameworks!  # required by simple_permission
@@ -58,7 +58,7 @@ For help on editing plugin code, view the [documentation](https://flutter.io/dev
 
 ## Installation
 
-First, add `flutter_inappbrowser` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
+First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
 ## Usage
 
@@ -72,7 +72,7 @@ Classes:
 
 ## API Reference
 
-See the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappbrowser/latest/) to get the full documentation.
+See the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the full documentation.
 
 ### Load a file inside `assets` folder
 
@@ -113,7 +113,7 @@ Example:
 ```dart
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   runApp(new MyApp());
@@ -290,30 +290,30 @@ Screenshots:
 The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
 The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
 
-The JavaScript function that can be used to call the handler is `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
+The JavaScript function that can be used to call the handler is `window.flutter_inappwebview.callHandler(handlerName <String>, ...args)`, where `args` are [rest parameters](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/rest_parameters).
 The `args` will be stringified automatically using `JSON.stringify(args)` method and then they will be decoded on the Dart side.
 
-In order to call `window.flutter_inappbrowser.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppBrowserPlatformReady`.
+In order to call `window.flutter_inappwebview.callHandler(handlerName <String>, ...args)` properly, you need to wait and listen the JavaScript event `flutterInAppWebViewPlatformReady`.
 This event will be dispatched as soon as the platform (Android or iOS) is ready to handle the `callHandler` method.
 ```javascript
-   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+   window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
      console.log("ready");
    });
 ```
 
-`window.flutter_inappbrowser.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
+`window.flutter_inappwebview.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
 that can be used to get the json result returned by [JavaScriptHandlerCallback].
 In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
 
 So, on the JavaScript side, to get data coming from the Dart side, you will use:
 ```html
 <script>
-   window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
-     window.flutter_inappbrowser.callHandler('handlerFoo').then(function(result) {
+   window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
+     window.flutter_inappwebview.callHandler('handlerFoo').then(function(result) {
        console.log(result);
      });
 
-     window.flutter_inappbrowser.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
+     window.flutter_inappwebview.callHandler('handlerFooWithArgs', 1, true, ['bar', 5], {foo: 'baz'}).then(function(result) {
        console.log(result);
      });
    });
@@ -324,7 +324,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 ```dart
   // Inject JavaScript that will receive data back from Flutter
   inAppWebViewController.evaluateJavascript(source: """
-    window.flutter_inappbrowser.callHandler('test', 'Text from Javascript').then(function(result) {
+    window.flutter_inappwebview.callHandler('test', 'Text from Javascript').then(function(result) {
       console.log(result);
     });
   """);
@@ -459,7 +459,7 @@ Create a Class that extends the `InAppBrowser` Class in order to override the ca
 Example:
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MyInAppBrowser extends InAppBrowser {
   @override
@@ -626,7 +626,7 @@ You can initialize the `ChromeSafariBrowser` instance with an `InAppBrowser` fal
 Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:
 ```dart
 import 'package:flutter/material.dart';
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MyInAppBrowser extends InAppBrowser {
 

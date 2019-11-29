@@ -28,7 +28,7 @@
          FlutterApplication and put your custom class here. -->
     <application
         android:name=".MyApplication"
-        android:label="flutter_inappbrowser_example"
+        android:label="flutter_inappwebview_example"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
         <activity

@@ -8,10 +8,10 @@
     public boolean *(android.webkit.WebView, java.lang.String);
     public void *(android.webkit.webView, jav.lang.String);
 }
--keepclassmembers class com.pichillilorenzo.flutter_inappbrowser$JavaScriptBridgeInterface {
+-keepclassmembers class flutter_inappwebview$JavaScriptBridgeInterface {
      <fields>;
      <methods>;
      public *;
      private *;
 }
--keep class com.pichillilorenzo.flutter_inappbrowser.** { *; }
+-keep class flutter_inappwebview.** { *; }

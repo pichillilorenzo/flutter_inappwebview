@@ -10,7 +10,7 @@ import 'types.dart';
 ///**NOTE for iOS**: available from iOS 11.0+.
 class CookieManager {
   static CookieManager _instance;
-  static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser_cookiemanager');
+  static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
   ///Gets the cookie manager shared instance.
   static CookieManager instance() {

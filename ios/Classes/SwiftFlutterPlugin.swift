@@ -428,7 +428,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             webViewOptions.parse(options: options)
         }
         
-        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppBrowserFlutterPlugin.self))
+        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
         let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
         self.webViewControllers[uuid] = vc as? InAppBrowserWebViewController
         let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController
@@ -495,7 +495,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         webViewOptions = InAppWebViewOptions()
         webViewOptions.parse(options: options)
         
-        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppBrowserFlutterPlugin.self))
+        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
         let vc = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID)
         self.webViewControllers[uuid] = vc as? InAppBrowserWebViewController
         let webViewController: InAppBrowserWebViewController = self.webViewControllers[uuid] as! InAppBrowserWebViewController

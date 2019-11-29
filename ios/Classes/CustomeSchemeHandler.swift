@@ -1,6 +1,6 @@
 //
 //  CustomeSchemeHandler.swift
-//  flutter_downloader
+//  flutter_inappwebview
 //
 //  Created by Lorenzo Pichilli on 25/10/2019.
 //

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main_test.dart';
 import 'custom_widget_test.dart';
@@ -40,7 +40,7 @@ class InAppWebViewOnDownloadStartTestState extends WidgetTestState {
         <h1>InAppWebViewOnDownloadStartTest</h1>
         <a id="download-file" href="http://${environment["NODE_SERVER_IP"]}:8082/test-download-file">download file</a>
         <script>
-            window.addEventListener("flutterInAppBrowserPlatformReady", function(event) {
+            window.addEventListener("flutterInAppWebViewPlatformReady", function(event) {
                 document.querySelector("#download-file").click();
             });
         </script>

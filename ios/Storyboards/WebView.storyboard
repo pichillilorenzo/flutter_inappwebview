@@ -12,7 +12,7 @@
         <!--In App Browser Web View Controller-->
         <scene sceneID="PeV-E5-ivI">
             <objects>
-                <viewController storyboardIdentifier="viewController" id="zfm-Ja-gep" customClass="InAppBrowserWebViewController" customModule="flutter_inappbrowser" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="viewController" id="zfm-Ja-gep" customClass="InAppBrowserWebViewController" customModule="flutter_inappwebview" sceneMemberID="viewController">
                     <layoutGuides>
                         <viewControllerLayoutGuide type="top" id="eCU-xC-qdo"/>
                         <viewControllerLayoutGuide type="bottom" id="dUM-I7-PRF"/>
@@ -21,7 +21,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" userLabel="Container WebView" customClass="InAppWebView_IBWrapper" customModule="flutter_inappbrowser">
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" userLabel="Container WebView" customClass="InAppWebView_IBWrapper" customModule="flutter_inappwebview">
                                 <rect key="frame" x="0.0" y="66" width="414" height="626"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>

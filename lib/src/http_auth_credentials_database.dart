@@ -11,7 +11,7 @@ import 'package:flutter/services.dart';
 ///doesn't offer the same functionalities as iOS `URLCredentialStorage`.
 class HttpAuthCredentialDatabase {
   static HttpAuthCredentialDatabase _instance;
-  static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser_credential_database');
+  static const MethodChannel _channel = const MethodChannel('com.pichillilorenzo/flutter_inappwebview_credential_database');
 
   ///Gets the database shared instance.
   static HttpAuthCredentialDatabase instance() {

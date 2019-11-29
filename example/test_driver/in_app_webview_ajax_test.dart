@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 
-import 'package:flutter_inappbrowser/flutter_inappbrowser.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main_test.dart';
 import 'custom_widget_test.dart';
@@ -41,7 +41,7 @@ class InAppWebViewAjaxTestState extends WidgetTestState {
     <body>
         <h1>InAppWebViewAjaxTest</h1>
         <script>
-          window.addEventListener('flutterInAppBrowserPlatformReady', function(event) {
+          window.addEventListener('flutterInAppWebViewPlatformReady', function(event) {
             var xhttp = new XMLHttpRequest();
             xhttp.open("POST", "http://${environment["NODE_SERVER_IP"]}:8082/test-ajax-post");
             xhttp.setRequestHeader("Content-type", "application/x-www-form-urlencoded");

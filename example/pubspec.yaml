@@ -1,5 +1,5 @@
-name: flutter_inappbrowser_example
-description: Demonstrates how to use the flutter_inappbrowser plugin.
+name: flutter_inappwebview_example
+description: Demonstrates how to use the flutter_inappwebview plugin.
 
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
@@ -22,7 +22,7 @@ dependencies:
   flutter_downloader: ^1.3.2
   path_provider: ^1.4.0
   permission_handler: ^3.3.0
-  flutter_inappbrowser:
+  flutter_inappwebview:
     path: ../
 
 dev_dependencies:

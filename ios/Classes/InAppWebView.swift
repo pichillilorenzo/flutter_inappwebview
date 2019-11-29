@@ -1,6 +1,6 @@
 //
 //  InAppWebView.swift
-//  flutter_inappbrowser
+//  flutter_inappwebview
 //
 //  Created by Lorenzo on 21/10/18.
 //
@@ -39,7 +39,7 @@ func JSONStringify(value: Any, prettyPrinted: Bool = false) -> String {
     return ""
 }
 
-let JAVASCRIPT_BRIDGE_NAME = "flutter_inappbrowser"
+let JAVASCRIPT_BRIDGE_NAME = "flutter_inappwebview"
 
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
 let consoleLogJS = """
@@ -82,7 +82,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 }
 """
 
-let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppBrowserPlatformReady'));";
+let platformReadyJS = "window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));";
 
 let findTextHighlightJS = """
 var wkwebview_SearchResultCount = 0;
@@ -234,7 +234,7 @@ function wkwebview_FindNext(forward) {
 }
 """
 
-let variableForOnLoadResourceJS = "window._flutter_inappbrowser_useOnLoadResource"
+let variableForOnLoadResourceJS = "window._flutter_inappwebview_useOnLoadResource"
 let enableVariableForOnLoadResourceJS = "\(variableForOnLoadResourceJS) = $PLACEHOLDER_VALUE;"
 
 let resourceObserverJS = """
@@ -250,7 +250,7 @@ let resourceObserverJS = """
 })();
 """
 
-let variableForShouldInterceptAjaxRequestJS = "window._flutter_inappbrowser_useShouldInterceptAjaxRequest"
+let variableForShouldInterceptAjaxRequestJS = "window._flutter_inappwebview_useShouldInterceptAjaxRequest"
 let enableVariableForShouldInterceptAjaxRequestJS = "\(variableForShouldInterceptAjaxRequestJS) = $PLACEHOLDER_VALUE;"
 
 let interceptAjaxRequestsJS = """
@@ -258,14 +258,14 @@ let interceptAjaxRequestsJS = """
   var send = ajax.prototype.send;
   var open = ajax.prototype.open;
   var setRequestHeader = ajax.prototype.setRequestHeader;
-  ajax.prototype._flutter_inappbrowser_url = null;
-  ajax.prototype._flutter_inappbrowser_method = null;
-  ajax.prototype._flutter_inappbrowser_isAsync = null;
-  ajax.prototype._flutter_inappbrowser_user = null;
-  ajax.prototype._flutter_inappbrowser_password = null;
-  ajax.prototype._flutter_inappbrowser_password = null;
-  ajax.prototype._flutter_inappbrowser_already_onreadystatechange_wrapped = false;
-  ajax.prototype._flutter_inappbrowser_request_headers = {};
+  ajax.prototype._flutter_inappwebview_url = null;
+  ajax.prototype._flutter_inappwebview_method = null;
+  ajax.prototype._flutter_inappwebview_isAsync = null;
+  ajax.prototype._flutter_inappwebview_user = null;
+  ajax.prototype._flutter_inappwebview_password = null;
+  ajax.prototype._flutter_inappwebview_password = null;
+  ajax.prototype._flutter_inappwebview_already_onreadystatechange_wrapped = false;
+  ajax.prototype._flutter_inappwebview_request_headers = {};
   function convertRequestResponse(request, callback) {
     if (request.response != null && request.responseType != null) {
       switch (request.responseType) {
@@ -291,16 +291,16 @@ let interceptAjaxRequestsJS = """
   };
   ajax.prototype.open = function(method, url, isAsync, user, password) {
     isAsync = (isAsync != null) ? isAsync : true;
-    this._flutter_inappbrowser_url = url;
-    this._flutter_inappbrowser_method = method;
-    this._flutter_inappbrowser_isAsync = isAsync;
-    this._flutter_inappbrowser_user = user;
-    this._flutter_inappbrowser_password = password;
-    this._flutter_inappbrowser_request_headers = {};
+    this._flutter_inappwebview_url = url;
+    this._flutter_inappwebview_method = method;
+    this._flutter_inappwebview_isAsync = isAsync;
+    this._flutter_inappwebview_user = user;
+    this._flutter_inappwebview_password = password;
+    this._flutter_inappwebview_request_headers = {};
     open.call(this, method, url, isAsync, user, password);
   };
   ajax.prototype.setRequestHeader = function(header, value) {
-    this._flutter_inappbrowser_request_headers[header] = value;
+    this._flutter_inappwebview_request_headers[header] = value;
     setRequestHeader.call(this, header, value);
   };
   function handleEvent(e) {
@@ -319,13 +319,13 @@ let interceptAjaxRequestsJS = """
       }
       convertRequestResponse(this, function(response) {
         var ajaxRequest = {
-          method: self._flutter_inappbrowser_method,
-          url: self._flutter_inappbrowser_url,
-          isAsync: self._flutter_inappbrowser_isAsync,
-          user: self._flutter_inappbrowser_user,
-          password: self._flutter_inappbrowser_password,
+          method: self._flutter_inappwebview_method,
+          url: self._flutter_inappwebview_url,
+          isAsync: self._flutter_inappwebview_isAsync,
+          user: self._flutter_inappwebview_user,
+          password: self._flutter_inappwebview_password,
           withCredentials: self.withCredentials,
-          headers: self._flutter_inappbrowser_request_headers,
+          headers: self._flutter_inappwebview_request_headers,
           readyState: self.readyState,
           status: self.status,
           responseURL: self.responseURL,
@@ -357,8 +357,8 @@ let interceptAjaxRequestsJS = """
   ajax.prototype.send = function(data) {
     var self = this;
     if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
-      if (!this._flutter_inappbrowser_already_onreadystatechange_wrapped) {
-        this._flutter_inappbrowser_already_onreadystatechange_wrapped = true;
+      if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {
+        this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
         var onreadystatechange = this.onreadystatechange;
         this.onreadystatechange = function() {
           if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
@@ -375,13 +375,13 @@ let interceptAjaxRequestsJS = """
             }
             convertRequestResponse(this, function(response) {
               var ajaxRequest = {
-                method: self._flutter_inappbrowser_method,
-                url: self._flutter_inappbrowser_url,
-                isAsync: self._flutter_inappbrowser_isAsync,
-                user: self._flutter_inappbrowser_user,
-                password: self._flutter_inappbrowser_password,
+                method: self._flutter_inappwebview_method,
+                url: self._flutter_inappwebview_url,
+                isAsync: self._flutter_inappwebview_isAsync,
+                user: self._flutter_inappwebview_user,
+                password: self._flutter_inappwebview_password,
                 withCredentials: self.withCredentials,
-                headers: self._flutter_inappbrowser_request_headers,
+                headers: self._flutter_inappwebview_request_headers,
                 readyState: self.readyState,
                 status: self.status,
                 responseURL: self.responseURL,
@@ -419,13 +419,13 @@ let interceptAjaxRequestsJS = """
       this.addEventListener('timeout', handleEvent);
       var ajaxRequest = {
         data: data,
-        method: this._flutter_inappbrowser_method,
-        url: this._flutter_inappbrowser_url,
-        isAsync: this._flutter_inappbrowser_isAsync,
-        user: this._flutter_inappbrowser_user,
-        password: this._flutter_inappbrowser_password,
+        method: this._flutter_inappwebview_method,
+        url: this._flutter_inappwebview_url,
+        isAsync: this._flutter_inappwebview_isAsync,
+        user: this._flutter_inappwebview_user,
+        password: this._flutter_inappwebview_password,
         withCredentials: this.withCredentials,
-        headers: this._flutter_inappbrowser_request_headers,
+        headers: this._flutter_inappwebview_request_headers,
         responseType: this.responseType
       };
       window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptAjaxRequest', ajaxRequest).then(function(result) {
@@ -442,15 +442,15 @@ let interceptAjaxRequestsJS = """
           };
           for (var header in result.headers) {
             var value = result.headers[header];
-            var flutter_inappbrowser_value = self._flutter_inappbrowser_request_headers[header];
-            if (flutter_inappbrowser_value == null) {
-              self._flutter_inappbrowser_request_headers[header] = value;
+            var flutter_inappwebview_value = self._flutter_inappwebview_request_headers[header];
+            if (flutter_inappwebview_value == null) {
+              self._flutter_inappwebview_request_headers[header] = value;
             } else {
-              self._flutter_inappbrowser_request_headers[header] += ', ' + value;
+              self._flutter_inappwebview_request_headers[header] += ', ' + value;
             }
             setRequestHeader.call(self, header, value);
           };
-          if ((self._flutter_inappbrowser_method != result.method && result.method != null) || (self._flutter_inappbrowser_url != result.url && result.url != null)) {
+          if ((self._flutter_inappwebview_method != result.method && result.method != null) || (self._flutter_inappwebview_url != result.url && result.url != null)) {
             self.abort();
             self.open(result.method, result.url, result.isAsync, result.user, result.password);
             return;
@@ -465,7 +465,7 @@ let interceptAjaxRequestsJS = """
 })(window.XMLHttpRequest);
 """
 
-let variableForShouldInterceptFetchRequestsJS = "window._flutter_inappbrowser_useShouldInterceptFetchRequest"
+let variableForShouldInterceptFetchRequestsJS = "window._flutter_inappwebview_useShouldInterceptFetchRequest"
 let enableVariableForShouldInterceptFetchRequestsJS = "\(variableForShouldInterceptFetchRequestsJS) = $PLACEHOLDER_VALUE;"
 
 let interceptFetchRequestsJS = """
@@ -656,7 +656,7 @@ let interceptNavigationStateChangeJS = """
     return function pushState(){
       var ret = f.apply(this, arguments);
       window.dispatchEvent(new Event('pushstate'));
-      window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
+      window.dispatchEvent(new Event('_flutter_inappwebview_locationchange'));
       return ret;
     };
   })(history.pushState);
@@ -664,14 +664,14 @@ let interceptNavigationStateChangeJS = """
     return function replaceState(){
       var ret = f.apply(this, arguments);
       window.dispatchEvent(new Event('replacestate'));
-      window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
+      window.dispatchEvent(new Event('_flutter_inappwebview_locationchange'));
       return ret;
     };
   })(history.replaceState);
   window.addEventListener('popstate',function() {
-    window.dispatchEvent(new Event('_flutter_inappbrowser_locationchange'));
+    window.dispatchEvent(new Event('_flutter_inappwebview_locationchange'));
   });
-  window.addEventListener('_flutter_inappbrowser_locationchange', function() {
+  window.addEventListener('_flutter_inappwebview_locationchange', function() {
     window.webkit.messageHandlers["onNavigationStateChange"].postMessage(JSON.stringify({
       url: document.location.href
     }));

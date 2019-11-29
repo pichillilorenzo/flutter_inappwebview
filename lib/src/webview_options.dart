@@ -1,7 +1,7 @@
 import 'dart:io';
 
+import 'content_blocker.dart';
 import 'types.dart';
-import 'package:flutter_inappbrowser/src/content_blocker.dart';
 
 class AndroidOptions {}
 class IosOptions {}

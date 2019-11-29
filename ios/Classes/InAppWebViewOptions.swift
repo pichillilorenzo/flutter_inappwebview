@@ -1,6 +1,6 @@
 //
 //  InAppWebViewOptions.swift
-//  flutter_inappbrowser
+//  flutter_inappwebview
 //
 //  Created by Lorenzo on 21/10/18.
 //

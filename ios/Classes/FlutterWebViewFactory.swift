@@ -1,6 +1,6 @@
 //
 //  FlutterWebViewFactory.swift
-//  flutter_inappbrowser
+//  flutter_inappwebview
 //
 //  Created by Lorenzo on 13/11/18.
 //

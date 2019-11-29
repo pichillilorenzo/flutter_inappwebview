@@ -4,7 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappbrowser/src/webview_options.dart';
+import 'webview_options.dart';
 
 import 'types.dart';
 import 'channel_manager.dart';

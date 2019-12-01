@@ -32,10 +32,11 @@ class ConsoleMessageLevel {
       return ConsoleMessageLevel._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 0:
         return "TIP";
       case 2:
@@ -65,18 +66,19 @@ class ConsoleMessageLevel {
 ///Public class representing a resource response of the [InAppBrowser] WebView.
 ///It is used by the method [InAppBrowser.onLoadResource()].
 class LoadedResource {
-
   ///A string representing the type of resource.
   String initiatorType;
+
   ///Resource URL.
   String url;
+
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) for the time a resource fetch started.
   double startTime;
+
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
   double duration;
 
   LoadedResource({this.initiatorType, this.url, this.startTime, this.duration});
-
 }
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
@@ -88,7 +90,11 @@ class InAppWebViewInitialData {
   String encoding;
   String baseUrl;
 
-  InAppWebViewInitialData({@required this.data, this.mimeType = "text/html", this.encoding = "utf8", this.baseUrl = "about:blank"});
+  InAppWebViewInitialData(
+      {@required this.data,
+      this.mimeType = "text/html",
+      this.encoding = "utf8",
+      this.baseUrl = "about:blank"});
 
   Map<String, String> toMap() {
     return {
@@ -136,12 +142,17 @@ class WebResourceResponse {
 class CustomSchemeResponse {
   ///Data enconded to 'base64'.
   Uint8List data;
+
   ///Content-Type of the data, such as `image/png`.
   String contentType;
+
   ///Content-Enconding of the data, such as `utf-8`.
   String contentEnconding;
 
-  CustomSchemeResponse({@required this.data, @required this.contentType, this.contentEnconding = 'utf-8'});
+  CustomSchemeResponse(
+      {@required this.data,
+      @required this.contentType,
+      this.contentEnconding = 'utf-8'});
 
   Map<String, dynamic> toJson() {
     return {
@@ -157,11 +168,11 @@ class CustomSchemeResponse {
 ///
 ///To receive notifications of these messages, use the [onConsoleMessage] event.
 class ConsoleMessage {
-
   String message;
   ConsoleMessageLevel messageLevel;
 
-  ConsoleMessage({this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
+  ConsoleMessage(
+      {this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
 }
 
 ///WebHistory class.
@@ -170,6 +181,7 @@ class ConsoleMessage {
 class WebHistory {
   ///List of all [WebHistoryItem]s.
   List<WebHistoryItem> list;
+
   ///Index of the current [WebHistoryItem].
   int currentIndex;
 
@@ -182,16 +194,21 @@ class WebHistory {
 class WebHistoryItem {
   ///Original url of this history item.
   String originalUrl;
+
   ///Document title of this history item.
   String title;
+
   ///Url of this history item.
   String url;
+
   ///0-based position index in the back-forward [WebHistory.list].
   int index;
+
   ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
   int offset;
 
-  WebHistoryItem({this.originalUrl, this.title, this.url, this.index, this.offset});
+  WebHistoryItem(
+      {this.originalUrl, this.title, this.url, this.index, this.offset});
 }
 
 ///GeolocationPermissionPromptResponse class.
@@ -200,19 +217,18 @@ class WebHistoryItem {
 class GeolocationPermissionShowPromptResponse {
   ///The origin for which permissions are set.
   String origin;
+
   ///Whether or not the origin should be allowed to use the Geolocation API.
   bool allow;
+
   ///Whether the permission should be retained beyond the lifetime of a page currently being displayed by a WebView
   bool retain;
 
-  GeolocationPermissionShowPromptResponse({this.origin, this.allow, this.retain});
+  GeolocationPermissionShowPromptResponse(
+      {this.origin, this.allow, this.retain});
 
   Map<String, dynamic> toMap() {
-    return {
-      "origin": origin,
-      "allow": allow,
-      "retain": retain
-    };
+    return {"origin": origin, "allow": allow, "retain": retain};
   }
 }
 
@@ -234,14 +250,21 @@ class JsAlertResponseAction {
 class JsAlertResponse {
   ///Message to be displayed in the window.
   String message;
+
   ///Title of the confirm button.
   String confirmButtonTitle;
+
   ///Whether the client will handle the alert dialog.
   bool handledByClient;
+
   ///Action used to confirm that the user hit confirm button.
   JsAlertResponseAction action;
 
-  JsAlertResponse({this.message = "", this.handledByClient = false, this.confirmButtonTitle = "", this.action = JsAlertResponseAction.CONFIRM});
+  JsAlertResponse(
+      {this.message = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.action = JsAlertResponseAction.CONFIRM});
 
   Map<String, dynamic> toMap() {
     return {
@@ -272,16 +295,25 @@ class JsConfirmResponseAction {
 class JsConfirmResponse {
   ///Message to be displayed in the window.
   String message;
+
   ///Title of the confirm button.
   String confirmButtonTitle;
+
   ///Title of the cancel button.
   String cancelButtonTitle;
+
   ///Whether the client will handle the confirm dialog.
   bool handledByClient;
+
   ///Action used to confirm that the user hit confirm or cancel button.
   JsConfirmResponseAction action;
 
-  JsConfirmResponse({this.message = "", this.handledByClient = false, this.confirmButtonTitle = "", this.cancelButtonTitle = "", this.action = JsConfirmResponseAction.CANCEL});
+  JsConfirmResponse(
+      {this.message = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.action = JsConfirmResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
     return {
@@ -313,20 +345,33 @@ class JsPromptResponseAction {
 class JsPromptResponse {
   ///Message to be displayed in the window.
   String message;
+
   ///The default value displayed in the prompt dialog.
   String defaultValue;
+
   ///Title of the confirm button.
   String confirmButtonTitle;
+
   ///Title of the cancel button.
   String cancelButtonTitle;
+
   ///Whether the client will handle the prompt dialog.
   bool handledByClient;
+
   ///Value of the prompt dialog.
   String value;
+
   ///Action used to confirm that the user hit confirm or cancel button.
   JsPromptResponseAction action;
 
-  JsPromptResponse({this.message = "", this.defaultValue = "", this.handledByClient = false, this.confirmButtonTitle = "", this.cancelButtonTitle = "", this.value, this.action = JsPromptResponseAction.CANCEL});
+  JsPromptResponse(
+      {this.message = "",
+      this.defaultValue = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.value,
+      this.action = JsPromptResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
     return {
@@ -350,9 +395,10 @@ class SafeBrowsingThreat {
       return SafeBrowsingThreat._internal(value);
     return null;
   }
+
   int toValue() => _value;
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "SAFE_BROWSING_THREAT_MALWARE";
       case 2:
@@ -367,11 +413,16 @@ class SafeBrowsingThreat {
     }
   }
 
-  static const SAFE_BROWSING_THREAT_UNKNOWN = const SafeBrowsingThreat._internal(0);
-  static const SAFE_BROWSING_THREAT_MALWARE = const SafeBrowsingThreat._internal(1);
-  static const SAFE_BROWSING_THREAT_PHISHING = const SafeBrowsingThreat._internal(2);
-  static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE = const SafeBrowsingThreat._internal(3);
-  static const SAFE_BROWSING_THREAT_BILLING = const SafeBrowsingThreat._internal(4);
+  static const SAFE_BROWSING_THREAT_UNKNOWN =
+      const SafeBrowsingThreat._internal(0);
+  static const SAFE_BROWSING_THREAT_MALWARE =
+      const SafeBrowsingThreat._internal(1);
+  static const SAFE_BROWSING_THREAT_PHISHING =
+      const SafeBrowsingThreat._internal(2);
+  static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE =
+      const SafeBrowsingThreat._internal(3);
+  static const SAFE_BROWSING_THREAT_BILLING =
+      const SafeBrowsingThreat._internal(4);
 
   bool operator ==(value) => value == _value;
 
@@ -387,10 +438,13 @@ class SafeBrowsingResponseAction {
 
   ///Act as if the user clicked the "back to safety" button.
   static const BACK_TO_SAFETY = const SafeBrowsingResponseAction._internal(0);
+
   ///Act as if the user clicked the "visit this unsafe site" button.
   static const PROCEED = const SafeBrowsingResponseAction._internal(1);
+
   ///Display the default interstitial.
-  static const SHOW_INTERSTITIAL = const SafeBrowsingResponseAction._internal(2);
+  static const SHOW_INTERSTITIAL =
+      const SafeBrowsingResponseAction._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -403,16 +457,16 @@ class SafeBrowsingResponseAction {
 class SafeBrowsingResponse {
   ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   bool report;
+
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.
   SafeBrowsingResponseAction action;
 
-  SafeBrowsingResponse({this.report = true, this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL});
+  SafeBrowsingResponse(
+      {this.report = true,
+      this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL});
 
   Map<String, dynamic> toMap() {
-    return {
-      "report": report,
-      "action": action?.toValue()
-    };
+    return {"report": report, "action": action?.toValue()};
   }
 }
 
@@ -424,10 +478,13 @@ class HttpAuthResponseAction {
 
   ///Instructs the WebView to cancel the authentication request.
   static const CANCEL = const HttpAuthResponseAction._internal(0);
+
   ///Instructs the WebView to proceed with the authentication with the given credentials.
   static const PROCEED = const HttpAuthResponseAction._internal(1);
+
   ///Uses the credentials stored for the current host.
-  static const USE_SAVED_HTTP_AUTH_CREDENTIALS = const HttpAuthResponseAction._internal(2);
+  static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
+      const HttpAuthResponseAction._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -439,14 +496,21 @@ class HttpAuthResponseAction {
 class HttpAuthResponse {
   ///Represents the username used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
   String username;
+
   ///Represents the password used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
   String password;
+
   ///Indicate if the given credentials need to be saved permanently.
   bool permanentPersistence;
+
   ///Indicate the [HttpAuthResponseAction] to take in response of the authentication challenge.
   HttpAuthResponseAction action;
 
-  HttpAuthResponse({this.username = "", this.password = "", this.permanentPersistence = false, this.action = HttpAuthResponseAction.CANCEL});
+  HttpAuthResponse(
+      {this.username = "",
+      this.password = "",
+      this.permanentPersistence = false,
+      this.action = HttpAuthResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
     return {
@@ -463,26 +527,34 @@ class HttpAuthResponse {
 class HttpAuthChallenge {
   ///A count of previous failed authentication attempts.
   int previousFailureCount;
+
   ///The protection space requiring authentication.
   ProtectionSpace protectionSpace;
 
-  HttpAuthChallenge({@required this.previousFailureCount, @required this.protectionSpace}): assert(previousFailureCount != null && protectionSpace != null);
+  HttpAuthChallenge(
+      {@required this.previousFailureCount, @required this.protectionSpace})
+      : assert(previousFailureCount != null && protectionSpace != null);
 }
 
 ///ProtectionSpace class represents a protection space requiring authentication.
 class ProtectionSpace {
   ///The hostname of the server.
   String host;
+
   ///The protocol of the server - e.g. "http", "ftp", "https".
   String protocol;
+
   ///A string indicating a protocol-specific subdivision of a single host.
   ///For http and https, this maps to the realm string in http authentication challenges.
   ///For many other protocols it is unused.
   String realm;
+
   ///The port of the server.
   int port;
 
-  ProtectionSpace({@required this.host, @required this.protocol, this.realm, this.port}): assert(host != null && protocol != null);
+  ProtectionSpace(
+      {@required this.host, @required this.protocol, this.realm, this.port})
+      : assert(host != null && protocol != null);
 }
 
 ///HttpAuthCredential represents the credentials of an http authentication.
@@ -490,10 +562,12 @@ class ProtectionSpace {
 class HttpAuthCredential {
   ///Represents the username.
   String username;
+
   ///Represents the password.
   String password;
 
-  HttpAuthCredential({@required this.username, @required this.password}): assert(username != null && password != null);
+  HttpAuthCredential({@required this.username, @required this.password})
+      : assert(username != null && password != null);
 }
 
 ///ServerTrustAuthResponseAction class used by [ServerTrustAuthResponse] class.
@@ -504,6 +578,7 @@ class ServerTrustAuthResponseAction {
 
   ///Instructs the WebView to cancel the authentication challenge.
   static const CANCEL = const ServerTrustAuthResponseAction._internal(0);
+
   ///Instructs the WebView to proceed with the authentication challenge.
   static const PROCEED = const ServerTrustAuthResponseAction._internal(1);
 
@@ -521,9 +596,7 @@ class ServerTrustAuthResponse {
   ServerTrustAuthResponse({this.action = ServerTrustAuthResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
-    return {
-      "action": action?.toValue()
-    };
+    return {"action": action?.toValue()};
   }
 }
 
@@ -532,18 +605,26 @@ class ServerTrustAuthResponse {
 class ServerTrustChallenge {
   ///The protection space requiring authentication.
   ProtectionSpace protectionSpace;
+
   ///The primary error associated to the server SSL certificate.
   ///
   ///**NOTE**: on iOS this value is always -1.
   int error;
+
   ///The message associated to the [error].
   ///
   ///**NOTE**: on iOS this value is always an empty string.
   String message;
+
   ///The `X509Certificate` used to create the server SSL certificate.
   Uint8List serverCertificate;
 
-  ServerTrustChallenge({@required this.protectionSpace, @required this.error, this.message, this.serverCertificate}): assert(protectionSpace != null && error != null);
+  ServerTrustChallenge(
+      {@required this.protectionSpace,
+      @required this.error,
+      this.message,
+      this.serverCertificate})
+      : assert(protectionSpace != null && error != null);
 }
 
 ///ClientCertResponseAction class used by [ClientCertResponse] class.
@@ -554,8 +635,10 @@ class ClientCertResponseAction {
 
   ///Cancel this request.
   static const CANCEL = const ClientCertResponseAction._internal(0);
+
   ///Proceed with the specified certificate.
   static const PROCEED = const ClientCertResponseAction._internal(1);
+
   ///Ignore the request for now.
   static const IGNORE = const ClientCertResponseAction._internal(2);
 
@@ -569,14 +652,21 @@ class ClientCertResponseAction {
 class ClientCertResponse {
   ///The file path of the certificate to use.
   String certificatePath;
+
   ///The certificate password.
   String certificatePassword;
+
   ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
   String androidKeyStoreType;
+
   ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
   ClientCertResponseAction action;
 
-  ClientCertResponse({this.certificatePath, this.certificatePassword = "", this.androidKeyStoreType = "PKCS12", this.action = ClientCertResponseAction.CANCEL}) {
+  ClientCertResponse(
+      {this.certificatePath,
+      this.certificatePassword = "",
+      this.androidKeyStoreType = "PKCS12",
+      this.action = ClientCertResponseAction.CANCEL}) {
     if (this.action == ClientCertResponseAction.PROCEED)
       assert(certificatePath != null && certificatePath.isNotEmpty);
   }
@@ -597,21 +687,26 @@ class ClientCertChallenge {
   ///The protection space requiring authentication.
   ProtectionSpace protectionSpace;
 
-  ClientCertChallenge({@required this.protectionSpace}): assert(protectionSpace != null);
+  ClientCertChallenge({@required this.protectionSpace})
+      : assert(protectionSpace != null);
 }
 
 ///Favicon class represents a favicon of a website. It is used by [InAppWebViewController.getFavicons] method.
 class Favicon {
   ///The url of the favicon image.
   String url;
+
   ///The relationship between the current web page and the favicon image.
   String rel;
+
   ///The width of the favicon image.
   int width;
+
   ///The height of the favicon image.
   int height;
 
-  Favicon({@required this.url, this.rel, this.width, this.height}): assert(url != null);
+  Favicon({@required this.url, this.rel, this.width, this.height})
+      : assert(url != null);
 
   String toString() {
     return "url: $url, rel: $rel, width: $width, height: $height";
@@ -627,10 +722,11 @@ class AndroidInAppWebViewCacheMode {
       return AndroidInAppWebViewCacheMode._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "LOAD_CACHE_ELSE_NETWORK";
       case 2:
@@ -646,12 +742,17 @@ class AndroidInAppWebViewCacheMode {
   ///Default cache usage mode. If the navigation type doesn't impose any specific behavior,
   ///use cached resources when they are available and not expired, otherwise load resources from the network.
   static const LOAD_DEFAULT = const AndroidInAppWebViewCacheMode._internal(-1);
+
   ///Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
-  static const LOAD_CACHE_ELSE_NETWORK = const AndroidInAppWebViewCacheMode._internal(1);
+  static const LOAD_CACHE_ELSE_NETWORK =
+      const AndroidInAppWebViewCacheMode._internal(1);
+
   ///Don't use the cache, load from the network.
   static const LOAD_NO_CACHE = const AndroidInAppWebViewCacheMode._internal(2);
+
   ///Don't use the network, load from the cache.
-  static const LOAD_CACHE_ONLY = const AndroidInAppWebViewCacheMode._internal(3);
+  static const LOAD_CACHE_ONLY =
+      const AndroidInAppWebViewCacheMode._internal(3);
 
   bool operator ==(value) => value == _value;
 
@@ -670,10 +771,11 @@ class AndroidInAppWebViewModeMenuItem {
       return AndroidInAppWebViewModeMenuItem._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "MENU_ITEM_SHARE";
       case 2:
@@ -687,13 +789,20 @@ class AndroidInAppWebViewModeMenuItem {
   }
 
   ///No menu items should be disabled.
-  static const MENU_ITEM_NONE = const AndroidInAppWebViewModeMenuItem._internal(0);
+  static const MENU_ITEM_NONE =
+      const AndroidInAppWebViewModeMenuItem._internal(0);
+
   ///Disable menu item "Share".
-  static const MENU_ITEM_SHARE = const AndroidInAppWebViewModeMenuItem._internal(1);
+  static const MENU_ITEM_SHARE =
+      const AndroidInAppWebViewModeMenuItem._internal(1);
+
   ///Disable menu item "Web Search".
-  static const MENU_ITEM_WEB_SEARCH = const AndroidInAppWebViewModeMenuItem._internal(2);
+  static const MENU_ITEM_WEB_SEARCH =
+      const AndroidInAppWebViewModeMenuItem._internal(2);
+
   ///Disable all the action mode menu items for text processing.
-  static const MENU_ITEM_PROCESS_TEXT = const AndroidInAppWebViewModeMenuItem._internal(4);
+  static const MENU_ITEM_PROCESS_TEXT =
+      const AndroidInAppWebViewModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
 
@@ -712,10 +821,11 @@ class AndroidInAppWebViewForceDark {
       return AndroidInAppWebViewForceDark._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "FORCE_DARK_AUTO";
       case 2:
@@ -729,8 +839,11 @@ class AndroidInAppWebViewForceDark {
   ///Disable force dark, irrespective of the force dark mode of the WebView parent.
   ///In this mode, WebView content will always be rendered as-is, regardless of whether native views are being automatically darkened.
   static const FORCE_DARK_OFF = const AndroidInAppWebViewForceDark._internal(0);
+
   ///Enable force dark dependent on the state of the WebView parent view.
-  static const FORCE_DARK_AUTO = const AndroidInAppWebViewForceDark._internal(1);
+  static const FORCE_DARK_AUTO =
+      const AndroidInAppWebViewForceDark._internal(1);
+
   ///Unconditionally enable force dark. In this mode WebView content will always be rendered so as to emulate a dark theme.
   static const FORCE_DARK_ON = const AndroidInAppWebViewForceDark._internal(2);
 
@@ -745,19 +858,25 @@ class AndroidInAppWebViewLayoutAlgorithm {
   final String _value;
   const AndroidInAppWebViewLayoutAlgorithm._internal(this._value);
   static AndroidInAppWebViewLayoutAlgorithm fromValue(String value) {
-    return (["NORMAL", "TEXT_AUTOSIZING"].contains(value)) ? AndroidInAppWebViewLayoutAlgorithm._internal(value) : null;
+    return (["NORMAL", "TEXT_AUTOSIZING"].contains(value))
+        ? AndroidInAppWebViewLayoutAlgorithm._internal(value)
+        : null;
   }
+
   String toValue() => _value;
   @override
   String toString() => _value;
 
   ///NORMAL means no rendering changes. This is the recommended choice for maximum compatibility across different platforms and Android versions.
-  static const NORMAL = const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
+  static const NORMAL =
+      const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
+
   ///TEXT_AUTOSIZING boosts font size of paragraphs based on heuristics to make the text readable when viewing a wide-viewport layout in the overview mode.
   ///It is recommended to enable zoom support [AndroidInAppWebViewOptions.supportZoom] when using this mode.
   ///
   ///**NOTE**: available on Android 19+.
-  static const TEXT_AUTOSIZING = const AndroidInAppWebViewLayoutAlgorithm._internal("TEXT_AUTOSIZING");
+  static const TEXT_AUTOSIZING =
+      const AndroidInAppWebViewLayoutAlgorithm._internal("TEXT_AUTOSIZING");
 
   bool operator ==(value) => value == _value;
 
@@ -776,10 +895,11 @@ class AndroidInAppWebViewMixedContentMode {
       return AndroidInAppWebViewMixedContentMode._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "MIXED_CONTENT_NEVER_ALLOW";
       case 2:
@@ -792,16 +912,21 @@ class AndroidInAppWebViewMixedContentMode {
 
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
-  static const MIXED_CONTENT_ALWAYS_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(0);
+  static const MIXED_CONTENT_ALWAYS_ALLOW =
+      const AndroidInAppWebViewMixedContentMode._internal(0);
+
   ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
   ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
-  static const MIXED_CONTENT_NEVER_ALLOW = const AndroidInAppWebViewMixedContentMode._internal(1);
+  static const MIXED_CONTENT_NEVER_ALLOW =
+      const AndroidInAppWebViewMixedContentMode._internal(1);
+
   ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
   ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
   ///The types of content are allowed or blocked may change release to release and are not explicitly defined.
   ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
   ///For highest security, apps are recommended to use [AndroidInAppWebViewMixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
-  static const MIXED_CONTENT_COMPATIBILITY_MODE = const AndroidInAppWebViewMixedContentMode._internal(2);
+  static const MIXED_CONTENT_COMPATIBILITY_MODE =
+      const AndroidInAppWebViewMixedContentMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -818,10 +943,11 @@ class IosInAppWebViewSelectionGranularity {
       return IosInAppWebViewSelectionGranularity._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "CHARACTER";
       case 0:
@@ -832,8 +958,10 @@ class IosInAppWebViewSelectionGranularity {
 
   ///Selection granularity varies automatically based on the selection.
   static const DYNAMIC = const IosInAppWebViewSelectionGranularity._internal(0);
+
   ///Selection endpoints can be placed at any character boundary.
-  static const CHARACTER = const IosInAppWebViewSelectionGranularity._internal(1);
+  static const CHARACTER =
+      const IosInAppWebViewSelectionGranularity._internal(1);
 
   bool operator ==(value) => value == _value;
 
@@ -848,31 +976,61 @@ class IosInAppWebViewDataDetectorTypes {
   final String _value;
   const IosInAppWebViewDataDetectorTypes._internal(this._value);
   static IosInAppWebViewDataDetectorTypes fromValue(String value) {
-    return (["NONE", "PHONE_NUMBER", "LINK", "ADDRESS", "CALENDAR_EVENT", "TRACKING_NUMBER",
-      "TRACKING_NUMBER", "FLIGHT_NUMBER", "LOOKUP_SUGGESTION", "SPOTLIGHT_SUGGESTION", "ALL"].contains(value)) ? IosInAppWebViewDataDetectorTypes._internal(value) : null;
+    return ([
+      "NONE",
+      "PHONE_NUMBER",
+      "LINK",
+      "ADDRESS",
+      "CALENDAR_EVENT",
+      "TRACKING_NUMBER",
+      "TRACKING_NUMBER",
+      "FLIGHT_NUMBER",
+      "LOOKUP_SUGGESTION",
+      "SPOTLIGHT_SUGGESTION",
+      "ALL"
+    ].contains(value))
+        ? IosInAppWebViewDataDetectorTypes._internal(value)
+        : null;
   }
+
   String toValue() => _value;
   @override
   String toString() => _value;
 
   ///No detection is performed.
   static const NONE = const IosInAppWebViewDataDetectorTypes._internal("NONE");
+
   ///Phone numbers are detected and turned into links.
-  static const PHONE_NUMBER = const IosInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
+  static const PHONE_NUMBER =
+      const IosInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
+
   ///URLs in text are detected and turned into links.
   static const LINK = const IosInAppWebViewDataDetectorTypes._internal("LINK");
+
   ///Addresses are detected and turned into links.
-  static const ADDRESS = const IosInAppWebViewDataDetectorTypes._internal("ADDRESS");
+  static const ADDRESS =
+      const IosInAppWebViewDataDetectorTypes._internal("ADDRESS");
+
   ///Dates and times that are in the future are detected and turned into links.
-  static const CALENDAR_EVENT = const IosInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
+  static const CALENDAR_EVENT =
+      const IosInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
+
   ///Tracking numbers are detected and turned into links.
-  static const TRACKING_NUMBER = const IosInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
+  static const TRACKING_NUMBER =
+      const IosInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
+
   ///Flight numbers are detected and turned into links.
-  static const FLIGHT_NUMBER = const IosInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
+  static const FLIGHT_NUMBER =
+      const IosInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
+
   ///Lookup suggestions are detected and turned into links.
-  static const LOOKUP_SUGGESTION = const IosInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
+  static const LOOKUP_SUGGESTION =
+      const IosInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
+
   ///Spotlight suggestions are detected and turned into links.
-  static const SPOTLIGHT_SUGGESTION = const IosInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+  static const SPOTLIGHT_SUGGESTION =
+      const IosInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+
   ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
   static const ALL = const IosInAppWebViewDataDetectorTypes._internal("ALL");
 
@@ -891,10 +1049,11 @@ class InAppWebViewUserPreferredContentMode {
       return InAppWebViewUserPreferredContentMode._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "MOBILE";
       case 2:
@@ -906,11 +1065,15 @@ class InAppWebViewUserPreferredContentMode {
   }
 
   ///The recommended content mode for the current platform.
-  static const RECOMMENDED = const InAppWebViewUserPreferredContentMode._internal(0);
+  static const RECOMMENDED =
+      const InAppWebViewUserPreferredContentMode._internal(0);
+
   ///Represents content targeting mobile browsers.
   static const MOBILE = const InAppWebViewUserPreferredContentMode._internal(1);
+
   ///Represents content targeting desktop browsers.
-  static const DESKTOP = const InAppWebViewUserPreferredContentMode._internal(2);
+  static const DESKTOP =
+      const InAppWebViewUserPreferredContentMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -927,10 +1090,11 @@ class IosWebViewOptionsPresentationStyle {
       return IosWebViewOptionsPresentationStyle._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "PAGE_SHEET";
       case 2:
@@ -956,27 +1120,43 @@ class IosWebViewOptionsPresentationStyle {
   }
 
   ///A presentation style in which the presented view covers the screen.
-  static const FULL_SCREEN = const IosWebViewOptionsPresentationStyle._internal(0);
+  static const FULL_SCREEN =
+      const IosWebViewOptionsPresentationStyle._internal(0);
+
   ///A presentation style that partially covers the underlying content.
-  static const PAGE_SHEET = const IosWebViewOptionsPresentationStyle._internal(1);
+  static const PAGE_SHEET =
+      const IosWebViewOptionsPresentationStyle._internal(1);
+
   ///A presentation style that displays the content centered in the screen.
-  static const FORM_SHEET = const IosWebViewOptionsPresentationStyle._internal(2);
+  static const FORM_SHEET =
+      const IosWebViewOptionsPresentationStyle._internal(2);
+
   ///A presentation style where the content is displayed over another view controller’s content.
-  static const CURRENT_CONTEXT = const IosWebViewOptionsPresentationStyle._internal(3);
+  static const CURRENT_CONTEXT =
+      const IosWebViewOptionsPresentationStyle._internal(3);
+
   ///A custom view presentation style that is managed by a custom presentation controller and one or more custom animator objects.
   static const CUSTOM = const IosWebViewOptionsPresentationStyle._internal(4);
+
   ///A view presentation style in which the presented view covers the screen.
-  static const OVER_FULL_SCREEN = const IosWebViewOptionsPresentationStyle._internal(5);
+  static const OVER_FULL_SCREEN =
+      const IosWebViewOptionsPresentationStyle._internal(5);
+
   ///A presentation style where the content is displayed over another view controller’s content.
-  static const OVER_CURRENT_CONTEXT = const IosWebViewOptionsPresentationStyle._internal(6);
+  static const OVER_CURRENT_CONTEXT =
+      const IosWebViewOptionsPresentationStyle._internal(6);
+
   ///A presentation style where the content is displayed in a popover view.
   static const POPOVER = const IosWebViewOptionsPresentationStyle._internal(7);
+
   ///A presentation style that indicates no adaptations should be made.
   static const NONE = const IosWebViewOptionsPresentationStyle._internal(8);
+
   ///The default presentation style chosen by the system.
   ///
   ///**NOTE**: available on iOS 13.0+.
-  static const AUTOMATIC = const IosWebViewOptionsPresentationStyle._internal(9);
+  static const AUTOMATIC =
+      const IosWebViewOptionsPresentationStyle._internal(9);
 
   bool operator ==(value) => value == _value;
 
@@ -993,10 +1173,11 @@ class IosWebViewOptionsTransitionStyle {
       return IosWebViewOptionsTransitionStyle._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "FLIP_HORIZONTAL";
       case 2:
@@ -1011,18 +1192,25 @@ class IosWebViewOptionsTransitionStyle {
 
   ///When the view controller is presented, its view slides up from the bottom of the screen.
   ///On dismissal, the view slides back down. This is the default transition style.
-  static const COVER_VERTICAL = const IosWebViewOptionsTransitionStyle._internal(0);
+  static const COVER_VERTICAL =
+      const IosWebViewOptionsTransitionStyle._internal(0);
+
   ///When the view controller is presented, the current view initiates a horizontal 3D flip from right-to-left,
   ///resulting in the revealing of the new view as if it were on the back of the previous view.
   ///On dismissal, the flip occurs from left-to-right, returning to the original view.
-  static const FLIP_HORIZONTAL = const IosWebViewOptionsTransitionStyle._internal(1);
+  static const FLIP_HORIZONTAL =
+      const IosWebViewOptionsTransitionStyle._internal(1);
+
   ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
   ///On dismissal, a similar type of cross-fade is used to return to the original view.
-  static const CROSS_DISSOLVE = const IosWebViewOptionsTransitionStyle._internal(2);
+  static const CROSS_DISSOLVE =
+      const IosWebViewOptionsTransitionStyle._internal(2);
+
   ///When the view controller is presented, one corner of the current view curls up to reveal the presented view underneath.
   ///On dismissal, the curled up page unfurls itself back on top of the presented view.
   ///A view controller presented using this transition is itself prevented from presenting any additional view controllers.
-  static const PARTIAL_CURL = const IosWebViewOptionsTransitionStyle._internal(3);
+  static const PARTIAL_CURL =
+      const IosWebViewOptionsTransitionStyle._internal(3);
 
   bool operator ==(value) => value == _value;
 
@@ -1041,10 +1229,11 @@ class IosSafariOptionsDismissButtonStyle {
       return IosSafariOptionsDismissButtonStyle._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "CLOSE";
       case 2:
@@ -1057,8 +1246,10 @@ class IosSafariOptionsDismissButtonStyle {
 
   ///Makes the button title the localized string "Done".
   static const DONE = const IosSafariOptionsDismissButtonStyle._internal(0);
+
   ///Makes the button title the localized string "Close".
   static const CLOSE = const IosSafariOptionsDismissButtonStyle._internal(1);
+
   ///Makes the button title the localized string "Cancel".
   static const CANCEL = const IosSafariOptionsDismissButtonStyle._internal(2);
 
@@ -1072,36 +1263,50 @@ class IosSafariOptionsDismissButtonStyle {
 class InAppWebViewWidgetOptions {
   ///Cross-platform options.
   InAppWebViewOptions inAppWebViewOptions;
+
   ///Android-specific options.
   AndroidInAppWebViewOptions androidInAppWebViewOptions;
+
   ///iOS-specific options.
   IosInAppWebViewOptions iosInAppWebViewOptions;
 
-  InAppWebViewWidgetOptions({this.inAppWebViewOptions, this.androidInAppWebViewOptions, this.iosInAppWebViewOptions});
+  InAppWebViewWidgetOptions(
+      {this.inAppWebViewOptions,
+      this.androidInAppWebViewOptions,
+      this.iosInAppWebViewOptions});
 }
 
 ///InAppBrowserClassOptions class represents the options that can be used for an [InAppBrowser] WebView.
 class InAppBrowserClassOptions {
   ///Cross-platform options.
   InAppBrowserOptions inAppBrowserOptions;
+
   ///Android-specific options.
   AndroidInAppBrowserOptions androidInAppBrowserOptions;
+
   ///iOS-specific options.
   IosInAppBrowserOptions iosInAppBrowserOptions;
+
   ///WebView options.
   InAppWebViewWidgetOptions inAppWebViewWidgetOptions;
 
-  InAppBrowserClassOptions({this.inAppBrowserOptions, this.androidInAppBrowserOptions, this.iosInAppBrowserOptions, this.inAppWebViewWidgetOptions});
+  InAppBrowserClassOptions(
+      {this.inAppBrowserOptions,
+      this.androidInAppBrowserOptions,
+      this.iosInAppBrowserOptions,
+      this.inAppWebViewWidgetOptions});
 }
 
 ///ChromeSafariBrowserClassOptions class represents the options that can be used for an [ChromeSafariBrowser] window.
 class ChromeSafariBrowserClassOptions {
   ///Android-specific options.
   AndroidChromeCustomTabsOptions androidChromeCustomTabsOptions;
+
   ///iOS-specific options.
   IosSafariOptions iosSafariOptions;
 
-  ChromeSafariBrowserClassOptions({this.androidChromeCustomTabsOptions, this.iosSafariOptions});
+  ChromeSafariBrowserClassOptions(
+      {this.androidChromeCustomTabsOptions, this.iosSafariOptions});
 }
 
 ///AjaxRequestAction class used by [AjaxRequest] class.
@@ -1112,6 +1317,7 @@ class AjaxRequestAction {
 
   ///Aborts the current [AjaxRequest].
   static const ABORT = const AjaxRequestAction._internal(0);
+
   ///Proceeds with the current [AjaxRequest].
   static const PROCEED = const AjaxRequestAction._internal(1);
 
@@ -1136,24 +1342,34 @@ class AjaxRequestEventType {
   final String _value;
   const AjaxRequestEventType._internal(this._value);
   static AjaxRequestEventType fromValue(String value) {
-    return (["loadstart", "load", "loadend", "progress", "error", "abort"].contains(value)) ? AjaxRequestEventType._internal(value) : null;
+    return (["loadstart", "load", "loadend", "progress", "error", "abort"]
+            .contains(value))
+        ? AjaxRequestEventType._internal(value)
+        : null;
   }
+
   String toValue() => _value;
   String toString() => _value;
 
   ///The LOADSTART event is fired when a request has started to load data.
   static const LOADSTART = const AjaxRequestEventType._internal("loadstart");
+
   ///The LOAD event is fired when an `XMLHttpRequest` transaction completes successfully.
   static const LOAD = const AjaxRequestEventType._internal("load");
+
   ///The LOADEND event is fired when a request has completed, whether successfully (after [AjaxRequestEventType.LOAD]) or
   ///unsuccessfully (after [AjaxRequestEventType.ABORT] or [AjaxRequestEventType.ERROR]).
   static const LOADEND = const AjaxRequestEventType._internal("loadend");
+
   ///The PROGRESS event is fired periodically when a request receives more data.
   static const PROGRESS = const AjaxRequestEventType._internal("progress");
+
   ///The ERROR event is fired when the request encountered an error.
   static const ERROR = const AjaxRequestEventType._internal("error");
+
   ///The ABORT event is fired when a request has been aborted.
   static const ABORT = const AjaxRequestEventType._internal("abort");
+
   ///The TIMEOUT event is fired when progression is terminated due to preset time expiring.
   static const TIMEOUT = const AjaxRequestEventType._internal("timeout");
 
@@ -1167,13 +1383,16 @@ class AjaxRequestEventType {
 class AjaxRequestEvent {
   ///Event type.
   AjaxRequestEventType type;
+
   ///Is a Boolean flag indicating if the total work to be done, and the amount of work already done, by the underlying process is calculable.
   ///In other words, it tells if the progress is measurable or not.
   bool lengthComputable;
+
   ///Is an integer representing the amount of work already performed by the underlying process.
   ///The ratio of work done can be calculated with the property and [AjaxRequestEvent.total].
   ///When downloading a resource using HTTP, this only represent the part of the content itself, not headers and other overhead.
   int loaded;
+
   ///Is an integer representing the total amount of work that the underlying process is in the progress of performing.
   ///When downloading a resource using HTTP, this only represent the content itself, not headers and other overhead.
   int total;
@@ -1190,10 +1409,11 @@ class AjaxRequestReadyState {
       return AjaxRequestReadyState._internal(value);
     return null;
   }
+
   int toValue() => _value;
   @override
   String toString() {
-    switch(_value) {
+    switch (_value) {
       case 1:
         return "OPENED";
       case 2:
@@ -1210,12 +1430,16 @@ class AjaxRequestReadyState {
 
   ///Client has been created. `XMLHttpRequest.open()` not called yet.
   static const UNSENT = const AjaxRequestReadyState._internal(0);
+
   ///`XMLHttpRequest.open()` has been called.
   static const OPENED = const AjaxRequestReadyState._internal(1);
+
   ///`XMLHttpRequest.send()` has been called, and [AjaxRequest.headers] and [AjaxRequest.status] are available.
   static const HEADERS_RECEIVED = const AjaxRequestReadyState._internal(2);
+
   ///Downloading; [AjaxRequest.responseText] holds partial data.
   static const LOADING = const AjaxRequestReadyState._internal(3);
+
   ///The operation is complete.
   static const DONE = const AjaxRequestReadyState._internal(4);
 
@@ -1254,56 +1478,91 @@ class AjaxRequestHeaders {
 class AjaxRequest {
   ///Data passed as a parameter to the `XMLHttpRequest.send()` method.
   dynamic data;
+
   ///The HTTP request method of the `XMLHttpRequest` request.
   String method;
+
   ///The URL of the `XMLHttpRequest` request.
   String url;
+
   ///An optional Boolean parameter, defaulting to true, indicating whether or not the request is performed asynchronously.
   bool isAsync;
+
   ///The optional user name to use for authentication purposes; by default, this is the null value.
   String user;
+
   ///The optional password to use for authentication purposes; by default, this is the null value.
   String password;
+
   ///The XMLHttpRequest.withCredentials property is a Boolean that indicates whether or not cross-site Access-Control requests
   ///should be made using credentials such as cookies, authorization headers or TLS client certificates.
   ///Setting withCredentials has no effect on same-site requests.
   ///In addition, this flag is also used to indicate when cookies are to be ignored in the response. The default is false.
   bool withCredentials;
+
   ///The HTTP request headers.
   AjaxRequestHeaders headers;
+
   ///The state of the `XMLHttpRequest` request.
   AjaxRequestReadyState readyState;
+
   ///The numerical HTTP [status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) of the `XMLHttpRequest`'s response.
   int status;
+
   ///The serialized URL of the response or the empty string if the URL is null.
   ///If the URL is returned, any URL fragment present in the URL will be stripped away.
   ///The value of responseURL will be the final URL obtained after any redirects.
   String responseURL;
+
   ///It is an enumerated string value specifying the type of data contained in the response.
   ///It also lets the author change the [response type](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType).
   ///If an empty string is set as the value of responseType, the default value of text is used.
   String responseType;
+
   ///The response's body content. The content-type depends on the [AjaxRequest.reponseType].
   dynamic response;
+
   ///The text received from a server following a request being sent.
   String responseText;
+
   ///The HTML or XML string retrieved by the request or null if the request was unsuccessful, has not yet been sent, or if the data can't be parsed as XML or HTML.
   String responseXML;
+
   ///A String containing the response's status message as returned by the HTTP server.
   ///Unlike [AjaxRequest.status] which indicates a numerical status code, this property contains the text of the response status, such as "OK" or "Not Found".
   ///If the request's readyState is in [AjaxRequestReadyState.UNSENT] or [AjaxRequestReadyState.OPENED] state, the value of statusText will be an empty string.
   ///If the server response doesn't explicitly specify a status text, statusText will assume the default value "OK".
   String statusText;
+
   ///All the response headers or returns null if no response has been received. If a network error happened, an empty string is returned.
   Map<dynamic, dynamic> responseHeaders;
+
   ///Event type of the `XMLHttpRequest` request.
   AjaxRequestEvent event;
+
   ///Indicates the [AjaxRequestAction] that can be used to control the `XMLHttpRequest` request.
   AjaxRequestAction action;
 
-  AjaxRequest({this.data, this.method, this.url, this.isAsync, this.user, this.password,
-    this.withCredentials, this.headers, this.readyState, this.status, this.responseURL, this.responseType,
-    this.response, this.responseText, this.responseXML, this.statusText, this.responseHeaders, this.event, this.action = AjaxRequestAction.PROCEED});
+  AjaxRequest(
+      {this.data,
+      this.method,
+      this.url,
+      this.isAsync,
+      this.user,
+      this.password,
+      this.withCredentials,
+      this.headers,
+      this.readyState,
+      this.status,
+      this.responseURL,
+      this.responseType,
+      this.response,
+      this.responseText,
+      this.responseXML,
+      this.statusText,
+      this.responseHeaders,
+      this.event,
+      this.action = AjaxRequestAction.PROCEED});
 
   Map<String, dynamic> toMap() {
     return {
@@ -1341,6 +1600,7 @@ class FetchRequestAction {
 
   ///Aborts the fetch request.
   static const ABORT = const FetchRequestAction._internal(0);
+
   ///Proceeds with the fetch request.
   static const PROCEED = const FetchRequestAction._internal(1);
 
@@ -1358,9 +1618,7 @@ class FetchRequestCredential {
   FetchRequestCredential({this.type});
 
   Map<String, dynamic> toMap() {
-    return {
-      "type": type
-    };
+    return {"type": type};
   }
 }
 
@@ -1369,7 +1627,7 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
   ///The value of the credentials.
   String value;
 
-  FetchRequestCredentialDefault({type, this.value}): super(type: type);
+  FetchRequestCredentialDefault({type, this.value}) : super(type: type);
 
   Map<String, dynamic> toMap() {
     return {
@@ -1383,16 +1641,22 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
 class FetchRequestFederatedCredential extends FetchRequestCredential {
   ///Credential's identifier.
   dynamic id;
+
   ///The name associated with a credential. It should be a human-readable, public name.
   String name;
+
   ///Credential's federated identity protocol.
   String protocol;
+
   ///Credential's federated identity provider.
   String provider;
+
   ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
   String iconURL;
 
-  FetchRequestFederatedCredential({type, this.id, this.name, this.protocol, this.provider, this.iconURL}): super(type: type);
+  FetchRequestFederatedCredential(
+      {type, this.id, this.name, this.protocol, this.provider, this.iconURL})
+      : super(type: type);
 
   Map<String, dynamic> toMap() {
     return {
@@ -1410,14 +1674,19 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
 class FetchRequestPasswordCredential extends FetchRequestCredential {
   ///Credential's identifier.
   dynamic id;
+
   ///The name associated with a credential. It should be a human-readable, public name.
   String name;
+
   ///The password of the credential.
   String password;
+
   ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
   String iconURL;
 
-  FetchRequestPasswordCredential({type, this.id, this.name, this.password, this.iconURL}): super(type: type);
+  FetchRequestPasswordCredential(
+      {type, this.id, this.name, this.password, this.iconURL})
+      : super(type: type);
 
   Map<String, dynamic> toMap() {
     return {
@@ -1434,34 +1703,57 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
 class FetchRequest {
   ///The URL of the request.
   String url;
+
   ///The HTTP request method used of the request.
   String method;
+
   ///The HTTP request headers.
   Map<String, dynamic> headers;
+
   ///Body of the request.
   Uint8List body;
+
   ///The mode used by the request.
   String mode;
+
   ///The request credentials used by the request.
   FetchRequestCredential credentials;
+
   ///The cache mode used by the request.
   String cache;
+
   ///The redirect mode used by the request.
   String redirect;
+
   ///A String specifying no-referrer, client, or a URL.
   String referrer;
+
   ///The value of the referer HTTP header.
   String referrerPolicy;
+
   ///Contains the subresource integrity value of the request.
   String integrity;
+
   ///The keepalive option used to allow the request to outlive the page.
   bool keepalive;
+
   ///Indicates the [FetchRequestAction] that can be used to control the request.
   FetchRequestAction action;
 
-  FetchRequest({this.url, this.method, this.headers, this.body, this.mode, this.credentials,
-    this.cache, this.redirect, this.referrer, this.referrerPolicy, this.integrity, this.keepalive,
-    this.action = FetchRequestAction.PROCEED});
+  FetchRequest(
+      {this.url,
+      this.method,
+      this.headers,
+      this.body,
+      this.mode,
+      this.credentials,
+      this.cache,
+      this.redirect,
+      this.referrer,
+      this.referrerPolicy,
+      this.integrity,
+      this.keepalive,
+      this.action = FetchRequestAction.PROCEED});
 
   Map<String, dynamic> toMap() {
     return {
@@ -1485,16 +1777,27 @@ class FetchRequest {
     return this.toMap();
   }
 
-  static FetchRequestCredential createFetchRequestCredentialFromMap(credentialsMap) {
+  static FetchRequestCredential createFetchRequestCredentialFromMap(
+      credentialsMap) {
     if (credentialsMap != null) {
       if (credentialsMap["type"] == "default") {
-        return FetchRequestCredentialDefault(type: credentialsMap["type"], value: credentialsMap["value"]);
+        return FetchRequestCredentialDefault(
+            type: credentialsMap["type"], value: credentialsMap["value"]);
       } else if (credentialsMap["type"] == "federated") {
-        return FetchRequestFederatedCredential(type: credentialsMap["type"], id: credentialsMap["id"], name: credentialsMap["name"],
-            protocol: credentialsMap["protocol"], provider: credentialsMap["provider"], iconURL: credentialsMap["iconURL"]);
+        return FetchRequestFederatedCredential(
+            type: credentialsMap["type"],
+            id: credentialsMap["id"],
+            name: credentialsMap["name"],
+            protocol: credentialsMap["protocol"],
+            provider: credentialsMap["provider"],
+            iconURL: credentialsMap["iconURL"]);
       } else if (credentialsMap["type"] == "password") {
-        return FetchRequestPasswordCredential(type: credentialsMap["type"], id: credentialsMap["id"], name: credentialsMap["name"],
-            password: credentialsMap["password"], iconURL: credentialsMap["iconURL"]);
+        return FetchRequestPasswordCredential(
+            type: credentialsMap["type"],
+            id: credentialsMap["id"],
+            name: credentialsMap["name"],
+            password: credentialsMap["password"],
+            iconURL: credentialsMap["iconURL"]);
       }
     }
     return null;
@@ -1506,20 +1809,38 @@ class ContentBlockerTriggerResourceType {
   final String _value;
   const ContentBlockerTriggerResourceType._internal(this._value);
   static ContentBlockerTriggerResourceType fromValue(String value) {
-    return (["document", "image", "style-sheet", "script", "font",
-      "media", "svg-document", "raw"].contains(value)) ? ContentBlockerTriggerResourceType._internal(value) : null;
+    return ([
+      "document",
+      "image",
+      "style-sheet",
+      "script",
+      "font",
+      "media",
+      "svg-document",
+      "raw"
+    ].contains(value))
+        ? ContentBlockerTriggerResourceType._internal(value)
+        : null;
   }
+
   String toValue() => _value;
   @override
   String toString() => _value;
 
-  static const DOCUMENT = const ContentBlockerTriggerResourceType._internal('document');
-  static const IMAGE = const ContentBlockerTriggerResourceType._internal('image');
-  static const STYLE_SHEET = const ContentBlockerTriggerResourceType._internal('style-sheet');
-  static const SCRIPT = const ContentBlockerTriggerResourceType._internal('script');
+  static const DOCUMENT =
+      const ContentBlockerTriggerResourceType._internal('document');
+  static const IMAGE =
+      const ContentBlockerTriggerResourceType._internal('image');
+  static const STYLE_SHEET =
+      const ContentBlockerTriggerResourceType._internal('style-sheet');
+  static const SCRIPT =
+      const ContentBlockerTriggerResourceType._internal('script');
   static const FONT = const ContentBlockerTriggerResourceType._internal('font');
-  static const MEDIA = const ContentBlockerTriggerResourceType._internal('media');
-  static const SVG_DOCUMENT = const ContentBlockerTriggerResourceType._internal('svg-document');
+  static const MEDIA =
+      const ContentBlockerTriggerResourceType._internal('media');
+  static const SVG_DOCUMENT =
+      const ContentBlockerTriggerResourceType._internal('svg-document');
+
   ///Any untyped load
   static const RAW = const ContentBlockerTriggerResourceType._internal('raw');
 
@@ -1529,22 +1850,27 @@ class ContentBlockerTriggerResourceType {
   int get hashCode => _value.hashCode;
 }
 
-
 ///ContentBlockerTriggerLoadType class represents the possible load type for a [ContentBlockerTrigger].
 class ContentBlockerTriggerLoadType {
   final String _value;
   const ContentBlockerTriggerLoadType._internal(this._value);
   static ContentBlockerTriggerLoadType fromValue(String value) {
-    return (["first-party", "third-party"].contains(value)) ? ContentBlockerTriggerLoadType._internal(value) : null;
+    return (["first-party", "third-party"].contains(value))
+        ? ContentBlockerTriggerLoadType._internal(value)
+        : null;
   }
+
   String toValue() => _value;
   @override
   String toString() => _value;
 
   ///FIRST_PARTY is triggered only if the resource has the same scheme, domain, and port as the main page resource.
-  static const FIRST_PARTY = const ContentBlockerTriggerLoadType._internal('first-party');
+  static const FIRST_PARTY =
+      const ContentBlockerTriggerLoadType._internal('first-party');
+
   ///THIRD_PARTY is triggered if the resource is not from the same domain as the main page resource.
-  static const THIRD_PARTY = const ContentBlockerTriggerLoadType._internal('third-party');
+  static const THIRD_PARTY =
+      const ContentBlockerTriggerLoadType._internal('third-party');
 
   bool operator ==(value) => value == _value;
 
@@ -1557,20 +1883,27 @@ class ContentBlockerActionType {
   final String _value;
   const ContentBlockerActionType._internal(this._value);
   static ContentBlockerActionType fromValue(String value) {
-    return (["block", "css-display-none", "make-https"].contains(value)) ? ContentBlockerActionType._internal(value) : null;
+    return (["block", "css-display-none", "make-https"].contains(value))
+        ? ContentBlockerActionType._internal(value)
+        : null;
   }
+
   String toValue() => _value;
   @override
   String toString() => _value;
 
   ///Stops loading of the resource. If the resource was cached, the cache is ignored.
   static const BLOCK = const ContentBlockerActionType._internal('block');
+
   ///Hides elements of the page based on a CSS selector. A selector field contains the selector list. Any matching element has its display property set to none, which hides it.
   ///
   ///**NOTE**: on Android, JavaScript must be enabled.
-  static const CSS_DISPLAY_NONE = const ContentBlockerActionType._internal('css-display-none');
+  static const CSS_DISPLAY_NONE =
+      const ContentBlockerActionType._internal('css-display-none');
+
   ///Changes a URL from http to https. URLs with a specified (nondefault) port and links using other protocols are unaffected.
-  static const MAKE_HTTPS = const ContentBlockerActionType._internal('make-https');
+  static const MAKE_HTTPS =
+      const ContentBlockerActionType._internal('make-https');
 
   bool operator ==(value) => value == _value;
 
@@ -1582,6 +1915,7 @@ class ContentBlockerActionType {
 class Cookie {
   ///The name;
   String name;
+
   ///The value;
   dynamic value;
 
@@ -1596,6 +1930,7 @@ class PermissionRequestResponseAction {
 
   ///Denies the request.
   static const DENY = const PermissionRequestResponseAction._internal(0);
+
   ///Grants origin the permission to access the given resources.
   static const GRANT = const PermissionRequestResponseAction._internal(1);
 
@@ -1609,15 +1944,15 @@ class PermissionRequestResponseAction {
 class PermissionRequestResponse {
   ///Resources granted to be accessed by origin.
   List<String> resources;
+
   ///Indicate the [PermissionRequestResponseAction] to take in response of a permission request.
   PermissionRequestResponseAction action;
 
-  PermissionRequestResponse({this.resources = const [], this.action = PermissionRequestResponseAction.DENY});
+  PermissionRequestResponse(
+      {this.resources = const [],
+      this.action = PermissionRequestResponseAction.DENY});
 
   Map<String, dynamic> toMap() {
-    return {
-      "resources": resources,
-      "action": action?.toValue()
-    };
+    return {"resources": resources, "action": action?.toValue()};
   }
 }

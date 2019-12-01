@@ -11,27 +11,22 @@ import 'types.dart';
 class ContentBlocker {
   ///Trigger of the content blocker. The trigger tells to the WebView when to perform the corresponding action.
   ContentBlockerTrigger trigger;
+
   ///Action associated to the trigger. The action tells to the WebView what to do when the trigger is matched.
   ContentBlockerAction action;
 
-  ContentBlocker({@required this.trigger,@required this.action});
+  ContentBlocker({@required this.trigger, @required this.action});
 
   Map<String, Map<String, dynamic>> toMap() {
-    return {
-      "trigger": trigger.toMap(),
-      "action": action.toMap()
-    };
+    return {"trigger": trigger.toMap(), "action": action.toMap()};
   }
 
   static ContentBlocker fromMap(Map<dynamic, Map<dynamic, dynamic>> map) {
     return ContentBlocker(
         trigger: ContentBlockerTrigger.fromMap(
-          Map<String, dynamic>.from(map["trigger"])
-        ),
+            Map<String, dynamic>.from(map["trigger"])),
         action: ContentBlockerAction.fromMap(
-          Map<String, dynamic>.from(map["action"])
-        )
-      );
+            Map<String, dynamic>.from(map["action"])));
   }
 }
 
@@ -42,29 +37,42 @@ class ContentBlocker {
 class ContentBlockerTrigger {
   ///A regular expression pattern to match the URL against.
   String urlFilter;
+
   ///Used only by iOS. A Boolean value. The default value is false.
   bool urlFilterIsCaseSensitive;
+
   ///A list of [ContentBlockerTriggerResourceType] representing the resource types (how the browser intends to use the resource) that the rule should match.
   ///If not specified, the rule matches all resource types.
   List<ContentBlockerTriggerResourceType> resourceType;
+
   ///A list of strings matched to a URL's domain; limits action to a list of specific domains.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.unlessDomain].
   List<String> ifDomain;
+
   ///A list of strings matched to a URL's domain; acts on any site except domains in a provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.ifDomain].
   List<String> unlessDomain;
+
   ///A list of [ContentBlockerTriggerLoadType] that can include one of two mutually exclusive values. If not specified, the rule matches all load types.
   List<ContentBlockerTriggerLoadType> loadType;
+
   ///A list of strings matched to the entire main document URL; limits the action to a specific list of URL patterns.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.unlessTopUrl].
   List<String> ifTopUrl;
+
   ///An array of strings matched to the entire main document URL; acts on any site except URL patterns in provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.ifTopUrl].
   List<String> unlessTopUrl;
 
-  ContentBlockerTrigger({@required String urlFilter, bool urlFilterIsCaseSensitive = false, List<ContentBlockerTriggerResourceType> resourceType = const [],
-    List<String> ifDomain = const [], List<String> unlessDomain = const [], List<ContentBlockerTriggerLoadType> loadType = const [],
-    List<String> ifTopUrl = const [], List<String> unlessTopUrl = const []}) {
+  ContentBlockerTrigger(
+      {@required String urlFilter,
+      bool urlFilterIsCaseSensitive = false,
+      List<ContentBlockerTriggerResourceType> resourceType = const [],
+      List<String> ifDomain = const [],
+      List<String> unlessDomain = const [],
+      List<ContentBlockerTriggerLoadType> loadType = const [],
+      List<String> ifTopUrl = const [],
+      List<String> unlessTopUrl = const []}) {
     this.urlFilter = urlFilter;
     assert(this.urlFilter != null);
     this.resourceType = resourceType;
@@ -101,7 +109,9 @@ class ContentBlockerTrigger {
     };
 
     map.keys
-        .where((key) => map[key] == null || (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .where((key) =>
+            map[key] == null ||
+            (map[key] is List && (map[key] as List).length == 0)) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
 
@@ -112,7 +122,8 @@ class ContentBlockerTrigger {
     List<ContentBlockerTriggerResourceType> resourceType = [];
     List<ContentBlockerTriggerLoadType> loadType = [];
 
-    List<String> resourceTypeStringList = List<String>.from(map["resource-type"] ?? []);
+    List<String> resourceTypeStringList =
+        List<String>.from(map["resource-type"] ?? []);
     resourceTypeStringList.forEach((type) {
       resourceType.add(ContentBlockerTriggerResourceType.fromValue(type));
     });
@@ -130,8 +141,7 @@ class ContentBlockerTrigger {
         resourceType: resourceType,
         loadType: loadType,
         ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
-        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? [])
-    );
+        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []));
   }
 }
 
@@ -143,11 +153,13 @@ class ContentBlockerTrigger {
 class ContentBlockerAction {
   ///Type of the action.
   ContentBlockerActionType type;
+
   ///If the action type is [ContentBlockerActionType.CSS_DISPLAY_NONE], then also the [selector] property is required, otherwise it is ignored.
   ///It specify a string that defines a selector list. Use CSS identifiers as the individual selector values, separated by commas.
   String selector;
 
-  ContentBlockerAction({@required ContentBlockerActionType type, String selector}) {
+  ContentBlockerAction(
+      {@required ContentBlockerActionType type, String selector}) {
     this.type = type;
     assert(this.type != null);
     if (this.type == ContentBlockerActionType.CSS_DISPLAY_NONE) {
@@ -157,13 +169,12 @@ class ContentBlockerAction {
   }
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> map =  {
-      "type": type.toValue(),
-      "selector": selector
-    };
+    Map<String, dynamic> map = {"type": type.toValue(), "selector": selector};
 
     map.keys
-        .where((key) => map[key] == null || (map[key] is List && (map[key] as List).length == 0)) // filter keys
+        .where((key) =>
+            map[key] == null ||
+            (map[key] is List && (map[key] as List).length == 0)) // filter keys
         .toList() // create a copy to avoid concurrent modifications
         .forEach(map.remove);
 
@@ -173,7 +184,6 @@ class ContentBlockerAction {
   static ContentBlockerAction fromMap(Map<String, dynamic> map) {
     return ContentBlockerAction(
         type: ContentBlockerActionType.fromValue(map["type"]),
-        selector: map["selector"]
-    );
+        selector: map["selector"]);
   }
 }

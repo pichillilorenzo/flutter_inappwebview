@@ -8,7 +8,6 @@ import 'package:mime/mime.dart';
 ///
 ///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server. The default [port] value is `8080`.
 class InAppLocalhostServer {
-
   HttpServer _server;
   int _port = 8080;
 
@@ -28,7 +27,6 @@ class InAppLocalhostServer {
   ///```
   ///The `NSAllowsLocalNetworking` key is available since **iOS 10**.
   Future<void> start() async {
-
     if (this._server != null) {
       throw Exception('Server already started on http://localhost:$_port');
     }
@@ -48,8 +46,7 @@ class InAppLocalhostServer {
           path += (path.endsWith('/')) ? 'index.html' : '';
 
           try {
-            body = (await rootBundle.load(path))
-                .buffer.asUint8List();
+            body = (await rootBundle.load(path)).buffer.asUint8List();
           } catch (e) {
             print(e.toString());
             request.response.close();
@@ -57,14 +54,17 @@ class InAppLocalhostServer {
           }
 
           var contentType = ['text', 'html'];
-          if (!request.requestedUri.path.endsWith('/') && request.requestedUri.pathSegments.isNotEmpty) {
-            var mimeType = lookupMimeType(request.requestedUri.path, headerBytes: body);
+          if (!request.requestedUri.path.endsWith('/') &&
+              request.requestedUri.pathSegments.isNotEmpty) {
+            var mimeType =
+                lookupMimeType(request.requestedUri.path, headerBytes: body);
             if (mimeType != null) {
               contentType = mimeType.split('/');
             }
           }
 
-          request.response.headers.contentType = new ContentType(contentType[0], contentType[1], charset: 'utf-8');
+          request.response.headers.contentType =
+              new ContentType(contentType[0], contentType[1], charset: 'utf-8');
           request.response.add(body);
           request.response.close();
         });
@@ -84,5 +84,4 @@ class InAppLocalhostServer {
       this._server = null;
     }
   }
-
 }

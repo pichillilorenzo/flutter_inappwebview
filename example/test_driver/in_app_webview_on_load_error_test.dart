@@ -27,7 +27,7 @@ class InAppWebViewOnLoadErrorTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialUrl: "http://not-existing-domain.org/",
+                    initialUrl: "https://not-existing-domain.org/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(

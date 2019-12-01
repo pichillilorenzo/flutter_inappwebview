@@ -6,7 +6,8 @@ import 'package:flutter/services.dart';
 import 'types.dart' show ListenerCallback;
 
 class ChannelManager {
-  static const MethodChannel channel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
+  static const MethodChannel channel =
+      const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
   static bool initialized = false;
   static final listeners = HashMap<String, ListenerCallback>();
 
@@ -16,12 +17,11 @@ class ChannelManager {
   }
 
   static void addListener(String key, ListenerCallback callback) {
-    if (!initialized)
-      init();
+    if (!initialized) init();
     listeners.putIfAbsent(key, () => callback);
   }
 
-  static void init () {
+  static void init() {
     channel.setMethodCallHandler(_handleMethod);
     initialized = true;
   }

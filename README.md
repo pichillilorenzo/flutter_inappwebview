@@ -14,7 +14,7 @@ A Flutter plugin that allows you to add an inline webview or open an in-app brow
 - Dart sdk: ">=2.0.0-dev.68.0 <3.0.0"
 - Flutter: ">=1.9.1+hotfix.5 <2.0.0"
 - Android: `minSdkVersion 17`
-- iOS: `--ios-language swift`
+- iOS: `--ios-language swift`, Xcode version `>= 11`
 
 ### Note for Android
 
@@ -440,7 +440,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `onReceivedHttpAuthRequest`: Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
 * `onReceivedServerTrustAuthRequest`: Event fired when the WebView need to perform server trust authentication (certificate validation).
-* `onReceivedClientCertRequest`: Notify the host application to handle a SSL client certificate request.
+* `onReceivedClientCertRequest`: Notify the host application to handle an SSL client certificate request.
 * `onFindResultReceived`: Event fired as find-on-page operations progress.
 * `shouldInterceptAjaxRequest`: Event fired when an `XMLHttpRequest` is sent to a server.
 * `onAjaxReadyStateChange`: Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.

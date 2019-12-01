@@ -164,7 +164,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, clickListener);
@@ -255,7 +255,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
@@ -372,7 +372,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(view.getContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);

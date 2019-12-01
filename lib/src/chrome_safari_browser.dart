@@ -20,7 +20,7 @@ class ChromeSafariBrowser {
   bool _isOpened = false;
 
   ///Initialize the [ChromeSafariBrowser] instance with an [InAppBrowser] fallback instance or `null`.
-  ChromeSafariBrowser ({bFallback}) {
+  ChromeSafariBrowser({bFallback}) {
     uuid = uuidGenerator.v4();
     browserFallback = bFallback;
     ChannelManager.addListener(uuid, handleMethod);
@@ -28,7 +28,7 @@ class ChromeSafariBrowser {
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
-    switch(call.method) {
+    switch (call.method) {
       case "onChromeSafariBrowserOpened":
         onOpened();
         break;
@@ -53,7 +53,11 @@ class ChromeSafariBrowser {
   ///[headersFallback]: The additional header of the [InAppBrowser] instance fallback to be used in the HTTP request for this URL, specified as a map from name to value.
   ///
   ///[optionsFallback]: Options used by the [InAppBrowser] instance fallback.
-  Future<void> open({@required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback}) async {
+  Future<void> open(
+      {@required String url,
+      ChromeSafariBrowserClassOptions options,
+      Map<String, String> headersFallback = const {},
+      InAppBrowserClassOptions optionsFallback}) async {
     assert(url != null && url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
@@ -65,21 +69,33 @@ class ChromeSafariBrowser {
 
     Map<String, dynamic> optionsFallbackMap = {};
     if (optionsFallback != null) {
-      optionsFallbackMap.addAll(optionsFallback.inAppBrowserOptions?.toMap() ?? {});
-      optionsFallbackMap.addAll(optionsFallback.inAppWebViewWidgetOptions?.inAppWebViewOptions?.toMap() ?? {});
+      optionsFallbackMap
+          .addAll(optionsFallback.inAppBrowserOptions?.toMap() ?? {});
+      optionsFallbackMap.addAll(optionsFallback
+              .inAppWebViewWidgetOptions?.inAppWebViewOptions
+              ?.toMap() ??
+          {});
       if (Platform.isAndroid) {
-        optionsFallbackMap.addAll(optionsFallback.androidInAppBrowserOptions?.toMap() ?? {});
-        optionsFallbackMap.addAll(optionsFallback.inAppWebViewWidgetOptions?.androidInAppWebViewOptions?.toMap() ?? {});
-      }
-      else if (Platform.isIOS) {
-        optionsFallbackMap.addAll(optionsFallback.iosInAppBrowserOptions?.toMap() ?? {});
-        optionsFallbackMap.addAll(optionsFallback.inAppWebViewWidgetOptions?.iosInAppWebViewOptions?.toMap() ?? {});
+        optionsFallbackMap
+            .addAll(optionsFallback.androidInAppBrowserOptions?.toMap() ?? {});
+        optionsFallbackMap.addAll(optionsFallback
+                .inAppWebViewWidgetOptions?.androidInAppWebViewOptions
+                ?.toMap() ??
+            {});
+      } else if (Platform.isIOS) {
+        optionsFallbackMap
+            .addAll(optionsFallback.iosInAppBrowserOptions?.toMap() ?? {});
+        optionsFallbackMap.addAll(optionsFallback
+                .inAppWebViewWidgetOptions?.iosInAppWebViewOptions
+                ?.toMap() ??
+            {});
       }
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('uuidFallback', () => (browserFallback != null) ? browserFallback.uuid : '');
+    args.putIfAbsent('uuidFallback',
+        () => (browserFallback != null) ? browserFallback.uuid : '');
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headersFallback);
     args.putIfAbsent('options', () => optionsMap);
@@ -91,19 +107,13 @@ class ChromeSafariBrowser {
   }
 
   ///Event fires when the [ChromeSafariBrowser] is opened.
-  void onOpened() {
-
-  }
+  void onOpened() {}
 
   ///Event fires when the [ChromeSafariBrowser] is loaded.
-  void onLoaded() {
-
-  }
+  void onLoaded() {}
 
   ///Event fires when the [ChromeSafariBrowser] is closed.
-  void onClosed() {
-
-  }
+  void onClosed() {}
 
   ///Returns `true` if the [ChromeSafariBrowser] instance is opened, otherwise `false`.
   bool isOpened() {
@@ -112,13 +122,17 @@ class ChromeSafariBrowser {
 
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
-      throw Exception(['Error: ${ (message.isEmpty) ? '' : message + ' '}The browser is already opened.']);
+      throw Exception([
+        'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is already opened.'
+      ]);
     }
   }
 
   void throwIsNotOpened({String message = ''}) {
     if (!this.isOpened()) {
-      throw Exception(['Error: ${ (message.isEmpty) ? '' : message + ' '}The browser is not opened.']);
+      throw Exception([
+        'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is not opened.'
+      ]);
     }
   }
 }

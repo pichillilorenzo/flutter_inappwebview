@@ -1,3 +1,7 @@
+## 2.0.1+1
+
+- Fixed error "java.lang.ClassCastException: $Proxy1 cannot be cast to android.view.WindowManagerImpl" on Android when using native alert dialogs
+
 ## 2.0.1
 
 - Added `onPermissionRequest` event. This event is fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).

@@ -46,6 +46,7 @@ flutter:
     - assets/index.html
     - assets/page-1.html
     - assets/page-2.html
+    - assets/js/
     - assets/css/
     - assets/images/
     - assets/favicon.ico

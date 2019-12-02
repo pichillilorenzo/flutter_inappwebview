@@ -88,7 +88,8 @@ public class InAppBrowserActivity extends AppCompatActivity {
       String mimeType = b.getString("mimeType");
       String encoding = b.getString("encoding");
       String baseUrl = b.getString("baseUrl");
-      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, null);
+      String historyUrl = b.getString("historyUrl");
+      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
     }
 
     Map<String, Object> obj = new HashMap<>();
@@ -228,9 +229,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
     }
   }
 
-  public void loadData(String data, String mimeType, String encoding, String baseUrl, MethodChannel.Result result) {
+  public void loadData(String data, String mimeType, String encoding, String baseUrl, String historyUrl, MethodChannel.Result result) {
     if (webView != null) {
-      webView.loadData(data, mimeType, encoding, baseUrl, result);
+      webView.loadData(data, mimeType, encoding, baseUrl, historyUrl, result);
     } else {
       result.error(LOG_TAG, "webView is null", null);
     }

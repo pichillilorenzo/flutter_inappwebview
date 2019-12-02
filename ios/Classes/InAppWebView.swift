@@ -689,6 +689,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     static var credentialsProposed: [URLCredential] = []
     var lastScrollX: CGFloat = 0
     var lastScrollY: CGFloat = 0
+    var isPausedTimers = false
+    var isPausedTimersCompletionHandler: (() -> Void)?
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, IAWController: FlutterWebViewController?) {
         
@@ -705,6 +707,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func prepare() {
+        
         addObserver(self,
                     forKeyPath: #keyPath(WKWebView.estimatedProgress),
                     options: .new,
@@ -1632,6 +1635,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
                  initiatedByFrame frame: WKFrameInfo, completionHandler: @escaping () -> Void) {
         
+        if (isPausedTimers) {
+            isPausedTimersCompletionHandler = completionHandler
+            return
+        }
+        
         onJsAlert(message: message, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message)
@@ -2134,27 +2142,42 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return (IABController != nil) ? SwiftFlutterPlugin.instance!.channel! : ((IAWController != nil) ? IAWController!.channel! : nil);
     }
     
-    func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+    public func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
         let startSearch = "wkwebview_FindAllAsync('\(find ?? "")');"
         evaluateJavaScript(startSearch, completionHandler: completionHandler)
     }
 
-    func findNext(forward: Bool, completionHandler: ((Any?, Error?) -> Void)?) {
+    public func findNext(forward: Bool, completionHandler: ((Any?, Error?) -> Void)?) {
         evaluateJavaScript("wkwebview_FindNext(\(forward ? "true" : "false"));", completionHandler: completionHandler)
     }
 
-    func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
+    public func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
         evaluateJavaScript("wkwebview_ClearMatches();", completionHandler: completionHandler)
     }
     
-    func scrollTo(x: Int, y: Int) {
+    public func scrollTo(x: Int, y: Int) {
         scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
     }
     
-    func scrollBy(x: Int, y: Int) {
+    public func scrollBy(x: Int, y: Int) {
         let newX = CGFloat(x) + scrollView.contentOffset.x
         let newY = CGFloat(y) + scrollView.contentOffset.y
         scrollView.setContentOffset(CGPoint(x: newX, y: newY), animated: false)
+    }
+    
+    
+    public func pauseTimers() {
+        isPausedTimers = true
+        let script = "alert();";
+        self.evaluateJavaScript(script, completionHandler: nil)
+    }
+    
+    public func resumeTimers() {
+        if let completionHandler = isPausedTimersCompletionHandler {
+            completionHandler()
+            isPausedTimersCompletionHandler = nil
+        }
+        isPausedTimers = false
     }
     
     public override func removeFromSuperview() {
@@ -2175,5 +2198,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         IAWController?.channel?.setMethodCallHandler(nil)
         IABController?.webView = nil
         IAWController?.webView = nil
+        isPausedTimersCompletionHandler = nil
     }
 }

@@ -427,12 +427,12 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onLoadHttpError`: Event fired when the InAppWebView main page receives an HTTP error.
 * `onProgressChanged`: Event fired when the current progress of loading a page is changed.
 * `onConsoleMessage`: Event fired when the InAppWebView receives a ConsoleMessage.
-* `shouldOverrideUrlLoading`: Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
-* `onLoadResource`: Event fired when the InAppWebView loads a resource.
+* `shouldOverrideUrlLoading`: Give the host application a chance to take control when a URL is about to be loaded in the current WebView (to use this event, the `useShouldOverrideUrlLoading` option must be `true`).
+* `onLoadResource`: Event fired when the InAppWebView loads a resource (to use this event, the `useOnLoadResource` option must be `true`).
 * `onScrollChanged`: Event fired when the InAppWebView scrolls.
-* `onDownloadStart`: Event fired when InAppWebView recognizes and starts a downloadable file.
+* `onDownloadStart`: Event fired when InAppWebView recognizes and starts a downloadable file (to use this event, the `useOnDownloadStart` option must be `true`).
 * `onLoadResourceCustomScheme`: Event fired when the InAppWebView finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a CustomSchemeResponse to load a specific resource encoded to `base64`.
-* `onTargetBlank`: Event fired when the InAppWebView tries to open a link with `target="_blank"`.
+* `onTargetBlank`: Event fired when the InAppWebView tries to open a link with `target="_blank"` (to use this event, the `useOnTargetBlank` option must be `true`).
 * `onGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
 * `onJsAlert`: Event fired when javascript calls the `alert()` method to display an alert dialog.
 * `onJsConfirm`: Event fired when javascript calls the `confirm()` method to display a confirm dialog.
@@ -442,10 +442,10 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onReceivedServerTrustAuthRequest`: Event fired when the WebView need to perform server trust authentication (certificate validation).
 * `onReceivedClientCertRequest`: Notify the host application to handle an SSL client certificate request.
 * `onFindResultReceived`: Event fired as find-on-page operations progress.
-* `shouldInterceptAjaxRequest`: Event fired when an `XMLHttpRequest` is sent to a server.
-* `onAjaxReadyStateChange`: Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
-* `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress.
-* `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
+* `shouldInterceptAjaxRequest`: Event fired when an `XMLHttpRequest` is sent to a server (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
+* `onAjaxReadyStateChange`: Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
+* `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
+* `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) (to use this event, the `useShouldInterceptFetchRequest` option must be `true`).
 * `onNavigationStateChange`: Event fired when the navigation state of the InAppWebView changes.
 * `onPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 

@@ -82,26 +82,36 @@ class LoadedResource {
 }
 
 ///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
-///The [mimeType] property specifies the format of the data.
-///The [encoding] property specifies the encoding of the data.
 class InAppWebViewInitialData {
+  ///A String of data in the given encoding.
   String data;
+
+  ///The MIME type of the data, e.g. "text/html". The default value is `"text/html"`.
   String mimeType;
+
+  ///The encoding of the data. The default value is `"utf8"`.
   String encoding;
+
+  ///The URL to use as the page's base URL. The default value is `about:blank`.
   String baseUrl;
+
+  ///The URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
+  String historyUrl;
 
   InAppWebViewInitialData(
       {@required this.data,
       this.mimeType = "text/html",
       this.encoding = "utf8",
-      this.baseUrl = "about:blank"});
+      this.baseUrl = "about:blank",
+      this.historyUrl = "about:blank"});
 
   Map<String, String> toMap() {
     return {
       "data": data,
       "mimeType": mimeType,
       "encoding": encoding,
-      "baseUrl": baseUrl
+      "baseUrl": baseUrl,
+      "historyUrl": historyUrl
     };
   }
 }

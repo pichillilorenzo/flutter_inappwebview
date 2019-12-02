@@ -318,6 +318,18 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 }
                 result(true)
                 break
+            case "pauseTimers":
+               if webView != nil {
+                   webView!.pauseTimers()
+               }
+               result(true)
+               break
+            case "resumeTimers":
+                if webView != nil {
+                    webView!.resumeTimers()
+                }
+                result(true)
+                break
             case "removeFromSuperview":
                 webView!.removeFromSuperview()
                 result(true)

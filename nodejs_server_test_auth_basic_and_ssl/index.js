@@ -94,6 +94,11 @@ appAuthBasic.use((req, res, next) => {
   }
 })
 
+appAuthBasic.use(express.static(__dirname + '/public'));
+appAuthBasic.get('/test-index', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
+
 appAuthBasic.get("/", (req, res) => {
   console.log(JSON.stringify(req.headers))
   res.send(`
@@ -119,6 +124,11 @@ app.use(cors());
 
 // Parse JSON bodies (as sent by API clients)
 app.use(express.json());
+
+app.use(express.static(__dirname + '/public'));
+app.get('/test-index', (req, res) => {
+    res.sendFile(__dirname + '/public/index.html');
+});
 
 app.get("/", (req, res) => {
   console.log(JSON.stringify(req.headers))

@@ -76,7 +76,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       String mimeType = initialData.get("mimeType");
       String encoding = initialData.get("encoding");
       String baseUrl = initialData.get("baseUrl");
-      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, null);
+      String historyUrl = initialData.get("historyUrl");
+      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
     }
     else
       webView.loadUrl(initialUrl, initialHeaders);
@@ -117,9 +118,10 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           String mimeType = (String) call.argument("mimeType");
           String encoding = (String) call.argument("encoding");
           String baseUrl = (String) call.argument("baseUrl");
+          String historyUrl = (String) call.argument("historyUrl");
 
           if (webView != null)
-            webView.loadData(data, mimeType, encoding, baseUrl, result);
+            webView.loadData(data, mimeType, encoding, baseUrl, historyUrl, result);
           else
             result.success(false);
         }
@@ -299,6 +301,38 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           webView.scrollBy(x, y);
         }
         result.success(true);
+        break;
+      case "pause":
+        if (webView != null) {
+          webView.onPause();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "resume":
+        if (webView != null) {
+          webView.onResume();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "pauseTimers":
+        if (webView != null) {
+          webView.pauseTimers();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "resumeTimers":
+        if (webView != null) {
+          webView.resumeTimers();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
         break;
       default:
         result.notImplemented();

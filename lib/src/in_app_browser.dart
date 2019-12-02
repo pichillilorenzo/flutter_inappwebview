@@ -162,9 +162,11 @@ class InAppBrowser {
 
   ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
   ///
-  ///The [mimeType] parameter specifies the format of the data.
+  ///The [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
   ///
-  ///The [encoding] parameter specifies the encoding of the data.
+  ///The [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
+  ///
+  ///The [historyUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
   ///
   ///The [options] parameter specifies the options for the [InAppBrowser].
   Future<void> openData(
@@ -172,6 +174,7 @@ class InAppBrowser {
       String mimeType = "text/html",
       String encoding = "utf8",
       String baseUrl = "about:blank",
+      String historyUrl = "about:blank",
       InAppBrowserClassOptions options}) async {
     assert(data != null);
 

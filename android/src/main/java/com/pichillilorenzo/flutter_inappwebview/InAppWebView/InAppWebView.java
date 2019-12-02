@@ -794,8 +794,8 @@ final public class InAppWebView extends InputAwareWebView {
     result.success(true);
   }
 
-  public void loadData(String data, String mimeType, String encoding, String baseUrl, MethodChannel.Result result) {
-    loadDataWithBaseURL(baseUrl, data, mimeType, encoding, null);
+  public void loadData(String data, String mimeType, String encoding, String baseUrl, String historyUrl, MethodChannel.Result result) {
+    loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
     result.success(true);
   }
 

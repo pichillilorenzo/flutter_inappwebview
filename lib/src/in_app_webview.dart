@@ -1115,13 +1115,18 @@ class InAppWebViewController {
   }
 
   ///Loads the given [data] into this WebView, using [baseUrl] as the base URL for the content.
-  ///The [mimeType] parameter specifies the format of the data.
-  ///The [encoding] parameter specifies the encoding of the data.
+  ///
+  ///The [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
+  ///
+  ///The [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
+  ///
+  ///The [historyUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
   Future<void> loadData(
       {@required String data,
       String mimeType = "text/html",
       String encoding = "utf8",
-      String baseUrl = "about:blank"}) async {
+      String baseUrl = "about:blank",
+      String historyUrl = "about:blank"}) async {
     assert(data != null);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1132,6 +1137,7 @@ class InAppWebViewController {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl);
+    args.putIfAbsent('historyUrl', () => historyUrl);
     await _channel.invokeMethod('loadData', args);
   }
 
@@ -1671,6 +1677,51 @@ class InAppWebViewController {
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
     await _channel.invokeMethod('scrollBy', args);
+  }
+
+  ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
+  ///To pause JavaScript globally, use [pauseTimers()]. To resume WebView, call [resume()].
+  ///
+  ///**NOTE**: available only on Android.
+  Future<void> pause() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('pause', args);
+  }
+
+  ///Resumes a WebView after a previous call to [pause()].
+  ///
+  ///**NOTE**: available only on Android.
+  Future<void> resume() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('resume', args);
+  }
+
+  ///Pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
+  Future<void> pauseTimers() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('pauseTimers', args);
+  }
+
+  ///Resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
+  Future<void> resumeTimers() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('resumeTimers', args);
   }
 
   /*Future<void> dispose() async {

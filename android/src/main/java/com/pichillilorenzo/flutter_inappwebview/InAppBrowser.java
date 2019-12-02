@@ -153,7 +153,8 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
               String mimeType = (String) call.argument("mimeType");
               String encoding = (String) call.argument("encoding");
               String baseUrl = (String) call.argument("baseUrl");
-              openData(activity, uuid, options, data, mimeType, encoding, baseUrl);
+              String historyUrl = (String) call.argument("historyUrl");
+              openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl);
               result.success(true);
             }
           });
@@ -180,7 +181,8 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
           String mimeType = (String) call.argument("mimeType");
           String encoding = (String) call.argument("encoding");
           String baseUrl = (String) call.argument("baseUrl");
-          loadData(uuid, data, mimeType, encoding, baseUrl, result);
+          String historyUrl = (String) call.argument("historyUrl");
+          loadData(uuid, data, mimeType, encoding, baseUrl, historyUrl, result);
         }
         break;
       case "loadFile":
@@ -460,7 +462,7 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
     result.error(LOG_TAG, "No WebView fallback declared.", null);
   }
 
-  public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding, String baseUrl) {
+  public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding, String baseUrl, String historyUrl) {
     Intent intent = new Intent(activity, InAppBrowserActivity.class);
     Bundle extras = new Bundle();
 
@@ -471,6 +473,7 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
     extras.putString("mimeType", mimeType);
     extras.putString("encoding", encoding);
     extras.putString("baseUrl", baseUrl);
+    extras.putString("historyUrl", historyUrl);
 
     intent.putExtras(extras);
     activity.startActivity(intent);
@@ -513,10 +516,10 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
       inAppBrowserActivity.postUrl(url, postData, result);
   }
 
-  public void loadData(String uuid, String data, String mimeType, String encoding, String baseUrl, Result result) {
+  public void loadData(String uuid, String data, String mimeType, String encoding, String baseUrl, String historyUrl, Result result) {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
-      inAppBrowserActivity.loadData(data, mimeType, encoding, baseUrl, result);
+      inAppBrowserActivity.loadData(data, mimeType, encoding, baseUrl, historyUrl, result);
   }
 
   public void loadFile(String uuid, String url, Map<String, String> headers, Result result) {

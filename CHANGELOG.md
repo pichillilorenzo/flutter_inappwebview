@@ -1,3 +1,7 @@
+## 2.1.0+1
+
+- Fix docs
+
 ## 2.1.0
 
 - Added `pause` and `resume` methods for Android.

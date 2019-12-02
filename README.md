@@ -247,7 +247,7 @@ Screenshots:
 * `getFavicons`: Gets the list of all favicons for the current page.
 * `loadUrl({@required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
 * `postUrl({@required String url, @required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
-* `loadData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank"})`: Loads the given data into this WebView.
+* `loadData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String historyUrl = "about:blank"})`: Loads the given data into this WebView.
 * `loadFile({@required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
 * `reload`: Reloads the WebView.
 * `goBack`: Goes back in the history of the WebView.
@@ -569,7 +569,7 @@ Screenshots:
 
 * `open({String url = "about:blank", Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens an `url` in a new `InAppBrowser` instance.
 * `openFile({@required String assetFilePath, Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens the given `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open`.
-* `openData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", InAppBrowserClassOptions options})`: Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
+* `openData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String historyUrl = "about:blank", InAppBrowserClassOptions options})`: Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
 * `openWithSystemBrowser({@required String url})`: This is a static method that opens an `url` in the system browser. You wont be able to use the `InAppBrowser` methods here!
 * `show`: Displays an `InAppBrowser` window that was opened hidden. Calling this has no effect if the `InAppBrowser` was already visible.
 * `hide`: Hides the `InAppBrowser` window. Calling this has no effect if the `InAppBrowser` was already hidden.

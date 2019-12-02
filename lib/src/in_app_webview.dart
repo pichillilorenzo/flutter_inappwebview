@@ -1704,7 +1704,10 @@ class InAppWebViewController {
     await _channel.invokeMethod('resume', args);
   }
 
-  ///Pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
+  ///On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews.
+  ///This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
+  ///
+  ///On iOS, it is restricted to just this WebView.
   Future<void> pauseTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1714,7 +1717,9 @@ class InAppWebViewController {
     await _channel.invokeMethod('pauseTimers', args);
   }
 
-  ///Resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
+  ///On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
+  ///
+  ///On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
   Future<void> resumeTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {

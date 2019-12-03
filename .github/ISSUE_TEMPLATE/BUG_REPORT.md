@@ -6,10 +6,12 @@ about: Something is crashing or not working as intended
 
 ## Environment
 
+**Flutter version:** 
 **Plugin version:**  <!-- Add branch if necessary -->  
 **Android version:**  <!-- If customize ROM, write which -->  
+**iOS version:**
+**Xcode version:**  
 **Device information:**  <!-- Manufacturer and model -->  
-**Flutter version:**  <!-- Flutter version used -->  
 
 ## Description
 

@@ -16,6 +16,7 @@ import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
+import android.webkit.WebStorage;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -854,6 +855,7 @@ final public class InAppWebView extends InputAwareWebView {
     clearCache(true);
     clearCookies();
     clearFormData();
+    WebStorage.getInstance().deleteAllData();
   }
 
   public void takeScreenshot(final MethodChannel.Result result) {

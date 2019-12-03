@@ -16,9 +16,11 @@ A Flutter plugin that allows you to add an inline webview or open an in-app brow
 - Android: `minSdkVersion 17`
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
-### Note for Android
+### IMPORTANT Note for Android
 
-During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `build.gradle` file to at least `17`. 
+During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `android/app/build.gradle` file to at least `17`.
+
+Also, you need to add `<uses-permission android:name="android.permission.INTERNET"/>` in the `android/app/src/main/AndroidManifest.xml` file in order to give minimum permission to perform network operations in your application. 
 
 Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0`.
 

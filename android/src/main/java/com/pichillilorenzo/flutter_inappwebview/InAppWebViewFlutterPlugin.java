@@ -15,6 +15,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
   protected static final String LOG_TAG = "InAppWebViewFlutterPlugin";
 
   public static InAppBrowser inAppBrowser;
+  public static InAppWebViewStatic inAppWebViewStatic;
   public static MyCookieManager myCookieManager;
   public static CredentialDatabaseHandler credentialDatabaseHandler;
   public static ValueCallback<Uri[]> uploadMessageArray;
@@ -28,6 +29,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
             .platformViewRegistry()
             .registerViewFactory(
                     "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar, registrar.view()));
+    new InAppWebViewStatic(registrar);
     new MyCookieManager(registrar);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       new CredentialDatabaseHandler(registrar);
@@ -44,6 +46,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
             .getRegistry()
             .registerViewFactory(
                     "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar,null));
+    inAppWebViewStatic = new InAppWebViewStatic(registrar);
     myCookieManager = new MyCookieManager(registrar);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       credentialDatabaseHandler = new CredentialDatabaseHandler(registrar);
@@ -63,6 +66,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
     if (credentialDatabaseHandler != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       credentialDatabaseHandler.dispose();
       credentialDatabaseHandler = null;
+    }
+    if (inAppWebViewStatic != null) {
+      inAppWebViewStatic.dispose();
+      inAppWebViewStatic = null;
     }
     uploadMessageArray = null;
   }

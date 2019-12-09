@@ -14,7 +14,6 @@ public class InAppWebViewOptions: Options {
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
     var useOnDownloadStart = false
-    var useOnTargetBlank = false
     var clearCache = false
     var userAgent = ""
     var applicationNameForUserAgent = ""

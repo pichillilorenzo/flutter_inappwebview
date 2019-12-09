@@ -76,6 +76,10 @@ Classes:
 
 See the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the full documentation.
 
+The API showed in this `README.md` file shows only a part of the documentation that conforms to the master branch only. 
+So, here you could have methods, options, and events that aren't published yet.
+If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).  
+
 ### Load a file inside `assets` folder
 
 To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
@@ -286,6 +290,8 @@ Screenshots:
 * `getTRexRunnerCss`: Gets the css of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerHtml()`.
 * `scrollTo({@required int x, @required int y})`: Scrolls the WebView to the position.
 * `scrollBy({@required int x, @required int y})`: Moves the scrolled position of the WebView.
+* `printCurrentPage`: Prints the current page.
+* `static getDefaultUserAgent`: Gets the default user agent.
 
 ##### About the JavaScript handler
 
@@ -339,7 +345,6 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `useShouldOverrideUrlLoading`: Set to `true` to be able to listen at the `shouldOverrideUrlLoading` event. The default value is `false`.
 * `useOnLoadResource`: Set to `true` to be able to listen at the `onLoadResource` event. The default value is `false`.
 * `useOnDownloadStart`: Set to `true` to be able to listen at the `onDownloadStart` event. The default value is `false`.
-* `useOnTargetBlank`: Set to `true` to be able to listen at the `onTargetBlank` event. The default value is `false`.
 * `clearCache`: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
 * `userAgent`: Sets the user-agent for the WebView.
 * `applicationNameForUserAgent`: Append to the existing user-agent. Setting userAgent will override this.
@@ -369,7 +374,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `displayZoomControls`: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
 * `supportZoom`: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
 * `databaseEnabled`: Set to `true` if you want the database storage API is enabled. The default value is `false`.
-* `domStorageEnabled`: Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
+* `domStorageEnabled`: Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
 * `useWideViewPort`: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
 * `safeBrowsingEnabled`: Sets whether Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links.
 * `mixedContentMode`: Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
@@ -403,6 +408,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `saveFormData`: Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
 * `thirdPartyCookiesEnabled`: Boolean value to enable third party cookies in the WebView.
 * `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
+* `supportMultipleWindows`: Sets whether the WebView whether supports multiple windows.
 
 ##### `InAppWebView` iOS-specific options
 
@@ -429,12 +435,13 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onLoadHttpError`: Event fired when the InAppWebView main page receives an HTTP error.
 * `onProgressChanged`: Event fired when the current progress of loading a page is changed.
 * `onConsoleMessage`: Event fired when the InAppWebView receives a ConsoleMessage.
-* `shouldOverrideUrlLoading`: Give the host application a chance to take control when a URL is about to be loaded in the current WebView (to use this event, the `useShouldOverrideUrlLoading` option must be `true`).
+* `shouldOverrideUrlLoading`: Give the host application a chance to take control when a URL is about to be loaded in the current WebView (to use this event, the `useShouldOverrideUrlLoading` option must be `true`). This event is not called on the initial load of the WebView.
+* `onNavigationStateChange`: Event fired when the navigation state of the InAppWebView changes, for example through the usage of the javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions.
 * `onLoadResource`: Event fired when the InAppWebView loads a resource (to use this event, the `useOnLoadResource` option must be `true`).
 * `onScrollChanged`: Event fired when the InAppWebView scrolls.
 * `onDownloadStart`: Event fired when InAppWebView recognizes and starts a downloadable file (to use this event, the `useOnDownloadStart` option must be `true`).
 * `onLoadResourceCustomScheme`: Event fired when the InAppWebView finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a CustomSchemeResponse to load a specific resource encoded to `base64`.
-* `onTargetBlank`: Event fired when the InAppWebView tries to open a link with `target="_blank"` (to use this event, the `useOnTargetBlank` option must be `true`).
+* `onCreateWindow`: Event fired when the InAppWebView requests the host application to create a new window, for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
 * `onGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
 * `onJsAlert`: Event fired when javascript calls the `alert()` method to display an alert dialog.
 * `onJsConfirm`: Event fired when javascript calls the `confirm()` method to display a confirm dialog.
@@ -448,8 +455,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onAjaxReadyStateChange`: Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
 * `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
 * `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) (to use this event, the `useShouldInterceptFetchRequest` option must be `true`).
-* `onNavigationStateChange`: Event fired when the navigation state of the InAppWebView changes.
 * `onPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
+* `onPrint`: Event fired when `window.print()` is called from JavaScript side.
 
 ### `InAppBrowser` class
 
@@ -495,9 +502,9 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void shouldOverrideUrlLoading(String url) {
-    print("\n\n override $url\n\n");
-    this.webViewController.loadUrl(url: url);
+  void shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) {
+    print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
+    this.webViewController.loadUrl(url: shouldOverrideUrlLoadingRequest.url);
   }
 
   @override

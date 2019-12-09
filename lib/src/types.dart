@@ -1966,3 +1966,94 @@ class PermissionRequestResponse {
     return {"resources": resources, "action": action?.toValue()};
   }
 }
+
+///ShouldOverrideUrlLoadingAction class is used by [shouldOverrideUrlLoading] event.
+///It represents the policy to pass back to the decision handler.
+class ShouldOverrideUrlLoadingAction {
+  final int _value;
+  const ShouldOverrideUrlLoadingAction._internal(this._value);
+  int toValue() => _value;
+
+  ///Cancel the navigation.
+  static const CANCEL = const ShouldOverrideUrlLoadingAction._internal(0);
+
+  ///Allow the navigation to continue.
+  static const ALLOW = const ShouldOverrideUrlLoadingAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": _value,
+    };
+  }
+}
+
+///IosWKNavigationType class represents the type of action triggering a navigation on iOS for the [shouldOverrideUrlLoading] event.
+class IosWKNavigationType {
+  final int _value;
+  const IosWKNavigationType._internal(this._value);
+  int toValue() => _value;
+  static IosWKNavigationType fromValue(int value) {
+    if (value != null && ((value >= 0 && value <= 4) || value == -1))
+      return IosWKNavigationType._internal(value);
+    return null;
+  }
+
+  ///A link with an href attribute was activated by the user.
+  static const LINK_ACTIVATED = const IosWKNavigationType._internal(0);
+
+  ///A form was submitted.
+  static const FORM_SUBMITTED = const IosWKNavigationType._internal(1);
+
+  ///An item from the back-forward list was requested.
+  static const BACK_FORWARD = const IosWKNavigationType._internal(2);
+
+  ///The webpage was reloaded.
+  static const RELOAD = const IosWKNavigationType._internal(3);
+
+  ///A form was resubmitted (for example by going back, going forward, or reloading).
+  static const FORM_RESUBMITTED = const IosWKNavigationType._internal(4);
+
+  ///Navigation is taking place for some other reason.
+  static const OTHER = const IosWKNavigationType._internal(-1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///ShouldOverrideUrlLoadingAction class represents the navigation request used by the [shouldOverrideUrlLoading] event.
+class ShouldOverrideUrlLoadingRequest {
+  ///Represents the url of the navigation request.
+  String url;
+
+  ///Represents the method of the navigation request. On Android < 21, this value is always `GET`.
+  String method;
+
+  ///Represents the headers of the navigation request. On Android < 21, this is always `null`.
+  Map<String, String> headers;
+
+  ///Indicates whether the request was made for the main frame. On Android < 21, this is always `true`.
+  bool isForMainFrame;
+
+  ///Gets whether the request was a result of a server-side redirect. Available only on Android. On Android < 21, this is always `false`.
+  bool androidHasGesture;
+
+  ///Gets whether a gesture (such as a click) was associated with the request.
+  ///For security reasons in certain situations this method may return `false` even though
+  ///the sequence of events which caused the request to be created was initiated by a user
+  ///gesture.
+  ///
+  ///Available only on Android. On Android < 24, this is always `false`.
+  bool androidIsRedirect;
+
+  ///The type of action triggering the navigation. Available only on iOS.
+  IosWKNavigationType iosWKNavigationType;
+
+  ShouldOverrideUrlLoadingRequest({this.url, this.method, this.headers, this.isForMainFrame, this.androidHasGesture, this.androidIsRedirect, this.iosWKNavigationType});
+}

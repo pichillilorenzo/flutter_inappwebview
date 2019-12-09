@@ -37,7 +37,7 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void shouldOverrideUrlLoading(String url) {
+  void shouldOverrideUrlLoading(String url, Map<String, String> headers, bool isForMainFrame) {
     print("\n\n override $url\n\n");
     this.webViewController.loadUrl(url: url);
   }

@@ -6,6 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.os.Build;
+import android.print.PrintAttributes;
+import android.print.PrintDocumentAdapter;
+import android.print.PrintManager;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.MotionEvent;
@@ -17,6 +20,8 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+
+import androidx.annotation.RequiresApi;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -34,12 +39,13 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.OkHttpClient;
 
-import static com.pichillilorenzo.flutter_inappwebview.InAppWebView.PreferredContentModeOptionType.*;
+import static com.pichillilorenzo.flutter_inappwebview.InAppWebView.PreferredContentModeOptionType.fromValue;
 
 final public class InAppWebView extends InputAwareWebView {
 
@@ -57,6 +63,7 @@ final public class InAppWebView extends InputAwareWebView {
   public float scale = getResources().getDisplayMetrics().density;
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
+  public Pattern regexToCancelSubFramesLoadingCompiled;
 
   static final String consoleLogJS = "(function(console) {" +
           "   var oldLogs = {" +
@@ -83,6 +90,10 @@ final public class InAppWebView extends InputAwareWebView {
           "       })(k);" +
           "   }" +
           "})(window.console);";
+
+  static final String printJS = "window.print = function() {" +
+          "  window." + JavaScriptBridgeInterface.name + ".callHandler('onPrint', window.location.href);" +
+          "}";
 
   static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));";
 
@@ -554,7 +565,7 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
     settings.setBuiltInZoomControls(options.builtInZoomControls);
     settings.setDisplayZoomControls(options.displayZoomControls);
-    settings.setSupportMultipleWindows(options.useOnTargetBlank);
+    settings.setSupportMultipleWindows(options.supportMultipleWindows);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
       settings.setSafeBrowsingEnabled(options.safeBrowsingEnabled);
@@ -571,7 +582,7 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (options.applicationNameForUserAgent != null && !options.applicationNameForUserAgent.isEmpty()) {
       if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-        String userAgent = (options.userAgent != null && !options.userAgent.isEmpty()) ? options.userAgent :WebSettings.getDefaultUserAgent(getContext());
+        String userAgent = (options.userAgent != null && !options.userAgent.isEmpty()) ? options.userAgent : WebSettings.getDefaultUserAgent(getContext());
         String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
         settings.setUserAgentString(userAgentWithApplicationName);
       }
@@ -655,6 +666,9 @@ final public class InAppWebView extends InputAwareWebView {
       setLayerType(View.LAYER_TYPE_HARDWARE, null);
     else
       setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    if (options.regexToCancelSubFramesLoading != null) {
+      regexToCancelSubFramesLoadingCompiled = Pattern.compile(options.regexToCancelSubFramesLoading);
+    }
 
     contentBlockerHandler.getRuleList().clear();
     for (Map<String, Map<String, Object>> contentBlocker : options.contentBlockers) {
@@ -996,8 +1010,8 @@ final public class InAppWebView extends InputAwareWebView {
       if (newOptionsMap.get("mixedContentMode") != null && !options.mixedContentMode.equals(newOptions.mixedContentMode))
         settings.setMixedContentMode(newOptions.mixedContentMode);
 
-    if (newOptionsMap.get("useOnTargetBlank") != null && options.useOnTargetBlank != newOptions.useOnTargetBlank)
-      settings.setSupportMultipleWindows(newOptions.useOnTargetBlank);
+    if (newOptionsMap.get("supportMultipleWindows") != null && options.supportMultipleWindows != newOptions.supportMultipleWindows)
+      settings.setSupportMultipleWindows(newOptions.supportMultipleWindows);
 
     if (newOptionsMap.get("useOnDownloadStart") != null && options.useOnDownloadStart != newOptions.useOnDownloadStart) {
       if (newOptions.useOnDownloadStart) {
@@ -1125,6 +1139,13 @@ final public class InAppWebView extends InputAwareWebView {
         setLayerType(View.LAYER_TYPE_HARDWARE, null);
       else
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
+    }
+
+    if (newOptionsMap.get("regexToCancelSubFramesLoading") != null && options.regexToCancelSubFramesLoading != newOptions.regexToCancelSubFramesLoading) {
+      if (newOptions.regexToCancelSubFramesLoading == null)
+        regexToCancelSubFramesLoadingCompiled = null;
+      else
+        regexToCancelSubFramesLoadingCompiled = Pattern.compile(options.regexToCancelSubFramesLoading);
     }
 
     if (newOptions.contentBlockers != null) {
@@ -1302,6 +1323,22 @@ final public class InAppWebView extends InputAwareWebView {
     webSettings.setLoadWithOverviewMode(enabled);
     webSettings.setSupportZoom(enabled);
     webSettings.setBuiltInZoomControls(enabled);
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public void printCurrentPage() {
+    // Get a PrintManager instance
+    PrintManager printManager = (PrintManager) registrar.activity()
+            .getSystemService(Context.PRINT_SERVICE);
+
+    String jobName = getTitle() + " Document";
+
+    // Get a printCurrentPage adapter instance
+    PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
+
+    // Create a printCurrentPage job with name and adapter instance
+    printManager.print(jobName, printAdapter,
+            new PrintAttributes.Builder().build());
   }
 
   @Override

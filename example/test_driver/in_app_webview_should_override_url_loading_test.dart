@@ -50,8 +50,9 @@ class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
                         controller.evaluateJavascript(source: "document.querySelector('#link').click();");
                       }
                     },
-                    shouldOverrideUrlLoading: (InAppWebViewController controller, String url) {
+                    shouldOverrideUrlLoading: (InAppWebViewController controller, ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
                       controller.loadUrl(url: "https://flutter.dev/");
+                      return ShouldOverrideUrlLoadingAction.CANCEL;
                     },
                   ),
                 ),

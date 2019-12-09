@@ -6,6 +6,8 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.drawable.ColorDrawable;
+
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -537,4 +539,41 @@ public class InAppBrowserActivity extends AppCompatActivity {
       webView.loadUrl("about:blank");
     }
   }
+
+  public void scrollTo(Integer x, Integer y) {
+    if (webView != null)
+      webView.scrollTo(x, y);
+  }
+
+  public void scrollBy(Integer x, Integer y) {
+    if (webView != null)
+      webView.scrollBy(x, y);
+  }
+
+  public void onPauseWebView() {
+    if (webView != null)
+      webView.onPause();
+  }
+
+  public void onResumeWebView() {
+    if (webView != null)
+      webView.onResume();
+  }
+
+  public void pauseTimers() {
+    if (webView != null)
+      webView.pauseTimers();
+  }
+
+  public void resumeTimers() {
+    if (webView != null)
+      webView.resumeTimers();
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public void printCurrentPage() {
+    if (webView != null)
+      webView.printCurrentPage();
+  }
+
 }

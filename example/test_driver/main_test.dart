@@ -25,7 +25,7 @@ import 'in_app_webview_on_progress_changed_test.dart';
 import 'in_app_webview_on_received_http_auth_request_test.dart';
 import 'in_app_webview_on_safe_browsing_hit_test.dart';
 import 'in_app_webview_on_scroll_changed_test.dart';
-import 'in_app_webview_on_target_blank_test.dart';
+import 'in_app_webview_on_create_window_test.dart';
 import 'in_app_webview_should_override_url_loading_test.dart';
 import 'in_app_webview_ssl_request_test.dart';
 
@@ -44,7 +44,7 @@ Map<String, WidgetBuilder> getTestRoutes({@required BuildContext context}) {
     '/InAppWebViewShouldOverrideUrlLoadingTest': (context) => InAppWebViewShouldOverrideUrlLoadingTest(),
     '/InAppWebViewOnConsoleMessageTest': (context) => InAppWebViewOnConsoleMessageTest(),
     '/InAppWebViewOnDownloadStartTest': (context) => InAppWebViewOnDownloadStartTest(),
-    '/InAppWebViewOnTargetBlankTest': (context) => InAppWebViewOnTargetBlankTest(),
+    '/InAppWebViewOnCreateWindowTest': (context) => InAppWebViewOnCreateWindowTest(),
     '/InAppWebViewOnJsDialogTest': (context) => InAppWebViewOnJsDialogTest(),
     '/InAppWebViewOnSafeBrowsingHitTest': (context) => InAppWebViewOnSafeBrowsingHitTest(),
     '/InAppWebViewOnReceivedHttpAuthRequestTest': (context) => InAppWebViewOnReceivedHttpAuthRequestTest(),

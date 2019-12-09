@@ -1,3 +1,23 @@
+## 2.2.0
+
+- Updated `clearCache` for Android
+- Added `Promise` javascript [polyfill](https://github.com/taylorhakes/promise-polyfill/blob/master/src/index.js) for webviews that doesn't support it for `window.flutter_inappwebview.callHandler`
+- Added `getDefaultUserAgent` static method to `InAppWebViewController`
+- Added `printCurrentPage` method to `InAppWebViewController`
+- Added `onPrint` event
+- Added `supportMultipleWindows` webview option for Android
+- Added `regexToCancelSubFramesLoading` webview option for Android to cancel subframe requests on `shouldOverrideUrlLoading` event based on a Regular Expression
+- Updated default value for `domStorageEnabled` option to `true` for Android
+- Fix for Android `InAppBrowser` for some controller methods not exposed.
+
+### BREAKING CHANGES
+
+- Updated `shouldOverrideUrlLoading` event: 
+  - the `url` parameter has been moved inside an instance of `ShouldOverrideUrlLoadingRequest` class
+  - it has a return type `ShouldOverrideUrlLoadingAction` to allow or cancel navigation instead of cancel every time the request
+- Renamed `onTargetBlank` to `onCreateWindow`
+- Deleted `useOnTargetBlank` webview option
+
 ## 2.1.0+1
 
 - Fix docs

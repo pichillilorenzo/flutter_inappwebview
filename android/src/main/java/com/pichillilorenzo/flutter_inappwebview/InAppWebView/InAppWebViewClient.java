@@ -1,13 +1,14 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
-import android.content.Intent;
+import android.annotation.SuppressLint;
+import android.annotation.TargetApi;
 import android.graphics.Bitmap;
-import android.net.Uri;
 import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.webkit.ClientCertRequest;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
@@ -43,6 +44,7 @@ import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
 
 import io.flutter.plugin.common.MethodChannel;
 
@@ -51,7 +53,6 @@ public class InAppWebViewClient extends WebViewClient {
   protected static final String LOG_TAG = "IABWebViewClient";
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
-  Map<Integer, String> statusCodeMapping = new HashMap<Integer, String>();
   private static int previousAuthRequestFailureCount = 0;
   private static List<Credential> credentialsProposed = null;
   private String onPageStartedURL = "";
@@ -63,72 +64,105 @@ public class InAppWebViewClient extends WebViewClient {
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
   }
+
+  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+  @Override
+  public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
+    InAppWebView webView = (InAppWebView) view;
+    if (webView.options.useShouldOverrideUrlLoading) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        onShouldOverrideUrlLoading(
+                request.getUrl().toString(),
+                request.getMethod(),
+                request.getRequestHeaders(),
+                request.isForMainFrame(),
+                request.hasGesture(),
+                request.isRedirect());
+      } else {
+        onShouldOverrideUrlLoading(
+                request.getUrl().toString(),
+                request.getMethod(),
+                request.getRequestHeaders(),
+                request.isForMainFrame(),
+                request.hasGesture(),
+                false);
+      }
+      if (webView.regexToCancelSubFramesLoadingCompiled != null) {
+        if (request.isForMainFrame())
+          return true;
+        else {
+          Matcher m = webView.regexToCancelSubFramesLoadingCompiled.matcher(request.getUrl().toString());
+          if (m.matches())
+            return true;
+          else
+            return false;
+        }
+      } else {
+        // There isn't any way to load an URL for a frame that is not the main frame,
+        // so if the request is not for the main frame, the navigation is allowed.
+        return request.isForMainFrame();
+      }
+    }
+    return false;
+  }
+
   @Override
   public boolean shouldOverrideUrlLoading(WebView webView, String url) {
-
     if (((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).options.useShouldOverrideUrlLoading) {
-      Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
-      obj.put("url", url);
-      getChannel().invokeMethod("shouldOverrideUrlLoading", obj);
+      onShouldOverrideUrlLoading(url, "GET", null,true, false, false);
       return true;
     }
+    return false;
+  }
 
-    if (url != null) {
-      if (url.startsWith(WebView.SCHEME_TEL)) {
-        try {
-          Intent intent = new Intent(Intent.ACTION_DIAL);
-          intent.setData(Uri.parse(url));
-          ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
-          return true;
-        } catch (android.content.ActivityNotFoundException e) {
-          Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
-        }
-      } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
-        try {
-          Intent intent = new Intent(Intent.ACTION_VIEW);
-          intent.setData(Uri.parse(url));
-          ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
-          return true;
-        } catch (android.content.ActivityNotFoundException e) {
-          Log.e(LOG_TAG, "Error with " + url + ": " + e.toString());
-        }
-      }
-      // If sms:5551212?body=This is the message
-      else if (url.startsWith("sms:")) {
-        try {
-          Intent intent = new Intent(Intent.ACTION_VIEW);
-
-          // Get address
-          String address;
-          int parmIndex = url.indexOf('?');
-          if (parmIndex == -1) {
-            address = url.substring(4);
-          } else {
-            address = url.substring(4, parmIndex);
-
-            // If body, then set sms body
-            Uri uri = Uri.parse(url);
-            String query = uri.getQuery();
-            if (query != null) {
-              if (query.startsWith("body=")) {
-                intent.putExtra("sms_body", query.substring(5));
-              }
+  public void onShouldOverrideUrlLoading(final String url, final String method, final Map<String, String> headers, final boolean isForMainFrame, boolean hasGesture, boolean isRedirect) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
+    obj.put("method", method);
+    obj.put("headers", headers);
+    obj.put("isForMainFrame", isForMainFrame);
+    obj.put("androidHasGesture", hasGesture);
+    obj.put("androidIsRedirect", isRedirect);
+    obj.put("iosWKNavigationType", null);
+    getChannel().invokeMethod("shouldOverrideUrlLoading", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          Integer action = (Integer) responseMap.get("action");
+          if (action != null) {
+            switch (action) {
+              case 1:
+                if (isForMainFrame) {
+                  // There isn't any way to load an URL for a frame that is not the main frame,
+                  // so call this only on main frame.
+                  InAppWebView webView = ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView);
+                  if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+                    webView.loadUrl(url, headers);
+                  else
+                    webView.loadUrl(url);
+                }
+                return;
+              case 0:
+              default:
+                return;
             }
           }
-          intent.setData(Uri.parse("sms:" + address));
-          intent.putExtra("address", address);
-          intent.setType("vnd.android-dir/mms-sms");
-          ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivity(intent);
-          return true;
-        } catch (android.content.ActivityNotFoundException e) {
-          Log.e(LOG_TAG, "Error sending sms " + url + ":" + e.toString());
         }
       }
-    }
 
-    return super.shouldOverrideUrlLoading(webView, url);
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.d(LOG_TAG, "ERROR: " + s + " " + s1);
+      }
+
+      @Override
+      public void notImplemented() {
+
+      }
+    });
   }
 
   @Override
@@ -138,7 +172,6 @@ public class InAppWebViewClient extends WebViewClient {
 
     String js = InAppWebView.consoleLogJS.replaceAll("[\r\n]+", "");
     js += JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", "");
-
     if (webView.options.useShouldInterceptAjaxRequest) {
       js += InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", "");
     }
@@ -148,6 +181,7 @@ public class InAppWebViewClient extends WebViewClient {
     if (webView.options.useOnLoadResource) {
       js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
     }
+    js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
@@ -665,6 +699,11 @@ public class InAppWebViewClient extends WebViewClient {
   public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
     String url = request.getUrl().toString();
     return shouldInterceptRequest(view, url);
+  }
+
+  @Override
+  public void onUnhandledKeyEvent(WebView view, KeyEvent event) {
+
   }
 
   private MethodChannel getChannel() {

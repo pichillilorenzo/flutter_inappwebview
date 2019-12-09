@@ -418,16 +418,16 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     if (data == null) {
       // to get the URL, create a temp weview
-      final WebView newWebView = new WebView(view.getContext());
+      final WebView tempWebView = new WebView(view.getContext());
       // disable javascript
-      newWebView.getSettings().setJavaScriptEnabled(false);
-      newWebView.setWebViewClient(new WebViewClient(){
+      tempWebView.getSettings().setJavaScriptEnabled(false);
+      tempWebView.setWebViewClient(new WebViewClient(){
         @Override
         public void onPageStarted(WebView v, String url, Bitmap favicon) {
           super.onPageStarted(v, url, favicon);
 
           obj.put("url", url);
-          getChannel().invokeMethod("onTargetBlank", obj);
+          getChannel().invokeMethod("onCreateWindow", obj);
 
           // stop webview loading
           v.stopLoading();
@@ -437,13 +437,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           v.destroy();
         }
       });
-      ((WebView.WebViewTransport)resultMsg.obj).setWebView(newWebView);
+      ((WebView.WebViewTransport) resultMsg.obj).setWebView(tempWebView);
       resultMsg.sendToTarget();
       return true;
     }
 
     obj.put("url", data);
-    getChannel().invokeMethod("onTargetBlank", obj);
+    getChannel().invokeMethod("onCreateWindow", obj);
     return false;
   }
 

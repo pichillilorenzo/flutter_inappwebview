@@ -31,7 +31,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             title: Text("InAppWebView")
         ),
         drawer: myDrawer(context: context),
-        body: Container(
+        body: SafeArea(
             child: Column(children: <Widget>[
               Container(
                 padding: EdgeInsets.all(20.0),
@@ -65,6 +65,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       });
                     },
                     onLoadStop: (InAppWebViewController controller, String url) async {
+                      setState(() {
+                        this.url = url;
+                      });
+                    },
+                    onNavigationStateChange: (InAppWebViewController controller, String url) async {
                       setState(() {
                         this.url = url;
                       });

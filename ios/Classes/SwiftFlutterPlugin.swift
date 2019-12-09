@@ -57,12 +57,10 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         SwiftFlutterPlugin.instance = SwiftFlutterPlugin(with: registrar)
         registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: "com.pichillilorenzo/flutter_inappwebview")
         
+        InAppWebViewStatic(registrar: registrar)
         if #available(iOS 11.0, *) {
             MyCookieManager(registrar: registrar)
-        } else {
-            // Fallback on earlier versions
         }
-        
         CredentialDatabase(registrar: registrar)
     }
     

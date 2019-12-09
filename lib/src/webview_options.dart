@@ -49,9 +49,6 @@ class InAppWebViewOptions
   ///Set to `true` to be able to listen at the [onDownloadStart] event. The default value is `false`.
   bool useOnDownloadStart;
 
-  ///Set to `true` to be able to listen at the [onTargetBlank] event. The default value is `false`.
-  bool useOnTargetBlank;
-
   ///Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
   bool clearCache;
 
@@ -135,7 +132,6 @@ class InAppWebViewOptions
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
       this.useOnDownloadStart = false,
-      this.useOnTargetBlank = false,
       this.clearCache = false,
       this.userAgent = "",
       this.applicationNameForUserAgent = "",
@@ -174,7 +170,6 @@ class InAppWebViewOptions
       "useShouldOverrideUrlLoading": useShouldOverrideUrlLoading,
       "useOnLoadResource": useOnLoadResource,
       "useOnDownloadStart": useOnDownloadStart,
-      "useOnTargetBlank": useOnTargetBlank,
       "clearCache": clearCache,
       "userAgent": userAgent,
       "applicationNameForUserAgent": applicationNameForUserAgent,
@@ -213,7 +208,6 @@ class InAppWebViewOptions
     options.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
     options.useOnLoadResource = map["useOnLoadResource"];
     options.useOnDownloadStart = map["useOnDownloadStart"];
-    options.useOnTargetBlank = map["useOnTargetBlank"];
     options.clearCache = map["clearCache"];
     options.userAgent = map["userAgent"];
     options.applicationNameForUserAgent = map["applicationNameForUserAgent"];
@@ -265,7 +259,7 @@ class AndroidInAppWebViewOptions
   ///Set to `true` if you want the database storage API is enabled. The default value is `false`.
   bool databaseEnabled;
 
-  ///Set to `true` if you want the DOM storage API is enabled. The default value is `false`.
+  ///Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
   bool domStorageEnabled;
 
   ///Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
@@ -392,6 +386,7 @@ class AndroidInAppWebViewOptions
 
   ///Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
   ///Therefore, the Webview form data save feature is disabled. Note that the feature will continue to be supported on older versions of Android as before.
+  ///The default value is `true`.
   bool saveFormData;
 
   ///Boolean value to enable third party cookies in the WebView.
@@ -405,6 +400,13 @@ class AndroidInAppWebViewOptions
   ///The default value is `true`.
   bool hardwareAcceleration;
 
+  ///Sets whether the WebView whether supports multiple windows.
+  ///If set to `true`, [onCreateWindow] event must be implemented by the host application. The default value is `false`.
+  bool supportMultipleWindows;
+
+  ///Regular expression used by [shouldOverrideUrlLoading] event to cancel navigation for frames that are not the main frame.
+  String regexToCancelSubFramesLoading;
+
   AndroidInAppWebViewOptions(
       {this.textZoom = 100,
       this.clearSessionCache = false,
@@ -412,7 +414,7 @@ class AndroidInAppWebViewOptions
       this.displayZoomControls = false,
       this.supportZoom = true,
       this.databaseEnabled = false,
-      this.domStorageEnabled = false,
+      this.domStorageEnabled = true,
       this.useWideViewPort = true,
       this.safeBrowsingEnabled = true,
       this.mixedContentMode,
@@ -445,7 +447,9 @@ class AndroidInAppWebViewOptions
       this.saveFormData = true,
       this.thirdPartyCookiesEnabled = true,
       this.hardwareAcceleration = true,
-      this.initialScale = 0});
+      this.initialScale = 0,
+      this.supportMultipleWindows = false,
+      this.regexToCancelSubFramesLoading});
 
   @override
   Map<String, dynamic> toMap() {
@@ -489,7 +493,9 @@ class AndroidInAppWebViewOptions
       "standardFontFamily": standardFontFamily,
       "saveFormData": saveFormData,
       "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
-      "hardwareAcceleration": hardwareAcceleration
+      "hardwareAcceleration": hardwareAcceleration,
+      "supportMultipleWindows": supportMultipleWindows,
+      "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading
     };
   }
 
@@ -542,6 +548,8 @@ class AndroidInAppWebViewOptions
     options.saveFormData = map["saveFormData"];
     options.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
     options.hardwareAcceleration = map["hardwareAcceleration"];
+    options.supportMultipleWindows = map["supportMultipleWindows"];
+    options.regexToCancelSubFramesLoading = map["regexToCancelSubFramesLoading"];
     return options;
   }
 }

@@ -20,7 +20,6 @@ public class InAppWebViewOptions extends Options {
   public Boolean useShouldOverrideUrlLoading = false;
   public Boolean useOnLoadResource = false;
   public Boolean useOnDownloadStart = false;
-  public Boolean useOnTargetBlank = false;
   public Boolean clearCache = false;
   public String userAgent = "";
   public String applicationNameForUserAgent = "";
@@ -48,7 +47,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean displayZoomControls = false;
   public Boolean supportZoom = true;
   public Boolean databaseEnabled = false;
-  public Boolean domStorageEnabled = false;
+  public Boolean domStorageEnabled = true;
   public Boolean useWideViewPort = true;
   public Boolean safeBrowsingEnabled = true;
   public Integer mixedContentMode;
@@ -82,6 +81,8 @@ public class InAppWebViewOptions extends Options {
   public Boolean saveFormData = true;
   public Boolean thirdPartyCookiesEnabled = true;
   public Boolean hardwareAcceleration = true;
+  public Boolean supportMultipleWindows = false;
+  public String regexToCancelSubFramesLoading;
 
   @Override
   public Object onParse(Map.Entry<String, Object> pair) {

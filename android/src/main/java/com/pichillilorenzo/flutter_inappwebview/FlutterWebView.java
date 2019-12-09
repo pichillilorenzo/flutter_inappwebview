@@ -334,6 +334,14 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(false);
         }
         break;
+      case "printCurrentPage":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          webView.printCurrentPage();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
       default:
         result.notImplemented();
     }

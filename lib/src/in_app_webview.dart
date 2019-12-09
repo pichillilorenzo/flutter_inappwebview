@@ -16,12 +16,14 @@ import 'types.dart';
 import 'in_app_browser.dart';
 import 'webview_options.dart';
 
+///List of forbidden names for JavaScript handlers.
 const javaScriptHandlerForbiddenNames = [
   "onLoadResource",
   "shouldInterceptAjaxRequest",
   "onAjaxReadyStateChange",
   "onAjaxProgress",
-  "shouldInterceptFetchRequest"
+  "shouldInterceptFetchRequest",
+  "onPrint",
 ];
 
 ///InAppWebView Widget class.
@@ -63,10 +65,18 @@ class InAppWebView extends StatefulWidget {
           InAppWebViewController controller, ConsoleMessage consoleMessage)
       onConsoleMessage;
 
-  ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
+  ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
+  ///
+  ///Note that on Android there isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.
+  ///However, if you want to cancel requests for subframes, you can use the [AndroidInAppWebViewOptions.regexToCancelSubFramesLoading] option
+  ///to write a Regular Expression that, if the url request of a subframe matches, then the request of that subframe is canceled.
+  ///
+  ///Also, on Android, this method is not called for POST requests.
+  ///
+  ///[shouldOverrideUrlLoadingRequest] represents the navigation request.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldOverrideUrlLoading] option to `true`.
-  final void Function(InAppWebViewController controller, String url)
+  final Future<ShouldOverrideUrlLoadingAction> Function(InAppWebViewController controller, ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest)
       shouldOverrideUrlLoading;
 
   ///Event fired when the [InAppWebView] loads a resource.
@@ -101,13 +111,14 @@ class InAppWebView extends StatefulWidget {
           InAppWebViewController controller, String scheme, String url)
       onLoadResourceCustomScheme;
 
-  ///Event fired when the [InAppWebView] tries to open a link with `target="_blank"`.
+  ///Event fired when the [InAppWebView] requests the host application to create a new window,
+  ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
   ///
-  ///[url] represents the url of the link.
+  ///[url] represents the url of the request.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnTargetBlank] option to `true`.
+  ///**NOTE**: on Android you need to set [AndroidInAppWebViewOptions.supportMultipleWindows] option to `true`.
   final void Function(InAppWebViewController controller, String url)
-      onTargetBlank;
+      onCreateWindow;
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
   ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
@@ -246,7 +257,7 @@ class InAppWebView extends StatefulWidget {
           InAppWebViewController controller, FetchRequest fetchRequest)
       shouldInterceptFetchRequest;
 
-  ///Event fired when the navigation state of the [InAppWebView] changes throught the usage of
+  ///Event fired when the navigation state of the [InAppWebView] changes through the usage of
   ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event.
   ///
   ///Also, the event is fired when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
@@ -266,6 +277,13 @@ class InAppWebView extends StatefulWidget {
       InAppWebViewController controller,
       String origin,
       List<String> resources) onPermissionRequest;
+
+  ///Event fired when `window.print()` is called from JavaScript side.
+  ///
+  ///[url] represents the url on which is called.
+  ///
+  ///**NOTE**: available on Android 21+.
+  final void Function(InAppWebViewController controller, String url) onPrint;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -310,7 +328,7 @@ class InAppWebView extends StatefulWidget {
     this.onScrollChanged,
     this.onDownloadStart,
     this.onLoadResourceCustomScheme,
-    this.onTargetBlank,
+    this.onCreateWindow,
     this.onGeolocationPermissionsShowPrompt,
     this.onJsAlert,
     this.onJsConfirm,
@@ -326,6 +344,7 @@ class InAppWebView extends StatefulWidget {
     this.shouldInterceptFetchRequest,
     this.onNavigationStateChange,
     this.onPermissionRequest,
+    this.onPrint,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -426,6 +445,7 @@ class _InAppWebViewState extends State<InAppWebView> {
 class InAppWebViewController {
   InAppWebView _widget;
   MethodChannel _channel;
+  static MethodChannel _staticChannel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_static');
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
   // ignore: unused_field
@@ -491,10 +511,20 @@ class InAppWebViewController {
         break;
       case "shouldOverrideUrlLoading":
         String url = call.arguments["url"];
+        String method = call.arguments["method"];
+        Map<String, String> headers = call.arguments["headers"]?.cast<String, String>();
+        bool isForMainFrame = call.arguments["isForMainFrame"];
+        bool androidHasGesture = call.arguments["androidHasGesture"];
+        bool androidIsRedirect = call.arguments["androidIsRedirect"];
+        int iosWKNavigationType = call.arguments["iosWKNavigationType"];
+
+        ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest = ShouldOverrideUrlLoadingRequest(url: url, method: method, headers: headers, isForMainFrame: isForMainFrame,
+          androidHasGesture: androidHasGesture, androidIsRedirect: androidIsRedirect, iosWKNavigationType: IosWKNavigationType.fromValue(iosWKNavigationType));
+
         if (_widget != null && _widget.shouldOverrideUrlLoading != null)
-          _widget.shouldOverrideUrlLoading(this, url);
+          return (await _widget.shouldOverrideUrlLoading(this, shouldOverrideUrlLoadingRequest))?.toMap();
         else if (_inAppBrowser != null)
-          _inAppBrowser.shouldOverrideUrlLoading(url);
+          return (await _inAppBrowser.shouldOverrideUrlLoading(shouldOverrideUrlLoadingRequest))?.toMap();
         break;
       case "onConsoleMessage":
         String message = call.arguments["message"];
@@ -543,11 +573,11 @@ class InAppWebViewController {
           }
         }
         break;
-      case "onTargetBlank":
+      case "onCreateWindow":
         String url = call.arguments["url"];
-        if (_widget != null && _widget.onTargetBlank != null)
-          _widget.onTargetBlank(this, url);
-        else if (_inAppBrowser != null) _inAppBrowser.onTargetBlank(url);
+        if (_widget != null && _widget.onCreateWindow != null)
+          _widget.onCreateWindow(this, url);
+        else if (_inAppBrowser != null) _inAppBrowser.onCreateWindow(url);
         break;
       case "onGeolocationPermissionsShowPrompt":
         String origin = call.arguments["origin"];
@@ -874,6 +904,13 @@ class InAppWebViewController {
             else if (_inAppBrowser != null)
               return jsonEncode(
                   await _inAppBrowser.shouldInterceptFetchRequest(request));
+            return null;
+          case "onPrint":
+            String url = args[0];
+            if (_widget != null && _widget.onPrint != null)
+              _widget.onPrint(this, url);
+            else if (_inAppBrowser != null)
+              _inAppBrowser.onPrint(url);
             return null;
         }
 
@@ -1388,6 +1425,8 @@ class InAppWebViewController {
   ///    });
   ///  """);
   ///```
+  ///
+  ///Forbidden names for JavaScript handlers are defined in [javaScriptHandlerForbiddenNames].
   void addJavaScriptHandler(
       {@required String handlerName,
       @required JavaScriptHandlerCallback callback}) {
@@ -1727,6 +1766,24 @@ class InAppWebViewController {
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     await _channel.invokeMethod('resumeTimers', args);
+  }
+
+  ///Prints the current page.
+  ///
+  ///**NOTE**: available on Android 21+.
+  Future<void> printCurrentPage() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    await _channel.invokeMethod('printCurrentPage', args);
+  }
+
+  ///Gets the default user agent.
+  static Future<String> getDefaultUserAgent() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod('getDefaultUserAgent', args);
   }
 
   /*Future<void> dispose() async {

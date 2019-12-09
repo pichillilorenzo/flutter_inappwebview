@@ -357,10 +357,19 @@ class InAppBrowser {
   ///Event fired when the [InAppBrowser] webview receives a [ConsoleMessage].
   void onConsoleMessage(ConsoleMessage consoleMessage) {}
 
-  ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
+  ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
+  ///
+  ///Note that on Android there isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.
+  ///However, if you want to cancel requests for subframes, you can use the [AndroidInAppWebViewOptions.regexToCancelSubFramesLoading] option
+  ///to write a Regular Expression that, if the url request of a subframe matches, then the request of that subframe is canceled.
+  ///
+  ///Also, on Android, this method is not called for POST requests.
+  ///
+  ///[shouldOverrideUrlLoadingRequest] represents the navigation request.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldOverrideUrlLoading] option to `true`.
-  void shouldOverrideUrlLoading(String url) {}
+  // ignore: missing_return
+  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) {}
 
   ///Event fired when the [InAppBrowser] webview loads a resource.
   ///
@@ -390,12 +399,13 @@ class InAppBrowser {
   Future<CustomSchemeResponse> onLoadResourceCustomScheme(
       String scheme, String url) {}
 
-  ///Event fired when the [InAppBrowser] webview tries to open a link with `target="_blank"`.
+  ///Event fired when the [InAppBrowser] webview requests the host application to create a new window,
+  ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
   ///
-  ///[url] represents the url of the link.
+  ///[url] represents the url of the request.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnTargetBlank] option to `true`.
-  void onTargetBlank(String url) {}
+  ///**NOTE**: on Android you need to set [AndroidInAppWebViewOptions.supportMultipleWindows] option to `true`.
+  void onCreateWindow(String url) {}
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
   ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
@@ -532,6 +542,13 @@ class InAppBrowser {
   // ignore: missing_return
   Future<PermissionRequestResponse> onPermissionRequest(
       String origin, List<String> resources) {}
+
+  ///Event fired when `window.print()` is called from JavaScript side.
+  ///
+  ///[url] represents the url on which is called.
+  ///
+  ///**NOTE**: available on Android 21+.
+  void onPrint(String url) {}
 
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {

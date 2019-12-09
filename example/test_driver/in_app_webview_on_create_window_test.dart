@@ -5,15 +5,15 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'main_test.dart';
 import 'custom_widget_test.dart';
 
-class InAppWebViewOnTargetBlankTest extends WidgetTest {
-  final InAppWebViewOnTargetBlankTestState state = InAppWebViewOnTargetBlankTestState();
+class InAppWebViewOnCreateWindowTest extends WidgetTest {
+  final InAppWebViewOnCreateWindowTestState state = InAppWebViewOnCreateWindowTestState();
 
   @override
-  InAppWebViewOnTargetBlankTestState createState() => state;
+  InAppWebViewOnCreateWindowTestState createState() => state;
 }
 
-class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
-  String appBarTitle = "InAppWebViewOnTargetBlankTest";
+class InAppWebViewOnCreateWindowTestState extends WidgetTestState {
+  String appBarTitle = "InAppWebViewOnCreateWindowTest";
 
   @override
   Widget build(BuildContext context) {
@@ -26,13 +26,12 @@ class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
               Expanded(
                 child: Container(
                   child: InAppWebView(
-                    initialFile: "test_assets/in_app_webview_on_target_blank_test.html",
+                    initialFile: "test_assets/in_app_webview_on_create_window_test.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
                         inAppWebViewOptions: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true,
-                            useOnTargetBlank: true,
                             javaScriptCanOpenWindowsAutomatically: true,
                         )
                     ),
@@ -49,7 +48,7 @@ class InAppWebViewOnTargetBlankTestState extends WidgetTestState {
                         });
                       }
                     },
-                    onTargetBlank: (InAppWebViewController controller, String url) {
+                    onCreateWindow: (InAppWebViewController controller, String url) {
                       controller.loadUrl(url: url);
                     },
                   ),

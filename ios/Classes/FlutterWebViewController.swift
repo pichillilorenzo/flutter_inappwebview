@@ -330,6 +330,20 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                 }
                 result(true)
                 break
+            case "printCurrentPage":
+                if webView != nil {
+                    webView!.printCurrentPage(printCompletionHandler: {(completed, error) in
+                        if !completed, let e = error {
+                            result(false)
+                            return
+                        }
+                        result(true)
+                    })
+                    
+                } else {
+                    result(false)
+                }
+                break
             case "removeFromSuperview":
                 webView!.removeFromSuperview()
                 result(true)

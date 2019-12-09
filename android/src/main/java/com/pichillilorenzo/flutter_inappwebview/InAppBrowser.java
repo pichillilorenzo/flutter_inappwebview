@@ -25,6 +25,7 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
+import android.os.Build;
 import android.os.Parcelable;
 import android.provider.Browser;
 import android.net.Uri;
@@ -33,6 +34,8 @@ import android.webkit.MimeTypeMap;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
 
 import com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ChromeCustomTabsActivity;
 import com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.CustomTabActivityHelper;
@@ -307,13 +310,51 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
       case "clearMatches":
         clearMatches(uuid, result);
         break;
+      case "scrollTo":
+        {
+          Integer x = (Integer) call.argument("x");
+          Integer y = (Integer) call.argument("y");
+          scrollTo(uuid, x, y);
+        }
+        result.success(true);
+        break;
+      case "scrollBy":
+        {
+          Integer x = (Integer) call.argument("x");
+          Integer y = (Integer) call.argument("y");
+          scrollBy(uuid, x, y);
+        }
+        result.success(true);
+        break;
+      case "pause":
+         onPause(uuid);
+         result.success(true);
+        break;
+      case "resume":
+        onResume(uuid);
+        result.success(true);
+        break;
+      case "pauseTimers":
+        pauseTimers(uuid);
+        result.success(true);
+        break;
+      case "resumeTimers":
+        resumeTimers(uuid);
+        result.success(true);
+        break;
+      case "printCurrentPage":
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          printCurrentPage(uuid);
+        }
+        result.success(true);
+        break;
       default:
         result.notImplemented();
     }
 
   }
 
-  private void evaluateJavascript(String uuid, String source, final Result result) {
+  public void evaluateJavascript(String uuid, String source, final Result result) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
       inAppBrowserActivity.evaluateJavascript(source, result);
@@ -322,21 +363,21 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
     }
   }
 
-  private void injectJavascriptFileFromUrl(String uuid, String urlFile) {
+  public void injectJavascriptFileFromUrl(String uuid, String urlFile) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
       inAppBrowserActivity.injectJavascriptFileFromUrl(urlFile);
     }
   }
 
-  private void injectCSSCode(String uuid, String source) {
+  public void injectCSSCode(String uuid, String source) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
       inAppBrowserActivity.injectCSSCode(source);
     }
   }
 
-  private void injectCSSFileFromUrl(String uuid, String urlFile) {
+  public void injectCSSFileFromUrl(String uuid, String urlFile) {
     final InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null) {
       inAppBrowserActivity.injectCSSFileFromUrl(urlFile);
@@ -386,7 +427,7 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
    * Opens the intent, providing a chooser that excludes the current app to avoid
    * circular loops.
    */
-  private void openExternalExcludeCurrentApp(Activity activity, Intent intent) {
+  public void openExternalExcludeCurrentApp(Activity activity, Intent intent) {
     String currentPackage = activity.getPackageName();
     boolean hasCurrentPackage = false;
     PackageManager pm = activity.getPackageManager();
@@ -479,21 +520,21 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
     activity.startActivity(intent);
   }
 
-  private String getUrl(String uuid) {
+  public String getUrl(String uuid) {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       return inAppBrowserActivity.getUrl();
     return null;
   }
 
-  private String getTitle(String uuid) {
+  public String getTitle(String uuid) {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       return inAppBrowserActivity.getWebViewTitle();
     return null;
   }
 
-  private Integer getProgress(String uuid) {
+  public Integer getProgress(String uuid) {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       return inAppBrowserActivity.getProgress();
@@ -728,6 +769,49 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
     if (inAppBrowserActivity != null)
       inAppBrowserActivity.clearMatches(result);
     result.success(false);
+  }
+
+  public void scrollTo(String uuid, Integer x, Integer y) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.scrollTo(x, y);
+  }
+
+  public void scrollBy(String uuid, Integer x, Integer y) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.scrollBy(x, y);
+  }
+
+  public void onPause(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.onPauseWebView();
+  }
+
+  public void onResume(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.onResumeWebView();
+  }
+
+  public void pauseTimers(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.pauseTimers();
+  }
+
+  public void resumeTimers(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.resumeTimers();
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public void printCurrentPage(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.printCurrentPage();
   }
 
   public void dispose() {

@@ -37,9 +37,10 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void shouldOverrideUrlLoading(String url, Map<String, String> headers, bool isForMainFrame) {
-    print("\n\n override $url\n\n");
-    this.webViewController.loadUrl(url: url);
+  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
+    print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
+    this.webViewController.loadUrl(url: shouldOverrideUrlLoadingRequest.url);
+    return ShouldOverrideUrlLoadingAction.CANCEL;
   }
 
   @override

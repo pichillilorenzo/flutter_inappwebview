@@ -301,6 +301,7 @@ class InAppBrowser {
       options = options.cast<String, dynamic>();
       inAppBrowserClassOptions.inAppBrowserOptions =
           InAppBrowserOptions.fromMap(options);
+      inAppBrowserClassOptions.inAppWebViewWidgetOptions = InAppWebViewWidgetOptions();
       inAppBrowserClassOptions.inAppWebViewWidgetOptions.inAppWebViewOptions =
           InAppWebViewOptions.fromMap(options);
       if (Platform.isAndroid) {

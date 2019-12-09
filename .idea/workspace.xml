@@ -15,72 +15,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
-      <change afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebViewStatic.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebViewStatic.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/InAppWebViewStatic.swift" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/ios/Classes/InAppWebViewStatic.swift" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/FlutterWebView.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/FlutterWebView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowser.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebView.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewChromeClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewChromeClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewOptions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebViewFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebViewFlutterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/JavaScriptBridgeInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/JavaScriptBridgeInterface.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/README.md" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/README.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/FlutterWebView.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/FlutterWebView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowser.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowser.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowserActivity.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppBrowserActivity.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebView.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebView.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewChromeClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewChromeClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewClient.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewOptions.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebViewFlutterPlugin.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebViewFlutterPlugin.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/JavaScriptBridgeInterface.java" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/JavaScriptBridgeInterface.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/ios/Flutter/flutter_export_environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/ios/Flutter/flutter_export_environment.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/lib/in_app_browser_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/lib/in_app_browser_example.screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/lib/in_app_webiew_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/lib/in_app_webiew_example.screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_assets/in_app_webview_on_target_blank_test.html" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_assets/in_app_webview_on_create_window_test.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_driver/in_app_webview_on_target_blank_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_driver/in_app_webview_on_create_window_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_driver/in_app_webview_should_override_url_loading_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_driver/in_app_webview_should_override_url_loading_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_driver/main_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/example/test_driver/main_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/flutter_inappwebview.iml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/flutter_inappwebview.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/FlutterWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/FlutterWebViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/InAppWebView.swift" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/InAppWebView.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/InAppWebViewOptions.swift" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/InAppWebViewOptions.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/in_app_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/in_app_browser.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/in_app_webview.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/in_app_webview.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/types.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/types.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/webview_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/lib/src/webview_options.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/.symlinks/plugins/flutter_inappwebview/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/ios/Flutter/flutter_export_environment.sh" beforeDir="false" afterPath="$PROJECT_DIR$/example/ios/Flutter/flutter_export_environment.sh" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/in_app_webiew_example.screen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/example/pubspec.yaml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/test_assets/in_app_webview_on_target_blank_test.html" beforeDir="false" afterPath="$PROJECT_DIR$/example/test_assets/in_app_webview_on_create_window_test.html" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/test_driver/in_app_webview_on_target_blank_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/test_driver/in_app_webview_on_create_window_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/test_driver/in_app_webview_should_override_url_loading_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/test_driver/in_app_webview_should_override_url_loading_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/test_driver/main_test.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/test_driver/main_test.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/flutter_inappwebview.iml" beforeDir="false" afterPath="$PROJECT_DIR$/flutter_inappwebview.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/FlutterWebViewController.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/FlutterWebViewController.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppWebView.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppWebView.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/InAppWebViewOptions.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/InAppWebViewOptions.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" beforeDir="false" afterPath="$PROJECT_DIR$/ios/Classes/SwiftFlutterPlugin.swift" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/in_app_browser.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_browser.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/in_app_webview.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/in_app_webview.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/types.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/types.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/lib/src/webview_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/webview_options.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/pubspec.yaml" beforeDir="false" afterPath="$PROJECT_DIR$/pubspec.yaml" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -100,13 +37,13 @@
   <component name="ExecutionTargetManager" SELECTED_TARGET="Pixel_3_XL_API_24" />
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="194">
-              <caret line="229" column="55" selection-start-line="229" selection-start-column="26" selection-end-line="229" selection-end-column="55" />
+            <state relative-caret-position="149">
+              <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
               <folding>
-                <element signature="e#1907#1927#0" expanded="true" />
+                <element signature="e#0#20#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -160,11 +97,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/README.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="294">
-              <caret line="78" selection-start-line="78" selection-end-line="80" selection-end-column="134" />
+            <state relative-caret-position="197">
+              <caret line="80" column="60" selection-start-line="80" selection-start-column="60" selection-end-line="80" selection-end-column="60" />
               <folding>
                 <element signature="e#0#39#0" expanded="true" />
                 <element signature="e#0#39#0" expanded="true" />
@@ -176,8 +113,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="120">
-              <caret line="8" column="160" selection-start-line="8" selection-start-column="160" selection-end-line="8" selection-end-column="160" />
+            <state relative-caret-position="135">
+              <caret line="9" column="46" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="46" />
             </state>
           </provider>
         </entry>
@@ -291,12 +228,12 @@
         <option value="$PROJECT_DIR$/example/pubspec.yaml" />
         <option value="$PROJECT_DIR$/lib/src/types.dart" />
         <option value="$PROJECT_DIR$/lib/src/webview_options.dart" />
-        <option value="$PROJECT_DIR$/example/lib/main.dart" />
-        <option value="$PROJECT_DIR$/CHANGELOG.md" />
         <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
         <option value="$PROJECT_DIR$/lib/src/in_app_browser.dart" />
         <option value="$PROJECT_DIR$/example/test_driver/in_app_webview_should_override_url_loading_test.dart" />
         <option value="$PROJECT_DIR$/README.md" />
+        <option value="$PROJECT_DIR$/CHANGELOG.md" />
+        <option value="$PROJECT_DIR$/example/lib/main.dart" />
       </list>
     </option>
   </component>
@@ -527,7 +464,7 @@
     <frame x="-1" y="23" width="1920" height="1057" extended-state="0" />
     <editor active="true" />
     <layout>
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6177474" visible="true" weight="0.20766774" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6177474" visible="true" weight="0.20766774" />
       <window_info id="Structure" order="1" sideWeight="0.38225257" side_tool="true" weight="0.2087327" />
       <window_info id="Designer" order="2" />
       <window_info id="Build Variants" order="3" side_tool="true" />
@@ -538,7 +475,7 @@
       <window_info id="Resources Explorer" order="8" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32745314" />
-      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49478307" visible="true" weight="0.4787565" />
+      <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49478307" weight="0.4787565" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.34196892" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
@@ -546,7 +483,7 @@
       <window_info anchor="bottom" id="Android Profiler" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.50532484" side_tool="true" weight="0.35751295" />
       <window_info anchor="bottom" id="Version Control" order="9" />
-      <window_info anchor="bottom" id="Terminal" order="10" sideWeight="0.4946752" weight="0.35336787" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="10" sideWeight="0.4946752" visible="true" weight="0.35336787" />
       <window_info anchor="bottom" id="Logcat" order="11" weight="0.32953367" />
       <window_info anchor="bottom" id="Messages" order="12" sideWeight="0.4968051" weight="0.33782384" />
       <window_info anchor="bottom" id="Dependency Viewer" order="13" weight="0.32800853" />
@@ -896,16 +833,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="194">
-          <caret line="229" column="55" selection-start-line="229" selection-start-column="26" selection-end-line="229" selection-end-column="55" />
-          <folding>
-            <element signature="e#1907#1927#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/webview_options.dart">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="328">
@@ -946,20 +873,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="120">
-          <caret line="8" column="160" selection-start-line="8" selection-start-column="160" selection-end-line="8" selection-end-column="160" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/README.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="294">
-          <caret line="78" selection-start-line="78" selection-end-line="80" selection-end-column="134" />
+        <state relative-caret-position="197">
+          <caret line="80" column="60" selection-start-line="80" selection-start-column="60" selection-end-line="80" selection-end-column="60" />
           <folding>
             <element signature="e#0#39#0" expanded="true" />
             <element signature="e#0#39#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="135">
+          <caret line="9" column="46" selection-start-line="9" selection-start-column="29" selection-end-line="9" selection-end-column="46" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="149">
+          <caret line="54" lean-forward="true" selection-start-line="54" selection-end-line="54" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
           </folding>
         </state>
       </provider>

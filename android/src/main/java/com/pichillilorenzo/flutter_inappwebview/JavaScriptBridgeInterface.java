@@ -274,7 +274,7 @@ public class JavaScriptBridgeInterface {
       public void run() {
 
         // workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/182
-        if (handlerName.equals("flutterInAppWebViewDropDownWorkaroud")) {
+        if (handlerName.equals("flutterInAppWebViewDropDownWorkaround")) {
           try {
             JSONArray jsonArray = new JSONArray(args);
 
@@ -301,7 +301,7 @@ public class JavaScriptBridgeInterface {
               values.add(value);
             }
 
-            webView.showDropDownWorkaroud(selectedValues, values, isMultiSelect, new InAppWebView.DropDownWorkaroudCallback() {
+            webView.showDropDownWorkaround(selectedValues, values, isMultiSelect, new InAppWebView.DropDownWorkaroundCallback() {
               @Override
               public void result(List<String> values) {
                 String value = "{values: " + (new JSONArray(values)) + "}";

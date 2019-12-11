@@ -567,7 +567,7 @@ final public class InAppWebView extends InputAwareWebView {
           "        });" +
           "      }" +
           "      var isMultiple = !!this.flutterInAppWebViewSelect.multiple;" +
-          "      window." + JavaScriptBridgeInterface.name + ".callHandler('flutterInAppWebViewDropDownWorkaroud', getIndexSelectValues(this.flutterInAppWebViewSelect), isMultiple, options).then(function(result) {" +
+          "      window." + JavaScriptBridgeInterface.name + ".callHandler('flutterInAppWebViewDropDownWorkaround', getIndexSelectValues(this.flutterInAppWebViewSelect), isMultiple, options).then(function(result) {" +
           "        if (result != null && result.values != null) {" +
           "          if (!isMultiple) {" +
           "            if (result.values.length > 0) {" +
@@ -1470,7 +1470,7 @@ final public class InAppWebView extends InputAwareWebView {
             new PrintAttributes.Builder().build());
   }
 
-  public void showDropDownWorkaroud(final List<Integer> selectedValues, final List<List<String>> values, final boolean isMultiSelect, final DropDownWorkaroudCallback callback) {
+  public void showDropDownWorkaround(final List<Integer> selectedValues, final List<List<String>> values, final boolean isMultiSelect, final DropDownWorkaroundCallback callback) {
     FrameLayout layout = new FrameLayout(getContext());
 
     final List<String> listViewValues = new ArrayList<String>();
@@ -1495,7 +1495,6 @@ final public class InAppWebView extends InputAwareWebView {
         String value = values.get(position).get(1);
         if (!isMultiSelect) {
           result.add(value);
-          //callback.result(result);
           alertDialog.dismiss();
         } else {
           if (!result.contains(value)) {
@@ -1530,7 +1529,7 @@ final public class InAppWebView extends InputAwareWebView {
     alertDialog.show();
   }
 
-  public static class DropDownWorkaroudCallback {
+  public static class DropDownWorkaroundCallback {
     public void result(List<String> value) {
 
     }

@@ -410,6 +410,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
 * `supportMultipleWindows`: Sets whether the WebView whether supports multiple windows.
 * `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
+* `dropDownWorkaroundEnabled`: Enable a temporary workaround for html dropdowns (`<select>` tags) (available on Android 19+). It requires **JavaScript enabled**. It attempts to block click events for the dropdowns creating a custom `<div>` layer over the dropdown to intercept user's clicks. The default value is `false`.
 
 ##### `InAppWebView` iOS-specific options
 

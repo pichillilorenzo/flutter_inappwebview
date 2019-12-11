@@ -226,7 +226,7 @@ public class InAppWebViewClient extends WebViewClient {
 
     String js = InAppWebView.platformReadyJS.replaceAll("[\r\n]+", "");
 
-    if (webView.options.dropDownWorkaroudEnabled) {
+    if (webView.options.dropDownWorkaroundEnabled) {
       js += InAppWebView.dropDownWorkaroundJS.replaceAll("[\r\n]+", "");
     }
 

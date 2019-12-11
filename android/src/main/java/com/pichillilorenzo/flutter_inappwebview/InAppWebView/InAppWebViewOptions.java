@@ -83,7 +83,7 @@ public class InAppWebViewOptions extends Options {
   public Boolean hardwareAcceleration = true;
   public Boolean supportMultipleWindows = false;
   public String regexToCancelSubFramesLoading;
-  public Boolean dropDownWorkaroudEnabled = false;
+  public Boolean dropDownWorkaroundEnabled = false;
 
   @Override
   public Object onParse(Map.Entry<String, Object> pair) {

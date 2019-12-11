@@ -16,7 +16,9 @@
   <component name="ChangeListManager">
     <list default="true" id="9b41f7a2-a71e-4923-91fb-249d7815b3e7" name="Default" comment="">
       <change beforePath="$PROJECT_DIR$/CHANGELOG.md" beforeDir="false" afterPath="$PROJECT_DIR$/CHANGELOG.md" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/example/lib/main.dart" beforeDir="false" afterPath="$PROJECT_DIR$/example/lib/main.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewClient.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewClient.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewOptions.java" beforeDir="false" afterPath="$PROJECT_DIR$/android/src/main/java/com/pichillilorenzo/flutter_inappwebview/InAppWebView/InAppWebViewOptions.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/lib/src/webview_options.dart" beforeDir="false" afterPath="$PROJECT_DIR$/lib/src/webview_options.dart" afterDir="false" />
     </list>
     <ignored path="$PROJECT_DIR$/.dart_tool/" />
     <ignored path="$PROJECT_DIR$/.idea/" />
@@ -39,11 +41,10 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="112">
-              <caret line="169" selection-start-line="169" selection-end-line="182" selection-end-column="4" />
+            <state relative-caret-position="509">
+              <caret line="78" column="1" selection-start-line="78" selection-start-column="1" selection-end-line="78" selection-end-column="1" />
               <folding>
-                <element signature="e#0#12717#0" expanded="true" />
-                <element signature="e#1907#1927#0" expanded="true" />
+                <element signature="e#0#20#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -64,8 +65,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/lib/src/webview_options.dart">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="314">
-              <caret line="562" column="36" selection-start-line="562" selection-start-column="12" selection-end-line="562" selection-end-column="36" />
+            <state relative-caret-position="234">
+              <caret line="507" column="32" selection-start-line="507" selection-start-column="32" selection-end-line="507" selection-end-column="32" />
               <folding>
                 <element signature="e#0#17#0" expanded="true" />
               </folding>
@@ -121,8 +122,8 @@
       <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="210">
-              <caret line="14" column="20" lean-forward="true" selection-start-line="14" selection-start-column="20" selection-end-line="14" selection-end-column="20" />
+            <state relative-caret-position="180">
+              <caret line="12" column="34" selection-start-line="12" selection-start-column="34" selection-end-line="12" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -239,8 +240,8 @@
         <option value="$PROJECT_DIR$/example/lib/in_app_browser_example.screen.dart" />
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/lib/src/in_app_webview.dart" />
-        <option value="$PROJECT_DIR$/lib/src/webview_options.dart" />
         <option value="$PROJECT_DIR$/example/lib/main.dart" />
+        <option value="$PROJECT_DIR$/lib/src/webview_options.dart" />
         <option value="$PROJECT_DIR$/CHANGELOG.md" />
       </list>
     </option>
@@ -889,31 +890,30 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="112">
-          <caret line="169" selection-start-line="169" selection-end-line="182" selection-end-column="4" />
-          <folding>
-            <element signature="e#0#12717#0" expanded="true" />
-            <element signature="e#1907#1927#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/lib/src/webview_options.dart">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="314">
-          <caret line="562" column="36" selection-start-line="562" selection-start-column="12" selection-end-line="562" selection-end-column="36" />
+        <state relative-caret-position="234">
+          <caret line="507" column="32" selection-start-line="507" selection-start-column="32" selection-end-line="507" selection-end-column="32" />
           <folding>
             <element signature="e#0#17#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/example/lib/main.dart">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="509">
+          <caret line="78" column="1" selection-start-line="78" selection-start-column="1" selection-end-line="78" selection-end-column="1" />
+          <folding>
+            <element signature="e#0#20#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/CHANGELOG.md">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="210">
-          <caret line="14" column="20" lean-forward="true" selection-start-line="14" selection-start-column="20" selection-end-line="14" selection-end-column="20" />
+        <state relative-caret-position="180">
+          <caret line="12" column="34" selection-start-line="12" selection-start-column="34" selection-end-line="12" selection-end-column="34" />
         </state>
       </provider>
     </entry>

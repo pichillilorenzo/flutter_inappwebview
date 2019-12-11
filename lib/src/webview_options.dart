@@ -413,7 +413,7 @@ class AndroidInAppWebViewOptions
   ///The default value is `false`.
   ///
   ///**NOTE**: available on Android 19+.
-  bool dropDownWorkaroudEnabled;
+  bool dropDownWorkaroundEnabled;
 
   AndroidInAppWebViewOptions(
       {this.textZoom = 100,
@@ -458,7 +458,7 @@ class AndroidInAppWebViewOptions
       this.initialScale = 0,
       this.supportMultipleWindows = false,
       this.regexToCancelSubFramesLoading,
-      this.dropDownWorkaroudEnabled = false});
+      this.dropDownWorkaroundEnabled = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -505,7 +505,7 @@ class AndroidInAppWebViewOptions
       "hardwareAcceleration": hardwareAcceleration,
       "supportMultipleWindows": supportMultipleWindows,
       "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
-      "dropDownWorkaroudEnabled": dropDownWorkaroudEnabled
+      "dropDownWorkaroundEnabled": dropDownWorkaroundEnabled
     };
   }
 
@@ -560,7 +560,7 @@ class AndroidInAppWebViewOptions
     options.hardwareAcceleration = map["hardwareAcceleration"];
     options.supportMultipleWindows = map["supportMultipleWindows"];
     options.regexToCancelSubFramesLoading = map["regexToCancelSubFramesLoading"];
-    options.dropDownWorkaroudEnabled = map["dropDownWorkaroudEnabled"];
+    options.dropDownWorkaroundEnabled = map["dropDownWorkaroundEnabled"];
     return options;
   }
 }

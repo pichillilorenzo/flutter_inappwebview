@@ -877,6 +877,10 @@ final public class InAppWebView extends InputAwareWebView {
           "    var clickEventListener = function(event) {" +
           "      var self = this;" +
           "      event.preventDefault();" +
+          "      var isDisabled = !!this.flutterInAppWebViewSelect.disabled;" +
+          "      if (isDisabled) {" +
+          "        return;" +
+          "      }" +
           "      this.flutterInAppWebViewSelect.focus();" +
           "      var options = [];" +
           "      var optionElements = this.flutterInAppWebViewSelect.querySelectorAll(" +
@@ -890,8 +894,7 @@ final public class InAppWebView extends InputAwareWebView {
           "        });" +
           "      }" +
           "      var isMultiple = !!this.flutterInAppWebViewSelect.multiple;" +
-          "      window.flutter_inappwebview" +
-          "        .callHandler(" +
+          "      window." + JavaScriptBridgeInterface.name + ".callHandler(" +
           "          \"flutterInAppWebViewDropDownWorkaround\"," +
           "          getIndexSelectValues(this.flutterInAppWebViewSelect)," +
           "          isMultiple," +

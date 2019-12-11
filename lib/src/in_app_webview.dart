@@ -24,6 +24,7 @@ const javaScriptHandlerForbiddenNames = [
   "onAjaxProgress",
   "shouldInterceptFetchRequest",
   "onPrint",
+  "flutterInAppWebViewDropDownWorkaroud"
 ];
 
 ///InAppWebView Widget class.

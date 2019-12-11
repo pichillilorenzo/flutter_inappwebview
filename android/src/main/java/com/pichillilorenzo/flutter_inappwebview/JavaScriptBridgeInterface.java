@@ -9,7 +9,13 @@ import android.webkit.ValueCallback;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -251,7 +257,7 @@ public class JavaScriptBridgeInterface {
   }
 
   @JavascriptInterface
-  public void _callHandler(final String handlerName, final String _callHandlerID, String args) {
+  public void _callHandler(final String handlerName, final String _callHandlerID, final String args) {
     final InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
 
     final Map<String, Object> obj = new HashMap<>();
@@ -266,6 +272,53 @@ public class JavaScriptBridgeInterface {
     handler.post(new Runnable() {
       @Override
       public void run() {
+
+        // workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/182
+        if (handlerName.equals("flutterInAppWebViewDropDownWorkaroud")) {
+          try {
+            JSONArray jsonArray = new JSONArray(args);
+
+            List<Integer> selectedValues = new ArrayList<>();
+            JSONArray jsonSelectedValues = jsonArray.getJSONArray(0);
+            for(int i = 0; i < jsonSelectedValues.length(); i++) {
+              Integer selectedValue = jsonSelectedValues.getInt(i);
+              selectedValues.add(selectedValue);
+            }
+
+            boolean isMultiSelect = jsonArray.getBoolean(1);
+
+            List<List<String>> values = new ArrayList<>();
+            JSONArray options = jsonArray.getJSONArray(2);
+
+            Log.d(LOG_TAG, options.toString());
+            for(int i = 0; i < options.length(); i++) {
+              JSONObject option = options.getJSONObject(i);
+
+              List<String> value = new ArrayList<>();
+              value.add(option.getString("key"));
+              value.add(option.getString("value"));
+
+              values.add(value);
+            }
+
+            webView.showDropDownWorkaroud(selectedValues, values, isMultiSelect, new InAppWebView.DropDownWorkaroudCallback() {
+              @Override
+              public void result(List<String> values) {
+                String value = "{values: " + (new JSONArray(values)) + "}";
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                  webView.evaluateJavascript("if(window." + name + "[" + _callHandlerID + "] != null) {window." + name + "[" + _callHandlerID + "](" + value + "); delete window." + name + "[" + _callHandlerID + "];}", (ValueCallback<String>) null);
+                }
+                else {
+                  webView.loadUrl("javascript:if(window." + name + "[" + _callHandlerID + "] != null) {window." + name + "[" + _callHandlerID + "](" + value + "); delete window." + name + "[" + _callHandlerID + "];}");
+                }
+              }
+            });
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+          return;
+        }
+
         if (handlerName.equals("onPrint") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           webView.printCurrentPage();
         }

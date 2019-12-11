@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -20,8 +21,13 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.FrameLayout;
+import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.AlertDialog;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -31,6 +37,7 @@ import com.pichillilorenzo.flutter_inappwebview.FlutterWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
+import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayOutputStream;
@@ -506,6 +513,128 @@ final public class InAppWebView extends InputAwareWebView {
           "    }" +
           "  };" +
           "})(window.fetch);";
+
+  // Android API 19+
+  static final String dropDownWorkaroundJS = "(function() {" +
+          "  function getIndexSelectValues(select) {" +
+          "    var result = [];" +
+          "    var options = select && select.options;" +
+          "    for (var i = 0, iLen=options.length; i < iLen; i++) {" +
+          "      var opt = options[i];" +
+          "      if (opt.selected) {" +
+          "        result.push(i);" +
+          "      }" +
+          "    }" +
+          "    return result;" +
+          "  }" +
+          "  function setMultipleValues(select, values) {" +
+          "    var options = select && select.options;" +
+          "    for (var i = 0, iLen=options.length; i < iLen; i++) {" +
+          "      var opt = options[i];" +
+          "      opt.selected = values.indexOf(opt.value) >= 0;" +
+          "    }" +
+          "  }" +
+          "  function addDivWrapper(selectElement) {" +
+          "    var divElement = document.createElement('div');" +
+          "    divElement.flutterInAppWebViewSelect = selectElement;" +
+          "    divElement.class = 'flutterInAppWebViewSelect';" +
+          "    divElement.style.position = 'absolute';" +
+          "    divElement.style.zIndex = 99999999;" +
+          "    divElement.style.backgroundColor = 'transparent';" +
+          "    selectElement.flutterInAppWebViewDivWrapper = divElement;" +
+          "    updateBoundingClientRectDivWrapper(selectElement);" +
+          "    var mutationObserver = new MutationObserver(function(mutations) {" +
+          "      mutations.forEach(function(mutation) {" +
+          "        updateBoundingClientRectDivWrapper(selectElement);" +
+          "      });" +
+          "    });" +
+          "    mutationObserver.observe(selectElement, {" +
+          "      attributes: true," +
+          "      attributeFilter: ['style']" +
+          "    });" +
+          "    selectElement.mutationObserver = mutationObserver;" +
+          "    var clickEventListener = function(event) {" +
+          "      var self = this;" +
+          "      event.preventDefault();" +
+          "      this.flutterInAppWebViewSelect.focus();" +
+          "      var options = [];" +
+          "      var optionElements = this.flutterInAppWebViewSelect.querySelectorAll('option');" +
+          "      for (var i = 0; i < optionElements.length; i++) {" +
+          "        var optionElement = optionElements[i];" +
+          "        options.push({" +
+          "          key: optionElement.textContent," +
+          "          value: optionElement.value" +
+          "        });" +
+          "      }" +
+          "      var isMultiple = !!this.flutterInAppWebViewSelect.multiple;" +
+          "      window." + JavaScriptBridgeInterface.name + ".callHandler('flutterInAppWebViewDropDownWorkaroud', getIndexSelectValues(this.flutterInAppWebViewSelect), isMultiple, options).then(function(result) {" +
+          "        if (result != null && result.values != null) {" +
+          "          if (!isMultiple) {" +
+          "            if (result.values.length > 0) {" +
+          "              self.flutterInAppWebViewSelect.value = result.values[0];" +
+          "            }" +
+          "          } else {" +
+          "            setMultipleValues(self.flutterInAppWebViewSelect, result.values);" +
+          "          }" +
+          "        }" +
+          "        self.flutterInAppWebViewSelect.blur();" +
+          "      });" +
+          "    };" +
+          "    divElement.addEventListener('click', clickEventListener);" +
+          "    divWithEventListeners.push({" +
+          "      divElement: divElement," +
+          "      clickEvent: clickEventListener" +
+          "    });" +
+          "    document.body.appendChild(divElement);" +
+          "  }" +
+          "  function removeDivWrapper(selectElement) {" +
+          "    if (selectElement.flutterInAppWebViewDivWrapper) {" +
+          "      divWithEventListeners.splice(divWithEventListeners.indexOf(selectElement.flutterInAppWebViewDivWrapper), 1);" +
+          "      document.body.removeChild(selectElement.flutterInAppWebViewDivWrapper);" +
+          "    }" +
+          "  }" +
+          "  function updateBoundingClientRectDivWrapper(selectElement) {" +
+          "    selectElement.flutterInAppWebViewDivWrapper.style.width = selectElement.getBoundingClientRect().width + 'px';" +
+          "    selectElement.flutterInAppWebViewDivWrapper.style.height = selectElement.getBoundingClientRect().height + 'px';" +
+          "    selectElement.flutterInAppWebViewDivWrapper.style.top = selectElement.getBoundingClientRect().y + 'px';" +
+          "    selectElement.flutterInAppWebViewDivWrapper.style.left = selectElement.getBoundingClientRect().x + 'px';" +
+          "  }" +
+          "  var selectElements = document.querySelectorAll('select');" +
+          "  var divWithEventListeners = [];" +
+          "  for(var selectElement of selectElements) {" +
+          "    addDivWrapper(selectElement);" +
+          "  }" +
+          "  window.addEventListener('resize', function(event) {" +
+          "    for(var divWithEventListener of divWithEventListeners) {" +
+          "      var divElement = divWithEventListener.divElement;" +
+          "      var selectElement = divElement.flutterInAppWebViewSelect;" +
+          "      divElement.style.width = selectElement.getBoundingClientRect().width + 'px';" +
+          "      divElement.style.height = selectElement.getBoundingClientRect().height + 'px';" +
+          "      divElement.style.top = selectElement.getBoundingClientRect().y + 'px';" +
+          "      divElement.style.left = selectElement.getBoundingClientRect().x + 'px';" +
+          "    }" +
+          "  });" +
+          "  var mutationObserver = new MutationObserver(function(mutations) {" +
+          "    mutations.forEach(function(mutation) {" +
+          "      for(var nodeElement of mutation.addedNodes) {" +
+          "        if (nodeElement.tagName == 'SELECT') {" +
+          "          addDivWrapper(nodeElement);" +
+          "        }" +
+          "      }" +
+          "      for(var nodeElement of mutation.removedNodes) {" +
+          "        if (nodeElement.tagName == 'SELECT') {" +
+          "          removeDivWrapper(nodeElement);" +
+          "          if (nodeElement.mutationObserver) {" +
+          "            nodeElement.mutationObserver.disconnect();" +
+          "          }" +
+          "        }" +
+          "      }" +
+          "    });" +
+          "  });" +
+          "  mutationObserver.observe(document.body, {" +
+          "    childList: true" +
+          "  });" +
+          "})();";
 
 
   public InAppWebView(Context context) {
@@ -1339,6 +1468,72 @@ final public class InAppWebView extends InputAwareWebView {
     // Create a printCurrentPage job with name and adapter instance
     printManager.print(jobName, printAdapter,
             new PrintAttributes.Builder().build());
+  }
+
+  public void showDropDownWorkaroud(final List<Integer> selectedValues, final List<List<String>> values, final boolean isMultiSelect, final DropDownWorkaroudCallback callback) {
+    FrameLayout layout = new FrameLayout(getContext());
+
+    final List<String> listViewValues = new ArrayList<String>();
+    for(List<String> value : values) {
+      listViewValues.add(value.get(0));
+    }
+
+    ListView listView = new ListView(registrar.activeContext());
+    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(registrar.activeContext(), (!isMultiSelect) ? android.R.layout.simple_list_item_1 : android.R.layout.simple_list_item_multiple_choice, listViewValues);
+    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_list_item_multiple_choice);
+    listView.setAdapter(spinnerArrayAdapter);
+
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    final AlertDialog alertDialog = alertDialogBuilder.create();
+
+    final List<String> result = new ArrayList<>();
+
+    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      @Override
+      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+        String value = values.get(position).get(1);
+        if (!isMultiSelect) {
+          result.add(value);
+          //callback.result(result);
+          alertDialog.dismiss();
+        } else {
+          if (!result.contains(value)) {
+            result.add(value);
+          } else {
+            result.remove(value);
+          }
+        }
+      }
+    });
+
+    if (isMultiSelect) {
+      listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
+      listView.setItemsCanFocus(false);
+
+      for(Integer selectedValueIndex : selectedValues) {
+        listView.setItemChecked(selectedValueIndex, true);
+        String value = values.get(selectedValueIndex).get(1);
+        result.add(value);
+      }
+    }
+
+    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
+      @Override
+      public void onDismiss(DialogInterface dialog) {
+        callback.result(result);
+      }
+    });
+
+    layout.addView(listView);
+    alertDialog.setView(layout);
+    alertDialog.show();
+  }
+
+  public static class DropDownWorkaroudCallback {
+    public void result(List<String> value) {
+
+    }
   }
 
   @Override

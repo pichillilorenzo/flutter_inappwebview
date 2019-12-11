@@ -9,6 +9,8 @@
 - Added `regexToCancelSubFramesLoading` webview option for Android to cancel subframe requests on `shouldOverrideUrlLoading` event based on a Regular Expression
 - Updated default value for `domStorageEnabled` option to `true` for Android
 - Fix for Android `InAppBrowser` for some controller methods not exposed.
+- Merge "Fixes null error when calling getOptions for InAppBrowser class" [#214](https://github.com/pichillilorenzo/flutter_inappwebview/pull/214) (thanks to [panndoraBoo](https://github.com/panndoraBoo))
+- Added `enableDropDownWorkaroud` webview option for Android to enable a temporary workaround for html dropdowns (issue [#182](https://github.com/pichillilorenzo/flutter_inappwebview/issues/182))
 
 ### BREAKING CHANGES
 

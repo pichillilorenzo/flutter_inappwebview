@@ -409,6 +409,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `thirdPartyCookiesEnabled`: Boolean value to enable third party cookies in the WebView.
 * `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
 * `supportMultipleWindows`: Sets whether the WebView whether supports multiple windows.
+* `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
 
 ##### `InAppWebView` iOS-specific options
 

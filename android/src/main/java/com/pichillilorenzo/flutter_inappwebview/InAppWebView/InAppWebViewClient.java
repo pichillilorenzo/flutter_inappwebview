@@ -1,6 +1,5 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
-import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.http.SslCertificate;
@@ -226,6 +225,10 @@ public class InAppWebViewClient extends WebViewClient {
     view.requestFocus();
 
     String js = InAppWebView.platformReadyJS.replaceAll("[\r\n]+", "");
+
+    if (webView.options.dropDownWorkaroudEnabled) {
+      js += InAppWebView.dropDownWorkaroundJS.replaceAll("[\r\n]+", "");
+    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);

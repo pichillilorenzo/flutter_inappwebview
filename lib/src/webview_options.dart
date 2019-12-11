@@ -404,8 +404,16 @@ class AndroidInAppWebViewOptions
   ///If set to `true`, [onCreateWindow] event must be implemented by the host application. The default value is `false`.
   bool supportMultipleWindows;
 
-  ///Regular expression used by [shouldOverrideUrlLoading] event to cancel navigation for frames that are not the main frame.
+  ///Regular expression used by [shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
+  ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
   String regexToCancelSubFramesLoading;
+
+  ///Enable a temporary workaround for html dropdowns (`<select>` tags). It requires **JavaScript enabled**.
+  ///It attempts to block click events for the dropdowns creating a custom `<div>` layer over the dropdown to intercept user's clicks.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: available on Android 19+.
+  bool dropDownWorkaroudEnabled;
 
   AndroidInAppWebViewOptions(
       {this.textZoom = 100,
@@ -449,7 +457,8 @@ class AndroidInAppWebViewOptions
       this.hardwareAcceleration = true,
       this.initialScale = 0,
       this.supportMultipleWindows = false,
-      this.regexToCancelSubFramesLoading});
+      this.regexToCancelSubFramesLoading,
+      this.dropDownWorkaroudEnabled = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -495,7 +504,8 @@ class AndroidInAppWebViewOptions
       "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
       "hardwareAcceleration": hardwareAcceleration,
       "supportMultipleWindows": supportMultipleWindows,
-      "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading
+      "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
+      "dropDownWorkaroudEnabled": dropDownWorkaroudEnabled
     };
   }
 
@@ -550,6 +560,7 @@ class AndroidInAppWebViewOptions
     options.hardwareAcceleration = map["hardwareAcceleration"];
     options.supportMultipleWindows = map["supportMultipleWindows"];
     options.regexToCancelSubFramesLoading = map["regexToCancelSubFramesLoading"];
+    options.dropDownWorkaroudEnabled = map["dropDownWorkaroudEnabled"];
     return options;
   }
 }

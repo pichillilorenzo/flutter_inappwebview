@@ -7,6 +7,7 @@ import android.webkit.ValueCallback;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.embedding.engine.plugins.shim.ShimPluginRegistry;
 
 public class InAppWebViewFlutterPlugin implements FlutterPlugin {
   public PluginRegistry.Registrar registrar;
@@ -39,6 +40,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
     //BinaryMessenger messenger = binding.getFlutterEngine().getDartExecutor();
+    ShimPluginRegistry shimPluginRegistry = new ShimPluginRegistry(binding.getFlutterEngine());
+    registrar = shimPluginRegistry.registrarFor("com.pichillilorenzo/flutter_inappwebview");
     inAppBrowser = new InAppBrowser(registrar);
     binding
             .getFlutterEngine()

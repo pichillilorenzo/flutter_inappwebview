@@ -854,8 +854,11 @@ final public class InAppWebView extends InputAwareWebView {
           "    var spanElement = document.createElement(\"span\");" +
           "    spanElement.flutterInAppWebViewSelect = selectElement;" +
           "    new ResizeSensor(spanElement, function() {" +
-          "      selectElement.style.width = spanElement.getBoundingClientRect().width + \"px\";" +
-          "      selectElement.style.height = spanElement.getBoundingClientRect().height + \"px\";" +
+          "      var style = selectElement.currentStyle || window.getComputedStyle(selectElement);" +
+          "      var xMargin = parseFloat(style.marginLeft) + parseFloat(style.marginRight);" +
+          "      var yMargin = parseFloat(style.marginTop) + parseFloat(style.marginBottom);" +
+          "      selectElement.style.width = (spanElement.getBoundingClientRect().width - xMargin) + \"px\";" +
+          "      selectElement.style.height = (spanElement.getBoundingClientRect().height - yMargin) + \"px\";" +
           "    });" +
           "    spanElement.className = \"flutterInAppWebViewSelect-\" + uuid;" +
           "    spanElement.style.padding = \"0px\";" +

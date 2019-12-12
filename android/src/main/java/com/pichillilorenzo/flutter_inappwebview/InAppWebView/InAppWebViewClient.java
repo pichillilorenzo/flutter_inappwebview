@@ -180,6 +180,9 @@ public class InAppWebViewClient extends WebViewClient {
     if (webView.options.useOnLoadResource) {
       js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
     }
+    if (webView.options.dropDownWorkaroundEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      js += InAppWebView.dropDownWorkaroundJS.replaceAll("[\r\n]+", "");
+    }
     js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -225,10 +228,6 @@ public class InAppWebViewClient extends WebViewClient {
     view.requestFocus();
 
     String js = InAppWebView.platformReadyJS.replaceAll("[\r\n]+", "");
-
-    if (webView.options.dropDownWorkaroundEnabled) {
-      js += InAppWebView.dropDownWorkaroundJS.replaceAll("[\r\n]+", "");
-    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);

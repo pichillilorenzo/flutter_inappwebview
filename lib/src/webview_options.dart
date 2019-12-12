@@ -410,6 +410,7 @@ class AndroidInAppWebViewOptions
 
   ///Enable a temporary workaround for html dropdowns (`<select>` tags). It requires **JavaScript enabled**.
   ///It attempts to block click events for the dropdowns creating a custom `<div>` layer over the dropdown to intercept user's clicks.
+  ///This workaround is applied as soon as the web page fires the `DOMContentLoaded` JavaScript event.
   ///The default value is `false`.
   ///
   ///**NOTE**: available on Android 19+.

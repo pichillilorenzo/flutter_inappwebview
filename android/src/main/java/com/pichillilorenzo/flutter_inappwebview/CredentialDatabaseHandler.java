@@ -13,6 +13,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
@@ -22,15 +23,13 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
 
   static final String LOG_TAG = "CredentialDatabaseHandler";
 
-  public static PluginRegistry.Registrar registrar;
   public static MethodChannel channel;
   public static CredentialDatabase credentialDatabase;
 
-  public CredentialDatabaseHandler(PluginRegistry.Registrar r) {
-    registrar = r;
-    channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappwebview_credential_database");
+  public CredentialDatabaseHandler(BinaryMessenger messenger) {
+    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_credential_database");
     channel.setMethodCallHandler(this);
-    credentialDatabase = CredentialDatabase.getInstance(registrar.context());
+    credentialDatabase = CredentialDatabase.getInstance(Shared.applicationContext);
   }
 
   @Override

@@ -290,7 +290,6 @@ public class JavaScriptBridgeInterface {
             List<List<String>> values = new ArrayList<>();
             JSONArray options = jsonArray.getJSONArray(2);
 
-            Log.d(LOG_TAG, options.toString());
             for(int i = 0; i < options.length(); i++) {
               JSONObject option = options.getJSONObject(i);
 

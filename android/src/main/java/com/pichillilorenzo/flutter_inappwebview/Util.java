@@ -27,7 +27,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.OkHttpClient;
 
 public class Util {
@@ -37,13 +36,13 @@ public class Util {
 
   private Util() {}
 
-  public static String getUrlAsset(PluginRegistry.Registrar registrar, String assetFilePath) throws IOException {
-    String key = registrar.lookupKeyForAsset(assetFilePath);
+  public static String getUrlAsset(String assetFilePath) throws IOException {
+    String key = (Shared.registrar != null) ? Shared.registrar.lookupKeyForAsset(assetFilePath) : Shared.flutterAssets.getAssetFilePathByName(assetFilePath);
     InputStream is = null;
     IOException e = null;
 
     try {
-      is = getFileAsset(registrar, assetFilePath);
+      is = getFileAsset(assetFilePath);
     } catch (IOException ex) {
       e = ex;
     } finally {
@@ -62,9 +61,9 @@ public class Util {
     return ANDROID_ASSET_URL + key;
   }
 
-  public static InputStream getFileAsset(PluginRegistry.Registrar registrar, String assetFilePath) throws IOException {
-    String key = registrar.lookupKeyForAsset(assetFilePath);
-    AssetManager mg = registrar.activeContext().getResources().getAssets();
+  public static InputStream getFileAsset(String assetFilePath) throws IOException {
+    String key = (Shared.registrar != null) ? Shared.registrar.lookupKeyForAsset(assetFilePath) : Shared.flutterAssets.getAssetFilePathByName(assetFilePath);
+    AssetManager mg = Shared.applicationContext.getResources().getAssets();
     return mg.open(key);
   }
 
@@ -116,12 +115,12 @@ public class Util {
     }
   }
 
-  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(PluginRegistry.Registrar registrar, String certificatePath, String certificatePassword, String keyStoreType) {
+  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate( String certificatePath, String certificatePassword, String keyStoreType) {
 
     PrivateKeyAndCertificates privateKeyAndCertificates = null;
 
     try {
-      InputStream certificateFileStream = getFileAsset(registrar, certificatePath);
+      InputStream certificateFileStream = getFileAsset(certificatePath);
 
       KeyStore keyStore = KeyStore.getInstance(keyStoreType);
       keyStore.load(certificateFileStream, certificatePassword != null ? certificatePassword.toCharArray() : null);

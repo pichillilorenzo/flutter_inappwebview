@@ -22,6 +22,7 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
@@ -47,6 +48,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -57,16 +59,14 @@ import io.flutter.plugin.common.PluginRegistry.Registrar;
  */
 public class InAppBrowser implements MethodChannel.MethodCallHandler {
 
-  public Registrar registrar;
   public MethodChannel channel;
   public Map<String, InAppBrowserActivity> webViewActivities = new HashMap<>();
   public Map<String, ChromeCustomTabsActivity> chromeCustomTabsActivities = new HashMap<>();
 
   protected static final String LOG_TAG = "IABFlutterPlugin";
 
-  public InAppBrowser(Registrar r) {
-    registrar = r;
-    channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappbrowser");
+  public InAppBrowser(BinaryMessenger messenger) {
+    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappbrowser");
     channel.setMethodCallHandler(this);
   }
 
@@ -74,7 +74,7 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
   public void onMethodCall(final MethodCall call, final Result result) {
     String source;
     String urlFile;
-    final Activity activity = registrar.activity();
+    final Activity activity = Shared.activity;
     final String uuid = (String) call.argument("uuid");
 
     switch (call.method) {
@@ -114,7 +114,7 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
                 if (isLocalFile) {
                   // check if the asset file exists
                   try {
-                    url = Util.getUrlAsset(registrar, url);
+                    url = Util.getUrlAsset(url);
                   } catch (IOException e) {
                     e.printStackTrace();
                     result.error(LOG_TAG, url + " asset file cannot be found!", e);

@@ -180,9 +180,6 @@ public class InAppWebViewClient extends WebViewClient {
     if (webView.options.useOnLoadResource) {
       js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
     }
-    if (webView.options.dropDownWorkaroundEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      js += InAppWebView.dropDownWorkaroundJS.replaceAll("[\r\n]+", "");
-    }
     js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -540,7 +537,7 @@ public class InAppWebViewClient extends WebViewClient {
                   String certificatePath = (String) responseMap.get("certificatePath");
                   String certificatePassword = (String) responseMap.get("certificatePassword");
                   String androidKeyStoreType = (String) responseMap.get("androidKeyStoreType");
-                  Util.PrivateKeyAndCertificates privateKeyAndCertificates = Util.loadPrivateKeyAndCertificate(webView.registrar, certificatePath, certificatePassword, androidKeyStoreType);
+                  Util.PrivateKeyAndCertificates privateKeyAndCertificates = Util.loadPrivateKeyAndCertificate(certificatePath, certificatePassword, androidKeyStoreType);
                   request.proceed(privateKeyAndCertificates.privateKey, privateKeyAndCertificates.certificates);
                 }
                 return;

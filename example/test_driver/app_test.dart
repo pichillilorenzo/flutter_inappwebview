@@ -263,7 +263,7 @@ void main() {
 
       final sideMenuButton = find.byValueKey('SideMenu');
       final listTiles = find.byValueKey('ListTiles');
-      final nextTest = find.byValueKey('InAppWebViewOnTargetBlankTest');
+      final nextTest = find.byValueKey('InAppWebViewOnCreateWindowTest');
 
       while((await driver.getText(appBarTitle)) == "InAppWebViewOnDownloadStartTest") {
         await Future.delayed(const Duration(milliseconds: 500));
@@ -277,14 +277,14 @@ void main() {
       await driver.tap(nextTest);
     }, timeout: new Timeout(new Duration(minutes: 5)));
 
-    test('InAppWebViewOnTargetBlankTest', () async {
+    test('InAppWebViewOnCreateWindowTest', () async {
       final appBarTitle = find.byValueKey('AppBarTitle');
 
       final sideMenuButton = find.byValueKey('SideMenu');
       final listTiles = find.byValueKey('ListTiles');
       final nextTest = find.byValueKey('InAppWebViewOnJsDialogTest');
 
-      while((await driver.getText(appBarTitle)) == "InAppWebViewOnTargetBlankTest") {
+      while((await driver.getText(appBarTitle)) == "InAppWebViewOnCreateWindowTest") {
         await Future.delayed(const Duration(milliseconds: 500));
       }
 

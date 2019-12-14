@@ -1,18 +1,23 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
+import android.app.Activity;
+import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.webkit.ValueCallback;
 
-import io.flutter.plugin.common.MethodChannel;
+import io.flutter.embedding.engine.plugins.activity.ActivityAware;
+import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
+import io.flutter.plugin.platform.PlatformViewRegistry;
+import io.flutter.view.FlutterView;
 
-public class InAppWebViewFlutterPlugin implements FlutterPlugin {
-  public PluginRegistry.Registrar registrar;
-  public MethodChannel channel;
+public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
-  protected static final String LOG_TAG = "InAppWebViewFlutterPlugin";
+  protected static final String LOG_TAG = "InAppWebViewFlutterPL";
 
   public static InAppBrowser inAppBrowser;
   public static InAppWebViewStatic inAppWebViewStatic;
@@ -23,33 +28,32 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
   public InAppWebViewFlutterPlugin() {}
 
   public static void registerWith(PluginRegistry.Registrar registrar) {
-    inAppBrowser = new InAppBrowser(registrar);
-
-    registrar
-            .platformViewRegistry()
-            .registerViewFactory(
-                    "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar, registrar.view()));
-    new InAppWebViewStatic(registrar);
-    new MyCookieManager(registrar);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      new CredentialDatabaseHandler(registrar);
-    }
+    final InAppWebViewFlutterPlugin instance = new InAppWebViewFlutterPlugin();
+    Shared.registrar = registrar;
+    instance.onAttachedToEngine(
+            registrar.context(), registrar.messenger(), registrar.activity(), registrar.platformViewRegistry(), registrar.view());
   }
 
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
-    //BinaryMessenger messenger = binding.getFlutterEngine().getDartExecutor();
-    inAppBrowser = new InAppBrowser(registrar);
-    binding
-            .getFlutterEngine()
-            .getPlatformViewsController()
-            .getRegistry()
-            .registerViewFactory(
-                    "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(registrar,null));
-    inAppWebViewStatic = new InAppWebViewStatic(registrar);
-    myCookieManager = new MyCookieManager(registrar);
+    Shared.flutterAssets = binding.getFlutterAssets();
+    onAttachedToEngine(
+            binding.getApplicationContext(), binding.getBinaryMessenger(), null, binding.getPlatformViewRegistry(), null);
+  }
+
+
+  private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger, Activity activity, PlatformViewRegistry platformViewRegistry, FlutterView flutterView) {
+    Shared.applicationContext = applicationContext;
+    Shared.activity = activity;
+
+    inAppBrowser = new InAppBrowser(messenger);
+
+    platformViewRegistry.registerViewFactory(
+                    "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(messenger, flutterView));
+    inAppWebViewStatic = new InAppWebViewStatic(messenger);
+    myCookieManager = new MyCookieManager(messenger);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      credentialDatabaseHandler = new CredentialDatabaseHandler(registrar);
+      credentialDatabaseHandler = new CredentialDatabaseHandler(messenger);
     }
   }
 
@@ -72,5 +76,29 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin {
       inAppWebViewStatic = null;
     }
     uploadMessageArray = null;
+  }
+
+  @Override
+  public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
+    Shared.activityPluginBinding = activityPluginBinding;
+    Shared.activity = activityPluginBinding.getActivity();
+  }
+
+  @Override
+  public void onDetachedFromActivityForConfigChanges() {
+    Shared.activityPluginBinding = null;
+    Shared.activity = null;
+  }
+
+  @Override
+  public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
+    Shared.activityPluginBinding = activityPluginBinding;
+    Shared.activity = activityPluginBinding.getActivity();
+  }
+
+  @Override
+  public void onDetachedFromActivity() {
+    Shared.activityPluginBinding = null;
+    Shared.activity = null;
   }
 }

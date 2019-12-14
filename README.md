@@ -13,10 +13,12 @@ A Flutter plugin that allows you to add an inline webview or open an in-app brow
 
 - Dart sdk: ">=2.0.0-dev.68.0 <3.0.0"
 - Flutter: ">=1.9.1+hotfix.5 <2.0.0"
-- Android: `minSdkVersion 17`
+- Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
 ### IMPORTANT Note for Android
+
+If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift` to add support for `androidx`, otherwise it won't work (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app).
 
 During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `android/app/build.gradle` file to at least `17`.
 
@@ -26,7 +28,7 @@ Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development
 
 ### IMPORTANT Note for iOS
 
-If you are starting a new fresh app, you need to create the Flutter App with `flutter create -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
+If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```
 === BUILD TARGET flutter_inappwebview OF PROJECT Pods WITH CONFIGURATION Debug ===
 The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2, 5.0. This setting can be set in the build settings editor.
@@ -410,7 +412,6 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
 * `supportMultipleWindows`: Sets whether the WebView whether supports multiple windows.
 * `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
-* `dropDownWorkaroundEnabled`: Enable a temporary workaround for html dropdowns (`<select>` tags) (available on Android 19+). It requires **JavaScript enabled**. It attempts to block click events for the dropdowns creating a custom `<div>` layer over the dropdown to intercept user's clicks. This workaround is applied as soon as the web page fires the `DOMContentLoaded` JavaScript event. The default value is `false`.
 
 ##### `InAppWebView` iOS-specific options
 

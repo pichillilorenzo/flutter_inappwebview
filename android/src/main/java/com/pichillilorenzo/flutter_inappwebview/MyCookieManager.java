@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
@@ -21,13 +22,11 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
 
   static final String LOG_TAG = "MyCookieManager";
 
-  public static PluginRegistry.Registrar registrar;
   public static MethodChannel channel;
   public static CookieManager cookieManager;
 
-  public MyCookieManager(PluginRegistry.Registrar r) {
-    registrar = r;
-    channel = new MethodChannel(registrar.messenger(), "com.pichillilorenzo/flutter_inappwebview_cookiemanager");
+  public MyCookieManager(BinaryMessenger messenger) {
+    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_cookiemanager");
     channel.setMethodCallHandler(this);
     cookieManager = CookieManager.getInstance();
   }
@@ -110,7 +109,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieManager.flush();
     }
     else {
-      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(Shared.applicationContext);
       cookieSyncMngr.startSync();
       cookieManager.setCookie(url, cookieValue);
       result.success(true);
@@ -155,7 +154,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieManager.flush();
     }
     else {
-      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(Shared.applicationContext);
       cookieSyncMngr.startSync();
       cookieManager.setCookie(url, cookieValue);
       result.success(true);
@@ -172,7 +171,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     if (cookiesString != null) {
 
       if (Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-        cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+        cookieSyncMngr = CookieSyncManager.createInstance(Shared.applicationContext);
         cookieSyncMngr.startSync();
       }
 
@@ -208,7 +207,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieManager.flush();
     }
     else {
-      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(registrar.context());
+      CookieSyncManager cookieSyncMngr = CookieSyncManager.createInstance(Shared.applicationContext);
       cookieSyncMngr.startSync();
       cookieManager.removeAllCookie();
       result.success(true);

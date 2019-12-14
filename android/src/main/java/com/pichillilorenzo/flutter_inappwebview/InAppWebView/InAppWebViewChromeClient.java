@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -31,6 +32,8 @@ import com.pichillilorenzo.flutter_inappwebview.FlutterWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -47,7 +50,6 @@ import static android.app.Activity.RESULT_OK;
 public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
-  private PluginRegistry.Registrar registrar;
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
   private ValueCallback<Uri> mUploadMessage;
@@ -58,30 +60,31 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private int mOriginalOrientation;
   private int mOriginalSystemUiVisibility;
 
-  public InAppWebViewChromeClient(Object obj, PluginRegistry.Registrar registrar) {
-    super();
-    this.registrar = registrar;
+  public InAppWebViewChromeClient(Object obj) {
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
 
-    registrar.addActivityResultListener(this);
+    if (Shared.registrar != null)
+      Shared.registrar.addActivityResultListener(this);
+    else
+      Shared.activityPluginBinding.addActivityResultListener(this);
   }
 
   public Bitmap getDefaultVideoPoster() {
     if (mCustomView == null) {
       return null;
     }
-    return BitmapFactory.decodeResource(this.registrar.activeContext().getResources(), 2130837573);
+    return BitmapFactory.decodeResource(Shared.activity.getApplicationContext().getResources(), 2130837573);
   }
 
   public void onHideCustomView() {
-    View decorView = this.registrar.activity().getWindow().getDecorView();
+    View decorView = Shared.activity.getWindow().getDecorView();
     ((FrameLayout) decorView).removeView(this.mCustomView);
     this.mCustomView = null;
     decorView.setSystemUiVisibility(this.mOriginalSystemUiVisibility);
-    this.registrar.activity().setRequestedOrientation(this.mOriginalOrientation);
+    Shared.activity.setRequestedOrientation(this.mOriginalOrientation);
     this.mCustomViewCallback.onCustomViewHidden();
     this.mCustomViewCallback = null;
   }
@@ -91,10 +94,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       onHideCustomView();
       return;
     }
-    View decorView = this.registrar.activity().getWindow().getDecorView();
+    View decorView = Shared.activity.getWindow().getDecorView();
     this.mCustomView = paramView;
     this.mOriginalSystemUiVisibility = decorView.getSystemUiVisibility();
-    this.mOriginalOrientation = this.registrar.activity().getRequestedOrientation();
+    this.mOriginalOrientation = Shared.activity.getRequestedOrientation();
     this.mCustomViewCallback = paramCustomViewCallback;
     this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
     ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
@@ -173,7 +176,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, clickListener);
@@ -264,7 +267,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
@@ -381,7 +384,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(registrar.activeContext(), R.style.Theme_AppCompat_Dialog_Alert);
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
@@ -530,7 +533,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("image/*");
-    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    Shared.activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
 
   }
 
@@ -540,7 +543,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("*/*");
-    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(
+    Shared.activity.startActivityForResult(
             Intent.createChooser(i, "File Browser"),
             FILECHOOSER_RESULTCODE);
   }
@@ -551,7 +554,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("image/*");
-    ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    Shared.activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
 
   }
 
@@ -569,7 +572,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
       chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
       chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-      ((inAppBrowserActivity != null) ? inAppBrowserActivity : flutterWebView.activity).startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
+      Shared.activity.startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
     } catch (ActivityNotFoundException e) {
       e.printStackTrace();
       return false;

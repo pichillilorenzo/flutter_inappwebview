@@ -408,14 +408,6 @@ class AndroidInAppWebViewOptions
   ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
   String regexToCancelSubFramesLoading;
 
-  ///Enable a temporary workaround for html dropdowns (`<select>` tags). It requires **JavaScript enabled**.
-  ///It attempts to block click events for the dropdowns creating a custom `<div>` layer over the dropdown to intercept user's clicks.
-  ///This workaround is applied as soon as the web page fires the `DOMContentLoaded` JavaScript event.
-  ///The default value is `false`.
-  ///
-  ///**NOTE**: available on Android 19+.
-  bool dropDownWorkaroundEnabled;
-
   AndroidInAppWebViewOptions(
       {this.textZoom = 100,
       this.clearSessionCache = false,
@@ -458,8 +450,7 @@ class AndroidInAppWebViewOptions
       this.hardwareAcceleration = true,
       this.initialScale = 0,
       this.supportMultipleWindows = false,
-      this.regexToCancelSubFramesLoading,
-      this.dropDownWorkaroundEnabled = false});
+      this.regexToCancelSubFramesLoading});
 
   @override
   Map<String, dynamic> toMap() {
@@ -505,8 +496,7 @@ class AndroidInAppWebViewOptions
       "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
       "hardwareAcceleration": hardwareAcceleration,
       "supportMultipleWindows": supportMultipleWindows,
-      "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
-      "dropDownWorkaroundEnabled": dropDownWorkaroundEnabled
+      "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading
     };
   }
 
@@ -561,7 +551,6 @@ class AndroidInAppWebViewOptions
     options.hardwareAcceleration = map["hardwareAcceleration"];
     options.supportMultipleWindows = map["supportMultipleWindows"];
     options.regexToCancelSubFramesLoading = map["regexToCancelSubFramesLoading"];
-    options.dropDownWorkaroundEnabled = map["dropDownWorkaroundEnabled"];
     return options;
   }
 }

@@ -58,7 +58,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     webView = findViewById(R.id.webView);
     webView.inAppBrowserActivity = this;
-    webView.registrar = InAppWebViewFlutterPlugin.inAppBrowser.registrar;
 
     Bundle b = getIntent().getExtras();
     uuid = b.getString("uuid");

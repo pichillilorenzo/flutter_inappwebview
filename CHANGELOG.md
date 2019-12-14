@@ -1,5 +1,6 @@
-## 2.2.0
+## 3.0.0
 
+- Updated for Flutter 1.12 new Java Embedding API (Android)
 - Updated `clearCache` for Android
 - Added `Promise` javascript [polyfill](https://github.com/taylorhakes/promise-polyfill/blob/master/src/index.js) for webviews that doesn't support it for `window.flutter_inappwebview.callHandler`
 - Added `getDefaultUserAgent` static method to `InAppWebViewController`
@@ -11,6 +12,7 @@
 - Fix for Android `InAppBrowser` for some controller methods not exposed.
 - Merge "Fixes null error when calling getOptions for InAppBrowser class" [#214](https://github.com/pichillilorenzo/flutter_inappwebview/pull/214) (thanks to [panndoraBoo](https://github.com/panndoraBoo))
 - Added `dropDownWorkaroundEnabled` webview option for Android to enable a temporary workaround for html dropdowns (issue [#182](https://github.com/pichillilorenzo/flutter_inappwebview/issues/182))
+- Fixed "App Crashes after clicking on dropdown (Using inappwebview)" [#182](https://github.com/pichillilorenzo/flutter_inappwebview/issues/182)
 
 ### BREAKING CHANGES
 

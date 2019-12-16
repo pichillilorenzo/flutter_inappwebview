@@ -48,6 +48,7 @@ public class InAppWebViewOptions: Options {
     var dataDetectorTypes: [String] = ["NONE"] // WKDataDetectorTypeNone
     var preferredContentMode = 0
     var sharedCookiesEnabled = false
+    var automaticallyAdjustsScrollIndicatorInsets = false
     
     override init(){
         super.init()

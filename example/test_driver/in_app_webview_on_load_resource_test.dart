@@ -35,7 +35,7 @@ class InAppWebViewOnLoadResourceTestState extends WidgetTestState {
                     initialFile: "test_assets/in_app_webview_on_load_resource_test.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                           clearCache: true,
                           debuggingEnabled: true,
                           useOnLoadResource: true

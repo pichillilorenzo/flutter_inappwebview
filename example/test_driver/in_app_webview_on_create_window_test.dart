@@ -29,7 +29,7 @@ class InAppWebViewOnCreateWindowTestState extends WidgetTestState {
                     initialFile: "test_assets/in_app_webview_on_create_window_test.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true,
                             javaScriptCanOpenWindowsAutomatically: true,
@@ -48,8 +48,8 @@ class InAppWebViewOnCreateWindowTestState extends WidgetTestState {
                         });
                       }
                     },
-                    onCreateWindow: (InAppWebViewController controller, String url) {
-                      controller.loadUrl(url: url);
+                    onCreateWindow: (InAppWebViewController controller, OnCreateWindowRequest onCreateWindowRequest) {
+                      controller.loadUrl(url: onCreateWindowRequest.url);
                     },
                   ),
                 ),

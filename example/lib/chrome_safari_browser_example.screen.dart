@@ -52,8 +52,8 @@ class _ChromeSafariBrowserExampleScreenState
                 await widget.browser.open(
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
-                        androidChromeCustomTabsOptions: AndroidChromeCustomTabsOptions(addShareButton: false),
-                        iosSafariOptions: IosSafariOptions(barCollapsingEnabled: true)));
+                        android: AndroidChromeCustomTabsOptions(addShareButton: false),
+                        ios: IOSSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),
         ));

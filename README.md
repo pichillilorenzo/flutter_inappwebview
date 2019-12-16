@@ -73,6 +73,7 @@ Classes:
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
 - [CookieManager](#cookiemanager-class): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances. **NOTE for iOS**: available from iOS 11.0+.
 - [HttpAuthCredentialDatabase](#httpauthcredentialdatabase-class): This class implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
+- [WebStorageManager](#webstoragemanager-class): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 
 ## API Reference
 
@@ -176,7 +177,7 @@ class _MyAppState extends State<MyApp> {
                   initialUrl: "https://flutter.dev/",
                   initialHeaders: {},
                   initialOptions: InAppWebViewWidgetOptions(
-                    inAppWebViewOptions: InAppWebViewOptions(
+                    crossPlatform: InAppWebViewOptions(
                         debuggingEnabled: true,
                     )
                   ),
@@ -248,6 +249,8 @@ Screenshots:
 
 #### `InAppWebViewController` Methods
 
+##### `InAppWebViewController` Cross-platform methods
+
 * `getUrl`: Gets the URL for the current page.
 * `getTitle`: Gets the title for the current page.
 * `getProgress`: Gets the progress for the current page. The progress value is between 0 and 100.
@@ -255,7 +258,7 @@ Screenshots:
 * `getFavicons`: Gets the list of all favicons for the current page.
 * `loadUrl({@required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
 * `postUrl({@required String url, @required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
-* `loadData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String historyUrl = "about:blank"})`: Loads the given data into this WebView.
+* `loadData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
 * `loadFile({@required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
 * `reload`: Reloads the WebView.
 * `goBack`: Goes back in the history of the WebView.
@@ -279,12 +282,7 @@ Screenshots:
 * `setOptions({@required InAppWebViewWidgetOptions options})`: Sets the WebView options with the new options and evaluates them.
 * `getOptions`: Gets the current WebView options. Returns the options with `null` value if they are not set yet.
 * `getCopyBackForwardList`: Gets the `WebHistory` for this WebView. This contains the back/forward list for use in querying each item in the history stack.
-* `startSafeBrowsing`: Starts Safe Browsing initialization (available only on Android).
-* `setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews (available only on Android).
-* `getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
 * `clearCache`: Clears all the webview's cache.
-* `clearSslPreferences`: Clears the SSL preferences table stored in response to proceeding with SSL certificate errors (available only on Android).
-* `clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests (available only on Android).
 * `findAllAsync({@required String find})`: Finds all instances of find on the page and highlights them. Notifies `onFindResultReceived` listener.
 * `findNext({@required bool forward})`: Highlights and scrolls to the next match found by `findAllAsync()`. Notifies `onFindResultReceived` listener.
 * `clearMatches`: Clears the highlighting surrounding text matches created by `findAllAsync()`.
@@ -292,8 +290,30 @@ Screenshots:
 * `getTRexRunnerCss`: Gets the css of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerHtml()`.
 * `scrollTo({@required int x, @required int y})`: Scrolls the WebView to the position.
 * `scrollBy({@required int x, @required int y})`: Moves the scrolled position of the WebView.
+* `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
+* `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
 * `printCurrentPage`: Prints the current page.
+* `getScale`: Gets the current scale of this WebView.
 * `static getDefaultUserAgent`: Gets the default user agent.
+
+##### `InAppWebViewController` Android-specific methods
+
+Android-specific methods can be called using the `InAppWebViewController.android` attribute.
+
+* `startSafeBrowsing`: Starts Safe Browsing initialization.
+* `setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
+* `getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
+* `clearSslPreferences`: Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
+* `clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
+* `pause`: Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
+* `resume`: Resumes a WebView after a previous call to `pause()`.
+* `getOriginalUrl`: Gets the URL that was originally requested for the current page.
+
+##### `InAppWebViewController` iOS-specific methods
+
+iOS-specific methods can be called using the `InAppWebViewController.ios` attribute.
+
+* `reloadFromOrigin`: Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
 
 ##### About the JavaScript handler
 
@@ -375,7 +395,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `builtInZoomControls`: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
 * `displayZoomControls`: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
 * `supportZoom`: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
-* `databaseEnabled`: Set to `true` if you want the database storage API is enabled. The default value is `false`.
+* `databaseEnabled`: Set to `true` if you want the database storage API is enabled. The default value is `true`.
 * `domStorageEnabled`: Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
 * `useWideViewPort`: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
 * `safeBrowsingEnabled`: Sets whether Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links.
@@ -431,6 +451,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 
 #### `InAppWebView` Events
 
+Event names that starts with `android` or `ios` are events platform-specific.  
+
 * `onWebViewCreated`: Event fired when the InAppWebView is created.
 * `onLoadStart`: Event fired when the InAppWebView starts to load an url.
 * `onLoadStop`: Event fired when the InAppWebView finishes loading an url.
@@ -439,17 +461,15 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onProgressChanged`: Event fired when the current progress of loading a page is changed.
 * `onConsoleMessage`: Event fired when the InAppWebView receives a ConsoleMessage.
 * `shouldOverrideUrlLoading`: Give the host application a chance to take control when a URL is about to be loaded in the current WebView (to use this event, the `useShouldOverrideUrlLoading` option must be `true`). This event is not called on the initial load of the WebView.
-* `onNavigationStateChange`: Event fired when the navigation state of the InAppWebView changes, for example through the usage of the javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions.
+* `onUpdateVisitedHistory`: Event fired when the host application updates its visited links database. This event is also fired when the navigation state of the InAppWebView changes, for example through the usage of the javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions.
 * `onLoadResource`: Event fired when the InAppWebView loads a resource (to use this event, the `useOnLoadResource` option must be `true`).
 * `onScrollChanged`: Event fired when the InAppWebView scrolls.
 * `onDownloadStart`: Event fired when InAppWebView recognizes and starts a downloadable file (to use this event, the `useOnDownloadStart` option must be `true`).
 * `onLoadResourceCustomScheme`: Event fired when the InAppWebView finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a CustomSchemeResponse to load a specific resource encoded to `base64`.
 * `onCreateWindow`: Event fired when the InAppWebView requests the host application to create a new window, for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
-* `onGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
 * `onJsAlert`: Event fired when javascript calls the `alert()` method to display an alert dialog.
 * `onJsConfirm`: Event fired when javascript calls the `confirm()` method to display a confirm dialog.
 * `onJsPrompt`: Event fired when javascript calls the `prompt()` method to display a prompt dialog.
-* `onSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `onReceivedHttpAuthRequest`: Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
 * `onReceivedServerTrustAuthRequest`: Event fired when the WebView need to perform server trust authentication (certificate validation).
 * `onReceivedClientCertRequest`: Notify the host application to handle an SSL client certificate request.
@@ -458,8 +478,11 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `onAjaxReadyStateChange`: Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
 * `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
 * `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) (to use this event, the `useShouldInterceptFetchRequest` option must be `true`).
-* `onPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `onPrint`: Event fired when `window.print()` is called from JavaScript side.
+* `androidOnSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
+* `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
+* `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
+* `androidOnGeolocationPermissionsHidePrompt`: Notify the host application that a request for Geolocation permissions, made with a previous call to `androidOnGeolocationPermissionsShowPrompt` has been canceled. (available only on Android).
 
 ### `InAppBrowser` class
 
@@ -556,7 +579,7 @@ class _MyAppState extends State<MyApp> {
                     assetFilePath: "assets/index.html",
                     options: InAppBrowserClassOptions(
                         inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(
-                            inAppWebViewOptions: InAppWebViewOptions(
+                            crossPlatform: InAppWebViewOptions(
                               useShouldOverrideUrlLoading: true,
                               useOnLoadResource: true,
                             ))));
@@ -714,8 +737,8 @@ class _MyAppState extends State<MyApp> {
                 await widget.browser.open(
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
-                        androidChromeCustomTabsOptions: AndroidChromeCustomTabsOptions(addShareButton: false),
-                        iosSafariOptions: IosSafariOptions(barCollapsingEnabled: true)));
+                        android: AndroidChromeCustomTabsOptions(addShareButton: false),
+                        ios: IosSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),
         ),
@@ -860,3 +883,38 @@ On Android, this class has a custom implementation using `android.database.sqlit
 * `removeHttpAuthCredential({@required ProtectionSpace protectionSpace, @required HttpAuthCredential credential})`: Removes an HTTP auth `credential` for that `protectionSpace`.
 * `removeHttpAuthCredentials({@required ProtectionSpace protectionSpace})`: Removes all the HTTP auth credentials saved for that `protectionSpace`.
 * `clearAllAuthCredentials()`: Removes all the HTTP auth credentials saved in the database.
+
+### `WebStorageManager` class
+
+This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
+
+On Android, it is implemented using [WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html). 
+On iOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore)
+
+**NOTE for iOS**: available from iOS 9.0+.
+
+#### `WebStorageManager` methods
+
+* `instance`: Gets the WebStorage manager shared instance.
+
+#### `WebStorageManager` Android-specific methods
+
+Android-specific methods can be called using the `WebStorageManager.instance().android` attribute.
+
+`AndroidWebStorageManager` class is used to manage the JavaScript storage APIs provided by the WebView. It manages the Application Cache API, the Web SQL Database API and the HTML5 Web Storage API.
+
+* `getOrigins`: Gets the origins currently using either the Application Cache or Web SQL Database APIs.
+* `deleteAllData`: Clears all storage currently being used by the JavaScript storage APIs.
+* `deleteOrigin({@required String origin})`: Clears the storage currently being used by both the Application Cache and Web SQL Database APIs by the given `origin`.
+* `getQuotaForOrigin({@required String origin})`: Gets the storage quota for the Web SQL Database API for the given `origin`.
+* `getUsageForOrigin({@required String origin})`: Gets the amount of storage currently being used by both the Application Cache and Web SQL Database APIs by the given `origin`.
+
+#### `WebStorageManager` iOS-specific methods
+
+iOS-specific methods can be called using the `WebStorageManager.instance().ios` attribute.
+
+`IOSWebStorageManager` class represents various types of data that a website might make use of. This includes cookies, disk and memory caches, and persistent data such as WebSQL, IndexedDB databases, and local storage.
+
+* `fetchDataRecords({@required Set<IOSWKWebsiteDataType> dataTypes})`: Fetches data records containing the given website data types.
+* `removeDataFor({@required Set<IOSWKWebsiteDataType> dataTypes, @required List<IOSWKWebsiteDataRecord> dataRecords})`: Removes website data of the given types for the given data records.
+* `removeDataModifiedSince({@required Set<IOSWKWebsiteDataType> dataTypes, @required DateTime date})`: Removes all website data of the given types that has been modified since the given date.

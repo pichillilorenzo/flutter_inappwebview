@@ -23,6 +23,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public static InAppWebViewStatic inAppWebViewStatic;
   public static MyCookieManager myCookieManager;
   public static CredentialDatabaseHandler credentialDatabaseHandler;
+  public static MyWebStorage myWebStorage;
   public static ValueCallback<Uri[]> uploadMessageArray;
 
   public InAppWebViewFlutterPlugin() {}
@@ -52,6 +53,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
                     "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(messenger, flutterView));
     inAppWebViewStatic = new InAppWebViewStatic(messenger);
     myCookieManager = new MyCookieManager(messenger);
+    myWebStorage = new MyWebStorage(messenger);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       credentialDatabaseHandler = new CredentialDatabaseHandler(messenger);
     }
@@ -66,6 +68,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (myCookieManager != null) {
       myCookieManager.dispose();
       myCookieManager = null;
+    }
+    if (myWebStorage != null) {
+      myWebStorage.dispose();
+      myWebStorage = null;
     }
     if (credentialDatabaseHandler != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       credentialDatabaseHandler.dispose();

@@ -30,7 +30,7 @@ class InAppWebViewOnProgressChangedTestState extends WidgetTestState {
                     initialUrl: "https://flutter.dev/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true
                         )

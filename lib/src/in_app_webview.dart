@@ -115,22 +115,11 @@ class InAppWebView extends StatefulWidget {
   ///Event fired when the [InAppWebView] requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
   ///
-  ///[url] represents the url of the request.
+  ///[onCreateWindowRequest] represents the request.
   ///
   ///**NOTE**: on Android you need to set [AndroidInAppWebViewOptions.supportMultipleWindows] option to `true`.
-  final void Function(InAppWebViewController controller, String url)
+  final void Function(InAppWebViewController controller, OnCreateWindowRequest onCreateWindowRequest)
       onCreateWindow;
-
-  ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
-  ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
-  ///On non-secure origins geolocation requests are automatically denied.
-  ///
-  ///[origin] represents the origin of the web content attempting to use the Geolocation API.
-  ///
-  ///**NOTE**: available only on Android.
-  final Future<GeolocationPermissionShowPromptResponse> Function(
-          InAppWebViewController controller, String origin)
-      onGeolocationPermissionsShowPrompt;
 
   ///Event fired when javascript calls the `alert()` method to display an alert dialog.
   ///If [JsAlertResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
@@ -154,17 +143,6 @@ class InAppWebView extends StatefulWidget {
   ///[defaultValue] represents the default value displayed in the prompt dialog.
   final Future<JsPromptResponse> Function(InAppWebViewController controller,
       String message, String defaultValue) onJsPrompt;
-
-  ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
-  ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
-  ///
-  ///[url] represents the url of the request.
-  ///
-  ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
-  ///
-  ///**NOTE**: available only on Android.
-  final Future<SafeBrowsingResponse> Function(InAppWebViewController controller,
-      String url, SafeBrowsingThreat threatType) onSafeBrowsingHit;
 
   ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
@@ -258,14 +236,33 @@ class InAppWebView extends StatefulWidget {
           InAppWebViewController controller, FetchRequest fetchRequest)
       shouldInterceptFetchRequest;
 
-  ///Event fired when the navigation state of the [InAppWebView] changes through the usage of
-  ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event.
+  ///Event fired when the host application updates its visited links database.
+  ///This event is also fired when the navigation state of the [InAppWebView] changes through the usage of
+  ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event
+  ///or, also, when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
   ///
-  ///Also, the event is fired when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
+  ///[url] represents the url being visited.
   ///
-  ///[url] represents the new url.
-  final void Function(InAppWebViewController controller, String url)
-      onNavigationStateChange;
+  ///[androidIsReload] indicates if this url is being reloaded. Available only on Android.
+  final void Function(InAppWebViewController controller, String url, bool androidIsReload) onUpdateVisitedHistory;
+
+  ///Event fired when `window.print()` is called from JavaScript side.
+  ///
+  ///[url] represents the url on which is called.
+  ///
+  ///**NOTE**: available on Android 21+.
+  final void Function(InAppWebViewController controller, String url) onPrint;
+
+  ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
+  ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
+  ///
+  ///[url] represents the url of the request.
+  ///
+  ///[threatType] represents the reason the resource was caught by Safe Browsing, corresponding to a [SafeBrowsingThreat].
+  ///
+  ///**NOTE**: available only on Android 27+.
+  final Future<SafeBrowsingResponse> Function(InAppWebViewController controller,
+      String url, SafeBrowsingThreat threatType) androidOnSafeBrowsingHit;
 
   ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
   ///
@@ -277,14 +274,24 @@ class InAppWebView extends StatefulWidget {
   final Future<PermissionRequestResponse> Function(
       InAppWebViewController controller,
       String origin,
-      List<String> resources) onPermissionRequest;
+      List<String> resources) androidOnPermissionRequest;
 
-  ///Event fired when `window.print()` is called from JavaScript side.
+  ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
+  ///Note that for applications targeting Android N and later SDKs (API level > `Build.VERSION_CODES.M`) this method is only called for requests originating from secure origins such as https.
+  ///On non-secure origins geolocation requests are automatically denied.
   ///
-  ///[url] represents the url on which is called.
+  ///[origin] represents the origin of the web content attempting to use the Geolocation API.
   ///
-  ///**NOTE**: available on Android 21+.
-  final void Function(InAppWebViewController controller, String url) onPrint;
+  ///**NOTE**: available only on Android.
+  final Future<GeolocationPermissionShowPromptResponse> Function(
+      InAppWebViewController controller, String origin)
+  androidOnGeolocationPermissionsShowPrompt;
+
+  ///Notify the host application that a request for Geolocation permissions, made with a previous call to [androidOnGeolocationPermissionsShowPrompt] has been canceled.
+  ///Any related UI should therefore be hidden.
+  ///
+  ///**NOTE**: available only on Android.
+  final Future<void> Function(InAppWebViewController controller) androidOnGeolocationPermissionsHidePrompt;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -330,11 +337,9 @@ class InAppWebView extends StatefulWidget {
     this.onDownloadStart,
     this.onLoadResourceCustomScheme,
     this.onCreateWindow,
-    this.onGeolocationPermissionsShowPrompt,
     this.onJsAlert,
     this.onJsConfirm,
     this.onJsPrompt,
-    this.onSafeBrowsingHit,
     this.onReceivedHttpAuthRequest,
     this.onReceivedServerTrustAuthRequest,
     this.onReceivedClientCertRequest,
@@ -343,9 +348,12 @@ class InAppWebView extends StatefulWidget {
     this.onAjaxReadyStateChange,
     this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
-    this.onNavigationStateChange,
-    this.onPermissionRequest,
+    this.onUpdateVisitedHistory,
     this.onPrint,
+    this.androidOnSafeBrowsingHit,
+    this.androidOnPermissionRequest,
+    this.androidOnGeolocationPermissionsShowPrompt,
+    this.androidOnGeolocationPermissionsHidePrompt,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -360,13 +368,13 @@ class _InAppWebViewState extends State<InAppWebView> {
   Widget build(BuildContext context) {
     Map<String, dynamic> initialOptions = {};
     initialOptions
-        .addAll(widget.initialOptions.inAppWebViewOptions?.toMap() ?? {});
+        .addAll(widget.initialOptions.crossPlatform?.toMap() ?? {});
     if (Platform.isAndroid)
       initialOptions.addAll(
-          widget.initialOptions.androidInAppWebViewOptions?.toMap() ?? {});
+          widget.initialOptions.android?.toMap() ?? {});
     else if (Platform.isIOS)
       initialOptions
-          .addAll(widget.initialOptions.iosInAppWebViewOptions?.toMap() ?? {});
+          .addAll(widget.initialOptions.ios?.toMap() ?? {});
 
     if (defaultTargetPlatform == TargetPlatform.android) {
       return AndroidView(
@@ -439,10 +447,10 @@ class _InAppWebViewState extends State<InAppWebView> {
   }
 }
 
-/// Controls an [InAppWebView] widget instance.
+/// Controls a WebView, such as an [InAppWebView] widget instance or [InAppBrowser] WebView instance.
 ///
-/// An [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
-/// callback for an [InAppWebView] widget.
+/// If you are using the [InAppWebView] widget, an [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
+/// callback. Instead, if you are using an [InAppBrowser] instance, you can get it through the [InAppBrowser.webViewController] attribute.
 class InAppWebViewController {
   InAppWebView _widget;
   MethodChannel _channel;
@@ -456,12 +464,20 @@ class InAppWebViewController {
   String _inAppBrowserUuid;
   InAppBrowser _inAppBrowser;
 
+  ///Android controller that contains only android-specific methods
+  AndroidInAppWebViewController android;
+
+  ///iOS controller that contains only ios-specific methods
+  IOSInAppWebViewController ios;
+
   InAppWebViewController(int id, InAppWebView widget) {
     this._id = id;
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
     this._widget = widget;
+    this.android = AndroidInAppWebViewController(this);
+    this.ios = IOSInAppWebViewController(this);
   }
 
   InAppWebViewController.fromInAppBrowser(
@@ -520,7 +536,7 @@ class InAppWebViewController {
         int iosWKNavigationType = call.arguments["iosWKNavigationType"];
 
         ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest = ShouldOverrideUrlLoadingRequest(url: url, method: method, headers: headers, isForMainFrame: isForMainFrame,
-          androidHasGesture: androidHasGesture, androidIsRedirect: androidIsRedirect, iosWKNavigationType: IosWKNavigationType.fromValue(iosWKNavigationType));
+          androidHasGesture: androidHasGesture, androidIsRedirect: androidIsRedirect, iosWKNavigationType: IOSWKNavigationType.fromValue(iosWKNavigationType));
 
         if (_widget != null && _widget.shouldOverrideUrlLoading != null)
           return (await _widget.shouldOverrideUrlLoading(this, shouldOverrideUrlLoadingRequest))?.toMap();
@@ -576,21 +592,36 @@ class InAppWebViewController {
         break;
       case "onCreateWindow":
         String url = call.arguments["url"];
+        bool androidIsDialog = call.arguments["androidIsDialog"];
+        bool androidIsUserGesture = call.arguments["androidIsUserGesture"];
+        int iosWKNavigationType = call.arguments["iosWKNavigationType"];
+
+        OnCreateWindowRequest onCreateWindowRequest = OnCreateWindowRequest(url: url, androidIsDialog: androidIsDialog, androidIsUserGesture: androidIsUserGesture, iosWKNavigationType: IOSWKNavigationType.fromValue(iosWKNavigationType));
+
         if (_widget != null && _widget.onCreateWindow != null)
-          _widget.onCreateWindow(this, url);
-        else if (_inAppBrowser != null) _inAppBrowser.onCreateWindow(url);
+          _widget.onCreateWindow(this, onCreateWindowRequest);
+        else if (_inAppBrowser != null) _inAppBrowser.onCreateWindow(onCreateWindowRequest);
         break;
       case "onGeolocationPermissionsShowPrompt":
         String origin = call.arguments["origin"];
         if (_widget != null &&
-            _widget.onGeolocationPermissionsShowPrompt != null)
-          return (await _widget.onGeolocationPermissionsShowPrompt(
+            _widget.androidOnGeolocationPermissionsShowPrompt != null)
+          return (await _widget.androidOnGeolocationPermissionsShowPrompt(
                   this, origin))
               ?.toMap();
         else if (_inAppBrowser != null)
           return (await _inAppBrowser
-                  .onGeolocationPermissionsShowPrompt(origin))
+                  .androidOnGeolocationPermissionsShowPrompt(origin))
               ?.toMap();
+        break;
+      case "onGeolocationPermissionsHidePrompt":
+        if (_widget != null &&
+            _widget.androidOnGeolocationPermissionsHidePrompt != null)
+          await _widget.androidOnGeolocationPermissionsHidePrompt(
+              this);
+        else if (_inAppBrowser != null)
+          await _inAppBrowser
+              .androidOnGeolocationPermissionsHidePrompt();
         break;
       case "onJsAlert":
         String message = call.arguments["message"];
@@ -620,11 +651,11 @@ class InAppWebViewController {
         String url = call.arguments["url"];
         SafeBrowsingThreat threatType =
             SafeBrowsingThreat.fromValue(call.arguments["threatType"]);
-        if (_widget != null && _widget.onSafeBrowsingHit != null)
-          return (await _widget.onSafeBrowsingHit(this, url, threatType))
+        if (_widget != null && _widget.androidOnSafeBrowsingHit != null)
+          return (await _widget.androidOnSafeBrowsingHit(this, url, threatType))
               ?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onSafeBrowsingHit(url, threatType))
+          return (await _inAppBrowser.androidOnSafeBrowsingHit(url, threatType))
               ?.toMap();
         break;
       case "onReceivedHttpAuthRequest":
@@ -695,23 +726,24 @@ class InAppWebViewController {
           _inAppBrowser.onFindResultReceived(
               activeMatchOrdinal, numberOfMatches, isDoneCounting);
         break;
-      case "onNavigationStateChange":
-        String url = call.arguments["url"];
-        if (_widget != null && _widget.onNavigationStateChange != null)
-          _widget.onNavigationStateChange(this, url);
-        else if (_inAppBrowser != null)
-          _inAppBrowser.onNavigationStateChange(url);
-        break;
       case "onPermissionRequest":
         String origin = call.arguments["origin"];
         List<String> resources = call.arguments["resources"].cast<String>();
-        if (_widget != null && _widget.onPermissionRequest != null)
-          return (await _widget.onPermissionRequest(this, origin, resources))
+        if (_widget != null && _widget.androidOnPermissionRequest != null)
+          return (await _widget.androidOnPermissionRequest(this, origin, resources))
               ?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onPermissionRequest(origin, resources))
+          return (await _inAppBrowser.androidOnPermissionRequest(origin, resources))
               ?.toMap();
         break;
+      case "onUpdateVisitedHistory":
+        String url = call.arguments["url"];
+        bool androidIsReload = call.arguments["androidIsReload"];
+        if (_widget != null && _widget.onUpdateVisitedHistory != null)
+          _widget.onUpdateVisitedHistory(this, url, androidIsReload);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onUpdateVisitedHistory(url, androidIsReload);
+        return null;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json
@@ -969,7 +1001,7 @@ class InAppWebViewController {
     var html = "";
     InAppWebViewWidgetOptions options = await getOptions();
     if (options != null &&
-        options.inAppWebViewOptions.javaScriptEnabled == true) {
+        options.crossPlatform.javaScriptEnabled == true) {
       html = await evaluateJavascript(
           source: "window.document.getElementsByTagName('html')[0].outerHTML;");
       if (html != null && html.isNotEmpty) return html;
@@ -1158,13 +1190,13 @@ class InAppWebViewController {
   ///
   ///The [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
   ///
-  ///The [historyUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
+  ///The [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
   Future<void> loadData(
       {@required String data,
       String mimeType = "text/html",
       String encoding = "utf8",
       String baseUrl = "about:blank",
-      String historyUrl = "about:blank"}) async {
+      String androidHistoryUrl = "about:blank"}) async {
     assert(data != null);
     Map<String, dynamic> args = <String, dynamic>{};
     if (_inAppBrowserUuid != null && _inAppBrowser != null) {
@@ -1175,7 +1207,7 @@ class InAppWebViewController {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl);
-    args.putIfAbsent('historyUrl', () => historyUrl);
+    args.putIfAbsent('historyUrl', () => androidHistoryUrl);
     await _channel.invokeMethod('loadData', args);
   }
 
@@ -1464,11 +1496,11 @@ class InAppWebViewController {
     }
 
     Map<String, dynamic> optionsMap = {};
-    optionsMap.addAll(options.inAppWebViewOptions?.toMap() ?? {});
+    optionsMap.addAll(options.crossPlatform?.toMap() ?? {});
     if (Platform.isAndroid)
-      optionsMap.addAll(options.androidInAppWebViewOptions?.toMap() ?? {});
+      optionsMap.addAll(options.android?.toMap() ?? {});
     else if (Platform.isIOS)
-      optionsMap.addAll(options.iosInAppWebViewOptions?.toMap() ?? {});
+      optionsMap.addAll(options.ios?.toMap() ?? {});
 
     args.putIfAbsent('options', () => optionsMap);
     await _channel.invokeMethod('setOptions', args);
@@ -1488,14 +1520,14 @@ class InAppWebViewController {
         await _channel.invokeMethod('getOptions', args);
     if (options != null) {
       options = options.cast<String, dynamic>();
-      inAppWebViewWidgetOptions.inAppWebViewOptions =
+      inAppWebViewWidgetOptions.crossPlatform =
           InAppWebViewOptions.fromMap(options);
       if (Platform.isAndroid)
-        inAppWebViewWidgetOptions.androidInAppWebViewOptions =
+        inAppWebViewWidgetOptions.android =
             AndroidInAppWebViewOptions.fromMap(options);
       else if (Platform.isIOS)
-        inAppWebViewWidgetOptions.iosInAppWebViewOptions =
-            IosInAppWebViewOptions.fromMap(options);
+        inAppWebViewWidgetOptions.ios =
+            IOSInAppWebViewOptions.fromMap(options);
     }
 
     return inAppWebViewWidgetOptions;
@@ -1533,62 +1565,6 @@ class InAppWebViewController {
     return WebHistory(list: historyList, currentIndex: currentIndex);
   }
 
-  ///Starts Safe Browsing initialization.
-  ///
-  ///URL loads are not guaranteed to be protected by Safe Browsing until after the this method returns true.
-  ///Safe Browsing is not fully supported on all devices. For those devices this method will returns false.
-  ///
-  ///This should not be called if Safe Browsing has been disabled by manifest tag
-  ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
-  ///
-  ///**NOTE**: available only on Android 27+.
-  Future<bool> startSafeBrowsing() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    return await _channel.invokeMethod('startSafeBrowsing', args);
-  }
-
-  ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
-  ///
-  /// Each rule should take one of these:
-  ///| Rule | Example | Matches Subdomain |
-  ///| -- | -- | -- |
-  ///| HOSTNAME | example.com | Yes |
-  ///| .HOSTNAME | .example.com | No |
-  ///| IPV4_LITERAL | 192.168.1.1 | No |
-  ///| IPV6_LITERAL_WITH_BRACKETS | [10:20:30:40:50:60:70:80] | No |
-  ///
-  ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
-  ///
-  ///[hosts] represents the list of hosts. This value must never be null.
-  ///
-  ///**NOTE**: available only on Android 27+.
-  Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
-    assert(hosts != null);
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    args.putIfAbsent('hosts', () => hosts);
-    return await _channel.invokeMethod('setSafeBrowsingWhitelist', args);
-  }
-
-  ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
-  ///
-  ///**NOTE**: available only on Android 27+.
-  Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    return await _channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
-  }
-
   ///Clears all the webview's cache.
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1597,34 +1573,6 @@ class InAppWebViewController {
       args.putIfAbsent('uuid', () => _inAppBrowserUuid);
     }
     await _channel.invokeMethod('clearCache', args);
-  }
-
-  ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
-  ///
-  ///**NOTE**: available only on Android.
-  Future<void> clearSslPreferences() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    await _channel.invokeMethod('clearSslPreferences', args);
-  }
-
-  ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
-  ///Note that WebView automatically clears these preferences when the system keychain is updated.
-  ///The preferences are shared by all the WebViews that are created by the embedder application.
-  ///
-  ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
-  ///
-  ///**NOTE**: available on Android 21+.
-  Future<void> clearClientCertPreferences() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    await _channel.invokeMethod('clearClientCertPreferences', args);
   }
 
   ///Finds all instances of find on the page and highlights them. Notifies [onFindResultReceived] listener.
@@ -1719,31 +1667,6 @@ class InAppWebViewController {
     await _channel.invokeMethod('scrollBy', args);
   }
 
-  ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
-  ///To pause JavaScript globally, use [pauseTimers()]. To resume WebView, call [resume()].
-  ///
-  ///**NOTE**: available only on Android.
-  Future<void> pause() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    await _channel.invokeMethod('pause', args);
-  }
-
-  ///Resumes a WebView after a previous call to [pause()].
-  ///
-  ///**NOTE**: available only on Android.
-  Future<void> resume() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
-    await _channel.invokeMethod('resume', args);
-  }
-
   ///On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews.
   ///This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
   ///
@@ -1781,15 +1704,189 @@ class InAppWebViewController {
     await _channel.invokeMethod('printCurrentPage', args);
   }
 
+  ///Gets the height of the HTML content.
+  Future<int> getContentHeight() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('getContentHeight', args);
+  }
+
+  ///Gets the height of the HTML content.
+  ///
+  ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 to 100.0 inclusive.
+  ///
+  ///**NOTE**: available on Android 21+.
+  Future<void> zoomBy(double zoomFactor) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    args.putIfAbsent('zoomFactor', () => zoomFactor);
+    return await _channel.invokeMethod('zoomBy', args);
+  }
+
+  ///Gets the current scale of this WebView.
+  Future<double> getScale() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
+      _inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
+    }
+    return await _channel.invokeMethod('getScale', args);
+  }
+
   ///Gets the default user agent.
   static Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod('getDefaultUserAgent', args);
   }
+}
 
-  /*Future<void> dispose() async {
+///InAppWebViewControllerAndroid class represents the Android controller that contains only android-specific methods for the WebView.
+class AndroidInAppWebViewController {
+
+  InAppWebViewController _controller;
+
+  AndroidInAppWebViewController(InAppWebViewController controller) {
+    this._controller = controller;
+  }
+
+  ///Starts Safe Browsing initialization.
+  ///
+  ///URL loads are not guaranteed to be protected by Safe Browsing until after the this method returns true.
+  ///Safe Browsing is not fully supported on all devices. For those devices this method will returns false.
+  ///
+  ///This should not be called if Safe Browsing has been disabled by manifest tag
+  ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
+  ///
+  ///**NOTE**: available only on Android 27+.
+  Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (Platform.isIOS)
-      await _channel.invokeMethod('removeFromSuperview', args);
-  }*/
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    return await _controller._channel.invokeMethod('startSafeBrowsing', args);
+  }
+
+  ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
+  ///
+  /// Each rule should take one of these:
+  ///| Rule | Example | Matches Subdomain |
+  ///| -- | -- | -- |
+  ///| HOSTNAME | example.com | Yes |
+  ///| .HOSTNAME | .example.com | No |
+  ///| IPV4_LITERAL | 192.168.1.1 | No |
+  ///| IPV6_LITERAL_WITH_BRACKETS | [10:20:30:40:50:60:70:80] | No |
+  ///
+  ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
+  ///
+  ///[hosts] represents the list of hosts. This value must never be null.
+  ///
+  ///**NOTE**: available only on Android 27+.
+  Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
+    assert(hosts != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    args.putIfAbsent('hosts', () => hosts);
+    return await _controller._channel.invokeMethod('setSafeBrowsingWhitelist', args);
+  }
+
+  ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
+  ///
+  ///**NOTE**: available only on Android 27+.
+  Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    return await _controller._channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
+  }
+
+  ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
+  Future<void> clearSslPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    await _controller._channel.invokeMethod('clearSslPreferences', args);
+  }
+
+  ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
+  ///Note that WebView automatically clears these preferences when the system keychain is updated.
+  ///The preferences are shared by all the WebViews that are created by the embedder application.
+  ///
+  ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
+  ///
+  ///**NOTE**: available on Android 21+.
+  Future<void> clearClientCertPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    await _controller._channel.invokeMethod('clearClientCertPreferences', args);
+  }
+
+  ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
+  ///To pause JavaScript globally, use [pauseTimers()]. To resume WebView, call [resume()].
+  Future<void> pause() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    await _controller._channel.invokeMethod('pause', args);
+  }
+
+  ///Resumes a WebView after a previous call to [pause()].
+  Future<void> resume() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    await _controller._channel.invokeMethod('resume', args);
+  }
+
+  ///Gets the URL that was originally requested for the current page.
+  ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun,
+  ///the current page may not have changed. Also, there may have been redirects resulting in a different URL to that originally requested.
+  Future<String> getOriginalUrl() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    return await _controller._channel.invokeMethod('getOriginalUrl', args);
+  }
+
+}
+
+///InAppWebViewControllerIOS class represents the iOS controller that contains only ios-specific methods for the WebView.
+class IOSInAppWebViewController {
+  InAppWebViewController _controller;
+
+  IOSInAppWebViewController(InAppWebViewController controller) {
+    this._controller = controller;
+  }
+
+  ///Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
+  Future<void> reloadFromOrigin() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
+      _controller._inAppBrowser.throwIsNotOpened();
+      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
+    }
+    await _controller._channel.invokeMethod('reloadFromOrigin', args);
+  }
 }

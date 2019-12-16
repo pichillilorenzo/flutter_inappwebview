@@ -354,6 +354,24 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(false);
         }
         break;
+      case "getContentHeight":
+        result.success((webView != null) ? webView.getContentHeight() : null);
+        break;
+      case "zoomBy":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          Float zoomFactor = (Float) call.argument("zoomFactor");
+          webView.zoomBy(zoomFactor);
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "getOriginalUrl":
+        result.success((webView != null) ? webView.getOriginalUrl() : null);
+        break;
+      case "getScale":
+        result.success((webView != null) ? webView.getUpdatedScale() : null);
+        break;
       default:
         result.notImplemented();
     }

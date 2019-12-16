@@ -1342,69 +1342,8 @@ final public class InAppWebView extends InputAwareWebView {
             new PrintAttributes.Builder().build());
   }
 
-  public void showDropDownWorkaround(final List<Integer> selectedValues, final List<List<String>> values, final boolean isMultiSelect, final DropDownWorkaroundCallback callback) {
-    FrameLayout layout = new FrameLayout(Shared.activity);
-
-    final List<String> listViewValues = new ArrayList<String>();
-    for(List<String> value : values) {
-      listViewValues.add(value.get(0));
-    }
-
-    ListView listView = new ListView(Shared.activity);
-    ArrayAdapter<String> spinnerArrayAdapter = new ArrayAdapter<String>(Shared.activity, (!isMultiSelect) ? android.R.layout.simple_list_item_1 : android.R.layout.simple_list_item_multiple_choice, listViewValues);
-    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_list_item_multiple_choice);
-    listView.setAdapter(spinnerArrayAdapter);
-
-
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
-    final AlertDialog alertDialog = alertDialogBuilder.create();
-
-    final List<String> result = new ArrayList<>();
-
-    listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      @Override
-      public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        String value = values.get(position).get(1);
-        if (!isMultiSelect) {
-          result.add(value);
-          alertDialog.dismiss();
-        } else {
-          if (!result.contains(value)) {
-            result.add(value);
-          } else {
-            result.remove(value);
-          }
-        }
-      }
-    });
-
-    if (isMultiSelect) {
-      listView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
-      listView.setItemsCanFocus(false);
-
-      for(Integer selectedValueIndex : selectedValues) {
-        listView.setItemChecked(selectedValueIndex, true);
-        String value = values.get(selectedValueIndex).get(1);
-        result.add(value);
-      }
-    }
-
-    alertDialog.setOnDismissListener(new DialogInterface.OnDismissListener() {
-      @Override
-      public void onDismiss(DialogInterface dialog) {
-        callback.result(result);
-      }
-    });
-
-    layout.addView(listView);
-    alertDialog.setView(layout);
-    alertDialog.show();
-  }
-
-  public static class DropDownWorkaroundCallback {
-    public void result(List<String> value) {
-
-    }
+  public Float getUpdatedScale() {
+    return scale;
   }
 
   @Override

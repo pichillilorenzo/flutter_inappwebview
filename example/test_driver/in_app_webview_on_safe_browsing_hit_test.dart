@@ -32,20 +32,20 @@ class InAppWebViewOnSafeBrowsingHitTestState extends WidgetTestState {
                     initialUrl: (Platform.isAndroid) ? "chrome://safe-browsing/match?type=malware" : "https://flutter.dev/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             // if I set javaScriptEnabled to true, it will crash!
                             javaScriptEnabled: false,
                             clearCache: true,
                             debuggingEnabled: true
                         ),
-                        androidInAppWebViewOptions: AndroidInAppWebViewOptions(
+                        android: AndroidInAppWebViewOptions(
                           safeBrowsingEnabled: true,
                         ),
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                       if(Platform.isAndroid)
-                        controller.startSafeBrowsing();
+                        controller.android.startSafeBrowsing();
                     },
                     onLoadStart: (InAppWebViewController controller, String url) {
 
@@ -55,7 +55,7 @@ class InAppWebViewOnSafeBrowsingHitTestState extends WidgetTestState {
                         appBarTitle = url;
                       });
                     },
-                    onSafeBrowsingHit: (InAppWebViewController controller, String url, SafeBrowsingThreat threatType) async {
+                    androidOnSafeBrowsingHit: (InAppWebViewController controller, String url, SafeBrowsingThreat threatType) async {
                       return SafeBrowsingResponse(report: true, action: SafeBrowsingResponseAction.PROCEED);
                     },
                   ),

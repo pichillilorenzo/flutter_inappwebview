@@ -575,4 +575,27 @@ public class InAppBrowserActivity extends AppCompatActivity {
       webView.printCurrentPage();
   }
 
+  public Integer getContentHeight() {
+    if (webView != null)
+      return webView.getContentHeight();
+    return null;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public void zoomBy(Float zoomFactor) {
+    if (webView != null)
+      webView.zoomBy(zoomFactor);
+  }
+
+  public String getOriginalUrl() {
+    if (webView != null)
+      return webView.getOriginalUrl();
+    return null;
+  }
+
+  public Float getScale() {
+    if (webView != null)
+      return webView.getUpdatedScale();
+    return null;
+  }
 }

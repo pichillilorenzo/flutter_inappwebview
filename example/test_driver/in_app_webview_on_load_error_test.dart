@@ -30,7 +30,7 @@ class InAppWebViewOnLoadErrorTestState extends WidgetTestState {
                     initialUrl: "https://not-existing-domain.org/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true
                         )

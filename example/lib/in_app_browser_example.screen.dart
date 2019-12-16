@@ -92,7 +92,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                     assetFilePath: "assets/index.html",
                     options: InAppBrowserClassOptions(
                         inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(
-                            inAppWebViewOptions: InAppWebViewOptions(
+                            crossPlatform: InAppWebViewOptions(
                             useShouldOverrideUrlLoading: true,
                             useOnLoadResource: true,
                     ))));

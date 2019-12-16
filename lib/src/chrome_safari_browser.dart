@@ -63,30 +63,30 @@ class ChromeSafariBrowser {
 
     Map<String, dynamic> optionsMap = {};
     if (Platform.isAndroid)
-      optionsMap.addAll(options.androidChromeCustomTabsOptions?.toMap() ?? {});
+      optionsMap.addAll(options.android?.toMap() ?? {});
     else if (Platform.isIOS)
-      optionsMap.addAll(options.iosSafariOptions?.toMap() ?? {});
+      optionsMap.addAll(options.ios?.toMap() ?? {});
 
     Map<String, dynamic> optionsFallbackMap = {};
     if (optionsFallback != null) {
       optionsFallbackMap
-          .addAll(optionsFallback.inAppBrowserOptions?.toMap() ?? {});
+          .addAll(optionsFallback.crossPlatform?.toMap() ?? {});
       optionsFallbackMap.addAll(optionsFallback
-              .inAppWebViewWidgetOptions?.inAppWebViewOptions
+              .inAppWebViewWidgetOptions?.crossPlatform
               ?.toMap() ??
           {});
       if (Platform.isAndroid) {
         optionsFallbackMap
-            .addAll(optionsFallback.androidInAppBrowserOptions?.toMap() ?? {});
+            .addAll(optionsFallback.android?.toMap() ?? {});
         optionsFallbackMap.addAll(optionsFallback
-                .inAppWebViewWidgetOptions?.androidInAppWebViewOptions
+                .inAppWebViewWidgetOptions?.android
                 ?.toMap() ??
             {});
       } else if (Platform.isIOS) {
         optionsFallbackMap
-            .addAll(optionsFallback.iosInAppBrowserOptions?.toMap() ?? {});
+            .addAll(optionsFallback.ios?.toMap() ?? {});
         optionsFallbackMap.addAll(optionsFallback
-                .inAppWebViewWidgetOptions?.iosInAppWebViewOptions
+                .inAppWebViewWidgetOptions?.ios
                 ?.toMap() ??
             {});
       }

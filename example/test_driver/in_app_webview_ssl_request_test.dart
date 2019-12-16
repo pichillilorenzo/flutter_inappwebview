@@ -31,7 +31,7 @@ class InAppWebViewSslRequestTestState extends WidgetTestState {
                     initialUrl: "https://${environment["NODE_SERVER_IP"]}:4433/",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true
                         )

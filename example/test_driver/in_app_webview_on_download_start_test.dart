@@ -49,7 +49,7 @@ class InAppWebViewOnDownloadStartTestState extends WidgetTestState {
                     """),
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true,
                             useOnDownloadStart: true

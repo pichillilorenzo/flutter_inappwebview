@@ -30,7 +30,7 @@ class InAppWebViewOnLoadResourceCustomSchemeTestState extends WidgetTestState {
                     initialFile: "test_assets/in_app_webview_on_load_resource_custom_scheme_test.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                           clearCache: true,
                           debuggingEnabled: true,
                           resourceCustomSchemes: ["my-special-custom-scheme"]

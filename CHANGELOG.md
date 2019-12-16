@@ -1,18 +1,24 @@
 ## 3.0.0
 
-- Updated for Flutter 1.12 new Java Embedding API (Android)
-- Updated `clearCache` for Android
 - Added `Promise` javascript [polyfill](https://github.com/taylorhakes/promise-polyfill/blob/master/src/index.js) for webviews that doesn't support it for `window.flutter_inappwebview.callHandler`
 - Added `getDefaultUserAgent` static method to `InAppWebViewController`
-- Added `printCurrentPage` method to `InAppWebViewController`
-- Added `onPrint` event
+- Added `onUpdateVisitedHistory`, `onPrint` event
+- Added `onGeolocationPermissionsHidePrompt` event for Android
 - Added `supportMultipleWindows` webview option for Android
 - Added `regexToCancelSubFramesLoading` webview option for Android to cancel subframe requests on `shouldOverrideUrlLoading` event based on a Regular Expression
-- Updated default value for `domStorageEnabled` option to `true` for Android
-- Fix for Android `InAppBrowser` for some controller methods not exposed.
+- Added `getContentHeight`, `zoomBy`, `printCurrentPage`, `getScale` methods
+- Added `getOriginalUrl` webview method for Android
+- Added `reloadFromOrigin` webview method for iOS
+- Added `automaticallyAdjustsScrollIndicatorInsets` webview options for iOS
+- Added `WebStorageManager` class which manages the web storage used by WebView instances
+- Updated for Flutter 1.12 new Java Embedding API (Android)
+- Updated `clearCache` for Android
+- Updated default value for `domStorageEnabled` and `databaseEnabled` options to `true` for Android
 - Merge "Fixes null error when calling getOptions for InAppBrowser class" [#214](https://github.com/pichillilorenzo/flutter_inappwebview/pull/214) (thanks to [panndoraBoo](https://github.com/panndoraBoo))
-- Added `dropDownWorkaroundEnabled` webview option for Android to enable a temporary workaround for html dropdowns (issue [#182](https://github.com/pichillilorenzo/flutter_inappwebview/issues/182))
+- Merge "Fixes crash onConsoleMessage iOS forced unwrapping" [#228](https://github.com/pichillilorenzo/flutter_inappwebview/pull/228) (thanks to [tokonu](https://github.com/tokonu))
+- Fix for Android and iOS `InAppBrowser` for some controller methods not exposed.
 - Fixed "App Crashes after clicking on dropdown (Using inappwebview)" [#182](https://github.com/pichillilorenzo/flutter_inappwebview/issues/182)
+- Fixed "webview can not be released when in ios" [#225](https://github.com/pichillilorenzo/flutter_inappwebview/issues/225). Now the iOS WebView is released from memory when it is disposed from Flutter.
 
 ### BREAKING CHANGES
 
@@ -21,6 +27,14 @@
   - it has a return type `ShouldOverrideUrlLoadingAction` to allow or cancel navigation instead of cancel every time the request
 - Renamed `onTargetBlank` to `onCreateWindow`
 - Deleted `useOnTargetBlank` webview option
+- Making methods available only for the specific platform more explicit: moved all the webview's controller methods for Android inside `controller.android` and all the webview's controller methods for iOS inside `controller.ios`
+- Making events available only for the specific platform more explicit:
+  - Renamed `onSafeBrowsingHit` to `androidOnSafeBrowsingHit`
+  - Renamed `onGeolocationPermissionsShowPrompt` to `androidOnGeolocationPermissionsShowPrompt` 
+  - Renamed `onPermissionRequest` to `androidOnPermissionRequest`  
+- Updated attribute names for `InAppWebViewWidgetOptions`, `InAppBrowserClassOptions` and `ChromeSafariBrowserClassOptions` classes
+- Renamed and updated `onNavigationStateChange` to `onUpdateVisitedHistory`
+- Renamed all iOS options prefix from `Ios` to `IOS`
 
 ## 2.1.0+1
 

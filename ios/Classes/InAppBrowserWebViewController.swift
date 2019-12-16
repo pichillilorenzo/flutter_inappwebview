@@ -65,7 +65,7 @@ typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, B
 class InAppWebView_IBWrapper: InAppWebView {
     required init(coder: NSCoder) {
         let config = WKWebViewConfiguration()
-        super.init(frame: .zero, configuration: config, IABController: nil, IAWController: nil)
+        super.init(frame: .zero, configuration: config, IABController: nil, channel: nil)
         self.translatesAutoresizingMaskIntoConstraints = false
     }
 }
@@ -114,7 +114,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
-            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, IAWController: nil)
+            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, channel: nil)
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
@@ -194,12 +194,21 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     
     // Prevent crashes on closing windows
     deinit {
-        webView.removeObserver(self, forKeyPath: "estimatedProgress")
-        webView.uiDelegate = nil
+        print("InAppBrowserWebViewController - dealloc")
     }
     
     override func viewWillDisappear (_ animated: Bool) {
         super.viewWillDisappear(animated)
+        webView.dispose()
+        navigationDelegate = nil
+        transitioningDelegate = nil
+        urlField.delegate = nil
+        closeButton.removeTarget(self, action: #selector(self.close), for: .touchUpInside)
+        forwardButton.target = nil
+        forwardButton.target = nil
+        backButton.target = nil
+        reloadButton.target = nil
+        shareButton.target = nil
     }
     
     func prepareConstraints () {

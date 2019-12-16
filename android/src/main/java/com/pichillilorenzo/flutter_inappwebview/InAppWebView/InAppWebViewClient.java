@@ -17,6 +17,7 @@ import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
+import android.webkit.WebStorage;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -54,7 +55,6 @@ public class InAppWebViewClient extends WebViewClient {
   private InAppBrowserActivity inAppBrowserActivity;
   private static int previousAuthRequestFailureCount = 0;
   private static List<Credential> credentialsProposed = null;
-  private String onPageStartedURL = "";
 
   public InAppWebViewClient(Object obj) {
     super();
@@ -188,7 +188,6 @@ public class InAppWebViewClient extends WebViewClient {
       webView.loadUrl("javascript:" + js);
     }
 
-    onPageStartedURL = url;
     super.onPageStarted(view, url, favicon);
 
     webView.isLoading = true;
@@ -241,16 +240,14 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void doUpdateVisitedHistory (WebView view, String url, boolean isReload) {
-    super.doUpdateVisitedHistory(view, url, isReload);
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
+    obj.put("androidIsReload", isReload);
+    getChannel().invokeMethod("onUpdateVisitedHistory", obj);
 
-    if (!isReload && !url.equals(onPageStartedURL)) {
-      onPageStartedURL = "";
-      Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
-      obj.put("url", url);
-      getChannel().invokeMethod("onNavigationStateChange", obj);
-    }
+    super.doUpdateVisitedHistory(view, url, isReload);
   }
 
   @Override

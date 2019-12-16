@@ -256,7 +256,7 @@ class AndroidInAppWebViewOptions
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   bool supportZoom;
 
-  ///Set to `true` if you want the database storage API is enabled. The default value is `false`.
+  ///Set to `true` if you want the database storage API is enabled. The default value is `true`.
   bool databaseEnabled;
 
   ///Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
@@ -556,7 +556,7 @@ class AndroidInAppWebViewOptions
 }
 
 ///This class represents all the iOS-only WebView options available.
-class IosInAppWebViewOptions
+class IOSInAppWebViewOptions
     implements WebViewOptions, BrowserOptions, IosOptions {
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   bool disallowOverScroll;
@@ -599,15 +599,15 @@ class IosInAppWebViewOptions
   bool isFraudulentWebsiteWarningEnabled;
 
   ///The level of granularity with which the user can interactively select content in the web view.
-  ///The default value is [IosInAppWebViewSelectionGranularity.DYNAMIC]
-  IosInAppWebViewSelectionGranularity selectionGranularity;
+  ///The default value is [IOSInAppWebViewSelectionGranularity.DYNAMIC]
+  IOSInAppWebViewSelectionGranularity selectionGranularity;
 
   ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
-  ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [IosInAppWebViewDataDetectorTypes.LINK].
-  ///The default value is [IosInAppWebViewDataDetectorTypes.NONE].
+  ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [IOSInAppWebViewDataDetectorTypes.LINK].
+  ///The default value is [IOSInAppWebViewDataDetectorTypes.NONE].
   ///
   ///**NOTE**: available on iOS 10.0+.
-  List<IosInAppWebViewDataDetectorTypes> dataDetectorTypes;
+  List<IOSInAppWebViewDataDetectorTypes> dataDetectorTypes;
 
   ///Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
   ///The default value is `false`.
@@ -615,7 +615,13 @@ class IosInAppWebViewOptions
   ///**NOTE**: available on iOS 11.0+.
   bool sharedCookiesEnabled;
 
-  IosInAppWebViewOptions(
+  ///Configures whether the scroll indicator insets are automatically adjusted by the system.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: available on iOS 13.0+.
+  bool automaticallyAdjustsScrollIndicatorInsets;
+
+  IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
       this.suppressesIncrementalRendering = false,
@@ -626,9 +632,10 @@ class IosInAppWebViewOptions
       this.allowsInlineMediaPlayback = false,
       this.allowsPictureInPictureMediaPlayback = true,
       this.isFraudulentWebsiteWarningEnabled = true,
-      this.selectionGranularity = IosInAppWebViewSelectionGranularity.DYNAMIC,
-      this.dataDetectorTypes = const [IosInAppWebViewDataDetectorTypes.NONE],
-      this.sharedCookiesEnabled = false});
+      this.selectionGranularity = IOSInAppWebViewSelectionGranularity.DYNAMIC,
+      this.dataDetectorTypes = const [IOSInAppWebViewDataDetectorTypes.NONE],
+      this.sharedCookiesEnabled = false,
+      this.automaticallyAdjustsScrollIndicatorInsets = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -652,20 +659,21 @@ class IosInAppWebViewOptions
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
       "selectionGranularity": selectionGranularity.toValue(),
       "dataDetectorTypes": dataDetectorTypesList,
-      "sharedCookiesEnabled": sharedCookiesEnabled
+      "sharedCookiesEnabled": sharedCookiesEnabled,
+      "automaticallyAdjustsScrollIndicatorInsets": automaticallyAdjustsScrollIndicatorInsets
     };
   }
 
-  static IosInAppWebViewOptions fromMap(Map<String, dynamic> map) {
-    List<IosInAppWebViewDataDetectorTypes> dataDetectorTypes = [];
+  static IOSInAppWebViewOptions fromMap(Map<String, dynamic> map) {
+    List<IOSInAppWebViewDataDetectorTypes> dataDetectorTypes = [];
     List<String> dataDetectorTypesList =
         List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorType) {
       dataDetectorTypes
-          .add(IosInAppWebViewDataDetectorTypes.fromValue(dataDetectorType));
+          .add(IOSInAppWebViewDataDetectorTypes.fromValue(dataDetectorType));
     });
 
-    IosInAppWebViewOptions options = new IosInAppWebViewOptions();
+    IOSInAppWebViewOptions options = new IOSInAppWebViewOptions();
     options.disallowOverScroll = map["disallowOverScroll"];
     options.enableViewportScale = map["enableViewportScale"];
     options.suppressesIncrementalRendering =
@@ -682,10 +690,11 @@ class IosInAppWebViewOptions
     options.isFraudulentWebsiteWarningEnabled =
         map["isFraudulentWebsiteWarningEnabled"];
     options.selectionGranularity =
-        IosInAppWebViewSelectionGranularity.fromValue(
+        IOSInAppWebViewSelectionGranularity.fromValue(
             map["selectionGranularity"]);
     options.dataDetectorTypes = dataDetectorTypes;
     options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
+    options.automaticallyAdjustsScrollIndicatorInsets = map["automaticallyAdjustsScrollIndicatorInsets"];
     return options;
   }
 }
@@ -773,7 +782,7 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
 }
 
 ///This class represents all the iOS-only [InAppBrowser] options available.
-class IosInAppBrowserOptions implements BrowserOptions, IosOptions {
+class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   ///Set to `false` to hide the toolbar at the bottom of the WebView. The default value is `true`.
   bool toolbarBottom;
 
@@ -789,23 +798,23 @@ class IosInAppBrowserOptions implements BrowserOptions, IosOptions {
   ///Set the custom color for the close button.
   String closeButtonColor;
 
-  ///Set the custom modal presentation style when presenting the WebView. The default value is [IosWebViewOptionsPresentationStyle.FULL_SCREEN].
-  IosWebViewOptionsPresentationStyle presentationStyle;
+  ///Set the custom modal presentation style when presenting the WebView. The default value is [IOSWebViewOptionsPresentationStyle.FULL_SCREEN].
+  IOSWebViewOptionsPresentationStyle presentationStyle;
 
-  ///Set to the custom transition style when presenting the WebView. The default value is [IosWebViewOptionsTransitionStyle.COVER_VERTICAL].
-  IosWebViewOptionsTransitionStyle transitionStyle;
+  ///Set to the custom transition style when presenting the WebView. The default value is [IOSWebViewOptionsTransitionStyle.COVER_VERTICAL].
+  IOSWebViewOptionsTransitionStyle transitionStyle;
 
   ///Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
   bool spinner;
 
-  IosInAppBrowserOptions(
+  IOSInAppBrowserOptions(
       {this.toolbarBottom = true,
       this.toolbarBottomBackgroundColor = "",
       this.toolbarBottomTranslucent = true,
       this.closeButtonCaption = "",
       this.closeButtonColor = "",
-      this.presentationStyle = IosWebViewOptionsPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = IosWebViewOptionsTransitionStyle.COVER_VERTICAL,
+      this.presentationStyle = IOSWebViewOptionsPresentationStyle.FULL_SCREEN,
+      this.transitionStyle = IOSWebViewOptionsTransitionStyle.COVER_VERTICAL,
       this.spinner = true});
 
   @override
@@ -822,17 +831,17 @@ class IosInAppBrowserOptions implements BrowserOptions, IosOptions {
     };
   }
 
-  static IosInAppBrowserOptions fromMap(Map<String, dynamic> map) {
-    IosInAppBrowserOptions options = new IosInAppBrowserOptions();
+  static IOSInAppBrowserOptions fromMap(Map<String, dynamic> map) {
+    IOSInAppBrowserOptions options = new IOSInAppBrowserOptions();
     options.toolbarBottom = map["toolbarBottom"];
     options.toolbarBottomBackgroundColor = map["toolbarBottomBackgroundColor"];
     options.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
     options.closeButtonCaption = map["closeButtonCaption"];
     options.closeButtonColor = map["closeButtonColor"];
     options.presentationStyle =
-        IosWebViewOptionsPresentationStyle.fromValue(map["presentationStyle"]);
+        IOSWebViewOptionsPresentationStyle.fromValue(map["presentationStyle"]);
     options.transitionStyle =
-        IosWebViewOptionsTransitionStyle.fromValue(map["transitionStyle"]);
+        IOSWebViewOptionsTransitionStyle.fromValue(map["transitionStyle"]);
     options.spinner = map["spinner"];
     return options;
   }
@@ -887,17 +896,17 @@ class AndroidChromeCustomTabsOptions
 }
 
 ///This class represents all the iOS-only [ChromeSafariBrowser] options available.
-class IosSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
+class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
   bool entersReaderIfAvailable;
 
   ///Set to `true` to enable bar collapsing. The default value is `false`.
   bool barCollapsingEnabled;
 
-  ///Set the custom style for the dismiss button. The default value is [IosSafariOptionsDismissButtonStyle.DONE].
+  ///Set the custom style for the dismiss button. The default value is [IOSSafariOptionsDismissButtonStyle.DONE].
   ///
   ///**NOTE**: available on iOS 11.0+.
-  IosSafariOptionsDismissButtonStyle dismissButtonStyle;
+  IOSSafariOptionsDismissButtonStyle dismissButtonStyle;
 
   ///Set the custom background color of the navigation bar and the toolbar.
   ///
@@ -909,20 +918,20 @@ class IosSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   ///**NOTE**: available on iOS 10.0+.
   String preferredControlTintColor;
 
-  ///Set the custom modal presentation style when presenting the WebView. The default value is [IosWebViewOptionsPresentationStyle.FULL_SCREEN].
-  IosWebViewOptionsPresentationStyle presentationStyle;
+  ///Set the custom modal presentation style when presenting the WebView. The default value is [IOSWebViewOptionsPresentationStyle.FULL_SCREEN].
+  IOSWebViewOptionsPresentationStyle presentationStyle;
 
-  ///Set to the custom transition style when presenting the WebView. The default value is [IosWebViewOptionsTransitionStyle.COVER_VERTICAL].
-  IosWebViewOptionsTransitionStyle transitionStyle;
+  ///Set to the custom transition style when presenting the WebView. The default value is [IOSWebViewOptionsTransitionStyle.COVER_VERTICAL].
+  IOSWebViewOptionsTransitionStyle transitionStyle;
 
-  IosSafariOptions(
+  IOSSafariOptions(
       {this.entersReaderIfAvailable = false,
       this.barCollapsingEnabled = false,
-      this.dismissButtonStyle = IosSafariOptionsDismissButtonStyle.DONE,
+      this.dismissButtonStyle = IOSSafariOptionsDismissButtonStyle.DONE,
       this.preferredBarTintColor = "",
       this.preferredControlTintColor = "",
-      this.presentationStyle = IosWebViewOptionsPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = IosWebViewOptionsTransitionStyle.COVER_VERTICAL});
+      this.presentationStyle = IOSWebViewOptionsPresentationStyle.FULL_SCREEN,
+      this.transitionStyle = IOSWebViewOptionsTransitionStyle.COVER_VERTICAL});
 
   @override
   Map<String, dynamic> toMap() {
@@ -937,18 +946,18 @@ class IosSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     };
   }
 
-  static IosSafariOptions fromMap(Map<String, dynamic> map) {
-    IosSafariOptions options = new IosSafariOptions();
+  static IOSSafariOptions fromMap(Map<String, dynamic> map) {
+    IOSSafariOptions options = new IOSSafariOptions();
     options.entersReaderIfAvailable = map["entersReaderIfAvailable"];
     options.barCollapsingEnabled = map["barCollapsingEnabled"];
     options.dismissButtonStyle =
-        IosSafariOptionsDismissButtonStyle.fromValue(map["dismissButtonStyle"]);
+        IOSSafariOptionsDismissButtonStyle.fromValue(map["dismissButtonStyle"]);
     options.preferredBarTintColor = map["preferredBarTintColor"];
     options.preferredControlTintColor = map["preferredControlTintColor"];
     options.presentationStyle =
-        IosWebViewOptionsPresentationStyle.fromValue(map["presentationStyle"]);
+        IOSWebViewOptionsPresentationStyle.fromValue(map["presentationStyle"]);
     options.transitionStyle =
-        IosWebViewOptionsTransitionStyle.fromValue(map["transitionStyle"]);
+        IOSWebViewOptionsTransitionStyle.fromValue(map["transitionStyle"]);
     return options;
   }
 }

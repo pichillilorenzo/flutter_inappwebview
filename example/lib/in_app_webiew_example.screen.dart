@@ -50,9 +50,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     initialUrl: "https://flutter.dev/",
+                    //initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                           debuggingEnabled: true,
                         )
                     ),
@@ -60,23 +61,49 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       webView = controller;
                     },
                     onLoadStart: (InAppWebViewController controller, String url) {
+                      print("onLoadStart $url");
                       setState(() {
                         this.url = url;
                       });
                     },
                     onLoadStop: (InAppWebViewController controller, String url) async {
+                      print("onLoadStop $url");
                       setState(() {
                         this.url = url;
                       });
-                    },
-                    onNavigationStateChange: (InAppWebViewController controller, String url) async {
-                      setState(() {
-                        this.url = url;
-                      });
+                      /*var origins = await WebStorageManager.instance().android.getOrigins();
+                      for (var origin in origins) {
+                        print(origin);
+                        print(await WebStorageManager.instance().android.getQuotaForOrigin(origin: origin.origin));
+                        print(await WebStorageManager.instance().android.getUsageForOrigin(origin: origin.origin));
+                      }
+                      await WebStorageManager.instance().android.deleteAllData();
+                      print("\n\nDELETED\n\n");
+                      origins = await WebStorageManager.instance().android.getOrigins();
+                      for (var origin in origins) {
+                        print(origin);
+                        await WebStorageManager.instance().android.deleteOrigin(origin: origin.origin);
+                      }*/
+                      /*var records = await WebStorageManager.instance().ios.fetchDataRecords(dataTypes: IOSWKWebsiteDataType.ALL);
+                      for(var record in records) {
+                        print(record);
+                      }
+                      await WebStorageManager.instance().ios.removeDataModifiedSince(dataTypes: IOSWKWebsiteDataType.ALL, date: DateTime(0));
+                      print("\n\nDELETED\n\n");
+                      records = await WebStorageManager.instance().ios.fetchDataRecords(dataTypes: IOSWKWebsiteDataType.ALL);
+                      for(var record in records) {
+                        print(record);
+                      }*/
                     },
                     onProgressChanged: (InAppWebViewController controller, int progress) {
                       setState(() {
                         this.progress = progress / 100;
+                      });
+                    },
+                    onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
+                      print("onUpdateVisitedHistory $url");
+                      setState(() {
+                        this.url = url;
                       });
                     },
                   ),

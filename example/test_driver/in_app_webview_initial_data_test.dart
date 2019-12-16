@@ -66,7 +66,7 @@ class InAppWebViewInitialDataTestState extends WidgetTestState {
                     """),
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true
                         )

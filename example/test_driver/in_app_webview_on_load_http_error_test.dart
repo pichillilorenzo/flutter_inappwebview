@@ -30,7 +30,7 @@ class InAppWebViewOnLoadHttpErrorTestState extends WidgetTestState {
                     initialUrl: "https://google.com/404",
                     initialHeaders: {},
                     initialOptions: InAppWebViewWidgetOptions(
-                        inAppWebViewOptions: InAppWebViewOptions(
+                        crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true
                         )

@@ -273,51 +273,6 @@ public class JavaScriptBridgeInterface {
       @Override
       public void run() {
 
-        // workaround for https://github.com/pichillilorenzo/flutter_inappwebview/issues/182
-        if (handlerName.equals("flutterInAppWebViewDropDownWorkaround")) {
-          try {
-            JSONArray jsonArray = new JSONArray(args);
-
-            List<Integer> selectedValues = new ArrayList<>();
-            JSONArray jsonSelectedValues = jsonArray.getJSONArray(0);
-            for(int i = 0; i < jsonSelectedValues.length(); i++) {
-              Integer selectedValue = jsonSelectedValues.getInt(i);
-              selectedValues.add(selectedValue);
-            }
-
-            boolean isMultiSelect = jsonArray.getBoolean(1);
-
-            List<List<String>> values = new ArrayList<>();
-            JSONArray options = jsonArray.getJSONArray(2);
-
-            for(int i = 0; i < options.length(); i++) {
-              JSONObject option = options.getJSONObject(i);
-
-              List<String> value = new ArrayList<>();
-              value.add(option.getString("key"));
-              value.add(option.getString("value"));
-
-              values.add(value);
-            }
-
-            webView.showDropDownWorkaround(selectedValues, values, isMultiSelect, new InAppWebView.DropDownWorkaroundCallback() {
-              @Override
-              public void result(List<String> values) {
-                String value = "{values: " + (new JSONArray(values)) + "}";
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                  webView.evaluateJavascript("if(window." + name + "[" + _callHandlerID + "] != null) {window." + name + "[" + _callHandlerID + "](" + value + "); delete window." + name + "[" + _callHandlerID + "];}", (ValueCallback<String>) null);
-                }
-                else {
-                  webView.loadUrl("javascript:if(window." + name + "[" + _callHandlerID + "] != null) {window." + name + "[" + _callHandlerID + "](" + value + "); delete window." + name + "[" + _callHandlerID + "];}");
-                }
-              }
-            });
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-          return;
-        }
-
         if (handlerName.equals("onPrint") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           webView.printCurrentPage();
         }

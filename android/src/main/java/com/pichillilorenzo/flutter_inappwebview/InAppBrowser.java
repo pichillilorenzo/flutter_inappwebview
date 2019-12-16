@@ -22,6 +22,7 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.app.Activity;
+import android.content.ActivityNotFoundException;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -133,7 +134,7 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
                       Intent intent = new Intent(Intent.ACTION_DIAL);
                       intent.setData(Uri.parse(url));
                       activity.startActivity(intent);
-                    } catch (android.content.ActivityNotFoundException e) {
+                    } catch (ActivityNotFoundException e) {
                       Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
                     }
                   }
@@ -347,6 +348,22 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
           printCurrentPage(uuid);
         }
         result.success(true);
+        break;
+      case "getContentHeight":
+        result.success(getContentHeight(uuid));
+        break;
+      case "zoomBy":
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          Float zoomFactor = (Float) call.argument("zoomFactor");
+          zoomBy(uuid, zoomFactor);
+        }
+        result.success(true);
+        break;
+      case "getOriginalUrl":
+        result.success(getOriginalUrl(uuid));
+        break;
+      case "getScale":
+        result.success(getScale(uuid));
         break;
       default:
         result.notImplemented();
@@ -812,6 +829,34 @@ public class InAppBrowser implements MethodChannel.MethodCallHandler {
     InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
     if (inAppBrowserActivity != null)
       inAppBrowserActivity.printCurrentPage();
+  }
+
+  public Integer getContentHeight(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getContentHeight();
+    return null;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public void zoomBy(String uuid, Float zoomFactor) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      inAppBrowserActivity.zoomBy(zoomFactor);
+  }
+
+  public String getOriginalUrl(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getOriginalUrl();
+    return null;
+  }
+
+  public Float getScale(String uuid) {
+    InAppBrowserActivity inAppBrowserActivity = webViewActivities.get(uuid);
+    if (inAppBrowserActivity != null)
+      return inAppBrowserActivity.getScale();
+    return null;
   }
 
   public void dispose() {

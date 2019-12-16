@@ -411,10 +411,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   @Override
-  public boolean onCreateWindow(WebView view, boolean isDialog, boolean userGesture, final Message resultMsg) {
+  public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, final Message resultMsg) {
     final Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("androidIsDialog", isDialog);
+    obj.put("androidIsUserGesture", isUserGesture);
+    obj.put("iosWKNavigationType", null);
 
     WebView.HitTestResult result = view.getHitTestResult();
     String data = result.getExtra();
@@ -476,6 +479,14 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         callback.invoke(origin, false, false);
       }
     });
+  }
+
+  @Override
+  public void onGeolocationPermissionsHidePrompt() {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    getChannel().invokeMethod("onGeolocationPermissionsHidePrompt", obj);
   }
 
   @Override

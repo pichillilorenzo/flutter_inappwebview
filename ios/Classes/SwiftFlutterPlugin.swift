@@ -61,6 +61,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         if #available(iOS 11.0, *) {
             MyCookieManager(registrar: registrar)
         }
+        if #available(iOS 9.0, *) {
+            MyWebStorageManager(registrar: registrar)
+        }
         CredentialDatabase(registrar: registrar)
     }
     
@@ -253,6 +256,39 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             case "clearCache":
                 self.clearCache(uuid: uuid)
                 result(true)
+                break
+            case "scrollTo":
+                let x = arguments!["x"] as! Int
+                let y = arguments!["y"] as! Int
+                self.scrollTo(uuid: uuid, x: x, y: y)
+                result(true)
+                break
+            case "scrollBy":
+                let x = arguments!["x"] as! Int
+                let y = arguments!["y"] as! Int
+                self.scrollTo(uuid: uuid, x: x, y: y)
+                result(true)
+                break
+            case "pauseTimers":
+               self.pauseTimers(uuid: uuid)
+               result(true)
+               break
+            case "resumeTimers":
+                self.resumeTimers(uuid: uuid)
+                result(true)
+                break
+            case "printCurrentPage":
+                self.printCurrentPage(uuid: uuid, result: result)
+                break
+            case "getContentHeight":
+                result(self.getContentHeight(uuid: uuid))
+                break
+            case "reloadFromOrigin":
+                self.reloadFromOrigin(uuid: uuid)
+                result(true)
+                break
+            case "getScale":
+                result(self.getScale(uuid: uuid))
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -690,33 +726,33 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func onBrowserCreated(uuid: String, webView: WKWebView) {
+    public func onBrowserCreated(uuid: String, webView: WKWebView) {
         if let webViewController = self.webViewControllers[uuid] {
             self.channel!.invokeMethod("onBrowserCreated", arguments: ["uuid": uuid])
         }
     }
     
-    func onExit(uuid: String) {
+    public func onExit(uuid: String) {
         self.channel!.invokeMethod("onExit", arguments: ["uuid": uuid])
     }
     
-    func onChromeSafariBrowserOpened(uuid: String) {
+    public func onChromeSafariBrowserOpened(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
             self.channel!.invokeMethod("onChromeSafariBrowserOpened", arguments: ["uuid": uuid])
         }
     }
     
-    func onChromeSafariBrowserLoaded(uuid: String) {
+    public func onChromeSafariBrowserLoaded(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
             self.channel!.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
         }
     }
     
-    func onChromeSafariBrowserClosed(uuid: String) {
+    public func onChromeSafariBrowserClosed(uuid: String) {
         self.channel!.invokeMethod("onChromeSafariBrowserClosed", arguments: ["uuid": uuid])
     }
     
-    func safariExit(uuid: String) {
+    public func safariExit(uuid: String) {
         if let safariViewController = self.safariViewControllers[uuid] {
             if #available(iOS 9.0, *) {
                 (safariViewController as! SafariViewController).statusDelegate = nil
@@ -727,7 +763,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func browserExit(uuid: String) {
+    public func browserExit(uuid: String) {
         if let webViewController = self.webViewControllers[uuid] {
             // Set navigationDelegate to nil to ensure no callbacks are received from it.
             webViewController?.navigationDelegate = nil
@@ -743,33 +779,33 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func setOptions(uuid: String, options: InAppBrowserOptions, optionsMap: [String: Any]) {
+    public func setOptions(uuid: String, options: InAppBrowserOptions, optionsMap: [String: Any]) {
         if let webViewController = self.webViewControllers[uuid] {
             webViewController!.setOptions(newOptions: options, newOptionsMap: optionsMap)
         }
     }
     
-    func getOptions(uuid: String) -> [String: Any]? {
+    public func getOptions(uuid: String) -> [String: Any]? {
         if let webViewController = self.webViewControllers[uuid] {
             return webViewController!.getOptions()
         }
         return nil
     }
     
-    func getCopyBackForwardList(uuid: String) -> [String: Any]? {
+    public func getCopyBackForwardList(uuid: String) -> [String: Any]? {
         if let webViewController = self.webViewControllers[uuid] {
             return webViewController!.webView.getCopyBackForwardList()
         }
         return nil
     }
     
-    func findAllAsync(uuid: String, find: String) {
+    public func findAllAsync(uuid: String, find: String) {
         if let webViewController = self.webViewControllers[uuid] {
             webViewController!.webView.findAllAsync(find: find, completionHandler: nil)
         }
     }
     
-    func findNext(uuid: String, forward: Bool, result: @escaping FlutterResult) {
+    public func findNext(uuid: String, forward: Bool, result: @escaping FlutterResult) {
         if let webViewController = self.webViewControllers[uuid] {
             webViewController!.webView.findNext(forward: forward, completionHandler: {(value, error) in
                 if error != nil {
@@ -783,7 +819,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func clearMatches(uuid: String, result: @escaping FlutterResult) {
+    public func clearMatches(uuid: String, result: @escaping FlutterResult) {
         if let webViewController = self.webViewControllers[uuid] {
             webViewController!.webView.clearMatches(completionHandler: {(value, error) in
                 if error != nil {
@@ -797,12 +833,69 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    func clearCache(uuid: String) {
+    public func clearCache(uuid: String) {
         if let webViewController = self.webViewControllers[uuid] {
             webViewController!.webView.clearCache()
         }
     }
     
+    public func scrollTo(uuid: String, x: Int, y: Int) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.scrollTo(x: x, y: y)
+        }
+    }
+    
+    public func scrollBy(uuid: String, x: Int, y: Int) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.scrollBy(x: x, y: y)
+        }
+    }
+    
+    public func pauseTimers(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.pauseTimers()
+        }
+    }
+    
+    public func resumeTimers(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.resumeTimers()
+        }
+    }
+    
+    public func printCurrentPage(uuid: String, result: @escaping FlutterResult) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.printCurrentPage(printCompletionHandler: {(completed, error) in
+                if !completed, let e = error {
+                    result(false)
+                    return
+                }
+                result(true)
+            })
+        } else {
+            result(false)
+        }
+    }
+    
+    public func getContentHeight(uuid: String) -> Int64? {
+        if let webViewController = self.webViewControllers[uuid] {
+            return webViewController!.webView.getContentHeight()
+        }
+        return nil
+    }
+    
+    public func reloadFromOrigin(uuid: String) {
+        if let webViewController = self.webViewControllers[uuid] {
+            webViewController!.webView.reloadFromOrigin()
+        }
+    }
+    
+    public func getScale(uuid: String) -> Float? {
+        if let webViewController = self.webViewControllers[uuid] {
+            return webViewController!.webView.getScale()
+        }
+        return nil
+    }
 }
 
 // Helper function inserted by Swift 4.2 migrator.

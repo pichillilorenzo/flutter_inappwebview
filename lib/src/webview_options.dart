@@ -606,6 +606,12 @@ class IosInAppWebViewOptions
   ///**NOTE**: available on iOS 11.0+.
   bool sharedCookiesEnabled;
 
+  ///Set `false` if scrollView of WKWebView should not automatically adjust scroll indicator insets.
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 13.0+.
+  bool automaticallyAdjustsScrollIndicatorInsets;
+
   IosInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -619,7 +625,8 @@ class IosInAppWebViewOptions
       this.isFraudulentWebsiteWarningEnabled = true,
       this.selectionGranularity = IosInAppWebViewSelectionGranularity.DYNAMIC,
       this.dataDetectorTypes = const [IosInAppWebViewDataDetectorTypes.NONE],
-      this.sharedCookiesEnabled = false});
+      this.sharedCookiesEnabled = false,
+      this.automaticallyAdjustsScrollIndicatorInsets = true});
 
   @override
   Map<String, dynamic> toMap() {
@@ -643,7 +650,9 @@ class IosInAppWebViewOptions
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
       "selectionGranularity": selectionGranularity.toValue(),
       "dataDetectorTypes": dataDetectorTypesList,
-      "sharedCookiesEnabled": sharedCookiesEnabled
+      "sharedCookiesEnabled": sharedCookiesEnabled,
+      "automaticallyAdjustsScrollIndicatorInsets":
+          automaticallyAdjustsScrollIndicatorInsets
     };
   }
 

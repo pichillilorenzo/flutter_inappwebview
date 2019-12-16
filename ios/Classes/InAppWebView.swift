@@ -856,6 +856,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.clearCache)! {
             clearCache()
         }
+        
+        if #available(iOS 13.0, *) {
+            scrollView.automaticallyAdjustsScrollIndicatorInsets = (options?.automaticallyAdjustsScrollIndicatorInsets)!
+        }
     }
     
     @available(iOS 10.0, *)
@@ -1239,7 +1243,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             if error != nil {
                 let userInfo = (error! as NSError).userInfo
-                self.onConsoleMessage(message: userInfo["WKJavaScriptExceptionMessage"] as! String, messageLevel: 3)
+                self.onConsoleMessage(message: userInfo["WKJavaScriptExceptionMessage"] as? String ?? "", messageLevel: 3)
             }
             
             if value == nil {

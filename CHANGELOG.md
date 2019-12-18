@@ -11,6 +11,7 @@
 - Added `reloadFromOrigin` webview method for iOS
 - Added `automaticallyAdjustsScrollIndicatorInsets` webview options for iOS
 - Added `WebStorageManager` class which manages the web storage used by WebView instances
+- Added `packageName` [#229](https://github.com/pichillilorenzo/flutter_inappwebview/issues/229) and `keepAliveEnabled` ChromeCustomTab options for Android
 - Updated for Flutter 1.12 new Java Embedding API (Android)
 - Updated `clearCache` for Android
 - Updated default value for `domStorageEnabled` and `databaseEnabled` options to `true` for Android
@@ -34,7 +35,9 @@
   - Renamed `onPermissionRequest` to `androidOnPermissionRequest`  
 - Updated attribute names for `InAppWebViewWidgetOptions`, `InAppBrowserClassOptions` and `ChromeSafariBrowserClassOptions` classes
 - Renamed and updated `onNavigationStateChange` to `onUpdateVisitedHistory`
-- Renamed all iOS options prefix from `Ios` to `IOS`
+- Renamed all iOS and Android webview options class
+- Renamed Chrome Custom Tab `addShareButton` option to `addDefaultShareMenuItem`
+- Renamed ChromeSafariBrowser `onLoaded` to `onCompletedInitialLoad`
 
 ## 2.1.0+1
 

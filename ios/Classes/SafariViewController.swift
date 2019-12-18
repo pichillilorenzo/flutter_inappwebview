@@ -59,11 +59,30 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
     func safariViewController(_ controller: SFSafariViewController,
                               didCompleteInitialLoad didLoadSuccessfully: Bool) {
         if didLoadSuccessfully {
-            statusDelegate?.onChromeSafariBrowserLoaded(uuid: self.uuid)
+            statusDelegate?.onChromeSafariBrowserCompletedInitialLoad(uuid: self.uuid)
         }
         else {
             print("Cant load successfully the 'SafariViewController'.")
         }
+    }
+    
+    func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
+//        print("activityItemsFor")
+//        print(URL)
+//        print(title)
+        return []
+    }
+
+    func safariViewController(_ controller: SFSafariViewController, excludedActivityTypesFor URL: URL, title: String?) -> [UIActivity.ActivityType] {
+//        print("excludedActivityTypesFor")
+//        print(URL)
+//        print(title)
+        return []
+    }
+
+    func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo URL: URL) {
+//        print("initialLoadDidRedirectTo")
+//        print(URL)
     }
     
     // Helper function to convert hex color string to UIColor

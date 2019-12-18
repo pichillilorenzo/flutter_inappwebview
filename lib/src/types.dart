@@ -723,13 +723,13 @@ class Favicon {
   }
 }
 
-///AndroidInAppWebViewCacheMode class represents an Android-specific class used to override the way the cache is used.
-class AndroidInAppWebViewCacheMode {
+///AndroidCacheMode class represents an Android-specific class used to override the way the cache is used.
+class AndroidCacheMode {
   final int _value;
-  const AndroidInAppWebViewCacheMode._internal(this._value);
-  static AndroidInAppWebViewCacheMode fromValue(int value) {
+  const AndroidCacheMode._internal(this._value);
+  static AndroidCacheMode fromValue(int value) {
     if (value != null && value >= 0 && value <= 3)
-      return AndroidInAppWebViewCacheMode._internal(value);
+      return AndroidCacheMode._internal(value);
     return null;
   }
 
@@ -751,18 +751,18 @@ class AndroidInAppWebViewCacheMode {
 
   ///Default cache usage mode. If the navigation type doesn't impose any specific behavior,
   ///use cached resources when they are available and not expired, otherwise load resources from the network.
-  static const LOAD_DEFAULT = const AndroidInAppWebViewCacheMode._internal(-1);
+  static const LOAD_DEFAULT = const AndroidCacheMode._internal(-1);
 
   ///Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
   static const LOAD_CACHE_ELSE_NETWORK =
-      const AndroidInAppWebViewCacheMode._internal(1);
+      const AndroidCacheMode._internal(1);
 
   ///Don't use the cache, load from the network.
-  static const LOAD_NO_CACHE = const AndroidInAppWebViewCacheMode._internal(2);
+  static const LOAD_NO_CACHE = const AndroidCacheMode._internal(2);
 
   ///Don't use the network, load from the cache.
   static const LOAD_CACHE_ONLY =
-      const AndroidInAppWebViewCacheMode._internal(3);
+      const AndroidCacheMode._internal(3);
 
   bool operator ==(value) => value == _value;
 
@@ -770,15 +770,15 @@ class AndroidInAppWebViewCacheMode {
   int get hashCode => _value.hashCode;
 }
 
-///AndroidInAppWebViewModeMenuItem class represents an Android-specific class used to disable the action mode menu items.
+///AndroidActionModeMenuItem class represents an Android-specific class used to disable the action mode menu items.
 ///
 ///**NOTE**: available on Android 24+.
-class AndroidInAppWebViewModeMenuItem {
+class AndroidActionModeMenuItem {
   final int _value;
-  const AndroidInAppWebViewModeMenuItem._internal(this._value);
-  static AndroidInAppWebViewModeMenuItem fromValue(int value) {
+  const AndroidActionModeMenuItem._internal(this._value);
+  static AndroidActionModeMenuItem fromValue(int value) {
     if (value != null && value != 3 && value >= 0 && value <= 4)
-      return AndroidInAppWebViewModeMenuItem._internal(value);
+      return AndroidActionModeMenuItem._internal(value);
     return null;
   }
 
@@ -800,19 +800,19 @@ class AndroidInAppWebViewModeMenuItem {
 
   ///No menu items should be disabled.
   static const MENU_ITEM_NONE =
-      const AndroidInAppWebViewModeMenuItem._internal(0);
+      const AndroidActionModeMenuItem._internal(0);
 
   ///Disable menu item "Share".
   static const MENU_ITEM_SHARE =
-      const AndroidInAppWebViewModeMenuItem._internal(1);
+      const AndroidActionModeMenuItem._internal(1);
 
   ///Disable menu item "Web Search".
   static const MENU_ITEM_WEB_SEARCH =
-      const AndroidInAppWebViewModeMenuItem._internal(2);
+      const AndroidActionModeMenuItem._internal(2);
 
   ///Disable all the action mode menu items for text processing.
   static const MENU_ITEM_PROCESS_TEXT =
-      const AndroidInAppWebViewModeMenuItem._internal(4);
+      const AndroidActionModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
 
@@ -820,15 +820,15 @@ class AndroidInAppWebViewModeMenuItem {
   int get hashCode => _value.hashCode;
 }
 
-///AndroidInAppWebViewForceDark class represents an Android-specific class used to indicate the force dark mode.
+///AndroidForceDark class represents an Android-specific class used to indicate the force dark mode.
 ///
 ///**NOTE**: available on Android 29+.
-class AndroidInAppWebViewForceDark {
+class AndroidForceDark {
   final int _value;
-  const AndroidInAppWebViewForceDark._internal(this._value);
-  static AndroidInAppWebViewForceDark fromValue(int value) {
+  const AndroidForceDark._internal(this._value);
+  static AndroidForceDark fromValue(int value) {
     if (value != null && value >= 0 && value <= 2)
-      return AndroidInAppWebViewForceDark._internal(value);
+      return AndroidForceDark._internal(value);
     return null;
   }
 
@@ -848,14 +848,14 @@ class AndroidInAppWebViewForceDark {
 
   ///Disable force dark, irrespective of the force dark mode of the WebView parent.
   ///In this mode, WebView content will always be rendered as-is, regardless of whether native views are being automatically darkened.
-  static const FORCE_DARK_OFF = const AndroidInAppWebViewForceDark._internal(0);
+  static const FORCE_DARK_OFF = const AndroidForceDark._internal(0);
 
   ///Enable force dark dependent on the state of the WebView parent view.
   static const FORCE_DARK_AUTO =
-      const AndroidInAppWebViewForceDark._internal(1);
+      const AndroidForceDark._internal(1);
 
   ///Unconditionally enable force dark. In this mode WebView content will always be rendered so as to emulate a dark theme.
-  static const FORCE_DARK_ON = const AndroidInAppWebViewForceDark._internal(2);
+  static const FORCE_DARK_ON = const AndroidForceDark._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -863,13 +863,13 @@ class AndroidInAppWebViewForceDark {
   int get hashCode => _value.hashCode;
 }
 
-///AndroidInAppWebViewLayoutAlgorithm class represents an Android-specific class used to set the underlying layout algorithm.
-class AndroidInAppWebViewLayoutAlgorithm {
+///AndroidLayoutAlgorithm class represents an Android-specific class used to set the underlying layout algorithm.
+class AndroidLayoutAlgorithm {
   final String _value;
-  const AndroidInAppWebViewLayoutAlgorithm._internal(this._value);
-  static AndroidInAppWebViewLayoutAlgorithm fromValue(String value) {
+  const AndroidLayoutAlgorithm._internal(this._value);
+  static AndroidLayoutAlgorithm fromValue(String value) {
     return (["NORMAL", "TEXT_AUTOSIZING"].contains(value))
-        ? AndroidInAppWebViewLayoutAlgorithm._internal(value)
+        ? AndroidLayoutAlgorithm._internal(value)
         : null;
   }
 
@@ -879,14 +879,14 @@ class AndroidInAppWebViewLayoutAlgorithm {
 
   ///NORMAL means no rendering changes. This is the recommended choice for maximum compatibility across different platforms and Android versions.
   static const NORMAL =
-      const AndroidInAppWebViewLayoutAlgorithm._internal("NORMAL");
+      const AndroidLayoutAlgorithm._internal("NORMAL");
 
   ///TEXT_AUTOSIZING boosts font size of paragraphs based on heuristics to make the text readable when viewing a wide-viewport layout in the overview mode.
   ///It is recommended to enable zoom support [AndroidInAppWebViewOptions.supportZoom] when using this mode.
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =
-      const AndroidInAppWebViewLayoutAlgorithm._internal("TEXT_AUTOSIZING");
+      const AndroidLayoutAlgorithm._internal("TEXT_AUTOSIZING");
 
   bool operator ==(value) => value == _value;
 
@@ -894,15 +894,15 @@ class AndroidInAppWebViewLayoutAlgorithm {
   int get hashCode => _value.hashCode;
 }
 
-///AndroidInAppWebViewMixedContentMode class represents an Android-specific class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
+///AndroidMixedContentMode class represents an Android-specific class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
 ///
 ///**NOTE**: available on Android 21+.
-class AndroidInAppWebViewMixedContentMode {
+class AndroidMixedContentMode {
   final int _value;
-  const AndroidInAppWebViewMixedContentMode._internal(this._value);
-  static AndroidInAppWebViewMixedContentMode fromValue(int value) {
+  const AndroidMixedContentMode._internal(this._value);
+  static AndroidMixedContentMode fromValue(int value) {
     if (value != null && value >= 0 && value <= 2)
-      return AndroidInAppWebViewMixedContentMode._internal(value);
+      return AndroidMixedContentMode._internal(value);
     return null;
   }
 
@@ -923,20 +923,20 @@ class AndroidInAppWebViewMixedContentMode {
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
   static const MIXED_CONTENT_ALWAYS_ALLOW =
-      const AndroidInAppWebViewMixedContentMode._internal(0);
+      const AndroidMixedContentMode._internal(0);
 
   ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
   ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
   static const MIXED_CONTENT_NEVER_ALLOW =
-      const AndroidInAppWebViewMixedContentMode._internal(1);
+      const AndroidMixedContentMode._internal(1);
 
   ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
   ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
   ///The types of content are allowed or blocked may change release to release and are not explicitly defined.
   ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
-  ///For highest security, apps are recommended to use [AndroidInAppWebViewMixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
+  ///For highest security, apps are recommended to use [AndroidMixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
   static const MIXED_CONTENT_COMPATIBILITY_MODE =
-      const AndroidInAppWebViewMixedContentMode._internal(2);
+      const AndroidMixedContentMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -944,13 +944,13 @@ class AndroidInAppWebViewMixedContentMode {
   int get hashCode => _value.hashCode;
 }
 
-///IOSInAppWebViewSelectionGranularity class represents an iOS-specific class used to set the level of granularity with which the user can interactively select content in the web view.
-class IOSInAppWebViewSelectionGranularity {
+///IOSWKSelectionGranularity class represents an iOS-specific class used to set the level of granularity with which the user can interactively select content in the web view.
+class IOSWKSelectionGranularity {
   final int _value;
-  const IOSInAppWebViewSelectionGranularity._internal(this._value);
-  static IOSInAppWebViewSelectionGranularity fromValue(int value) {
+  const IOSWKSelectionGranularity._internal(this._value);
+  static IOSWKSelectionGranularity fromValue(int value) {
     if (value != null && value >= 0 && value <= 1)
-      return IOSInAppWebViewSelectionGranularity._internal(value);
+      return IOSWKSelectionGranularity._internal(value);
     return null;
   }
 
@@ -967,11 +967,11 @@ class IOSInAppWebViewSelectionGranularity {
   }
 
   ///Selection granularity varies automatically based on the selection.
-  static const DYNAMIC = const IOSInAppWebViewSelectionGranularity._internal(0);
+  static const DYNAMIC = const IOSWKSelectionGranularity._internal(0);
 
   ///Selection endpoints can be placed at any character boundary.
   static const CHARACTER =
-      const IOSInAppWebViewSelectionGranularity._internal(1);
+      const IOSWKSelectionGranularity._internal(1);
 
   bool operator ==(value) => value == _value;
 
@@ -979,13 +979,13 @@ class IOSInAppWebViewSelectionGranularity {
   int get hashCode => _value.hashCode;
 }
 
-///IOSInAppWebViewDataDetectorTypes class represents an iOS-specific class used to specify a dataDetectoryTypes value that adds interactivity to web content that matches the value.
+///IOSWKDataDetectorTypes class represents an iOS-specific class used to specify a dataDetectoryTypes value that adds interactivity to web content that matches the value.
 ///
 ///**NOTE**: available on iOS 10.0+.
-class IOSInAppWebViewDataDetectorTypes {
+class IOSWKDataDetectorTypes {
   final String _value;
-  const IOSInAppWebViewDataDetectorTypes._internal(this._value);
-  static IOSInAppWebViewDataDetectorTypes fromValue(String value) {
+  const IOSWKDataDetectorTypes._internal(this._value);
+  static IOSWKDataDetectorTypes fromValue(String value) {
     return ([
       "NONE",
       "PHONE_NUMBER",
@@ -999,7 +999,7 @@ class IOSInAppWebViewDataDetectorTypes {
       "SPOTLIGHT_SUGGESTION",
       "ALL"
     ].contains(value))
-        ? IOSInAppWebViewDataDetectorTypes._internal(value)
+        ? IOSWKDataDetectorTypes._internal(value)
         : null;
   }
 
@@ -1008,41 +1008,41 @@ class IOSInAppWebViewDataDetectorTypes {
   String toString() => _value;
 
   ///No detection is performed.
-  static const NONE = const IOSInAppWebViewDataDetectorTypes._internal("NONE");
+  static const NONE = const IOSWKDataDetectorTypes._internal("NONE");
 
   ///Phone numbers are detected and turned into links.
   static const PHONE_NUMBER =
-      const IOSInAppWebViewDataDetectorTypes._internal("PHONE_NUMBER");
+      const IOSWKDataDetectorTypes._internal("PHONE_NUMBER");
 
   ///URLs in text are detected and turned into links.
-  static const LINK = const IOSInAppWebViewDataDetectorTypes._internal("LINK");
+  static const LINK = const IOSWKDataDetectorTypes._internal("LINK");
 
   ///Addresses are detected and turned into links.
   static const ADDRESS =
-      const IOSInAppWebViewDataDetectorTypes._internal("ADDRESS");
+      const IOSWKDataDetectorTypes._internal("ADDRESS");
 
   ///Dates and times that are in the future are detected and turned into links.
   static const CALENDAR_EVENT =
-      const IOSInAppWebViewDataDetectorTypes._internal("CALENDAR_EVENT");
+      const IOSWKDataDetectorTypes._internal("CALENDAR_EVENT");
 
   ///Tracking numbers are detected and turned into links.
   static const TRACKING_NUMBER =
-      const IOSInAppWebViewDataDetectorTypes._internal("TRACKING_NUMBER");
+      const IOSWKDataDetectorTypes._internal("TRACKING_NUMBER");
 
   ///Flight numbers are detected and turned into links.
   static const FLIGHT_NUMBER =
-      const IOSInAppWebViewDataDetectorTypes._internal("FLIGHT_NUMBER");
+      const IOSWKDataDetectorTypes._internal("FLIGHT_NUMBER");
 
   ///Lookup suggestions are detected and turned into links.
   static const LOOKUP_SUGGESTION =
-      const IOSInAppWebViewDataDetectorTypes._internal("LOOKUP_SUGGESTION");
+      const IOSWKDataDetectorTypes._internal("LOOKUP_SUGGESTION");
 
   ///Spotlight suggestions are detected and turned into links.
   static const SPOTLIGHT_SUGGESTION =
-      const IOSInAppWebViewDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+      const IOSWKDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
 
   ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
-  static const ALL = const IOSInAppWebViewDataDetectorTypes._internal("ALL");
+  static const ALL = const IOSWKDataDetectorTypes._internal("ALL");
 
   bool operator ==(value) => value == _value;
 
@@ -1050,13 +1050,13 @@ class IOSInAppWebViewDataDetectorTypes {
   int get hashCode => _value.hashCode;
 }
 
-///InAppWebViewUserPreferredContentMode class represents the content mode to prefer when loading and rendering a webpage.
-class InAppWebViewUserPreferredContentMode {
+///UserPreferredContentMode class represents the content mode to prefer when loading and rendering a webpage.
+class UserPreferredContentMode {
   final int _value;
-  const InAppWebViewUserPreferredContentMode._internal(this._value);
-  static InAppWebViewUserPreferredContentMode fromValue(int value) {
+  const UserPreferredContentMode._internal(this._value);
+  static UserPreferredContentMode fromValue(int value) {
     if (value != null && value >= 0 && value <= 2)
-      return InAppWebViewUserPreferredContentMode._internal(value);
+      return UserPreferredContentMode._internal(value);
     return null;
   }
 
@@ -1076,14 +1076,14 @@ class InAppWebViewUserPreferredContentMode {
 
   ///The recommended content mode for the current platform.
   static const RECOMMENDED =
-      const InAppWebViewUserPreferredContentMode._internal(0);
+      const UserPreferredContentMode._internal(0);
 
   ///Represents content targeting mobile browsers.
-  static const MOBILE = const InAppWebViewUserPreferredContentMode._internal(1);
+  static const MOBILE = const UserPreferredContentMode._internal(1);
 
   ///Represents content targeting desktop browsers.
   static const DESKTOP =
-      const InAppWebViewUserPreferredContentMode._internal(2);
+      const UserPreferredContentMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -1091,13 +1091,13 @@ class InAppWebViewUserPreferredContentMode {
   int get hashCode => _value.hashCode;
 }
 
-///IOSWebViewOptionsPresentationStyle class represents an iOS-specific class used to specify the modal presentation style when presenting a view controller.
-class IOSWebViewOptionsPresentationStyle {
+///IOSUIModalPresentationStyle class represents an iOS-specific class used to specify the modal presentation style when presenting a view controller.
+class IOSUIModalPresentationStyle {
   final int _value;
-  const IOSWebViewOptionsPresentationStyle._internal(this._value);
-  static IOSWebViewOptionsPresentationStyle fromValue(int value) {
+  const IOSUIModalPresentationStyle._internal(this._value);
+  static IOSUIModalPresentationStyle fromValue(int value) {
     if (value != null && value >= 0 && value <= 9)
-      return IOSWebViewOptionsPresentationStyle._internal(value);
+      return IOSUIModalPresentationStyle._internal(value);
     return null;
   }
 
@@ -1131,42 +1131,42 @@ class IOSWebViewOptionsPresentationStyle {
 
   ///A presentation style in which the presented view covers the screen.
   static const FULL_SCREEN =
-      const IOSWebViewOptionsPresentationStyle._internal(0);
+      const IOSUIModalPresentationStyle._internal(0);
 
   ///A presentation style that partially covers the underlying content.
   static const PAGE_SHEET =
-      const IOSWebViewOptionsPresentationStyle._internal(1);
+      const IOSUIModalPresentationStyle._internal(1);
 
   ///A presentation style that displays the content centered in the screen.
   static const FORM_SHEET =
-      const IOSWebViewOptionsPresentationStyle._internal(2);
+      const IOSUIModalPresentationStyle._internal(2);
 
   ///A presentation style where the content is displayed over another view controller’s content.
   static const CURRENT_CONTEXT =
-      const IOSWebViewOptionsPresentationStyle._internal(3);
+      const IOSUIModalPresentationStyle._internal(3);
 
   ///A custom view presentation style that is managed by a custom presentation controller and one or more custom animator objects.
-  static const CUSTOM = const IOSWebViewOptionsPresentationStyle._internal(4);
+  static const CUSTOM = const IOSUIModalPresentationStyle._internal(4);
 
   ///A view presentation style in which the presented view covers the screen.
   static const OVER_FULL_SCREEN =
-      const IOSWebViewOptionsPresentationStyle._internal(5);
+      const IOSUIModalPresentationStyle._internal(5);
 
   ///A presentation style where the content is displayed over another view controller’s content.
   static const OVER_CURRENT_CONTEXT =
-      const IOSWebViewOptionsPresentationStyle._internal(6);
+      const IOSUIModalPresentationStyle._internal(6);
 
   ///A presentation style where the content is displayed in a popover view.
-  static const POPOVER = const IOSWebViewOptionsPresentationStyle._internal(7);
+  static const POPOVER = const IOSUIModalPresentationStyle._internal(7);
 
   ///A presentation style that indicates no adaptations should be made.
-  static const NONE = const IOSWebViewOptionsPresentationStyle._internal(8);
+  static const NONE = const IOSUIModalPresentationStyle._internal(8);
 
   ///The default presentation style chosen by the system.
   ///
   ///**NOTE**: available on iOS 13.0+.
   static const AUTOMATIC =
-      const IOSWebViewOptionsPresentationStyle._internal(9);
+      const IOSUIModalPresentationStyle._internal(9);
 
   bool operator ==(value) => value == _value;
 
@@ -1174,13 +1174,13 @@ class IOSWebViewOptionsPresentationStyle {
   int get hashCode => _value.hashCode;
 }
 
-///IOSWebViewOptionsTransitionStyle class represents an iOS-specific class used to specify the transition style when presenting a view controller.
-class IOSWebViewOptionsTransitionStyle {
+///IOSUIModalTransitionStyle class represents an iOS-specific class used to specify the transition style when presenting a view controller.
+class IOSUIModalTransitionStyle {
   final int _value;
-  const IOSWebViewOptionsTransitionStyle._internal(this._value);
-  static IOSWebViewOptionsTransitionStyle fromValue(int value) {
+  const IOSUIModalTransitionStyle._internal(this._value);
+  static IOSUIModalTransitionStyle fromValue(int value) {
     if (value != null && value >= 0 && value <= 3)
-      return IOSWebViewOptionsTransitionStyle._internal(value);
+      return IOSUIModalTransitionStyle._internal(value);
     return null;
   }
 
@@ -1203,24 +1203,24 @@ class IOSWebViewOptionsTransitionStyle {
   ///When the view controller is presented, its view slides up from the bottom of the screen.
   ///On dismissal, the view slides back down. This is the default transition style.
   static const COVER_VERTICAL =
-      const IOSWebViewOptionsTransitionStyle._internal(0);
+      const IOSUIModalTransitionStyle._internal(0);
 
   ///When the view controller is presented, the current view initiates a horizontal 3D flip from right-to-left,
   ///resulting in the revealing of the new view as if it were on the back of the previous view.
   ///On dismissal, the flip occurs from left-to-right, returning to the original view.
   static const FLIP_HORIZONTAL =
-      const IOSWebViewOptionsTransitionStyle._internal(1);
+      const IOSUIModalTransitionStyle._internal(1);
 
   ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
   ///On dismissal, a similar type of cross-fade is used to return to the original view.
   static const CROSS_DISSOLVE =
-      const IOSWebViewOptionsTransitionStyle._internal(2);
+      const IOSUIModalTransitionStyle._internal(2);
 
   ///When the view controller is presented, one corner of the current view curls up to reveal the presented view underneath.
   ///On dismissal, the curled up page unfurls itself back on top of the presented view.
   ///A view controller presented using this transition is itself prevented from presenting any additional view controllers.
   static const PARTIAL_CURL =
-      const IOSWebViewOptionsTransitionStyle._internal(3);
+      const IOSUIModalTransitionStyle._internal(3);
 
   bool operator ==(value) => value == _value;
 
@@ -1228,15 +1228,15 @@ class IOSWebViewOptionsTransitionStyle {
   int get hashCode => _value.hashCode;
 }
 
-///IOSSafariOptionsDismissButtonStyle class represents an iOS-specific class used to set the custom style for the dismiss button.
+///IOSSafariDismissButtonStyle class represents an iOS-specific class used to set the custom style for the dismiss button.
 ///
 ///**NOTE**: available on iOS 11.0+.
-class IOSSafariOptionsDismissButtonStyle {
+class IOSSafariDismissButtonStyle {
   final int _value;
-  const IOSSafariOptionsDismissButtonStyle._internal(this._value);
-  static IOSSafariOptionsDismissButtonStyle fromValue(int value) {
+  const IOSSafariDismissButtonStyle._internal(this._value);
+  static IOSSafariDismissButtonStyle fromValue(int value) {
     if (value != null && value >= 0 && value <= 2)
-      return IOSSafariOptionsDismissButtonStyle._internal(value);
+      return IOSSafariDismissButtonStyle._internal(value);
     return null;
   }
 
@@ -1255,13 +1255,13 @@ class IOSSafariOptionsDismissButtonStyle {
   }
 
   ///Makes the button title the localized string "Done".
-  static const DONE = const IOSSafariOptionsDismissButtonStyle._internal(0);
+  static const DONE = const IOSSafariDismissButtonStyle._internal(0);
 
   ///Makes the button title the localized string "Close".
-  static const CLOSE = const IOSSafariOptionsDismissButtonStyle._internal(1);
+  static const CLOSE = const IOSSafariDismissButtonStyle._internal(1);
 
   ///Makes the button title the localized string "Cancel".
-  static const CANCEL = const IOSSafariOptionsDismissButtonStyle._internal(2);
+  static const CANCEL = const IOSSafariDismissButtonStyle._internal(2);
 
   bool operator ==(value) => value == _value;
 

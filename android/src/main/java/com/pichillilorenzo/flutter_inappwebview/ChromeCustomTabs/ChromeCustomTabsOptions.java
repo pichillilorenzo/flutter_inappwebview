@@ -6,10 +6,12 @@ public class ChromeCustomTabsOptions extends Options {
 
     final static String LOG_TAG = "ChromeCustomTabsOptions";
 
-    public boolean addShareButton = true;
-    public boolean showTitle = true;
+    public Boolean addDefaultShareMenuItem = true;
+    public Boolean showTitle = true;
     public String toolbarBackgroundColor = "";
-    public boolean enableUrlBarHiding = false;
-    public boolean instantAppsEnabled = false;
+    public Boolean enableUrlBarHiding = false;
+    public Boolean instantAppsEnabled = false;
+    public String packageName;
+    public Boolean keepAliveEnabled = false;
 
 }

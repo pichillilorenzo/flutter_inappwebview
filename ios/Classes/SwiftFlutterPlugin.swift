@@ -432,11 +432,10 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
                 safari.safariOptions = safariOptions
                 
                 self.safariViewControllers[uuid] = safari
-                
-                tmpController.present(self.safariViewControllers[uuid]! as! SFSafariViewController, animated: true)
-                onChromeSafariBrowserOpened(uuid: uuid)
-                result(true)
-                
+                tmpController.present(self.safariViewControllers[uuid]! as! SFSafariViewController, animated: true) {
+                    self.onChromeSafariBrowserOpened(uuid: uuid)
+                    result(true)
+                }
                 return
             }
             else {
@@ -742,9 +741,9 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
     }
     
-    public func onChromeSafariBrowserLoaded(uuid: String) {
+    public func onChromeSafariBrowserCompletedInitialLoad(uuid: String) {
         if self.safariViewControllers[uuid] != nil {
-            self.channel!.invokeMethod("onChromeSafariBrowserLoaded", arguments: ["uuid": uuid])
+            self.channel!.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", arguments: ["uuid": uuid])
         }
     }
     

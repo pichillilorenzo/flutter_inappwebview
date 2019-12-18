@@ -32,8 +32,8 @@ class ChromeSafariBrowser {
       case "onChromeSafariBrowserOpened":
         onOpened();
         break;
-      case "onChromeSafariBrowserLoaded":
-        onLoaded();
+      case "onChromeSafariBrowserCompletedInitialLoad":
+        onCompletedInitialLoad();
         break;
       case "onChromeSafariBrowserClosed":
         onClosed();
@@ -109,8 +109,8 @@ class ChromeSafariBrowser {
   ///Event fires when the [ChromeSafariBrowser] is opened.
   void onOpened() {}
 
-  ///Event fires when the [ChromeSafariBrowser] is loaded.
-  void onLoaded() {}
+  ///Event fires when the initial URL load is complete.
+  void onCompletedInitialLoad() {}
 
   ///Event fires when the [ChromeSafariBrowser] is closed.
   void onClosed() {}

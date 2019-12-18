@@ -1036,8 +1036,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
             }
             configuration.dataDetectorTypes = dataDetectorTypes
-        } else {
-            // Fallback on earlier versions
         }
         
         if #available(iOS 13.0, *) {
@@ -1046,8 +1044,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: (options?.preferredContentMode)!)!
             }
             scrollView.automaticallyAdjustsScrollIndicatorInsets = (options?.automaticallyAdjustsScrollIndicatorInsets)!
-        } else {
-            // Fallback on earlier versions
         }
         
         scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
@@ -1110,8 +1106,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     configuration.setURLSchemeHandler(CustomeSchemeHandler(), forURLScheme: scheme)
                 }
             }
-        } else {
-            // Fallback on earlier versions
         }
         
         return configuration
@@ -1335,11 +1329,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
                 configuration.dataDetectorTypes = dataDetectorTypes
             }
-        } else {
-            // Fallback on earlier versions
         }
-        
-        scrollView
         
         if #available(iOS 13.0, *) {
             if newOptionsMap["isFraudulentWebsiteWarningEnabled"] != nil && options?.isFraudulentWebsiteWarningEnabled != newOptions.isFraudulentWebsiteWarningEnabled {
@@ -1351,8 +1341,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if newOptionsMap["automaticallyAdjustsScrollIndicatorInsets"] != nil && options?.automaticallyAdjustsScrollIndicatorInsets != newOptions.automaticallyAdjustsScrollIndicatorInsets {
                 scrollView.automaticallyAdjustsScrollIndicatorInsets = newOptions.automaticallyAdjustsScrollIndicatorInsets
             }
-        } else {
-            // Fallback on earlier versions
         }
         
         if newOptionsMap["verticalScrollBarEnabled"] != nil && options?.verticalScrollBarEnabled != newOptions.verticalScrollBarEnabled {

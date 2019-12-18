@@ -3,6 +3,8 @@ package com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs;
 import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
+
+import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.customtabs.CustomTabsServiceConnection;
@@ -18,6 +20,7 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
     private CustomTabsClient mClient;
     private CustomTabsServiceConnection mConnection;
     private ConnectionCallback mConnectionCallback;
+    private CustomTabsCallback mCustomTabsCallback;
 
     /**
      * Opens the URL on a Custom Tab if possible. Otherwise fallsback to opening it on a WebView.
@@ -59,7 +62,7 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
         if (mClient == null) {
             mCustomTabsSession = null;
         } else if (mCustomTabsSession == null) {
-            mCustomTabsSession = mClient.newSession(null);
+            mCustomTabsSession = mClient.newSession(mCustomTabsCallback);
         }
         return mCustomTabsSession;
     }
@@ -70,6 +73,10 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
      */
     public void setConnectionCallback(ConnectionCallback connectionCallback) {
         this.mConnectionCallback = connectionCallback;
+    }
+
+    public void setCustomTabsCallback(CustomTabsCallback customTabsCallback) {
+        this.mCustomTabsCallback = customTabsCallback;
     }
 
     /**

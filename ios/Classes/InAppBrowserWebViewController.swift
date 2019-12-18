@@ -431,7 +431,9 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
         if browserOptions?.closeButtonColor != "" {
             closeButton.tintColor = color(fromHexString: (browserOptions?.closeButtonColor)!)
         }
-        
+    }
+    
+    public func prepareBeforeViewWillAppear() {
         self.modalPresentationStyle = UIModalPresentationStyle(rawValue: (browserOptions?.presentationStyle)!)!
         self.modalTransitionStyle = UIModalTransitionStyle(rawValue: (browserOptions?.transitionStyle)!)!
     }

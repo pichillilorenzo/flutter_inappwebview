@@ -106,6 +106,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         webViewController.webViewOptions = webViewOptions
         webViewController.isHidden = browserOptions.hidden
         webViewController.previousStatusBarStyle = previousStatusBarStyle
+        webViewController.prepareBeforeViewWillAppear()
         return webViewController
     }
     

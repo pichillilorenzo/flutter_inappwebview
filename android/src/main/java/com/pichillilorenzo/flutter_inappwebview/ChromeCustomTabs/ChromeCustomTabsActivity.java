@@ -5,7 +5,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -14,16 +13,21 @@ import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.Shared;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ChromeCustomTabsActivity extends Activity {
+import io.flutter.plugin.common.MethodCall;
+import io.flutter.plugin.common.MethodChannel;
+
+public class ChromeCustomTabsActivity extends Activity implements MethodChannel.MethodCallHandler {
 
   protected static final String LOG_TAG = "CustomTabsActivity";
-  String uuid;
-  CustomTabsIntent.Builder builder;
-  ChromeCustomTabsOptions options;
+  public MethodChannel channel;
+  public String uuid;
+  private CustomTabsIntent.Builder builder;
+  private ChromeCustomTabsOptions options;
   private CustomTabActivityHelper customTabActivityHelper;
   private CustomTabsSession customTabsSession;
   private final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
@@ -39,12 +43,14 @@ public class ChromeCustomTabsActivity extends Activity {
     Bundle b = getIntent().getExtras();
     assert b != null;
     uuid = b.getString("uuid");
+
+    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid);
+    channel.setMethodCallHandler(this);
+
     final String url = b.getString("url");
 
     options = new ChromeCustomTabsOptions();
     options.parse((HashMap<String, Object>) b.getSerializable("options"));
-
-    InAppWebViewFlutterPlugin.inAppBrowser.chromeCustomTabsActivities.put(uuid, this);
 
     final ChromeCustomTabsActivity chromeCustomTabsActivity = this;
 
@@ -68,7 +74,7 @@ public class ChromeCustomTabsActivity extends Activity {
         finish();
         Map<String, Object> obj = new HashMap<>();
         obj.put("uuid", uuid);
-        InAppWebViewFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+        channel.invokeMethod("onChromeSafariBrowserClosed", obj);
       }
     });
 
@@ -79,14 +85,14 @@ public class ChromeCustomTabsActivity extends Activity {
           onChromeSafariBrowserOpened = true;
           Map<String, Object> obj = new HashMap<>();
           obj.put("uuid", uuid);
-          InAppWebViewFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserOpened", obj);
+          channel.invokeMethod("onChromeSafariBrowserOpened", obj);
         }
 
         if (navigationEvent == NAVIGATION_FINISHED && !onChromeSafariBrowserCompletedInitialLoad) {
           onChromeSafariBrowserCompletedInitialLoad = true;
           Map<String, Object> obj = new HashMap<>();
           obj.put("uuid", uuid);
-          InAppWebViewFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", obj);
+          channel.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", obj);
         }
       }
 
@@ -111,6 +117,14 @@ public class ChromeCustomTabsActivity extends Activity {
 
       }
     });
+  }
+
+  @Override
+  public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
+    switch (call.method) {
+      default:
+        result.notImplemented();
+    }
   }
 
   private void prepareCustomTabs(CustomTabsIntent customTabsIntent) {
@@ -155,7 +169,7 @@ public class ChromeCustomTabsActivity extends Activity {
       finish();
       Map<String, Object> obj = new HashMap<>();
       obj.put("uuid", uuid);
-      InAppWebViewFlutterPlugin.inAppBrowser.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+      InAppWebViewFlutterPlugin.inAppBrowserManager.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
     }
   }
 

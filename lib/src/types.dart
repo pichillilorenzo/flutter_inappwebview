@@ -9,8 +9,6 @@ import 'webview_options.dart';
 
 var uuidGenerator = new Uuid();
 
-typedef Future<dynamic> ListenerCallback(MethodCall call);
-
 ///This type represents a callback, added with [addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
 ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).

@@ -9,16 +9,34 @@ import Foundation
 import SafariServices
 
 @available(iOS 9.0, *)
-class SafariViewController: SFSafariViewController, SFSafariViewControllerDelegate {
+public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafariViewControllerDelegate {
     
-    weak var statusDelegate: SwiftFlutterPlugin?
+    var channel: FlutterMethodChannel?
     var tmpWindow: UIWindow?
     var safariOptions: SafariBrowserOptions?
     var uuid: String = ""
     
-    override func viewWillAppear(_ animated: Bool) {
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        
+    }
+    
+    deinit {
+        print("SafariViewController - dealloc")
+    }
+    
+    public func prepareMethodChannel() {
+        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        SwiftFlutterPlugin.instance!.registrar!.addMethodCallDelegate(self, channel: channel!)
+    }
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
         prepareSafariBrowser()
         super.viewWillAppear(animated)
+        onChromeSafariBrowserOpened()
     }
     
     func prepareSafariBrowser() {
@@ -45,50 +63,64 @@ class SafariViewController: SFSafariViewController, SFSafariViewControllerDelega
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {() -> Void in
             self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-            
-            if (self.statusDelegate != nil) {
-                self.statusDelegate?.safariExit(uuid: self.uuid)
-            }
+            self.onChromeSafariBrowserClosed()
+            self.dispose()
         })
     }
     
-    func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
+    public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
         close()
     }
     
-    func safariViewController(_ controller: SFSafariViewController,
+    public func safariViewController(_ controller: SFSafariViewController,
                               didCompleteInitialLoad didLoadSuccessfully: Bool) {
         if didLoadSuccessfully {
-            statusDelegate?.onChromeSafariBrowserCompletedInitialLoad(uuid: self.uuid)
+            onChromeSafariBrowserCompletedInitialLoad()
         }
         else {
             print("Cant load successfully the 'SafariViewController'.")
         }
     }
     
-    func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
+    public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
 //        print("activityItemsFor")
 //        print(URL)
 //        print(title)
         return []
     }
 
-    func safariViewController(_ controller: SFSafariViewController, excludedActivityTypesFor URL: URL, title: String?) -> [UIActivity.ActivityType] {
+    public func safariViewController(_ controller: SFSafariViewController, excludedActivityTypesFor URL: URL, title: String?) -> [UIActivity.ActivityType] {
 //        print("excludedActivityTypesFor")
 //        print(URL)
 //        print(title)
         return []
     }
 
-    func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo URL: URL) {
+    public func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo URL: URL) {
 //        print("initialLoadDidRedirectTo")
 //        print(URL)
+    }
+    
+    public func onChromeSafariBrowserOpened() {
+        channel!.invokeMethod("onChromeSafariBrowserOpened", arguments: [])
+    }
+    
+    public func onChromeSafariBrowserCompletedInitialLoad() {
+        channel!.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", arguments: [])
+    }
+    
+    public func onChromeSafariBrowserClosed() {
+        channel!.invokeMethod("onChromeSafariBrowserClosed", arguments: [])
+    }
+    
+    public func dispose() {
+        delegate = nil
+        channel!.setMethodCallHandler(nil)
     }
     
     // Helper function to convert hex color string to UIColor
     // Assumes input like "#00FF00" (#RRGGBB).
     // Taken from https://stackoverflow.com/questions/1560081/how-can-i-create-a-uicolor-from-a-hex-string
-    
     func color(fromHexString: String, alpha:CGFloat? = 1.0) -> UIColor {
         
         // Convert hex string to an integer

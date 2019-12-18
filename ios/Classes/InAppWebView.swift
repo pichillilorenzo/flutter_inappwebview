@@ -890,7 +890,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var activateShouldOverrideUrlLoading = false
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, channel: FlutterMethodChannel?) {
-        
         super.init(frame: frame, configuration: configuration)
         self.channel = channel
         self.IABController = IABController
@@ -1403,7 +1402,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         self.options = newOptions
     }
     
-    func getOptions() -> [String: Any]? {
+    func getOptions() -> [String: Any?]? {
         if (self.options == nil) {
             return nil
         }
@@ -1512,7 +1511,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 
                 shouldOverrideUrlLoading(url: url, method: navigationAction.request.httpMethod, headers: navigationAction.request.allHTTPHeaderFields, isForMainFrame: isForMainFrame, navigationType: navigationAction.navigationType, result: { (result) -> Void in
                     if result is FlutterError {
-                        print((result as! FlutterError).message)
+                        print((result as! FlutterError).message ?? "")
                     }
                     else if (result as? NSObject) == FlutterMethodNotImplemented {
                         self.updateUrlTextFieldForIABController(navigationAction: navigationAction)
@@ -1642,7 +1641,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let port = challenge.protectionSpace.port
             onReceivedHttpAuthRequest(challenge: challenge, result: {(result) -> Void in
                 if result is FlutterError {
-                    print((result as! FlutterError).message)
+                    print((result as! FlutterError).message ?? "")
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {
                     completionHandler(.performDefaultHandling, nil)
@@ -1711,7 +1710,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 
             onReceivedServerTrustAuthRequest(challenge: challenge, result: {(result) -> Void in
                 if result is FlutterError {
-                    print((result as! FlutterError).message)
+                    print((result as! FlutterError).message ?? "")
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {
                     completionHandler(.performDefaultHandling, nil)
@@ -1746,7 +1745,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodClientCertificate {
             onReceivedClientCertRequest(challenge: challenge, result: {(result) -> Void in
                 if result is FlutterError {
-                    print((result as! FlutterError).message)
+                    print((result as! FlutterError).message ?? "")
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {
                     completionHandler(.performDefaultHandling, nil)
@@ -1832,7 +1831,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         } else {
             print("Security Error: " + securityError.description)
             if #available(iOS 11.3, *) {
-                print(SecCopyErrorMessageString(securityError,nil))
+                print(SecCopyErrorMessageString(securityError,nil) ?? "")
             }
         }
         return identityAndTrust;
@@ -1863,7 +1862,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         onJsAlert(message: message, result: {(result) -> Void in
             if result is FlutterError {
-                print((result as! FlutterError).message)
+                print((result as! FlutterError).message ?? "")
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createAlertDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, completionHandler: completionHandler)
@@ -1921,7 +1920,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         onJsConfirm(message: message, result: {(result) -> Void in
             if result is FlutterError {
-                print((result as! FlutterError).message)
+                print((result as! FlutterError).message ?? "")
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createConfirmDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, completionHandler: completionHandler)
@@ -1993,7 +1992,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                  completionHandler: @escaping (String?) -> Void) {
         onJsPrompt(message: message, defaultValue: defaultValue, result: {(result) -> Void in
             if result is FlutterError {
-                print((result as! FlutterError).message)
+                print((result as! FlutterError).message ?? "")
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, value: nil, completionHandler: completionHandler)
@@ -2069,102 +2068,56 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func onLoadStart(url: String) {
-        var arguments: [String: Any] = ["url": url]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadStart", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["url": url]
+        channel?.invokeMethod("onLoadStart", arguments: arguments)
     }
     
     public func onLoadStop(url: String) {
-        var arguments: [String: Any] = ["url": url]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadStop", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["url": url]
+        channel?.invokeMethod("onLoadStop", arguments: arguments)
     }
     
     public func onLoadError(url: String, error: Error) {
-        var arguments: [String: Any] = ["url": url, "code": error._code, "message": error.localizedDescription]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadError", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["url": url, "code": error._code, "message": error.localizedDescription]
+        channel?.invokeMethod("onLoadError", arguments: arguments)
     }
     
     public func onLoadHttpError(url: String, statusCode: Int, description: String) {
-        var arguments: [String: Any] = ["url": url, "statusCode": statusCode, "description": description]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadHttpError", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["url": url, "statusCode": statusCode, "description": description]
+        channel?.invokeMethod("onLoadHttpError", arguments: arguments)
     }
     
     public func onProgressChanged(progress: Int) {
-        var arguments: [String: Any] = ["progress": progress]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onProgressChanged", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["progress": progress]
+        channel?.invokeMethod("onProgressChanged", arguments: arguments)
     }
     
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
-        var arguments: [String : Any] = [
+        let arguments: [String : Any] = [
             "activeMatchOrdinal": activeMatchOrdinal,
             "numberOfMatches": numberOfMatches,
             "isDoneCounting": isDoneCounting
         ]
-        
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onFindResultReceived", arguments: arguments)
-        }
+        channel?.invokeMethod("onFindResultReceived", arguments: arguments)
     }
     
     public func onScrollChanged(x: Int, y: Int) {
-        var arguments: [String: Any] = ["x": x, "y": y]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onScrollChanged", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["x": x, "y": y]
+        channel?.invokeMethod("onScrollChanged", arguments: arguments)
     }
     
     public func onDownloadStart(url: String) {
-        var arguments: [String: Any] = ["url": url]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onDownloadStart", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["url": url]
+        channel?.invokeMethod("onDownloadStart", arguments: arguments)
     }
     
     public func onLoadResourceCustomScheme(scheme: String, url: String, result: FlutterResult?) {
-        var arguments: [String: Any] = ["scheme": scheme, "url": url]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onLoadResourceCustomScheme", arguments: arguments, result: result)
-        }
+        let arguments: [String: Any] = ["scheme": scheme, "url": url]
+        channel?.invokeMethod("onLoadResourceCustomScheme", arguments: arguments, result: result)
     }
     
     public func shouldOverrideUrlLoading(url: URL, method: String?, headers: [String: String]?, isForMainFrame: Bool, navigationType: WKNavigationType, result: FlutterResult?) {
-        var arguments: [String: Any?] = [
+        let arguments: [String: Any?] = [
             "url": url.absoluteString,
             "method": method,
             "headers": headers,
@@ -2173,43 +2126,28 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             "androidIsRedirect": nil,
             "iosWKNavigationType": navigationType.rawValue
         ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("shouldOverrideUrlLoading", arguments: arguments, result: result)
-        }
+        channel?.invokeMethod("shouldOverrideUrlLoading", arguments: arguments, result: result)
     }
     
     public func onCreateWindow(url: URL, navigationType: WKNavigationType) {
-        var arguments: [String: Any?] = [
+        let arguments: [String: Any?] = [
             "url": url.absoluteString,
             "androidIsDialog": nil,
             "androidIsUserGesture": nil,
             "iosWKNavigationType": navigationType.rawValue
         ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onCreateWindow", arguments: arguments)
-        }
+        channel?.invokeMethod("onCreateWindow", arguments: arguments)
     }
     
     public func onReceivedHttpAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
-        var arguments: [String: Any?] = [
+        let arguments: [String: Any?] = [
             "host": challenge.protectionSpace.host,
             "protocol": challenge.protectionSpace.protocol,
             "realm": challenge.protectionSpace.realm,
             "port": challenge.protectionSpace.port,
             "previousFailureCount": challenge.previousFailureCount
         ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onReceivedHttpAuthRequest", arguments: arguments, result: result)
-        }
+        channel?.invokeMethod("onReceivedHttpAuthRequest", arguments: arguments, result: result)
     }
     
     public func onReceivedServerTrustAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
@@ -2222,7 +2160,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             serverCertificateData = NSData(bytes: data, length: size)
         }
         
-        var arguments: [String: Any?] = [
+        let arguments: [String: Any?] = [
             "host": challenge.protectionSpace.host,
             "protocol": challenge.protectionSpace.protocol,
             "realm": challenge.protectionSpace.realm,
@@ -2232,103 +2170,62 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             "error": -1,
             "message": "",
         ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, result: result)
-        }
+        channel?.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, result: result)
     }
     
     public func onReceivedClientCertRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
-        var arguments: [String: Any?] = [
+        let arguments: [String: Any?] = [
             "host": challenge.protectionSpace.host,
             "protocol": challenge.protectionSpace.protocol,
             "realm": challenge.protectionSpace.realm,
             "port": challenge.protectionSpace.port
         ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onReceivedClientCertRequest", arguments: arguments, result: result)
-        }
+        channel?.invokeMethod("onReceivedClientCertRequest", arguments: arguments, result: result)
     }
     
     public func onJsAlert(message: String, result: FlutterResult?) {
-        var arguments: [String: Any] = ["message": message]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onJsAlert", arguments: arguments, result: result)
-        }
+        let arguments: [String: Any] = ["message": message]
+        channel?.invokeMethod("onJsAlert", arguments: arguments, result: result)
     }
     
     public func onJsConfirm(message: String, result: FlutterResult?) {
-        var arguments: [String: Any] = ["message": message]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onJsConfirm", arguments: arguments, result: result)
-        }
+        let arguments: [String: Any] = ["message": message]
+        channel?.invokeMethod("onJsConfirm", arguments: arguments, result: result)
     }
     
     public func onJsPrompt(message: String, defaultValue: String?, result: FlutterResult?) {
-        var arguments: [String: Any] = ["message": message, "defaultValue": defaultValue as Any]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onJsPrompt", arguments: arguments, result: result)
-        }
+        let arguments: [String: Any] = ["message": message, "defaultValue": defaultValue as Any]
+        channel?.invokeMethod("onJsPrompt", arguments: arguments, result: result)
     }
     
     public func onConsoleMessage(message: String, messageLevel: Int) {
-        var arguments: [String: Any] = ["message": message, "messageLevel": messageLevel]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onConsoleMessage", arguments: arguments)
-        }
+        let arguments: [String: Any] = ["message": message, "messageLevel": messageLevel]
+        channel?.invokeMethod("onConsoleMessage", arguments: arguments)
     }
     
     public func onUpdateVisitedHistory(url: String) {
-        var arguments: [String: Any?] = [
+        let arguments: [String: Any?] = [
             "url": url,
             "androidIsReload": nil
         ]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        if let channel = getChannel() {
-            channel.invokeMethod("onUpdateVisitedHistory", arguments: arguments)
-        }
+        channel?.invokeMethod("onUpdateVisitedHistory", arguments: arguments)
     }
     
     public func onCallJsHandler(handlerName: String, _callHandlerID: Int64, args: String) {
-        var arguments: [String: Any] = ["handlerName": handlerName, "args": args]
-        if IABController != nil {
-            arguments["uuid"] = IABController!.uuid
-        }
-        
-        if let channel = getChannel() {
-            channel.invokeMethod("onCallJsHandler", arguments: arguments, result: {(result) -> Void in
-                if result is FlutterError {
-                    print((result as! FlutterError).message)
+        let arguments: [String: Any] = ["handlerName": handlerName, "args": args]
+        channel?.invokeMethod("onCallJsHandler", arguments: arguments, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message ?? "")
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {}
+            else {
+                var json = "null"
+                if let r = result {
+                    json = r as! String
                 }
-                else if (result as? NSObject) == FlutterMethodNotImplemented {}
-                else {
-                    var json = "null"
-                    if let r = result {
-                        json = r as! String
-                    }
-                    self.evaluateJavaScript("if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json)); delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];}", completionHandler: nil)
-                }
-            })
-        }
+                self.evaluateJavaScript("if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json)); delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];}", completionHandler: nil)
+            }
+        })
     }
     
     public func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
@@ -2375,10 +2272,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 self.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
             }
         }
-    }
-    
-    private func getChannel() -> FlutterMethodChannel? {
-        return (IABController != nil) ? SwiftFlutterPlugin.instance!.channel! : ((channel != nil) ? channel! : nil);
     }
     
     public func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {

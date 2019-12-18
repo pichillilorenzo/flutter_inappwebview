@@ -1,8 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
-import android.app.Activity;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -21,13 +19,8 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.FrameLayout;
-import android.widget.ListView;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.AlertDialog;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -37,7 +30,6 @@ import com.pichillilorenzo.flutter_inappwebview.FlutterWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
-import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
@@ -50,7 +42,6 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 import okhttp3.OkHttpClient;
 
 import static com.pichillilorenzo.flutter_inappwebview.InAppWebView.PreferredContentModeOptionType.fromValue;
@@ -61,6 +52,7 @@ final public class InAppWebView extends InputAwareWebView {
 
   public InAppBrowserActivity inAppBrowserActivity;
   public FlutterWebView flutterWebView;
+  public MethodChannel channel;
   public int id;
   public InAppWebViewClient inAppWebViewClient;
   public InAppWebViewChromeClient inAppWebViewChromeClient;
@@ -123,7 +115,7 @@ final public class InAppWebView extends InputAwareWebView {
 
   static final String interceptAjaxRequestsJS = "(function(ajax) {" +
           "  var send = ajax.prototype.send;" +
-          "  var open = ajax.prototype.open;" +
+          "  var openUrl = ajax.prototype.openUrl;" +
           "  var setRequestHeader = ajax.prototype.setRequestHeader;" +
           "  ajax.prototype._flutter_inappwebview_url = null;" +
           "  ajax.prototype._flutter_inappwebview_method = null;" +
@@ -156,7 +148,7 @@ final public class InAppWebView extends InputAwareWebView {
           "    }" +
           "    callback(null);" +
           "  };" +
-          "  ajax.prototype.open = function(method, url, isAsync, user, password) {" +
+          "  ajax.prototype.openUrl = function(method, url, isAsync, user, password) {" +
           "    isAsync = (isAsync != null) ? isAsync : true;" +
           "    this._flutter_inappwebview_url = url;" +
           "    this._flutter_inappwebview_method = method;" +
@@ -164,7 +156,7 @@ final public class InAppWebView extends InputAwareWebView {
           "    this._flutter_inappwebview_user = user;" +
           "    this._flutter_inappwebview_password = password;" +
           "    this._flutter_inappwebview_request_headers = {};" +
-          "    open.call(this, method, url, isAsync, user, password);" +
+          "    openUrl.call(this, method, url, isAsync, user, password);" +
           "  };" +
           "  ajax.prototype.setRequestHeader = function(header, value) {" +
           "    this._flutter_inappwebview_request_headers[header] = value;" +
@@ -319,7 +311,7 @@ final public class InAppWebView extends InputAwareWebView {
           "          };" +
           "          if ((self._flutter_inappwebview_method != result.method && result.method != null) || (self._flutter_inappwebview_url != result.url && result.url != null)) {" +
           "            self.abort();" +
-          "            self.open(result.method, result.url, result.isAsync, result.user, result.password);" +
+          "            self.openUrl(result.method, result.url, result.isAsync, result.user, result.password);" +
           "            return;" +
           "          }" +
           "        }" +
@@ -532,6 +524,7 @@ final public class InAppWebView extends InputAwareWebView {
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
+    this.channel = (this.inAppBrowserActivity != null) ? this.inAppBrowserActivity.channel : this.flutterWebView.channel;
     this.id = id;
     this.options = options;
   }
@@ -689,7 +682,7 @@ final public class InAppWebView extends InputAwareWebView {
         obj.put("activeMatchOrdinal", activeMatchOrdinal);
         obj.put("numberOfMatches", numberOfMatches);
         obj.put("isDoneCounting", isDoneCounting);
-        getChannel().invokeMethod("onFindResultReceived", obj);
+        channel.invokeMethod("onFindResultReceived", obj);
       }
     });
 
@@ -1264,11 +1257,7 @@ final public class InAppWebView extends InputAwareWebView {
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("x", x);
     obj.put("y", y);
-    getChannel().invokeMethod("onScrollChanged", obj);
-  }
-
-  private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppWebViewFlutterPlugin.inAppBrowser.channel : flutterWebView.channel;
+    channel.invokeMethod("onScrollChanged", obj);
   }
 
   public void startSafeBrowsing(final MethodChannel.Result result) {
@@ -1304,7 +1293,7 @@ final public class InAppWebView extends InputAwareWebView {
       if (inAppBrowserActivity != null)
         obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("url", url);
-      getChannel().invokeMethod("onDownloadStart", obj);
+      channel.invokeMethod("onDownloadStart", obj);
     }
   }
 

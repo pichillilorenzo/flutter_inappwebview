@@ -7,7 +7,6 @@ import 'package:flutter/services.dart';
 import 'webview_options.dart';
 
 import 'types.dart';
-import 'channel_manager.dart';
 import 'in_app_webview.dart' show InAppWebViewController;
 
 ///InAppBrowser class. [webViewController] can be used to access the [InAppWebView] API.
@@ -18,6 +17,8 @@ class InAppBrowser {
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
+  MethodChannel _channel;
+  static const MethodChannel _sharedChannel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
   /// WebView Controller that can be used to access the [InAppWebView] API.
   InAppWebViewController webViewController;
@@ -25,10 +26,12 @@ class InAppBrowser {
   ///
   InAppBrowser() {
     uuid = uuidGenerator.v4();
-    ChannelManager.addListener(uuid, handleMethod);
+    this._channel =
+        MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$uuid');
+    this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
     webViewController = new InAppWebViewController.fromInAppBrowser(
-        uuid, ChannelManager.channel, this);
+        uuid, this._channel, this);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
@@ -53,8 +56,8 @@ class InAppBrowser {
   ///[headers]: The additional headers to be used in the HTTP request for this URL, specified as a map from name to value.
   ///
   ///[options]: Options for the [InAppBrowser].
-  Future<void> open(
-      {String url = "about:blank",
+  Future<void> openUrl(
+      {@required String url,
       Map<String, String> headers = const {},
       InAppBrowserClassOptions options}) async {
     assert(url != null && url.isNotEmpty);
@@ -83,14 +86,10 @@ class InAppBrowser {
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('options', () => optionsMap);
-    args.putIfAbsent('openWithSystemBrowser', () => false);
-    args.putIfAbsent('isLocalFile', () => false);
-    args.putIfAbsent('isData', () => false);
-    args.putIfAbsent('useChromeSafariBrowser', () => false);
-    await ChannelManager.channel.invokeMethod('open', args);
+    await _sharedChannel.invokeMethod('openUrl', args);
   }
 
-  ///Opens the given [assetFilePath] file in a new [InAppBrowser] instance. The other arguments are the same of [InAppBrowser.open].
+  ///Opens the given [assetFilePath] file in a new [InAppBrowser] instance. The other arguments are the same of [InAppBrowser.openUrl].
   ///
   ///To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
   ///
@@ -153,11 +152,7 @@ class InAppBrowser {
     args.putIfAbsent('url', () => assetFilePath);
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('options', () => optionsMap);
-    args.putIfAbsent('openWithSystemBrowser', () => false);
-    args.putIfAbsent('isLocalFile', () => true);
-    args.putIfAbsent('isData', () => false);
-    args.putIfAbsent('useChromeSafariBrowser', () => false);
-    await ChannelManager.channel.invokeMethod('open', args);
+    await _sharedChannel.invokeMethod('openFile', args);
   }
 
   ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
@@ -203,26 +198,16 @@ class InAppBrowser {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl);
-    args.putIfAbsent('openWithSystemBrowser', () => false);
-    args.putIfAbsent('isLocalFile', () => false);
-    args.putIfAbsent('isData', () => true);
-    args.putIfAbsent('useChromeSafariBrowser', () => false);
-    await ChannelManager.channel.invokeMethod('open', args);
+    args.putIfAbsent('historyUrl', () => androidHistoryUrl);
+    await _sharedChannel.invokeMethod('openData', args);
   }
 
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [InAppBrowser] methods here!
   static Future<void> openWithSystemBrowser({@required String url}) async {
     assert(url != null && url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => "");
     args.putIfAbsent('url', () => url);
-    args.putIfAbsent('headers', () => {});
-    args.putIfAbsent('isLocalFile', () => false);
-    args.putIfAbsent('isData', () => false);
-    args.putIfAbsent('openWithSystemBrowser', () => true);
-    args.putIfAbsent('useChromeSafariBrowser', () => false);
-    args.putIfAbsent('options', () => {});
-    return await ChannelManager.channel.invokeMethod('open', args);
+    return await _sharedChannel.invokeMethod('openWithSystemBrowser', args);
   }
 
   ///Displays an [InAppBrowser] window that was opened hidden. Calling this has no effect if the [InAppBrowser] was already visible.
@@ -230,31 +215,28 @@ class InAppBrowser {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    await ChannelManager.channel.invokeMethod('show', args);
+    await _channel.invokeMethod('show', args);
   }
 
   ///Hides the [InAppBrowser] window. Calling this has no effect if the [InAppBrowser] was already hidden.
   Future<void> hide() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
-    await ChannelManager.channel.invokeMethod('hide', args);
+    await _channel.invokeMethod('hide', args);
   }
 
   ///Closes the [InAppBrowser] window.
   Future<void> close() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
-    await ChannelManager.channel.invokeMethod('close', args);
+    await _channel.invokeMethod('close', args);
   }
 
   ///Check if the Web View of the [InAppBrowser] instance is hidden.
   Future<bool> isHidden() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
-    return await ChannelManager.channel.invokeMethod('isHidden', args);
+    return await _channel.invokeMethod('isHidden', args);
   }
 
   ///Sets the [InAppBrowser] options with the new [options] and evaluates them.
@@ -280,23 +262,19 @@ class InAppBrowser {
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('options', () => optionsMap);
-    args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
-    await ChannelManager.channel.invokeMethod('setOptions', args);
+    await _channel.invokeMethod('setOptions', args);
   }
 
   ///Gets the current [InAppBrowser] options as a `Map`. Returns `null` if the options are not setted yet.
   Future<InAppBrowserClassOptions> getOptions() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('optionsType', () => "InAppBrowserOptions");
 
     InAppBrowserClassOptions inAppBrowserClassOptions =
         InAppBrowserClassOptions();
     Map<dynamic, dynamic> options =
-        await ChannelManager.channel.invokeMethod('getOptions', args);
+        await _channel.invokeMethod('getOptions', args);
     if (options != null) {
       options = options.cast<String, dynamic>();
       inAppBrowserClassOptions.crossPlatform =

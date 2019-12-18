@@ -81,7 +81,7 @@ See the online [API Reference](https://pub.dartlang.org/documentation/flutter_in
 
 The API showed in this `README.md` file shows only a part of the documentation that conforms to the master branch only. 
 So, here you could have methods, options, and events that aren't published yet.
-If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).  
+If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).
 
 ### Load a file inside `assets` folder
 
@@ -530,8 +530,7 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
     print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
-    this.webViewController.loadUrl(url: shouldOverrideUrlLoadingRequest.url);
-    return ShouldOverrideUrlLoadingAction.CANCEL;
+    return ShouldOverrideUrlLoadingAction.ALLOW;
   }
 
   @override

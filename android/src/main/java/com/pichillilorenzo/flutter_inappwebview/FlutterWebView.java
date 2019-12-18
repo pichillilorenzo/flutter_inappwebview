@@ -38,6 +38,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public final MethodChannel channel;
 
   public FlutterWebView(BinaryMessenger messenger, final Context context, int id, HashMap<String, Object> params, View containerView) {
+    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_" + id);
+    channel.setMethodCallHandler(this);
+
     DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
     DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
     displayListenerProxy.onPreWebViewInitialization(displayManager);
@@ -69,9 +72,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     }
 
     webView.prepare();
-
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_" + id);
-    channel.setMethodCallHandler(this);
 
     if (initialFile != null) {
       try {

@@ -9,13 +9,7 @@ import android.webkit.ValueCallback;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -25,6 +19,7 @@ public class JavaScriptBridgeInterface {
   public static final String name = "flutter_inappwebview";
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
+  public MethodChannel channel;
 
   // https://github.com/taylorhakes/promise-polyfill/blob/master/src/index.js
   public static final String promisePolyfillJS = "if (window.Promise == null) {" +
@@ -254,6 +249,7 @@ public class JavaScriptBridgeInterface {
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
+    this.channel = (this.inAppBrowserActivity != null) ? this.inAppBrowserActivity.channel : this.flutterWebView.channel;
   }
 
   @JavascriptInterface
@@ -277,7 +273,7 @@ public class JavaScriptBridgeInterface {
           webView.printCurrentPage();
         }
 
-        getChannel().invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
+        channel.invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
           @Override
           public void success(Object json) {
             if (webView == null) {
@@ -304,9 +300,5 @@ public class JavaScriptBridgeInterface {
         });
       }
     });
-  }
-
-  private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppWebViewFlutterPlugin.inAppBrowser.channel : flutterWebView.channel;
   }
 }

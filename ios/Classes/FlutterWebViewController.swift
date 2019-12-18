@@ -25,20 +25,20 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
         myView = UIView(frame: frame)
         
         let channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(viewId)
-        self.channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
-        self.channel?.setMethodCallHandler(LeakAvoider(delegate: self).handle)
+        channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
+        channel!.setMethodCallHandler(LeakAvoider(delegate: self).handle)
         
-        let initialUrl = (args["initialUrl"] as? String)!
+        let initialUrl = args["initialUrl"] as? String
         let initialFile = args["initialFile"] as? String
         let initialData = args["initialData"] as? [String: String]
-        let initialHeaders = (args["initialHeaders"] as? [String: String])!
-        let initialOptions = (args["initialOptions"] as? [String: Any])!
+        let initialHeaders = args["initialHeaders"] as? [String: String]
+        let initialOptions = args["initialOptions"] as! [String: Any?]
 
         let options = InAppWebViewOptions()
-        options.parse(options: initialOptions)
+        let _ = options.parse(options: initialOptions)
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options)
 
-        webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, channel: self.channel)
+        webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, channel: channel!)
         webView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.addSubview(webView!)
         
@@ -76,7 +76,7 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
     
     deinit {
         print("FlutterWebViewController - dealloc")
-        self.channel?.setMethodCallHandler(nil)
+        channel?.setMethodCallHandler(nil)
         webView!.dispose()
         webView = nil
         myView = nil
@@ -86,7 +86,7 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
         return myView!
     }
     
-    public func load(initialUrl: String, initialFile: String?, initialData: [String: String]?, initialHeaders: [String: String]) {
+    public func load(initialUrl: String?, initialFile: String?, initialData: [String: String]?, initialHeaders: [String: String]?) {
         if initialFile != nil {
             do {
                 try webView!.loadFile(url: initialFile!, headers: initialHeaders)
@@ -98,14 +98,14 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
         }
         
         if initialData != nil {
-            let data = (initialData!["data"] as? String)!
-            let mimeType = (initialData!["mimeType"] as? String)!
-            let encoding = (initialData!["encoding"] as? String)!
-            let baseUrl = (initialData!["baseUrl"] as? String)!
+            let data = initialData!["data"]!
+            let mimeType = initialData!["mimeType"]!
+            let encoding = initialData!["encoding"]!
+            let baseUrl = initialData!["baseUrl"]!
             webView!.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
         }
         else {
-            webView!.loadUrl(url: URL(string: initialUrl)!, headers: initialHeaders)
+            webView!.loadUrl(url: URL(string: initialUrl!)!, headers: initialHeaders)
         }
     }
     
@@ -263,7 +263,7 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                 if webView != nil {
                     let inAppWebViewOptions = InAppWebViewOptions()
                     let inAppWebViewOptionsMap = arguments!["options"] as! [String: Any]
-                    inAppWebViewOptions.parse(options: inAppWebViewOptionsMap)
+                    let _ = inAppWebViewOptions.parse(options: inAppWebViewOptionsMap)
                     webView!.setOptions(newOptions: inAppWebViewOptions, newOptionsMap: inAppWebViewOptionsMap)
                 }
                 result(true)
@@ -277,8 +277,13 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
             case "findAllAsync":
                 if webView != nil {
                     let find = arguments!["find"] as! String
-                    webView!.findAllAsync(find: find, completionHandler: nil)
+                    webView!.findAllAsync(find: find, completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "FlutterWebViewController", message: error?.localizedDescription, details: nil))
+                        return
+                    }
                     result(true)
+                })
                 } else {
                     result(false)
                 }
@@ -347,13 +352,12 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
             case "printCurrentPage":
                 if webView != nil {
                     webView!.printCurrentPage(printCompletionHandler: {(completed, error) in
-                        if !completed, let e = error {
+                        if !completed, let _ = error {
                             result(false)
                             return
                         }
                         result(true)
                     })
-                    
                 } else {
                     result(false)
                 }

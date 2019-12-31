@@ -85,7 +85,12 @@ public class InAppWebViewClient extends WebViewClient {
         } catch (android.content.ActivityNotFoundException e) {
           Log.e(LOG_TAG, "Error dialing " + url + ": " + e.toString());
         }
-      } else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("market:") || url.startsWith("intent:")) {
+      }
+
+
+
+
+      else if (url.startsWith("geo:") || url.startsWith(WebView.SCHEME_MAILTO) || url.startsWith("https://api.whatsapp.com") || url.startsWith("whatsapp://")  || url.startsWith("market:") || url.startsWith("intent:")) {
         try {
           Intent intent = new Intent(Intent.ACTION_VIEW);
           intent.setData(Uri.parse(url));

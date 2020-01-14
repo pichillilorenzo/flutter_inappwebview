@@ -1050,10 +1050,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             // Fallback on earlier versions
         }
         
-        scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
-        scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
         scrollView.showsVerticalScrollIndicator = !(options?.disableVerticalScroll)!
         scrollView.showsHorizontalScrollIndicator = !(options?.disableHorizontalScroll)!
+        
+        scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
+        scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
         
         // options.debuggingEnabled is always enabled for iOS.
         

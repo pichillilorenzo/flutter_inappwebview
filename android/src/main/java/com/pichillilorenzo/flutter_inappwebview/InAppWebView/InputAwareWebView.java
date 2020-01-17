@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
 import android.content.Context;
+import android.os.Build;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -190,7 +191,11 @@ public class InputAwareWebView extends WebView {
                         // onCreateInputConnection() on targetView on the same thread as
                         // targetView.getHandler(). It will also call subsequent InputConnection methods on this
                         // thread. This is the IME thread in cases where targetView is our proxyAdapterView.
-                        imm.isActive(containerView);
+
+                        // TODO (ALexVincent525): Currently only prompt has been tested, still needs more test cases.
+                        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) {
+                            imm.isActive(containerView);
+                        }
                     }
                 });
     }

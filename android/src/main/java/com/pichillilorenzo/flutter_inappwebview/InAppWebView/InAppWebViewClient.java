@@ -168,26 +168,7 @@ public class InAppWebViewClient extends WebViewClient {
   public void onPageStarted(WebView view, String url, Bitmap favicon) {
 
     InAppWebView webView = (InAppWebView) view;
-
-    String js = InAppWebView.consoleLogJS.replaceAll("[\r\n]+", "");
-    js += JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", "");
-    if (webView.options.useShouldInterceptAjaxRequest) {
-      js += InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", "");
-    }
-    if (webView.options.useShouldInterceptFetchRequest) {
-      js += InAppWebView.interceptFetchRequestsJS.replaceAll("[\r\n]+", "");
-    }
-    if (webView.options.useOnLoadResource) {
-      js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
-    }
-    js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      webView.evaluateJavascript(js, (ValueCallback<String>) null);
-    } else {
-      webView.loadUrl("javascript:" + js);
-    }
-
+    
     super.onPageStarted(view, url, favicon);
 
     webView.isLoading = true;
@@ -230,6 +211,26 @@ public class InAppWebViewClient extends WebViewClient {
     } else {
       webView.loadUrl("javascript:" + js);
     }
+    
+    js = InAppWebView.consoleLogJS.replaceAll("[\r\n]+", "");
+    js += JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", "");
+    if (webView.options.useShouldInterceptAjaxRequest) {
+      js += InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", "");
+    }
+    if (webView.options.useShouldInterceptFetchRequest) {
+      js += InAppWebView.interceptFetchRequestsJS.replaceAll("[\r\n]+", "");
+    }
+    if (webView.options.useOnLoadResource) {
+      js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
+    }
+    js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      webView.evaluateJavascript(js, (ValueCallback<String>) null);
+    } else {
+      webView.loadUrl("javascript:" + js);
+    }
+
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)

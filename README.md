@@ -177,7 +177,7 @@ class _MyAppState extends State<MyApp> {
                   initialUrl: "https://flutter.dev/",
                   initialHeaders: {},
                   initialOptions: InAppWebViewWidgetOptions(
-                    crossPlatform: InAppWebViewOptions(
+                    inAppWebViewOptions: InAppWebViewOptions(
                         debuggingEnabled: true,
                     )
                   ),

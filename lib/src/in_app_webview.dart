@@ -383,7 +383,7 @@ class _InAppWebViewState extends State<InAppWebView> {
         gestureRecognizers: widget.gestureRecognizers,
         layoutDirection: TextDirection.rtl,
         creationParams: <String, dynamic>{
-          'initialUrl': widget.initialUrl,
+          'initialUrl': '${Uri.parse(widget.initialUrl)}',
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
@@ -416,7 +416,7 @@ class _InAppWebViewState extends State<InAppWebView> {
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: widget.gestureRecognizers,
         creationParams: <String, dynamic>{
-          'initialUrl': widget.initialUrl,
+          'initialUrl': '${Uri.parse(widget.initialUrl)}',
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,

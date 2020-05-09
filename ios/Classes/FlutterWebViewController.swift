@@ -98,14 +98,16 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
         }
         
         if initialData != nil {
-            let data = (initialData!["data"] as? String)!
-            let mimeType = (initialData!["mimeType"] as? String)!
-            let encoding = (initialData!["encoding"] as? String)!
-            let baseUrl = (initialData!["baseUrl"] as? String)!
+            let data = (initialData!["data"])!
+            let mimeType = (initialData!["mimeType"])!
+            let encoding = (initialData!["encoding"])!
+            let baseUrl = (initialData!["baseUrl"])!
             webView!.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
         }
         else {
-            webView!.loadUrl(url: URL(string: initialUrl)!, headers: initialHeaders)
+            if let url = URL(string: initialUrl) {
+                webView!.loadUrl(url: url, headers: initialHeaders)
+            }
         }
     }
     
@@ -347,7 +349,7 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
             case "printCurrentPage":
                 if webView != nil {
                     webView!.printCurrentPage(printCompletionHandler: {(completed, error) in
-                        if !completed, let e = error {
+                        if !completed, let _ = error {
                             result(false)
                             return
                         }

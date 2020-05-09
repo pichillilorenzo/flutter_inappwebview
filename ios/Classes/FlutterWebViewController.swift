@@ -40,6 +40,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
 
         webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, channel: channel!)
         webView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
+        myView!.autoresizesSubviews = true
+        myView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.addSubview(webView!)
         
         webView!.options = options
@@ -104,8 +106,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
             let baseUrl = initialData!["baseUrl"]!
             webView!.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
         }
-        else {
-            webView!.loadUrl(url: URL(string: initialUrl!)!, headers: initialHeaders)
+        else if let url = URL(string: initialUrl!) {
+            webView!.loadUrl(url: url, headers: initialHeaders)
         }
     }
     
@@ -373,6 +375,9 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                 break
             case "getScale":
                 result( (webView != nil) ? webView!.getScale() : nil )
+                break
+            case "hasOnlySecureContent":
+                result( (webView != nil) ? webView!.hasOnlySecureContent : nil )
                 break
             default:
                 result(FlutterMethodNotImplemented)

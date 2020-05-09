@@ -11,8 +11,8 @@ A Flutter plugin that allows you to add an inline webview or open an in-app brow
 
 ### Requirements
 
-- Dart sdk: ">=2.0.0-dev.68.0 <3.0.0"
-- Flutter: ">=1.9.1+hotfix.5 <2.0.0"
+- Dart sdk: ">=2.7.0 <3.0.0"
+- Flutter: ">=1.12.13+hotfix.5"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
@@ -448,6 +448,15 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
 * `dataDetectorTypes`: Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
 * `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
+* `automaticallyAdjustsScrollIndicatorInsets`: Configures whether the scroll indicator insets are automatically adjusted by the system. The default value is `false`.
+* `accessibilityIgnoresInvertColors`: A Boolean value indicating whether the view ignores an accessibility request to invert its colors. The default value is `false`.
+* `decelerationRate`: A `IOSUIScrollViewDecelerationRate` value that determines the rate of deceleration after the user lifts their finger. The default value is `IOSUIScrollViewDecelerationRate.NORMAL`.
+* `alwaysBounceVertical`: A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content. The default value is `false`.
+* `alwaysBounceHorizontal`: A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view. The default value is `false`.
+* `scrollsToTop`: A Boolean value that controls whether the scroll-to-top gesture is enabled. The default value is `true`.
+* `isPagingEnabled`: A Boolean value that determines whether paging is enabled for the scroll view. The default value is `false`.
+* `maximumZoomScale`: A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
+* `minimumZoomScale`: A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
 
 #### `InAppWebView` Events
 
@@ -479,10 +488,14 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
 * `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) (to use this event, the `useShouldInterceptFetchRequest` option must be `true`).
 * `onPrint`: Event fired when `window.print()` is called from JavaScript side.
+* `onLongPressHitTestResult`: Event fired when an HTML element of the webview has been clicked and held.
 * `androidOnSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
 * `androidOnGeolocationPermissionsHidePrompt`: Notify the host application that a request for Geolocation permissions, made with a previous call to `androidOnGeolocationPermissionsShowPrompt` has been canceled. (available only on Android).
+* `iosOnWebContentProcessDidTerminate`: Invoked when the web view's web content process is terminated (available only on iOS).
+* `iosOnDidCommit`: Called when the web view begins to receive web content (available only on iOS).
+* `iosOnDidReceiveServerRedirectForProvisionalNavigation`: Called when a web view receives a server redirect (available only on iOS).
 
 ### `InAppBrowser` class
 
@@ -553,7 +566,12 @@ class MyInAppBrowser extends InAppBrowser {
   }
 }
 
-void main() => runApp(new MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    new MyApp(),
+  );
+}
 
 class MyApp extends StatefulWidget {
   final MyInAppBrowser browser = new MyInAppBrowser();
@@ -707,7 +725,12 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 }
 
-void main() => runApp(new MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    new MyApp(),
+  );
+}
 
 class MyApp extends StatefulWidget {
   final ChromeSafariBrowser browser = new MyChromeSafariBrowser(new MyInAppBrowser());

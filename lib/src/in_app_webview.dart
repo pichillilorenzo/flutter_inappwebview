@@ -253,6 +253,11 @@ class InAppWebView extends StatefulWidget {
   ///**NOTE**: available on Android 21+.
   final void Function(InAppWebViewController controller, String url) onPrint;
 
+  ///Event fired when an HTML element of the webview has been clicked and held.
+  ///
+  ///[hitTestResult] represents the hit result for hitting an HTML elements.
+  final void Function(InAppWebViewController controller, LongPressHitTestResult hitTestResult) onLongPressHitTestResult;
+
   ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
@@ -292,6 +297,21 @@ class InAppWebView extends StatefulWidget {
   ///
   ///**NOTE**: available only on Android.
   final Future<void> Function(InAppWebViewController controller) androidOnGeolocationPermissionsHidePrompt;
+
+  ///Invoked when the web view's web content process is terminated.
+  ///
+  ///**NOTE**: available only on iOS.
+  final Future<void> Function(InAppWebViewController controller) iosOnWebContentProcessDidTerminate;
+
+  ///Called when the web view begins to receive web content.
+  ///
+  ///**NOTE**: available only on iOS.
+  final Future<void> Function(InAppWebViewController controller) iosOnDidCommit;
+
+  ///Called when a web view receives a server redirect.
+  ///
+  ///**NOTE**: available only on iOS.
+  final Future<void> Function(InAppWebViewController controller) iosOnDidReceiveServerRedirectForProvisionalNavigation;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -350,10 +370,14 @@ class InAppWebView extends StatefulWidget {
     this.shouldInterceptFetchRequest,
     this.onUpdateVisitedHistory,
     this.onPrint,
+    this.onLongPressHitTestResult,
     this.androidOnSafeBrowsingHit,
     this.androidOnPermissionRequest,
     this.androidOnGeolocationPermissionsShowPrompt,
     this.androidOnGeolocationPermissionsHidePrompt,
+    this.iosOnWebContentProcessDidTerminate,
+    this.iosOnDidCommit,
+    this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -383,7 +407,7 @@ class _InAppWebViewState extends State<InAppWebView> {
         gestureRecognizers: widget.gestureRecognizers,
         layoutDirection: TextDirection.rtl,
         creationParams: <String, dynamic>{
-          'initialUrl': widget.initialUrl,
+          'initialUrl': '${Uri.parse(widget.initialUrl)}',
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
@@ -401,7 +425,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           gestureRecognizers: widget.gestureRecognizers,
           layoutDirection: TextDirection.rtl,
           creationParams: <String, dynamic>{
-            'initialUrl': widget.initialUrl,
+            'initialUrl': '${Uri.parse(widget.initialUrl)}',
             'initialFile': widget.initialFile,
             'initialData': widget.initialData?.toMap(),
             'initialHeaders': widget.initialHeaders,
@@ -416,7 +440,7 @@ class _InAppWebViewState extends State<InAppWebView> {
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: widget.gestureRecognizers,
         creationParams: <String, dynamic>{
-          'initialUrl': widget.initialUrl,
+          'initialUrl': '${Uri.parse(widget.initialUrl)}',
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
@@ -744,6 +768,35 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           _inAppBrowser.onUpdateVisitedHistory(url, androidIsReload);
         return null;
+      case "onWebContentProcessDidTerminate":
+        if (_widget != null && _widget.iosOnWebContentProcessDidTerminate != null)
+          _widget.iosOnWebContentProcessDidTerminate(this);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.iosOnWebContentProcessDidTerminate();
+        return null;
+      case "onDidCommit":
+        if (_widget != null && _widget.iosOnDidCommit != null)
+          _widget.iosOnDidCommit(this);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.iosOnDidCommit();
+        return null;
+      case "onDidReceiveServerRedirectForProvisionalNavigation":
+        if (_widget != null && _widget.iosOnDidReceiveServerRedirectForProvisionalNavigation != null)
+          _widget.iosOnDidReceiveServerRedirectForProvisionalNavigation(this);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.iosOnDidReceiveServerRedirectForProvisionalNavigation();
+        return null;
+      case "onLongPressHitTestResult":
+        Map<dynamic, dynamic> hitTestResultMap = call.arguments["hitTestResult"];
+        LongPressHitTestResultType type = LongPressHitTestResultType.fromValue(hitTestResultMap["type"].toInt());
+        String extra = hitTestResultMap["extra"];
+        LongPressHitTestResult hitTestResult = new LongPressHitTestResult(type: type, extra: extra);
+
+        if (_widget != null && _widget.onLongPressHitTestResult != null)
+          _widget.onLongPressHitTestResult(this, hitTestResult);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onLongPressHitTestResult(hitTestResult);
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json
@@ -966,30 +1019,18 @@ class InAppWebViewController {
   ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun, the current page may not have changed.
   Future<String> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('getUrl', args);
   }
 
   ///Gets the title for the current page.
   Future<String> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('getTitle', args);
   }
 
   ///Gets the progress for the current page. The progress value is between 0 and 100.
   Future<int> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('getProgress', args);
   }
 
@@ -1160,10 +1201,6 @@ class InAppWebViewController {
       {@required String url, Map<String, String> headers = const {}}) async {
     assert(url != null && url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened(message: 'Cannot laod $url!');
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
     await _channel.invokeMethod('loadUrl', args);
@@ -1175,10 +1212,6 @@ class InAppWebViewController {
     assert(url != null && url.isNotEmpty);
     assert(postData != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened(message: 'Cannot laod $url!');
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('postData', () => postData);
     await _channel.invokeMethod('postUrl', args);
@@ -1199,10 +1232,6 @@ class InAppWebViewController {
       String androidHistoryUrl = "about:blank"}) async {
     assert(data != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
@@ -1245,10 +1274,6 @@ class InAppWebViewController {
       Map<String, String> headers = const {}}) async {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened(message: 'Cannot laod $assetFilePath!');
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('url', () => assetFilePath);
     args.putIfAbsent('headers', () => headers);
     await _channel.invokeMethod('loadFile', args);
@@ -1257,50 +1282,30 @@ class InAppWebViewController {
   ///Reloads the WebView.
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('reload', args);
   }
 
   ///Goes back in the history of the WebView.
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('goBack', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can move backward.
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('canGoBack', args);
   }
 
   ///Goes forward in the history of the WebView.
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('goForward', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can move forward.
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('canGoForward', args);
   }
 
@@ -1309,10 +1314,6 @@ class InAppWebViewController {
     assert(steps != null);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('steps', () => steps);
     await _channel.invokeMethod('goBackOrForward', args);
   }
@@ -1322,10 +1323,6 @@ class InAppWebViewController {
     assert(steps != null);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('steps', () => steps);
     return await _channel.invokeMethod('canGoBackOrForward', args);
   }
@@ -1338,30 +1335,18 @@ class InAppWebViewController {
   ///Check if the WebView instance is in a loading state.
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('isLoading', args);
   }
 
   ///Stops the WebView from loading.
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('stopLoading', args);
   }
 
   ///Evaluates JavaScript code into the WebView and returns the result of the evaluation.
   Future<dynamic> evaluateJavascript({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('source', () => source);
     var data = await _channel.invokeMethod('evaluateJavascript', args);
     if (data != null && Platform.isAndroid) data = json.decode(data);
@@ -1371,10 +1356,6 @@ class InAppWebViewController {
   ///Injects an external JavaScript file into the WebView from a defined url.
   Future<void> injectJavascriptFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('urlFile', () => urlFile);
     await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
   }
@@ -1389,10 +1370,6 @@ class InAppWebViewController {
   ///Injects CSS into the WebView.
   Future<void> injectCSSCode({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('source', () => source);
     await _channel.invokeMethod('injectCSSCode', args);
   }
@@ -1400,10 +1377,6 @@ class InAppWebViewController {
   ///Injects an external CSS file into the WebView from a defined url.
   Future<void> injectCSSFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('urlFile', () => urlFile);
     await _channel.invokeMethod('injectStyleFile', args);
   }
@@ -1480,20 +1453,12 @@ class InAppWebViewController {
   ///**NOTE for iOS**: available from iOS 11.0+.
   Future<Uint8List> takeScreenshot() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('takeScreenshot', args);
   }
 
   ///Sets the WebView options with the new [options] and evaluates them.
   Future<void> setOptions({@required InAppWebViewWidgetOptions options}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
 
     Map<String, dynamic> optionsMap = {};
     optionsMap.addAll(options.crossPlatform?.toMap() ?? {});
@@ -1509,10 +1474,6 @@ class InAppWebViewController {
   ///Gets the current WebView options. Returns the options with `null` value if they are not set yet.
   Future<InAppWebViewWidgetOptions> getOptions() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
 
     InAppWebViewWidgetOptions inAppWebViewWidgetOptions =
         InAppWebViewWidgetOptions();
@@ -1539,10 +1500,6 @@ class InAppWebViewController {
   ///The object returned from this method will not be updated to reflect any new state.
   Future<WebHistory> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     Map<dynamic, dynamic> result =
         await _channel.invokeMethod('getCopyBackForwardList', args);
     result = result.cast<String, dynamic>();
@@ -1568,10 +1525,6 @@ class InAppWebViewController {
   ///Clears all the webview's cache.
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('clearCache', args);
   }
 
@@ -1585,10 +1538,6 @@ class InAppWebViewController {
   Future<void> findAllAsync({@required String find}) async {
     assert(find != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('find', () => find);
     await _channel.invokeMethod('findAllAsync', args);
   }
@@ -1601,10 +1550,6 @@ class InAppWebViewController {
   Future<void> findNext({@required bool forward}) async {
     assert(forward != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('forward', () => forward);
     await _channel.invokeMethod('findNext', args);
   }
@@ -1614,10 +1559,6 @@ class InAppWebViewController {
   ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('clearMatches', args);
   }
 
@@ -1641,10 +1582,6 @@ class InAppWebViewController {
   Future<void> scrollTo({@required int x, @required int y}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
     await _channel.invokeMethod('scrollTo', args);
@@ -1658,10 +1595,6 @@ class InAppWebViewController {
   Future<void> scrollBy({@required int x, @required int y}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
     await _channel.invokeMethod('scrollBy', args);
@@ -1673,10 +1606,6 @@ class InAppWebViewController {
   ///On iOS, it is restricted to just this WebView.
   Future<void> pauseTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('pauseTimers', args);
   }
 
@@ -1685,10 +1614,6 @@ class InAppWebViewController {
   ///On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
   Future<void> resumeTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('resumeTimers', args);
   }
 
@@ -1697,20 +1622,12 @@ class InAppWebViewController {
   ///**NOTE**: available on Android 21+.
   Future<void> printCurrentPage() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     await _channel.invokeMethod('printCurrentPage', args);
   }
 
   ///Gets the height of the HTML content.
   Future<int> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('getContentHeight', args);
   }
 
@@ -1721,10 +1638,6 @@ class InAppWebViewController {
   ///**NOTE**: available on Android 21+.
   Future<void> zoomBy(double zoomFactor) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     args.putIfAbsent('zoomFactor', () => zoomFactor);
     return await _channel.invokeMethod('zoomBy', args);
   }
@@ -1732,10 +1645,6 @@ class InAppWebViewController {
   ///Gets the current scale of this WebView.
   Future<double> getScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_inAppBrowserUuid != null && _inAppBrowser != null) {
-      _inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _inAppBrowserUuid);
-    }
     return await _channel.invokeMethod('getScale', args);
   }
 
@@ -1766,10 +1675,6 @@ class AndroidInAppWebViewController {
   ///**NOTE**: available only on Android 27+.
   Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     return await _controller._channel.invokeMethod('startSafeBrowsing', args);
   }
 
@@ -1791,10 +1696,6 @@ class AndroidInAppWebViewController {
   Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
     assert(hosts != null);
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     args.putIfAbsent('hosts', () => hosts);
     return await _controller._channel.invokeMethod('setSafeBrowsingWhitelist', args);
   }
@@ -1804,20 +1705,12 @@ class AndroidInAppWebViewController {
   ///**NOTE**: available only on Android 27+.
   Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     return await _controller._channel.invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
   }
 
   ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
   Future<void> clearSslPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     await _controller._channel.invokeMethod('clearSslPreferences', args);
   }
 
@@ -1830,10 +1723,6 @@ class AndroidInAppWebViewController {
   ///**NOTE**: available on Android 21+.
   Future<void> clearClientCertPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     await _controller._channel.invokeMethod('clearClientCertPreferences', args);
   }
 
@@ -1841,20 +1730,12 @@ class AndroidInAppWebViewController {
   ///To pause JavaScript globally, use [pauseTimers()]. To resume WebView, call [resume()].
   Future<void> pause() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     await _controller._channel.invokeMethod('pause', args);
   }
 
   ///Resumes a WebView after a previous call to [pause()].
   Future<void> resume() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     await _controller._channel.invokeMethod('resume', args);
   }
 
@@ -1863,10 +1744,6 @@ class AndroidInAppWebViewController {
   ///the current page may not have changed. Also, there may have been redirects resulting in a different URL to that originally requested.
   Future<String> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     return await _controller._channel.invokeMethod('getOriginalUrl', args);
   }
 
@@ -1883,10 +1760,12 @@ class IOSInAppWebViewController {
   ///Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
   Future<void> reloadFromOrigin() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    if (_controller._inAppBrowserUuid != null && _controller._inAppBrowser != null) {
-      _controller._inAppBrowser.throwIsNotOpened();
-      args.putIfAbsent('uuid', () => _controller._inAppBrowserUuid);
-    }
     await _controller._channel.invokeMethod('reloadFromOrigin', args);
+  }
+
+  ///A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
+  Future<bool> hasOnlySecureContent() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _controller._channel.invokeMethod('hasOnlySecureContent', args);
   }
 }

@@ -621,6 +621,46 @@ class IOSInAppWebViewOptions
   ///**NOTE**: available on iOS 13.0+.
   bool automaticallyAdjustsScrollIndicatorInsets;
 
+  ///A Boolean value indicating whether the view ignores an accessibility request to invert its colors.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: available on iOS 11.0+.
+  bool accessibilityIgnoresInvertColors;
+
+  ///A [IOSUIScrollViewDecelerationRate] value that determines the rate of deceleration after the user lifts their finger.
+  ///The default value is [IOSUIScrollViewDecelerationRate.NORMAL].
+  IOSUIScrollViewDecelerationRate decelerationRate;
+
+  ///A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content.
+  ///The default value is `false`.
+  bool alwaysBounceVertical;
+
+  ///A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view.
+  ///The default value is `false`.
+  bool alwaysBounceHorizontal;
+
+  ///A Boolean value that controls whether the scroll-to-top gesture is enabled.
+  ///The scroll-to-top gesture is a tap on the status bar. When a user makes this gesture,
+  ///the system asks the scroll view closest to the status bar to scroll to the top.
+  ///The default value is `true`.
+  bool scrollsToTop;
+
+  ///A Boolean value that determines whether paging is enabled for the scroll view.
+  ///If the value of this property is true, the scroll view stops on multiples of the scroll view’s bounds when the user scrolls.
+  ///The default value is `false`.
+  bool isPagingEnabled;
+
+  ///A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content.
+  ///This value determines how large the content can be scaled.
+  ///It must be greater than the minimum zoom scale for zooming to be enabled.
+  ///The default value is `1.0`.
+  double maximumZoomScale;
+
+  ///A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content.
+  ///This value determines how small the content can be scaled.
+  ///The default value is `1.0`.
+  double minimumZoomScale;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -635,7 +675,15 @@ class IOSInAppWebViewOptions
       this.selectionGranularity = IOSWKSelectionGranularity.DYNAMIC,
       this.dataDetectorTypes = const [IOSWKDataDetectorTypes.NONE],
       this.sharedCookiesEnabled = false,
-      this.automaticallyAdjustsScrollIndicatorInsets = false});
+      this.automaticallyAdjustsScrollIndicatorInsets = false,
+      this.accessibilityIgnoresInvertColors = false,
+      this.decelerationRate = IOSUIScrollViewDecelerationRate.NORMAL,
+      this.alwaysBounceVertical = false,
+      this.alwaysBounceHorizontal = false,
+      this.scrollsToTop = true,
+      this.isPagingEnabled = false,
+      this.maximumZoomScale = 1.0,
+      this.minimumZoomScale = 1.0});
 
   @override
   Map<String, dynamic> toMap() {
@@ -660,7 +708,15 @@ class IOSInAppWebViewOptions
       "selectionGranularity": selectionGranularity.toValue(),
       "dataDetectorTypes": dataDetectorTypesList,
       "sharedCookiesEnabled": sharedCookiesEnabled,
-      "automaticallyAdjustsScrollIndicatorInsets": automaticallyAdjustsScrollIndicatorInsets
+      "automaticallyAdjustsScrollIndicatorInsets": automaticallyAdjustsScrollIndicatorInsets,
+      "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
+      "decelerationRate": decelerationRate.toValue(),
+      "alwaysBounceVertical": alwaysBounceVertical,
+      "alwaysBounceHorizontal": alwaysBounceHorizontal,
+      "scrollsToTop": scrollsToTop,
+      "isPagingEnabled": isPagingEnabled,
+      "maximumZoomScale": maximumZoomScale,
+      "minimumZoomScale": minimumZoomScale
     };
   }
 
@@ -695,6 +751,14 @@ class IOSInAppWebViewOptions
     options.dataDetectorTypes = dataDetectorTypes;
     options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
     options.automaticallyAdjustsScrollIndicatorInsets = map["automaticallyAdjustsScrollIndicatorInsets"];
+    options.accessibilityIgnoresInvertColors = map["accessibilityIgnoresInvertColors"];
+    options.decelerationRate = IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"]);
+    options.alwaysBounceVertical = map["alwaysBounceVertical"];
+    options.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
+    options.scrollsToTop = map["scrollsToTop"];
+    options.isPagingEnabled = map["isPagingEnabled"];
+    options.maximumZoomScale = map["maximumZoomScale"];
+    options.minimumZoomScale = map["minimumZoomScale"];
     return options;
   }
 }
@@ -752,7 +816,7 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   ///Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
   bool closeOnCannotGoBack;
 
-  ///Set to `false` to hide the progress bar at the bottom of the toolbar at the top. The default value is `true`.
+  ///Set to `false` to hide the progressz bar at the bottom of the toolbar at the top. The default value is `true`.
   bool progressBar;
 
   AndroidInAppBrowserOptions(

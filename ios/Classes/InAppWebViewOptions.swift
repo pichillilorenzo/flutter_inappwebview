@@ -49,11 +49,17 @@ public class InAppWebViewOptions: Options {
     var preferredContentMode = 0
     var sharedCookiesEnabled = false
     var automaticallyAdjustsScrollIndicatorInsets = false
+    var accessibilityIgnoresInvertColors = false
+    var decelerationRate = "NORMAL" // UIScrollView.DecelerationRate.normal
+    var alwaysBounceVertical = false
+    var alwaysBounceHorizontal = false
+    var scrollsToTop = true
+    var isPagingEnabled = false
+    var maximumZoomScale = 1.0
+    var minimumZoomScale = 1.0
     
     override init(){
         super.init()
     }
     
 }
-
-

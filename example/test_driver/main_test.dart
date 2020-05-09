@@ -121,6 +121,7 @@ Drawer myDrawer({@required context}) {
 }
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(new MyApp());
 }
 

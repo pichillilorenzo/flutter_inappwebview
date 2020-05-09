@@ -1048,6 +1048,35 @@ class IOSWKDataDetectorTypes {
   int get hashCode => _value.hashCode;
 }
 
+///IOSUIScrollViewDecelerationRate class represents a floating-point value that determines the rate of deceleration after the user lifts their finger.
+class IOSUIScrollViewDecelerationRate {
+  final String _value;
+  const IOSUIScrollViewDecelerationRate._internal(this._value);
+  static IOSUIScrollViewDecelerationRate fromValue(String value) {
+    return ([
+      "NORMAL",
+      "FAST"
+    ].contains(value))
+        ? IOSUIScrollViewDecelerationRate._internal(value)
+        : null;
+  }
+
+  String toValue() => _value;
+  @override
+  String toString() => _value;
+
+  ///The default deceleration rate for a scroll view: `0.998`.
+  static const NORMAL = const IOSUIScrollViewDecelerationRate._internal("NORMAL");
+
+  ///A fast deceleration rate for a scroll view: `0.99`.
+  static const FAST = const IOSUIScrollViewDecelerationRate._internal("FAST");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///UserPreferredContentMode class represents the content mode to prefer when loading and rendering a webpage.
 class UserPreferredContentMode {
   final int _value;
@@ -2218,4 +2247,71 @@ class IOSWKWebsiteDataRecord {
   String toString() {
     return toMap().toString();
   }
+}
+
+///Class representing the [LongPressHitTestResult] type.
+class LongPressHitTestResultType {
+  final int _value;
+  const LongPressHitTestResultType._internal(this._value);
+  static LongPressHitTestResultType fromValue(int value) {
+    if (value != null && [0, 2, 3, 4, 5, 7, 8, 9].contains(value))
+      return LongPressHitTestResultType._internal(value);
+    return null;
+  }
+
+  int toValue() => _value;
+  @override
+  String toString() {
+    switch (_value) {
+      case 2:
+        return "PHONE_TYPE";
+      case 3:
+        return "GEO_TYPE";
+      case 4:
+        return "EMAIL_TYPE";
+      case 5:
+        return "IMAGE_TYPE";
+      case 7:
+        return "SRC_ANCHOR_TYPE";
+      case 8:
+        return "SRC_IMAGE_ANCHOR_TYPE";
+      case 9:
+        return "EDIT_TEXT_TYPE";
+      case 0:
+      default:
+        return "UNKNOWN_TYPE";
+    }
+  }
+
+  ///Default [LongPressHitTestResult], where the target is unknown.
+  static const UNKNOWN_TYPE = const LongPressHitTestResultType._internal(0);
+  ///[LongPressHitTestResult] for hitting a phone number.
+  static const PHONE_TYPE = const LongPressHitTestResultType._internal(2);
+  ///[LongPressHitTestResult] for hitting a map address.
+  static const GEO_TYPE = const LongPressHitTestResultType._internal(3);
+  ///[LongPressHitTestResult] for hitting an email address.
+  static const EMAIL_TYPE = const LongPressHitTestResultType._internal(4);
+  ///[LongPressHitTestResult] for hitting an HTML::img tag.
+  static const IMAGE_TYPE = const LongPressHitTestResultType._internal(5);
+  ///[LongPressHitTestResult] for hitting a HTML::a tag with src=http.
+  static const SRC_ANCHOR_TYPE = const LongPressHitTestResultType._internal(7);
+  ///[LongPressHitTestResult] for hitting a HTML::a tag with src=http + HTML::img.
+  static const SRC_IMAGE_ANCHOR_TYPE = const LongPressHitTestResultType._internal(8);
+  ///[LongPressHitTestResult] for hitting an edit text area.
+  static const EDIT_TEXT_TYPE = const LongPressHitTestResultType._internal(9);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///LongPressHitTestResult class represents the hit result for hitting an HTML elements. Used by [onLongPressHitTestResult] event.
+class LongPressHitTestResult {
+  ///The type of the hit test result.
+  LongPressHitTestResultType type;
+  ///Additional type-dependant information about the result.
+  String extra;
+
+  LongPressHitTestResult({this.type, this.extra});
 }

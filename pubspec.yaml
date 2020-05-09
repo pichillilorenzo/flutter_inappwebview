@@ -5,8 +5,8 @@ author: Lorenzo Pichilli <pichillilorenzo@gmail.com>
 homepage: https://github.com/pichillilorenzo/flutter_inappwebview
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
-  flutter: ">=1.10.0 <2.0.0"
+  sdk: ">=2.7.0 <3.0.0"
+  flutter: ">=1.12.13+hotfix.5"
 
 dependencies:
   flutter:

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-
+import 'dart:io' show Platform;
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'custom_widget_test.dart';
@@ -51,8 +51,11 @@ class InAppWebViewShouldOverrideUrlLoadingTestState extends WidgetTestState {
                       }
                     },
                     shouldOverrideUrlLoading: (InAppWebViewController controller, ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
-                      controller.loadUrl(url: "https://flutter.dev/");
-                      return ShouldOverrideUrlLoadingAction.CANCEL;
+                      if (Platform.isAndroid || shouldOverrideUrlLoadingRequest.iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED) {
+                        await controller.loadUrl(url: "https://flutter.dev/");
+                        return ShouldOverrideUrlLoadingAction.CANCEL;
+                      }
+                      return ShouldOverrideUrlLoadingAction.ALLOW;
                     },
                   ),
                 ),

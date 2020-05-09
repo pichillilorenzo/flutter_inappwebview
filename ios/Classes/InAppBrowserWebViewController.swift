@@ -278,6 +278,9 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
             case "getScale":
                 result(webView.getScale())
                 break
+            case "hasOnlySecureContent":
+                result(webView.hasOnlySecureContent)
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

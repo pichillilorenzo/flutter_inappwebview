@@ -497,6 +497,11 @@ class InAppBrowser {
   ///**NOTE**: available on Android 21+.
   void onPrint(String url) {}
 
+  ///Event fired when an HTML element of the webview has been clicked and held.
+  ///
+  ///[hitTestResult] represents the hit result for hitting an HTML elements.
+  void onLongPressHitTestResult(LongPressHitTestResult hitTestResult) {}
+
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
@@ -536,6 +541,21 @@ class InAppBrowser {
   ///
   ///**NOTE**: available only on Android.
   void androidOnGeolocationPermissionsHidePrompt() {}
+
+  ///Invoked when the web view's web content process is terminated.
+  ///
+  ///**NOTE**: available only on iOS.
+  void iosOnWebContentProcessDidTerminate() {}
+
+  ///Called when the web view begins to receive web content.
+  ///
+  ///**NOTE**: available only on iOS.
+  void iosOnDidCommit() {}
+
+  ///Called when a web view receives a server redirect.
+  ///
+  ///**NOTE**: available only on iOS.
+  void iosOnDidReceiveServerRedirectForProvisionalNavigation() {}
 
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {

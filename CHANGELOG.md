@@ -1,15 +1,16 @@
 ## 3.0.0
 
-- Added `Promise` javascript [polyfill](https://github.com/taylorhakes/promise-polyfill/blob/master/src/index.js) for webviews that doesn't support it for `window.flutter_inappwebview.callHandler`
+- Added `Promise` javascript [polyfill](https://github.com/tildeio/rsvp.js) for webviews that doesn't support it for `window.flutter_inappwebview.callHandler`
 - Added `getDefaultUserAgent` static method to `InAppWebViewController`
-- Added `onUpdateVisitedHistory`, `onPrint` event
-- Added `onGeolocationPermissionsHidePrompt` event for Android
+- Added `onUpdateVisitedHistory`, `onPrint`, `onLongPressHitTestResult` event
+- Added `androidOnGeolocationPermissionsHidePrompt` event for Android webview
+- Added `iosOnWebContentProcessDidTerminate`, `iosOnDidCommit`, `iosOnDidReceiveServerRedirectForProvisionalNavigation` events for iOS webview
 - Added `supportMultipleWindows` webview option for Android
 - Added `regexToCancelSubFramesLoading` webview option for Android to cancel subframe requests on `shouldOverrideUrlLoading` event based on a Regular Expression
 - Added `getContentHeight`, `zoomBy`, `printCurrentPage`, `getScale` methods
 - Added `getOriginalUrl` webview method for Android
-- Added `reloadFromOrigin` webview method for iOS
-- Added `automaticallyAdjustsScrollIndicatorInsets` webview options for iOS
+- Added `reloadFromOrigin`, `hasOnlySecureContent` webview methods for iOS
+- Added `automaticallyAdjustsScrollIndicatorInsets`, `accessibilityIgnoresInvertColors`, `decelerationRate`, `alwaysBounceVertical`, `alwaysBounceHorizontal`, `scrollsToTop`, `isPagingEnabled`, `maximumZoomScale`, `minimumZoomScale` webview options for iOS
 - Added `WebStorageManager` class which manages the web storage used by WebView instances
 - Added `packageName` [#229](https://github.com/pichillilorenzo/flutter_inappwebview/issues/229) and `keepAliveEnabled` ChromeCustomTab options for Android
 - Updated for Flutter 1.12 new Java Embedding API (Android)
@@ -17,10 +18,16 @@
 - Updated default value for `domStorageEnabled` and `databaseEnabled` options to `true` for Android
 - Merge "Fixes null error when calling getOptions for InAppBrowser class" [#214](https://github.com/pichillilorenzo/flutter_inappwebview/pull/214) (thanks to [panndoraBoo](https://github.com/panndoraBoo))
 - Merge "Fixes crash onConsoleMessage iOS forced unwrapping" [#228](https://github.com/pichillilorenzo/flutter_inappwebview/pull/228) (thanks to [tokonu](https://github.com/tokonu))
+- Merge "Fix HTTPCookie.secure" [#311](https://github.com/pichillilorenzo/flutter_inappwebview/pull/311) (thanks to [xtyxtyx](https://github.com/xtyxtyx))
+- Merge "Fix config options for Android release builds" [#295](https://github.com/pichillilorenzo/flutter_inappwebview/pull/295) (thanks to [wwwdata](https://github.com/wwwdata))
+- Merge "fix scrollbar on iOS always show if not disable scroll" [#256](https://github.com/pichillilorenzo/flutter_inappwebview/pull/256) (thanks to [phamnhuvu-dev](https://github.com/phamnhuvu-dev))
+- Merge "Fix crash on nil/invalid URL (iOS)" [#262](https://github.com/pichillilorenzo/flutter_inappwebview/pull/262) (thanks to [AlexVincent525](https://github.com/AlexVincent525))
+- Merge "Fix crash when `prompt` was called on Android Q." [#262](https://github.com/pichillilorenzo/flutter_inappwebview/pull/263) (thanks to [AlexVincent525](https://github.com/AlexVincent525))
 - Fix for Android and iOS `InAppBrowser` for some controller methods not exposed.
 - Fixed "App Crashes after clicking on dropdown (Using inappwebview)" [#182](https://github.com/pichillilorenzo/flutter_inappwebview/issues/182)
 - Fixed "webview can not be released when in ios" [#225](https://github.com/pichillilorenzo/flutter_inappwebview/issues/225). Now the iOS WebView is released from memory when it is disposed from Flutter.
 - Fixed "Setting of presentationStyle not working on iOS" [#213](https://github.com/pichillilorenzo/flutter_inappwebview/issues/213)
+- Fixed "Android zoom issues" [#270](https://github.com/pichillilorenzo/flutter_inappwebview/issues/270)
 
 ### BREAKING CHANGES
 

@@ -6,11 +6,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Picture;
 import android.graphics.drawable.ColorDrawable;
-
-import androidx.annotation.RequiresApi;
-import androidx.appcompat.app.ActionBar;
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -25,6 +20,10 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
+import androidx.annotation.RequiresApi;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions;
 
@@ -34,11 +33,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class InAppBrowserActivity extends AppCompatActivity {
+public class InAppBrowserActivity extends AppCompatActivity implements MethodChannel.MethodCallHandler {
 
   static final String LOG_TAG = "InAppBrowserActivity";
+  public MethodChannel channel;
   public String uuid;
   public InAppWebView webView;
   public ActionBar actionBar;
@@ -54,13 +55,17 @@ public class InAppBrowserActivity extends AppCompatActivity {
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    Bundle b = getIntent().getExtras();
+    uuid = b.getString("uuid");
+
+    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + uuid);
+    channel.setMethodCallHandler(this);
+
     setContentView(R.layout.activity_web_view);
 
     webView = findViewById(R.id.webView);
     webView.inAppBrowserActivity = this;
 
-    Bundle b = getIntent().getExtras();
-    uuid = b.getString("uuid");
     fromActivity = b.getString("fromActivity");
 
     HashMap<String, Object> optionsMap = (HashMap<String, Object>) b.getSerializable("options");
@@ -71,8 +76,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
     InAppWebViewOptions webViewOptions = new InAppWebViewOptions();
     webViewOptions.parse(optionsMap);
     webView.options = webViewOptions;
-
-    InAppWebViewFlutterPlugin.inAppBrowser.webViewActivities.put(uuid, this);
 
     actionBar = getSupportActionBar();
 
@@ -95,8 +98,238 @@ public class InAppBrowserActivity extends AppCompatActivity {
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("uuid", uuid);
-    InAppWebViewFlutterPlugin.inAppBrowser.channel.invokeMethod("onBrowserCreated", obj);
+    channel.invokeMethod("onBrowserCreated", obj);
+  }
 
+  @Override
+  public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
+    switch (call.method) {
+      case "getUrl":
+        result.success(getUrl());
+        break;
+      case "getTitle":
+        result.success(getWebViewTitle());
+        break;
+      case "getProgress":
+        result.success(getProgress());
+        break;
+      case "loadUrl":
+        {
+          String url = (String) call.argument("url");
+          Map<String, String> headers = (Map<String, String>) call.argument("headers");
+          if (headers != null)
+            loadUrl(url, headers, result);
+          else
+            loadUrl(url, result);
+        }
+        break;
+      case "postUrl":
+        postUrl((String) call.argument("url"), (byte[]) call.argument("postData"), result);
+        break;
+      case "loadData":
+      {
+        String data = (String) call.argument("data");
+        String mimeType = (String) call.argument("mimeType");
+        String encoding = (String) call.argument("encoding");
+        String baseUrl = (String) call.argument("baseUrl");
+        String historyUrl = (String) call.argument("historyUrl");
+        loadData(data, mimeType, encoding, baseUrl, historyUrl, result);
+      }
+      break;
+      case "loadFile":
+        {
+          String url = (String) call.argument("url");
+          Map<String, String> headers = (Map<String, String>) call.argument("headers");
+          if (headers != null)
+            loadFile(url, headers, result);
+          else
+            loadFile(url, result);
+        }
+        break;
+      case "close":
+        close(result);
+        break;
+      case "evaluateJavascript":
+        {
+          String source = (String) call.argument("source");
+          evaluateJavascript(source, result);
+        }
+        break;
+      case "injectJavascriptFileFromUrl":
+        {
+          String urlFile = (String) call.argument("urlFile");
+          injectJavascriptFileFromUrl(urlFile);
+        }
+        result.success(true);
+        break;
+      case "injectCSSCode":
+        {
+          String source = (String) call.argument("source");
+          injectCSSCode(source);
+        }
+        result.success(true);
+        break;
+      case "injectCSSFileFromUrl":
+        {
+          String urlFile = (String) call.argument("urlFile");
+          injectCSSFileFromUrl(urlFile);
+        }
+        result.success(true);
+        break;
+      case "show":
+        show();
+        result.success(true);
+        break;
+      case "hide":
+        hide();
+        result.success(true);
+        break;
+      case "reload":
+        reload();
+        result.success(true);
+        break;
+      case "goBack":
+        goBack();
+        result.success(true);
+        break;
+      case "canGoBack":
+        result.success(canGoBack());
+        break;
+      case "goForward":
+        goForward();
+        result.success(true);
+        break;
+      case "canGoForward":
+        result.success(canGoForward());
+        break;
+      case "goBackOrForward":
+        goBackOrForward((Integer) call.argument("steps"));
+        result.success(true);
+        break;
+      case "canGoBackOrForward":
+        result.success(canGoBackOrForward((Integer) call.argument("steps")));
+        break;
+      case "stopLoading":
+        stopLoading();
+        result.success(true);
+        break;
+      case "isLoading":
+        result.success(isLoading());
+        break;
+      case "isHidden":
+        result.success(isHidden);
+        break;
+      case "takeScreenshot":
+        result.success(takeScreenshot());
+        break;
+      case "setOptions":
+        {
+          String optionsType = (String) call.argument("optionsType");
+          switch (optionsType){
+            case "InAppBrowserOptions":
+              InAppBrowserOptions inAppBrowserOptions = new InAppBrowserOptions();
+              HashMap<String, Object> inAppBrowserOptionsMap = (HashMap<String, Object>) call.argument("options");
+              inAppBrowserOptions.parse(inAppBrowserOptionsMap);
+              setOptions(inAppBrowserOptions, inAppBrowserOptionsMap);
+              break;
+            default:
+              result.error(LOG_TAG, "Options " + optionsType + " not available.", null);
+          }
+        }
+        result.success(true);
+        break;
+      case "getOptions":
+        result.success(getOptions());
+        break;
+      case "getCopyBackForwardList":
+        result.success(getCopyBackForwardList());
+        break;
+      case "startSafeBrowsing":
+        startSafeBrowsing(result);
+        break;
+      case "setSafeBrowsingWhitelist":
+        setSafeBrowsingWhitelist((List<String>) call.argument("hosts"), result);
+        break;
+      case "clearCache":
+        clearCache();
+        result.success(true);
+        break;
+      case "clearSslPreferences":
+        clearSslPreferences();
+        result.success(true);
+        break;
+      case "clearClientCertPreferences":
+        clearClientCertPreferences(result);
+        break;
+      case "findAllAsync":
+        String find = (String) call.argument("find");
+        findAllAsync(find);
+        result.success(true);
+        break;
+      case "findNext":
+        Boolean forward = (Boolean) call.argument("forward");
+        findNext(forward, result);
+        break;
+      case "clearMatches":
+        clearMatches(result);
+        break;
+      case "scrollTo":
+        {
+          Integer x = (Integer) call.argument("x");
+          Integer y = (Integer) call.argument("y");
+          scrollTo(x, y);
+        }
+        result.success(true);
+        break;
+      case "scrollBy":
+        {
+          Integer x = (Integer) call.argument("x");
+          Integer y = (Integer) call.argument("y");
+          scrollBy(x, y);
+        }
+        result.success(true);
+        break;
+      case "pause":
+        onPauseWebView();
+        result.success(true);
+        break;
+      case "resume":
+        onResumeWebView();
+        result.success(true);
+        break;
+      case "pauseTimers":
+        pauseTimers();
+        result.success(true);
+        break;
+      case "resumeTimers":
+        resumeTimers();
+        result.success(true);
+        break;
+      case "printCurrentPage":
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          printCurrentPage();
+        }
+        result.success(true);
+        break;
+      case "getContentHeight":
+        result.success(getContentHeight());
+        break;
+      case "zoomBy":
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          Float zoomFactor = (Float) call.argument("zoomFactor");
+          zoomBy(zoomFactor);
+        }
+        result.success(true);
+        break;
+      case "getOriginalUrl":
+        result.success(getOriginalUrl());
+        break;
+      case "getScale":
+        result.success(getScale());
+        break;
+      default:
+        result.notImplemented();
+    }
   }
 
   private void prepareView() {
@@ -259,15 +492,37 @@ public class InAppBrowserActivity extends AppCompatActivity {
       if (canGoBack())
         goBack();
       else if (options.closeOnCannotGoBack)
-        InAppWebViewFlutterPlugin.inAppBrowser.close(this, uuid, null);
+        close(null);
       return true;
     }
     return super.onKeyDown(keyCode, event);
   }
 
-  public void close() {
-    hide();
-    finish();
+  public void close(final MethodChannel.Result result) {
+    runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+
+        Map<String, Object> obj = new HashMap<>();
+        channel.invokeMethod("onExit", obj);
+
+        webView.setWebViewClient(new WebViewClient() {
+          // NB: wait for about:blank before dismissing
+          public void onPageFinished(WebView view, String url) {
+            hide();
+            finish();
+          }
+        });
+        // NB: From SDK 19: "If you call methods on WebView from any thread
+        // other than your app's UI thread, it can cause unexpected results."
+        // http://developer.android.com/guide/webapps/migrating.html#Threads
+        webView.loadUrl("about:blank");
+        if (result != null) {
+          result.success(true);
+        }
+      }
+    });
+
   }
 
   public void reload() {
@@ -358,7 +613,7 @@ public class InAppBrowserActivity extends AppCompatActivity {
   }
 
   public void closeButtonClicked(MenuItem item) {
-    InAppWebViewFlutterPlugin.inAppBrowser.close(this, uuid, null);
+    close(null);
   }
 
   public byte[] takeScreenshot() {
@@ -525,20 +780,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
       result.success(false);
   }
 
-  public void dispose() {
-    if (webView != null) {
-      webView.setWebChromeClient(new WebChromeClient());
-      webView.setWebViewClient(new WebViewClient() {
-        public void onPageFinished(WebView view, String url) {
-          webView.dispose();
-          webView.destroy();
-          webView = null;
-        }
-      });
-      webView.loadUrl("about:blank");
-    }
-  }
-
   public void scrollTo(Integer x, Integer y) {
     if (webView != null)
       webView.scrollTo(x, y);
@@ -597,5 +838,26 @@ public class InAppBrowserActivity extends AppCompatActivity {
     if (webView != null)
       return webView.getUpdatedScale();
     return null;
+  }
+
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+    if (webView != null) {
+      webView.setWebChromeClient(new WebChromeClient());
+      webView.setWebViewClient(new WebViewClient() {
+        public void onPageFinished(WebView view, String url) {
+          webView.dispose();
+          webView.destroy();
+          webView = null;
+        }
+      });
+      webView.loadUrl("about:blank");
+    }
+  }
+
+  @Override
+  public void onDestroy() {
+    dispose();
+    super.onDestroy();
   }
 }

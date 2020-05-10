@@ -90,7 +90,9 @@ class MyCookieManager: NSObject, FlutterPlugin {
         if maxAge != nil {
             properties[.maximumAge] = String(maxAge!)
         }
-        properties[.secure] = (isSecure != nil && isSecure!) ? "TRUE" : "FALSE"
+        if isSecure != nil && isSecure! {
+            properties[.secure] = "TRUE"
+        }
         
         let cookie = HTTPCookie(properties: properties)!
         MyCookieManager.httpCookieStore!.setCookie(cookie, completionHandler: {() in

@@ -8,7 +8,7 @@ import '.env.dart';
 
 void main() {
 
-  group('Flutter InAppBrowser', () {
+  group('Flutter InAppWebView', () {
     FlutterDriver driver;
 
     // Connect to the Flutter driver before running any tests.

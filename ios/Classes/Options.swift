@@ -14,7 +14,7 @@ public class Options: NSObject {
         super.init()
     }
     
-    func parse(options: [String: Any]) -> Options {
+    func parse(options: [String: Any?]) -> Options {
         for (key, value) in options {
             if self.responds(to: Selector(key)) {
                 self.setValue(value, forKey: key)
@@ -23,8 +23,8 @@ public class Options: NSObject {
         return self
     }
     
-    func getHashMap() -> [String: Any] {
-        var options: [String: Any] = [:]
+    func getHashMap() -> [String: Any?] {
+        var options: [String: Any?] = [:]
         var counts = UInt32();
         let properties = class_copyPropertyList(object_getClass(self), &counts);
         for i in 0..<counts {

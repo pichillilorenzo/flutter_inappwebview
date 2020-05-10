@@ -5,7 +5,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'types.dart';
-import 'channel_manager.dart';
 import 'in_app_browser.dart';
 
 ///ChromeSafariBrowser class.
@@ -18,12 +17,16 @@ class ChromeSafariBrowser {
   String uuid;
   InAppBrowser browserFallback;
   bool _isOpened = false;
+  MethodChannel _channel;
+  static const MethodChannel _sharedChannel = const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
   ///Initialize the [ChromeSafariBrowser] instance with an [InAppBrowser] fallback instance or `null`.
   ChromeSafariBrowser({bFallback}) {
     uuid = uuidGenerator.v4();
     browserFallback = bFallback;
-    ChannelManager.addListener(uuid, handleMethod);
+    this._channel =
+        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$uuid');
+    this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
   }
 
@@ -32,8 +35,8 @@ class ChromeSafariBrowser {
       case "onChromeSafariBrowserOpened":
         onOpened();
         break;
-      case "onChromeSafariBrowserLoaded":
-        onLoaded();
+      case "onChromeSafariBrowserCompletedInitialLoad":
+        onCompletedInitialLoad();
         break;
       case "onChromeSafariBrowserClosed":
         onClosed();
@@ -94,23 +97,21 @@ class ChromeSafariBrowser {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('uuidFallback',
-        () => (browserFallback != null) ? browserFallback.uuid : '');
     args.putIfAbsent('url', () => url);
-    args.putIfAbsent('headers', () => headersFallback);
     args.putIfAbsent('options', () => optionsMap);
+    args.putIfAbsent('uuidFallback',
+            () => (browserFallback != null) ? browserFallback.uuid : '');
+    args.putIfAbsent('headersFallback', () => headersFallback);
     args.putIfAbsent('optionsFallback', () => optionsFallbackMap);
-    args.putIfAbsent('isData', () => false);
-    args.putIfAbsent('useChromeSafariBrowser', () => true);
-    await ChannelManager.channel.invokeMethod('open', args);
+    await _sharedChannel.invokeMethod('open', args);
     this._isOpened = true;
   }
 
   ///Event fires when the [ChromeSafariBrowser] is opened.
   void onOpened() {}
 
-  ///Event fires when the [ChromeSafariBrowser] is loaded.
-  void onLoaded() {}
+  ///Event fires when the initial URL load is complete.
+  void onCompletedInitialLoad() {}
 
   ///Event fires when the [ChromeSafariBrowser] is closed.
   void onClosed() {}

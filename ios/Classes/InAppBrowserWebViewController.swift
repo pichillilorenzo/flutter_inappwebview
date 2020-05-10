@@ -14,55 +14,7 @@ import AVFoundation
 typealias OlderClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Any?) -> Void
 typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void
 
-//extension WKWebView{
-//
-//    var keyboardDisplayRequiresUserAction: Bool? {
-//        get {
-//            return self.keyboardDisplayRequiresUserAction
-//        }
-//        set {
-//            self.setKeyboardRequiresUserInteraction(newValue ?? true)
-//        }
-//    }
-//
-//    func setKeyboardRequiresUserInteraction( _ value: Bool) {
-//
-//        guard
-//            let WKContentViewClass: AnyClass = NSClassFromString("WKContentView") else {
-//                print("Cannot find the WKContentView class")
-//                return
-//        }
-//
-//        let olderSelector: Selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:userObject:")
-//        let newerSelector: Selector = sel_getUid("_startAssistingNode:userIsInteracting:blurPreviousNode:changingActivityState:userObject:")
-//
-//        if let method = class_getInstanceMethod(WKContentViewClass, olderSelector) {
-//
-//            let originalImp: IMP = method_getImplementation(method)
-//            let original: OlderClosureType = unsafeBitCast(originalImp, to: OlderClosureType.self)
-//            let block : @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3) in
-//                original(me, olderSelector, arg0, !value, arg2, arg3)
-//            }
-//            let imp: IMP = imp_implementationWithBlock(block)
-//            method_setImplementation(method, imp)
-//        }
-//
-//        if let method = class_getInstanceMethod(WKContentViewClass, newerSelector) {
-//
-//            let originalImp: IMP = method_getImplementation(method)
-//            let original: NewerClosureType = unsafeBitCast(originalImp, to: NewerClosureType.self)
-//            let block : @convention(block) (Any, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void = { (me, arg0, arg1, arg2, arg3, arg4) in
-//                original(me, newerSelector, arg0, !value, arg2, arg3, arg4)
-//            }
-//            let imp: IMP = imp_implementationWithBlock(block)
-//            method_setImplementation(method, imp)
-//        }
-//
-//    }
-//
-//}
-
-class InAppWebView_IBWrapper: InAppWebView {
+public class InAppWebView_IBWrapper: InAppWebView {
     required init(coder: NSCoder) {
         let config = WKWebViewConfiguration()
         super.init(frame: .zero, configuration: config, IABController: nil, channel: nil)
@@ -70,7 +22,7 @@ class InAppWebView_IBWrapper: InAppWebView {
     }
 }
 
-class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKUIDelegate, UITextFieldDelegate {
+public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIScrollViewDelegate, WKUIDelegate, UITextFieldDelegate {
     
     @IBOutlet var containerWebView: UIView!
     @IBOutlet var closeButton: UIButton!
@@ -90,8 +42,9 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     @IBOutlet var webView_BottomFullScreenConstraint: NSLayoutConstraint!
     @IBOutlet var webView_TopFullScreenConstraint: NSLayoutConstraint!
     
+    var uuid: String = ""
     var webView: InAppWebView!
-    weak var navigationDelegate: SwiftFlutterPlugin?
+    var channel: FlutterMethodChannel?
     var initURL: URL?
     var tmpWindow: UIWindow?
     var browserOptions: InAppBrowserOptions?
@@ -102,25 +55,248 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
     var initEncoding: String?
     var initBaseUrl: String?
     var isHidden = false
-    var uuid: String = ""
-    var WKNavigationMap: [String: [String: Any]] = [:]
-    var startPageTime: Int64 = 0
     var viewPrepared = false
+    var previousStatusBarStyle = -1
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    public static func register(with registrar: FlutterPluginRegistrar) {
+        
+    }
+    
+    public func prepareMethodChannel() {
+        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        SwiftFlutterPlugin.instance!.registrar!.addMethodCallDelegate(self, channel: channel!)
+    }
+    
+    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+        let arguments = call.arguments as? NSDictionary
+
+        switch call.method {
+            case "getUrl":
+                result(webView.url?.absoluteString)
+                break
+            case "getTitle":
+                result(webView.title)
+                break
+            case "getProgress":
+                let progress = Int(webView.estimatedProgress * 100)
+                result(progress)
+                break
+            case "loadUrl":
+                 let url = arguments!["url"] as! String
+               let headers = arguments!["headers"] as? [String: String]
+               let absoluteUrl = URL(string: url)!.absoluteURL
+               webView.loadUrl(url: absoluteUrl, headers: headers)
+                result(true)
+                break
+            case "loadData":
+                let data = arguments!["data"] as! String
+                let mimeType = arguments!["mimeType"] as! String
+                let encoding = arguments!["encoding"] as! String
+                let baseUrl = arguments!["baseUrl"] as! String
+                webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+                result(true)
+                break
+            case "postUrl":
+                let url = arguments!["url"] as! String
+                let postData = arguments!["postData"] as! FlutterStandardTypedData
+                let absoluteUrl = URL(string: url)!.absoluteURL
+                webView.postUrl(url: absoluteUrl, postData: postData.data, completionHandler: { () -> Void in
+                    result(true)
+                })
+                break
+            case "loadFile":
+                let url = arguments!["url"] as! String
+                let headers = arguments!["headers"] as? [String: String]
+                do {
+                    try webView.loadFile(url: url, headers: headers)
+                    result(true)
+                }
+                catch let error as NSError {
+                    dump(error)
+                    result(FlutterError(code: "InAppBrowserWebViewController", message: error.localizedDescription, details: nil))
+                }
+                break
+            case "close":
+                close()
+                result(true)
+                break
+            case "show":
+                show()
+                result(true)
+                break
+            case "hide":
+                hide()
+                result(true)
+                break
+            case "reload":
+                webView.reload()
+                result(true)
+                break
+            case "goBack":
+                webView.goBack()
+                result(true)
+                break
+            case "canGoBack":
+                result(webView.canGoBack)
+                break
+            case "goForward":
+                webView.goForward()
+                result(true)
+                break
+            case "canGoForward":
+                result(webView.canGoForward)
+                break
+            case "goBackOrForward":
+                let steps = arguments!["steps"] as! Int
+                webView.goBackOrForward(steps: steps)
+                result(true)
+                break
+            case "canGoBackOrForward":
+                let steps = arguments!["steps"] as! Int
+                result(webView.canGoBackOrForward(steps: steps))
+                break
+            case "isLoading":
+                result(webView.isLoading == true)
+                break
+            case "stopLoading":
+                webView.stopLoading()
+                result(true)
+                break
+            case "isHidden":
+                result(isHidden == true)
+                break
+            case "evaluateJavascript":
+                let source = arguments!["source"] as! String
+                webView.evaluateJavascript(source: source, result: result)
+                break
+            case "injectJavascriptFileFromUrl":
+                let urlFile = arguments!["urlFile"] as! String
+                webView.injectJavascriptFileFromUrl(urlFile: urlFile)
+                result(true)
+                break
+            case "injectCSSCode":
+                let source = arguments!["source"] as! String
+                webView.injectCSSCode(source: source)
+                result(true)
+                break
+            case "injectCSSFileFromUrl":
+                let urlFile = arguments!["urlFile"] as! String
+                webView.injectCSSFileFromUrl(urlFile: urlFile)
+                result(true)
+                break
+            case "takeScreenshot":
+                webView.takeScreenshot(completionHandler: { (screenshot) -> Void in
+                    result(screenshot)
+                })
+                break
+            case "setOptions":
+                let inAppBrowserOptions = InAppBrowserOptions()
+                let inAppBrowserOptionsMap = arguments!["options"] as! [String: Any]
+                let _ = inAppBrowserOptions.parse(options: inAppBrowserOptionsMap)
+                self.setOptions(newOptions: inAppBrowserOptions, newOptionsMap: inAppBrowserOptionsMap)
+                result(true)
+                break
+            case "getOptions":
+                result(getOptions())
+                break
+            case "getCopyBackForwardList":
+                result(webView.getCopyBackForwardList())
+                break
+            case "findAllAsync":
+                let find = arguments!["find"] as! String
+                webView.findAllAsync(find: find, completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "InAppBrowserWebViewController", message: error?.localizedDescription, details: nil))
+                        return
+                    }
+                    result(true)
+                })
+                break
+            case "findNext":
+                let forward = arguments!["forward"] as! Bool
+                webView.findNext(forward: forward, completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "InAppBrowserWebViewController", message: error?.localizedDescription, details: nil))
+                        return
+                    }
+                    result(true)
+                })
+                break
+            case "clearMatches":
+                webView.clearMatches(completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "InAppBrowserWebViewController", message: error?.localizedDescription, details: nil))
+                        return
+                    }
+                    result(true)
+                })
+                break
+            case "clearCache":
+                webView.clearCache()
+                result(true)
+                break
+            case "scrollTo":
+                let x = arguments!["x"] as! Int
+                let y = arguments!["y"] as! Int
+                webView.scrollTo(x: x, y: y)
+                result(true)
+                break
+            case "scrollBy":
+                let x = arguments!["x"] as! Int
+                let y = arguments!["y"] as! Int
+                webView.scrollTo(x: x, y: y)
+                result(true)
+                break
+            case "pauseTimers":
+               webView.pauseTimers()
+               result(true)
+               break
+            case "resumeTimers":
+                webView.resumeTimers()
+                result(true)
+                break
+            case "printCurrentPage":
+                webView.printCurrentPage(printCompletionHandler: {(completed, error) in
+                    if !completed, let _ = error {
+                        result(false)
+                        return
+                    }
+                    result(true)
+                })
+                break
+            case "getContentHeight":
+                result(webView.getContentHeight())
+                break
+            case "reloadFromOrigin":
+                webView.reloadFromOrigin()
+                result(true)
+                break
+            case "getScale":
+                result(webView.getScale())
+                break
+            case "hasOnlySecureContent":
+                result(webView.hasOnlySecureContent)
+                break
+            default:
+                result(FlutterMethodNotImplemented)
+                break
+        }
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
-            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, channel: nil)
+            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, channel: channel!)
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
             
             if #available(iOS 11.0, *) {
-                if let contentBlockers = webView!.options?.contentBlockers, contentBlockers.count > 0 {
+                if let contentBlockers = webView.options?.contentBlockers, contentBlockers.count > 0 {
                     do {
                         let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
                         let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
@@ -138,7 +314,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
                                 
                                 self.initLoad(initURL: self.initURL, initData: self.initData, initMimeType: self.initMimeType, initEncoding: self.initEncoding, initBaseUrl: self.initBaseUrl, initHeaders: self.initHeaders)
                                 
-                                self.navigationDelegate?.onBrowserCreated(uuid: self.uuid, webView: self.webView)
+                                self.onBrowserCreated()
                         }
                         return
                     } catch {
@@ -149,13 +325,13 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
             
             initLoad(initURL: initURL, initData: initData, initMimeType: initMimeType, initEncoding: initEncoding, initBaseUrl: initBaseUrl, initHeaders: initHeaders)
             
-            navigationDelegate?.onBrowserCreated(uuid: uuid, webView: webView)
+            onBrowserCreated()
         }
         viewPrepared = true
         super.viewWillAppear(animated)
     }
     
-    func initLoad(initURL: URL?, initData: String?, initMimeType: String?, initEncoding: String?, initBaseUrl: String?, initHeaders: [String: String]?) {
+    public func initLoad(initURL: URL?, initData: String?, initMimeType: String?, initEncoding: String?, initBaseUrl: String?, initHeaders: [String: String]?) {
         if self.initData == nil {
             loadUrl(url: self.initURL!, headers: self.initHeaders)
         }
@@ -164,7 +340,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         }
     }
     
-    override func viewDidLoad() {
+    public override func viewDidLoad() {
         super.viewDidLoad()
         
         urlField.delegate = self
@@ -197,39 +373,28 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         print("InAppBrowserWebViewController - dealloc")
     }
     
-    override func viewWillDisappear (_ animated: Bool) {
+    public override func viewWillDisappear (_ animated: Bool) {
+        dispose()
         super.viewWillDisappear(animated)
-        webView.dispose()
-        navigationDelegate = nil
-        transitioningDelegate = nil
-        urlField.delegate = nil
-        closeButton.removeTarget(self, action: #selector(self.close), for: .touchUpInside)
-        forwardButton.target = nil
-        forwardButton.target = nil
-        backButton.target = nil
-        reloadButton.target = nil
-        shareButton.target = nil
     }
     
-    func prepareConstraints () {
-        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
-        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
+    public func prepareConstraints () {
+        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
+        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
         
         webView.translatesAutoresizingMaskIntoConstraints = false
-        let height = NSLayoutConstraint(item: webView, attribute: .height, relatedBy: .equal, toItem: containerWebView, attribute: .height, multiplier: 1, constant: 0)
-        let width = NSLayoutConstraint(item: webView, attribute: .width, relatedBy: .equal, toItem: containerWebView, attribute: .width, multiplier: 1, constant: 0)
-        let leftConstraint = NSLayoutConstraint(item: webView, attribute: .leftMargin, relatedBy: .equal, toItem: containerWebView, attribute: .leftMargin, multiplier: 1, constant: 0)
-        let rightConstraint = NSLayoutConstraint(item: webView, attribute: .rightMargin, relatedBy: .equal, toItem: containerWebView, attribute: .rightMargin, multiplier: 1, constant: 0)
-        let bottomContraint = NSLayoutConstraint(item: webView, attribute: .bottomMargin, relatedBy: .equal, toItem: containerWebView, attribute: .bottomMargin, multiplier: 1, constant: 0)
+        let height = NSLayoutConstraint(item: self.webView!, attribute: .height, relatedBy: .equal, toItem: containerWebView, attribute: .height, multiplier: 1, constant: 0)
+        let width = NSLayoutConstraint(item: self.webView!, attribute: .width, relatedBy: .equal, toItem: containerWebView, attribute: .width, multiplier: 1, constant: 0)
+        let leftConstraint = NSLayoutConstraint(item: self.webView!, attribute: .leftMargin, relatedBy: .equal, toItem: containerWebView, attribute: .leftMargin, multiplier: 1, constant: 0)
+        let rightConstraint = NSLayoutConstraint(item: self.webView!, attribute: .rightMargin, relatedBy: .equal, toItem: containerWebView, attribute: .rightMargin, multiplier: 1, constant: 0)
+        let bottomContraint = NSLayoutConstraint(item: self.webView!, attribute: .bottomMargin, relatedBy: .equal, toItem: containerWebView, attribute: .bottomMargin, multiplier: 1, constant: 0)
         containerWebView.addConstraints([height, width, leftConstraint, rightConstraint, bottomContraint])
         
-        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
-        webView_TopFullScreenConstraint = NSLayoutConstraint(item: self.webView, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
+        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: webView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
+        webView_TopFullScreenConstraint = NSLayoutConstraint(item: webView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
     }
     
-    func prepareWebView() {
-        //UIApplication.shared.statusBarStyle = preferredStatusBarStyle
-        
+    public func prepareWebView() {
         self.webView.options = webViewOptions
         self.webView.prepare()
         
@@ -269,18 +434,20 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         if browserOptions?.closeButtonColor != "" {
             closeButton.tintColor = color(fromHexString: (browserOptions?.closeButtonColor)!)
         }
-        
+    }
+    
+    public func prepareBeforeViewWillAppear() {
         self.modalPresentationStyle = UIModalPresentationStyle(rawValue: (browserOptions?.presentationStyle)!)!
         self.modalTransitionStyle = UIModalTransitionStyle(rawValue: (browserOptions?.transitionStyle)!)!
     }
     
-    func loadUrl(url: URL, headers: [String: String]?) {
+    public func loadUrl(url: URL, headers: [String: String]?) {
         webView.loadUrl(url: url, headers: headers)
         updateUrlTextField(url: (webView.currentURL?.absoluteString)!)
     }
     
     // Load user requested url
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
+    public func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         if textField.text != nil && textField.text != "" {
             let url = textField.text?.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed)
@@ -298,69 +465,91 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         webView.frame = frame
     }
     
-    @objc func reload () {
+    public func show() {
+        isHidden = false
+        view.isHidden = false
+        
+        // Run later to avoid the "took a long time" log message.
+        DispatchQueue.main.async(execute: {() -> Void in
+            let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
+            self.tmpWindow?.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
+            self.tmpWindow?.makeKeyAndVisible()
+            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            self.tmpWindow?.rootViewController?.present(self, animated: true, completion: nil)
+        })
+    }
+
+    public func hide() {
+        isHidden = true
+        
+        // Run later to avoid the "took a long time" log message.
+        DispatchQueue.main.async(execute: {() -> Void in
+            self.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
+                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
+                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                if self.previousStatusBarStyle != -1 {
+                    UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: self.previousStatusBarStyle)!
+                }
+            })
+        })
+    }
+    
+    @objc public func reload () {
         webView.reload()
     }
     
-    @objc func share () {
+    @objc public func share () {
         let vc = UIActivityViewController(activityItems: [webView.currentURL ?? ""], applicationActivities: [])
         present(vc, animated: true, completion: nil)
     }
     
-    @objc func close() {
-        //currentURL = nil
-        
+    @objc public func close() {
         weak var weakSelf = self
         
         if (weakSelf?.responds(to: #selector(getter: self.presentingViewController)))! {
             weakSelf?.presentingViewController?.dismiss(animated: true, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
-                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                
             })
         }
         else {
             weakSelf?.parent?.dismiss(animated: true, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
-                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+                
             })
-        }
-        if (self.navigationDelegate != nil) {
-            self.navigationDelegate?.browserExit(uuid: self.uuid)
         }
     }
     
-    @objc func goBack() {
+    @objc public func goBack() {
         if canGoBack() {
             webView.goBack()
             updateUrlTextField(url: (webView?.url?.absoluteString)!)
         }
     }
     
-    func canGoBack() -> Bool {
+    public func canGoBack() -> Bool {
         return webView.canGoBack
     }
     
-    @objc func goForward() {
+    @objc public func goForward() {
         if canGoForward() {
             webView.goForward()
             updateUrlTextField(url: (webView?.url?.absoluteString)!)
         }
     }
     
-    func canGoForward() -> Bool {
+    public func canGoForward() -> Bool {
         return webView.canGoForward
     }
     
-    @objc func goBackOrForward(steps: Int) {
+    @objc public func goBackOrForward(steps: Int) {
         webView.goBackOrForward(steps: steps)
         updateUrlTextField(url: (webView?.url?.absoluteString)!)
     }
     
-    func canGoBackOrForward(steps: Int) -> Bool {
+    public func canGoBackOrForward(steps: Int) -> Bool {
         return webView.canGoBackOrForward(steps: steps)
     }
     
-    func updateUrlTextField(url: String) {
+    public func updateUrlTextField(url: String) {
         urlField.text = url
     }
     
@@ -405,18 +594,18 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         return hexInt
     }
 
-    func setOptions(newOptions: InAppBrowserOptions, newOptionsMap: [String: Any]) {
+    public func setOptions(newOptions: InAppBrowserOptions, newOptionsMap: [String: Any]) {
         
         let newInAppWebViewOptions = InAppWebViewOptions()
-        newInAppWebViewOptions.parse(options: newOptionsMap)
+        let _ = newInAppWebViewOptions.parse(options: newOptionsMap)
         self.webView.setOptions(newOptions: newInAppWebViewOptions, newOptionsMap: newOptionsMap)
         
         if newOptionsMap["hidden"] != nil && browserOptions?.hidden != newOptions.hidden {
             if newOptions.hidden {
-                self.navigationDelegate?.hide(uuid: self.uuid)
+                hide()
             }
             else {
-                self.navigationDelegate?.show(uuid: self.uuid)
+                show()
             }
         }
 
@@ -471,7 +660,7 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         self.webViewOptions = newInAppWebViewOptions
     }
     
-    func getOptions() -> [String: Any]? {
+    public func getOptions() -> [String: Any?]? {
         if (self.browserOptions == nil || self.webView.getOptions() == nil) {
             return nil
         }
@@ -479,5 +668,31 @@ class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKU
         optionsMap.merge(self.webView.getOptions()!, uniquingKeysWith: { (current, _) in current })
         return optionsMap
     }
-
+    
+    public func dispose() {
+        webView.dispose()
+        if previousStatusBarStyle != -1 {
+            UIApplication.shared.statusBarStyle = UIStatusBarStyle(rawValue: previousStatusBarStyle)!
+        }
+        transitioningDelegate = nil
+        urlField.delegate = nil
+        closeButton.removeTarget(self, action: #selector(self.close), for: .touchUpInside)
+        forwardButton.target = nil
+        forwardButton.target = nil
+        backButton.target = nil
+        reloadButton.target = nil
+        shareButton.target = nil
+        tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
+        UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+        onExit()
+        channel!.setMethodCallHandler(nil)
+    }
+    
+    public func onBrowserCreated() {
+        channel!.invokeMethod("onBrowserCreated", arguments: [])
+    }
+    
+    public func onExit() {
+        channel!.invokeMethod("onExit", arguments: [])
+    }
 }

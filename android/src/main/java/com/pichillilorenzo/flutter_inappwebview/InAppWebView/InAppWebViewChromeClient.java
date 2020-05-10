@@ -2,7 +2,6 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.annotation.TargetApi;
 import android.content.ActivityNotFoundException;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -33,7 +32,6 @@ import com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
-import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -52,6 +50,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   protected static final String LOG_TAG = "IABWebChromeClient";
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
+  public MethodChannel channel;
   private ValueCallback<Uri> mUploadMessage;
   private final static int FILECHOOSER_RESULTCODE = 1;
 
@@ -65,6 +64,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
     else if (obj instanceof FlutterWebView)
       this.flutterWebView = (FlutterWebView) obj;
+    this.channel = (this.inAppBrowserActivity != null) ? this.inAppBrowserActivity.channel : this.flutterWebView.channel;
 
     if (Shared.registrar != null)
       Shared.registrar.addActivityResultListener(this);
@@ -121,7 +121,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("message", message);
 
-    getChannel().invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
+    channel.invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {
         String responseMessage = null;
@@ -204,7 +204,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("message", message);
 
-    getChannel().invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
+    channel.invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {
         String responseMessage = null;
@@ -301,7 +301,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     obj.put("message", message);
     obj.put("defaultValue", defaultValue);
 
-    getChannel().invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
+    channel.invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {
         String responseMessage = null;
@@ -433,7 +433,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           super.onPageStarted(v, url, favicon);
 
           obj.put("url", url);
-          getChannel().invokeMethod("onCreateWindow", obj);
+          channel.invokeMethod("onCreateWindow", obj);
 
           // stop webview loading
           v.stopLoading();
@@ -449,7 +449,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     obj.put("url", data);
-    getChannel().invokeMethod("onCreateWindow", obj);
+    channel.invokeMethod("onCreateWindow", obj);
     return false;
   }
 
@@ -459,7 +459,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("origin", origin);
-    getChannel().invokeMethod("onGeolocationPermissionsShowPrompt", obj, new MethodChannel.Result() {
+    channel.invokeMethod("onGeolocationPermissionsShowPrompt", obj, new MethodChannel.Result() {
       @Override
       public void success(Object o) {
         Map<String, Object> response = (Map<String, Object>) o;
@@ -486,7 +486,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
-    getChannel().invokeMethod("onGeolocationPermissionsHidePrompt", obj);
+    channel.invokeMethod("onGeolocationPermissionsHidePrompt", obj);
   }
 
   @Override
@@ -496,7 +496,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("message", consoleMessage.message());
     obj.put("messageLevel", consoleMessage.messageLevel().ordinal());
-    getChannel().invokeMethod("onConsoleMessage", obj);
+    channel.invokeMethod("onConsoleMessage", obj);
     return true;
   }
 
@@ -518,7 +518,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("progress", progress);
-    getChannel().invokeMethod("onProgressChanged", obj);
+    channel.invokeMethod("onProgressChanged", obj);
 
     super.onProgressChanged(view, progress);
   }
@@ -608,7 +608,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("origin", request.getOrigin().toString());
       obj.put("resources", Arrays.asList(request.getResources()));
-      getChannel().invokeMethod("onPermissionRequest", obj, new MethodChannel.Result() {
+      channel.invokeMethod("onPermissionRequest", obj, new MethodChannel.Result() {
         @Override
         public void success(Object response) {
           if (response != null) {
@@ -645,9 +645,5 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         }
       });
     }
-  }
-
-  private MethodChannel getChannel() {
-    return (inAppBrowserActivity != null) ? InAppWebViewFlutterPlugin.inAppBrowser.channel : flutterWebView.channel;
   }
 }

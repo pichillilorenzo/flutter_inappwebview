@@ -11,8 +11,8 @@ A Flutter plugin that allows you to add an inline webview or open an in-app brow
 
 ### Requirements
 
-- Dart sdk: ">=2.0.0-dev.68.0 <3.0.0"
-- Flutter: ">=1.9.1+hotfix.5 <2.0.0"
+- Dart sdk: ">=2.7.0 <3.0.0"
+- Flutter: ">=1.12.13+hotfix.5"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
@@ -81,7 +81,7 @@ See the online [API Reference](https://pub.dartlang.org/documentation/flutter_in
 
 The API showed in this `README.md` file shows only a part of the documentation that conforms to the master branch only. 
 So, here you could have methods, options, and events that aren't published yet.
-If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).  
+If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).
 
 ### Load a file inside `assets` folder
 
@@ -125,6 +125,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(new MyApp());
 }
 
@@ -448,6 +449,15 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
 * `dataDetectorTypes`: Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
 * `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
+* `automaticallyAdjustsScrollIndicatorInsets`: Configures whether the scroll indicator insets are automatically adjusted by the system. The default value is `false`.
+* `accessibilityIgnoresInvertColors`: A Boolean value indicating whether the view ignores an accessibility request to invert its colors. The default value is `false`.
+* `decelerationRate`: A `IOSUIScrollViewDecelerationRate` value that determines the rate of deceleration after the user lifts their finger. The default value is `IOSUIScrollViewDecelerationRate.NORMAL`.
+* `alwaysBounceVertical`: A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content. The default value is `false`.
+* `alwaysBounceHorizontal`: A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view. The default value is `false`.
+* `scrollsToTop`: A Boolean value that controls whether the scroll-to-top gesture is enabled. The default value is `true`.
+* `isPagingEnabled`: A Boolean value that determines whether paging is enabled for the scroll view. The default value is `false`.
+* `maximumZoomScale`: A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
+* `minimumZoomScale`: A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
 
 #### `InAppWebView` Events
 
@@ -479,10 +489,14 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `onAjaxProgress`: Event fired as an `XMLHttpRequest` progress (to use this event, the `useShouldInterceptAjaxRequest` option must be `true`).
 * `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) (to use this event, the `useShouldInterceptFetchRequest` option must be `true`).
 * `onPrint`: Event fired when `window.print()` is called from JavaScript side.
+* `onLongPressHitTestResult`: Event fired when an HTML element of the webview has been clicked and held.
 * `androidOnSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
 * `androidOnGeolocationPermissionsHidePrompt`: Notify the host application that a request for Geolocation permissions, made with a previous call to `androidOnGeolocationPermissionsShowPrompt` has been canceled. (available only on Android).
+* `iosOnWebContentProcessDidTerminate`: Invoked when the web view's web content process is terminated (available only on iOS).
+* `iosOnDidCommit`: Called when the web view begins to receive web content (available only on iOS).
+* `iosOnDidReceiveServerRedirectForProvisionalNavigation`: Called when a web view receives a server redirect (available only on iOS).
 
 ### `InAppBrowser` class
 
@@ -530,8 +544,7 @@ class MyInAppBrowser extends InAppBrowser {
   @override
   Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
     print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
-    this.webViewController.loadUrl(url: shouldOverrideUrlLoadingRequest.url);
-    return ShouldOverrideUrlLoadingAction.CANCEL;
+    return ShouldOverrideUrlLoadingAction.ALLOW;
   }
 
   @override
@@ -554,7 +567,12 @@ class MyInAppBrowser extends InAppBrowser {
   }
 }
 
-void main() => runApp(new MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    new MyApp(),
+  );
+}
 
 class MyApp extends StatefulWidget {
   final MyInAppBrowser browser = new MyInAppBrowser();
@@ -641,8 +659,8 @@ Specific options of the `InAppBrowser` class are:
 * `toolbarBottomTranslucent`: Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
 * `closeButtonCaption`: Set the custom text for the close button.
 * `closeButtonColor`: Set the custom color for the close button.
-* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IosWebViewOptionsPresentationStyle.FULL_SCREEN`.
-* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IosWebViewOptionsTransitionStyle.COVER_VERTICAL`.
+* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
+* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 * `spinner`: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
 
 #### `InAppBrowser` Events
@@ -698,8 +716,8 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 
   @override
-  void onLoaded() {
-    print("ChromeSafari browser loaded");
+  void onCompletedInitialLoad() {
+    print("ChromeSafari browser initial load completed");
   }
 
   @override
@@ -708,7 +726,12 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 }
 
-void main() => runApp(new MyApp());
+void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(
+    new MyApp(),
+  );
+}
 
 class MyApp extends StatefulWidget {
   final ChromeSafariBrowser browser = new MyChromeSafariBrowser(new MyInAppBrowser());
@@ -737,7 +760,7 @@ class _MyAppState extends State<MyApp> {
                 await widget.browser.open(
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(addShareButton: false),
+                        android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false),
                         ios: IosSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),
@@ -767,26 +790,28 @@ Screenshots:
 
 ##### `ChromeSafariBrowser` Android-specific options
 
-* `addShareButton`: Set to `false` if you don't want the default share button. The default value is `true`.
+* `addDefaultShareMenuItem`: Set to `false` if you don't want the default share item to the menu. The default value is `true`.
 * `showTitle`: Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
 * `toolbarBackgroundColor`: Set the custom background color of the toolbar.
 * `enableUrlBarHiding`: Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
 * `instantAppsEnabled`: Set to `true` to enable Instant Apps. The default value is `false`.
+* `packageName`: Set the name of the application package to handle the intent (for example `com.android.chrome`), or null to allow any application package.
+* `keepAliveEnabled`: Set to `true` to enable Keep Alive. The default value is `false`.
 
 ##### `ChromeSafariBrowser` iOS-specific options
 
 * `entersReaderIfAvailable`: Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
 * `barCollapsingEnabled`: Set to `true` to enable bar collapsing. The default value is `false`.
-* `dismissButtonStyle`: Set the custom style for the dismiss button. The default value is `IosSafariOptionsDismissButtonStyle.DONE`.
+* `dismissButtonStyle`: Set the custom style for the dismiss button. The default value is `IOSSafariDismissButtonStyle.DONE`.
 * `preferredBarTintColor`: Set the custom background color of the navigation bar and the toolbar.
 * `preferredControlTintColor`: Set the custom color of the control buttons on the navigation bar and the toolbar.
-* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IosWebViewOptionsPresentationStyle.FULL_SCREEN`.
-* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IosWebViewOptionsTransitionStyle.COVER_VERTICAL`.
+* `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
+* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 
 #### `ChromeSafariBrowser` Events
 
 * `onOpened`: Event fires when the `ChromeSafariBrowser` is opened.
-* `onLoaded`: Event fires when the `ChromeSafariBrowser` is loaded.
+* `onCompletedInitialLoad`: Event fires when the initial URL load is complete.
 * `onClosed`: Event fires when the `ChromeSafariBrowser` is closed.
 
 ### `InAppLocalhostServer` class
@@ -800,6 +825,7 @@ Example:
 InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   await localhostServer.start();
   runApp(new MyApp());
 }

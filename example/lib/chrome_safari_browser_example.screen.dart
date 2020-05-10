@@ -12,8 +12,8 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 
   @override
-  void onLoaded() {
-    print("ChromeSafari browser loaded");
+  void onCompletedInitialLoad() {
+    print("ChromeSafari browser initial load completed");
   }
 
   @override
@@ -52,7 +52,7 @@ class _ChromeSafariBrowserExampleScreenState
                 await widget.browser.open(
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(addShareButton: false),
+                        android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false, keepAliveEnabled: true),
                         ios: IOSSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),

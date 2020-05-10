@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.webkit.ValueCallback;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
@@ -19,7 +18,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   protected static final String LOG_TAG = "InAppWebViewFlutterPL";
 
-  public static InAppBrowser inAppBrowser;
+  public static InAppBrowserManager inAppBrowserManager;
+  public static ChromeSafariBrowserManager chromeSafariBrowserManager;
   public static InAppWebViewStatic inAppWebViewStatic;
   public static MyCookieManager myCookieManager;
   public static CredentialDatabaseHandler credentialDatabaseHandler;
@@ -46,8 +46,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger, Activity activity, PlatformViewRegistry platformViewRegistry, FlutterView flutterView) {
     Shared.applicationContext = applicationContext;
     Shared.activity = activity;
+    Shared.messenger = messenger;
 
-    inAppBrowser = new InAppBrowser(messenger);
+    inAppBrowserManager = new InAppBrowserManager(messenger);
+    chromeSafariBrowserManager = new ChromeSafariBrowserManager(messenger);
 
     platformViewRegistry.registerViewFactory(
                     "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(messenger, flutterView));
@@ -61,9 +63,13 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   @Override
   public void onDetachedFromEngine(FlutterPluginBinding binding) {
-    if (inAppBrowser != null) {
-      inAppBrowser.dispose();
-      inAppBrowser = null;
+    if (inAppBrowserManager != null) {
+      inAppBrowserManager.dispose();
+      inAppBrowserManager = null;
+    }
+    if (chromeSafariBrowserManager != null) {
+      chromeSafariBrowserManager.dispose();
+      chromeSafariBrowserManager = null;
     }
     if (myCookieManager != null) {
       myCookieManager.dispose();

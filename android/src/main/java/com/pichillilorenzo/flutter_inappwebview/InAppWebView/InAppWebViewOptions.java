@@ -4,16 +4,18 @@ import android.os.Build;
 import android.util.Log;
 import android.webkit.WebSettings;
 
+import com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ChromeCustomTabsOptions;
 import com.pichillilorenzo.flutter_inappwebview.Options;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
-public class InAppWebViewOptions extends Options {
+public class InAppWebViewOptions implements Options {
 
   public static final String LOG_TAG = "InAppWebViewOptions";
 
@@ -85,47 +87,316 @@ public class InAppWebViewOptions extends Options {
   public String regexToCancelSubFramesLoading;
 
   @Override
-  public Object onParse(Map.Entry<String, Object> pair) {
-    if (pair.getKey().equals("layoutAlgorithm")) {
-      String value = (String) pair.getValue();
-      if (value != null) {
-        switch (value) {
-          case "NORMAL":
-            pair.setValue(NORMAL);
-            return pair;
-          case "TEXT_AUTOSIZING":
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-              return pair.setValue(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING);
-            } else {
-              pair.setValue(NORMAL);
-            }
-            return pair;
-        }
+  public InAppWebViewOptions parse(HashMap<String, Object> options) {
+    for (Map.Entry<String, Object> pair : options.entrySet()) {
+      String key = pair.getKey();
+      Object value = pair.getValue();
+      if (value == null) {
+        continue;
+      }
+
+      switch (key) {
+        case "useShouldOverrideUrlLoading":
+          useShouldOverrideUrlLoading = (Boolean) value;
+          break;
+        case "useOnLoadResource":
+          useOnLoadResource = (Boolean) value;
+          break;
+        case "useOnDownloadStart":
+          useOnDownloadStart = (Boolean) value;
+          break;
+        case "clearCache":
+          clearCache = (Boolean) value;
+          break;
+        case "userAgent":
+          userAgent = (String) value;
+          break;
+        case "applicationNameForUserAgent":
+          applicationNameForUserAgent = (String) value;
+          break;
+        case "javaScriptEnabled":
+          javaScriptEnabled = (Boolean) value;
+          break;
+        case "debuggingEnabled":
+          debuggingEnabled = (Boolean) value;
+          break;
+        case "javaScriptCanOpenWindowsAutomatically":
+          javaScriptCanOpenWindowsAutomatically = (Boolean) value;
+          break;
+        case "mediaPlaybackRequiresUserGesture":
+          mediaPlaybackRequiresUserGesture = (Boolean) value;
+          break;
+        case "minimumFontSize":
+          minimumFontSize = (Integer) value;
+          break;
+        case "verticalScrollBarEnabled":
+          verticalScrollBarEnabled = (Boolean) value;
+          break;
+        case "horizontalScrollBarEnabled":
+          horizontalScrollBarEnabled = (Boolean) value;
+          break;
+        case "resourceCustomSchemes":
+          resourceCustomSchemes = (List<String>) value;
+          break;
+        case "contentBlockers":
+          contentBlockers = (List<Map<String, Map<String, Object>>>) value;
+          break;
+        case "preferredContentMode":
+          preferredContentMode = (Integer) value;
+          break;
+        case "useShouldInterceptAjaxRequest":
+          useShouldInterceptAjaxRequest = (Boolean) value;
+          break;
+        case "useShouldInterceptFetchRequest":
+          useShouldInterceptFetchRequest = (Boolean) value;
+          break;
+        case "incognito":
+          incognito = (Boolean) value;
+          break;
+        case "cacheEnabled":
+          cacheEnabled = (Boolean) value;
+          break;
+        case "transparentBackground":
+          transparentBackground = (Boolean) value;
+          break;
+        case "disableVerticalScroll":
+          disableVerticalScroll = (Boolean) value;
+          break;
+        case "disableHorizontalScroll":
+          disableHorizontalScroll = (Boolean) value;
+          break;
+        case "textZoom":
+          textZoom = (Integer) value;
+          break;
+        case "clearSessionCache":
+          clearSessionCache = (Boolean) value;
+          break;
+        case "builtInZoomControls":
+          builtInZoomControls = (Boolean) value;
+          break;
+        case "displayZoomControls":
+          displayZoomControls = (Boolean) value;
+          break;
+        case "supportZoom":
+          supportZoom = (Boolean) value;
+          break;
+        case "databaseEnabled":
+          databaseEnabled = (Boolean) value;
+          break;
+        case "domStorageEnabled":
+          domStorageEnabled = (Boolean) value;
+          break;
+        case "useWideViewPort":
+          useWideViewPort = (Boolean) value;
+          break;
+        case "safeBrowsingEnabled":
+          safeBrowsingEnabled = (Boolean) value;
+          break;
+        case "mixedContentMode":
+          mixedContentMode = (Integer) value;
+          break;
+        case "allowContentAccess":
+          allowContentAccess = (Boolean) value;
+          break;
+        case "allowFileAccess":
+          allowFileAccess = (Boolean) value;
+          break;
+        case "allowFileAccessFromFileURLs":
+          allowFileAccessFromFileURLs = (Boolean) value;
+          break;
+        case "allowUniversalAccessFromFileURLs":
+          allowUniversalAccessFromFileURLs = (Boolean) value;
+          break;
+        case "appCachePath":
+          appCachePath = (String) value;
+          break;
+        case "blockNetworkImage":
+          blockNetworkImage = (Boolean) value;
+          break;
+        case "blockNetworkLoads":
+          blockNetworkLoads = (Boolean) value;
+          break;
+        case "cacheMode":
+          cacheMode = (Integer) value;
+          break;
+        case "cursiveFontFamily":
+          cursiveFontFamily = (String) value;
+          break;
+        case "defaultFixedFontSize":
+          defaultFixedFontSize = (Integer) value;
+          break;
+        case "defaultFontSize":
+          defaultFontSize = (Integer) value;
+          break;
+        case "defaultTextEncodingName":
+          defaultTextEncodingName = (String) value;
+          break;
+        case "disabledActionModeMenuItems":
+          disabledActionModeMenuItems = (Integer) value;
+          break;
+        case "fantasyFontFamily":
+          fantasyFontFamily = (String) value;
+          break;
+        case "fixedFontFamily":
+          fixedFontFamily = (String) value;
+          break;
+        case "forceDark":
+          forceDark = (Integer) value;
+          break;
+        case "geolocationEnabled":
+          geolocationEnabled = (Boolean) value;
+          break;
+        case "layoutAlgorithm":
+          setLayoutAlgorithm((String) value);
+          break;
+        case "loadWithOverviewMode":
+          loadWithOverviewMode = (Boolean) value;
+          break;
+        case "loadsImagesAutomatically":
+          loadsImagesAutomatically = (Boolean) value;
+          break;
+        case "minimumLogicalFontSize":
+          minimumLogicalFontSize = (Integer) value;
+          break;
+        case "initialScale":
+          initialScale = (Integer) value;
+          break;
+        case "needInitialFocus":
+          needInitialFocus = (Boolean) value;
+          break;
+        case "offscreenPreRaster":
+          offscreenPreRaster = (Boolean) value;
+          break;
+        case "sansSerifFontFamily":
+          sansSerifFontFamily = (String) value;
+          break;
+        case "serifFontFamily":
+          serifFontFamily = (String) value;
+          break;
+        case "standardFontFamily":
+          standardFontFamily = (String) value;
+          break;
+        case "saveFormData":
+          saveFormData = (Boolean) value;
+          break;
+        case "thirdPartyCookiesEnabled":
+          thirdPartyCookiesEnabled = (Boolean) value;
+          break;
+        case "hardwareAcceleration":
+          hardwareAcceleration = (Boolean) value;
+          break;
+        case "supportMultipleWindows":
+          supportMultipleWindows = (Boolean) value;
+          break;
+        case "regexToCancelSubFramesLoading":
+          regexToCancelSubFramesLoading = (String) value;
+          break;
       }
     }
-    return super.onParse(pair);
+
+    return this;
   }
 
   @Override
-  public Object onGetHashMap(Field field) {
-    if (field.getName().equals("layoutAlgorithm")) {
-      try {
-        WebSettings.LayoutAlgorithm value = (WebSettings.LayoutAlgorithm) field.get(this);
-        if (value != null) {
-          switch (value) {
-            case NORMAL:
-              return "NORMAL";
-            default:
-              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && value.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
-                return "TEXT_AUTOSIZING";
-              }
-              return "NORMAL";
+  public HashMap<String, Object> getHashMap() {
+    HashMap<String, Object> options = new HashMap<>();
+    options.put("useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
+    options.put("useOnLoadResource", useOnLoadResource);
+    options.put("useOnDownloadStart", useOnDownloadStart);
+    options.put("clearCache", clearCache);
+    options.put("userAgent", userAgent);
+    options.put("applicationNameForUserAgent", applicationNameForUserAgent);
+    options.put("javaScriptEnabled", javaScriptEnabled);
+    options.put("debuggingEnabled", debuggingEnabled);
+    options.put("javaScriptCanOpenWindowsAutomatically", javaScriptCanOpenWindowsAutomatically);
+    options.put("mediaPlaybackRequiresUserGesture", mediaPlaybackRequiresUserGesture);
+    options.put("minimumFontSize", minimumFontSize);
+    options.put("verticalScrollBarEnabled", verticalScrollBarEnabled);
+    options.put("horizontalScrollBarEnabled", horizontalScrollBarEnabled);
+    options.put("resourceCustomSchemes", resourceCustomSchemes);
+    options.put("contentBlockers", contentBlockers);
+    options.put("preferredContentMode", preferredContentMode);
+    options.put("useShouldInterceptAjaxRequest", useShouldInterceptAjaxRequest);
+    options.put("useShouldInterceptFetchRequest", useShouldInterceptFetchRequest);
+    options.put("incognito", incognito);
+    options.put("cacheEnabled", cacheEnabled);
+    options.put("transparentBackground", transparentBackground);
+    options.put("disableVerticalScroll", disableVerticalScroll);
+    options.put("disableHorizontalScroll", disableHorizontalScroll);
+    options.put("textZoom", textZoom);
+    options.put("clearSessionCache", clearSessionCache);
+    options.put("builtInZoomControls", builtInZoomControls);
+    options.put("displayZoomControls", displayZoomControls);
+    options.put("supportZoom", supportZoom);
+    options.put("databaseEnabled", databaseEnabled);
+    options.put("domStorageEnabled", domStorageEnabled);
+    options.put("useWideViewPort", useWideViewPort);
+    options.put("safeBrowsingEnabled", safeBrowsingEnabled);
+    options.put("mixedContentMode", mixedContentMode);
+    options.put("allowContentAccess", allowContentAccess);
+    options.put("allowFileAccess", allowFileAccess);
+    options.put("allowFileAccessFromFileURLs", allowFileAccessFromFileURLs);
+    options.put("allowUniversalAccessFromFileURLs", allowUniversalAccessFromFileURLs);
+    options.put("appCachePath", appCachePath);
+    options.put("blockNetworkImage", blockNetworkImage);
+    options.put("blockNetworkLoads", blockNetworkLoads);
+    options.put("cacheMode", cacheMode);
+    options.put("cursiveFontFamily", cursiveFontFamily);
+    options.put("defaultFixedFontSize", defaultFixedFontSize);
+    options.put("defaultFontSize", defaultFontSize);
+    options.put("defaultTextEncodingName", defaultTextEncodingName);
+    options.put("disabledActionModeMenuItems", disabledActionModeMenuItems);
+    options.put("fantasyFontFamily", fantasyFontFamily);
+    options.put("fixedFontFamily", fixedFontFamily);
+    options.put("forceDark", forceDark);
+    options.put("geolocationEnabled", geolocationEnabled);
+    options.put("layoutAlgorithm", getLayoutAlgorithm());
+    options.put("loadWithOverviewMode", loadWithOverviewMode);
+    options.put("loadsImagesAutomatically", loadsImagesAutomatically);
+    options.put("minimumLogicalFontSize", minimumLogicalFontSize);
+    options.put("initialScale", initialScale);
+    options.put("needInitialFocus", needInitialFocus);
+    options.put("offscreenPreRaster", offscreenPreRaster);
+    options.put("sansSerifFontFamily", sansSerifFontFamily);
+    options.put("serifFontFamily", serifFontFamily);
+    options.put("standardFontFamily", standardFontFamily);
+    options.put("saveFormData", saveFormData);
+    options.put("thirdPartyCookiesEnabled", thirdPartyCookiesEnabled);
+    options.put("hardwareAcceleration", hardwareAcceleration);
+    options.put("supportMultipleWindows", supportMultipleWindows);
+    options.put("regexToCancelSubFramesLoading", regexToCancelSubFramesLoading);
+    return options;
+  }
+
+  private void setLayoutAlgorithm(String value) {
+    if (value != null) {
+      switch (value) {
+        case "NORMAL":
+          layoutAlgorithm = NORMAL;
+        case "TEXT_AUTOSIZING":
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            layoutAlgorithm = WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING;
+          } else {
+            layoutAlgorithm = NORMAL;
           }
-        }
-      } catch (IllegalAccessException e) {
-        Log.d(LOG_TAG, e.getMessage());
+          break;
       }
     }
-    return super.onGetHashMap(field);
+  }
+
+  private String getLayoutAlgorithm() {
+    if (layoutAlgorithm != null) {
+      switch (layoutAlgorithm) {
+        case NORMAL:
+          return "NORMAL";
+        case TEXT_AUTOSIZING:
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            return "TEXT_AUTOSIZING";
+          } else {
+            return "NORMAL";
+          }
+      }
+    }
+    return null;
   }
 }

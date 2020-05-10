@@ -38,9 +38,8 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
-    print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
-    this.webViewController.loadUrl(url: shouldOverrideUrlLoadingRequest.url);
-    return ShouldOverrideUrlLoadingAction.CANCEL;
+    print("\n\nOverride ${shouldOverrideUrlLoadingRequest.url}\n\n");
+    return ShouldOverrideUrlLoadingAction.ALLOW;
   }
 
   @override
@@ -87,14 +86,15 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
         drawer: myDrawer(context: context),
         body: Center(
           child: RaisedButton(
-              onPressed: () {
-                widget.browser.openFile(
+              onPressed: () async {
+                await widget.browser.openFile(
                     assetFilePath: "assets/index.html",
                     options: InAppBrowserClassOptions(
                         inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(
                             crossPlatform: InAppWebViewOptions(
-                            useShouldOverrideUrlLoading: true,
-                            useOnLoadResource: true,
+                              debuggingEnabled: true,
+                              useShouldOverrideUrlLoading: true,
+                              useOnLoadResource: true,
                     ))));
               },
               child: Text("Open Webview Browser")),

@@ -10,6 +10,7 @@ import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart'
 // InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
 Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
   // await localhostServer.start();
   runApp(new MyApp());
 }

@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.webkit.WebChromeClient;
+import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -397,6 +398,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           webView = null;
         }
       });
+      WebSettings settings = webView.getSettings();
+      settings.setJavaScriptEnabled(false);
       webView.loadUrl("about:blank");
     }
   }

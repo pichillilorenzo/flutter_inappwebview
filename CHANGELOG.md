@@ -1,8 +1,12 @@
+## 3.1.1
+
+- Fixed `Confirmation dialog (onbeforeunload) displayed after popped from webview page` [#337](https://github.com/pichillilorenzo/flutter_inappwebview/issues/337)
+
 ## 3.1.0
 
 - Added `HeadlessInAppWebView` class to be able to use WebView in headless mode
 - Added `close`, `addMenuItem`, `addMenuItems` methods to `ChromeSafariBrowser`
-- Added `ChromeSafariBrowserMenuItem` class in order to create custom menu item for `ChromeSafariBrowser`.
+- Added `ChromeSafariBrowserMenuItem` class in order to create custom menu item for `ChromeSafariBrowser`
 - Fixed `InAppWebView.channel` null when used by `InAppBrowserActivity` on android
 - Fixed iOS presentationStyle affecting only dismiss animation [#305](https://github.com/pichillilorenzo/flutter_inappwebview/issues/305)
 

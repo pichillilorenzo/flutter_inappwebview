@@ -49,7 +49,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
-                    initialUrl: "https://flutter.dev/",
+                    initialUrl: "s",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(

@@ -37,8 +37,13 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 let value = arguments!["value"] as! String
                 let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                let expiresDate = arguments!["expiresDate"] as? Int
-                let maxAge = arguments!["maxAge"] as? Int
+                
+                var expiresDate: Int64?
+                if let expiresDateString = arguments!["expiresDate"] as? String {
+                    expiresDate = Int64(expiresDateString)
+                }
+                
+                let maxAge = arguments!["maxAge"] as? Int64
                 let isSecure = arguments!["isSecure"] as? Bool
                 
                 MyCookieManager.setCookie(url: url, name: name, value: value, domain: domain, path: path, expiresDate: expiresDate, maxAge: maxAge, isSecure: isSecure, result: result)
@@ -74,8 +79,8 @@ class MyCookieManager: NSObject, FlutterPlugin {
                           value: String,
                           domain: String,
                           path: String,
-                          expiresDate: Int?,
-                          maxAge: Int?,
+                          expiresDate: Int64?,
+                          maxAge: Int64?,
                           isSecure: Bool?,
                           result: @escaping FlutterResult) {
         var properties: [HTTPCookiePropertyKey: Any] = [:]
@@ -85,7 +90,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
         properties[.domain] = domain
         properties[.path] = path
         if expiresDate != nil {
-            properties[.expires] = NSDate(timeIntervalSince1970: Double(expiresDate!))
+            properties[.expires] = Date(timeIntervalSince1970: TimeInterval(Double(expiresDate!)/1000))
         }
         if maxAge != nil {
             properties[.maximumAge] = String(maxAge!)

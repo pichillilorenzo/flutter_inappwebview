@@ -1,6 +1,7 @@
 ## 3.1.1
 
 - Fixed `Confirmation dialog (onbeforeunload) displayed after popped from webview page` [#337](https://github.com/pichillilorenzo/flutter_inappwebview/issues/337)
+- Fixed `CookieManager.setCookie` `expiresDate` option
 
 ## 3.1.0
 

@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.os.Build;
+import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
@@ -10,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -43,6 +45,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
           String path = (String) call.argument("path");
           String expiresDateString = (String) call.argument("expiresDate");
           Long expiresDate = (expiresDateString != null ? new Long(expiresDateString) : null);
+          Log.d(LOG_TAG, expiresDateString + "");
+          Log.d(LOG_TAG, expiresDate + "");
           Integer maxAge = (Integer) call.argument("maxAge");
           Boolean isSecure = (Boolean) call.argument("isSecure");
           MyCookieManager.setCookie(url, name, value, domain, path, expiresDate, maxAge, isSecure, result);
@@ -98,6 +102,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieValue += "; Secure";
 
     cookieValue += ";";
+
+    Log.d(LOG_TAG, cookieValue + "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {
@@ -217,7 +223,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
   }
 
   public static String getCookieExpirationDate(Long timestamp) {
-    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss z");
+    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss z", Locale.US);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     return sdf.format(new Date(timestamp));
   }

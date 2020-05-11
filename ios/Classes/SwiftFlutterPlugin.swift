@@ -31,6 +31,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var myWebStorageManager: Any?
     var credentialDatabase: CredentialDatabase?
     var inAppBrowserManager: InAppBrowserManager?
+    var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var chromeSafariBrowserManager: ChromeSafariBrowserManager?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
@@ -46,6 +47,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         registrar.register(FlutterWebViewFactory(registrar: registrar) as FlutterPlatformViewFactory, withId: "com.pichillilorenzo/flutter_inappwebview")
         
         inAppBrowserManager = InAppBrowserManager(registrar: registrar)
+        headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         chromeSafariBrowserManager = ChromeSafariBrowserManager(registrar: registrar)
         inAppWebViewStatic = InAppWebViewStatic(registrar: registrar)
         if #available(iOS 11.0, *) {

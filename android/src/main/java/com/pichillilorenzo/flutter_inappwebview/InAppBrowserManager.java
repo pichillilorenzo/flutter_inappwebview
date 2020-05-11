@@ -32,6 +32,8 @@ import android.os.Bundle;
 import android.webkit.MimeTypeMap;
 import android.util.Log;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
+
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import 'package:flutter/services.dart';
 
 import 'types.dart';
 
-///WebStorageManager class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
+///Class that implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 ///
 ///**NOTE for iOS**: available from iOS 9.0+.
 class WebStorageManager {
@@ -30,7 +30,7 @@ class WebStorageManager {
   static Future<dynamic> _handleMethod(MethodCall call) async {}
 }
 
-///AndroidWebStorageManager class is used to manage the JavaScript storage APIs provided by the WebView.
+///Class that is used to manage the JavaScript storage APIs provided by the WebView.
 ///It manages the Application Cache API, the Web SQL Database API and the HTML5 Web Storage API.
 class AndroidWebStorageManager {
   ///Gets the origins currently using either the Application Cache or Web SQL Database APIs.
@@ -83,7 +83,7 @@ class AndroidWebStorageManager {
   }
 }
 
-///IOSWebStorageManager class represents various types of data that a website might make use of.
+///Class that represents various types of data that a website might make use of.
 ///This includes cookies, disk and memory caches, and persistent data such as WebSQL, IndexedDB databases, and local storage.
 ///
 ///**NOTE**: available on iOS 9.0+.

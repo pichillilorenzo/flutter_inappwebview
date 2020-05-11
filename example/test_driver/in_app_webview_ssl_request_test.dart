@@ -30,7 +30,7 @@ class InAppWebViewSslRequestTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialUrl: "https://${environment["NODE_SERVER_IP"]}:4433/",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true

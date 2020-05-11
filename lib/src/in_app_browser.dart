@@ -4,14 +4,13 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'in_app_webview_controller.dart';
 import 'webview_options.dart';
 
 import 'types.dart';
-import 'in_app_webview.dart' show InAppWebViewController;
 
-///InAppBrowser class. [webViewController] can be used to access the [InAppWebView] API.
-///
 ///This class uses the native WebView of the platform.
+///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
   String uuid;
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
@@ -20,7 +19,7 @@ class InAppBrowser {
   MethodChannel _channel;
   static const MethodChannel _sharedChannel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
-  /// WebView Controller that can be used to access the [InAppWebView] API.
+  /// WebView Controller that can be used to access the [InAppWebViewController] API.
   InAppWebViewController webViewController;
 
   ///
@@ -63,29 +62,11 @@ class InAppBrowser {
     assert(url != null && url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
-    Map<String, dynamic> optionsMap = {};
-
-    optionsMap.addAll(options.crossPlatform?.toMap() ?? {});
-    optionsMap.addAll(
-        options.inAppWebViewWidgetOptions?.crossPlatform?.toMap() ?? {});
-    if (Platform.isAndroid) {
-      optionsMap.addAll(options.android?.toMap() ?? {});
-      optionsMap.addAll(options
-              .inAppWebViewWidgetOptions?.android
-              ?.toMap() ??
-          {});
-    } else if (Platform.isIOS) {
-      optionsMap.addAll(options.ios?.toMap() ?? {});
-      optionsMap.addAll(
-          options.inAppWebViewWidgetOptions?.ios?.toMap() ??
-              {});
-    }
-
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('options', () => optionsMap);
+    args.putIfAbsent('options', () => options?.toMap() ?? {});
     await _sharedChannel.invokeMethod('openUrl', args);
   }
 
@@ -129,29 +110,13 @@ class InAppBrowser {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $assetFilePath!');
 
-    Map<String, dynamic> optionsMap = {};
 
-    optionsMap.addAll(options.crossPlatform?.toMap() ?? {});
-    optionsMap.addAll(
-        options.inAppWebViewWidgetOptions?.crossPlatform?.toMap() ?? {});
-    if (Platform.isAndroid) {
-      optionsMap.addAll(options.android?.toMap() ?? {});
-      optionsMap.addAll(options
-              .inAppWebViewWidgetOptions?.android
-              ?.toMap() ??
-          {});
-    } else if (Platform.isIOS) {
-      optionsMap.addAll(options.ios?.toMap() ?? {});
-      optionsMap.addAll(
-          options.inAppWebViewWidgetOptions?.ios?.toMap() ??
-              {});
-    }
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => assetFilePath);
     args.putIfAbsent('headers', () => headers);
-    args.putIfAbsent('options', () => optionsMap);
+    args.putIfAbsent('options', () => options?.toMap() ?? {});
     await _sharedChannel.invokeMethod('openFile', args);
   }
 
@@ -173,27 +138,9 @@ class InAppBrowser {
       InAppBrowserClassOptions options}) async {
     assert(data != null);
 
-    Map<String, dynamic> optionsMap = {};
-
-    optionsMap.addAll(options.crossPlatform?.toMap() ?? {});
-    optionsMap.addAll(
-        options.inAppWebViewWidgetOptions?.crossPlatform?.toMap() ?? {});
-    if (Platform.isAndroid) {
-      optionsMap.addAll(options.android?.toMap() ?? {});
-      optionsMap.addAll(options
-              .inAppWebViewWidgetOptions?.android
-              ?.toMap() ??
-          {});
-    } else if (Platform.isIOS) {
-      optionsMap.addAll(options.ios?.toMap() ?? {});
-      optionsMap.addAll(
-          options.inAppWebViewWidgetOptions?.ios?.toMap() ??
-              {});
-    }
-
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('options', () => optionsMap);
+    args.putIfAbsent('options', () => options?.toMap() ?? {});
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
@@ -243,26 +190,8 @@ class InAppBrowser {
   Future<void> setOptions({@required InAppBrowserClassOptions options}) async {
     this.throwIsNotOpened();
 
-    Map<String, dynamic> optionsMap = {};
-
-    optionsMap.addAll(options.crossPlatform?.toMap() ?? {});
-    optionsMap.addAll(
-        options.inAppWebViewWidgetOptions?.crossPlatform?.toMap() ?? {});
-    if (Platform.isAndroid) {
-      optionsMap.addAll(options.android?.toMap() ?? {});
-      optionsMap.addAll(options
-              .inAppWebViewWidgetOptions?.android
-              ?.toMap() ??
-          {});
-    } else if (Platform.isIOS) {
-      optionsMap.addAll(options.ios?.toMap() ?? {});
-      optionsMap.addAll(
-          options.inAppWebViewWidgetOptions?.ios?.toMap() ??
-              {});
-    }
-
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('options', () => optionsMap);
+    args.putIfAbsent('options', () => options?.toMap() ?? {});
     await _channel.invokeMethod('setOptions', args);
   }
 
@@ -279,19 +208,19 @@ class InAppBrowser {
       options = options.cast<String, dynamic>();
       inAppBrowserClassOptions.crossPlatform =
           InAppBrowserOptions.fromMap(options);
-      inAppBrowserClassOptions.inAppWebViewWidgetOptions = InAppWebViewWidgetOptions();
-      inAppBrowserClassOptions.inAppWebViewWidgetOptions.crossPlatform =
+      inAppBrowserClassOptions.inAppWebViewGroupOptions = InAppWebViewGroupOptions();
+      inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
           InAppWebViewOptions.fromMap(options);
       if (Platform.isAndroid) {
         inAppBrowserClassOptions.android =
             AndroidInAppBrowserOptions.fromMap(options);
         inAppBrowserClassOptions
-                .inAppWebViewWidgetOptions.android =
+                .inAppWebViewGroupOptions.android =
             AndroidInAppWebViewOptions.fromMap(options);
       } else if (Platform.isIOS) {
         inAppBrowserClassOptions.ios =
             IOSInAppBrowserOptions.fromMap(options);
-        inAppBrowserClassOptions.inAppWebViewWidgetOptions
+        inAppBrowserClassOptions.inAppWebViewGroupOptions
             .ios = IOSInAppWebViewOptions.fromMap(options);
       }
     }

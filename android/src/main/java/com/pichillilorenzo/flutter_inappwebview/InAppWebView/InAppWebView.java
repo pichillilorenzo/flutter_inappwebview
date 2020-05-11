@@ -5,19 +5,16 @@ import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
-import android.graphics.Rect;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.view.ContextMenu;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.ViewParent;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
@@ -27,17 +24,12 @@ import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 
 import androidx.annotation.RequiresApi;
-import androidx.appcompat.widget.PopupMenu;
-
-import android.view.ActionMode;
-import android.webkit.WebView;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerHandler;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerTrigger;
-import com.pichillilorenzo.flutter_inappwebview.FlutterWebView;
-import com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity;
+import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -62,7 +54,7 @@ final public class InAppWebView extends InputAwareWebView {
   public InAppBrowserActivity inAppBrowserActivity;
   public FlutterWebView flutterWebView;
   public MethodChannel channel;
-  public int id;
+  public Object id;
   public InAppWebViewClient inAppWebViewClient;
   public InAppWebViewChromeClient inAppWebViewChromeClient;
   public InAppWebViewOptions options;
@@ -527,7 +519,7 @@ final public class InAppWebView extends InputAwareWebView {
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(Context context, Object obj, int id, InAppWebViewOptions options, View containerView) {
+  public InAppWebView(Context context, Object obj, Object id, InAppWebViewOptions options, View containerView) {
     super(context, containerView);
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
@@ -891,7 +883,8 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void takeScreenshot(final MethodChannel.Result result) {
-    post(new Runnable() {
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
       @Override
       public void run() {
         int height = (int) (getContentHeight() * scale + 0.5);
@@ -1199,7 +1192,8 @@ final public class InAppWebView extends InputAwareWebView {
       scriptToInject = String.format(jsWrapper, jsonSourceString);
     }
     final String finalScriptToInject = scriptToInject;
-    post(new Runnable() {
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
       @Override
       public void run() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {

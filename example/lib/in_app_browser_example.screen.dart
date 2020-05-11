@@ -90,7 +90,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                 await widget.browser.openFile(
                     assetFilePath: "assets/index.html",
                     options: InAppBrowserClassOptions(
-                        inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(
+                        inAppWebViewGroupOptions: InAppWebViewGroupOptions(
                             crossPlatform: InAppWebViewOptions(
                               debuggingEnabled: true,
                               useShouldOverrideUrlLoading: true,

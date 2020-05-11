@@ -52,7 +52,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialUrl: "https://flutter.dev/",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                           debuggingEnabled: true,
                         ),

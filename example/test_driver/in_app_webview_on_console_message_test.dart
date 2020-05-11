@@ -28,7 +28,7 @@ class InAppWebViewOnConsoleMessageTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialFile: "test_assets/in_app_webview_on_console_message_test.html",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true

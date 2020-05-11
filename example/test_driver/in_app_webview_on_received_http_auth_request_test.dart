@@ -30,7 +30,7 @@ class InAppWebViewOnReceivedHttpAuthRequestTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialUrl: "http://${environment["NODE_SERVER_IP"]}:8081/",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true

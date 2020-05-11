@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview;
+package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.app.Activity;
 import android.content.Context;
@@ -14,6 +14,8 @@ import android.webkit.WebViewClient;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.DisplayListenerProxy;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions;
+import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -37,7 +39,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public InAppWebView webView;
   public final MethodChannel channel;
 
-  public FlutterWebView(BinaryMessenger messenger, final Context context, int id, HashMap<String, Object> params, View containerView) {
+  public FlutterWebView(BinaryMessenger messenger, final Context context, Object id, HashMap<String, Object> params, View containerView) {
     channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_" + id);
     channel.setMethodCallHandler(this);
 
@@ -93,6 +95,12 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     }
     else
       webView.loadUrl(initialUrl, initialHeaders);
+
+    if (containerView == null && id instanceof String) {
+      Map<String, Object> obj = new HashMap<>();
+      obj.put("uuid", id);
+      channel.invokeMethod("onHeadlessWebViewCreated", obj);
+    }
   }
 
   @Override

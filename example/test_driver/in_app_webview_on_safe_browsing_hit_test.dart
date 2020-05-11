@@ -31,7 +31,7 @@ class InAppWebViewOnSafeBrowsingHitTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialUrl: (Platform.isAndroid) ? "chrome://safe-browsing/match?type=malware" : "https://flutter.dev/",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             // if I set javaScriptEnabled to true, it will crash!
                             javaScriptEnabled: false,

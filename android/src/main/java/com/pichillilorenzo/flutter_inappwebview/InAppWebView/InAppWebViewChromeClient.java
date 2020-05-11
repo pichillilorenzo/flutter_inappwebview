@@ -27,8 +27,7 @@ import android.widget.LinearLayout;
 
 import androidx.appcompat.app.AlertDialog;
 
-import com.pichillilorenzo.flutter_inappwebview.FlutterWebView;
-import com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity;
+import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;

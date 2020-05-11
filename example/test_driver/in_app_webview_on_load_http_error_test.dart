@@ -29,7 +29,7 @@ class InAppWebViewOnLoadHttpErrorTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialUrl: "https://google.com/404",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true

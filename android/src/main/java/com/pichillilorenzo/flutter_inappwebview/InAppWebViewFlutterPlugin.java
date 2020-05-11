@@ -6,6 +6,8 @@ import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebView.FlutterWebViewFactory;
+
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
 import io.flutter.plugin.common.BinaryMessenger;
@@ -19,6 +21,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   protected static final String LOG_TAG = "InAppWebViewFlutterPL";
 
   public static InAppBrowserManager inAppBrowserManager;
+  public static HeadlessInAppWebViewManager headlessInAppWebViewManager;
   public static ChromeSafariBrowserManager chromeSafariBrowserManager;
   public static InAppWebViewStatic inAppWebViewStatic;
   public static MyCookieManager myCookieManager;
@@ -49,6 +52,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     Shared.messenger = messenger;
 
     inAppBrowserManager = new InAppBrowserManager(messenger);
+    headlessInAppWebViewManager = new HeadlessInAppWebViewManager(messenger);
     chromeSafariBrowserManager = new ChromeSafariBrowserManager(messenger);
 
     platformViewRegistry.registerViewFactory(
@@ -66,6 +70,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (inAppBrowserManager != null) {
       inAppBrowserManager.dispose();
       inAppBrowserManager = null;
+    }
+    if (headlessInAppWebViewManager != null) {
+      headlessInAppWebViewManager.dispose();
+      headlessInAppWebViewManager = null;
     }
     if (chromeSafariBrowserManager != null) {
       chromeSafariBrowserManager.dispose();

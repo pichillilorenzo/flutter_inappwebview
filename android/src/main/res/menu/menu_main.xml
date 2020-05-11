@@ -3,7 +3,7 @@
     xmlns:appcompat="http://schemas.android.com/apk/res-auto"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".InAppBrowserActivity">
+    tools:context=".InAppBrowser.InAppBrowserActivity">
 
     <item
         android:id="@+id/action_go_back"

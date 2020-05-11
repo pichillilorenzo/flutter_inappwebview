@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview;
+package com.pichillilorenzo.flutter_inappwebview.InAppBrowser;
 
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -26,6 +26,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions;
+import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.Shared;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -65,6 +67,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
 
     webView = findViewById(R.id.webView);
     webView.inAppBrowserActivity = this;
+    webView.channel = channel;
 
     fromActivity = b.getString("fromActivity");
 

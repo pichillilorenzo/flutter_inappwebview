@@ -7,7 +7,7 @@
     android:layout_height="match_parent"
     android:clickable="true"
     android:focusableInTouchMode="true"
-    tools:context=".InAppBrowserActivity"
+    tools:context=".InAppBrowser.InAppBrowserActivity"
     android:focusable="true">
 
     <com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView

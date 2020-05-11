@@ -41,7 +41,8 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 let uuidFallback: String = arguments!["uuidFallback"] as! String
                 let headersFallback = arguments!["headersFallback"] as! [String: String]
                 let optionsFallback = arguments!["optionsFallback"] as! [String: Any?]
-                open(uuid: uuid, url: url, options: options, uuidFallback: uuidFallback, headersFallback: headersFallback, optionsFallback: optionsFallback, result: result)
+                let menuItemList = arguments!["menuItemList"] as! [[String: Any]]
+                open(uuid: uuid, url: url, options: options, uuidFallback: uuidFallback, headersFallback: headersFallback, optionsFallback: optionsFallback, menuItemList: menuItemList, result: result)
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -49,7 +50,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func open(uuid: String, url: String, options: [String: Any?], uuidFallback: String?, headersFallback: [String: String], optionsFallback: [String: Any?], result: @escaping FlutterResult) {
+    public func open(uuid: String, url: String, options: [String: Any?], uuidFallback: String?, headersFallback: [String: String], optionsFallback: [String: Any?], menuItemList: [[String: Any]], result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
         if self.previousStatusBarStyle == -1 {
@@ -85,10 +86,12 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
             }
             
             safari.uuid = uuid
+            safari.menuItemList = menuItemList
             safari.prepareMethodChannel()
             safari.delegate = safari
             safari.tmpWindow = tmpWindow
             safari.safariOptions = safariOptions
+            safari.prepareSafariBrowser()
             
             tmpController.present(safari, animated: true) {
                 result(true)

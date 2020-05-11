@@ -36,7 +36,7 @@ class InAppWebViewOnJsDialogTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialFile: "test_assets/in_app_webview_on_js_dialog_test.html",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true

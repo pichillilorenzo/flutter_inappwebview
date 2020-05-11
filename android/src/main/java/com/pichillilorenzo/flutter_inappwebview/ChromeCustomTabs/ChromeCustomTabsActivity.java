@@ -1,21 +1,24 @@
 package com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs;
 
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
-import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -52,6 +55,8 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     options = new ChromeCustomTabsOptions();
     options.parse((HashMap<String, Object>) b.getSerializable("options"));
 
+    final List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) b.getSerializable("menuItemList");
+
     final ChromeCustomTabsActivity chromeCustomTabsActivity = this;
 
     customTabActivityHelper = new CustomTabActivityHelper();
@@ -63,18 +68,17 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
         customTabActivityHelper.mayLaunchUrl(uri, null, null);
 
         builder = new CustomTabsIntent.Builder(customTabsSession);
+        prepareCustomTabs(menuItemList);
+
         CustomTabsIntent customTabsIntent = builder.build();
-        prepareCustomTabs(customTabsIntent);
+        prepareCustomTabsIntent(customTabsIntent);
+
         CustomTabActivityHelper.openCustomTab(chromeCustomTabsActivity, customTabsIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
       }
 
       @Override
       public void onCustomTabsDisconnected() {
-        customTabsSession = null;
-        finish();
-        Map<String, Object> obj = new HashMap<>();
-        obj.put("uuid", uuid);
-        channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+        chromeCustomTabsActivity.close();
       }
     });
 
@@ -122,12 +126,23 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   @Override
   public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
     switch (call.method) {
+      case "close":
+        this.onStop();
+        this.onDestroy();
+        this.close();
+
+        // https://stackoverflow.com/a/41596629/4637638
+        Intent myIntent = new Intent(Shared.activity, Shared.activity.getClass());
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+        myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+        Shared.activity.startActivity(myIntent);
+        break;
       default:
         result.notImplemented();
     }
   }
 
-  private void prepareCustomTabs(CustomTabsIntent customTabsIntent) {
+  private void prepareCustomTabs(List<HashMap<String, Object>> menuItemList) {
     if (options.addDefaultShareMenuItem)
       builder.addDefaultShareMenuItem();
 
@@ -141,6 +156,14 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
 
     builder.setInstantAppsEnabled(options.instantAppsEnabled);
 
+    for (HashMap<String, Object> menuItem : menuItemList) {
+      int id = (int) menuItem.get("id");
+      String label = (String) menuItem.get("label");
+      builder.addMenuItem(label, createPendingIntent(id));
+    }
+  }
+
+  private void prepareCustomTabsIntent(CustomTabsIntent customTabsIntent) {
     if (options.packageName != null)
       customTabsIntent.intent.setPackage(options.packageName);
     else
@@ -165,12 +188,27 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
-      customTabsSession = null;
-      finish();
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("uuid", uuid);
-      InAppWebViewFlutterPlugin.inAppBrowserManager.channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+      close();
     }
   }
 
+  public void close() {
+    customTabsSession = null;
+    finish();
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("uuid", uuid);
+    channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+  }
+
+  private PendingIntent createPendingIntent(int actionSourceId) {
+    Intent actionIntent = new Intent(this, ActionBroadcastReceiver.class);
+
+    Bundle extras = new Bundle();
+    extras.putInt(ActionBroadcastReceiver.KEY_ACTION_ID, actionSourceId);
+    extras.putString(ActionBroadcastReceiver.KEY_ACTION_UUID, uuid);
+    actionIntent.putExtras(extras);
+
+    return PendingIntent.getBroadcast(
+            this, actionSourceId, actionIntent, 0);
+  }
 }

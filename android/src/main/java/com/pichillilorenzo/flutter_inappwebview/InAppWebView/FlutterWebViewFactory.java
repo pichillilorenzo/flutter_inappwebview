@@ -1,12 +1,13 @@
-package com.pichillilorenzo.flutter_inappwebview;
+package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.content.Context;
 import android.view.View;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebView.FlutterWebView;
+
 import java.util.HashMap;
 
 import io.flutter.plugin.common.BinaryMessenger;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.common.StandardMessageCodec;
 import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;

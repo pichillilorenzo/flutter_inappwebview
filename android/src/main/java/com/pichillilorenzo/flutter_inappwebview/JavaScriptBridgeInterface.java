@@ -7,6 +7,8 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
+import com.pichillilorenzo.flutter_inappwebview.InAppWebView.FlutterWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 
 import java.util.HashMap;

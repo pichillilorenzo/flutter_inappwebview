@@ -12,21 +12,26 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
     
     private weak var registrar: FlutterPluginRegistrar?
     var webView: InAppWebView?
-    var viewId: Int64 = 0
+    var viewId: Any = 0
     var channel: FlutterMethodChannel?
     var myView: UIView?
 
-    init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: NSDictionary) {
+    init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Any, arguments args: NSDictionary) {
         super.init()
         
         self.registrar = registrar
         self.viewId = viewId
         
-        myView = UIView(frame: frame)
-        
-        let channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(viewId)
+        var channelName = ""
+        if let id = viewId as? Int64 {
+            channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(id)
+        } else if let id = viewId as? String {
+            channelName = "com.pichillilorenzo/flutter_inappwebview_" + id
+        }
         channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
         channel!.setMethodCallHandler(LeakAvoider(delegate: self).handle)
+        
+        myView = UIView(frame: frame)
         
         let initialUrl = args["initialUrl"] as? String
         let initialFile = args["initialFile"] as? String
@@ -74,6 +79,20 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
             }
         }
         load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+        
+        if (frame.isEmpty && viewId is String) {
+            /// Note: The WKWebView behaves very unreliable when rendering offscreen
+            /// on a device. This is especially true with JavaScript, which simply
+            /// won't be executed sometimes.
+            /// Therefore, I decided to add this very ugly hack where the rendering
+            /// webview will be added to the view hierarchy (between the
+            /// rootViewController's view and the key window).
+            self.myView!.alpha = 0.01
+            UIApplication.shared.keyWindow!.insertSubview(self.myView!, at: 0)
+
+            let arguments: [String: Any] = ["uuid": viewId]
+            channel!.invokeMethod("onHeadlessWebViewCreated", arguments: arguments)
+        }
     }
     
     deinit {

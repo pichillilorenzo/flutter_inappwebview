@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'types.dart';
 
-///ContentBlocker class represents a set of rules to use block content in the browser window.
+///Class that represents a set of rules to use block content in the browser window.
 ///
 ///On iOS, it uses [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore).
 ///On Android, it uses a custom implementation because such functionality doesn't exist.

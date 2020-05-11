@@ -1,4 +1,6 @@
-package com.pichillilorenzo.flutter_inappwebview;
+package com.pichillilorenzo.flutter_inappwebview.InAppBrowser;
+
+import com.pichillilorenzo.flutter_inappwebview.Options;
 
 import java.util.HashMap;
 import java.util.Map;

@@ -2,8 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pichillilorenzo.flutter_inappwebview">
     <application>
-        <activity android:theme="@style/AppTheme" android:name="com.pichillilorenzo.flutter_inappwebview.InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>
+        <activity android:theme="@style/AppTheme" android:name="com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>
         <activity android:theme="@style/ThemeTransparent" android:name="com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ChromeCustomTabsActivity" android:configChanges="orientation|screenSize"></activity>
+        <receiver android:name="com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ActionBroadcastReceiver" />
     </application>
 
 </manifest>

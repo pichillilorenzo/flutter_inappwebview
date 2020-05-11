@@ -15,6 +15,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     var tmpWindow: UIWindow?
     var safariOptions: SafariBrowserOptions?
     var uuid: String = ""
+    var menuItemList: [[String: Any]] = []
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         
@@ -30,11 +31,20 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        
+        let arguments = call.arguments as? NSDictionary
+
+        switch call.method {
+            case "close":
+                close()
+                break
+            default:
+                result(FlutterMethodNotImplemented)
+                break
+        }
     }
     
     public override func viewWillAppear(_ animated: Bool) {
-        prepareSafariBrowser()
+        // prepareSafariBrowser()
         super.viewWillAppear(animated)
         onChromeSafariBrowserOpened()
     }
@@ -83,23 +93,25 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     }
     
     public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
-//        print("activityItemsFor")
-//        print(URL)
-//        print(title)
-        return []
+        var uiActivities: [UIActivity] = []
+        menuItemList.forEach { (menuItem) in
+            let activity = CustomUIActivity(uuid: uuid, id: menuItem["id"] as! Int64, url: URL, title: title, label: menuItem["label"] as? String, type: nil, image: nil)
+            uiActivities.append(activity)
+        }
+        return uiActivities
     }
-
-    public func safariViewController(_ controller: SFSafariViewController, excludedActivityTypesFor URL: URL, title: String?) -> [UIActivity.ActivityType] {
+//
+//    public func safariViewController(_ controller: SFSafariViewController, excludedActivityTypesFor URL: URL, title: String?) -> [UIActivity.ActivityType] {
 //        print("excludedActivityTypesFor")
 //        print(URL)
 //        print(title)
-        return []
-    }
-
-    public func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo URL: URL) {
+//        return []
+//    }
+//
+//    public func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo URL: URL) {
 //        print("initialLoadDidRedirectTo")
 //        print(URL)
-    }
+//    }
     
     public func onChromeSafariBrowserOpened() {
         channel!.invokeMethod("onChromeSafariBrowserOpened", arguments: [])
@@ -144,5 +156,56 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
         // Scan hex value
         scanner.scanHexInt32(&hexInt)
         return hexInt
+    }
+}
+
+class CustomUIActivity : UIActivity {
+    var uuid: String
+    var id: Int64
+    var url: URL
+    var title: String?
+    var type: UIActivity.ActivityType?
+    var label: String?
+    var image: UIImage?
+    
+    init(uuid: String, id: Int64, url: URL, title: String?, label: String?, type: UIActivity.ActivityType?, image: UIImage?) {
+        self.uuid = uuid
+        self.id = id
+        self.url = url
+        self.title = title
+        self.label = label
+        self.type = type
+        self.image = image
+    }
+
+    override class var activityCategory: UIActivity.Category {
+        return .action
+    }
+
+    override var activityType: UIActivity.ActivityType? {
+        return type
+    }
+
+    override var activityTitle: String? {
+        return label
+    }
+
+    override var activityImage: UIImage? {
+        return image
+    }
+
+    override func canPerform(withActivityItems activityItems: [Any]) -> Bool {
+        return true
+    }
+
+    override func perform() {
+        let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        
+        let arguments: [String: Any?] = [
+            "url": url.absoluteString,
+            "title": title,
+            "id": id,
+        ]
+        channel.invokeMethod("onChromeSafariBrowserMenuItemActionPerform", arguments: arguments)
     }
 }

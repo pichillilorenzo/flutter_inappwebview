@@ -28,7 +28,7 @@ class InAppWebViewInitialFileTestState extends WidgetTestState {
                   child: InAppWebView(
                     initialFile: "test_assets/in_app_webview_initial_file_test.html",
                     initialHeaders: {},
-                    initialOptions: InAppWebViewWidgetOptions(
+                    initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
                             clearCache: true,
                             debuggingEnabled: true

@@ -68,6 +68,7 @@ First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](ht
 
 Classes:
 - [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
+- [HeadlessInAppWebView](#headlessinappwebview-class): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
@@ -132,7 +133,7 @@ Future main() async {
 class MyApp extends StatefulWidget {
   @override
   _MyAppState createState() => new _MyAppState();
-}
+}z
 
 class _MyAppState extends State<MyApp> {
 
@@ -177,7 +178,7 @@ class _MyAppState extends State<MyApp> {
                 child: InAppWebView(
                   initialUrl: "https://flutter.dev/",
                   initialHeaders: {},
-                  initialOptions: InAppWebViewWidgetOptions(
+                  initialOptions: InAppWebViewGroupOptions(
                     crossPlatform: InAppWebViewOptions(
                         debuggingEnabled: true,
                     )
@@ -280,7 +281,7 @@ Screenshots:
 * `addJavaScriptHandler({@required String handlerName, @required JavaScriptHandlerCallback callback})`: Adds a JavaScript message handler callback that listen to post messages sent from JavaScript by the handler with name `handlerName`.
 * `removeJavaScriptHandler({@required String handlerName})`: Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
 * `takeScreenshot`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
-* `setOptions({@required InAppWebViewWidgetOptions options})`: Sets the WebView options with the new options and evaluates them.
+* `setOptions({@required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
 * `getOptions`: Gets the current WebView options. Returns the options with `null` value if they are not set yet.
 * `getCopyBackForwardList`: Gets the `WebHistory` for this WebView. This contains the back/forward list for use in querying each item in the history stack.
 * `clearCache`: Clears all the webview's cache.
@@ -333,8 +334,8 @@ This event will be dispatched as soon as the platform (Android or iOS) is ready 
 ```
 
 `window.flutter_inappwebview.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-that can be used to get the json result returned by [JavaScriptHandlerCallback].
-In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
+that can be used to get the json result returned by `JavaScriptHandlerCallback.
+In this case, simply return data that you want to send and it will be automatically json encoded using `jsonEncode` from the `dart:convert` library.
 
 So, on the JavaScript side, to get data coming from the Dart side, you will use:
 ```html
@@ -498,6 +499,127 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `iosOnDidCommit`: Called when the web view begins to receive web content (available only on iOS).
 * `iosOnDidReceiveServerRedirectForProvisionalNavigation`: Called when a web view receives a server redirect (available only on iOS).
 
+### `HeadlessInAppWebView` class
+
+Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
+
+Remember to dispose it when you don't need it anymore.
+
+As `InAppWebView`, it has the same options and events. Use `InAppWebViewController` to control the WebView instance.
+
+Example:
+```dart
+import 'dart:async';
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  runApp(new MyApp());
+}
+
+class MyApp extends StatefulWidget {
+  @override
+  _MyAppState createState() => new _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+
+  HeadlessInAppWebView headlessWebView;
+  String url = "";
+
+  @override
+  void initState() {
+    super.initState();
+
+    headlessWebView = new HeadlessInAppWebView(
+      initialUrl: "https://flutter.dev/",
+      initialOptions: InAppWebViewGroupOptions(
+        crossPlatform: InAppWebViewOptions(
+          debuggingEnabled: true,
+        ),
+      ),
+      onWebViewCreated: (controller) {
+        print('HeadlessInAppWebView created!');
+      },
+      onConsoleMessage: (controller, consoleMessage) {
+        print("CONSOLE MESSAGE: " + consoleMessage.message);
+      },
+      onLoadStart: (controller, url) async {
+        print("onLoadStart $url");
+        setState(() {
+          this.url = url;
+        });
+      },
+      onLoadStop: (controller, url) async {
+        print("onLoadStop $url");
+        setState(() {
+          this.url = url;
+        });
+      },
+      onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
+        print("onUpdateVisitedHistory $url");
+        setState(() {
+          this.url = url;
+        });
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    headlessWebView.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+        appBar: AppBar(
+            title: Text(
+          "HeadlessInAppWebView",
+        )),
+        drawer: myDrawer(context: context),
+        body: SafeArea(
+          child: Column(children: <Widget>[
+            Container(
+            padding: EdgeInsets.all(20.0),
+            child: Text(
+                "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
+          ),
+          Center(
+            child: RaisedButton(
+              onPressed: () async {
+                await headlessWebView.dispose();
+                await headlessWebView.run();
+              },
+              child: Text("Run HeadlessInAppWebView")),
+          ),
+          Center(
+            child: RaisedButton(
+              onPressed: () async {
+                try {
+                  await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
+                } on MissingPluginException catch(e) {
+                  print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
+                }
+              },
+              child: Text("Send console.log message")),
+          ),
+          Center(
+            child: RaisedButton(
+              onPressed: () {
+                headlessWebView.dispose();
+              },
+              child: Text("Dispose HeadlessInAppWebView")),
+          )
+        ])
+      )
+    );
+  }
+}
+```
+
 ### `InAppBrowser` class
 
 In-App Browser using native WebView.
@@ -596,7 +718,7 @@ class _MyAppState extends State<MyApp> {
                 widget.browser.openFile(
                     assetFilePath: "assets/index.html",
                     options: InAppBrowserClassOptions(
-                        inAppWebViewWidgetOptions: InAppWebViewWidgetOptions(
+                        inAppWebViewGroupOptions: InAppWebViewGroupOptions(
                             crossPlatform: InAppWebViewOptions(
                               useShouldOverrideUrlLoading: true,
                               useOnLoadResource: true,
@@ -744,6 +866,16 @@ class _MyAppState extends State<MyApp> {
 
   @override
   void initState() {
+    widget.browser.addMenuItem(new ChromeSafariBrowserMenuItem(id: 1, label: 'Custom item menu 1', action: (url, title) {
+      print('Custom item menu 1 clicked!');
+      print(url);
+      print(title);
+    }));
+    widget.browser.addMenuItem(new ChromeSafariBrowserMenuItem(id: 2, label: 'Custom item menu 2', action: (url, title) {
+      print('Custom item menu 2 clicked!');
+      print(url);
+      print(title);
+    }));
     super.initState();
   }
 
@@ -785,6 +917,9 @@ Screenshots:
 
 * `open({@required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
 * `isOpened`: Returns `true` if the `ChromeSafariBrowser` instance is opened, otherwise `false`.
+* `close`: Closes the `ChromeSafariBrowser` instance.
+* `addMenuItem`: Adds a `ChromeSafariBrowserMenuItem` to the menu.
+* `addMenuItems`: Adds a list of `ChromeSafariBrowserMenuItem` to the menu.
 
 #### `ChromeSafariBrowser` options
 
@@ -846,7 +981,7 @@ Future main() async {
                 child: InAppWebView(
                   initialUrl: "http://localhost:8080/assets/index.html",
                   initialHeaders: {},
-                  initialOptions: InAppWebViewWidgetOptions(
+                  initialOptions: InAppWebViewGroupOptions(
                       inAppWebViewOptions: InAppWebViewOptions(
                         debuggingEnabled: true,
                       )

@@ -45,8 +45,6 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
           String path = (String) call.argument("path");
           String expiresDateString = (String) call.argument("expiresDate");
           Long expiresDate = (expiresDateString != null ? new Long(expiresDateString) : null);
-          Log.d(LOG_TAG, expiresDateString + "");
-          Log.d(LOG_TAG, expiresDate + "");
           Integer maxAge = (Integer) call.argument("maxAge");
           Boolean isSecure = (Boolean) call.argument("isSecure");
           MyCookieManager.setCookie(url, name, value, domain, path, expiresDate, maxAge, isSecure, result);
@@ -102,8 +100,6 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       cookieValue += "; Secure";
 
     cookieValue += ";";
-
-    Log.d(LOG_TAG, cookieValue + "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.setCookie(url, cookieValue, new ValueCallback<Boolean>() {

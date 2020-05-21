@@ -70,7 +70,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           String url = (String) call.argument("url");
           HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
           Map<String, String> headers = (Map<String, String>) call.argument("headers");
-          openUrl(activity, uuid, url, options, headers);
+          HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
+          openUrl(activity, uuid, url, options, headers, contextMenu);
         }
         result.success(true);
         break;
@@ -86,7 +87,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           }
           HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
           Map<String, String> headers = (Map<String, String>) call.argument("headers");
-          openUrl(activity, uuid, url, options, headers);
+          HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
+          openUrl(activity, uuid, url, options, headers, contextMenu);
         }
         result.success(true);
         break;
@@ -98,7 +100,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           String encoding = (String) call.argument("encoding");
           String baseUrl = (String) call.argument("baseUrl");
           String historyUrl = (String) call.argument("historyUrl");
-          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl);
+          HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
+          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu);
         }
         result.success(true);
         break;
@@ -189,7 +192,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     }
   }
 
-  public void openUrl(Activity activity, String uuid, String url, HashMap<String, Object> options, Map<String, String> headers) {
+  public void openUrl(Activity activity, String uuid, String url, HashMap<String, Object> options, Map<String, String> headers, HashMap<String, Object> contextMenu) {
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putString("url", url);
@@ -197,10 +200,11 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putString("uuid", uuid);
     extras.putSerializable("options", options);
     extras.putSerializable("headers", (Serializable) headers);
+    extras.putSerializable("contextMenu", (Serializable) contextMenu);
     startInAppBrowserActivity(activity, extras);
   }
 
-  public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding, String baseUrl, String historyUrl) {
+  public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding, String baseUrl, String historyUrl, HashMap<String, Object> contextMenu) {
     Bundle extras = new Bundle();
     extras.putBoolean("isData", true);
     extras.putString("uuid", uuid);
@@ -210,6 +214,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putString("encoding", encoding);
     extras.putString("baseUrl", baseUrl);
     extras.putString("historyUrl", historyUrl);
+    extras.putSerializable("contextMenu", (Serializable) contextMenu);
     startInAppBrowserActivity(activity, extras);
   }
 

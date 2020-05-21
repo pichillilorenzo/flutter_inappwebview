@@ -35,3 +35,4 @@ export 'src/webview_options.dart';
 export 'src/content_blocker.dart';
 export 'src/http_auth_credentials_database.dart';
 export 'src/web_storage_manager.dart';
+export 'src/context_menu.dart';

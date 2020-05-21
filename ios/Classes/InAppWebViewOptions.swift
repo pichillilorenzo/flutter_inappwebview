@@ -33,6 +33,7 @@ public class InAppWebViewOptions: Options {
     var transparentBackground = false
     var disableVerticalScroll = false
     var disableHorizontalScroll = false
+    var disableContextMenu = false
 
     var disallowOverScroll = false
     var enableViewportScale = false

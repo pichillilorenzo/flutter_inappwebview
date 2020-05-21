@@ -1,7 +1,18 @@
-## 3.1.1
+## 3.2.0
 
+- Added `ContextMenu` and `ContextMenuItem` classes [#235](https://github.com/pichillilorenzo/flutter_inappwebview/issues/235)
+- Added `onCreateContextMenu`, `onHideContextMenu`, `onContextMenuActionItemClicked` context menu events
+- Added `contextMenu` to WebView
+- Added `disableContextMenu` WebView option
+- Added `getSelectedText`, `getHitTestResult` methods to WebView Controller
 - Fixed `Confirmation dialog (onbeforeunload) displayed after popped from webview page` [#337](https://github.com/pichillilorenzo/flutter_inappwebview/issues/337)
 - Fixed `CookieManager.setCookie` `expiresDate` option
+- Fixed `Scrolling not smooth on iOS` [#341](https://github.com/pichillilorenzo/flutter_inappwebview/issues/341)
+
+### BREAKING CHANGES
+
+- Renamed `LongPressHitTestResult` to `InAppWebViewHitTestResult`.
+- Renamed `LongPressHitTestResultType` to `InAppWebViewHitTestResultType`.
 
 ## 3.1.0
 

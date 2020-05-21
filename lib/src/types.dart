@@ -2297,13 +2297,13 @@ class IOSWKWebsiteDataRecord {
   }
 }
 
-///Class representing the [LongPressHitTestResult] type.
-class LongPressHitTestResultType {
+///Class representing the [InAppWebViewHitTestResult] type.
+class InAppWebViewHitTestResultType {
   final int _value;
-  const LongPressHitTestResultType._internal(this._value);
-  static LongPressHitTestResultType fromValue(int value) {
+  const InAppWebViewHitTestResultType._internal(this._value);
+  static InAppWebViewHitTestResultType fromValue(int value) {
     if (value != null && [0, 2, 3, 4, 5, 7, 8, 9].contains(value))
-      return LongPressHitTestResultType._internal(value);
+      return InAppWebViewHitTestResultType._internal(value);
     return null;
   }
 
@@ -2331,22 +2331,22 @@ class LongPressHitTestResultType {
     }
   }
 
-  ///Default [LongPressHitTestResult], where the target is unknown.
-  static const UNKNOWN_TYPE = const LongPressHitTestResultType._internal(0);
-  ///[LongPressHitTestResult] for hitting a phone number.
-  static const PHONE_TYPE = const LongPressHitTestResultType._internal(2);
-  ///[LongPressHitTestResult] for hitting a map address.
-  static const GEO_TYPE = const LongPressHitTestResultType._internal(3);
-  ///[LongPressHitTestResult] for hitting an email address.
-  static const EMAIL_TYPE = const LongPressHitTestResultType._internal(4);
-  ///[LongPressHitTestResult] for hitting an HTML::img tag.
-  static const IMAGE_TYPE = const LongPressHitTestResultType._internal(5);
-  ///[LongPressHitTestResult] for hitting a HTML::a tag with src=http.
-  static const SRC_ANCHOR_TYPE = const LongPressHitTestResultType._internal(7);
-  ///[LongPressHitTestResult] for hitting a HTML::a tag with src=http + HTML::img.
-  static const SRC_IMAGE_ANCHOR_TYPE = const LongPressHitTestResultType._internal(8);
-  ///[LongPressHitTestResult] for hitting an edit text area.
-  static const EDIT_TEXT_TYPE = const LongPressHitTestResultType._internal(9);
+  ///Default [InAppWebViewHitTestResult], where the target is unknown.
+  static const UNKNOWN_TYPE = const InAppWebViewHitTestResultType._internal(0);
+  ///[InAppWebViewHitTestResult] for hitting a phone number.
+  static const PHONE_TYPE = const InAppWebViewHitTestResultType._internal(2);
+  ///[InAppWebViewHitTestResult] for hitting a map address.
+  static const GEO_TYPE = const InAppWebViewHitTestResultType._internal(3);
+  ///[InAppWebViewHitTestResult] for hitting an email address.
+  static const EMAIL_TYPE = const InAppWebViewHitTestResultType._internal(4);
+  ///[InAppWebViewHitTestResult] for hitting an HTML::img tag.
+  static const IMAGE_TYPE = const InAppWebViewHitTestResultType._internal(5);
+  ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http.
+  static const SRC_ANCHOR_TYPE = const InAppWebViewHitTestResultType._internal(7);
+  ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http + HTML::img.
+  static const SRC_IMAGE_ANCHOR_TYPE = const InAppWebViewHitTestResultType._internal(8);
+  ///[InAppWebViewHitTestResult] for hitting an edit text area.
+  static const EDIT_TEXT_TYPE = const InAppWebViewHitTestResultType._internal(9);
 
   bool operator ==(value) => value == _value;
 
@@ -2354,12 +2354,12 @@ class LongPressHitTestResultType {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the hit result for hitting an HTML elements. Used by [onLongPressHitTestResult] event.
-class LongPressHitTestResult {
+///Class that represents the hit result for hitting an HTML elements.
+class InAppWebViewHitTestResult {
   ///The type of the hit test result.
-  LongPressHitTestResultType type;
+  InAppWebViewHitTestResultType type;
   ///Additional type-dependant information about the result.
   String extra;
 
-  LongPressHitTestResult({this.type, this.extra});
+  InAppWebViewHitTestResult({this.type, this.extra});
 }

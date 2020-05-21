@@ -61,6 +61,8 @@ class ChromeSafariBrowser {
   ///[headersFallback]: The additional header of the [InAppBrowser] instance fallback to be used in the HTTP request for this URL, specified as a map from name to value.
   ///
   ///[optionsFallback]: Options used by the [InAppBrowser] instance fallback.
+  ///
+  ///[contextMenuFallback]: Context Menu used by the [InAppBrowser] instance fallback.
   Future<void> open(
       {@required String url,
       ChromeSafariBrowserClassOptions options,
@@ -81,11 +83,12 @@ class ChromeSafariBrowser {
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('menuItemList', () => menuItemList);
     args.putIfAbsent('uuidFallback',
             () => (browserFallback != null) ? browserFallback.uuid : '');
     args.putIfAbsent('headersFallback', () => headersFallback);
     args.putIfAbsent('optionsFallback', () => optionsFallback?.toMap() ?? {});
-    args.putIfAbsent('menuItemList', () => menuItemList);
+    args.putIfAbsent('contextMenuFallback', () => browserFallback?.contextMenu?.toMap() ?? {});
     await _sharedChannel.invokeMethod('open', args);
     this._isOpened = true;
   }

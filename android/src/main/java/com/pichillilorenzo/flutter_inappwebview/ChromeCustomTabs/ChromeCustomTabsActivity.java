@@ -136,6 +136,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
         Shared.activity.startActivity(myIntent);
+        result.success(true);
         break;
       default:
         result.notImplemented();

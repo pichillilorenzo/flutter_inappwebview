@@ -346,12 +346,12 @@ class InAppWebViewController {
           _webview.iosOnWebContentProcessDidTerminate(this);
         else if (_inAppBrowser != null)
           _inAppBrowser.iosOnWebContentProcessDidTerminate();
-        return null;
+        break;
       case "onDidCommit":
         if (_webview != null && _webview.iosOnDidCommit != null)
           _webview.iosOnDidCommit(this);
         else if (_inAppBrowser != null) _inAppBrowser.iosOnDidCommit();
-        return null;
+        break;
       case "onDidReceiveServerRedirectForProvisionalNavigation":
         if (_webview != null &&
             _webview.iosOnDidReceiveServerRedirectForProvisionalNavigation !=
@@ -359,20 +359,79 @@ class InAppWebViewController {
           _webview.iosOnDidReceiveServerRedirectForProvisionalNavigation(this);
         else if (_inAppBrowser != null)
           _inAppBrowser.iosOnDidReceiveServerRedirectForProvisionalNavigation();
-        return null;
+        break;
       case "onLongPressHitTestResult":
         Map<dynamic, dynamic> hitTestResultMap =
         call.arguments["hitTestResult"];
-        LongPressHitTestResultType type = LongPressHitTestResultType.fromValue(
+        InAppWebViewHitTestResultType type = InAppWebViewHitTestResultType.fromValue(
             hitTestResultMap["type"].toInt());
         String extra = hitTestResultMap["extra"];
-        LongPressHitTestResult hitTestResult =
-        new LongPressHitTestResult(type: type, extra: extra);
+        InAppWebViewHitTestResult hitTestResult = InAppWebViewHitTestResult(type: type, extra: extra);
 
         if (_webview != null && _webview.onLongPressHitTestResult != null)
           _webview.onLongPressHitTestResult(this, hitTestResult);
         else if (_inAppBrowser != null)
           _inAppBrowser.onLongPressHitTestResult(hitTestResult);
+        break;
+      case "onCreateContextMenu":
+        ContextMenu contextMenu;
+        if (_webview != null && _webview.contextMenu != null) {
+          contextMenu = _webview.contextMenu;
+        } else if (_inAppBrowser != null && _inAppBrowser.contextMenu != null) {
+          contextMenu = _inAppBrowser.contextMenu;
+        }
+
+        if (contextMenu != null && contextMenu.onCreateContextMenu != null) {
+          Map<dynamic, dynamic> hitTestResultMap =
+          call.arguments["hitTestResult"];
+          InAppWebViewHitTestResultType type = InAppWebViewHitTestResultType.fromValue(
+              hitTestResultMap["type"].toInt());
+          String extra = hitTestResultMap["extra"];
+          InAppWebViewHitTestResult hitTestResult = InAppWebViewHitTestResult(type: type, extra: extra);
+
+          contextMenu.onCreateContextMenu(hitTestResult);
+        }
+        break;
+      case "onHideContextMenu":
+        ContextMenu contextMenu;
+        if (_webview != null && _webview.contextMenu != null) {
+          contextMenu = _webview.contextMenu;
+        } else if (_inAppBrowser != null && _inAppBrowser.contextMenu != null) {
+          contextMenu = _inAppBrowser.contextMenu;
+        }
+
+        if (contextMenu != null && contextMenu.onHideContextMenu != null) {
+          contextMenu.onHideContextMenu();
+        }
+        break;
+      case "onContextMenuActionItemClicked":
+        ContextMenu contextMenu;
+        if (_webview != null && _webview.contextMenu != null) {
+          contextMenu = _webview.contextMenu;
+        } else if (_inAppBrowser != null && _inAppBrowser.contextMenu != null) {
+          contextMenu = _inAppBrowser.contextMenu;
+        }
+
+        if (contextMenu != null) {
+          int androidId = call.arguments["androidId"];
+          String iosId = call.arguments["iosId"];
+          String title = call.arguments["title"];
+
+          ContextMenuItem menuItemClicked = ContextMenuItem(androidId: androidId, iosId: iosId, title: title, action: null);
+
+          for (var menuItem in contextMenu.menuItems) {
+            if ((Platform.isAndroid && menuItem.androidId == androidId) ||
+                (Platform.isIOS && menuItem.iosId == iosId)) {
+              menuItemClicked = menuItem;
+              menuItem?.action();
+              break;
+            }
+          }
+
+          if (contextMenu.onContextMenuActionItemClicked != null) {
+            contextMenu.onContextMenuActionItemClicked(menuItemClicked);
+          }
+        }
         break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
@@ -1198,7 +1257,7 @@ class InAppWebViewController {
     return await _channel.invokeMethod('getContentHeight', args);
   }
 
-  ///Gets the height of the HTML content.
+  ///Performs a zoom operation in this WebView.
   ///
   ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 to 100.0 inclusive.
   ///
@@ -1213,6 +1272,27 @@ class InAppWebViewController {
   Future<double> getScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getScale', args);
+  }
+
+  ///Gets the selected text.
+  ///
+  ///**NOTE**: This method is implemented with using JavaScript.
+  ///Available only on Android 19+.
+  Future<String> getSelectedText() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('getSelectedText', args);
+  }
+
+  ///Gets the hit result for hitting an HTML elements.
+  ///
+  ///**NOTE**: On iOS it is implemented using JavaScript.
+  Future<InAppWebViewHitTestResult> getHitTestResult() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    var hitTestResultMap = await _channel.invokeMethod('getHitTestResult', args);
+    InAppWebViewHitTestResultType type = InAppWebViewHitTestResultType.fromValue(
+        hitTestResultMap["type"].toInt());
+    String extra = hitTestResultMap["extra"];
+    return InAppWebViewHitTestResult(type: type, extra: extra);
   }
 
   ///Gets the default user agent.

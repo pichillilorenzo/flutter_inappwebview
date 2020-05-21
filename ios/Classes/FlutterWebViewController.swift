@@ -38,12 +38,13 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
         let initialData = args["initialData"] as? [String: String]
         let initialHeaders = args["initialHeaders"] as? [String: String]
         let initialOptions = args["initialOptions"] as! [String: Any?]
+        let contextMenu = args["contextMenu"] as? [String: Any]
 
         let options = InAppWebViewOptions()
         let _ = options.parse(options: initialOptions)
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options)
 
-        webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, channel: channel!)
+        webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, contextMenu: contextMenu, channel: channel!)
         webView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.autoresizesSubviews = true
         myView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
@@ -98,7 +99,7 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
     deinit {
         print("FlutterWebViewController - dealloc")
         channel?.setMethodCallHandler(nil)
-        webView!.dispose()
+        webView?.dispose()
         webView = nil
         myView = nil
     }
@@ -373,7 +374,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
             case "printCurrentPage":
                 if webView != nil {
                     webView!.printCurrentPage(printCompletionHandler: {(completed, error) in
-                        if !completed, let _ = error {
+                        if !completed, let err = error {
+                            print(err.localizedDescription)
                             result(false)
                             return
                         }
@@ -397,6 +399,32 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                 break
             case "hasOnlySecureContent":
                 result( (webView != nil) ? webView!.hasOnlySecureContent : nil )
+                break
+            case "getSelectedText":
+                if webView != nil {
+                    webView!.getSelectedText { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                        }
+                        result(value)
+                    }
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "getHitTestResult":
+                if webView != nil {
+                    webView!.getHitTestResult { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                        }
+                        result(value)
+                    }
+                }
+                else {
+                    result(nil)
+                }
                 break
             default:
                 result(FlutterMethodNotImplemented)

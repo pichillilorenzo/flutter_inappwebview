@@ -128,6 +128,9 @@ class InAppWebViewOptions
   ///Set to `true` to disable horizontal scroll. The default value is `false`.
   bool disableHorizontalScroll;
 
+  ///Set to `true` to disable context menu. The default value is `false`.
+  bool disableContextMenu;
+
   InAppWebViewOptions(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
@@ -152,7 +155,8 @@ class InAppWebViewOptions
       this.cacheEnabled = true,
       this.transparentBackground = false,
       this.disableVerticalScroll = false,
-      this.disableHorizontalScroll = false}) {
+      this.disableHorizontalScroll = false,
+      this.disableContextMenu = false}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Platform.isAndroid ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
@@ -189,7 +193,8 @@ class InAppWebViewOptions
       "cacheEnabled": cacheEnabled,
       "transparentBackground": transparentBackground,
       "disableVerticalScroll": disableVerticalScroll,
-      "disableHorizontalScroll": disableHorizontalScroll
+      "disableHorizontalScroll": disableHorizontalScroll,
+      "disableContextMenu": disableContextMenu
     };
   }
 
@@ -234,6 +239,7 @@ class InAppWebViewOptions
     options.transparentBackground = map["transparentBackground"];
     options.disableVerticalScroll = map["disableVerticalScroll"];
     options.disableHorizontalScroll = map["disableHorizontalScroll"];
+    options.disableContextMenu = map["disableContextMenu"];
     return options;
   }
 }

@@ -41,7 +41,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let url = arguments!["url"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let headers = arguments!["headers"] as! [String: String]
-                openUrl(uuid: uuid, url: url, options: options, headers: headers)
+                let contextMenu = arguments!["contextMenu"] as! [String: Any]
+                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu)
                 result(true)
                 break
             case "openFile":
@@ -56,7 +57,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 }
                 let options = arguments!["options"] as! [String: Any?]
                 let headers = arguments!["headers"] as! [String: String]
-                openUrl(uuid: uuid, url: url, options: options, headers: headers)
+                let contextMenu = arguments!["contextMenu"] as! [String: Any]
+                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu)
                 result(true)
                 break
             case "openData":
@@ -65,7 +67,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let mimeType = arguments!["mimeType"] as! String
                 let encoding = arguments!["encoding"] as! String
                 let baseUrl = arguments!["baseUrl"] as! String
-                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+                let contextMenu = arguments!["contextMenu"] as! [String: Any]
+                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, contextMenu: contextMenu)
                 result(true)
                 break
             case "openWithSystemBrowser":
@@ -110,7 +113,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         return webViewController
     }
     
-    public func openUrl(uuid: String, url: String, options: [String: Any?], headers: [String: String]) {
+    public func openUrl(uuid: String, url: String, options: [String: Any?], headers: [String: String], contextMenu: [String: Any]) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
@@ -119,6 +122,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         webViewController.tmpWindow = tmpWindow
         webViewController.initURL = absoluteUrl
         webViewController.initHeaders = headers
+        webViewController.contextMenu = contextMenu
         
         if webViewController.isHidden {
             webViewController.view.isHidden = true
@@ -137,7 +141,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String, baseUrl: String) {
+    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String, baseUrl: String, contextMenu: [String: Any]) {
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
         webViewController.uuid = uuid
@@ -146,6 +150,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         webViewController.initMimeType = mimeType
         webViewController.initEncoding = encoding
         webViewController.initBaseUrl = baseUrl
+        webViewController.contextMenu = contextMenu
         
         if webViewController.isHidden {
             webViewController.view.isHidden = true

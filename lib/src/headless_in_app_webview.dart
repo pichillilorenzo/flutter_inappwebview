@@ -1,5 +1,6 @@
 import 'package:flutter/services.dart';
 
+import 'context_menu.dart';
 import 'types.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
@@ -16,46 +17,48 @@ class HeadlessInAppWebView implements WebView {
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
   InAppWebViewController webViewController;
 
-  HeadlessInAppWebView(
-      {this.onWebViewCreated,
-        this.onLoadStart,
-        this.onLoadStop,
-        this.onLoadError,
-        this.onLoadHttpError,
-        this.onProgressChanged,
-        this.onConsoleMessage,
-        this.shouldOverrideUrlLoading,
-        this.onLoadResource,
-        this.onScrollChanged,
-        this.onDownloadStart,
-        this.onLoadResourceCustomScheme,
-        this.onCreateWindow,
-        this.onJsAlert,
-        this.onJsConfirm,
-        this.onJsPrompt,
-        this.onReceivedHttpAuthRequest,
-        this.onReceivedServerTrustAuthRequest,
-        this.onReceivedClientCertRequest,
-        this.onFindResultReceived,
-        this.shouldInterceptAjaxRequest,
-        this.onAjaxReadyStateChange,
-        this.onAjaxProgress,
-        this.shouldInterceptFetchRequest,
-        this.onUpdateVisitedHistory,
-        this.onPrint,
-        this.onLongPressHitTestResult,
-        this.androidOnSafeBrowsingHit,
-        this.androidOnPermissionRequest,
-        this.androidOnGeolocationPermissionsShowPrompt,
-        this.androidOnGeolocationPermissionsHidePrompt,
-        this.iosOnWebContentProcessDidTerminate,
-        this.iosOnDidCommit,
-        this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
-        this.initialUrl,
-        this.initialFile,
-        this.initialData,
-        this.initialHeaders,
-        this.initialOptions}) {
+  HeadlessInAppWebView({
+    this.onWebViewCreated,
+    this.onLoadStart,
+    this.onLoadStop,
+    this.onLoadError,
+    this.onLoadHttpError,
+    this.onProgressChanged,
+    this.onConsoleMessage,
+    this.shouldOverrideUrlLoading,
+    this.onLoadResource,
+    this.onScrollChanged,
+    this.onDownloadStart,
+    this.onLoadResourceCustomScheme,
+    this.onCreateWindow,
+    this.onJsAlert,
+    this.onJsConfirm,
+    this.onJsPrompt,
+    this.onReceivedHttpAuthRequest,
+    this.onReceivedServerTrustAuthRequest,
+    this.onReceivedClientCertRequest,
+    this.onFindResultReceived,
+    this.shouldInterceptAjaxRequest,
+    this.onAjaxReadyStateChange,
+    this.onAjaxProgress,
+    this.shouldInterceptFetchRequest,
+    this.onUpdateVisitedHistory,
+    this.onPrint,
+    this.onLongPressHitTestResult,
+    this.androidOnSafeBrowsingHit,
+    this.androidOnPermissionRequest,
+    this.androidOnGeolocationPermissionsShowPrompt,
+    this.androidOnGeolocationPermissionsHidePrompt,
+    this.iosOnWebContentProcessDidTerminate,
+    this.iosOnDidCommit,
+    this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+    this.initialUrl,
+    this.initialFile,
+    this.initialData,
+    this.initialHeaders,
+    this.initialOptions,
+    this.contextMenu
+  }) {
     uuid = uuidGenerator.v4();
     webViewController = new InAppWebViewController(uuid, this);
   }
@@ -83,7 +86,8 @@ class HeadlessInAppWebView implements WebView {
       'initialFile': this.initialFile,
       'initialData': this.initialData?.toMap(),
       'initialHeaders': this.initialHeaders,
-      'initialOptions': this.initialOptions?.toMap()
+      'initialOptions': this.initialOptions?.toMap(),
+      'contextMenu': this.contextMenu?.toMap() ?? {}
     });
     await _sharedChannel.invokeMethod('createHeadlessWebView', args);
   }
@@ -129,6 +133,9 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final InAppWebViewGroupOptions initialOptions;
+
+  @override
+  final ContextMenu contextMenu;
 
   @override
   final String initialUrl;
@@ -210,7 +217,7 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final void Function(InAppWebViewController controller,
-      LongPressHitTestResult hitTestResult) onLongPressHitTestResult;
+      InAppWebViewHitTestResult hitTestResult) onLongPressHitTestResult;
 
   @override
   final void Function(InAppWebViewController controller, String url) onPrint;

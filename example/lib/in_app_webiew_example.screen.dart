@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -11,12 +13,33 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewController webView;
+  ContextMenu contextMenu;
   String url = "";
   double progress = 0;
 
   @override
   void initState() {
     super.initState();
+
+    contextMenu = ContextMenu(
+      onCreateContextMenu: (hitTestResult) async {
+        print("onCreateContextMenu");
+        print(hitTestResult.extra);
+        print(await webView.getSelectedText());
+      },
+      onHideContextMenu: () {
+        print("onHideContextMenu");
+      },
+      onContextMenuActionItemClicked: (contextMenuItemClicked) {
+        var id = (Platform.isAndroid) ? contextMenuItemClicked.androidId : contextMenuItemClicked.iosId;
+        print("onContextMenuActionItemClicked: " + id.toString() + " " + contextMenuItemClicked.title);
+      }
+    );
+    contextMenu.menuItems = [
+      ContextMenuItem(androidId: 1, iosId: "1", title: "Special", action: () async {
+        print("Menu item Special clicked!");
+      })
+    ];
   }
 
   @override
@@ -49,12 +72,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
-                    initialUrl: "s",
+                    contextMenu: contextMenu,
+                    initialUrl: "https://github.com/flutter",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true,
+                          debuggingEnabled: true
                         ),
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
@@ -106,7 +130,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url;
                       });
-                    },
+                    }
                   ),
                 ),
               ),

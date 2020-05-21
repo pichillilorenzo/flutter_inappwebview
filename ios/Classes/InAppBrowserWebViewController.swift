@@ -17,7 +17,7 @@ typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, B
 public class InAppWebView_IBWrapper: InAppWebView {
     required init(coder: NSCoder) {
         let config = WKWebViewConfiguration()
-        super.init(frame: .zero, configuration: config, IABController: nil, channel: nil)
+        super.init(frame: .zero, configuration: config, IABController: nil, contextMenu: nil, channel: nil)
         self.translatesAutoresizingMaskIntoConstraints = false
     }
 }
@@ -46,6 +46,7 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     var webView: InAppWebView!
     var channel: FlutterMethodChannel?
     var initURL: URL?
+    var contextMenu: [String: Any]?
     var tmpWindow: UIWindow?
     var browserOptions: InAppBrowserOptions?
     var webViewOptions: InAppWebViewOptions?
@@ -281,6 +282,32 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
             case "hasOnlySecureContent":
                 result(webView.hasOnlySecureContent)
                 break
+            case "getSelectedText":
+                if webView != nil {
+                    webView!.getSelectedText { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                        }
+                        result(value)
+                    }
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "getHitTestResult":
+                if webView != nil {
+                    webView!.getHitTestResult { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                        }
+                        result(value)
+                    }
+                }
+                else {
+                    result(nil)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break
@@ -290,7 +317,7 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     public override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
-            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, channel: channel!)
+            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, contextMenu: contextMenu, channel: channel!)
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
@@ -685,7 +712,8 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
         tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
         UIApplication.shared.delegate?.window??.makeKeyAndVisible()
         onExit()
-        channel!.setMethodCallHandler(nil)
+        channel?.setMethodCallHandler(nil)
+        channel = nil
     }
     
     public func onBrowserCreated() {

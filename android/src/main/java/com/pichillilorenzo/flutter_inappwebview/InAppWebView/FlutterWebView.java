@@ -4,6 +4,8 @@ import android.app.Activity;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.View;
@@ -49,15 +51,16 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     displayListenerProxy.onPreWebViewInitialization(displayManager);
 
     String initialUrl = (String) params.get("initialUrl");
-    String initialFile = (String) params.get("initialFile");
-    Map<String, String> initialData = (Map<String, String>) params.get("initialData");
-    Map<String, String> initialHeaders = (Map<String, String>) params.get("initialHeaders");
+    final String initialFile = (String) params.get("initialFile");
+    final Map<String, String> initialData = (Map<String, String>) params.get("initialData");
+    final Map<String, String> initialHeaders = (Map<String, String>) params.get("initialHeaders");
     HashMap<String, Object> initialOptions = (HashMap<String, Object>) params.get("initialOptions");
+    HashMap<String, Object> contextMenu = (HashMap<String, Object>) params.get("contextMenu");
 
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
 
-    webView = new InAppWebView(Shared.activity, this, id, options, containerView);
+    webView = new InAppWebView(Shared.activity, this, id, options, contextMenu, containerView);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     // fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/182
@@ -86,16 +89,23 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       }
     }
 
-    if (initialData != null) {
-      String data = initialData.get("data");
-      String mimeType = initialData.get("mimeType");
-      String encoding = initialData.get("encoding");
-      String baseUrl = initialData.get("baseUrl");
-      String historyUrl = initialData.get("historyUrl");
-      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
-    }
-    else
-      webView.loadUrl(initialUrl, initialHeaders);
+    final String finalInitialUrl = initialUrl;
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        if (initialData != null) {
+          String data = initialData.get("data");
+          String mimeType = initialData.get("mimeType");
+          String encoding = initialData.get("encoding");
+          String baseUrl = initialData.get("baseUrl");
+          String historyUrl = initialData.get("historyUrl");
+          webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+        }
+        else
+          webView.loadUrl(finalInitialUrl, initialHeaders);
+      }
+    });
 
     if (containerView == null && id instanceof String) {
       Map<String, Object> obj = new HashMap<>();
@@ -380,6 +390,24 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "getScale":
         result.success((webView != null) ? webView.getUpdatedScale() : null);
+        break;
+      case "getSelectedText":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+          webView.getSelectedText(result);
+        } else {
+          result.success(null);
+        }
+        break;
+      case "getHitTestResult":
+        if (webView != null) {
+          WebView.HitTestResult hitTestResult = webView.getHitTestResult();
+          Map<String, Object> obj = new HashMap<>();
+          obj.put("type", hitTestResult.getType());
+          obj.put("extra", hitTestResult.getExtra());
+          result.success(obj);
+        } else {
+          result.success(null);
+        }
         break;
       default:
         result.notImplemented();

@@ -721,6 +721,22 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint = function(x, y) {
 }
 """
 
+let getSelectedTextJS = """
+(function(){
+    var txt;
+    if (window.getSelection) {
+      txt = window.getSelection().toString();
+    } else if (window.document.getSelection) {
+      txt = window.document.getSelection().toString();
+    } else if (window.document.selection) {
+      txt = window.document.selection.createRange().text;
+    }
+    return txt;
+})();
+"""
+
+var SharedLastTouchPointTimestamp: [InAppWebView: Int64] = [:]
+
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate {
 
     var IABController: InAppBrowserWebViewController?
@@ -736,15 +752,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     // This flag is used to block the "shouldOverrideUrlLoading" event when the WKWebView is loading the first time,
     // in order to have the same behavior as Android
     var activateShouldOverrideUrlLoading = false
+    var contextMenu: [String: Any]?
     
     // https://github.com/mozilla-mobile/firefox-ios/blob/50531a7e9e4d459fb11d4fcb7d4322e08103501f/Client/Frontend/Browser/ContextMenuHelper.swift
     fileprivate var nativeHighlightLongPressRecognizer: UILongPressGestureRecognizer?
     var longPressRecognizer: UILongPressGestureRecognizer?
+    var lastLongPressTouchPoint: CGPoint?
     
+    var lastTouchPoint: CGPoint?
+    var lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     
-    init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, channel: FlutterMethodChannel?) {
+    var contextMenuIsShowing = false
+    
+    var customIMPs: [IMP] = []
+    
+    init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, contextMenu: [String: Any]?, channel: FlutterMethodChannel?) {
         super.init(frame: frame, configuration: configuration)
         self.channel = channel
+        self.contextMenu = contextMenu
         self.IABController = IABController
         uiDelegate = self
         navigationDelegate = self
@@ -757,21 +782,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }
-    
-    /*
-    public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
-        if let _ = sender as? UIMenuController {
-            print(action)
-            // disable/hide UIMenuController
-            return false
-        }
-        return super.canPerformAction(action, withSender: sender)
-    }*/
-    
-//    @objc func uiMenuViewControllerDidShowMenu() {
-//        print("MENU\n\n")
-//    }
-
 
     public func gestureRecognizer(_ gestureRecognizer: UIGestureRecognizer, shouldRecognizeSimultaneouslyWith otherGestureRecognizer: UIGestureRecognizer) -> Bool {
         return true
@@ -831,14 +841,70 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         touchLocation.y -= self.scrollView.contentInset.top
         touchLocation.x /= self.scrollView.zoomScale
         touchLocation.y /= self.scrollView.zoomScale
+        
+        lastLongPressTouchPoint = touchLocation
 
         self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(touchLocation.x),\(touchLocation.y))", completionHandler: {(value, error) in
             if error != nil {
-                print("Long press gesture recognizer error: \(error?.localizedDescription)")
+                print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
             } else {
                 self.onLongPressHitTestResult(hitTestResult: value as! [String: Any?])
             }
         })
+    }
+    
+    public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+        lastTouchPoint = point
+        lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
+        SharedLastTouchPointTimestamp[self] = lastTouchPointTimestamp
+        
+        UIMenuController.shared.menuItems = []
+        if let menu = self.contextMenu {
+            if let menuItems = menu["menuItems"] as? [[String : Any]] {
+                for menuItem in menuItems {
+                    let id = menuItem["iosId"] as! String
+                    let title = menuItem["title"] as! String
+                    let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" + id
+                    if !self.responds(to: Selector(targetMethodName)) {
+                        let customAction: () -> Void = {
+                            let arguments: [String: Any?] = [
+                                "iosId": id,
+                                "androidId": nil,
+                                "title": title
+                            ]
+                            self.channel?.invokeMethod("onContextMenuActionItemClicked", arguments: arguments)
+                        }
+                        let castedCustomAction: AnyObject = unsafeBitCast(customAction as @convention(block) () -> Void, to: AnyObject.self)
+                        let swizzledImplementation = imp_implementationWithBlock(castedCustomAction)
+                        class_addMethod(InAppWebView.self, Selector(targetMethodName), swizzledImplementation, nil)
+                        self.customIMPs.append(swizzledImplementation)
+                    }
+                    let item = UIMenuItem(title: title, action: Selector(targetMethodName))
+                    UIMenuController.shared.menuItems!.append(item)
+                }
+            }
+        }
+        
+        return super.hitTest(point, with: event)
+    }
+   
+    public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
+        if let _ = sender as? UIMenuController {
+            if self.options?.disableContextMenu == true {
+                return false
+            }
+            if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
+                let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
+                let arguments: [String: Any?] = [
+                    "iosId": id,
+                    "androidId": nil,
+                    "title": action.description
+                ]
+                self.channel?.invokeMethod("onContextMenuActionItemClicked", arguments: arguments)
+            }
+        }
+        
+        return super.canPerformAction(action, withSender: sender)
     }
 
     public func prepare() {
@@ -854,12 +920,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     forKeyPath: #keyPath(WKWebView.url),
                     options: [.new, .old],
                     context: nil)
+
+        NotificationCenter.default.addObserver(
+                        self,
+                        selector: #selector(onCreateContextMenu),
+                        name: UIMenuController.willShowMenuNotification,
+                        object: nil)
         
-//        NotificationCenter.default.addObserver(
-//                         self,
-//                         selector: #selector(uiMenuViewControllerDidShowMenu),
-//                         name: UIMenuController.didShowMenuNotification,
-//                         object: nil)
+        
+        NotificationCenter.default.addObserver(
+                        self,
+                        selector: #selector(onHideContextMenu),
+                        name: UIMenuController.didHideMenuNotification,
+                        object: nil)
         
         configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
@@ -998,10 +1071,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
 
         scrollView.decelerationRate = getDecelerationRate(type: (options?.decelerationRate)!)
-        scrollView.alwaysBounceVertical = !(options?.alwaysBounceVertical)!
-        scrollView.alwaysBounceHorizontal = !(options?.alwaysBounceHorizontal)!
-        scrollView.scrollsToTop = !(options?.scrollsToTop)!
-        scrollView.isPagingEnabled = !(options?.isPagingEnabled)!
+        scrollView.alwaysBounceVertical = (options?.alwaysBounceVertical)!
+        scrollView.alwaysBounceHorizontal = (options?.alwaysBounceHorizontal)!
+        scrollView.scrollsToTop = (options?.scrollsToTop)!
+        scrollView.isPagingEnabled = (options?.isPagingEnabled)!
         scrollView.maximumZoomScale = CGFloat((options?.maximumZoomScale)!)
         scrollView.minimumZoomScale = CGFloat((options?.minimumZoomScale)!)
         
@@ -1010,6 +1083,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.clearCache)! {
             clearCache()
         }
+        
+        
     }
     
     @available(iOS 10.0, *)
@@ -1074,6 +1149,47 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         return configuration
+    }
+    
+    @objc func onCreateContextMenu() {
+        let mapSorted = SharedLastTouchPointTimestamp.sorted { $0.value > $1.value }
+        if (mapSorted.first?.key != self) {
+            return
+        }
+        
+        contextMenuIsShowing = true
+        
+        var arguments: [String: Any?] = [
+            "hitTestResult": nil
+        ]
+        if let lastLongPressTouhLocation = lastLongPressTouchPoint {
+            if configuration.preferences.javaScriptEnabled {
+                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
+                    if error != nil {
+                        print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
+                    } else {
+                        let hitTestResult = value as! [String: Any?]
+                        arguments["hitTestResult"] = hitTestResult
+                        self.channel?.invokeMethod("onCreateContextMenu", arguments: arguments)
+                    }
+                })
+            } else {
+                channel?.invokeMethod("onCreateContextMenu", arguments: arguments)
+            }
+        } else {
+            channel?.invokeMethod("onCreateContextMenu", arguments: arguments)
+        }
+    }
+    
+    @objc func onHideContextMenu() {
+        if contextMenuIsShowing == false {
+            return
+        }
+        
+        contextMenuIsShowing = false
+        
+        let arguments: [String: Any] = [:]
+        channel?.invokeMethod("onHideContextMenu", arguments: arguments)
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?,
@@ -1362,8 +1478,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 customUserAgent = newOptions.userAgent
             }
         }
-        
-        
         
         if newOptionsMap["clearCache"] != nil && newOptions.clearCache {
             clearCache()
@@ -2080,6 +2194,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 //    public func webView(_ webView: WKWebView,
 //                        contextMenuConfigurationForElement elementInfo: WKContextMenuElementInfo,
 //                        completionHandler: @escaping (UIContextMenuConfiguration?) -> Void) {
+//        print("contextMenuConfigurationForElement")
 //        let actionProvider: UIContextMenuActionProvider = { _ in
 //            let editMenu = UIMenu(title: "Edit...", children: [
 //                UIAction(title: "Copy") { action in
@@ -2099,76 +2214,82 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
 //        let contextMenuConfiguration = UIContextMenuConfiguration(identifier: nil, previewProvider: nil, actionProvider: actionProvider)
 //        //completionHandler(contextMenuConfiguration)
 //        completionHandler(nil)
-//        onContextMenuConfigurationForElement(linkURL: elementInfo.linkURL?.absoluteString, result: nil/*{(result) -> Void in
-//            if result is FlutterError {
-//                print((result as! FlutterError).message ?? "")
-//            }
-//            else if (result as? NSObject) == FlutterMethodNotImplemented {
-//                completionHandler(nil)
-//            }
-//            else {
-//                var response: [String: Any]
-//                if let r = result {
-//                    response = r as! [String: Any]
-//                    var action = response["action"] as? Int
-//                    action = action != nil ? action : 0;
-//                    switch action {
-//                        case 0:
-//                            break
-//                        case 1:
-//                            break
-//                        default:
-//                            completionHandler(nil)
-//                    }
-//                    return;
-//                }
-//                completionHandler(nil)
-//            }
-//        }*/)
-//    }
-//
-//    @available(iOS 13.0, *)
-//    public func webView(_ webView: WKWebView,
-//                        contextMenuDidEndForElement elementInfo: WKContextMenuElementInfo) {
-//        onContextMenuDidEndForElement(linkURL: elementInfo.linkURL?.absoluteString)
-//    }
-//
-//    @available(iOS 13.0, *)
-//    public func webView(_ webView: WKWebView,
-//                        contextMenuForElement elementInfo: WKContextMenuElementInfo,
-//                        willCommitWithAnimator animator: UIContextMenuInteractionCommitAnimating) {
-//        onWillCommitWithAnimator(linkURL: elementInfo.linkURL?.absoluteString, result: nil/*{(result) -> Void in
-//            if result is FlutterError {
-//                print((result as! FlutterError).message ?? "")
-//            }
-//            else if (result as? NSObject) == FlutterMethodNotImplemented {
-//
-//            }
-//            else {
-//                var response: [String: Any]
-//                if let r = result {
-//                    response = r as! [String: Any]
-//                    var action = response["action"] as? Int
-//                    action = action != nil ? action : 0;
+////        onContextMenuConfigurationForElement(linkURL: elementInfo.linkURL?.absoluteString, result: nil/*{(result) -> Void in
+////            if result is FlutterError {
+////                print((result as! FlutterError).message ?? "")
+////            }
+////            else if (result as? NSObject) == FlutterMethodNotImplemented {
+////                completionHandler(nil)
+////            }
+////            else {
+////                var response: [String: Any]
+////                if let r = result {
+////                    response = r as! [String: Any]
+////                    var action = response["action"] as? Int
+////                    action = action != nil ? action : 0;
 ////                    switch action {
 ////                        case 0:
 ////                            break
 ////                        case 1:
 ////                            break
 ////                        default:
-////
+////                            completionHandler(nil)
 ////                    }
-//                    return;
-//                }
+////                    return;
+////                }
+////                completionHandler(nil)
+////            }
+////        }*/)
+//    }
+////
+//    @available(iOS 13.0, *)
+//    public func webView(_ webView: WKWebView,
+//                        contextMenuDidEndForElement elementInfo: WKContextMenuElementInfo) {
+//        print("contextMenuDidEndForElement")
+//        print(elementInfo)
+//        //onContextMenuDidEndForElement(linkURL: elementInfo.linkURL?.absoluteString)
+//    }
 //
-//            }
-//        }*/)
+//    @available(iOS 13.0, *)
+//    public func webView(_ webView: WKWebView,
+//                        contextMenuForElement elementInfo: WKContextMenuElementInfo,
+//                        willCommitWithAnimator animator: UIContextMenuInteractionCommitAnimating) {
+//        print("willCommitWithAnimator")
+//        print(elementInfo)
+////        onWillCommitWithAnimator(linkURL: elementInfo.linkURL?.absoluteString, result: nil/*{(result) -> Void in
+////            if result is FlutterError {
+////                print((result as! FlutterError).message ?? "")
+////            }
+////            else if (result as? NSObject) == FlutterMethodNotImplemented {
+////
+////            }
+////            else {
+////                var response: [String: Any]
+////                if let r = result {
+////                    response = r as! [String: Any]
+////                    var action = response["action"] as? Int
+////                    action = action != nil ? action : 0;
+//////                    switch action {
+//////                        case 0:
+//////                            break
+//////                        case 1:
+//////                            break
+//////                        default:
+//////
+//////                    }
+////                    return;
+////                }
+////
+////            }
+////        }*/)
 //    }
 //
 //    @available(iOS 13.0, *)
 //    public func webView(_ webView: WKWebView,
 //                        contextMenuWillPresentForElement elementInfo: WKContextMenuElementInfo) {
-//        onContextMenuWillPresentForElement(linkURL: elementInfo.linkURL?.absoluteString)
+//        print("contextMenuWillPresentForElement")
+//        print(elementInfo.linkURL)
+//        //onContextMenuWillPresentForElement(linkURL: elementInfo.linkURL?.absoluteString)
 //    }
     
     public func onLoadStart(url: String) {
@@ -2489,6 +2610,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return Float(scrollView.zoomScale)
     }
     
+    public func getSelectedText(completionHandler: @escaping (Any?, Error?) -> Void) {
+        if configuration.preferences.javaScriptEnabled {
+            evaluateJavaScript(getSelectedTextJS, completionHandler: completionHandler)
+        } else {
+            completionHandler(nil, nil)
+        }
+    }
+    
+    public func getHitTestResult(completionHandler: @escaping (Any?, Error?) -> Void) {
+        if configuration.preferences.javaScriptEnabled, let lastTouchLocation = lastTouchPoint {
+            self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastTouchLocation.x),\(lastTouchLocation.y))", completionHandler: {(value, error) in
+                completionHandler(value, error)
+            })
+        } else {
+            completionHandler(nil, nil)
+        }
+    }
+    
     public func dispose() {
         stopLoading()
         configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog")
@@ -2504,14 +2643,20 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if #available(iOS 11.0, *) {
             configuration.userContentController.removeAllContentRuleLists()
         }
-        longPressRecognizer!.removeTarget(self, action: #selector(longPressGestureDetected))
-        longPressRecognizer!.delegate = nil
-        self.scrollView.removeGestureRecognizer(longPressRecognizer!)
+        NotificationCenter.default.removeObserver(self)
+        for imp in customIMPs {
+            imp_removeBlock(imp)
+        }
+        longPressRecognizer?.removeTarget(self, action: #selector(longPressGestureDetected))
+        longPressRecognizer?.delegate = nil
+        scrollView.removeGestureRecognizer(longPressRecognizer!)
         uiDelegate = nil
         navigationDelegate = nil
         scrollView.delegate = nil
         IABController?.webView = nil
         isPausedTimersCompletionHandler = nil
+        channel = nil
+        SharedLastTouchPointTimestamp.removeValue(forKey: self)
         super.removeFromSuperview()
     }
     

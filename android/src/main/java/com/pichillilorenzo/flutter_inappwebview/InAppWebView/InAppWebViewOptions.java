@@ -42,6 +42,7 @@ public class InAppWebViewOptions implements Options {
   public Boolean transparentBackground = false;
   public Boolean disableVerticalScroll = false;
   public Boolean disableHorizontalScroll = false;
+  public Boolean disableContextMenu = false;
 
   public Integer textZoom = 100;
   public Boolean clearSessionCache = false;
@@ -164,6 +165,9 @@ public class InAppWebViewOptions implements Options {
           break;
         case "disableHorizontalScroll":
           disableHorizontalScroll = (Boolean) value;
+          break;
+        case "disableContextMenu":
+          disableContextMenu = (Boolean) value;
           break;
         case "textZoom":
           textZoom = (Integer) value;
@@ -323,6 +327,7 @@ public class InAppWebViewOptions implements Options {
     options.put("transparentBackground", transparentBackground);
     options.put("disableVerticalScroll", disableVerticalScroll);
     options.put("disableHorizontalScroll", disableHorizontalScroll);
+    options.put("disableContextMenu", disableContextMenu);
     options.put("textZoom", textZoom);
     options.put("clearSessionCache", clearSessionCache);
     options.put("builtInZoomControls", builtInZoomControls);

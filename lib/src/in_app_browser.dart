@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import 'context_menu.dart';
 import 'in_app_webview_controller.dart';
 import 'webview_options.dart';
 
@@ -12,7 +13,12 @@ import 'types.dart';
 ///This class uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
+  ///Browser's UUID
   String uuid;
+
+  ///Context menu used by the browser
+  ContextMenu contextMenu;
+
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
@@ -67,6 +73,7 @@ class InAppBrowser {
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     await _sharedChannel.invokeMethod('openUrl', args);
   }
 
@@ -117,6 +124,7 @@ class InAppBrowser {
     args.putIfAbsent('url', () => assetFilePath);
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     await _sharedChannel.invokeMethod('openFile', args);
   }
 
@@ -146,6 +154,7 @@ class InAppBrowser {
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl);
     args.putIfAbsent('historyUrl', () => androidHistoryUrl);
+    args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     await _sharedChannel.invokeMethod('openData', args);
   }
 
@@ -429,7 +438,7 @@ class InAppBrowser {
   ///Event fired when an HTML element of the webview has been clicked and held.
   ///
   ///[hitTestResult] represents the hit result for hitting an HTML elements.
-  void onLongPressHitTestResult(LongPressHitTestResult hitTestResult) {}
+  void onLongPressHitTestResult(InAppWebViewHitTestResult hitTestResult) {}
 
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.

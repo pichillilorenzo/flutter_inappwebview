@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 
+import 'context_menu.dart';
 import 'webview.dart';
 import 'types.dart';
 import 'in_app_webview_controller.dart';
@@ -38,6 +39,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialData,
     this.initialHeaders = const {},
     @required this.initialOptions,
+    this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
@@ -111,6 +113,9 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final String initialUrl;
+
+  @override
+  final ContextMenu contextMenu;
 
   @override
   final Future<void> Function(InAppWebViewController controller) iosOnDidCommit;
@@ -189,7 +194,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final void Function(InAppWebViewController controller,
-      LongPressHitTestResult hitTestResult) onLongPressHitTestResult;
+      InAppWebViewHitTestResult hitTestResult) onLongPressHitTestResult;
 
   @override
   final void Function(InAppWebViewController controller, String url) onPrint;
@@ -258,7 +263,8 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
-          'initialOptions': widget.initialOptions?.toMap() ?? {}
+          'initialOptions': widget.initialOptions?.toMap() ?? {},
+          'contextMenu': widget.contextMenu?.toMap() ?? {}
         },
         creationParamsCodec: const StandardMessageCodec(),
       );
@@ -291,7 +297,8 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
-          'initialOptions': widget.initialOptions?.toMap() ?? {}
+          'initialOptions': widget.initialOptions?.toMap() ?? {},
+          'contextMenu': widget.contextMenu?.toMap() ?? {}
         },
         creationParamsCodec: const StandardMessageCodec(),
       );

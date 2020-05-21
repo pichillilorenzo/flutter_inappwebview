@@ -31,11 +31,10 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let arguments = call.arguments as? NSDictionary
-
+        // let arguments = call.arguments as? NSDictionary
         switch call.method {
             case "close":
-                close()
+                close(result: result)
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -67,7 +66,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
         self.modalTransitionStyle = UIModalTransitionStyle(rawValue: (safariOptions?.transitionStyle)!)!
     }
     
-    func close() {
+    func close(result: FlutterResult?) {
         dismiss(animated: true)
         
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {() -> Void in
@@ -75,11 +74,14 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             self.onChromeSafariBrowserClosed()
             self.dispose()
+            if result != nil {
+               result!(true)
+            }
         })
     }
     
     public func safariViewControllerDidFinish(_ controller: SFSafariViewController) {
-        close()
+        close(result: nil)
     }
     
     public func safariViewController(_ controller: SFSafariViewController,

@@ -40,11 +40,12 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
         {
           String url = (String) call.argument("url");
           HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
+          List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
           String uuidFallback = (String) call.argument("uuidFallback");
           Map<String, String> headersFallback = (Map<String, String>) call.argument("headersFallback");
           HashMap<String, Object> optionsFallback = (HashMap<String, Object>) call.argument("optionsFallback");
-          List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(activity, uuid, url, options, uuidFallback, headersFallback, optionsFallback, menuItemList, result);
+          HashMap<String, Object> contextMenuFallback = (HashMap<String, Object>) call.argument("contextMenuFallback");
+          open(activity, uuid, url, options, menuItemList, uuidFallback, headersFallback, optionsFallback, contextMenuFallback, result);
         }
         break;
       default:
@@ -52,8 +53,8 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     }
   }
 
-  public void open(Activity activity, String uuid, String url, HashMap<String, Object> options, String uuidFallback,
-                   Map<String, String> headersFallback, HashMap<String, Object> optionsFallback, List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
+  public void open(Activity activity, String uuid, String url, HashMap<String, Object> options, List<HashMap<String, Object>> menuItemList, String uuidFallback,
+                   Map<String, String> headersFallback, HashMap<String, Object> optionsFallback, HashMap<String, Object> contextMenuFallback, MethodChannel.Result result) {
 
     Intent intent = null;
     Bundle extras = new Bundle();
@@ -62,8 +63,10 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putBoolean("isData", false);
     extras.putString("uuid", uuid);
     extras.putSerializable("options", options);
-    extras.putSerializable("headers", (Serializable) headersFallback);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
+
+    extras.putSerializable("headers", (Serializable) headersFallback);
+    extras.putSerializable("contextMenu", (Serializable) contextMenuFallback);
 
     if (CustomTabActivityHelper.isAvailable(activity)) {
       intent = new Intent(activity, ChromeCustomTabsActivity.class);

@@ -439,6 +439,11 @@ class InAppWebViewController {
         List<dynamic> args = jsonDecode(call.arguments["args"]);
 
         switch (handlerName) {
+          case "androidKeyboardWorkaroundFocusoutEvent":
+            // android Workaround to hide the Keyboard when the user click outside
+            // on something not focusable such as input or a textarea.
+            SystemChannels.textInput.invokeMethod("TextInput.hide");
+            break;
           case "onLoadResource":
             Map<dynamic, dynamic> argMap = args[0];
             String initiatorType = argMap["initiatorType"];

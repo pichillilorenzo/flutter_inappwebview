@@ -45,6 +45,21 @@ public class JavaScriptBridgeInterface {
   }
 
   @JavascriptInterface
+  public void _hideContextMenu() {
+    final InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
+
+    final Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        if (webView != null && webView.floatingContextMenu != null) {
+          webView.hideContextMenu();
+        }
+      }
+    });
+  }
+
+  @JavascriptInterface
   public void _callHandler(final String handlerName, final String _callHandlerID, final String args) {
     final InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
 

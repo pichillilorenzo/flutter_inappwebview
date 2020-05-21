@@ -1,3 +1,9 @@
+## 3.3.0
+
+- Updated Android context menu workaround
+- Calling `onCreateContextMenu` event on iOS also when the context menu is disabled in order to have the same effect as Android
+- Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
+
 ## 3.2.0
 
 - Added `ContextMenu` and `ContextMenuItem` classes [#235](https://github.com/pichillilorenzo/flutter_inappwebview/issues/235)

@@ -76,18 +76,17 @@ final public class InAppWebView extends InputAwareWebView {
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
   public Pattern regexToCancelSubFramesLoadingCompiled;
-  private GestureDetector gestureDetector = null;
-  private MotionEvent motionEvent = null;
-  private LinearLayout floatingContextMenu = null;
+  public GestureDetector gestureDetector = null;
+  public LinearLayout floatingContextMenu = null;
   public HashMap<String, Object> contextMenu = null;
   public Handler headlessHandler = new Handler(Looper.getMainLooper());
 
-  private Runnable checkScrollStoppedTask;
-  private int initialPositionScrollStoppedTask;
-  private int newCheckScrollStoppedTask = 100;
+  public Runnable checkScrollStoppedTask;
+  public int initialPositionScrollStoppedTask;
+  public int newCheckScrollStoppedTask = 100; // ms
 
-  private Runnable selectedTextTask;
-  private int newCheckSelectedTextTask = 100;
+  public Runnable checkContextMenuShouldBeClosedTask;
+  public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
 
   static final String consoleLogJS = "(function(console) {" +
           "   var oldLogs = {" +
@@ -117,7 +116,7 @@ final public class InAppWebView extends InputAwareWebView {
 
   static final String printJS = "window.print = function() {" +
           "  window." + JavaScriptBridgeInterface.name + ".callHandler('onPrint', window.location.href);" +
-          "}";
+          "};";
 
   static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));";
 
@@ -531,6 +530,14 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "})(window.fetch);";
 
+  static final String isActiveElementInputEditableJS =
+          "var activeEl = document.activeElement;" +
+          "var nodeName = (activeEl != null) ? activeEl.nodeName.toLowerCase() : '';" +
+          "var isActiveElementInputEditable = activeEl != null && " +
+                  "(activeEl.nodeType == 1 && (nodeName == 'textarea' || (nodeName == 'input' && /^(?:text|email|number|search|tel|url|password)$/i.test(activeEl.type != null ? activeEl.type : 'text')))) && " +
+                  "!activeEl.disabled && !activeEl.readOnly;" +
+          "var isActiveElementEditable = isActiveElementInputEditable || (activeEl != null && activeEl.isContentEditable) || document.designMode === 'on';";
+
   static final String getSelectedTextJS = "(function(){" +
           "  var txt;" +
           "  if (window.getSelection) {" +
@@ -541,6 +548,48 @@ final public class InAppWebView extends InputAwareWebView {
           "    txt = window.document.selection.createRange().text;" +
           "  }" +
           "  return txt;" +
+          "})();";
+
+  // android Workaround to hide context menu when selected text is empty
+  // and the document active element is not an input element.
+  static final String checkContextMenuShouldBeHiddenJS = "(function(){" +
+          "  var txt;" +
+          "  if (window.getSelection) {" +
+          "    txt = window.getSelection().toString();" +
+          "  } else if (window.document.getSelection) {" +
+          "    txt = window.document.getSelection().toString();" +
+          "  } else if (window.document.selection) {" +
+          "    txt = window.document.selection.createRange().text;" +
+          "  }" +
+             isActiveElementInputEditableJS +
+          "  return txt === '' && !isActiveElementEditable;" +
+          "})();";
+
+  // android Workaround to hide context menu when user emit a keydown event
+  static final String checkGlobalKeyDownEventToHideContextMenuJS = "(function(){" +
+          "  document.addEventListener('keydown', function(e) {" +
+          "    window." + JavaScriptBridgeInterface.name + "._hideContextMenu();" +
+          "  });" +
+          "})();";
+
+  // android Workaround to hide the Keyboard when the user click outside
+  // on something not focusable such as input or a textarea.
+  static final String androidKeyboardWorkaroundFocusoutEventJS = "(function(){" +
+          "  var isFocusin = false;" +
+          "  document.addEventListener('focusin', function(e) {" +
+          "    var nodeName = e.target.nodeName.toLowerCase();" +
+          "    var isInputButton = nodeName === 'input' && e.target.type != null && e.target.type === 'button';" +
+          "    isFocusin = (['a', 'area', 'button', 'details', 'iframe', 'select', 'summary'].indexOf(nodeName) >= 0 || isInputButton) ? false : true;" +
+          "  });" +
+          "  document.addEventListener('focusout', function(e) {" +
+          "    isFocusin = false;" +
+          "    setTimeout(function() {" +
+                 isActiveElementInputEditableJS +
+          "      if (!isFocusin && !isActiveElementEditable) {" +
+          "        window." + JavaScriptBridgeInterface.name + ".callHandler('androidKeyboardWorkaroundFocusoutEvent');" +
+          "      }" +
+          "    }, 300);" +
+          "  });" +
           "})();";
 
   public InAppWebView(Context context) {
@@ -746,19 +795,19 @@ final public class InAppWebView extends InputAwareWebView {
     };
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      selectedTextTask = new Runnable() {
+      checkContextMenuShouldBeClosedTask = new Runnable() {
         @Override
         public void run() {
           if (floatingContextMenu != null) {
-            getSelectedText(new ValueCallback<String>() {
+            evaluateJavascript(checkContextMenuShouldBeHiddenJS, new ValueCallback<String>() {
               @Override
               public void onReceiveValue(String value) {
-                if (value == null || value.length() == 0) {
+                if (value == null || value.equals("true")) {
                   if (floatingContextMenu != null) {
                     hideContextMenu();
                   }
                 } else {
-                  headlessHandler.postDelayed(selectedTextTask, newCheckSelectedTextTask);
+                  headlessHandler.postDelayed(checkContextMenuShouldBeClosedTask, newCheckContextMenuShouldBeClosedTaskTask);
                 }
               }
             });
@@ -1424,14 +1473,18 @@ final public class InAppWebView extends InputAwareWebView {
     PrintManager printManager = (PrintManager) Shared.activity.getApplicationContext()
             .getSystemService(Context.PRINT_SERVICE);
 
-    String jobName = getTitle() + " Document";
+    if (printManager != null) {
+      String jobName = getTitle() + " Document";
 
-    // Get a printCurrentPage adapter instance
-    PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
+      // Get a printCurrentPage adapter instance
+      PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
 
-    // Create a printCurrentPage job with name and adapter instance
-    printManager.print(jobName, printAdapter,
-            new PrintAttributes.Builder().build());
+      // Create a printCurrentPage job with name and adapter instance
+      printManager.print(jobName, printAdapter,
+              new PrintAttributes.Builder().build());
+    } else {
+      Log.e(LOG_TAG, "No PrintManager available");
+    }
   }
 
   public Float getUpdatedScale() {
@@ -1442,6 +1495,12 @@ final public class InAppWebView extends InputAwareWebView {
   public void onCreateContextMenu(ContextMenu menu) {
     super.onCreateContextMenu(menu);
     sendOnCreateContextMenuEvent();
+  }
+
+  @Override
+  public boolean onCheckIsTextEditor() {
+    Log.d(LOG_TAG, "onCheckIsTextEditor");
+    return super.onCheckIsTextEditor();
   }
 
   private void sendOnCreateContextMenuEvent() {
@@ -1545,7 +1604,7 @@ final public class InAppWebView extends InputAwareWebView {
           text.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
-              clearFocus();
+              // clearFocus();
               hideContextMenu();
 
               Map<String, Object> obj = new HashMap<>();
@@ -1588,8 +1647,8 @@ final public class InAppWebView extends InputAwareWebView {
       if (hasBeenRemovedAndRebuilt) {
         sendOnCreateContextMenuEvent();
       }
-      if (selectedTextTask != null) {
-        selectedTextTask.run();
+      if (checkContextMenuShouldBeClosedTask != null) {
+        checkContextMenuShouldBeClosedTask.run();
       }
     }
     actionMenu.clear();

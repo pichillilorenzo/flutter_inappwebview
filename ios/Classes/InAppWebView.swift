@@ -763,6 +763,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     
     var contextMenuIsShowing = false
+    // flag used for the workaround to trigger onCreateContextMenu event as the same on Android
+    var onCreateContextMenuEventTriggeredWhenMenuDisabled = false
     
     var customIMPs: [IMP] = []
     
@@ -887,10 +889,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         return super.hitTest(point, with: event)
     }
-   
+    
     public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         if let _ = sender as? UIMenuController {
             if self.options?.disableContextMenu == true {
+                if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
+                    // workaround to trigger onCreateContextMenu event as the same on Android
+                    self.onCreateContextMenu()
+                    onCreateContextMenuEventTriggeredWhenMenuDisabled = true
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.onCreateContextMenuEventTriggeredWhenMenuDisabled = false
+                    }
+                }
                 return false
             }
             if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
@@ -1083,8 +1093,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (options?.clearCache)! {
             clearCache()
         }
-        
-        
     }
     
     @available(iOS 10.0, *)

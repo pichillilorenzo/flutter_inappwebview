@@ -1,6 +1,9 @@
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main.dart';
@@ -78,7 +81,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true
+                          debuggingEnabled: true,
+                          disableContextMenu: true,
                         ),
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {

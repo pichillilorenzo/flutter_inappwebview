@@ -18,7 +18,8 @@ const javaScriptHandlerForbiddenNames = [
   "onAjaxReadyStateChange",
   "onAjaxProgress",
   "shouldInterceptFetchRequest",
-  "onPrint"
+  "onPrint",
+  "androidKeyboardWorkaroundFocusoutEvent"
 ];
 
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.

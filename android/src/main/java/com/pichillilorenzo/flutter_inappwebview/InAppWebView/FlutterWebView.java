@@ -1,22 +1,17 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
-import android.app.Activity;
 import android.content.Context;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
-import android.view.ContextThemeWrapper;
 import android.view.View;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.pichillilorenzo.flutter_inappwebview.InAppWebView.DisplayListenerProxy;
-import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
-import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
@@ -29,7 +24,6 @@ import java.util.Map;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry.Registrar;
 import io.flutter.plugin.platform.PlatformView;
 
 import static io.flutter.plugin.common.MethodChannel.MethodCallHandler;

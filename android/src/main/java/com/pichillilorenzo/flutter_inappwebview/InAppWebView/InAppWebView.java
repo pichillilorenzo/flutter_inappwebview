@@ -1470,8 +1470,7 @@ final public class InAppWebView extends InputAwareWebView {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void printCurrentPage() {
     // Get a PrintManager instance
-    PrintManager printManager = (PrintManager) Shared.activity.getApplicationContext()
-            .getSystemService(Context.PRINT_SERVICE);
+    PrintManager printManager = (PrintManager) Shared.activity.getSystemService(Context.PRINT_SERVICE);
 
     if (printManager != null) {
       String jobName = getTitle() + " Document";

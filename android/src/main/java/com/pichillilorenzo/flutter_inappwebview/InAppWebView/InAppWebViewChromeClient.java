@@ -71,6 +71,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       Shared.activityPluginBinding.addActivityResultListener(this);
   }
 
+  @Override
   public Bitmap getDefaultVideoPoster() {
     if (mCustomView == null) {
       return null;
@@ -78,6 +79,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     return BitmapFactory.decodeResource(Shared.activity.getApplicationContext().getResources(), 2130837573);
   }
 
+  @Override
   public void onHideCustomView() {
     View decorView = Shared.activity.getWindow().getDecorView();
     ((FrameLayout) decorView).removeView(this.mCustomView);
@@ -88,7 +90,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     this.mCustomViewCallback = null;
   }
 
-  public void onShowCustomView(View paramView, WebChromeClient.CustomViewCallback paramCustomViewCallback) {
+  @Override
+  public void onShowCustomView(View paramView, CustomViewCallback paramCustomViewCallback) {
     if (this.mCustomView != null) {
       onHideCustomView();
       return;
@@ -100,16 +103,28 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     this.mCustomViewCallback = paramCustomViewCallback;
     this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
     ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
-    decorView.setSystemUiVisibility(
-            View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-            // Set the content to appear under the system bars so that the
-            // content doesn't resize when the system bars hide and show.
-            | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-            | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            // Hide the nav bar and status bar
-            | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-            | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      decorView.setSystemUiVisibility(
+              View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
+              // Set the content to appear under the system bars so that the
+              // content doesn't resize when the system bars hide and show.
+              | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+              // Hide the nav bar and status bar
+              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    } else {
+      decorView.setSystemUiVisibility(
+              // Set the content to appear under the system bars so that the
+              // content doesn't resize when the system bars hide and show.
+              View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
+              // Hide the nav bar and status bar
+              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+    }
   }
 
   @Override

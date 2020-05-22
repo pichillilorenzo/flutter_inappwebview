@@ -860,6 +860,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
         SharedLastTouchPointTimestamp[self] = lastTouchPointTimestamp
         
+        // re-build context menu items for the current webview
         UIMenuController.shared.menuItems = []
         if let menu = self.contextMenu {
             if let menuItems = menu["menuItems"] as? [[String : Any]] {
@@ -903,6 +904,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
                 return false
             }
+            
             if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
                 let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
                 let arguments: [String: Any?] = [
@@ -943,6 +945,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         selector: #selector(onHideContextMenu),
                         name: UIMenuController.didHideMenuNotification,
                         object: nil)
+        
+        // listen for videos playing in fullscreen
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onEnterFullscreen(_:)),
+                                               name: UIWindow.didBecomeVisibleNotification,
+                                               object: window)
+
+        // listen for videos stopping to play in fullscreen
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onExitFullscreen(_:)),
+                                               name: UIWindow.didBecomeHiddenNotification,
+                                               object: window)
         
         configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
@@ -2478,6 +2492,34 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func onDidReceiveServerRedirectForProvisionalNavigation() {
         channel?.invokeMethod("onDidReceiveServerRedirectForProvisionalNavigation", arguments: [])
+    }
+    
+    // https://stackoverflow.com/a/42840541/4637638
+    public func isVideoPlayerWindow(_ notificationObject: AnyObject?) -> Bool {
+        let nonVideoClasses = ["_UIAlertControllerShimPresenterWindow",
+                               "UITextEffectsWindow",
+                               "UIRemoteKeyboardWindow"]
+        var isVideo = true
+        if let obj = notificationObject {
+            for nonVideoClass in nonVideoClasses {
+                if let clazz = NSClassFromString(nonVideoClass) {
+                    isVideo = isVideo && !(obj.isKind(of: clazz))
+                }
+            }
+        }
+        return isVideo
+    }
+    
+    @objc func onEnterFullscreen(_ notification: Notification) {
+        if (isVideoPlayerWindow(notification.object as AnyObject?)) {
+            channel?.invokeMethod("onEnterFullscreen", arguments: [])
+        }
+    }
+    
+    @objc func onExitFullscreen(_ notification: Notification) {
+        if (isVideoPlayerWindow(notification.object as AnyObject?)) {
+            channel?.invokeMethod("onExitFullscreen", arguments: [])
+        }
     }
     
 //    public func onContextMenuConfigurationForElement(linkURL: String?, result: FlutterResult?) {

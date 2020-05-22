@@ -88,6 +88,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Shared.activity.setRequestedOrientation(this.mOriginalOrientation);
     this.mCustomViewCallback.onCustomViewHidden();
     this.mCustomViewCallback = null;
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    channel.invokeMethod("onExitFullscreen", obj);
   }
 
   @Override
@@ -125,6 +130,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
               | View.SYSTEM_UI_FLAG_FULLSCREEN);
     }
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    channel.invokeMethod("onEnterFullscreen", obj);
   }
 
   @Override
@@ -549,8 +559,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     super.onReceivedIcon(view, icon);
   }
 
-  //The undocumented magic method override
-  //Eclipse will swear at you if you try to put @Override here
   // For Android 3.0+
   public void openFileChooser(ValueCallback<Uri> uploadMsg) {
 
@@ -573,7 +581,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
             FILECHOOSER_RESULTCODE);
   }
 
-  //For Android 4.1
+  // For Android 4.1
   public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
     mUploadMessage = uploadMsg;
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
@@ -583,7 +591,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   }
 
-  //For Android 5.0+
+  // For Android 5.0+
   public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
     InAppWebViewFlutterPlugin.uploadMessageArray = filePathCallback;
     try {

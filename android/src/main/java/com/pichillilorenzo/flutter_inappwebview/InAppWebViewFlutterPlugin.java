@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.webkit.ValueCallback;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.FlutterWebViewFactory;
@@ -47,6 +48,9 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
 
   private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger, Activity activity, PlatformViewRegistry platformViewRegistry, FlutterView flutterView) {
+
+    Log.d(LOG_TAG, "\n\n\n onAttachedToEngine CALLED! \n\n\n");
+
     Shared.applicationContext = applicationContext;
     Shared.activity = activity;
     Shared.messenger = messenger;
@@ -67,6 +71,9 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   @Override
   public void onDetachedFromEngine(FlutterPluginBinding binding) {
+
+    Log.d(LOG_TAG, "\n\n\n onDetachedFromEngine CALLED! \n\n\n");
+
     if (inAppBrowserManager != null) {
       inAppBrowserManager.dispose();
       inAppBrowserManager = null;
@@ -100,24 +107,36 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   @Override
   public void onAttachedToActivity(ActivityPluginBinding activityPluginBinding) {
+
+    Log.d(LOG_TAG, "\n\n\n onAttachedToActivity CALLED! \n\n\n");
+
     Shared.activityPluginBinding = activityPluginBinding;
     Shared.activity = activityPluginBinding.getActivity();
   }
 
   @Override
   public void onDetachedFromActivityForConfigChanges() {
+
+    Log.d(LOG_TAG, "\n\n\n onDetachedFromActivityForConfigChanges CALLED! \n\n\n");
+
     Shared.activityPluginBinding = null;
     Shared.activity = null;
   }
 
   @Override
   public void onReattachedToActivityForConfigChanges(ActivityPluginBinding activityPluginBinding) {
+
+    Log.d(LOG_TAG, "\n\n\n onReattachedToActivityForConfigChanges CALLED! \n\n\n");
+
     Shared.activityPluginBinding = activityPluginBinding;
     Shared.activity = activityPluginBinding.getActivity();
   }
 
   @Override
   public void onDetachedFromActivity() {
+
+    Log.d(LOG_TAG, "\n\n\n onDetachedFromActivity CALLED! \n\n\n");
+
     Shared.activityPluginBinding = null;
     Shared.activity = null;
   }

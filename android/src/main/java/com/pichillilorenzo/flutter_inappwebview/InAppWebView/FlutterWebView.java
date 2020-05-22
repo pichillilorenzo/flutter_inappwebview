@@ -54,6 +54,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
 
+    Log.d(LOG_TAG, "\n\n\n Shared.activity " + ((Shared.activity == null) ? "is null" : "is NOT null!") + "\n\n\n");
+
     webView = new InAppWebView(Shared.activity, this, id, options, contextMenu, containerView);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 

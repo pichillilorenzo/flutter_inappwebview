@@ -3,6 +3,7 @@
 - Updated Android context menu workaround
 - Calling `onCreateContextMenu` event on iOS also when the context menu is disabled in order to have the same effect as Android
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
+- Added `onEnterFullscreen`, `onExitFullscreen` webview events
 - Fixed `Print preview is not working? java.lang.IllegalStateException: Can print only from an activity` [#128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/128)
 
 ## 3.2.0

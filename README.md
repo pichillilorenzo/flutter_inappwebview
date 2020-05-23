@@ -68,7 +68,7 @@ end
 Instead, if you have already a non-swift project, you can check this issue to solve the problem: [Friction adding swift plugin to objective-c project](https://github.com/flutter/flutter/issues/16049).
 
 **Support HTTP request**: you need to disable Apple Transport Security (ATS) feature. There're two options:
-1. Disable ATS for a specific domain only: (add following codes to your `Info.plist` file)
+1. Disable ATS for a specific domain only ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsexceptiondomains)): (add following codes to your `Info.plist` file)
 ```xml
 <key>NSAppTransportSecurity</key>
 <dict>
@@ -89,7 +89,7 @@ Instead, if you have already a non-swift project, you can check this issue to so
   </dict>
 </dict>
 ```
-2. Completely disable ATS: (add following codes to your `Info.plist` file)
+2. Completely disable ATS ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloads)): (add following codes to your `Info.plist` file)
 ```xml
 <key>NSAppTransportSecurity</key>
 <dict>
@@ -98,8 +98,8 @@ Instead, if you have already a non-swift project, you can check this issue to so
 ```
 
 Other useful `Info.plist` properties are:
-* `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking);
-* `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent).
+* `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking));
+* `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent)).
 
 ## Getting Started
 

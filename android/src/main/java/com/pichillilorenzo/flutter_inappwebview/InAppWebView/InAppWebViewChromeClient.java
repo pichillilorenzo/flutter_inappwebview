@@ -1,17 +1,25 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
+import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
+import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
@@ -76,16 +84,18 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (mCustomView == null) {
       return null;
     }
-    return BitmapFactory.decodeResource(Shared.activity.getApplicationContext().getResources(), 2130837573);
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    return BitmapFactory.decodeResource(activity.getApplicationContext().getResources(), 2130837573);
   }
 
   @Override
   public void onHideCustomView() {
-    View decorView = Shared.activity.getWindow().getDecorView();
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    View decorView = activity.getWindow().getDecorView();
     ((FrameLayout) decorView).removeView(this.mCustomView);
     this.mCustomView = null;
     decorView.setSystemUiVisibility(this.mOriginalSystemUiVisibility);
-    Shared.activity.setRequestedOrientation(this.mOriginalOrientation);
+    activity.setRequestedOrientation(this.mOriginalOrientation);
     this.mCustomViewCallback.onCustomViewHidden();
     this.mCustomViewCallback = null;
 
@@ -96,18 +106,20 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   @Override
-  public void onShowCustomView(View paramView, CustomViewCallback paramCustomViewCallback) {
+  public void onShowCustomView(final View paramView, final CustomViewCallback paramCustomViewCallback) {
     if (this.mCustomView != null) {
       onHideCustomView();
       return;
     }
-    View decorView = Shared.activity.getWindow().getDecorView();
+
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    final View decorView = activity.getWindow().getDecorView();
     this.mCustomView = paramView;
     this.mOriginalSystemUiVisibility = decorView.getSystemUiVisibility();
-    this.mOriginalOrientation = Shared.activity.getRequestedOrientation();
+    this.mOriginalOrientation = activity.getRequestedOrientation();
     this.mCustomViewCallback = paramCustomViewCallback;
     this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
-    ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(-1, -1));
+    ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       decorView.setSystemUiVisibility(
               View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
@@ -200,7 +212,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity, R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, clickListener);
@@ -291,7 +305,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity, R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
@@ -408,7 +424,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     };
 
-    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(Shared.activity, R.style.Theme_AppCompat_Dialog_Alert);
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+
+    AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity, R.style.Theme_AppCompat_Dialog_Alert);
     alertDialogBuilder.setMessage(alertMessage);
     if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
       alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
@@ -561,13 +579,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   // For Android 3.0+
   public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-
     mUploadMessage = uploadMsg;
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("image/*");
-    Shared.activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
-
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
   }
 
   // For Android 3.0+
@@ -576,7 +593,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("*/*");
-    Shared.activity.startActivityForResult(
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    activity.startActivityForResult(
             Intent.createChooser(i, "File Browser"),
             FILECHOOSER_RESULTCODE);
   }
@@ -587,8 +605,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Intent i = new Intent(Intent.ACTION_GET_CONTENT);
     i.addCategory(Intent.CATEGORY_OPENABLE);
     i.setType("image/*");
-    Shared.activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
-
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
   }
 
   // For Android 5.0+
@@ -605,7 +623,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
       chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
       chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-      Shared.activity.startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
+      Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+      activity.startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
     } catch (ActivityNotFoundException e) {
       e.printStackTrace();
       return false;

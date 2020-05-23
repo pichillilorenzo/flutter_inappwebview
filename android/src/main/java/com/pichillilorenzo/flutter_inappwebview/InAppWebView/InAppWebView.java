@@ -1496,12 +1496,6 @@ final public class InAppWebView extends InputAwareWebView {
     sendOnCreateContextMenuEvent();
   }
 
-  @Override
-  public boolean onCheckIsTextEditor() {
-    Log.d(LOG_TAG, "onCheckIsTextEditor");
-    return super.onCheckIsTextEditor();
-  }
-
   private void sendOnCreateContextMenuEvent() {
     HitTestResult hitTestResult = getHitTestResult();
     Map<String, Object> hitTestResultMap = new HashMap<>();

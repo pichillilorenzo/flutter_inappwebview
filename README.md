@@ -22,7 +22,19 @@ If you are starting a new fresh app, you need to create the Flutter App with `fl
 
 During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `android/app/build.gradle` file to at least `17`.
 
-Also, you need to add `<uses-permission android:name="android.permission.INTERNET"/>` in the `android/app/src/main/AndroidManifest.xml` file in order to give minimum permission to perform network operations in your application. 
+Also, you need to add `<uses-permission android:name="android.permission.INTERNET"/>` in the `android/app/src/main/AndroidManifest.xml` file in order to give minimum permission to perform network operations in your application.
+
+If you `flutter create`d your project prior to version `1.12`, you need to make sure to update your project in order to use the new **Java Embedding API**!
+Take a look at the official Flutter wiki: [Upgrading pre 1.12 Android projects](https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects).
+Also, you can refer to the [#343](https://github.com/pichillilorenzo/flutter_inappwebview/issues/343) issue.
+Remember to add `<meta-data>` tag inside the `<application>` tag of your `android/app/src/main/AndroidManifest.xml`:
+```xml
+<meta-data
+  android:name="flutterEmbedding"
+  android:value="2" />
+```
+as mentioned in the 6th step of [Full-Flutter app migration](https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects#full-flutter-app-migration) guide.
+**Without this, the plugin will NOT work!!!**
 
 Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0`.
 
@@ -54,6 +66,40 @@ end
 ```
 
 Instead, if you have already a non-swift project, you can check this issue to solve the problem: [Friction adding swift plugin to objective-c project](https://github.com/flutter/flutter/issues/16049).
+
+**Support HTTP request**: you need to disable Apple Transport Security (ATS) feature. There're two options:
+1. Disable ATS for a specific domain only: (add following codes to your `Info.plist` file)
+```xml
+<key>NSAppTransportSecurity</key>
+<dict>
+  <key>NSExceptionDomains</key>
+  <dict>
+    <key>www.yourserver.com</key>
+    <dict>
+      <!-- add this key to enable subdomains such as sub.yourserver.com -->
+      <key>NSIncludesSubdomains</key>
+      <true/>
+      <!-- add this key to allow standard HTTP requests, thus negating the ATS -->
+      <key>NSTemporaryExceptionAllowsInsecureHTTPLoads</key>
+      <true/>
+      <!-- add this key to specify the minimum TLS version to accept -->
+      <key>NSTemporaryExceptionMinimumTLSVersion</key>
+      <string>TLSv1.1</string>
+    </dict>
+  </dict>
+</dict>
+```
+2. Completely disable ATS: (add following codes to your `Info.plist` file)
+```xml
+<key>NSAppTransportSecurity</key>
+<dict>
+    <key>NSAllowsArbitraryLoads</key><true/>
+</dict>
+```
+
+Other useful `Info.plist` properties are:
+* `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking);
+* `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent).
 
 ## Getting Started
 

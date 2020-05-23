@@ -5,6 +5,7 @@
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
 - Added `onEnterFullscreen`, `onExitFullscreen` webview events
 - Fixed `Print preview is not working? java.lang.IllegalStateException: Can print only from an activity` [#128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/128)
+- Fixed `onJsAlert`, `onJsConfirm`, `onJsPrompt` for `InAppBrowser` on Android
 
 ## 3.2.0
 

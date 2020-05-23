@@ -34,10 +34,10 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        let uuid: String = arguments!["uuid"] as! String
 
         switch call.method {
             case "openUrl":
+                let uuid = arguments!["uuid"] as! String
                 let url = arguments!["url"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let headers = arguments!["headers"] as! [String: String]
@@ -46,6 +46,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 result(true)
                 break
             case "openFile":
+                let uuid = arguments!["uuid"] as! String
                 var url = arguments!["url"] as! String
                 let key = InAppBrowserManager.registrar!.lookupKey(forAsset: url)
                 let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
@@ -62,6 +63,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 result(true)
                 break
             case "openData":
+                let uuid = arguments!["uuid"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let data = arguments!["data"] as! String
                 let mimeType = arguments!["mimeType"] as! String

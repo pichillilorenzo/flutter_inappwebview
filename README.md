@@ -7,7 +7,7 @@
 [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/LorenzoPichilli)
 [![Donate to this project using Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=9269604)
 
-A Flutter plugin that allows you to add an inline webview or open an in-app browser window.
+A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
 ### Requirements
 
@@ -16,13 +16,32 @@ A Flutter plugin that allows you to add an inline webview or open an in-app brow
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
+### IMPORTANT Note for Android and iOS
+
+If you're running an application and need to access the binary messenger before `runApp()` has been called
+(for example, during plugin initialization), then you need to explicitly call the `WidgetsFlutterBinding.ensureInitialized()` first.
+
+An example:
+```dart
+void main() {
+  // it should be the first line in main method
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // rest of your app code
+  runApp(MyApp());
+}
+```
+
 ### IMPORTANT Note for Android
 
-If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift` to add support for `androidx`, otherwise it won't work (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app).
+If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift`
+to add support for `androidx`, otherwise it won't work (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app).
 
-During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`, it means that you need to update the `minSdkVersion` of your `android/app/build.gradle` file to at least `17`.
+During the build, if Android fails with `Error: uses-sdk:minSdkVersion 16 cannot be smaller than version 17 declared in library`,
+it means that you need to update the `minSdkVersion` of your `android/app/build.gradle` file to at least `17`.
 
-Also, you need to add `<uses-permission android:name="android.permission.INTERNET"/>` in the `android/app/src/main/AndroidManifest.xml` file in order to give minimum permission to perform network operations in your application.
+Also, you need to add `<uses-permission android:name="android.permission.INTERNET"/>` in the `android/app/src/main/AndroidManifest.xml`
+file in order to give minimum permission to perform network operations in your application.
 
 If you `flutter create`d your project prior to version `1.12`, you need to make sure to update your project in order to use the new **Java Embedding API**!
 Take a look at the official Flutter wiki: [Upgrading pre 1.12 Android projects](https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects).
@@ -42,7 +61,8 @@ Also, note that to use the `InAppWebView` widget on Android, it requires **Andro
 
 ### IMPORTANT Note for iOS
 
-If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift` (see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
+If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift`
+(see [flutter/flutter#13422 (comment)](https://github.com/flutter/flutter/issues/13422#issuecomment-392133780)), otherwise, you will get this message:
 ```
 === BUILD TARGET flutter_inappwebview OF PROJECT Pods WITH CONFIGURATION Debug ===
 The “Swift Language Version” (SWIFT_VERSION) build setting must be set to a supported value for targets which use Swift. Supported values are: 3.0, 4.0, 4.2, 5.0. This setting can be set in the build settings editor.

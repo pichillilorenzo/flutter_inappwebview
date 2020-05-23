@@ -57,6 +57,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    if (savedInstanceState != null) {
+      return;
+    }
+
     Bundle b = getIntent().getExtras();
     uuid = b.getString("uuid");
 

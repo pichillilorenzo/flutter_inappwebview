@@ -440,6 +440,12 @@ class InAppBrowser {
   ///[hitTestResult] represents the hit result for hitting an HTML elements.
   void onLongPressHitTestResult(InAppWebViewHitTestResult hitTestResult) {}
 
+  ///Event fired when the current page has entered full screen mode.
+  void onEnterFullscreen() {}
+
+  ///Event fired when the current page has exited full screen mode.
+  void onExitFullscreen() {}
+
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///

@@ -237,6 +237,12 @@ abstract class WebView {
   final void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult) onLongPressHitTestResult;
 
+  ///Event fired when the current page has entered full screen mode.
+  final void Function(InAppWebViewController controller) onEnterFullscreen;
+
+  ///Event fired when the current page has exited full screen mode.
+  final void Function(InAppWebViewController controller) onExitFullscreen;
+
   ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
@@ -341,6 +347,8 @@ abstract class WebView {
     this.onUpdateVisitedHistory,
     this.onPrint,
     this.onLongPressHitTestResult,
+    this.onEnterFullscreen,
+    this.onExitFullscreen,
     this.androidOnSafeBrowsingHit,
     this.androidOnPermissionRequest,
     this.androidOnGeolocationPermissionsShowPrompt,

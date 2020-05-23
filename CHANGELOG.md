@@ -3,7 +3,8 @@
 - Updated Android context menu workaround
 - Calling `onCreateContextMenu` event on iOS also when the context menu is disabled in order to have the same effect as Android
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
-- Added `onEnterFullscreen`, `onExitFullscreen` webview events
+- Added `onEnterFullscreen`, `onExitFullscreen` webview events [#275](https://github.com/pichillilorenzo/flutter_inappwebview/issues/275)
+- Added Android support to use camera on HTML inputs that requires it, such as `<input type="file" accept="image/*" capture>` [#353](https://github.com/pichillilorenzo/flutter_inappwebview/issues/353)
 - Fixed `Print preview is not working? java.lang.IllegalStateException: Can print only from an activity` [#128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/128)
 - Fixed `onJsAlert`, `onJsConfirm`, `onJsPrompt` for `InAppBrowser` on Android
 - Fixed `InAppBrowser.openWithSystemBrowser crash on iOS` [#358](https://github.com/pichillilorenzo/flutter_inappwebview/issues/358)

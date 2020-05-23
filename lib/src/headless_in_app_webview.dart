@@ -45,6 +45,8 @@ class HeadlessInAppWebView implements WebView {
     this.onUpdateVisitedHistory,
     this.onPrint,
     this.onLongPressHitTestResult,
+    this.onEnterFullscreen,
+    this.onExitFullscreen,
     this.androidOnSafeBrowsingHit,
     this.androidOnPermissionRequest,
     this.androidOnGeolocationPermissionsShowPrompt,
@@ -268,4 +270,10 @@ class HeadlessInAppWebView implements WebView {
       InAppWebViewController controller,
       ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest)
   shouldOverrideUrlLoading;
+
+  @override
+  final void Function(InAppWebViewController controller) onEnterFullscreen;
+
+  @override
+  final void Function(InAppWebViewController controller) onExitFullscreen;
 }

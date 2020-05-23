@@ -68,6 +68,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onUpdateVisitedHistory,
     this.onPrint,
     this.onLongPressHitTestResult,
+    this.onEnterFullscreen,
+    this.onExitFullscreen,
     this.androidOnSafeBrowsingHit,
     this.androidOnPermissionRequest,
     this.androidOnGeolocationPermissionsShowPrompt,
@@ -246,6 +248,12 @@ class InAppWebView extends StatefulWidget implements WebView {
           InAppWebViewController controller,
           ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest)
       shouldOverrideUrlLoading;
+
+  @override
+  final void Function(InAppWebViewController controller) onEnterFullscreen;
+
+  @override
+  final void Function(InAppWebViewController controller) onExitFullscreen;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

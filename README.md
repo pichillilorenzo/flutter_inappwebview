@@ -121,6 +121,37 @@ Other useful `Info.plist` properties are:
 * `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking));
 * `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent)).
 
+### How to enable the usage of camera for HTML inputs such as `<input type="file" accept="image/*" capture>`
+
+In order to be able to use camera, for example, for taking images through `<input type="file" accept="image/*" capture>` HTML tag, you need to ask camera permission.
+To ask camera permission, you can simply use the [permission_handler](https://pub.dev/packages/permission_handler) plugin!
+
+Example:
+```dart
+import 'package:permission_handler/permission_handler.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Permission.camera.request();
+
+  runApp(MyApp());
+}
+```
+
+On **Android**, you need to add some additional configurations.
+Add the following codes inside the `<application>` tag of your `android/app/src/main/AndroidManifest.xml`:
+```xml
+<provider
+    android:name="androidx.core.content.FileProvider"
+    android:authorities="${applicationId}.flutter_inappwebview.fileprovider"
+    android:exported="false"
+    android:grantUriPermissions="true">
+    <meta-data
+        android:name="android.support.FILE_PROVIDER_PATHS"
+        android:resource="@xml/provider_paths" />
+</provider>
+```
+
 ## Getting Started
 
 For help getting started with Flutter, view our online
@@ -566,6 +597,8 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `shouldInterceptFetchRequest`: Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API) (to use this event, the `useShouldInterceptFetchRequest` option must be `true`).
 * `onPrint`: Event fired when `window.print()` is called from JavaScript side.
 * `onLongPressHitTestResult`: Event fired when an HTML element of the webview has been clicked and held.
+* `onEnterFullscreen`: Event fired when the current page has entered full screen mode.
+* `onExitFullscreen`: Event fired when the current page has exited full screen mode.
 * `androidOnSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).

@@ -433,6 +433,20 @@ class InAppWebViewController {
           }
         }
         break;
+      case "onEnterFullscreen":
+        if (_webview != null &&
+            _webview.onEnterFullscreen != null)
+          _webview.onEnterFullscreen(this);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onEnterFullscreen();
+        break;
+      case "onExitFullscreen":
+        if (_webview != null &&
+            _webview.onExitFullscreen != null)
+          _webview.onExitFullscreen(this);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onExitFullscreen();
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json

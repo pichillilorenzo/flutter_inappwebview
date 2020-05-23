@@ -28,7 +28,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public static MyCookieManager myCookieManager;
   public static CredentialDatabaseHandler credentialDatabaseHandler;
   public static MyWebStorage myWebStorage;
-  public static ValueCallback<Uri[]> uploadMessageArray;
+  public static ValueCallback<Uri> filePathCallbackLegacy;
+  public static ValueCallback<Uri[]> filePathCallback;
 
   public InAppWebViewFlutterPlugin() {}
 
@@ -95,7 +96,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
       inAppWebViewStatic.dispose();
       inAppWebViewStatic = null;
     }
-    uploadMessageArray = null;
+    filePathCallbackLegacy = null;
+    filePathCallback = null;
   }
 
   @Override

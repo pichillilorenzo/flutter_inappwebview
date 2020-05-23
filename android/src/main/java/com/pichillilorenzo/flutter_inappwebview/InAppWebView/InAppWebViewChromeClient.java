@@ -1,20 +1,21 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
-import android.annotation.SuppressLint;
+import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
 import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.content.pm.ActivityInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
+import android.os.Environment;
 import android.os.Message;
+import android.os.Parcelable;
+import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -24,6 +25,7 @@ import android.webkit.ConsoleMessage;
 import android.webkit.GeolocationPermissions;
 import android.webkit.JsPromptResult;
 import android.webkit.JsResult;
+import android.webkit.MimeTypeMap;
 import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
@@ -33,13 +35,18 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -49,7 +56,6 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.PluginRegistry;
 
-import static android.app.Activity.RESULT_CANCELED;
 import static android.app.Activity.RESULT_OK;
 
 public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener {
@@ -58,8 +64,31 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
   public MethodChannel channel;
-  private ValueCallback<Uri> mUploadMessage;
-  private final static int FILECHOOSER_RESULTCODE = 1;
+
+  private static final String fileProviderAuthorityExtension = "flutter_inappwebview.fileprovider";
+
+  private static final int PICKER = 1;
+  private static final int PICKER_LEGACY = 3;
+  final String DEFAULT_MIME_TYPES = "*/*";
+  private Uri outputFileUri;
+
+  protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
+          ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
+
+  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+  protected static final int FULLSCREEN_SYSTEM_UI_VISIBILITY_KITKAT = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+          View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+          View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+          View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+          View.SYSTEM_UI_FLAG_FULLSCREEN |
+          View.SYSTEM_UI_FLAG_IMMERSIVE |
+          View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+
+  protected static final int FULLSCREEN_SYSTEM_UI_VISIBILITY = View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION |
+          View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN |
+          View.SYSTEM_UI_FLAG_LAYOUT_STABLE |
+          View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
+          View.SYSTEM_UI_FLAG_FULLSCREEN;
 
   private View mCustomView;
   private WebChromeClient.CustomViewCallback mCustomViewCallback;
@@ -91,13 +120,15 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onHideCustomView() {
     Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
-    View decorView = activity.getWindow().getDecorView();
+
+    View decorView = getRootView();
     ((FrameLayout) decorView).removeView(this.mCustomView);
     this.mCustomView = null;
     decorView.setSystemUiVisibility(this.mOriginalSystemUiVisibility);
     activity.setRequestedOrientation(this.mOriginalOrientation);
     this.mCustomViewCallback.onCustomViewHidden();
     this.mCustomViewCallback = null;
+    activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
@@ -113,35 +144,21 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
-    final View decorView = activity.getWindow().getDecorView();
+
+    View decorView = getRootView();
     this.mCustomView = paramView;
     this.mOriginalSystemUiVisibility = decorView.getSystemUiVisibility();
     this.mOriginalOrientation = activity.getRequestedOrientation();
     this.mCustomViewCallback = paramCustomViewCallback;
-    this.mCustomView.setBackgroundColor(Color.parseColor("#000000"));
-    ((FrameLayout) decorView).addView(this.mCustomView, new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    this.mCustomView.setBackgroundColor(Color.BLACK);
+
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      decorView.setSystemUiVisibility(
-              View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-              // Set the content to appear under the system bars so that the
-              // content doesn't resize when the system bars hide and show.
-              | View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-              // Hide the nav bar and status bar
-              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+      decorView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY_KITKAT);
     } else {
-      decorView.setSystemUiVisibility(
-              // Set the content to appear under the system bars so that the
-              // content doesn't resize when the system bars hide and show.
-              View.SYSTEM_UI_FLAG_LAYOUT_STABLE
-              | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-              // Hide the nav bar and status bar
-              | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-              | View.SYSTEM_UI_FLAG_FULLSCREEN);
+      decorView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY);
     }
+    activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
+    ((FrameLayout) decorView).addView(this.mCustomView, FULLSCREEN_LAYOUT_PARAMS);
 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
@@ -577,68 +594,321 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     super.onReceivedIcon(view, icon);
   }
 
-  // For Android 3.0+
-  public void openFileChooser(ValueCallback<Uri> uploadMsg) {
-    mUploadMessage = uploadMsg;
-    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-    i.addCategory(Intent.CATEGORY_OPENABLE);
-    i.setType("image/*");
+  protected ViewGroup getRootView() {
     Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
-    activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+    return (ViewGroup) activity.findViewById(android.R.id.content);
   }
 
-  // For Android 3.0+
-  public void openFileChooser(ValueCallback uploadMsg, String acceptType) {
-    mUploadMessage = uploadMsg;
-    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-    i.addCategory(Intent.CATEGORY_OPENABLE);
-    i.setType("*/*");
-    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
-    activity.startActivityForResult(
-            Intent.createChooser(i, "File Browser"),
-            FILECHOOSER_RESULTCODE);
+  protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
+    startPhotoPickerIntent(filePathCallback, acceptType);
   }
 
-  // For Android 4.1
-  public void openFileChooser(ValueCallback<Uri> uploadMsg, String acceptType, String capture) {
-    mUploadMessage = uploadMsg;
-    Intent i = new Intent(Intent.ACTION_GET_CONTENT);
-    i.addCategory(Intent.CATEGORY_OPENABLE);
-    i.setType("image/*");
-    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
-    activity.startActivityForResult(Intent.createChooser(i, "File Chooser"), FILECHOOSER_RESULTCODE);
+  protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
+    startPhotoPickerIntent(filePathCallback, "");
   }
 
-  // For Android 5.0+
-  public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
-    InAppWebViewFlutterPlugin.uploadMessageArray = filePathCallback;
-    try {
-      Intent contentSelectionIntent = new Intent(Intent.ACTION_GET_CONTENT);
-      contentSelectionIntent.addCategory(Intent.CATEGORY_OPENABLE);
-      contentSelectionIntent.setType("*/*");
-      Intent[] intentArray;
-      intentArray = new Intent[0];
-
-      Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-      chooserIntent.putExtra(Intent.EXTRA_INTENT, contentSelectionIntent);
-      chooserIntent.putExtra(Intent.EXTRA_TITLE, "Image Chooser");
-      chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, intentArray);
-      Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
-      activity.startActivityForResult(chooserIntent, FILECHOOSER_RESULTCODE);
-    } catch (ActivityNotFoundException e) {
-      e.printStackTrace();
-      return false;
-    }
-    return true;
+  protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
+    startPhotoPickerIntent(filePathCallback, acceptType);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
   @Override
+  public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
+    String[] acceptTypes = fileChooserParams.getAcceptTypes();
+    boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
+    Intent intent = fileChooserParams.createIntent();
+    return startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+  }
+
+  @Override
   public boolean onActivityResult(int requestCode, int resultCode, Intent data) {
-    if (requestCode == FILECHOOSER_RESULTCODE && (resultCode == RESULT_OK || resultCode == RESULT_CANCELED)) {
-      InAppWebViewFlutterPlugin.uploadMessageArray.onReceiveValue(WebChromeClient.FileChooserParams.parseResult(resultCode, data));
+    if (InAppWebViewFlutterPlugin.filePathCallback == null && InAppWebViewFlutterPlugin.filePathCallbackLegacy == null) {
+      return true;
     }
+
+    // based off of which button was pressed, we get an activity result and a file
+    // the camera activity doesn't properly return the filename* (I think?) so we use
+    // this filename instead
+    switch (requestCode) {
+      case PICKER:
+        if (resultCode != RESULT_OK) {
+          if (InAppWebViewFlutterPlugin.filePathCallback != null) {
+            InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(null);
+          }
+        } else {
+          Uri result[] = this.getSelectedFiles(data, resultCode);
+          if (result != null) {
+            InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(result);
+          } else {
+            InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(new Uri[]{outputFileUri});
+          }
+        }
+        break;
+      case PICKER_LEGACY:
+        Uri result = resultCode != Activity.RESULT_OK ? null : data == null ? outputFileUri : data.getData();
+        InAppWebViewFlutterPlugin.filePathCallbackLegacy.onReceiveValue(result);
+        break;
+
+    }
+    InAppWebViewFlutterPlugin.filePathCallback = null;
+    InAppWebViewFlutterPlugin.filePathCallbackLegacy = null;
+    outputFileUri = null;
+
     return true;
+  }
+
+  private Uri[] getSelectedFiles(Intent data, int resultCode) {
+    if (data == null) {
+      return null;
+    }
+
+    // we have one file selected
+    if (data.getData() != null) {
+      if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+        return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
+      } else {
+        return null;
+      }
+    }
+
+    // we have multiple files selected
+    if (data.getClipData() != null) {
+      final int numSelectedFiles = data.getClipData().getItemCount();
+      Uri[] result = new Uri[numSelectedFiles];
+      for (int i = 0; i < numSelectedFiles; i++) {
+        result[i] = data.getClipData().getItemAt(i).getUri();
+      }
+      return result;
+    }
+    return null;
+  }
+
+  public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
+    InAppWebViewFlutterPlugin.filePathCallbackLegacy = filePathCallback;
+
+    Intent fileChooserIntent = getFileChooserIntent(acceptType);
+    Intent chooserIntent = Intent.createChooser(fileChooserIntent, "");
+
+    ArrayList<Parcelable> extraIntents = new ArrayList<>();
+    if (acceptsImages(acceptType)) {
+      extraIntents.add(getPhotoIntent());
+    }
+    if (acceptsVideo(acceptType)) {
+      extraIntents.add(getVideoIntent());
+    }
+    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
+      activity.startActivityForResult(chooserIntent, PICKER_LEGACY);
+    } else {
+      Log.d(LOG_TAG, "there is no Activity to handle this Intent");
+    }
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
+    InAppWebViewFlutterPlugin.filePathCallback = callback;
+
+    ArrayList<Parcelable> extraIntents = new ArrayList<>();
+    if (!needsCameraPermission()) {
+      if (acceptsImages(acceptTypes)) {
+        extraIntents.add(getPhotoIntent());
+      }
+      if (acceptsVideo(acceptTypes)) {
+        extraIntents.add(getVideoIntent());
+      }
+    }
+
+    Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+
+    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
+    chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
+    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
+      activity.startActivityForResult(chooserIntent, PICKER);
+    } else {
+      Log.d(LOG_TAG, "there is no Activity to handle this Intent");
+    }
+
+    return true;
+  }
+
+  protected boolean needsCameraPermission() {
+    boolean needed = false;
+
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    PackageManager packageManager = activity.getPackageManager();
+    try {
+      String[] requestedPermissions = packageManager.getPackageInfo(activity.getApplicationContext().getPackageName(), PackageManager.GET_PERMISSIONS).requestedPermissions;
+      if (Arrays.asList(requestedPermissions).contains(Manifest.permission.CAMERA)
+              && ContextCompat.checkSelfPermission(activity, Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
+        needed = true;
+      }
+    } catch (PackageManager.NameNotFoundException e) {
+      needed = true;
+    }
+
+    return needed;
+  }
+
+  private Intent getPhotoIntent() {
+    Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+    outputFileUri = getOutputUri(MediaStore.ACTION_IMAGE_CAPTURE);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    return intent;
+  }
+
+  private Intent getVideoIntent() {
+    Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
+    outputFileUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    return intent;
+  }
+
+  private Intent getFileChooserIntent(String acceptTypes) {
+    String _acceptTypes = acceptTypes;
+    if (acceptTypes.isEmpty()) {
+      _acceptTypes = DEFAULT_MIME_TYPES;
+    }
+    if (acceptTypes.matches("\\.\\w+")) {
+      _acceptTypes = getMimeTypeFromExtension(acceptTypes.replace(".", ""));
+    }
+    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType(_acceptTypes);
+    return intent;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+  private Intent getFileChooserIntent(String[] acceptTypes, boolean allowMultiple) {
+    Intent intent = new Intent(Intent.ACTION_GET_CONTENT);
+    intent.addCategory(Intent.CATEGORY_OPENABLE);
+    intent.setType("*/*");
+    intent.putExtra(Intent.EXTRA_MIME_TYPES, getAcceptedMimeType(acceptTypes));
+    intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, allowMultiple);
+    return intent;
+  }
+
+  private Boolean acceptsImages(String types) {
+    String mimeType = types;
+    if (types.matches("\\.\\w+")) {
+      mimeType = getMimeTypeFromExtension(types.replace(".", ""));
+    }
+    return mimeType.isEmpty() || mimeType.toLowerCase().contains("image");
+  }
+
+  private Boolean acceptsImages(String[] types) {
+    String[] mimeTypes = getAcceptedMimeType(types);
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image");
+  }
+
+  private Boolean acceptsVideo(String types) {
+    String mimeType = types;
+    if (types.matches("\\.\\w+")) {
+      mimeType = getMimeTypeFromExtension(types.replace(".", ""));
+    }
+    return mimeType.isEmpty() || mimeType.toLowerCase().contains("video");
+  }
+
+  private Boolean acceptsVideo(String[] types) {
+    String[] mimeTypes = getAcceptedMimeType(types);
+    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "video");
+  }
+
+  private Boolean arrayContainsString(String[] array, String pattern) {
+    for (String content : array) {
+      if (content.contains(pattern)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private String[] getAcceptedMimeType(String[] types) {
+    if (isArrayEmpty(types)) {
+      return new String[]{DEFAULT_MIME_TYPES};
+    }
+    String[] mimeTypes = new String[types.length];
+    for (int i = 0; i < types.length; i++) {
+      String t = types[i];
+      // convert file extensions to mime types
+      if (t.matches("\\.\\w+")) {
+        String mimeType = getMimeTypeFromExtension(t.replace(".", ""));
+        mimeTypes[i] = mimeType;
+      } else {
+        mimeTypes[i] = t;
+      }
+    }
+    return mimeTypes;
+  }
+
+  private String getMimeTypeFromExtension(String extension) {
+    String type = null;
+    if (extension != null) {
+      type = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+    }
+    return type;
+  }
+
+  private Uri getOutputUri(String intentType) {
+    File capturedFile = null;
+    try {
+      capturedFile = getCapturedFile(intentType);
+    } catch (IOException e) {
+      Log.e(LOG_TAG, "Error occurred while creating the File", e);
+      e.printStackTrace();
+    }
+
+    // for versions below 6.0 (23) we use the old File creation & permissions model
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      return Uri.fromFile(capturedFile);
+    }
+
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    // for versions 6.0+ (23) we use the FileProvider to avoid runtime permissions
+    String packageName = activity.getApplicationContext().getPackageName();
+    return FileProvider.getUriForFile(activity.getApplicationContext(), packageName + "." + fileProviderAuthorityExtension, capturedFile);
+  }
+
+  private File getCapturedFile(String intentType) throws IOException {
+    String prefix = "";
+    String suffix = "";
+    String dir = "";
+    String filename = "";
+
+    if (intentType.equals(MediaStore.ACTION_IMAGE_CAPTURE)) {
+      prefix = "image-";
+      suffix = ".jpg";
+      dir = Environment.DIRECTORY_PICTURES;
+    } else if (intentType.equals(MediaStore.ACTION_VIDEO_CAPTURE)) {
+      prefix = "video-";
+      suffix = ".mp4";
+      dir = Environment.DIRECTORY_MOVIES;
+    }
+
+    filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
+
+    // for versions below 6.0 (23) we use the old File creation & permissions model
+    if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
+      // only this Directory works on all tested Android versions
+      // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
+      File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+      return new File(storageDir, filename);
+    }
+
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+    File storageDir = activity.getApplicationContext().getExternalFilesDir(null);
+    return File.createTempFile(filename, suffix, storageDir);
+  }
+
+  private Boolean isArrayEmpty(String[] arr) {
+    // when our array returned from getAcceptTypes() has no values set from the webview
+    // i.e. <input type="file" />, without any "accept" attr
+    // will be an array with one empty string element, afaik
+    return arr.length == 0 || (arr.length == 1 && arr[0].length() == 0);
   }
 
   @Override

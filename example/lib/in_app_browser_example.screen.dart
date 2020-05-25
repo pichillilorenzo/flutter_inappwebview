@@ -101,7 +101,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                             useOnLoadResource: true,
                           ))));
                     },
-                    child: Text("Open Webview Browser")),
+                    child: Text("Open In-App Browser")),
                 Container(height: 40),
                 RaisedButton(
                     onPressed: () async {

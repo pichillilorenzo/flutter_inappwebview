@@ -5,9 +5,18 @@
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
 - Added `onEnterFullscreen`, `onExitFullscreen` webview events [#275](https://github.com/pichillilorenzo/flutter_inappwebview/issues/275)
 - Added Android support to use camera on HTML inputs that requires it, such as `<input type="file" accept="image/*" capture>` [#353](https://github.com/pichillilorenzo/flutter_inappwebview/issues/353)
+- Added `overScrollMode`, `networkAvailable`, `scrollBarStyle`, `verticalScrollbarPosition`, `scrollBarDefaultDelayBeforeFade`, `scrollbarFadingEnabled`, `scrollBarFadeDuration`, `rendererPriorityPolicy` webview options on Android
+- Added `pageDown`, `pageUp`, `saveWebArchive`, `zoomIn`, `zoomOut` webview methods on Android
+- Added `getCurrentWebViewPackage` static webview method on Android
+- Added `shouldInterceptRequest`, `onRenderProcessUnresponsive`, `onRenderProcessResponsive`, `onRenderProcessGone`, `onFormResubmission`, `onPageCommitVisible`, `onScaleChanged` Android events
 - Fixed `Print preview is not working? java.lang.IllegalStateException: Can print only from an activity` [#128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/128)
 - Fixed `onJsAlert`, `onJsConfirm`, `onJsPrompt` for `InAppBrowser` on Android
+- Fixed `onActivityResult` for `InAppBrowser` on Android
 - Fixed `InAppBrowser.openWithSystemBrowser crash on iOS` [#358](https://github.com/pichillilorenzo/flutter_inappwebview/issues/358)
+
+### BREAKING CHANGES
+
+- Android `clearClientCertPreferences`, `getSafeBrowsingPrivacyPolicyUrl`, `setSafeBrowsingWhitelist` webview methods are static now
 
 ## 3.2.0
 

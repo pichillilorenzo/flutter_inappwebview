@@ -76,13 +76,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     contextMenu: contextMenu,
-                    initialUrl: "https://www.youtube.com/watch?v=oD5RtLhhubg",
+                    initialUrl: "https://github.com/flutter",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true,
-                          disableContextMenu: true,
+                          debuggingEnabled: true
                         ),
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {

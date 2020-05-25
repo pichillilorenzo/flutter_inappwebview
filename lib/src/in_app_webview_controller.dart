@@ -1343,54 +1343,10 @@ class AndroidInAppWebViewController {
     return await _controller._channel.invokeMethod('startSafeBrowsing', args);
   }
 
-  ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
-  ///
-  /// Each rule should take one of these:
-  ///| Rule | Example | Matches Subdomain |
-  ///| -- | -- | -- |
-  ///| HOSTNAME | example.com | Yes |
-  ///| .HOSTNAME | .example.com | No |
-  ///| IPV4_LITERAL | 192.168.1.1 | No |
-  ///| IPV6_LITERAL_WITH_BRACKETS | [10:20:30:40:50:60:70:80] | No |
-  ///
-  ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
-  ///
-  ///[hosts] represents the list of hosts. This value must never be null.
-  ///
-  ///**NOTE**: available only on Android 27+.
-  Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
-    assert(hosts != null);
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('hosts', () => hosts);
-    return await _controller._channel
-        .invokeMethod('setSafeBrowsingWhitelist', args);
-  }
-
-  ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
-  ///
-  ///**NOTE**: available only on Android 27+.
-  Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    return await _controller._channel
-        .invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
-  }
-
   ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
   Future<void> clearSslPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _controller._channel.invokeMethod('clearSslPreferences', args);
-  }
-
-  ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
-  ///Note that WebView automatically clears these preferences when the system keychain is updated.
-  ///The preferences are shared by all the WebViews that are created by the embedder application.
-  ///
-  ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
-  ///
-  ///**NOTE**: available on Android 21+.
-  Future<void> clearClientCertPreferences() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    await _controller._channel.invokeMethod('clearClientCertPreferences', args);
   }
 
   ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
@@ -1412,6 +1368,50 @@ class AndroidInAppWebViewController {
   Future<String> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('getOriginalUrl', args);
+  }
+
+  ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
+  ///Note that WebView automatically clears these preferences when the system keychain is updated.
+  ///The preferences are shared by all the WebViews that are created by the embedder application.
+  ///
+  ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
+  ///
+  ///**NOTE**: available on Android 21+.
+  static Future<void> clearClientCertPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await InAppWebViewController._staticChannel.invokeMethod('clearClientCertPreferences', args);
+  }
+
+  ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
+  ///
+  ///**NOTE**: available only on Android 27+.
+  static Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await InAppWebViewController._staticChannel
+        .invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
+  }
+
+  ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
+  ///
+  /// Each rule should take one of these:
+  ///| Rule | Example | Matches Subdomain |
+  ///| -- | -- | -- |
+  ///| HOSTNAME | example.com | Yes |
+  ///| .HOSTNAME | .example.com | No |
+  ///| IPV4_LITERAL | 192.168.1.1 | No |
+  ///| IPV6_LITERAL_WITH_BRACKETS | [10:20:30:40:50:60:70:80] | No |
+  ///
+  ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
+  ///
+  ///[hosts] represents the list of hosts. This value must never be null.
+  ///
+  ///**NOTE**: available only on Android 27+.
+  static Future<bool> setSafeBrowsingWhitelist({@required List<String> hosts}) async {
+    assert(hosts != null);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('hosts', () => hosts);
+    return await InAppWebViewController._staticChannel
+        .invokeMethod('setSafeBrowsingWhitelist', args);
   }
 }
 

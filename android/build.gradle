@@ -45,8 +45,8 @@ android {
         }
     }
     dependencies {
-        implementation 'androidx.webkit:webkit:1.0.0'
-        implementation 'androidx.browser:browser:1.0.0'
+        implementation 'androidx.webkit:webkit:1.2.0'
+        implementation 'androidx.browser:browser:1.2.0'
         implementation 'androidx.appcompat:appcompat:1.0.0'
         implementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
     }

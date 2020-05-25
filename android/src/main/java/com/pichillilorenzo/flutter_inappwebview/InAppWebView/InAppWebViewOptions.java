@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.os.Build;
 import android.util.Log;
+import android.view.View;
 import android.webkit.WebSettings;
 
 import com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ChromeCustomTabsOptions;
@@ -86,6 +87,16 @@ public class InAppWebViewOptions implements Options {
   public Boolean hardwareAcceleration = true;
   public Boolean supportMultipleWindows = false;
   public String regexToCancelSubFramesLoading;
+
+  public Integer overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS;
+  public Boolean networkAvailable = null;
+  public Integer scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY;
+  public Integer verticalScrollbarPosition = View.SCROLLBAR_POSITION_DEFAULT;
+  public Integer scrollBarDefaultDelayBeforeFade = null;
+  public Boolean scrollbarFadingEnabled = true;
+  public Integer scrollBarFadeDuration = null;
+  public Map<String, Object> rendererPriorityPolicy = new HashMap<>();
+  public Boolean useShouldInterceptRequest = false;
 
   @Override
   public InAppWebViewOptions parse(HashMap<String, Object> options) {
@@ -295,6 +306,33 @@ public class InAppWebViewOptions implements Options {
         case "regexToCancelSubFramesLoading":
           regexToCancelSubFramesLoading = (String) value;
           break;
+        case "overScrollMode":
+          overScrollMode = (Integer) value;
+          break;
+        case "networkAvailable":
+          networkAvailable = (Boolean) value;
+          break;
+        case "scrollBarStyle":
+          scrollBarStyle = (Integer) value;
+          break;
+        case "verticalScrollbarPosition":
+          verticalScrollbarPosition = (Integer) value;
+          break;
+        case "scrollBarDefaultDelayBeforeFade":
+          scrollBarDefaultDelayBeforeFade = (Integer) value;
+          break;
+        case "scrollbarFadingEnabled":
+          scrollbarFadingEnabled = (Boolean) value;
+          break;
+        case "scrollBarFadeDuration":
+          scrollBarFadeDuration = (Integer) value;
+          break;
+        case "rendererPriorityPolicy":
+          rendererPriorityPolicy = (Map<String, Object>) value;
+          break;
+        case "useShouldInterceptRequest":
+          useShouldInterceptRequest = (Boolean) value;
+          break;
       }
     }
 
@@ -370,6 +408,15 @@ public class InAppWebViewOptions implements Options {
     options.put("hardwareAcceleration", hardwareAcceleration);
     options.put("supportMultipleWindows", supportMultipleWindows);
     options.put("regexToCancelSubFramesLoading", regexToCancelSubFramesLoading);
+    options.put("overScrollMode", overScrollMode);
+    options.put("networkAvailable", networkAvailable);
+    options.put("scrollBarStyle", scrollBarStyle);
+    options.put("verticalScrollbarPosition", verticalScrollbarPosition);
+    options.put("scrollBarDefaultDelayBeforeFade", scrollBarDefaultDelayBeforeFade);
+    options.put("scrollbarFadingEnabled", scrollbarFadingEnabled);
+    options.put("scrollBarFadeDuration", scrollBarFadeDuration);
+    options.put("rendererPriorityPolicy", rendererPriorityPolicy);
+    options.put("useShouldInterceptRequest", useShouldInterceptRequest);
     return options;
   }
 

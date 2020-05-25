@@ -12,7 +12,8 @@ import 'package:permission_handler/permission_handler.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Permission.camera.request();
+//  await Permission.camera.request();
+//  await Permission.storage.request();
   // await localhostServer.start();
   runApp(MyApp());
 }

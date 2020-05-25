@@ -1,12 +1,16 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.content.res.AssetManager;
+import android.os.Bundle;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Looper;
+import android.os.Parcelable;
 import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -115,7 +119,7 @@ public class Util {
     }
   }
 
-  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate( String certificatePath, String certificatePassword, String keyStoreType) {
+  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(String certificatePath, String certificatePassword, String keyStoreType) {
 
     PrivateKeyAndCertificates privateKeyAndCertificates = null;
 

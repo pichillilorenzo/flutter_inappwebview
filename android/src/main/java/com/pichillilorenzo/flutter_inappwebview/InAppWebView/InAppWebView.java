@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -35,6 +36,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.annotation.RequiresApi;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -69,6 +72,7 @@ final public class InAppWebView extends InputAwareWebView {
   public Object id;
   public InAppWebViewClient inAppWebViewClient;
   public InAppWebViewChromeClient inAppWebViewChromeClient;
+  public InAppWebViewRenderProcessClient inAppWebViewRenderProcessClient;
   public InAppWebViewOptions options;
   public boolean isLoading = false;
   public OkHttpClient httpClient;
@@ -636,6 +640,11 @@ final public class InAppWebView extends InputAwareWebView {
     inAppWebViewClient = new InAppWebViewClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
     setWebViewClient(inAppWebViewClient);
 
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
+      inAppWebViewRenderProcessClient = new InAppWebViewRenderProcessClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
+      WebViewCompat.setWebViewRenderProcessClient(this, inAppWebViewRenderProcessClient);
+    }
+
     if (options.useOnDownloadStart)
       setDownloadListener(new DownloadStartListener());
 
@@ -745,6 +754,33 @@ final public class InAppWebView extends InputAwareWebView {
     if (options.regexToCancelSubFramesLoading != null) {
       regexToCancelSubFramesLoadingCompiled = Pattern.compile(options.regexToCancelSubFramesLoading);
     }
+    setScrollBarStyle(options.scrollBarStyle);
+    if (options.scrollBarDefaultDelayBeforeFade != null) {
+      setScrollBarDefaultDelayBeforeFade(options.scrollBarDefaultDelayBeforeFade);
+    } else {
+      options.scrollBarDefaultDelayBeforeFade = getScrollBarDefaultDelayBeforeFade();
+    }
+    setScrollbarFadingEnabled(options.scrollbarFadingEnabled);
+    if (options.scrollBarFadeDuration != null) {
+      setScrollBarFadeDuration(options.scrollBarFadeDuration);
+    } else {
+      options.scrollBarFadeDuration = getScrollBarFadeDuration();
+    }
+    setVerticalScrollbarPosition(options.verticalScrollbarPosition);
+    setVerticalScrollBarEnabled(!options.disableVerticalScroll);
+    setHorizontalScrollBarEnabled(!options.disableHorizontalScroll);
+    setOverScrollMode(options.overScrollMode);
+    if (options.networkAvailable != null) {
+      setNetworkAvailable(options.networkAvailable);
+    }
+    if (options.rendererPriorityPolicy != null && !options.rendererPriorityPolicy.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      setRendererPriorityPolicy(
+              (int) options.rendererPriorityPolicy.get("rendererRequestedPriority"),
+              (boolean) options.rendererPriorityPolicy.get("waivedWhenNotVisible"));
+    } else if (options.rendererPriorityPolicy == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      options.rendererPriorityPolicy.put("rendererRequestedPriority", getRendererRequestedPriority());
+      options.rendererPriorityPolicy.put("waivedWhenNotVisible", getRendererPriorityWaivedWhenNotVisible());
+    }
 
     contentBlockerHandler.getRuleList().clear();
     for (Map<String, Map<String, Object>> contentBlocker : options.contentBlockers) {
@@ -766,9 +802,6 @@ final public class InAppWebView extends InputAwareWebView {
         channel.invokeMethod("onFindResultReceived", obj);
       }
     });
-
-    setVerticalScrollBarEnabled(!options.disableVerticalScroll);
-    setHorizontalScrollBarEnabled(!options.disableHorizontalScroll);
 
     gestureDetector = new GestureDetector(this.getContext(), new GestureDetector.SimpleOnGestureListener() {
       @Override
@@ -1300,11 +1333,41 @@ final public class InAppWebView extends InputAwareWebView {
       }
     }
 
+    if (newOptionsMap.get("scrollBarStyle") != null && !options.scrollBarStyle.equals(newOptions.scrollBarStyle))
+      setScrollBarStyle(newOptions.scrollBarStyle);
+
+    if (newOptionsMap.get("scrollBarDefaultDelayBeforeFade") != null && !options.scrollBarDefaultDelayBeforeFade.equals(newOptions.scrollBarDefaultDelayBeforeFade))
+      setScrollBarDefaultDelayBeforeFade(newOptions.scrollBarDefaultDelayBeforeFade);
+
+    if (newOptionsMap.get("scrollbarFadingEnabled") != null && !options.scrollbarFadingEnabled.equals(newOptions.scrollbarFadingEnabled))
+      setScrollbarFadingEnabled(newOptions.scrollbarFadingEnabled);
+
+    if (newOptionsMap.get("scrollBarFadeDuration") != null && !options.scrollBarFadeDuration.equals(newOptions.scrollBarFadeDuration))
+      setScrollBarFadeDuration(newOptions.scrollBarFadeDuration);
+
+    if (newOptionsMap.get("verticalScrollbarPosition") != null && !options.verticalScrollbarPosition.equals(newOptions.verticalScrollbarPosition))
+      setVerticalScrollbarPosition(newOptions.verticalScrollbarPosition);
+
     if (newOptionsMap.get("disableVerticalScroll") != null && options.disableVerticalScroll != newOptions.disableVerticalScroll)
       setVerticalScrollBarEnabled(!newOptions.disableVerticalScroll);
 
     if (newOptionsMap.get("disableHorizontalScroll") != null && options.disableHorizontalScroll != newOptions.disableHorizontalScroll)
       setHorizontalScrollBarEnabled(!newOptions.disableHorizontalScroll);
+
+    if (newOptionsMap.get("overScrollMode") != null && !options.overScrollMode.equals(newOptions.overScrollMode))
+      setOverScrollMode(newOptions.overScrollMode);
+
+    if (newOptionsMap.get("networkAvailable") != null && options.networkAvailable != newOptions.networkAvailable)
+      setNetworkAvailable(newOptions.networkAvailable);
+
+    if (newOptionsMap.get("rendererPriorityPolicy") != null &&
+            (options.rendererPriorityPolicy.get("rendererRequestedPriority") != newOptions.rendererPriorityPolicy.get("rendererRequestedPriority") ||
+            options.rendererPriorityPolicy.get("waivedWhenNotVisible") != newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible")) &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      setRendererPriorityPolicy(
+              (int) newOptions.rendererPriorityPolicy.get("rendererRequestedPriority"),
+              (boolean) newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible"));
+    }
 
     options = newOptions;
   }
@@ -1410,32 +1473,6 @@ final public class InAppWebView extends InputAwareWebView {
     obj.put("x", x);
     obj.put("y", y);
     channel.invokeMethod("onScrollChanged", obj);
-  }
-
-  public void startSafeBrowsing(final MethodChannel.Result result) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-      startSafeBrowsing(getContext(), new ValueCallback<Boolean>() {
-        @Override
-        public void onReceiveValue(Boolean value) {
-          result.success(value);
-        }
-      });
-    } else {
-      result.success(false);
-    }
-  }
-
-  public void setSafeBrowsingWhitelist(List<String> hosts, final MethodChannel.Result result) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-      setSafeBrowsingWhitelist(hosts, new ValueCallback<Boolean>() {
-        @Override
-        public void onReceiveValue(Boolean value) {
-          result.success(value);
-        }
-      });
-    } else {
-      result.success(false);
-    }
   }
 
   class DownloadStartListener implements DownloadListener {

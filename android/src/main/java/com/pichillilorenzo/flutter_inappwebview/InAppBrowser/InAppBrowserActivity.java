@@ -14,6 +14,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
@@ -23,6 +24,8 @@ import android.widget.SearchView;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions;
@@ -31,6 +34,7 @@ import com.pichillilorenzo.flutter_inappwebview.Shared;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -52,6 +56,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
   public ProgressBar progressBar;
   public boolean isHidden = false;
   public String fromActivity;
+  public List<ActivityResultListener> activityResultListeners = new ArrayList<>();
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -256,9 +261,6 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       case "startSafeBrowsing":
         startSafeBrowsing(result);
         break;
-      case "setSafeBrowsingWhitelist":
-        setSafeBrowsingWhitelist((List<String>) call.argument("hosts"), result);
-        break;
       case "clearCache":
         clearCache();
         result.success(true);
@@ -266,9 +268,6 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       case "clearSslPreferences":
         clearSslPreferences();
         result.success(true);
-        break;
-      case "clearClientCertPreferences":
-        clearClientCertPreferences(result);
         break;
       case "findAllAsync":
         String find = (String) call.argument("find");
@@ -726,18 +725,19 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
     return null;
   }
 
-  public void startSafeBrowsing(MethodChannel.Result result) {
-    if (webView != null)
-      webView.startSafeBrowsing(result);
-    else
+  public void startSafeBrowsing(final MethodChannel.Result result) {
+    if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.START_SAFE_BROWSING)) {
+      WebViewCompat.startSafeBrowsing(webView.getContext(), new ValueCallback<Boolean>() {
+        @Override
+        public void onReceiveValue(Boolean success) {
+          result.success(success);
+        }
+      });
+    }
+    else {
       result.success(false);
-  }
-
-  public void setSafeBrowsingWhitelist(List<String> hosts, MethodChannel.Result result) {
-    if (webView != null)
-      webView.setSafeBrowsingWhitelist(hosts, result);
-    else
-      result.success(false);
+    }
   }
 
   public void clearCache() {
@@ -748,19 +748,6 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
   public void clearSslPreferences() {
     if (webView != null)
       webView.clearSslPreferences();
-  }
-
-  public void clearClientCertPreferences(final MethodChannel.Result result) {
-    if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      webView.clearClientCertPreferences(new Runnable() {
-        @Override
-        public void run() {
-          result.success(true);
-        }
-      });
-    }
-    else
-      result.success(false);
   }
 
   public void findAllAsync(String find) {
@@ -867,7 +854,11 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    activityResultListeners.clear();
     if (webView != null) {
+      if (Shared.activityPluginBinding != null) {
+        Shared.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
+      }
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {
@@ -881,8 +872,25 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
   }
 
   @Override
+  protected void onActivityResult (int requestCode,
+                                   int resultCode,
+                                   Intent data) {
+    for (ActivityResultListener listener : activityResultListeners) {
+      if (listener.onActivityResult(requestCode, resultCode, data)) {
+        return;
+      }
+    }
+    super.onActivityResult(requestCode, resultCode, data);
+  }
+
+  @Override
   public void onDestroy() {
     dispose();
     super.onDestroy();
+  }
+
+  public interface ActivityResultListener {
+    /** @return true if the result has been handled. */
+    boolean onActivityResult(int requestCode, int resultCode, Intent data);
   }
 }

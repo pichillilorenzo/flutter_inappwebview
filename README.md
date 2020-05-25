@@ -142,7 +142,7 @@ On **Android**, you need to add some additional configurations.
 Add the following codes inside the `<application>` tag of your `android/app/src/main/AndroidManifest.xml`:
 ```xml
 <provider
-    android:name="androidx.core.content.FileProvider"
+    android:name="com.pichillilorenzo.flutter_inappwebview.InAppWebViewFileProvider"
     android:authorities="${applicationId}.flutter_inappwebview.fileprovider"
     android:exported="false"
     android:grantUriPermissions="true">

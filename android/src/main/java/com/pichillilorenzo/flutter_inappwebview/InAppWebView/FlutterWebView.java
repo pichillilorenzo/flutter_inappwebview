@@ -7,10 +7,14 @@ import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
 import android.view.View;
+import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -31,7 +35,7 @@ import static io.flutter.plugin.common.MethodChannel.Result;
 
 public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
-  static final String LOG_TAG = "FlutterWebView";
+  static final String LOG_TAG = "IAWFlutterWebView";
 
   public InAppWebView webView;
   public final MethodChannel channel;
@@ -253,24 +257,18 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         result.success((webView != null) ? webView.getCopyBackForwardList() : null);
         break;
       case "startSafeBrowsing":
-        if (webView != null)
-          webView.startSafeBrowsing(result);
-        else
-          result.success(false);
-        break;
-      case "setSafeBrowsingWhitelist":
-        if (webView != null) {
-          List<String> hosts = (List<String>) call.argument("hosts");
-          webView.setSafeBrowsingWhitelist(hosts, result);
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.START_SAFE_BROWSING)) {
+          WebViewCompat.startSafeBrowsing(webView.getContext(), new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean success) {
+              result.success(success);
+            }
+          });
         }
-        else
+        else {
           result.success(false);
-        break;
-      case "getSafeBrowsingPrivacyPolicyUrl":
-        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1) {
-          result.success(webView.getSafeBrowsingPrivacyPolicyUrl().toString());
-        } else
-          result.success(null);
+        }
         break;
       case "clearCache":
         if (webView != null)
@@ -281,18 +279,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null)
           webView.clearSslPreferences();
         result.success(true);
-        break;
-      case "clearClientCertPreferences":
-        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          webView.clearClientCertPreferences(new Runnable() {
-            @Override
-            public void run() {
-              result.success(true);
-            }
-          });
-        } else {
-          result.success(false);
-        }
         break;
       case "findAllAsync":
         if (webView != null) {
@@ -379,7 +365,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "zoomBy":
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          Float zoomFactor = (Float) call.argument("zoomFactor");
+          float zoomFactor = (float) call.argument("zoomFactor");
           webView.zoomBy(zoomFactor);
           result.success(true);
         } else {
@@ -410,6 +396,53 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(null);
         }
         break;
+
+
+
+      case "pageDown":
+        if (webView != null) {
+          boolean bottom = (boolean) call.argument("bottom");
+          result.success(webView.pageDown(bottom));
+        } else {
+          result.success(false);
+        }
+        break;
+      case "pageUp":
+        if (webView != null) {
+          boolean top = (boolean) call.argument("top");
+          result.success(webView.pageUp(top));
+        } else {
+          result.success(false);
+        }
+        break;
+      case "saveWebArchive":
+        if (webView != null) {
+          String basename = (String) call.argument("basename");
+          boolean autoname = (boolean) call.argument("autoname");
+          webView.saveWebArchive(basename, autoname, new ValueCallback<String>() {
+            @Override
+            public void onReceiveValue(String value) {
+              result.success(value);
+            }
+          });
+        } else {
+          result.success(null);
+        }
+        break;
+      case "zoomIn":
+        if (webView != null) {
+          result.success(webView.zoomIn());
+        } else {
+          result.success(false);
+        }
+        break;
+      case "zoomOut":
+        if (webView != null) {
+          result.success(webView.zoomOut());
+        } else {
+          result.success(false);
+        }
+        break;
       default:
         result.notImplemented();
     }
@@ -419,6 +452,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public void dispose() {
     channel.setMethodCallHandler(null);
     if (webView != null) {
+      if (Shared.activityPluginBinding != null) {
+        Shared.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
+      }
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {

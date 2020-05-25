@@ -58,7 +58,7 @@ import io.flutter.plugin.common.PluginRegistry;
 
 import static android.app.Activity.RESULT_OK;
 
-public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener {
+public class InAppWebViewChromeClient extends WebChromeClient implements PluginRegistry.ActivityResultListener, InAppBrowserActivity.ActivityResultListener {
 
   protected static final String LOG_TAG = "IABWebChromeClient";
   private FlutterWebView flutterWebView;
@@ -96,10 +96,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private int mOriginalSystemUiVisibility;
 
   public InAppWebViewChromeClient(Object obj) {
-    if (obj instanceof InAppBrowserActivity)
+    if (obj instanceof InAppBrowserActivity) {
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
-    else if (obj instanceof FlutterWebView)
+      this.inAppBrowserActivity.activityResultListeners.add(this);
+    }
+    else if (obj instanceof FlutterWebView) {
       this.flutterWebView = (FlutterWebView) obj;
+    }
     this.channel = (this.inAppBrowserActivity != null) ? this.inAppBrowserActivity.channel : this.flutterWebView.channel;
 
     if (Shared.registrar != null)

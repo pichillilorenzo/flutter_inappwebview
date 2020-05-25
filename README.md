@@ -779,6 +779,7 @@ Example:
 ```dart
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
@@ -845,44 +846,43 @@ class _MyAppState extends State<MyApp> {
     return Scaffold(
         appBar: AppBar(
             title: Text(
-          "HeadlessInAppWebView",
-        )),
-        drawer: myDrawer(context: context),
+              "HeadlessInAppWebView",
+            )),
         body: SafeArea(
-          child: Column(children: <Widget>[
-            Container(
-            padding: EdgeInsets.all(20.0),
-            child: Text(
-                "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
-          ),
-          Center(
-            child: RaisedButton(
-              onPressed: () async {
-                await headlessWebView.dispose();
-                await headlessWebView.run();
-              },
-              child: Text("Run HeadlessInAppWebView")),
-          ),
-          Center(
-            child: RaisedButton(
-              onPressed: () async {
-                try {
-                  await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
-                } on MissingPluginException catch(e) {
-                  print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
-                }
-              },
-              child: Text("Send console.log message")),
-          ),
-          Center(
-            child: RaisedButton(
-              onPressed: () {
-                headlessWebView.dispose();
-              },
-              child: Text("Dispose HeadlessInAppWebView")),
-          )
-        ])
-      )
+            child: Column(children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                    "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
+              ),
+              Center(
+                child: RaisedButton(
+                    onPressed: () async {
+                      await headlessWebView.dispose();
+                      await headlessWebView.run();
+                    },
+                    child: Text("Run HeadlessInAppWebView")),
+              ),
+              Center(
+                child: RaisedButton(
+                    onPressed: () async {
+                      try {
+                        await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
+                      } on MissingPluginException catch(e) {
+                        print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
+                      }
+                    },
+                    child: Text("Send console.log message")),
+              ),
+              Center(
+                child: RaisedButton(
+                    onPressed: () {
+                      headlessWebView.dispose();
+                    },
+                    child: Text("Dispose HeadlessInAppWebView")),
+              )
+            ])
+        )
     );
   }
 }

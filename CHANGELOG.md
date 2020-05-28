@@ -5,18 +5,21 @@
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
 - Added `onEnterFullscreen`, `onExitFullscreen` webview events [#275](https://github.com/pichillilorenzo/flutter_inappwebview/issues/275)
 - Added Android support to use camera on HTML inputs that requires it, such as `<input type="file" accept="image/*" capture>` [#353](https://github.com/pichillilorenzo/flutter_inappwebview/issues/353)
-- Added `overScrollMode`, `networkAvailable`, `scrollBarStyle`, `verticalScrollbarPosition`, `scrollBarDefaultDelayBeforeFade`, `scrollbarFadingEnabled`, `scrollBarFadeDuration`, `rendererPriorityPolicy` webview options on Android
+- Added `overScrollMode`, `networkAvailable`, `scrollBarStyle`, `verticalScrollbarPosition`, `scrollBarDefaultDelayBeforeFade`, `scrollbarFadingEnabled`, `scrollBarFadeDuration`, `rendererPriorityPolicy`, `useShouldInterceptRequest`, `useOnRenderProcessGone` webview options on Android
 - Added `pageDown`, `pageUp`, `saveWebArchive`, `zoomIn`, `zoomOut` webview methods on Android
 - Added `getCurrentWebViewPackage` static webview method on Android
-- Added `shouldInterceptRequest`, `onRenderProcessUnresponsive`, `onRenderProcessResponsive`, `onRenderProcessGone`, `onFormResubmission`, `onPageCommitVisible`, `onScaleChanged` Android events
+- Added `onPageCommitVisible` webview event
+- Added `androidShouldInterceptRequest`, `androidOnRenderProcessUnresponsive`, `androidOnRenderProcessResponsive`, `androidOnRenderProcessGone`, `androidOnFormResubmission`, `androidOnScaleChanged` Android events
 - Fixed `Print preview is not working? java.lang.IllegalStateException: Can print only from an activity` [#128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/128)
 - Fixed `onJsAlert`, `onJsConfirm`, `onJsPrompt` for `InAppBrowser` on Android
 - Fixed `onActivityResult` for `InAppBrowser` on Android
 - Fixed `InAppBrowser.openWithSystemBrowser crash on iOS` [#358](https://github.com/pichillilorenzo/flutter_inappwebview/issues/358)
+- Fixed `Attempt to invoke virtual method 'java.util.Set java.util.HashMap.entrySet()' on a null object reference` [#367](https://github.com/pichillilorenzo/flutter_inappwebview/issues/367)
 
 ### BREAKING CHANGES
 
 - Android `clearClientCertPreferences`, `getSafeBrowsingPrivacyPolicyUrl`, `setSafeBrowsingWhitelist` webview methods are static now
+- Removed iOS event `onDidCommit`; it has been renamed to `onPageCommitVisible` and made cross-platform
 
 ## 3.2.0
 

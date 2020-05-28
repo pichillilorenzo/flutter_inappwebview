@@ -39,7 +39,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialFile,
     this.initialData,
     this.initialHeaders = const {},
-    @required this.initialOptions,
+    this.initialOptions,
     this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
@@ -70,12 +70,18 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onLongPressHitTestResult,
     this.onEnterFullscreen,
     this.onExitFullscreen,
+    this.onPageCommitVisible,
     this.androidOnSafeBrowsingHit,
     this.androidOnPermissionRequest,
     this.androidOnGeolocationPermissionsShowPrompt,
     this.androidOnGeolocationPermissionsHidePrompt,
+    this.androidShouldInterceptRequest,
+    this.androidOnRenderProcessGone,
+    this.androidOnRenderProcessResponsive,
+    this.androidOnRenderProcessUnresponsive,
+    this.androidOnFormResubmission,
+    this.androidOnScaleChanged,
     this.iosOnWebContentProcessDidTerminate,
-    this.iosOnDidCommit,
     this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
     this.gestureRecognizers,
   }) : super(key: key);
@@ -121,7 +127,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   final ContextMenu contextMenu;
 
   @override
-  final Future<void> Function(InAppWebViewController controller) iosOnDidCommit;
+  final Future<void> Function(InAppWebViewController controller, String url) onPageCommitVisible;
 
   @override
   final Future<void> Function(InAppWebViewController controller)
@@ -254,6 +260,30 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final void Function(InAppWebViewController controller) onExitFullscreen;
+
+  @override
+  final Future<WebResourceResponse> Function(InAppWebViewController controller, WebResourceRequest request)
+  androidShouldInterceptRequest;
+
+  @override
+  final Future<WebViewRenderProcessAction> Function(InAppWebViewController controller, String url)
+  androidOnRenderProcessUnresponsive;
+
+  @override
+  final Future<WebViewRenderProcessAction> Function(InAppWebViewController controller, String url)
+  androidOnRenderProcessResponsive;
+
+  @override
+  final Future<void> Function(InAppWebViewController controller, RenderProcessGoneDetail detail)
+  androidOnRenderProcessGone;
+
+  @override
+  final Future<FormResubmissionAction> Function(InAppWebViewController controller, String url)
+  androidOnFormResubmission;
+
+  @override
+  final Future<void> Function(InAppWebViewController controller, double oldScale, double newScale)
+  androidOnScaleChanged;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

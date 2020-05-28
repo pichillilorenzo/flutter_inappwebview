@@ -396,9 +396,6 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(null);
         }
         break;
-
-
-
       case "pageDown":
         if (webView != null) {
           boolean bottom = (boolean) call.argument("bottom");

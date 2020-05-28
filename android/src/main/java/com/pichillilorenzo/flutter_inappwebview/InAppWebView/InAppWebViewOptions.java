@@ -87,7 +87,6 @@ public class InAppWebViewOptions implements Options {
   public Boolean hardwareAcceleration = true;
   public Boolean supportMultipleWindows = false;
   public String regexToCancelSubFramesLoading;
-
   public Integer overScrollMode = View.OVER_SCROLL_IF_CONTENT_SCROLLS;
   public Boolean networkAvailable = null;
   public Integer scrollBarStyle = View.SCROLLBARS_INSIDE_OVERLAY;
@@ -97,6 +96,7 @@ public class InAppWebViewOptions implements Options {
   public Integer scrollBarFadeDuration = null;
   public Map<String, Object> rendererPriorityPolicy = new HashMap<>();
   public Boolean useShouldInterceptRequest = false;
+  public Boolean useOnRenderProcessGone = false;
 
   @Override
   public InAppWebViewOptions parse(HashMap<String, Object> options) {
@@ -333,6 +333,9 @@ public class InAppWebViewOptions implements Options {
         case "useShouldInterceptRequest":
           useShouldInterceptRequest = (Boolean) value;
           break;
+        case "useOnRenderProcessGone":
+          useOnRenderProcessGone = (Boolean) value;
+          break;
       }
     }
 
@@ -417,6 +420,7 @@ public class InAppWebViewOptions implements Options {
     options.put("scrollBarFadeDuration", scrollBarFadeDuration);
     options.put("rendererPriorityPolicy", rendererPriorityPolicy);
     options.put("useShouldInterceptRequest", useShouldInterceptRequest);
+    options.put("useOnRenderProcessGone", useOnRenderProcessGone);
     return options;
   }
 

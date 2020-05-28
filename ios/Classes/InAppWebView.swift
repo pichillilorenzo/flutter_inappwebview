@@ -2204,7 +2204,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func webView(_ webView: WKWebView,
                         didCommit navigation: WKNavigation!) {
-        onDidCommit()
+        onPageCommitVisible(url: url?.absoluteString)
     }
     
     public func webView(_ webView: WKWebView,
@@ -2486,8 +2486,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         channel?.invokeMethod("onWebContentProcessDidTerminate", arguments: [])
     }
     
-    public func onDidCommit() {
-        channel?.invokeMethod("onDidCommit", arguments: [])
+    public func onPageCommitVisible(url: String?) {
+        let arguments: [String: Any?] = [
+            "url": url
+        ]
+        channel?.invokeMethod("onPageCommitVisible", arguments: arguments)
     }
     
     public func onDidReceiveServerRedirectForProvisionalNavigation() {

@@ -777,7 +777,8 @@ final public class InAppWebView extends InputAwareWebView {
       setRendererPriorityPolicy(
               (int) options.rendererPriorityPolicy.get("rendererRequestedPriority"),
               (boolean) options.rendererPriorityPolicy.get("waivedWhenNotVisible"));
-    } else if (options.rendererPriorityPolicy == null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    } else if ((options.rendererPriorityPolicy == null || (options.rendererPriorityPolicy != null && options.rendererPriorityPolicy.isEmpty())) &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       options.rendererPriorityPolicy.put("rendererRequestedPriority", getRendererRequestedPriority());
       options.rendererPriorityPolicy.put("waivedWhenNotVisible", getRendererPriorityWaivedWhenNotVisible());
     }

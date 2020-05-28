@@ -24,18 +24,14 @@ import android.webkit.WebViewClient;
 
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.Credential;
 import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
-import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -746,7 +742,7 @@ public class InAppWebViewClient extends WebViewClient {
       headers = webResourceRequest.getRequestHeaders();
       hasGesture = webResourceRequest.hasGesture();
       isForMainFrame = webResourceRequest.isForMainFrame();
-      if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         isRedirect = webResourceRequest.isRedirect();
       }
     }
@@ -775,8 +771,20 @@ public class InAppWebViewClient extends WebViewClient {
     }
     else if (flutterResult.result != null) {
       Map<String, Object> res = (Map<String, Object>) flutterResult.result;
+      String contentType = (String) res.get("contentType");
+      String contentEncoding = (String) res.get("contentEncoding");
       byte[] data = (byte[]) res.get("data");
-      return new WebResourceResponse(res.get("content-type").toString(), res.get("content-encoding").toString(), new ByteArrayInputStream(data));
+      Map<String, String> responseHeaders = (Map<String, String>) res.get("headers");
+      Integer statusCode = (Integer) res.get("statusCode");
+      String reasonPhrase = (String) res.get("reasonPhrase");
+
+      ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
+
+      if ((responseHeaders == null && statusCode == null && reasonPhrase == null) || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+        return new WebResourceResponse(contentType, contentEncoding, inputStream);
+      } else {
+        return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
+      }
     }
 
     return null;
@@ -793,17 +801,19 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void success(@Nullable Object response) {
-        Map<String, Object> responseMap = (Map<String, Object>) response;
-        Integer action = (Integer) responseMap.get("action");
-        if (action != null) {
-          switch (action) {
-            case 1:
-              resend.sendToTarget();
-              return;
-            case 0:
-            default:
-              dontResend.sendToTarget();
-              return;
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          Integer action = (Integer) responseMap.get("action");
+          if (action != null) {
+            switch (action) {
+              case 0:
+                resend.sendToTarget();
+                return;
+              case 1:
+              default:
+                dontResend.sendToTarget();
+                return;
+            }
           }
         }
 
@@ -835,16 +845,22 @@ public class InAppWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.O)
   @Override
   public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
-    Boolean didCrash = detail.didCrash();
-    Integer rendererPriorityAtExit = detail.rendererPriorityAtExit();
+    final InAppWebView webView = (InAppWebView) view;
 
-    Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
-    obj.put("didCrash", didCrash);
-    obj.put("rendererPriorityAtExit", rendererPriorityAtExit);
+    if (webView.options.useOnRenderProcessGone) {
+      Boolean didCrash = detail.didCrash();
+      Integer rendererPriorityAtExit = detail.rendererPriorityAtExit();
 
-    channel.invokeMethod("onRenderProcessGone", obj);
+      Map<String, Object> obj = new HashMap<>();
+      if (inAppBrowserActivity != null)
+        obj.put("uuid", inAppBrowserActivity.uuid);
+      obj.put("didCrash", didCrash);
+      obj.put("rendererPriorityAtExit", rendererPriorityAtExit);
+
+      channel.invokeMethod("onRenderProcessGone", obj);
+
+      return true;
+    }
 
     return super.onRenderProcessGone(view, detail);
   }

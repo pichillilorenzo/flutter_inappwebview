@@ -407,13 +407,19 @@ Screenshots:
 Android-specific methods can be called using the `InAppWebViewController.android` attribute.
 
 * `startSafeBrowsing`: Starts Safe Browsing initialization.
-* `setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
-* `getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
 * `clearSslPreferences`: Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
-* `clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
 * `pause`: Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
 * `resume`: Resumes a WebView after a previous call to `pause()`.
 * `getOriginalUrl`: Gets the URL that was originally requested for the current page.
+* `pageDown({@required bool bottom})`: Scrolls the contents of this WebView down by half the page size.
+* `pageUp({@required bool top})`: Scrolls the contents of this WebView up by half the view size.
+* `saveWebArchive({@required String basename, @required bool autoname})`: Saves the current view as a web archive.
+* `zoomIn`: Performs zoom in in this WebView.
+* `zoomOut`: Performs zoom out in this WebView.
+* `static clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
+* `static getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
+* `static setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
+* `static getCurrentWebViewPackage()`: Gets the current Android WebView package info.
 
 ##### `InAppWebViewController` iOS-specific methods
 
@@ -474,6 +480,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `useShouldOverrideUrlLoading`: Set to `true` to be able to listen at the `shouldOverrideUrlLoading` event. The default value is `false`.
 * `useOnLoadResource`: Set to `true` to be able to listen at the `onLoadResource` event. The default value is `false`.
 * `useOnDownloadStart`: Set to `true` to be able to listen at the `onDownloadStart` event. The default value is `false`.
+* `useShouldInterceptAjaxRequest`: Set to `true` to be able to listen at the `shouldInterceptAjaxRequest` event. The default value is `false`.
+* `useShouldInterceptFetchRequest`: Set to `true` to be able to listen at the `shouldInterceptFetchRequest` event. The default value is `false`.
 * `clearCache`: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
 * `userAgent`: Sets the user-agent for the WebView.
 * `applicationNameForUserAgent`: Append to the existing user-agent. Setting userAgent will override this.
@@ -487,8 +495,6 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `resourceCustomSchemes`: List of custom schemes that the WebView must handle. Use the `onLoadResourceCustomScheme` event to intercept resource requests with custom scheme.
 * `contentBlockers`: List of `ContentBlocker` that are a set of rules used to block content in the browser window.
 * `preferredContentMode`: Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is `InAppWebViewUserPreferredContentMode.RECOMMENDED`.
-* `useShouldInterceptAjaxRequest`: Set to `true` to be able to listen at the `shouldInterceptAjaxRequest` event. The default value is `false`.
-* `useShouldInterceptFetchRequest`: Set to `true` to be able to listen at the `shouldInterceptFetchRequest` event. The default value is `false`.
 * `incognito`: Set to `true` to open a browser window with incognito mode. The default value is `false`.
 * `cacheEnabled`: Sets whether WebView should use browser caching. The default value is `true`.
 * `transparentBackground`: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
@@ -498,6 +504,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 
 ##### `InAppWebView` Android-specific options
 
+* `useShouldInterceptRequest`: Set to `true` to be able to listen at the `androidShouldInterceptRequest` event. The default value is `false`.
+* `useOnRenderProcessGone`: Set to `true` to be able to listen at the `androidOnRenderProcessGone` event. The default value is `false`.
 * `textZoom`: Sets the text zoom of the page in percent. The default value is `100`.
 * `clearSessionCache`: Set to `true` to have the session cookie cache cleared before the new window is opened.
 * `builtInZoomControls`: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
@@ -540,6 +548,13 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
 * `supportMultipleWindows`: Sets whether the WebView whether supports multiple windows.
 * `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
+* `overScrollMode`: Sets the WebView's over-scroll mode. The default value is `AndroidOverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS`.
+* `scrollBarStyle`: Specify the style of the scrollbars. The scrollbars can be overlaid or inset. The default value is `AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY`.
+* `verticalScrollbarPosition`: Set the position of the vertical scroll bar. The default value is `AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT`.
+* `scrollBarDefaultDelayBeforeFade`: Defines the delay in milliseconds that a scrollbar waits before fade out.
+* `scrollbarFadingEnabled`: Define whether scrollbars will fade when the view is not scrolling. The default value is `true`.
+* `scrollBarFadeDuration`: Define the scrollbar fade duration in milliseconds.
+* `rendererPriorityPolicy`: Set the renderer priority policy for this WebView.
 
 ##### `InAppWebView` iOS-specific options
 
@@ -599,12 +614,18 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `onLongPressHitTestResult`: Event fired when an HTML element of the webview has been clicked and held.
 * `onEnterFullscreen`: Event fired when the current page has entered full screen mode.
 * `onExitFullscreen`: Event fired when the current page has exited full screen mode.
+* `onPageCommitVisible`: Called when the web view begins to receive web content.
 * `androidOnSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
-* `androidOnGeolocationPermissionsHidePrompt`: Notify the host application that a request for Geolocation permissions, made with a previous call to `androidOnGeolocationPermissionsShowPrompt` has been canceled. (available only on Android).
+* `androidOnGeolocationPermissionsHidePrompt`: Notify the host application that a request for Geolocation permissions, made with a previous call to `androidOnGeolocationPermissionsShowPrompt` has been canceled (available only on Android).
+* `androidShouldInterceptRequest`: Notify the host application of a resource request and allow the application to return the data (available only on Android).
+* `androidOnRenderProcessGone`: Event fired when the given WebView's render process has exited (available only on Android).
+* `androidOnRenderProcessResponsive`: Event called once when an unresponsive renderer currently associated with the WebView becomes responsive (available only on Android).
+* `androidOnRenderProcessUnresponsive`: Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript (available only on Android).
+* `androidOnFormResubmission`: As the host application if the browser should resend data as the requested page was a result of a POST. The default is to not resend the data (available only on Android).
+* `androidOnScaleChanged`: Event fired when the scale applied to the WebView has changed (available only on Android).
 * `iosOnWebContentProcessDidTerminate`: Invoked when the web view's web content process is terminated (available only on iOS).
-* `iosOnDidCommit`: Called when the web view begins to receive web content (available only on iOS).
 * `iosOnDidReceiveServerRedirectForProvisionalNavigation`: Called when a web view receives a server redirect (available only on iOS).
 
 ### `ContextMenu` class

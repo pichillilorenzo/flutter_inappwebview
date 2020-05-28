@@ -1,10 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppBrowser;
 
 import android.content.Intent;
-import android.graphics.Bitmap;
-import android.graphics.Canvas;
 import android.graphics.Color;
-import android.graphics.Picture;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,8 +29,6 @@ import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -344,6 +339,31 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
         break;
       case "getHitTestResult":
         result.success(getHitTestResult());
+        break;
+      case "pageDown":
+        {
+          boolean bottom = (boolean) call.argument("bottom");
+          result.success(pageDown(bottom));
+        }
+        break;
+      case "pageUp":
+        {
+          boolean top = (boolean) call.argument("top");
+          result.success(pageUp(top));
+        }
+        break;
+      case "saveWebArchive":
+        {
+          String basename = (String) call.argument("basename");
+          boolean autoname = (boolean) call.argument("autoname");
+          saveWebArchive(basename, autoname, result);
+        }
+        break;
+      case "zoomIn":
+        result.success(zoomIn());
+        break;
+      case "zoomOut":
+        result.success(zoomOut());
         break;
       default:
         result.notImplemented();
@@ -850,6 +870,43 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       return obj;
     }
     return null;
+  }
+
+  public boolean pageDown(boolean bottom) {
+    if (webView != null)
+      return webView.pageDown(bottom);
+    return false;
+  }
+
+  public boolean pageUp(boolean top) {
+    if (webView != null)
+      return webView.pageUp(top);
+    return false;
+  }
+
+  public void saveWebArchive(String basename, boolean autoname, final MethodChannel.Result result) {
+    if (webView != null) {
+      webView.saveWebArchive(basename, autoname, new ValueCallback<String>() {
+        @Override
+        public void onReceiveValue(String value) {
+          result.success(value);
+        }
+      });
+    } else {
+      result.success(null);
+    }
+  }
+
+  public boolean zoomIn() {
+    if (webView != null)
+      return webView.zoomIn();
+    return false;
+  }
+
+  public boolean zoomOut() {
+    if (webView != null)
+      return webView.zoomOut();
+    return false;
   }
 
   public void dispose() {

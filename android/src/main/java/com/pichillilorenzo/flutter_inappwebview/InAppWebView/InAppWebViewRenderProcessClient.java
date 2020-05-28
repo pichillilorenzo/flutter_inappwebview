@@ -37,6 +37,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", view.getUrl());
     channel.invokeMethod("onRenderProcessUnresponsive", obj, new MethodChannel.Result() {
 
       @Override
@@ -45,7 +46,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
         Integer action = (Integer) responseMap.get("action");
         if (action != null && renderer != null) {
           switch (action) {
-            case 1:
+            case 0:
               if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
                 renderer.terminate();
               break;
@@ -70,6 +71,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", view.getUrl());
     channel.invokeMethod("onRenderProcessResponsive", obj, new MethodChannel.Result() {
 
       @Override
@@ -78,7 +80,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
         Integer action = (Integer) responseMap.get("action");
         if (action != null && renderer != null) {
           switch (action) {
-            case 1:
+            case 0:
               if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
                 renderer.terminate();
               break;

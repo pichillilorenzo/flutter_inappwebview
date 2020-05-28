@@ -33,8 +33,6 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
       case "getDefaultUserAgent":
         result.success(WebSettings.getDefaultUserAgent(Shared.applicationContext));
         break;
-
-
       case "clearClientCertPreferences":
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           WebView.clearClientCertPreferences(new Runnable() {
@@ -66,15 +64,12 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
         else
           result.success(false);
         break;
-
-
-
       case "getCurrentWebViewPackage":
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           result.success(
                   convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(Shared.activity)));
         } else {
-          result.success(false);
+          result.success(null);
         }
         break;
       default:

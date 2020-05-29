@@ -7,7 +7,8 @@ import 'package:flutter/services.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
 ///On iOS, this class uses the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.
-///On Android, this class has a custom implementation using `android.database.sqlite.SQLiteDatabase` because [WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase)
+///On Android, this class has a custom implementation using `android.database.sqlite.SQLiteDatabase` because
+///[WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase)
 ///doesn't offer the same functionalities as iOS `URLCredentialStorage`.
 class HttpAuthCredentialDatabase {
   static HttpAuthCredentialDatabase _instance;

@@ -2,6 +2,8 @@ import 'package:flutter_inappwebview/src/context_menu.dart';
 
 import 'types.dart';
 import 'in_app_webview_controller.dart';
+import 'webview_options.dart';
+import 'headless_in_app_webview.dart';
 
 ///Abstract class that represents a WebView. Used by [WebView] and [HeadlessInAppWebView].
 abstract class WebView {

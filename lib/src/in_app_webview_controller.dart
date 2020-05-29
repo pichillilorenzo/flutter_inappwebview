@@ -8,14 +8,27 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:flutter_inappwebview/src/webview.dart';
 
 import 'package:html/parser.dart' show parse;
 
+import 'context_menu.dart';
 import 'types.dart';
 import 'in_app_browser.dart';
 import 'webview_options.dart';
+import 'headless_in_app_webview.dart';
+import 'webview.dart';
+import 'in_app_webview.dart';
+
+///List of forbidden names for JavaScript handlers.
+const javaScriptHandlerForbiddenNames = [
+  "onLoadResource",
+  "shouldInterceptAjaxRequest",
+  "onAjaxReadyStateChange",
+  "onAjaxProgress",
+  "shouldInterceptFetchRequest",
+  "onPrint",
+  "androidKeyboardWorkaroundFocusoutEvent"
+];
 
 ///Controls a WebView, such as an [InAppWebView] widget instance, a [HeadlessInAppWebView] instance or [InAppBrowser] WebView instance.
 ///
@@ -746,19 +759,28 @@ class InAppWebViewController {
   }
 
   ///Gets the URL for the current page.
-  ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun, the current page may not have changed.
+  ///This is not always the same as the URL passed to [WebView.onLoadStart] because although the load for that URL has begun, the current page may not have changed.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getUrl()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415005-url
   Future<String> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getUrl', args);
   }
 
   ///Gets the title for the current page.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getTitle()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415015-title
   Future<String> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getTitle', args);
   }
 
   ///Gets the progress for the current page. The progress value is between 0 and 100.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getProgress()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress
   Future<int> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getProgress', args);
@@ -926,6 +948,9 @@ class InAppWebViewController {
   }
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414954-load
   Future<void> loadUrl(
       {@required String url, Map<String, String> headers = const {}}) async {
     assert(url != null && url.isNotEmpty);
@@ -936,6 +961,8 @@ class InAppWebViewController {
   }
 
   ///Loads the given [url] with [postData] using `POST` method into this WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[])
   Future<void> postUrl(
       {@required String url, @required Uint8List postData}) async {
     assert(url != null && url.isNotEmpty);
@@ -953,6 +980,11 @@ class InAppWebViewController {
   ///The [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
   ///
   ///The [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)
+  ///**Official iOS API**:
+  ///- https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring
+  ///- https://developer.apple.com/documentation/webkit/wkwebview/1415011-load
   Future<void> loadData(
       {@required String data,
       String mimeType = "text/html",
@@ -1009,36 +1041,54 @@ class InAppWebViewController {
   }
 
   ///Reloads the WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#reload()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('reload', args);
   }
 
   ///Goes back in the history of the WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#goBack()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('goBack', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can move backward.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#canGoBack()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canGoBack', args);
   }
 
   ///Goes forward in the history of the WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#goForward()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('goForward', args);
   }
 
   ///Returns a boolean value indicating whether the WebView can move forward.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#canGoForward()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canGoForward', args);
   }
 
   ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#goBackOrForward(int)
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414991-go
   Future<void> goBackOrForward({@required int steps}) async {
     assert(steps != null);
 
@@ -1048,6 +1098,8 @@ class InAppWebViewController {
   }
 
   ///Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#canGoBackOrForward(int)
   Future<bool> canGoBackOrForward({@required int steps}) async {
     assert(steps != null);
 
@@ -1068,12 +1120,18 @@ class InAppWebViewController {
   }
 
   ///Stops the WebView from loading.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#stopLoading()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('stopLoading', args);
   }
 
   ///Evaluates JavaScript code into the WebView and returns the result of the evaluation.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415017-evaluatejavascript
   Future<dynamic> evaluateJavascript({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
@@ -1180,6 +1238,8 @@ class InAppWebViewController {
   ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
   ///
   ///**NOTE for iOS**: available from iOS 11.0+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot
   Future<Uint8List> takeScreenshot() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('takeScreenshot', args);
@@ -1219,6 +1279,9 @@ class InAppWebViewController {
   ///This contains only a snapshot of the current state.
   ///Multiple calls to this method may return different objects.
   ///The object returned from this method will not be updated to reflect any new state.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#copyBackForwardList()
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist
   Future<WebHistory> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<dynamic, dynamic> result =
@@ -1256,6 +1319,8 @@ class InAppWebViewController {
   ///**NOTE**: on Android, it finds all instances asynchronously. Successive calls to this will cancel any pending searches.
   ///
   ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)
   Future<void> findAllAsync({@required String find}) async {
     assert(find != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1268,6 +1333,8 @@ class InAppWebViewController {
   ///[forward] represents the direction to search.
   ///
   ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)
   Future<void> findNext({@required bool forward}) async {
     assert(forward != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1278,6 +1345,8 @@ class InAppWebViewController {
   ///Clears the highlighting surrounding text matches created by [findAllAsync()].
   ///
   ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#clearMatches()
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('clearMatches', args);
@@ -1300,6 +1369,9 @@ class InAppWebViewController {
   ///[x] represents the x position to scroll to.
   ///
   ///[y] represents the y position to scroll to.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
   Future<void> scrollTo({@required int x, @required int y}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1313,6 +1385,9 @@ class InAppWebViewController {
   ///[x] represents the amount of pixels to scroll by horizontally.
   ///
   ///[y] represents the amount of pixels to scroll by vertically.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
   Future<void> scrollBy({@required int x, @required int y}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1325,6 +1400,8 @@ class InAppWebViewController {
   ///This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
   ///
   ///On iOS, it is restricted to just this WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#pauseTimers()
   Future<void> pauseTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('pauseTimers', args);
@@ -1333,6 +1410,8 @@ class InAppWebViewController {
   ///On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
   ///
   ///On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#resumeTimers()
   Future<void> resumeTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('resumeTimers', args);
@@ -1341,12 +1420,18 @@ class InAppWebViewController {
   ///Prints the current page.
   ///
   ///**NOTE**: available on Android 21+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/print/PrintManager
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller
   Future<void> printCurrentPage() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('printCurrentPage', args);
   }
 
   ///Gets the height of the HTML content.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getContentHeight()
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize
   Future<int> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getContentHeight', args);
@@ -1357,6 +1442,9 @@ class InAppWebViewController {
   ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 to 100.0 inclusive.
   ///
   ///**NOTE**: available on Android 21+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale
   Future<void> zoomBy(double zoomFactor) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
@@ -1364,6 +1452,11 @@ class InAppWebViewController {
   }
 
   ///Gets the current scale of this WebView.
+  ///
+  ///**Official Android API**:
+  ///- https://developer.android.com/reference/android/util/DisplayMetrics#density
+  ///- https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale
   Future<double> getScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getScale', args);
@@ -1381,6 +1474,8 @@ class InAppWebViewController {
   ///Gets the hit result for hitting an HTML elements.
   ///
   ///**NOTE**: On iOS it is implemented using JavaScript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getHitTestResult()
   Future<InAppWebViewHitTestResult> getHitTestResult() async {
     Map<String, dynamic> args = <String, dynamic>{};
     var hitTestResultMap =
@@ -1393,6 +1488,8 @@ class InAppWebViewController {
   }
 
   ///Gets the default user agent.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)
   static Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod('getDefaultUserAgent', args);
@@ -1416,12 +1513,16 @@ class AndroidInAppWebViewController {
   ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
   ///
   ///**NOTE**: available only on Android 27+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#startSafeBrowsing(android.content.Context,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)
   Future<bool> startSafeBrowsing() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('startSafeBrowsing', args);
   }
 
   ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#clearSslPreferences()
   Future<void> clearSslPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _controller._channel.invokeMethod('clearSslPreferences', args);
@@ -1429,12 +1530,16 @@ class AndroidInAppWebViewController {
 
   ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
   ///To pause JavaScript globally, use [pauseTimers()]. To resume WebView, call [resume()].
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onPause()
   Future<void> pause() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _controller._channel.invokeMethod('pause', args);
   }
 
   ///Resumes a WebView after a previous call to [pause()].
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onResume()
   Future<void> resume() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _controller._channel.invokeMethod('resume', args);
@@ -1443,6 +1548,8 @@ class AndroidInAppWebViewController {
   ///Gets the URL that was originally requested for the current page.
   ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun,
   ///the current page may not have changed. Also, there may have been redirects resulting in a different URL to that originally requested.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getOriginalUrl()
   Future<String> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('getOriginalUrl', args);
@@ -1451,7 +1558,9 @@ class AndroidInAppWebViewController {
   ///Scrolls the contents of this WebView down by half the page size.
   ///Returns `true` if the page was scrolled.
   ///
-  ///[bottom] `true` to jump to bottom of page
+  ///[bottom] `true` to jump to bottom of page.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#pageDown(boolean)
   Future<bool> pageDown({@required bool bottom}) async {
     assert(bottom != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1462,7 +1571,9 @@ class AndroidInAppWebViewController {
   ///Scrolls the contents of this WebView up by half the view size.
   ///Returns `true` if the page was scrolled.
   ///
-  ///[bottom] `true` to jump to the top of the page
+  ///[bottom] `true` to jump to the top of the page.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#pageUp(boolean)
   Future<bool> pageUp({@required bool top}) async {
     assert(top != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1477,6 +1588,8 @@ class AndroidInAppWebViewController {
   ///
   ///[autoname] if `false`, takes basename to be a file.
   ///If `true`, [basename] is assumed to be a directory in which a filename will be chosen according to the URL of the current page.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
   Future<String> saveWebArchive({@required String basename, @required bool autoname}) async {
     assert(basename != null && autoname != null);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1487,6 +1600,8 @@ class AndroidInAppWebViewController {
 
   ///Performs zoom in in this WebView.
   ///Returns `true` if zoom in succeeds, `false` if no zoom changes.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomIn()
   Future<bool> zoomIn() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('zoomIn', args);
@@ -1494,6 +1609,8 @@ class AndroidInAppWebViewController {
 
   ///Performs zoom out in this WebView.
   ///Returns `true` if zoom out succeeds, `false` if no zoom changes.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomOut()
   Future<bool> zoomOut() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('zoomOut', args);
@@ -1506,6 +1623,8 @@ class AndroidInAppWebViewController {
   ///**NOTE**: On iOS certificate-based credentials are never stored permanently.
   ///
   ///**NOTE**: available on Android 21+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#clearClientCertPreferences(java.lang.Runnable)
   static Future<void> clearClientCertPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await InAppWebViewController._staticChannel
@@ -1515,6 +1634,8 @@ class AndroidInAppWebViewController {
   ///Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
   ///
   ///**NOTE**: available only on Android 27+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()
   static Future<String> getSafeBrowsingPrivacyPolicyUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await InAppWebViewController._staticChannel
@@ -1536,6 +1657,8 @@ class AndroidInAppWebViewController {
   ///[hosts] represents the list of hosts. This value must never be null.
   ///
   ///**NOTE**: available only on Android 27+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()
   static Future<bool> setSafeBrowsingWhitelist(
       {@required List<String> hosts}) async {
     assert(hosts != null);
@@ -1554,6 +1677,8 @@ class AndroidInAppWebViewController {
   ///The next time the app starts and loads WebView it will use the new WebView package instead.
   ///
   ///**NOTE**: available only on Android 26+.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getCurrentWebViewPackage(android.content.Context)
   static Future<AndroidWebViewPackageInfo> getCurrentWebViewPackage() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic> packageInfo = (await InAppWebViewController._staticChannel.invokeMethod('getCurrentWebViewPackage', args))?.cast<String, dynamic>();
@@ -1570,12 +1695,16 @@ class IOSInAppWebViewController {
   }
 
   ///Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin
   Future<void> reloadFromOrigin() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _controller._channel.invokeMethod('reloadFromOrigin', args);
   }
 
   ///A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415002-hasonlysecurecontent
   Future<bool> hasOnlySecureContent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel

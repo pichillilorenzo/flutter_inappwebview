@@ -6,6 +6,8 @@ import 'package:flutter/services.dart';
 import 'types.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the cookies used by WebView instances.
+///On Android, it is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).
+///On iOS, it is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
 ///
 ///**NOTE for iOS**: available from iOS 11.0+.
 class CookieManager {

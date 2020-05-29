@@ -11,17 +11,6 @@ import 'webview.dart';
 import 'types.dart';
 import 'in_app_webview_controller.dart';
 
-///List of forbidden names for JavaScript handlers.
-const javaScriptHandlerForbiddenNames = [
-  "onLoadResource",
-  "shouldInterceptAjaxRequest",
-  "onAjaxReadyStateChange",
-  "onAjaxProgress",
-  "shouldInterceptFetchRequest",
-  "onPrint",
-  "androidKeyboardWorkaroundFocusoutEvent"
-];
-
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
 class InAppWebView extends StatefulWidget implements WebView {
   /// `gestureRecognizers` specifies which gestures should be consumed by the web view.

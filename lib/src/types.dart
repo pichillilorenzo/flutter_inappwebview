@@ -1,15 +1,22 @@
 import 'dart:io';
 import 'dart:typed_data';
+import 'dart:convert';
 
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
 
+import 'in_app_browser.dart';
 import 'webview.dart';
 import 'webview_options.dart';
+import 'in_app_webview_controller.dart';
+import 'http_auth_credentials_database.dart';
+import 'chrome_safari_browser.dart';
+import 'cookie_manager.dart';
+import 'web_storage_manager.dart';
 
 var uuidGenerator = new Uuid();
 
-///This type represents a callback, added with [addJavaScriptHandler], that listens to post messages sent from JavaScript.
+///This type represents a callback, added with [InAppWebViewController.addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
 ///The Android implementation uses [addJavascriptInterface](https://developer.android.com/reference/android/webkit/WebView#addJavascriptInterface(java.lang.Object,%20java.lang.String)).
 ///The iOS implementation uses [addScriptMessageHandler](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537172-addscriptmessagehandler?language=objc)
@@ -64,8 +71,8 @@ class ConsoleMessageLevel {
   int get hashCode => _value.hashCode;
 }
 
-///Class representing a resource response of the [InAppBrowser] WebView.
-///It is used by the method [InAppBrowser.onLoadResource()].
+///Class representing a resource response of the [WebView].
+///It is used by the method [WebView.onLoadResource].
 class LoadedResource {
   ///A string representing the type of resource.
   String initiatorType;
@@ -82,7 +89,7 @@ class LoadedResource {
   LoadedResource({this.initiatorType, this.url, this.startTime, this.duration});
 }
 
-///Initial [data] as a content for an [InAppWebView] instance, using [baseUrl] as the base URL for it.
+///Initial [data] as a content for an [WebView] instance, using [baseUrl] as the base URL for it.
 class InAppWebViewInitialData {
   ///A String of data in the given encoding.
   String data;
@@ -233,7 +240,7 @@ class CustomSchemeResponse {
 ///Class representing a JavaScript console message from WebCore.
 ///This could be a issued by a call to one of the console logging functions (e.g. console.log('...')) or a JavaScript error on the page.
 ///
-///To receive notifications of these messages, use the [onConsoleMessage] event.
+///To receive notifications of these messages, use the [WebView.onConsoleMessage] event.
 class ConsoleMessage {
   String message;
   ConsoleMessageLevel messageLevel;
@@ -242,7 +249,7 @@ class ConsoleMessage {
       {this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
 }
 
-///This class contains a snapshot of the current back/forward list for a WebView.
+///This class contains a snapshot of the current back/forward list for a [WebView].
 class WebHistory {
   ///List of all [WebHistoryItem]s.
   List<WebHistoryItem> list;
@@ -253,7 +260,7 @@ class WebHistory {
   WebHistory({this.list, this.currentIndex});
 }
 
-///A convenience class for accessing fields in an entry in the back/forward list of a WebView. Each WebHistoryItem is a snapshot of the requested history item.
+///A convenience class for accessing fields in an entry in the back/forward list of a WebView. Each [WebHistoryItem] is a snapshot of the requested history item.
 class WebHistoryItem {
   ///Original url of this history item.
   String originalUrl;
@@ -274,7 +281,7 @@ class WebHistoryItem {
       {this.originalUrl, this.title, this.url, this.index, this.offset});
 }
 
-///Class used by the host application to set the Geolocation permission state for an origin during the [androidOnGeolocationPermissionsShowPrompt] event.
+///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.androidOnGeolocationPermissionsShowPrompt] event.
 class GeolocationPermissionShowPromptResponse {
   ///The origin for which permissions are set.
   String origin;
@@ -309,7 +316,7 @@ class JsAlertResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [onJsAlert] event to control a JavaScript alert dialog.
+///Class that represents the response used by the [WebView.onJsAlert] event to control a JavaScript alert dialog.
 class JsAlertResponse {
   ///Message to be displayed in the window.
   String message;
@@ -356,7 +363,7 @@ class JsConfirmResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [onJsConfirm] event to control a JavaScript confirm dialog.
+///Class that represents the response used by the [WebView.onJsConfirm] event to control a JavaScript confirm dialog.
 class JsConfirmResponse {
   ///Message to be displayed in the window.
   String message;
@@ -408,7 +415,7 @@ class JsPromptResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [onJsPrompt] event to control a JavaScript prompt dialog.
+///Class that represents the response used by the [WebView.onJsPrompt] event to control a JavaScript prompt dialog.
 class JsPromptResponse {
   ///Message to be displayed in the window.
   String message;
@@ -524,10 +531,10 @@ class SafeBrowsingResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [androidOnSafeBrowsingHit] event.
+///Class that represents the response used by the [WebView.androidOnSafeBrowsingHit] event.
 ///It is used to indicate an action to take when hitting a malicious URL.
 class SafeBrowsingResponse {
-  ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [InAppWebViewController.androidGetSafeBrowsingPrivacyPolicyUrl].
+  ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [AndroidInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   bool report;
 
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.
@@ -566,7 +573,7 @@ class HttpAuthResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [onReceivedHttpAuthRequest] event.
+///Class that represents the response used by the [WebView.onReceivedHttpAuthRequest] event.
 class HttpAuthResponse {
   ///Represents the username used for the authentication if the [action] corresponds to [HttpAuthResponseAction.PROCEED]
   String username;
@@ -596,7 +603,7 @@ class HttpAuthResponse {
   }
 }
 
-///Class that represents the challenge of the [onReceivedHttpAuthRequest] event.
+///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
 ///It provides all the information about the challenge.
 class HttpAuthChallenge {
   ///A count of previous failed authentication attempts.
@@ -664,7 +671,7 @@ class ServerTrustAuthResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///ServerTrustAuthResponse class represents the response used by the [onReceivedServerTrustAuthRequest] event.
+///ServerTrustAuthResponse class represents the response used by the [WebView.onReceivedServerTrustAuthRequest] event.
 class ServerTrustAuthResponse {
   ///Indicate the [ServerTrustAuthResponseAction] to take in response of the server trust authentication challenge.
   ServerTrustAuthResponseAction action;
@@ -676,7 +683,7 @@ class ServerTrustAuthResponse {
   }
 }
 
-///Class that represents the challenge of the [onReceivedServerTrustAuthRequest] event.
+///Class that represents the challenge of the [WebView.onReceivedServerTrustAuthRequest] event.
 ///It provides all the information about the challenge.
 class ServerTrustChallenge {
   ///The protection space requiring authentication.
@@ -726,7 +733,7 @@ class ClientCertResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [onReceivedClientCertRequest] event.
+///Class that represents the response used by the [WebView.onReceivedClientCertRequest] event.
 class ClientCertResponse {
   ///The file path of the certificate to use.
   String certificatePath;
@@ -759,7 +766,7 @@ class ClientCertResponse {
   }
 }
 
-///Class that represents the challenge of the [onReceivedClientCertRequest] event.
+///Class that represents the challenge of the [WebView.onReceivedClientCertRequest] event.
 ///It provides all the information about the challenge.
 class ClientCertChallenge {
   ///The protection space requiring authentication.
@@ -1058,7 +1065,7 @@ class IOSWKSelectionGranularity {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to specify a dataDetectoryTypes value that adds interactivity to web content that matches the value.
+///Class that represents an iOS-specific class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
 ///
 ///**NOTE**: available on iOS 10.0+.
 class IOSWKDataDetectorTypes {
@@ -2126,7 +2133,7 @@ class PermissionRequestResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [androidOnPermissionRequest] event.
+///Class that represents the response used by the [WebView.androidOnPermissionRequest] event.
 class PermissionRequestResponse {
   ///Resources granted to be accessed by origin.
   List<String> resources;
@@ -2143,7 +2150,7 @@ class PermissionRequestResponse {
   }
 }
 
-///Class that is used by [shouldOverrideUrlLoading] event.
+///Class that is used by [WebView.shouldOverrideUrlLoading] event.
 ///It represents the policy to pass back to the decision handler.
 class ShouldOverrideUrlLoadingAction {
   final int _value;
@@ -2170,7 +2177,7 @@ class ShouldOverrideUrlLoadingAction {
   }
 }
 
-///Class that represents the type of action triggering a navigation on iOS for the [shouldOverrideUrlLoading] event.
+///Class that represents the type of action triggering a navigation on iOS for the [WebView.shouldOverrideUrlLoading] event.
 class IOSWKNavigationType {
   final int _value;
 
@@ -2208,7 +2215,7 @@ class IOSWKNavigationType {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the navigation request used by the [shouldOverrideUrlLoading] event.
+///Class that represents the navigation request used by the [WebView.shouldOverrideUrlLoading] event.
 class ShouldOverrideUrlLoadingRequest {
   ///Represents the url of the navigation request.
   String url;
@@ -2246,7 +2253,7 @@ class ShouldOverrideUrlLoadingRequest {
       this.iosWKNavigationType});
 }
 
-///Class that represents the navigation request used by the [shouldOverrideUrlLoading] event.
+///Class that represents the navigation request used by the [WebView.onCreateWindow] event.
 class OnCreateWindowRequest {
   ///Represents the url of the navigation request.
   String url;
@@ -2680,8 +2687,9 @@ class AndroidOverScrollMode {
 ///The scrollbars can be overlaid or inset.
 ///When inset, they add to the padding of the view. And the scrollbars can be drawn inside the padding area or on the edge of the view.
 ///For example, if a view has a background drawable and you want to draw the scrollbars inside the padding specified by the drawable,
-///you can use SCROLLBARS_INSIDE_OVERLAY or SCROLLBARS_INSIDE_INSET. If you want them to appear at the edge of the view, ignoring the padding,
-///then you can use SCROLLBARS_OUTSIDE_OVERLAY or SCROLLBARS_OUTSIDE_INSET.
+///you can use [AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY] or [AndroidScrollBarStyle.SCROLLBARS_INSIDE_INSET].
+///If you want them to appear at the edge of the view, ignoring the padding,
+///then you can use [AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY] or [AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_INSET].
 class AndroidScrollBarStyle {
   final int _value;
 
@@ -2783,9 +2791,9 @@ class AndroidVerticalScrollbarPosition {
 
 ///Class that represents an Android WebView package info.
 class AndroidWebViewPackageInfo {
-  ///The version name of this package.
+  ///The version name of this WebView package.
   String versionName;
-  ///The name of this package.
+  ///The name of this WebView package.
   String packageName;
 
   AndroidWebViewPackageInfo({this.versionName, this.packageName});

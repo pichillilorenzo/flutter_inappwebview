@@ -39,10 +39,10 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 let url = arguments!["url"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let menuItemList = arguments!["menuItemList"] as! [[String: Any]]
-                let uuidFallback: String = arguments!["uuidFallback"] as! String
-                let headersFallback = arguments!["headersFallback"] as! [String: String]
-                let optionsFallback = arguments!["optionsFallback"] as! [String: Any?]
-                let contextMenuFallback = arguments!["contextMenuFallback"] as! [String: Any]
+                let uuidFallback = arguments!["uuidFallback"] as? String
+                let headersFallback = arguments!["headersFallback"] as? [String: String]
+                let optionsFallback = arguments!["optionsFallback"] as? [String: Any?]
+                let contextMenuFallback = arguments!["contextMenuFallback"] as? [String: Any]
                 open(uuid: uuid, url: url, options: options,  menuItemList: menuItemList, uuidFallback: uuidFallback, headersFallback: headersFallback, optionsFallback: optionsFallback, contextMenuFallback: contextMenuFallback, result: result)
                 break
             default:
@@ -51,7 +51,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func open(uuid: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], uuidFallback: String, headersFallback: [String: String], optionsFallback: [String: Any?], contextMenuFallback: [String: Any], result: @escaping FlutterResult) {
+    public func open(uuid: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], uuidFallback: String?, headersFallback: [String: String]?, optionsFallback: [String: Any?]?, contextMenuFallback: [String: Any]?, result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
         if self.previousStatusBarStyle == -1 {
@@ -106,7 +106,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 
                 return
             }
-            SwiftFlutterPlugin.instance!.inAppBrowserManager!.openUrl(uuid: uuidFallback, url: url, options: optionsFallback, headers: headersFallback, contextMenu: contextMenuFallback)
+            SwiftFlutterPlugin.instance!.inAppBrowserManager!.openUrl(uuid: uuidFallback!, url: url, options: optionsFallback ?? [:], headers: headersFallback ?? [:], contextMenu: contextMenuFallback ?? [:])
         }
     }
 }

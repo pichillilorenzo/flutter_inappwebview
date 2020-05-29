@@ -1056,6 +1056,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         allowsBackForwardNavigationGestures = (options?.allowsBackForwardNavigationGestures)!
         if #available(iOS 9.0, *) {
             allowsLinkPreview = (options?.allowsLinkPreview)!
+            configuration.allowsAirPlayForMediaPlayback = (options?.allowsAirPlayForMediaPlayback)!
             configuration.allowsPictureInPictureMediaPlayback = (options?.allowsPictureInPictureMediaPlayback)!
             if (options?.applicationNameForUserAgent != nil && (options?.applicationNameForUserAgent)! != "") {
                 configuration.applicationNameForUserAgent = (options?.applicationNameForUserAgent)!
@@ -1075,7 +1076,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
             for type in options?.dataDetectorTypes ?? [] {
-                let dataDetectorType = getDataDetectorType(type: type)
+                let dataDetectorType = InAppWebView.getDataDetectorType(type: type)
                 dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
             }
             configuration.dataDetectorTypes = dataDetectorTypes
@@ -1094,7 +1095,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
         scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
 
-        scrollView.decelerationRate = getDecelerationRate(type: (options?.decelerationRate)!)
+        scrollView.decelerationRate = InAppWebView.getDecelerationRate(type: (options?.decelerationRate)!)
         scrollView.alwaysBounceVertical = (options?.alwaysBounceVertical)!
         scrollView.alwaysBounceHorizontal = (options?.alwaysBounceHorizontal)!
         scrollView.scrollsToTop = (options?.scrollsToTop)!
@@ -1110,7 +1111,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     @available(iOS 10.0, *)
-    public func getDataDetectorType(type: String) -> WKDataDetectorTypes {
+    static public func getDataDetectorType(type: String) -> WKDataDetectorTypes {
         switch type {
             case "NONE":
                 return WKDataDetectorTypes.init(rawValue: 0)
@@ -1137,7 +1138,44 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func getDecelerationRate(type: String) -> UIScrollView.DecelerationRate {
+    @available(iOS 10.0, *)
+    static public func getDataDetectorTypeString(type: WKDataDetectorTypes) -> [String] {
+        var dataDetectorTypeString: [String] = []
+        if type.contains(.all) {
+            dataDetectorTypeString.append("ALL")
+        } else {
+            if type.contains(.phoneNumber) {
+                dataDetectorTypeString.append("PHONE_NUMBER")
+            }
+            if type.contains(.link) {
+                dataDetectorTypeString.append("LINK")
+            }
+            if type.contains(.address) {
+                dataDetectorTypeString.append("ADDRESS")
+            }
+            if type.contains(.calendarEvent) {
+                dataDetectorTypeString.append("CALENDAR_EVENT")
+            }
+            if type.contains(.trackingNumber) {
+                dataDetectorTypeString.append("TRACKING_NUMBER")
+            }
+            if type.contains(.flightNumber) {
+                dataDetectorTypeString.append("FLIGHT_NUMBER")
+            }
+            if type.contains(.lookupSuggestion) {
+                dataDetectorTypeString.append("LOOKUP_SUGGESTION")
+            }
+            if type.contains(.spotlightSuggestion) {
+                dataDetectorTypeString.append("SPOTLIGHT_SUGGESTION")
+            }
+        }
+        if dataDetectorTypeString.count == 0 {
+            dataDetectorTypeString = ["NONE"]
+        }
+        return dataDetectorTypeString
+    }
+    
+    static public func getDecelerationRate(type: String) -> UIScrollView.DecelerationRate {
         switch type {
             case "NORMAL":
                 return .normal
@@ -1145,6 +1183,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 return .fast
             default:
                 return .normal
+        }
+    }
+    
+    static public func getDecelerationRateString(type: UIScrollView.DecelerationRate) -> String {
+        switch type {
+            case .normal:
+                return "NORMAL"
+            case .fast:
+                return "FAST"
+            default:
+                return "NORMAL"
         }
     }
     
@@ -1403,10 +1452,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             allowsBackForwardNavigationGestures = newOptions.allowsBackForwardNavigationGestures
         }
         
-        if newOptionsMap["allowsInlineMediaPlayback"] != nil && options?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
-            configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
-        }
-        
         if newOptionsMap["javaScriptCanOpenWindowsAutomatically"] != nil && options?.javaScriptCanOpenWindowsAutomatically != newOptions.javaScriptCanOpenWindowsAutomatically {
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = newOptions.javaScriptCanOpenWindowsAutomatically
         }
@@ -1431,7 +1476,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if newOptionsMap["dataDetectorTypes"] != nil && options?.dataDetectorTypes != newOptions.dataDetectorTypes {
                 var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
                 for type in newOptions.dataDetectorTypes {
-                    let dataDetectorType = getDataDetectorType(type: type)
+                    let dataDetectorType = InAppWebView.getDataDetectorType(type: type)
                     dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
                 }
                 configuration.dataDetectorTypes = dataDetectorTypes
@@ -1465,7 +1510,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         if newOptionsMap["decelerationRate"] != nil && options?.decelerationRate != newOptions.decelerationRate {
-            scrollView.decelerationRate = getDecelerationRate(type: newOptions.decelerationRate)
+            scrollView.decelerationRate = InAppWebView.getDecelerationRate(type: newOptions.decelerationRate)
         }
         if newOptionsMap["alwaysBounceVertical"] != nil && options?.alwaysBounceVertical != newOptions.alwaysBounceVertical {
             scrollView.alwaysBounceVertical = newOptions.alwaysBounceVertical
@@ -1489,6 +1534,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if #available(iOS 9.0, *) {
             if newOptionsMap["allowsLinkPreview"] != nil && options?.allowsLinkPreview != newOptions.allowsLinkPreview {
                 allowsLinkPreview = newOptions.allowsLinkPreview
+            }
+            if newOptionsMap["allowsAirPlayForMediaPlayback"] != nil && options?.allowsAirPlayForMediaPlayback != newOptions.allowsAirPlayForMediaPlayback {
+                configuration.allowsAirPlayForMediaPlayback = newOptions.allowsAirPlayForMediaPlayback
             }
             if newOptionsMap["allowsPictureInPictureMediaPlayback"] != nil && options?.allowsPictureInPictureMediaPlayback != newOptions.allowsPictureInPictureMediaPlayback {
                 configuration.allowsPictureInPictureMediaPlayback = newOptions.allowsPictureInPictureMediaPlayback
@@ -1534,7 +1582,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if (self.options == nil) {
             return nil
         }
-        return self.options!.getHashMap()
+        return self.options!.getRealOptions(obj: self)
     }
     
     public func clearCache() {

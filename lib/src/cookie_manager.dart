@@ -22,7 +22,7 @@ class CookieManager {
 
   static CookieManager _init() {
     _channel.setMethodCallHandler(_handleMethod);
-    _instance = new CookieManager();
+    _instance = CookieManager();
     return _instance;
   }
 

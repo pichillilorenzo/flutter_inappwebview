@@ -16,6 +16,15 @@ class WebViewOptions {
   static WebViewOptions fromMap(Map<String, dynamic> map) {
     return null;
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 class BrowserOptions {
@@ -26,6 +35,15 @@ class BrowserOptions {
   static BrowserOptions fromMap(Map<String, dynamic> map) {
     return null;
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 class ChromeSafariBrowserOptions {
@@ -35,6 +53,15 @@ class ChromeSafariBrowserOptions {
 
   static ChromeSafariBrowserOptions fromMap(Map<String, dynamic> map) {
     return null;
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -148,8 +175,7 @@ class InAppWebViewOptions
       this.horizontalScrollBarEnabled = true,
       this.resourceCustomSchemes = const [],
       this.contentBlockers = const [],
-      this.preferredContentMode =
-          UserPreferredContentMode.RECOMMENDED,
+      this.preferredContentMode = UserPreferredContentMode.RECOMMENDED,
       this.useShouldInterceptAjaxRequest = false,
       this.useShouldInterceptFetchRequest = false,
       this.incognito = false,
@@ -229,8 +255,7 @@ class InAppWebViewOptions
         List<String>.from(map["resourceCustomSchemes"] ?? []);
     options.contentBlockers = contentBlockers;
     options.preferredContentMode =
-        UserPreferredContentMode.fromValue(
-            map["preferredContentMode"]);
+        UserPreferredContentMode.fromValue(map["preferredContentMode"]);
     options.useShouldInterceptAjaxRequest =
         map["useShouldInterceptAjaxRequest"];
     options.useShouldInterceptFetchRequest =
@@ -242,6 +267,16 @@ class InAppWebViewOptions
     options.disableHorizontalScroll = map["disableHorizontalScroll"];
     options.disableContextMenu = map["disableContextMenu"];
     return options;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -503,7 +538,8 @@ class AndroidInAppWebViewOptions
     this.overScrollMode = AndroidOverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,
     this.networkAvailable,
     this.scrollBarStyle = AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
-    this.verticalScrollbarPosition = AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+    this.verticalScrollbarPosition =
+        AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
     this.scrollBarDefaultDelayBeforeFade,
     this.scrollbarFadingEnabled = true,
     this.scrollBarFadeDuration,
@@ -589,19 +625,16 @@ class AndroidInAppWebViewOptions
     options.appCachePath = map["appCachePath"];
     options.blockNetworkImage = map["blockNetworkImage"];
     options.blockNetworkLoads = map["blockNetworkLoads"];
-    options.cacheMode =
-        AndroidCacheMode.fromValue(map["cacheMode"]);
+    options.cacheMode = AndroidCacheMode.fromValue(map["cacheMode"]);
     options.cursiveFontFamily = map["cursiveFontFamily"];
     options.defaultFixedFontSize = map["defaultFixedFontSize"];
     options.defaultFontSize = map["defaultFontSize"];
     options.defaultTextEncodingName = map["defaultTextEncodingName"];
     options.disabledActionModeMenuItems =
-        AndroidActionModeMenuItem.fromValue(
-            map["disabledActionModeMenuItems"]);
+        AndroidActionModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
     options.fantasyFontFamily = map["fantasyFontFamily"];
     options.fixedFontFamily = map["fixedFontFamily"];
-    options.forceDark =
-        AndroidForceDark.fromValue(map["forceDark"]);
+    options.forceDark = AndroidForceDark.fromValue(map["forceDark"]);
     options.geolocationEnabled = map["geolocationEnabled"];
     options.layoutAlgorithm =
         AndroidLayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
@@ -618,18 +651,35 @@ class AndroidInAppWebViewOptions
     options.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
     options.hardwareAcceleration = map["hardwareAcceleration"];
     options.supportMultipleWindows = map["supportMultipleWindows"];
-    options.regexToCancelSubFramesLoading = map["regexToCancelSubFramesLoading"];
+    options.regexToCancelSubFramesLoading =
+        map["regexToCancelSubFramesLoading"];
     options.useShouldInterceptRequest = map["useShouldInterceptRequest"];
     options.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-    options.overScrollMode = AndroidOverScrollMode.fromValue(map["overScrollMode"]);
+    options.overScrollMode =
+        AndroidOverScrollMode.fromValue(map["overScrollMode"]);
     options.networkAvailable = map["networkAvailable"];
-    options.scrollBarStyle = AndroidScrollBarStyle.fromValue(map["scrollBarStyle"]);
-    options.verticalScrollbarPosition = AndroidVerticalScrollbarPosition.fromValue(map["verticalScrollbarPosition"]);
-    options.scrollBarDefaultDelayBeforeFade = map["scrollBarDefaultDelayBeforeFade"];
+    options.scrollBarStyle =
+        AndroidScrollBarStyle.fromValue(map["scrollBarStyle"]);
+    options.verticalScrollbarPosition =
+        AndroidVerticalScrollbarPosition.fromValue(
+            map["verticalScrollbarPosition"]);
+    options.scrollBarDefaultDelayBeforeFade =
+        map["scrollBarDefaultDelayBeforeFade"];
     options.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
     options.scrollBarFadeDuration = map["scrollBarFadeDuration"];
-    options.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(map["rendererPriorityPolicy"]?.cast<String, dynamic>());
+    options.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
+        map["rendererPriorityPolicy"]?.cast<String, dynamic>());
     return options;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -786,7 +836,8 @@ class IOSInAppWebViewOptions
       "selectionGranularity": selectionGranularity.toValue(),
       "dataDetectorTypes": dataDetectorTypesList,
       "sharedCookiesEnabled": sharedCookiesEnabled,
-      "automaticallyAdjustsScrollIndicatorInsets": automaticallyAdjustsScrollIndicatorInsets,
+      "automaticallyAdjustsScrollIndicatorInsets":
+          automaticallyAdjustsScrollIndicatorInsets,
       "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
       "decelerationRate": decelerationRate.toValue(),
       "alwaysBounceVertical": alwaysBounceVertical,
@@ -803,8 +854,7 @@ class IOSInAppWebViewOptions
     List<String> dataDetectorTypesList =
         List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorType) {
-      dataDetectorTypes
-          .add(IOSWKDataDetectorTypes.fromValue(dataDetectorType));
+      dataDetectorTypes.add(IOSWKDataDetectorTypes.fromValue(dataDetectorType));
     });
 
     IOSInAppWebViewOptions options = IOSInAppWebViewOptions();
@@ -824,13 +874,15 @@ class IOSInAppWebViewOptions
     options.isFraudulentWebsiteWarningEnabled =
         map["isFraudulentWebsiteWarningEnabled"];
     options.selectionGranularity =
-        IOSWKSelectionGranularity.fromValue(
-            map["selectionGranularity"]);
+        IOSWKSelectionGranularity.fromValue(map["selectionGranularity"]);
     options.dataDetectorTypes = dataDetectorTypes;
     options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
-    options.automaticallyAdjustsScrollIndicatorInsets = map["automaticallyAdjustsScrollIndicatorInsets"];
-    options.accessibilityIgnoresInvertColors = map["accessibilityIgnoresInvertColors"];
-    options.decelerationRate = IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"]);
+    options.automaticallyAdjustsScrollIndicatorInsets =
+        map["automaticallyAdjustsScrollIndicatorInsets"];
+    options.accessibilityIgnoresInvertColors =
+        map["accessibilityIgnoresInvertColors"];
+    options.decelerationRate =
+        IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"]);
     options.alwaysBounceVertical = map["alwaysBounceVertical"];
     options.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
     options.scrollsToTop = map["scrollsToTop"];
@@ -838,6 +890,16 @@ class IOSInAppWebViewOptions
     options.maximumZoomScale = map["maximumZoomScale"];
     options.minimumZoomScale = map["minimumZoomScale"];
     return options;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -881,6 +943,16 @@ class InAppBrowserOptions
     options.hideUrlBar = map["hideUrlBar"];
     return options;
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///This class represents all the Android-only [InAppBrowser] options available.
@@ -920,6 +992,16 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
     options.closeOnCannotGoBack = map["closeOnCannotGoBack"];
     options.progressBar = map["progressBar"];
     return options;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -987,6 +1069,16 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
     options.spinner = map["spinner"];
     return options;
   }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///This class represents all the Android-only [ChromeSafariBrowser] options available.
@@ -1050,6 +1142,16 @@ class AndroidChromeCustomTabsOptions
     options.packageName = map["packageName"];
     options.keepAliveEnabled = map["keepAliveEnabled"];
     return options;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -1117,5 +1219,15 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     options.transitionStyle =
         IOSUIModalTransitionStyle.fromValue(map["transitionStyle"]);
     return options;
+  }
+
+  @override
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }

@@ -87,6 +87,24 @@ class LoadedResource {
   double duration;
 
   LoadedResource({this.initiatorType, this.url, this.startTime, this.duration});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "initiatorType": initiatorType,
+      "url": url,
+      "startTime": startTime,
+      "duration": duration
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Initial [data] as a content for an [WebView] instance, using [baseUrl] as the base URL for it.
@@ -122,6 +140,15 @@ class InAppWebViewInitialData {
       "historyUrl": historyUrl
     };
   }
+
+  Map<String, String> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class representing a resource request of the WebView used by the event [WebView.androidShouldInterceptRequest].
@@ -131,14 +158,17 @@ class InAppWebViewInitialData {
 class WebResourceRequest {
   ///The URL for which the resource request was made.
   String url;
+
   ///The headers associated with the request.
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `null`.
   Map<String, String> headers;
+
   ///The method associated with the request, for example `GET`.
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it will be always "GET".
   String method;
+
   ///Gets whether a gesture (such as a click) was associated with the request.
   ///For security reasons in certain situations this method may return `false` even though
   ///the sequence of events which caused the request to be created was initiated by a user
@@ -146,23 +176,44 @@ class WebResourceRequest {
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `false`.
   bool hasGesture;
+
   ///Whether the request was made in order to fetch the main frame's document.
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `true`.
   bool isForMainFrame;
+
   ///Whether the request was a result of a server-side redirect.
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `false`.
   bool isRedirect;
 
-  WebResourceRequest({
-    @required this.url,
-    this.headers,
-    this.method,
-    this.hasGesture,
-    this.isForMainFrame,
-    this.isRedirect
-  });
+  WebResourceRequest(
+      {@required this.url,
+      this.headers,
+      this.method,
+      this.hasGesture,
+      this.isForMainFrame,
+      this.isRedirect});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url,
+      "headers": headers,
+      "method": method,
+      "hasGesture": hasGesture,
+      "isForMainFrame": isForMainFrame,
+      "isRedirect": isRedirect
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class representing a resource response of the WebView used by the event [WebView.androidShouldInterceptRequest].
@@ -172,33 +223,37 @@ class WebResourceRequest {
 class WebResourceResponse {
   ///The resource response's MIME type, for example `text/html`.
   String contentType;
+
   ///The resource response's encoding. The default value is `utf-8`.
   String contentEncoding;
+
   ///The data provided by the resource response.
   Uint8List data;
+
   ///The headers for the resource response. If [headers] isn't `null`, then you need to set also [statusCode] and [reasonPhrase].
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
   Map<String, String> headers;
+
   ///The status code needs to be in the ranges [100, 299], [400, 599]. Causing a redirect by specifying a 3xx code is not supported.
   ///If statusCode is set, then you need to set also [headers] and [reasonPhrase]. This value cannot be `null`.
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
   int statusCode;
+
   ///The phrase describing the status code, for example `"OK"`. Must be non-empty.
   ///If reasonPhrase is set, then you need to set also [headers] and [reasonPhrase]. This value cannot be `null`.
   ///
   ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
   String reasonPhrase;
 
-  WebResourceResponse({
-    this.contentType = "",
-    this.contentEncoding = "utf-8",
-    this.data = null,
-    this.headers,
-    this.statusCode,
-    this.reasonPhrase
-  });
+  WebResourceResponse(
+      {this.contentType = "",
+      this.contentEncoding = "utf-8",
+      this.data = null,
+      this.headers,
+      this.statusCode,
+      this.reasonPhrase});
 
   Map<String, dynamic> toMap() {
     return {
@@ -208,6 +263,15 @@ class WebResourceResponse {
       "statusCode": statusCode,
       "reasonPhrase": reasonPhrase
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -228,12 +292,21 @@ class CustomSchemeResponse {
       @required this.contentType,
       this.contentEnconding = 'utf-8'});
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toMap() {
     return {
       'content-type': contentType,
       'content-encoding': contentEnconding,
       'data': data
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -247,6 +320,19 @@ class ConsoleMessage {
 
   ConsoleMessage(
       {this.message = "", this.messageLevel = ConsoleMessageLevel.LOG});
+
+  Map<String, dynamic> toMap() {
+    return {"message": message, "messageLevel": messageLevel?.toValue()};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///This class contains a snapshot of the current back/forward list for a [WebView].
@@ -258,6 +344,19 @@ class WebHistory {
   int currentIndex;
 
   WebHistory({this.list, this.currentIndex});
+
+  Map<String, dynamic> toMap() {
+    return {"list": list, "currentIndex": currentIndex};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///A convenience class for accessing fields in an entry in the back/forward list of a WebView. Each [WebHistoryItem] is a snapshot of the requested history item.
@@ -279,6 +378,25 @@ class WebHistoryItem {
 
   WebHistoryItem(
       {this.originalUrl, this.title, this.url, this.index, this.offset});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "originalUrl": originalUrl,
+      "title": title,
+      "url": url,
+      "index": index,
+      "offset": offset
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.androidOnGeolocationPermissionsShowPrompt] event.
@@ -297,6 +415,15 @@ class GeolocationPermissionShowPromptResponse {
 
   Map<String, dynamic> toMap() {
     return {"origin": origin, "allow": allow, "retain": retain};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -343,6 +470,15 @@ class JsAlertResponse {
       "handledByClient": handledByClient,
       "action": action?.toValue()
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -395,6 +531,15 @@ class JsConfirmResponse {
       "handledByClient": handledByClient,
       "action": action?.toValue()
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -457,6 +602,15 @@ class JsPromptResponse {
       "value": value,
       "action": action?.toValue()
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -547,6 +701,15 @@ class SafeBrowsingResponse {
   Map<String, dynamic> toMap() {
     return {"report": report, "action": action?.toValue()};
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by [HttpAuthResponse] class.
@@ -601,6 +764,15 @@ class HttpAuthResponse {
       "action": action?.toValue()
     };
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
@@ -615,6 +787,22 @@ class HttpAuthChallenge {
   HttpAuthChallenge(
       {@required this.previousFailureCount, @required this.protectionSpace})
       : assert(previousFailureCount != null && protectionSpace != null);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "previousFailureCount": previousFailureCount,
+      "protectionSpace": protectionSpace?.toMap()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents a protection space requiring authentication.
@@ -636,6 +824,19 @@ class ProtectionSpace {
   ProtectionSpace(
       {@required this.host, @required this.protocol, this.realm, this.port})
       : assert(host != null && protocol != null);
+
+  Map<String, dynamic> toMap() {
+    return {"host": host, "protocol": protocol, "realm": realm, "port": port};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the credentials of an http authentication.
@@ -649,6 +850,19 @@ class HttpAuthCredential {
 
   HttpAuthCredential({@required this.username, @required this.password})
       : assert(username != null && password != null);
+
+  Map<String, dynamic> toMap() {
+    return {"username": username, "password": password};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by [ServerTrustAuthResponse] class.
@@ -681,6 +895,15 @@ class ServerTrustAuthResponse {
   Map<String, dynamic> toMap() {
     return {"action": action?.toValue()};
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the challenge of the [WebView.onReceivedServerTrustAuthRequest] event.
@@ -708,6 +931,24 @@ class ServerTrustChallenge {
       this.message,
       this.serverCertificate})
       : assert(protectionSpace != null && error != null);
+
+  Map<String, dynamic> toMap() {
+    return {
+      "protectionSpace": protectionSpace?.toMap(),
+      "error": error,
+      "message": message,
+      "serverCertificate": serverCertificate
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by [ClientCertResponse] class.
@@ -764,6 +1005,15 @@ class ClientCertResponse {
       "action": action?.toValue()
     };
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the challenge of the [WebView.onReceivedClientCertRequest] event.
@@ -774,6 +1024,19 @@ class ClientCertChallenge {
 
   ClientCertChallenge({@required this.protectionSpace})
       : assert(protectionSpace != null);
+
+  Map<String, dynamic> toMap() {
+    return {"protectionSpace": protectionSpace?.toMap()};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents a favicon of a website. It is used by [InAppWebViewController.getFavicons] method.
@@ -793,8 +1056,17 @@ class Favicon {
   Favicon({@required this.url, this.rel, this.width, this.height})
       : assert(url != null);
 
+  Map<String, dynamic> toMap() {
+    return {"url": url, "rel": rel, "width": width, "height": height};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
   String toString() {
-    return "url: $url, rel: $rel, width: $width, height: $height";
+    return toMap().toString();
   }
 }
 
@@ -949,7 +1221,7 @@ class AndroidLayoutAlgorithm {
   const AndroidLayoutAlgorithm._internal(this._value);
 
   static AndroidLayoutAlgorithm fromValue(String value) {
-    return (["NORMAL", "TEXT_AUTOSIZING"].contains(value))
+    return (["NORMAL", "TEXT_AUTOSIZING", "NARROW_COLUMNS"].contains(value))
         ? AndroidLayoutAlgorithm._internal(value)
         : null;
   }
@@ -968,6 +1240,10 @@ class AndroidLayoutAlgorithm {
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =
       const AndroidLayoutAlgorithm._internal("TEXT_AUTOSIZING");
+
+  ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
+  static const NARROW_COLUMNS =
+      const AndroidLayoutAlgorithm._internal("NARROW_COLUMNS");
 
   bool operator ==(value) => value == _value;
 
@@ -1414,6 +1690,11 @@ class InAppWebViewGroupOptions {
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the options that can be used for an [InAppBrowser] WebView.
@@ -1455,6 +1736,11 @@ class InAppBrowserClassOptions {
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the options that can be used for an [ChromeSafariBrowser] window.
@@ -1478,6 +1764,11 @@ class ChromeSafariBrowserClassOptions {
 
   Map<String, dynamic> toJson() {
     return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -1508,6 +1799,11 @@ class AjaxRequestAction {
 
   Map<String, dynamic> toJson() {
     return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -1770,6 +2066,11 @@ class AjaxRequest {
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by [FetchRequest] class.
@@ -1802,6 +2103,15 @@ class FetchRequestCredential {
   Map<String, dynamic> toMap() {
     return {"type": type};
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the default credentials used by an [FetchRequest].
@@ -1816,6 +2126,15 @@ class FetchRequestCredentialDefault extends FetchRequestCredential {
       "type": type,
       "value": value,
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -1850,6 +2169,15 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
       "iconURL": iconURL
     };
   }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents a [PasswordCredential](https://developer.mozilla.org/en-US/docs/Web/API/PasswordCredential) type of credentials.
@@ -1878,6 +2206,15 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
       "password": password,
       "iconURL": iconURL
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -1957,6 +2294,11 @@ class FetchRequest {
 
   Map<String, dynamic> toJson() {
     return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 
   static FetchRequestCredential createFetchRequestCredentialFromMap(
@@ -2111,6 +2453,19 @@ class Cookie {
   dynamic value;
 
   Cookie({@required this.name, @required this.value});
+
+  Map<String, dynamic> toMap() {
+    return {"name": name, "value": value};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by [PermissionRequestResponse] class.
@@ -2147,6 +2502,15 @@ class PermissionRequestResponse {
 
   Map<String, dynamic> toMap() {
     return {"resources": resources, "action": action?.toValue()};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -2251,6 +2615,27 @@ class ShouldOverrideUrlLoadingRequest {
       this.androidHasGesture,
       this.androidIsRedirect,
       this.iosWKNavigationType});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url,
+      "headers": headers,
+      "method": method,
+      "isForMainFrame": isForMainFrame,
+      "androidHasGesture": androidHasGesture,
+      "androidIsRedirect": androidIsRedirect,
+      "iosWKNavigationType": iosWKNavigationType?.toValue()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the navigation request used by the [WebView.onCreateWindow] event.
@@ -2272,6 +2657,24 @@ class OnCreateWindowRequest {
       this.androidIsDialog,
       this.androidIsUserGesture,
       this.iosWKNavigationType});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url,
+      "androidIsDialog": androidIsDialog,
+      "androidIsUserGesture": androidIsUserGesture,
+      "iosWKNavigationType": iosWKNavigationType?.toValue()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that encapsulates information about the amount of storage currently used by an origin for the JavaScript storage APIs.
@@ -2292,6 +2695,11 @@ class AndroidWebStorageOrigin {
     return {"origin": origin, "quota": quota, "usage": usage};
   }
 
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
   String toString() {
     return toMap().toString();
   }
@@ -2415,6 +2823,11 @@ class IOSWKWebsiteDataRecord {
     return {"displayName": displayName, "dataTypes": dataTypesString};
   }
 
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
   String toString() {
     return toMap().toString();
   }
@@ -2499,6 +2912,19 @@ class InAppWebViewHitTestResult {
   String extra;
 
   InAppWebViewHitTestResult({this.type, this.extra});
+
+  Map<String, dynamic> toMap() {
+    return {"type": type?.toValue(), "extra": extra};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class that represents the action to take used by the [WebView.androidOnRenderProcessUnresponsive] and [WebView.androidOnRenderProcessResponsive] event
@@ -2519,9 +2945,7 @@ class WebViewRenderProcessAction {
   int get hashCode => _value.hashCode;
 
   Map<String, dynamic> toMap() {
-    return {
-      "action": _value
-    };
+    return {"action": _value};
   }
 }
 
@@ -2532,11 +2956,28 @@ class RenderProcessGoneDetail {
   ///
   ///If the render process was killed, this is most likely caused by the system being low on memory.
   bool didCrash;
+
   /// Returns the renderer priority that was set at the time that the renderer exited. This may be greater than the priority that
   /// any individual [WebView] requested using [].
   RendererPriority rendererPriorityAtExit;
 
   RenderProcessGoneDetail({this.didCrash, this.rendererPriorityAtExit});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "didCrash": didCrash,
+      "rendererPriorityAtExit": rendererPriorityAtExit?.toValue()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }
 
 ///Class used by [RendererPriorityPolicy] class.
@@ -2574,7 +3015,8 @@ class RendererPriority {
   static const RENDERER_PRIORITY_BOUND = const RendererPriority._internal(1);
 
   ///The renderer associated with this WebView is bound with Android `Context#BIND_IMPORTANT`.
-  static const RENDERER_PRIORITY_IMPORTANT = const RendererPriority._internal(2);
+  static const RENDERER_PRIORITY_IMPORTANT =
+      const RendererPriority._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -2591,10 +3033,13 @@ class RendererPriority {
 class RendererPriorityPolicy {
   ///The minimum priority at which this WebView desires the renderer process to be bound.
   RendererPriority rendererRequestedPriority;
+
   ///If true, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
   bool waivedWhenNotVisible;
 
-  RendererPriorityPolicy({@required this.rendererRequestedPriority, @required this.waivedWhenNotVisible});
+  RendererPriorityPolicy(
+      {@required this.rendererRequestedPriority,
+      @required this.waivedWhenNotVisible});
 
   Map<String, dynamic> toMap() {
     return {
@@ -2603,11 +3048,22 @@ class RendererPriorityPolicy {
     };
   }
 
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+
   static RendererPriorityPolicy fromMap(Map<String, dynamic> map) {
-    return map != null ? RendererPriorityPolicy(
-      rendererRequestedPriority: RendererPriority.fromValue(map["rendererRequestedPriority"]),
-      waivedWhenNotVisible: map["waivedWhenNotVisible"]
-    ) : RendererPriorityPolicy();
+    return map != null
+        ? RendererPriorityPolicy(
+            rendererRequestedPriority:
+                RendererPriority.fromValue(map["rendererRequestedPriority"]),
+            waivedWhenNotVisible: map["waivedWhenNotVisible"])
+        : RendererPriorityPolicy();
   }
 }
 
@@ -2631,9 +3087,16 @@ class FormResubmissionAction {
   int get hashCode => _value.hashCode;
 
   Map<String, dynamic> toMap() {
-    return {
-      "action": _value
-    };
+    return {"action": _value};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -2666,16 +3129,14 @@ class AndroidOverScrollMode {
   }
 
   ///Always allow a user to over-scroll this view, provided it is a view that can scroll.
-  static const OVER_SCROLL_ALWAYS =
-  const AndroidOverScrollMode._internal(0);
+  static const OVER_SCROLL_ALWAYS = const AndroidOverScrollMode._internal(0);
 
   ///Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
   static const OVER_SCROLL_IF_CONTENT_SCROLLS =
-  const AndroidOverScrollMode._internal(1);
+      const AndroidOverScrollMode._internal(1);
 
   ///Never allow a user to over-scroll this view.
-  static const OVER_SCROLL_NEVER =
-  const AndroidOverScrollMode._internal(2);
+  static const OVER_SCROLL_NEVER = const AndroidOverScrollMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -2721,22 +3182,22 @@ class AndroidScrollBarStyle {
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
   static const SCROLLBARS_INSIDE_OVERLAY =
-  const AndroidScrollBarStyle._internal(0);
+      const AndroidScrollBarStyle._internal(0);
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
-  const AndroidScrollBarStyle._internal(16777216);
+      const AndroidScrollBarStyle._internal(16777216);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
   static const SCROLLBARS_OUTSIDE_OVERLAY =
-  const AndroidScrollBarStyle._internal(33554432);
+      const AndroidScrollBarStyle._internal(33554432);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
-  const AndroidScrollBarStyle._internal(50331648);
+      const AndroidScrollBarStyle._internal(50331648);
 
   bool operator ==(value) => value == _value;
 
@@ -2773,15 +3234,15 @@ class AndroidVerticalScrollbarPosition {
 
   ///Position the scroll bar at the default position as determined by the system.
   static const SCROLLBAR_POSITION_DEFAULT =
-  const AndroidVerticalScrollbarPosition._internal(0);
+      const AndroidVerticalScrollbarPosition._internal(0);
 
   ///Position the scroll bar along the left edge.
   static const SCROLLBAR_POSITION_LEFT =
-  const AndroidVerticalScrollbarPosition._internal(1);
+      const AndroidVerticalScrollbarPosition._internal(1);
 
   ///Position the scroll bar along the right edge.
   static const SCROLLBAR_POSITION_RIGHT =
-  const AndroidVerticalScrollbarPosition._internal(2);
+      const AndroidVerticalScrollbarPosition._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -2793,15 +3254,29 @@ class AndroidVerticalScrollbarPosition {
 class AndroidWebViewPackageInfo {
   ///The version name of this WebView package.
   String versionName;
+
   ///The name of this WebView package.
   String packageName;
 
   AndroidWebViewPackageInfo({this.versionName, this.packageName});
 
   static AndroidWebViewPackageInfo fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidWebViewPackageInfo(
-      versionName: map["versionName"],
-      packageName: map["packageName"]
-    ) : AndroidWebViewPackageInfo();
+    return map != null
+        ? AndroidWebViewPackageInfo(
+            versionName: map["versionName"], packageName: map["packageName"])
+        : AndroidWebViewPackageInfo();
+  }
+
+  Map<String, dynamic> toMap() {
+    return {"versionName": versionName, "packageName": packageName};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }

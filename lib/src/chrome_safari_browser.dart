@@ -17,7 +17,8 @@ class ChromeSafariBrowser {
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   bool _isOpened = false;
   MethodChannel _channel;
-  static const MethodChannel _sharedChannel = const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
+  static const MethodChannel _sharedChannel =
+      const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
   ///Initialize the [ChromeSafariBrowser] instance with an [InAppBrowser] fallback instance or `null`.
   ChromeSafariBrowser({bFallback}) {
@@ -73,10 +74,7 @@ class ChromeSafariBrowser {
 
     List<Map<String, dynamic>> menuItemList = new List();
     _menuItems.forEach((key, value) {
-      menuItemList.add({
-        "id": value.id,
-        "label": value.label
-      });
+      menuItemList.add({"id": value.id, "label": value.label});
     });
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -84,11 +82,11 @@ class ChromeSafariBrowser {
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('options', () => options?.toMap() ?? {});
     args.putIfAbsent('menuItemList', () => menuItemList);
-    args.putIfAbsent('uuidFallback',
-            () => (browserFallback != null) ? browserFallback.uuid : '');
-    args.putIfAbsent('headersFallback', () => headersFallback);
+    args.putIfAbsent('uuidFallback', () => browserFallback?.uuid);
+    args.putIfAbsent('headersFallback', () => headersFallback ?? {});
     args.putIfAbsent('optionsFallback', () => optionsFallback?.toMap() ?? {});
-    args.putIfAbsent('contextMenuFallback', () => browserFallback?.contextMenu?.toMap() ?? {});
+    args.putIfAbsent('contextMenuFallback',
+        () => browserFallback?.contextMenu?.toMap() ?? {});
     await _sharedChannel.invokeMethod('open', args);
     this._isOpened = true;
   }
@@ -142,10 +140,30 @@ class ChromeSafariBrowser {
   }
 }
 
+///Class that represents a custom menu item for a [ChromeSafariBrowser] instance.
 class ChromeSafariBrowserMenuItem {
+  ///The menu item id
   int id;
+
+  ///The label of the menu item
   String label;
+
+  ///Callback function to be invoked when the menu item is clicked
   final void Function(String url, String title) action;
 
-  ChromeSafariBrowserMenuItem({@required this.id, @required this.label, @required this.action});
+  ChromeSafariBrowserMenuItem(
+      {@required this.id, @required this.label, @required this.action});
+
+  Map<String, dynamic> toMap() {
+    return {"id": id, "label": label};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }

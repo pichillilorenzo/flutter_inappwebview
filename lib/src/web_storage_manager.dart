@@ -40,10 +40,15 @@ class AndroidWebStorageManager {
     List<AndroidWebStorageOrigin> originsList = [];
 
     Map<String, dynamic> args = <String, dynamic>{};
-    List<Map<dynamic, dynamic>> origins = (await WebStorageManager._channel.invokeMethod('getOrigins', args)).cast<Map<dynamic, dynamic>>();
+    List<Map<dynamic, dynamic>> origins =
+        (await WebStorageManager._channel.invokeMethod('getOrigins', args))
+            .cast<Map<dynamic, dynamic>>();
 
-    for(var origin in origins) {
-      originsList.add(AndroidWebStorageOrigin(origin: origin["origin"], quota: origin["quota"], usage: origin["usage"]));
+    for (var origin in origins) {
+      originsList.add(AndroidWebStorageOrigin(
+          origin: origin["origin"],
+          quota: origin["quota"],
+          usage: origin["usage"]));
     }
 
     return originsList;
@@ -72,7 +77,8 @@ class AndroidWebStorageManager {
     assert(origin != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("origin", () => origin);
-    return await WebStorageManager._channel.invokeMethod('getQuotaForOrigin', args);
+    return await WebStorageManager._channel
+        .invokeMethod('getQuotaForOrigin', args);
   }
 
   ///Gets the amount of storage currently being used by both the Application Cache and Web SQL Database APIs by the given [origin].
@@ -81,7 +87,8 @@ class AndroidWebStorageManager {
     assert(origin != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("origin", () => origin);
-    return await WebStorageManager._channel.invokeMethod('getUsageForOrigin', args);
+    return await WebStorageManager._channel
+        .invokeMethod('getUsageForOrigin', args);
   }
 }
 
@@ -93,7 +100,8 @@ class IOSWebStorageManager {
   ///Fetches data records containing the given website data types.
   ///
   ///[dataTypes] represents the website data types to fetch records for.
-  Future<List<IOSWKWebsiteDataRecord>> fetchDataRecords({@required Set<IOSWKWebsiteDataType> dataTypes}) async {
+  Future<List<IOSWKWebsiteDataRecord>> fetchDataRecords(
+      {@required Set<IOSWKWebsiteDataType> dataTypes}) async {
     assert(dataTypes != null);
     List<IOSWKWebsiteDataRecord> recordList = [];
     List<String> dataTypesList = [];
@@ -102,14 +110,17 @@ class IOSWebStorageManager {
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
-    List<Map<dynamic, dynamic>> records = (await WebStorageManager._channel.invokeMethod('fetchDataRecords', args)).cast<Map<dynamic, dynamic>>();
-    for(var record in records) {
+    List<Map<dynamic, dynamic>> records = (await WebStorageManager._channel
+            .invokeMethod('fetchDataRecords', args))
+        .cast<Map<dynamic, dynamic>>();
+    for (var record in records) {
       List<String> dataTypesString = record["dataTypes"].cast<String>();
       Set<IOSWKWebsiteDataType> dataTypes = Set();
-      for(var dataType in dataTypesString) {
+      for (var dataType in dataTypesString) {
         dataTypes.add(IOSWKWebsiteDataType.fromValue(dataType));
       }
-      recordList.add(IOSWKWebsiteDataRecord(displayName: record["displayName"], dataTypes: dataTypes));
+      recordList.add(IOSWKWebsiteDataRecord(
+          displayName: record["displayName"], dataTypes: dataTypes));
     }
     return recordList;
   }
@@ -119,7 +130,9 @@ class IOSWebStorageManager {
   ///[dataTypes] represents the website data types that should be removed.
   ///
   ///[dataRecords] represents the website data records to delete website data for.
-  Future<void> removeDataFor({@required Set<IOSWKWebsiteDataType> dataTypes, @required List<IOSWKWebsiteDataRecord> dataRecords}) async {
+  Future<void> removeDataFor(
+      {@required Set<IOSWKWebsiteDataType> dataTypes,
+      @required List<IOSWKWebsiteDataRecord> dataRecords}) async {
     assert(dataTypes != null && dataRecords != null);
 
     List<String> dataTypesList = [];
@@ -143,7 +156,9 @@ class IOSWebStorageManager {
   ///[dataTypes] represents the website data types that should be removed.
   ///
   ///[date] represents a date. All website data modified after this date will be removed.
-  Future<void> removeDataModifiedSince({@required Set<IOSWKWebsiteDataType> dataTypes, @required DateTime date}) async {
+  Future<void> removeDataModifiedSince(
+      {@required Set<IOSWKWebsiteDataType> dataTypes,
+      @required DateTime date}) async {
     assert(dataTypes != null && date != null);
 
     List<String> dataTypesList = [];
@@ -156,6 +171,7 @@ class IOSWebStorageManager {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
     args.putIfAbsent("timestamp", () => timestamp);
-    await WebStorageManager._channel.invokeMethod('removeDataModifiedSince', args);
+    await WebStorageManager._channel
+        .invokeMethod('removeDataModifiedSince', args);
   }
 }

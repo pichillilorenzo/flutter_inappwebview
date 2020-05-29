@@ -22,7 +22,7 @@ class HttpAuthCredentialDatabase {
 
   static HttpAuthCredentialDatabase _init() {
     _channel.setMethodCallHandler(_handleMethod);
-    _instance = new HttpAuthCredentialDatabase();
+    _instance = HttpAuthCredentialDatabase();
     return _instance;
   }
 

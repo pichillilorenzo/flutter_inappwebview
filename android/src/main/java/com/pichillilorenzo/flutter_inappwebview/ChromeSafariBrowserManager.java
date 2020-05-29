@@ -72,14 +72,14 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
       intent = new Intent(activity, ChromeCustomTabsActivity.class);
     }
     // check for webview fallback
-    else if (!CustomTabActivityHelper.isAvailable(activity) && !uuidFallback.isEmpty()) {
+    else if (!CustomTabActivityHelper.isAvailable(activity) && uuidFallback != null) {
       Log.d(LOG_TAG, "WebView fallback declared.");
       // overwrite with extras fallback parameters
       extras.putString("uuid", uuidFallback);
       if (optionsFallback != null)
         extras.putSerializable("options", optionsFallback);
       else
-        extras.putSerializable("options", (new InAppBrowserOptions()).getHashMap());
+        extras.putSerializable("options", (Serializable) (new InAppBrowserOptions()).toMap());
       intent = new Intent(activity, InAppBrowserActivity.class);
     }
 

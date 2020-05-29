@@ -5,7 +5,7 @@ import com.pichillilorenzo.flutter_inappwebview.Options;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InAppBrowserOptions implements Options {
+public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
 
   public static final String LOG_TAG = "InAppBrowserOptions";
 
@@ -20,7 +20,7 @@ public class InAppBrowserOptions implements Options {
   public Boolean progressBar = true;
 
   @Override
-  public InAppBrowserOptions parse(HashMap<String, Object> options) {
+  public InAppBrowserOptions parse(Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -60,8 +60,8 @@ public class InAppBrowserOptions implements Options {
   }
 
   @Override
-  public HashMap<String, Object> getHashMap() {
-    HashMap<String, Object> options = new HashMap<>();
+  public Map<String, Object> toMap() {
+    Map<String, Object> options = new HashMap<>();
     options.put("hidden", hidden);
     options.put("toolbarTop", toolbarTop);
     options.put("toolbarTopBackgroundColor", toolbarTopBackgroundColor);
@@ -71,5 +71,11 @@ public class InAppBrowserOptions implements Options {
     options.put("closeOnCannotGoBack", closeOnCannotGoBack);
     options.put("progressBar", progressBar);
     return options;
+  }
+
+  @Override
+  public Map<String, Object> getRealOptions(InAppBrowserActivity inAppBrowserActivity) {
+    Map<String, Object> realOptions = toMap();
+    return realOptions;
   }
 }

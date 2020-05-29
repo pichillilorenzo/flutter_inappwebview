@@ -1,9 +1,10 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
-import java.util.HashMap;
+import java.util.Map;
 
-public interface Options {
+public interface Options<T> {
   static String LOG_TAG = "Options";
-  public Options parse(HashMap<String, Object> options);
-  public HashMap<String, Object> getHashMap();
+  public Options parse(Map<String, Object> options);
+  public Map<String, Object> toMap();
+  public Map<String, Object> getRealOptions(T webView);
 }

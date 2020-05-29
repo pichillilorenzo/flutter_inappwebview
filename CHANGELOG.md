@@ -1,5 +1,6 @@
 ## 3.3.0
 
+- Updated API docs
 - Updated Android context menu workaround
 - Calling `onCreateContextMenu` event on iOS also when the context menu is disabled in order to have the same effect as Android
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
@@ -10,11 +11,13 @@
 - Added `getCurrentWebViewPackage` static webview method on Android
 - Added `onPageCommitVisible` webview event
 - Added `androidShouldInterceptRequest`, `androidOnRenderProcessUnresponsive`, `androidOnRenderProcessResponsive`, `androidOnRenderProcessGone`, `androidOnFormResubmission`, `androidOnScaleChanged` Android events
+- Added `toString()` method to various classes in order to have a better output instead of simply `Instance of ...`
 - Fixed `Print preview is not working? java.lang.IllegalStateException: Can print only from an activity` [#128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/128)
 - Fixed `onJsAlert`, `onJsConfirm`, `onJsPrompt` for `InAppBrowser` on Android
 - Fixed `onActivityResult` for `InAppBrowser` on Android
 - Fixed `InAppBrowser.openWithSystemBrowser crash on iOS` [#358](https://github.com/pichillilorenzo/flutter_inappwebview/issues/358)
 - Fixed `Attempt to invoke virtual method 'java.util.Set java.util.HashMap.entrySet()' on a null object reference` [#367](https://github.com/pichillilorenzo/flutter_inappwebview/issues/367)
+- Fixed missing `allowsAirPlayForMediaPlayback` iOS webview options implementation
 
 ### BREAKING CHANGES
 

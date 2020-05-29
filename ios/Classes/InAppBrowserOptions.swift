@@ -8,7 +8,7 @@
 import Foundation
 
 @objcMembers
-public class InAppBrowserOptions: Options {
+public class InAppBrowserOptions: Options<InAppBrowserWebViewController> {
     
     var hidden = false
     var toolbarTop = true
@@ -29,5 +29,12 @@ public class InAppBrowserOptions: Options {
         super.init()
     }
     
+    override func getRealOptions(obj: InAppBrowserWebViewController?) -> [String: Any?] {
+        var realOptions: [String: Any?] = toMap()
+        if let inAppBrowserWebViewController = obj {
+            realOptions["presentationStyle"] = inAppBrowserWebViewController.modalPresentationStyle.rawValue
+            realOptions["transitionStyle"] = inAppBrowserWebViewController.modalTransitionStyle.rawValue
+        }
+        return realOptions
+    }
 }
-

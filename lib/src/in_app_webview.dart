@@ -116,7 +116,8 @@ class InAppWebView extends StatefulWidget implements WebView {
   final ContextMenu contextMenu;
 
   @override
-  final Future<void> Function(InAppWebViewController controller, String url) onPageCommitVisible;
+  final Future<void> Function(InAppWebViewController controller, String url)
+      onPageCommitVisible;
 
   @override
   final Future<void> Function(InAppWebViewController controller)
@@ -251,28 +252,33 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller) onExitFullscreen;
 
   @override
-  final Future<WebResourceResponse> Function(InAppWebViewController controller, WebResourceRequest request)
-  androidShouldInterceptRequest;
+  final Future<WebResourceResponse> Function(
+          InAppWebViewController controller, WebResourceRequest request)
+      androidShouldInterceptRequest;
 
   @override
-  final Future<WebViewRenderProcessAction> Function(InAppWebViewController controller, String url)
-  androidOnRenderProcessUnresponsive;
+  final Future<WebViewRenderProcessAction> Function(
+          InAppWebViewController controller, String url)
+      androidOnRenderProcessUnresponsive;
 
   @override
-  final Future<WebViewRenderProcessAction> Function(InAppWebViewController controller, String url)
-  androidOnRenderProcessResponsive;
+  final Future<WebViewRenderProcessAction> Function(
+          InAppWebViewController controller, String url)
+      androidOnRenderProcessResponsive;
 
   @override
-  final Future<void> Function(InAppWebViewController controller, RenderProcessGoneDetail detail)
-  androidOnRenderProcessGone;
+  final Future<void> Function(
+          InAppWebViewController controller, RenderProcessGoneDetail detail)
+      androidOnRenderProcessGone;
 
   @override
-  final Future<FormResubmissionAction> Function(InAppWebViewController controller, String url)
-  androidOnFormResubmission;
+  final Future<FormResubmissionAction> Function(
+      InAppWebViewController controller, String url) androidOnFormResubmission;
 
   @override
-  final Future<void> Function(InAppWebViewController controller, double oldScale, double newScale)
-  androidOnScaleChanged;
+  final Future<void> Function(
+          InAppWebViewController controller, double oldScale, double newScale)
+      androidOnScaleChanged;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

@@ -1590,7 +1590,8 @@ class AndroidInAppWebViewController {
   ///If `true`, [basename] is assumed to be a directory in which a filename will be chosen according to the URL of the current page.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
-  Future<String> saveWebArchive({@required String basename, @required bool autoname}) async {
+  Future<String> saveWebArchive(
+      {@required String basename, @required bool autoname}) async {
     assert(basename != null && autoname != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("basename", () => basename);
@@ -1681,7 +1682,10 @@ class AndroidInAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getCurrentWebViewPackage(android.content.Context)
   static Future<AndroidWebViewPackageInfo> getCurrentWebViewPackage() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic> packageInfo = (await InAppWebViewController._staticChannel.invokeMethod('getCurrentWebViewPackage', args))?.cast<String, dynamic>();
+    Map<String, dynamic> packageInfo = (await InAppWebViewController
+            ._staticChannel
+            .invokeMethod('getCurrentWebViewPackage', args))
+        ?.cast<String, dynamic>();
     return AndroidWebViewPackageInfo.fromMap(packageInfo);
   }
 }

@@ -7,8 +7,9 @@
 
 import Foundation
 
+@available(iOS 9.0, *)
 @objcMembers
-public class SafariBrowserOptions: Options {
+public class SafariBrowserOptions: Options<SafariViewController> {
     
     var entersReaderIfAvailable = false
     var barCollapsingEnabled = false
@@ -22,4 +23,17 @@ public class SafariBrowserOptions: Options {
         super.init()
     }
     
+    override func getRealOptions(obj: SafariViewController?) -> [String: Any?] {
+        var realOptions: [String: Any?] = toMap()
+        if let safariViewController = obj {
+            if #available(iOS 11.0, *) {
+                realOptions["entersReaderIfAvailable"] = safariViewController.configuration.entersReaderIfAvailable
+                realOptions["barCollapsingEnabled"] = safariViewController.configuration.barCollapsingEnabled
+                realOptions["dismissButtonStyle"] = safariViewController.dismissButtonStyle.rawValue
+            }
+            realOptions["presentationStyle"] = safariViewController.modalPresentationStyle.rawValue
+            realOptions["transitionStyle"] = safariViewController.modalTransitionStyle.rawValue
+        }
+        return realOptions
+    }
 }

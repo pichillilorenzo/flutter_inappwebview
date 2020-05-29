@@ -4,7 +4,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'main.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-  MyChromeSafariBrowser(browserFallback) : super(bFallback: browserFallback);
+  MyChromeSafariBrowser({browserFallback}) : super(bFallback: browserFallback);
 
   @override
   void onOpened() {
@@ -24,23 +24,23 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
 class ChromeSafariBrowserExampleScreen extends StatefulWidget {
   final ChromeSafariBrowser browser =
-      new MyChromeSafariBrowser(new InAppBrowser());
+      MyChromeSafariBrowser(browserFallback: InAppBrowser());
 
   @override
   _ChromeSafariBrowserExampleScreenState createState() =>
-      new _ChromeSafariBrowserExampleScreenState();
+      _ChromeSafariBrowserExampleScreenState();
 }
 
 class _ChromeSafariBrowserExampleScreenState
     extends State<ChromeSafariBrowserExampleScreen> {
   @override
   void initState() {
-    widget.browser.addMenuItem(new ChromeSafariBrowserMenuItem(id: 1, label: 'Custom item menu 1', action: (url, title) {
+    widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(id: 1, label: 'Custom item menu 1', action: (url, title) {
       print('Custom item menu 1 clicked!');
       print(url);
       print(title);
     }));
-    widget.browser.addMenuItem(new ChromeSafariBrowserMenuItem(id: 2, label: 'Custom item menu 2', action: (url, title) {
+    widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(id: 2, label: 'Custom item menu 2', action: (url, title) {
       print('Custom item menu 2 clicked!');
       print(url);
       print(title);

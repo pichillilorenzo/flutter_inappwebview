@@ -1,7 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
@@ -73,6 +72,7 @@ final public class InAppWebView extends InputAwareWebView {
   public InAppWebViewClient inAppWebViewClient;
   public InAppWebViewChromeClient inAppWebViewChromeClient;
   public InAppWebViewRenderProcessClient inAppWebViewRenderProcessClient;
+  public JavaScriptBridgeInterface javaScriptBridgeInterface;
   public InAppWebViewOptions options;
   public boolean isLoading = false;
   public OkHttpClient httpClient;
@@ -632,7 +632,8 @@ final public class InAppWebView extends InputAwareWebView {
 
     httpClient = new OkHttpClient().newBuilder().build();
 
-    addJavascriptInterface(new JavaScriptBridgeInterface((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView), JavaScriptBridgeInterface.name);
+    javaScriptBridgeInterface = new JavaScriptBridgeInterface((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
+    addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeInterface.name);
 
     inAppWebViewChromeClient = new InAppWebViewChromeClient((isFromInAppBrowserActivity) ? inAppBrowserActivity : flutterWebView);
     setWebChromeClient(inAppWebViewChromeClient);
@@ -1373,8 +1374,8 @@ final public class InAppWebView extends InputAwareWebView {
     options = newOptions;
   }
 
-  public HashMap<String, Object> getOptions() {
-    return (options != null) ? options.getHashMap() : null;
+  public Map<String, Object> getOptions() {
+    return (options != null) ? options.getRealOptions(this) : null;
   }
 
   public void injectDeferredObject(String source, String jsWrapper, final MethodChannel.Result result) {

@@ -8,7 +8,7 @@
 import Foundation
 
 @objcMembers
-public class Options: NSObject {
+public class Options<T>: NSObject {
     
     override init(){
         super.init()
@@ -23,7 +23,7 @@ public class Options: NSObject {
         return self
     }
     
-    func getHashMap() -> [String: Any?] {
+    func toMap() -> [String: Any?] {
         var options: [String: Any?] = [:]
         var counts = UInt32();
         let properties = class_copyPropertyList(object_getClass(self), &counts);
@@ -37,5 +37,10 @@ public class Options: NSObject {
         }
         free(properties)
         return options
+    }
+    
+    func getRealOptions(obj: T?) -> [String: Any?] {
+        let realOptions: [String: Any?] = toMap()
+        return realOptions
     }
 }

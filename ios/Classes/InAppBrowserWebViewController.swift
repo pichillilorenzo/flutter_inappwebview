@@ -688,11 +688,12 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     }
     
     public func getOptions() -> [String: Any?]? {
-        if (self.browserOptions == nil || self.webView.getOptions() == nil) {
+        let webViewOptionsMap = self.webView.getOptions()
+        if (self.browserOptions == nil || webViewOptionsMap == nil) {
             return nil
         }
-        var optionsMap = self.browserOptions!.getHashMap()
-        optionsMap.merge(self.webView.getOptions()!, uniquingKeysWith: { (current, _) in current })
+        var optionsMap = self.browserOptions!.getRealOptions(obj: self)
+        optionsMap.merge(webViewOptionsMap!, uniquingKeysWith: { (current, _) in current })
         return optionsMap
     }
     

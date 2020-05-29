@@ -707,12 +707,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
     options = newOptions;
   }
 
-  public HashMap<String, Object> getOptions() {
-    HashMap<String, Object> webViewOptionsMap = webView.getOptions();
+  public Map<String, Object> getOptions() {
+    Map<String, Object> webViewOptionsMap = webView.getOptions();
     if (options == null || webViewOptionsMap == null)
       return null;
 
-    HashMap<String, Object> optionsMap = options.getHashMap();
+    Map<String, Object> optionsMap = options.getRealOptions(this);
     optionsMap.putAll(webViewOptionsMap);
     return optionsMap;
   }

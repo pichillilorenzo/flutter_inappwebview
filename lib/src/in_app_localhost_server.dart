@@ -29,7 +29,7 @@ class InAppLocalhostServer {
       throw Exception('Server already started on http://localhost:$_port');
     }
 
-    var completer = new Completer();
+    var completer = Completer();
 
     runZoned(() {
       HttpServer.bind('127.0.0.1', _port).then((server) {
@@ -62,7 +62,7 @@ class InAppLocalhostServer {
           }
 
           request.response.headers.contentType =
-              new ContentType(contentType[0], contentType[1], charset: 'utf-8');
+              ContentType(contentType[0], contentType[1], charset: 'utf-8');
           request.response.add(body);
           request.response.close();
         });

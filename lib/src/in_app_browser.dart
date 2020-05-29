@@ -23,7 +23,8 @@ class InAppBrowser {
       HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
   MethodChannel _channel;
-  static const MethodChannel _sharedChannel = const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
+  static const MethodChannel _sharedChannel =
+      const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
   /// WebView Controller that can be used to access the [InAppWebViewController] API.
   InAppWebViewController webViewController;
@@ -35,8 +36,8 @@ class InAppBrowser {
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$uuid');
     this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
-    webViewController = new InAppWebViewController.fromInAppBrowser(
-        uuid, this._channel, this);
+    webViewController =
+        new InAppWebViewController.fromInAppBrowser(uuid, this._channel, this);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
@@ -116,8 +117,6 @@ class InAppBrowser {
       InAppBrowserClassOptions options}) async {
     assert(assetFilePath != null && assetFilePath.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $assetFilePath!');
-
-
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
@@ -217,20 +216,19 @@ class InAppBrowser {
       options = options.cast<String, dynamic>();
       inAppBrowserClassOptions.crossPlatform =
           InAppBrowserOptions.fromMap(options);
-      inAppBrowserClassOptions.inAppWebViewGroupOptions = InAppWebViewGroupOptions();
+      inAppBrowserClassOptions.inAppWebViewGroupOptions =
+          InAppWebViewGroupOptions();
       inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
           InAppWebViewOptions.fromMap(options);
       if (Platform.isAndroid) {
         inAppBrowserClassOptions.android =
             AndroidInAppBrowserOptions.fromMap(options);
-        inAppBrowserClassOptions
-                .inAppWebViewGroupOptions.android =
+        inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
             AndroidInAppWebViewOptions.fromMap(options);
       } else if (Platform.isIOS) {
-        inAppBrowserClassOptions.ios =
-            IOSInAppBrowserOptions.fromMap(options);
-        inAppBrowserClassOptions.inAppWebViewGroupOptions
-            .ios = IOSInAppWebViewOptions.fromMap(options);
+        inAppBrowserClassOptions.ios = IOSInAppBrowserOptions.fromMap(options);
+        inAppBrowserClassOptions.inAppWebViewGroupOptions.ios =
+            IOSInAppWebViewOptions.fromMap(options);
       }
     }
 
@@ -305,7 +303,8 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview
   // ignore: missing_return
-  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) {}
+  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(
+      ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) {}
 
   ///Event fired when the [InAppBrowser] webview loads a resource.
   ///
@@ -555,8 +554,8 @@ class InAppBrowser {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)
   Future<GeolocationPermissionShowPromptResponse>
-  // ignore: missing_return
-  androidOnGeolocationPermissionsShowPrompt(String origin) {}
+      // ignore: missing_return
+      androidOnGeolocationPermissionsShowPrompt(String origin) {}
 
   ///Notify the host application that a request for Geolocation permissions, made with a previous call to [androidOnGeolocationPermissionsShowPrompt] has been canceled.
   ///Any related UI should therefore be hidden.
@@ -584,8 +583,8 @@ class InAppBrowser {
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20java.lang.String)
   Future<WebResourceResponse>
-  // ignore: missing_return
-  androidShouldInterceptRequest(WebResourceRequest request) {}
+      // ignore: missing_return
+      androidShouldInterceptRequest(WebResourceRequest request) {}
 
   ///Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript.
   ///
@@ -606,8 +605,8 @@ class InAppBrowser {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)
   Future<WebViewRenderProcessAction>
-  // ignore: missing_return
-  androidOnRenderProcessUnresponsive(String url) {}
+      // ignore: missing_return
+      androidOnRenderProcessUnresponsive(String url) {}
 
   ///Event called once when an unresponsive renderer currently associated with the WebView becomes responsive.
   ///
@@ -621,8 +620,8 @@ class InAppBrowser {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)
   Future<WebViewRenderProcessAction>
-  // ignore: missing_return
-  androidOnRenderProcessResponsive(String url) {}
+      // ignore: missing_return
+      androidOnRenderProcessResponsive(String url) {}
 
   ///Event fired when the given WebView's render process has exited.
   ///The application's implementation of this callback should only attempt to clean up the WebView.
@@ -641,8 +640,8 @@ class InAppBrowser {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)
   Future<FormResubmissionAction>
-  // ignore: missing_return
-  androidOnFormResubmission(String url) {}
+      // ignore: missing_return
+      androidOnFormResubmission(String url) {}
 
   ///Event fired when the scale applied to the WebView has changed.
   ///

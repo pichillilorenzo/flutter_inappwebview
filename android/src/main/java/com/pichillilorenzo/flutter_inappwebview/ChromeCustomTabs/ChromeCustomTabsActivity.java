@@ -29,13 +29,13 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   protected static final String LOG_TAG = "CustomTabsActivity";
   public MethodChannel channel;
   public String uuid;
-  private CustomTabsIntent.Builder builder;
-  private ChromeCustomTabsOptions options;
-  private CustomTabActivityHelper customTabActivityHelper;
-  private CustomTabsSession customTabsSession;
-  private final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
-  private boolean onChromeSafariBrowserOpened = false;
-  private boolean onChromeSafariBrowserCompletedInitialLoad = false;
+  public CustomTabsIntent.Builder builder;
+  public ChromeCustomTabsOptions options;
+  public CustomTabActivityHelper customTabActivityHelper;
+  public CustomTabsSession customTabsSession;
+  protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
+  protected boolean onChromeSafariBrowserOpened = false;
+  protected boolean onChromeSafariBrowserCompletedInitialLoad = false;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {

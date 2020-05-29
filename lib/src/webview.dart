@@ -15,7 +15,7 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview
   final void Function(InAppWebViewController controller, String url)
-  onLoadStart;
+      onLoadStart;
 
   ///Event fired when the [WebView] finishes loading an [url].
   ///
@@ -49,14 +49,14 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)
   final void Function(InAppWebViewController controller, int progress)
-  onProgressChanged;
+      onProgressChanged;
 
   ///Event fired when the [WebView] receives a [ConsoleMessage].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)
   final void Function(
-      InAppWebViewController controller, ConsoleMessage consoleMessage)
-  onConsoleMessage;
+          InAppWebViewController controller, ConsoleMessage consoleMessage)
+      onConsoleMessage;
 
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
   ///
@@ -73,16 +73,16 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview
   final Future<ShouldOverrideUrlLoadingAction> Function(
-      InAppWebViewController controller,
-      ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest)
-  shouldOverrideUrlLoading;
+          InAppWebViewController controller,
+          ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest)
+      shouldOverrideUrlLoading;
 
   ///Event fired when the [WebView] loads a resource.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnLoadResource] and [InAppWebViewOptions.javaScriptEnabled] options to `true`.
   final void Function(
-      InAppWebViewController controller, LoadedResource resource)
-  onLoadResource;
+          InAppWebViewController controller, LoadedResource resource)
+      onLoadResource;
 
   ///Event fired when the [WebView] scrolls.
   ///
@@ -93,7 +93,7 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll
   final void Function(InAppWebViewController controller, int x, int y)
-  onScrollChanged;
+      onScrollChanged;
 
   ///Event fired when [WebView] recognizes a downloadable file.
   ///To download the file, you can use the [flutter_downloader](https://pub.dev/packages/flutter_downloader) plugin.
@@ -105,7 +105,7 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
   final void Function(InAppWebViewController controller, String url)
-  onDownloadStart;
+      onDownloadStart;
 
   ///Event fired when the [WebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
@@ -115,8 +115,8 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkurlschemehandler
   final Future<CustomSchemeResponse> Function(
-      InAppWebViewController controller, String scheme, String url)
-  onLoadResourceCustomScheme;
+          InAppWebViewController controller, String scheme, String url)
+      onLoadResourceCustomScheme;
 
   ///Event fired when the [WebView] requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
@@ -169,8 +169,8 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
   final Future<HttpAuthResponse> Function(
-      InAppWebViewController controller, HttpAuthChallenge challenge)
-  onReceivedHttpAuthRequest;
+          InAppWebViewController controller, HttpAuthChallenge challenge)
+      onReceivedHttpAuthRequest;
 
   ///Event fired when the WebView need to perform server trust authentication (certificate validation).
   ///The host application must return either [ServerTrustAuthResponse] instance with [ServerTrustAuthResponseAction.CANCEL] or [ServerTrustAuthResponseAction.PROCEED].
@@ -180,8 +180,8 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%20android.webkit.SslErrorHandler,%20android.net.http.SslError)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
   final Future<ServerTrustAuthResponse> Function(
-      InAppWebViewController controller, ServerTrustChallenge challenge)
-  onReceivedServerTrustAuthRequest;
+          InAppWebViewController controller, ServerTrustChallenge challenge)
+      onReceivedServerTrustAuthRequest;
 
   ///Notify the host application to handle an SSL client certificate request.
   ///Webview stores the response in memory (for the life of the application) if [ClientCertResponseAction.PROCEED] or [ClientCertResponseAction.CANCEL]
@@ -193,8 +193,8 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedClientCertRequest(android.webkit.WebView,%20android.webkit.ClientCertRequest)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
   final Future<ClientCertResponse> Function(
-      InAppWebViewController controller, ClientCertChallenge challenge)
-  onReceivedClientCertRequest;
+          InAppWebViewController controller, ClientCertChallenge challenge)
+      onReceivedClientCertRequest;
 
   ///Event fired as find-on-page operations progress.
   ///The listener may be notified multiple times while the operation is underway, and the numberOfMatches value should not be considered final unless [isDoneCounting] is true.
@@ -220,8 +220,8 @@ abstract class WebView {
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequest> Function(
-      InAppWebViewController controller, AjaxRequest ajaxRequest)
-  shouldInterceptAjaxRequest;
+          InAppWebViewController controller, AjaxRequest ajaxRequest)
+      shouldInterceptAjaxRequest;
 
   ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
   ///It gives the host application a chance to abort the request.
@@ -234,8 +234,8 @@ abstract class WebView {
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(
-      InAppWebViewController controller, AjaxRequest ajaxRequest)
-  onAjaxReadyStateChange;
+          InAppWebViewController controller, AjaxRequest ajaxRequest)
+      onAjaxReadyStateChange;
 
   ///Event fired as an `XMLHttpRequest` progress.
   ///It gives the host application a chance to abort the request.
@@ -248,8 +248,8 @@ abstract class WebView {
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the ajax requests will be intercept for sure.
   final Future<AjaxRequestAction> Function(
-      InAppWebViewController controller, AjaxRequest ajaxRequest)
-  onAjaxProgress;
+          InAppWebViewController controller, AjaxRequest ajaxRequest)
+      onAjaxProgress;
 
   ///Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
   ///It gives the host application a chance to take control over the request before sending it.
@@ -262,8 +262,8 @@ abstract class WebView {
   ///used to intercept fetch requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
   ///Inside the `window.addEventListener("flutterInAppWebViewPlatformReady")` event, the fetch requests will be intercept for sure.
   final Future<FetchRequest> Function(
-      InAppWebViewController controller, FetchRequest fetchRequest)
-  shouldInterceptFetchRequest;
+          InAppWebViewController controller, FetchRequest fetchRequest)
+      shouldInterceptFetchRequest;
 
   ///Event fired when the host application updates its visited links database.
   ///This event is also fired when the navigation state of the [WebView] changes through the usage of
@@ -276,8 +276,8 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)
   final void Function(
-      InAppWebViewController controller, String url, bool androidIsReload)
-  onUpdateVisitedHistory;
+          InAppWebViewController controller, String url, bool androidIsReload)
+      onUpdateVisitedHistory;
 
   ///Event fired when `window.print()` is called from JavaScript side.
   ///
@@ -316,7 +316,8 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview
-  final Future<void> Function(InAppWebViewController controller, String url) onPageCommitVisible;
+  final Future<void> Function(InAppWebViewController controller, String url)
+      onPageCommitVisible;
 
   ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
@@ -355,8 +356,8 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)
   final Future<GeolocationPermissionShowPromptResponse> Function(
-      InAppWebViewController controller, String origin)
-  androidOnGeolocationPermissionsShowPrompt;
+          InAppWebViewController controller, String origin)
+      androidOnGeolocationPermissionsShowPrompt;
 
   ///Notify the host application that a request for Geolocation permissions, made with a previous call to [androidOnGeolocationPermissionsShowPrompt] has been canceled.
   ///Any related UI should therefore be hidden.
@@ -365,7 +366,7 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsHidePrompt()
   final Future<void> Function(InAppWebViewController controller)
-  androidOnGeolocationPermissionsHidePrompt;
+      androidOnGeolocationPermissionsHidePrompt;
 
   ///Notify the host application of a resource request and allow the application to return the data.
   ///If the return value is `null`, the WebView will continue to load the resource as usual.
@@ -384,8 +385,9 @@ abstract class WebView {
   ///**Official Android API**:
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20java.lang.String)
-  final Future<WebResourceResponse> Function(InAppWebViewController controller, WebResourceRequest request)
-  androidShouldInterceptRequest;
+  final Future<WebResourceResponse> Function(
+          InAppWebViewController controller, WebResourceRequest request)
+      androidShouldInterceptRequest;
 
   ///Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript.
   ///
@@ -405,8 +407,9 @@ abstract class WebView {
   ///**NOTE**: available only on Android 29+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)
-  final Future<WebViewRenderProcessAction> Function(InAppWebViewController controller, String url)
-  androidOnRenderProcessUnresponsive;
+  final Future<WebViewRenderProcessAction> Function(
+          InAppWebViewController controller, String url)
+      androidOnRenderProcessUnresponsive;
 
   ///Event called once when an unresponsive renderer currently associated with the WebView becomes responsive.
   ///
@@ -419,8 +422,9 @@ abstract class WebView {
   ///**NOTE**: available only on Android 29+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)
-  final Future<WebViewRenderProcessAction> Function(InAppWebViewController controller, String url)
-  androidOnRenderProcessResponsive;
+  final Future<WebViewRenderProcessAction> Function(
+          InAppWebViewController controller, String url)
+      androidOnRenderProcessResponsive;
 
   ///Event fired when the given WebView's render process has exited.
   ///The application's implementation of this callback should only attempt to clean up the WebView.
@@ -431,16 +435,17 @@ abstract class WebView {
   ///**NOTE**: available only on Android 26+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)
-  final Future<void> Function(InAppWebViewController controller, RenderProcessGoneDetail detail)
-  androidOnRenderProcessGone;
+  final Future<void> Function(
+          InAppWebViewController controller, RenderProcessGoneDetail detail)
+      androidOnRenderProcessGone;
 
   ///As the host application if the browser should resend data as the requested page was a result of a POST. The default is to not resend the data.
   ///
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)
-  final Future<FormResubmissionAction> Function(InAppWebViewController controller, String url)
-  androidOnFormResubmission;
+  final Future<FormResubmissionAction> Function(
+      InAppWebViewController controller, String url) androidOnFormResubmission;
 
   ///Event fired when the scale applied to the WebView has changed.
   ///
@@ -451,8 +456,9 @@ abstract class WebView {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)
-  final Future<void> Function(InAppWebViewController controller, double oldScale, double newScale)
-  androidOnScaleChanged;
+  final Future<void> Function(
+          InAppWebViewController controller, double oldScale, double newScale)
+      androidOnScaleChanged;
 
   ///Invoked when the web view's web content process is terminated.
   ///
@@ -460,7 +466,7 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi
   final Future<void> Function(InAppWebViewController controller)
-  iosOnWebContentProcessDidTerminate;
+      iosOnWebContentProcessDidTerminate;
 
   ///Called when a web view receives a server redirect.
   ///
@@ -468,7 +474,7 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview
   final Future<void> Function(InAppWebViewController controller)
-  iosOnDidReceiveServerRedirectForProvisionalNavigation;
+      iosOnDidReceiveServerRedirectForProvisionalNavigation;
 
   ///Initial url that will be loaded.
   final String initialUrl;
@@ -488,54 +494,53 @@ abstract class WebView {
   ///Context menu which contains custom menu items to be shown when [ContextMenu] is presented.
   final ContextMenu contextMenu;
 
-  WebView({
-    this.onWebViewCreated,
-    this.onLoadStart,
-    this.onLoadStop,
-    this.onLoadError,
-    this.onLoadHttpError,
-    this.onProgressChanged,
-    this.onConsoleMessage,
-    this.shouldOverrideUrlLoading,
-    this.onLoadResource,
-    this.onScrollChanged,
-    this.onDownloadStart,
-    this.onLoadResourceCustomScheme,
-    this.onCreateWindow,
-    this.onJsAlert,
-    this.onJsConfirm,
-    this.onJsPrompt,
-    this.onReceivedHttpAuthRequest,
-    this.onReceivedServerTrustAuthRequest,
-    this.onReceivedClientCertRequest,
-    this.onFindResultReceived,
-    this.shouldInterceptAjaxRequest,
-    this.onAjaxReadyStateChange,
-    this.onAjaxProgress,
-    this.shouldInterceptFetchRequest,
-    this.onUpdateVisitedHistory,
-    this.onPrint,
-    this.onLongPressHitTestResult,
-    this.onEnterFullscreen,
-    this.onExitFullscreen,
-    this.onPageCommitVisible,
-    this.androidOnSafeBrowsingHit,
-    this.androidOnPermissionRequest,
-    this.androidOnGeolocationPermissionsShowPrompt,
-    this.androidOnGeolocationPermissionsHidePrompt,
-    this.androidShouldInterceptRequest,
-    this.androidOnRenderProcessGone,
-    this.androidOnRenderProcessResponsive,
-    this.androidOnRenderProcessUnresponsive,
-    this.androidOnFormResubmission,
-    this.androidOnScaleChanged,
-    this.iosOnWebContentProcessDidTerminate,
-    this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
-    this.initialUrl,
-    this.initialFile,
-    this.initialData,
-    this.initialHeaders,
-    this.initialOptions,
-    this.contextMenu
-  });
+  WebView(
+      {this.onWebViewCreated,
+      this.onLoadStart,
+      this.onLoadStop,
+      this.onLoadError,
+      this.onLoadHttpError,
+      this.onProgressChanged,
+      this.onConsoleMessage,
+      this.shouldOverrideUrlLoading,
+      this.onLoadResource,
+      this.onScrollChanged,
+      this.onDownloadStart,
+      this.onLoadResourceCustomScheme,
+      this.onCreateWindow,
+      this.onJsAlert,
+      this.onJsConfirm,
+      this.onJsPrompt,
+      this.onReceivedHttpAuthRequest,
+      this.onReceivedServerTrustAuthRequest,
+      this.onReceivedClientCertRequest,
+      this.onFindResultReceived,
+      this.shouldInterceptAjaxRequest,
+      this.onAjaxReadyStateChange,
+      this.onAjaxProgress,
+      this.shouldInterceptFetchRequest,
+      this.onUpdateVisitedHistory,
+      this.onPrint,
+      this.onLongPressHitTestResult,
+      this.onEnterFullscreen,
+      this.onExitFullscreen,
+      this.onPageCommitVisible,
+      this.androidOnSafeBrowsingHit,
+      this.androidOnPermissionRequest,
+      this.androidOnGeolocationPermissionsShowPrompt,
+      this.androidOnGeolocationPermissionsHidePrompt,
+      this.androidShouldInterceptRequest,
+      this.androidOnRenderProcessGone,
+      this.androidOnRenderProcessResponsive,
+      this.androidOnRenderProcessUnresponsive,
+      this.androidOnFormResubmission,
+      this.androidOnScaleChanged,
+      this.iosOnWebContentProcessDidTerminate,
+      this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+      this.initialUrl,
+      this.initialFile,
+      this.initialData,
+      this.initialHeaders,
+      this.initialOptions,
+      this.contextMenu});
 }

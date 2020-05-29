@@ -9,7 +9,7 @@ import Foundation
 import WebKit
 
 @objcMembers
-public class InAppWebViewOptions: Options {
+public class InAppWebViewOptions: Options<InAppWebView> {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false
@@ -63,4 +63,47 @@ public class InAppWebViewOptions: Options {
         super.init()
     }
     
+    override func getRealOptions(obj: InAppWebView?) -> [String: Any?] {
+        var realOptions: [String: Any?] = toMap()
+        if let webView = obj {
+            let configuration = webView.configuration
+            if #available(iOS 9.0, *) {
+                realOptions["userAgent"] = webView.customUserAgent
+                realOptions["applicationNameForUserAgent"] = configuration.applicationNameForUserAgent
+                realOptions["allowsAirPlayForMediaPlayback"] = configuration.allowsAirPlayForMediaPlayback
+                realOptions["allowsLinkPreview"] = webView.allowsLinkPreview
+                realOptions["allowsPictureInPictureMediaPlayback"] = configuration.allowsPictureInPictureMediaPlayback
+            }
+            realOptions["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
+            realOptions["javaScriptCanOpenWindowsAutomatically"] = configuration.preferences.javaScriptCanOpenWindowsAutomatically
+            if #available(iOS 10.0, *) {
+                realOptions["mediaPlaybackRequiresUserGesture"] = configuration.mediaTypesRequiringUserActionForPlayback == .all
+                realOptions["ignoresViewportScaleLimits"] = configuration.ignoresViewportScaleLimits
+                realOptions["dataDetectorTypes"] = InAppWebView.getDataDetectorTypeString(type: configuration.dataDetectorTypes)
+            } else {
+                realOptions["mediaPlaybackRequiresUserGesture"] = configuration.mediaPlaybackRequiresUserAction
+            }
+            realOptions["minimumFontSize"] = configuration.preferences.minimumFontSize
+            realOptions["suppressesIncrementalRendering"] = configuration.suppressesIncrementalRendering
+            realOptions["allowsBackForwardNavigationGestures"] = webView.allowsBackForwardNavigationGestures
+            realOptions["allowsInlineMediaPlayback"] = configuration.allowsInlineMediaPlayback
+            if #available(iOS 13.0, *) {
+                realOptions["isFraudulentWebsiteWarningEnabled"] = configuration.preferences.isFraudulentWebsiteWarningEnabled
+                realOptions["preferredContentMode"] = configuration.defaultWebpagePreferences.preferredContentMode.rawValue
+                realOptions["automaticallyAdjustsScrollIndicatorInsets"] = webView.scrollView.automaticallyAdjustsScrollIndicatorInsets
+            }
+            realOptions["selectionGranularity"] = configuration.selectionGranularity.rawValue
+            if #available(iOS 11.0, *) {
+                realOptions["accessibilityIgnoresInvertColors"] = webView.accessibilityIgnoresInvertColors
+            }
+            realOptions["decelerationRate"] = InAppWebView.getDecelerationRateString(type: webView.scrollView.decelerationRate)
+            realOptions["alwaysBounceVertical"] = webView.scrollView.alwaysBounceVertical
+            realOptions["alwaysBounceHorizontal"] = webView.scrollView.alwaysBounceHorizontal
+            realOptions["scrollsToTop"] = webView.scrollView.scrollsToTop
+            realOptions["isPagingEnabled"] = webView.scrollView.isPagingEnabled
+            realOptions["maximumZoomScale"] = webView.scrollView.maximumZoomScale
+            realOptions["minimumZoomScale"] = webView.scrollView.minimumZoomScale
+        }
+        return realOptions
+    }
 }

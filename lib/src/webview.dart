@@ -93,7 +93,8 @@ abstract class WebView {
   final void Function(InAppWebViewController controller, int x, int y)
   onScrollChanged;
 
-  ///Event fired when [WebView] recognizes and starts a downloadable file.
+  ///Event fired when [WebView] recognizes a downloadable file.
+  ///To download the file, you can use the [flutter_downloader](https://pub.dev/packages/flutter_downloader) plugin.
   ///
   ///[url] represents the url of the file.
   ///

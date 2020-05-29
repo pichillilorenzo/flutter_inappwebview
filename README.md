@@ -419,7 +419,7 @@ Android-specific methods can be called using the `InAppWebViewController.android
 * `static clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
 * `static getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
 * `static setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
-* `static getCurrentWebViewPackage()`: Gets the current Android WebView package info.
+* `static getCurrentWebViewPackage`: Gets the current Android WebView package info.
 
 ##### `InAppWebViewController` iOS-specific methods
 
@@ -596,7 +596,7 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `onUpdateVisitedHistory`: Event fired when the host application updates its visited links database. This event is also fired when the navigation state of the InAppWebView changes, for example through the usage of the javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions.
 * `onLoadResource`: Event fired when the InAppWebView loads a resource (to use this event, the `useOnLoadResource` option must be `true`).
 * `onScrollChanged`: Event fired when the InAppWebView scrolls.
-* `onDownloadStart`: Event fired when InAppWebView recognizes and starts a downloadable file (to use this event, the `useOnDownloadStart` option must be `true`).
+* `onDownloadStart`: Event fired when InAppWebView recognizes a downloadable file (to use this event, the `useOnDownloadStart` option must be `true`). To download the file, you can use the [flutter_downloader](https://pub.dev/packages/flutter_downloader) plugin.
 * `onLoadResourceCustomScheme`: Event fired when the InAppWebView finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a CustomSchemeResponse to load a specific resource encoded to `base64`.
 * `onCreateWindow`: Event fired when the InAppWebView requests the host application to create a new window, for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
 * `onJsAlert`: Event fired when javascript calls the `alert()` method to display an alert dialog.

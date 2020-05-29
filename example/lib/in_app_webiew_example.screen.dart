@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -73,13 +74,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     contextMenu: contextMenu,
-                    initialUrl: "https://github.com/flutter",
-                    // initialFile: "assets/index.html",
+                    // initialUrl: "https://github.com/flutter",
+                    initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
-                        crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true
-                        ),
+                      crossPlatform: InAppWebViewOptions(
+                        debuggingEnabled: true,
+                        useShouldOverrideUrlLoading: true
+                      ),
+                      android: AndroidInAppWebViewOptions(
+                        supportMultipleWindows: true
+                      )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
@@ -90,6 +95,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url;
                       });
+                    },
+                    shouldOverrideUrlLoading: (controller, shouldOverrideUrlLoadingRequest) async {
+                      print("shouldOverrideUrlLoading");
+                      return ShouldOverrideUrlLoadingAction.ALLOW;
+                    },
+                    onCreateWindow: (controller, onCreateWindowRequest) {
+                      print("onCreateWindow");
                     },
                     onLoadStop: (InAppWebViewController controller, String url) async {
                       print("onLoadStop $url");

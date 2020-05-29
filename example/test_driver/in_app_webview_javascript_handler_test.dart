@@ -54,7 +54,7 @@ class InAppWebViewJavaScriptHandlerTestState extends WidgetTestState {
 
                       controller.addJavaScriptHandler(handlerName:'handlerFoo', callback: (args) {
                         appBarTitle = (args.length == 0).toString();
-                        return new Foo(bar: 'bar_value', baz: 'baz_value');
+                        return Foo(bar: 'bar_value', baz: 'baz_value');
                       });
 
                       controller.addJavaScriptHandler(handlerName: 'handlerFooWithArgs', callback: (args) {

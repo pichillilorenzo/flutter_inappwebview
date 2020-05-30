@@ -426,6 +426,23 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                     result(nil)
                 }
                 break
+            case "clearFocus":
+                if webView != nil {
+                    webView!.clearFocus()
+                    result(true)
+                } else {
+                    result(false)
+                }
+                break
+            case "setContextMenu":
+                if webView != nil {
+                    let contextMenu = arguments!["contextMenu"] as? [String: Any]
+                    webView!.contextMenu = contextMenu
+                    result(true)
+                } else {
+                    result(false)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

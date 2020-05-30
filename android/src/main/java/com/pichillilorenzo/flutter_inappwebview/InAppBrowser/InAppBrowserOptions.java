@@ -30,10 +30,10 @@ public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
 
       switch (key) {
         case "hidden":
-          hidden = (boolean) value;
+          hidden = (Boolean) value;
           break;
         case "toolbarTop":
-          toolbarTop = (boolean) value;
+          toolbarTop = (Boolean) value;
           break;
         case "toolbarTopBackgroundColor":
           toolbarTopBackgroundColor = (String) value;
@@ -42,16 +42,16 @@ public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
           toolbarTopFixedTitle = (String) value;
           break;
         case "hideUrlBar":
-          hideUrlBar = (boolean) value;
+          hideUrlBar = (Boolean) value;
           break;
         case "hideTitleBar":
-          hideTitleBar = (boolean) value;
+          hideTitleBar = (Boolean) value;
           break;
         case "closeOnCannotGoBack":
-          closeOnCannotGoBack = (boolean) value;
+          closeOnCannotGoBack = (Boolean) value;
           break;
         case "progressBar":
-          progressBar = (boolean) value;
+          progressBar = (Boolean) value;
           break;
       }
     }

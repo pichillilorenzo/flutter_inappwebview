@@ -400,6 +400,8 @@ Screenshots:
 * `getScale`: Gets the current scale of this WebView.
 * `getSelectedText`: Gets the selected text.
 * `getHitTestResult`: Gets the hit result for hitting an HTML elements.
+* `clearFocus`: Clears the current focus. It will clear also, for example, the current text selection.
+* `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
 * `static getDefaultUserAgent`: Gets the default user agent.
 
 ##### `InAppWebViewController` Android-specific methods
@@ -416,6 +418,7 @@ Android-specific methods can be called using the `InAppWebViewController.android
 * `saveWebArchive({@required String basename, @required bool autoname})`: Saves the current view as a web archive.
 * `zoomIn`: Performs zoom in in this WebView.
 * `zoomOut`: Performs zoom out in this WebView.
+* `clearHistory`: Clears the internal back/forward list.
 * `static clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
 * `static getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
 * `static setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
@@ -665,6 +668,11 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     contextMenu = ContextMenu(
+        menuItems: [
+          ContextMenuItem(androidId: 1, iosId: "1", title: "Special", action: () async {
+            print("Menu item Special clicked!");
+          })
+        ],
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
@@ -678,12 +686,6 @@ class _MyAppState extends State<MyApp> {
           print("onContextMenuActionItemClicked: " + id.toString() + " " + contextMenuItemClicked.title);
         }
     );
-
-    contextMenu.menuItems = [
-      ContextMenuItem(androidId: 1, iosId: "1", title: "Special", action: () async {
-        print("Menu item Special clicked!");
-      })
-    ];
 
   }
 
@@ -781,6 +783,10 @@ class _MyAppState extends State<MyApp> {
   }
 }
 ```
+
+### `ContextMenu` options
+
+* `hideDefaultSystemContextMenuItems`: Whether all the default system context menu items should be hidden or not. The default value is `false`.
 
 ### `ContextMenu` Events
 
@@ -1118,7 +1124,7 @@ class MyInAppBrowser extends InAppBrowser {
 }
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-  
+
   MyChromeSafariBrowser(browserFallback) : super(bFallback: browserFallback);
 
   @override
@@ -1146,7 +1152,7 @@ void main() {
 
 class MyApp extends StatefulWidget {
   final ChromeSafariBrowser browser = new MyChromeSafariBrowser(new MyInAppBrowser());
-  
+
   @override
   _MyAppState createState() => new _MyAppState();
 }
@@ -1182,7 +1188,7 @@ class _MyAppState extends State<MyApp> {
                     url: "https://flutter.dev/",
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false),
-                        ios: IosSafariOptions(barCollapsingEnabled: true)));
+                        ios: IOSSafariOptions(barCollapsingEnabled: true)));
               },
               child: Text("Open Chrome Safari Browser")),
         ),
@@ -1190,7 +1196,6 @@ class _MyAppState extends State<MyApp> {
     );
   }
 }
-
 ```
 
 Screenshots:

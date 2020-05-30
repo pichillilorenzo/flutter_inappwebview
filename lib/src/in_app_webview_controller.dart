@@ -1487,6 +1487,23 @@ class InAppWebViewController {
     return InAppWebViewHitTestResult(type: type, extra: extra);
   }
 
+  ///Clears the current focus. It will clear also, for example, the current text selection.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/view/ViewGroup#clearFocus()
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiresponder/1621097-resignfirstresponder
+  Future<void> clearFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('clearFocus', args);
+  }
+
+  ///Sets or updates the WebView context menu to be used next time it will appear.
+  Future<void> setContextMenu(ContextMenu contextMenu) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("contextMenu", () => contextMenu?.toMap());
+    await _channel.invokeMethod('setContextMenu', args);
+    _inAppBrowser?.contextMenu = contextMenu;
+  }
+
   ///Gets the default user agent.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)
@@ -1615,6 +1632,14 @@ class AndroidInAppWebViewController {
   Future<bool> zoomOut() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('zoomOut', args);
+  }
+
+  ///Clears the internal back/forward list.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#clearHistory()
+  Future<void> clearHistory() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _controller._channel.invokeMethod('clearHistory', args);
   }
 
   ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.

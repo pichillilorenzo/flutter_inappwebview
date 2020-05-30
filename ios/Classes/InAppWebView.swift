@@ -905,6 +905,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 return false
             }
             
+            if let menu = contextMenu {
+                let contextMenuOptions = ContextMenuOptions()
+                if let contextMenuOptionsMap = menu["options"] as? [String: Any?] {
+                    let _ = contextMenuOptions.parse(options: contextMenuOptionsMap)
+                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuOptions.hideDefaultSystemContextMenuItems {
+                        return false
+                    }
+                }
+            }
+            
             if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
                 let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
                 let arguments: [String: Any?] = [
@@ -2727,6 +2737,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         } else {
             completionHandler(nil, nil)
         }
+    }
+    
+    public func clearFocus() {
+        self.scrollView.subviews.first?.resignFirstResponder()
     }
     
     public func dispose() {

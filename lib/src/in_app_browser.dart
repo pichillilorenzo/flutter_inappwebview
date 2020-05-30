@@ -13,10 +13,10 @@ import 'types.dart';
 ///This class uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
-  ///Browser's UUID
+  ///Browser's UUID.
   String uuid;
 
-  ///Context menu used by the browser
+  ///Context menu used by the browser. It should be set before opening the browser.
   ContextMenu contextMenu;
 
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =

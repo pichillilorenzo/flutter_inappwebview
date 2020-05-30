@@ -3,12 +3,14 @@
 - Updated API docs
 - Updated Android context menu workaround
 - Calling `onCreateContextMenu` event on iOS also when the context menu is disabled in order to have the same effect as Android
+- Added `options` attribute to `ContextMenu` class and created `ContextMenuOptions` class
 - Added Android keyboard workaround to hide the keyboard when clicking other HTML elements, losing the focus on the previous input
 - Added `onEnterFullscreen`, `onExitFullscreen` webview events [#275](https://github.com/pichillilorenzo/flutter_inappwebview/issues/275)
 - Added Android support to use camera on HTML inputs that requires it, such as `<input type="file" accept="image/*" capture>` [#353](https://github.com/pichillilorenzo/flutter_inappwebview/issues/353)
 - Added `overScrollMode`, `networkAvailable`, `scrollBarStyle`, `verticalScrollbarPosition`, `scrollBarDefaultDelayBeforeFade`, `scrollbarFadingEnabled`, `scrollBarFadeDuration`, `rendererPriorityPolicy`, `useShouldInterceptRequest`, `useOnRenderProcessGone` webview options on Android
-- Added `pageDown`, `pageUp`, `saveWebArchive`, `zoomIn`, `zoomOut` webview methods on Android
+- Added `pageDown`, `pageUp`, `saveWebArchive`, `zoomIn`, `zoomOut`, `clearHistory` webview methods on Android
 - Added `getCurrentWebViewPackage` static webview method on Android
+- Added `setContextMenu`, `clearFocus` methods to webview controller
 - Added `onPageCommitVisible` webview event
 - Added `androidShouldInterceptRequest`, `androidOnRenderProcessUnresponsive`, `androidOnRenderProcessResponsive`, `androidOnRenderProcessGone`, `androidOnFormResubmission`, `androidOnScaleChanged` Android events
 - Added `toString()` method to various classes in order to have a better output instead of simply `Instance of ...`
@@ -23,6 +25,7 @@
 
 - Android `clearClientCertPreferences`, `getSafeBrowsingPrivacyPolicyUrl`, `setSafeBrowsingWhitelist` webview methods are static now
 - Removed iOS event `onDidCommit`; it has been renamed to `onPageCommitVisible` and made cross-platform
+- `contextMenu` is `final` now
 
 ## 3.2.0
 

@@ -1,6 +1,6 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/src/webview.dart';
 
+import 'webview.dart';
 import 'types.dart';
 
 ///Class that represents the WebView context menu. It used by [WebView.contextMenu].
@@ -22,23 +22,34 @@ class ContextMenu {
   final void Function(ContextMenuItem contextMenuItemClicked)
       onContextMenuActionItemClicked;
 
+  ///Context menu options.
+  final ContextMenuOptions options;
+
   ///List of the custom [ContextMenuItem].
-  List<ContextMenuItem> menuItems = List();
+  final List<ContextMenuItem> menuItems;
 
   ContextMenu(
-      {this.menuItems,
+      {this.menuItems = const [],
       this.onCreateContextMenu,
       this.onHideContextMenu,
-      this.onContextMenuActionItemClicked});
+      this.options,
+      this.onContextMenuActionItemClicked})
+      : assert(menuItems != null);
 
   Map<String, dynamic> toMap() {
     return {
-      "menuItems": menuItems.map((menuItem) => menuItem?.toMap()).toList()
+      "menuItems": menuItems.map((menuItem) => menuItem?.toMap()).toList(),
+      "options": options?.toMap()
     };
   }
 
   Map<String, dynamic> toJson() {
     return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 
@@ -68,5 +79,33 @@ class ContextMenuItem {
 
   Map<String, dynamic> toJson() {
     return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents available options used by [ContextMenu].
+class ContextMenuOptions {
+  ///Whether all the default system context menu items should be hidden or not. The default value is `false`.
+  bool hideDefaultSystemContextMenuItems;
+
+  ContextMenuOptions({this.hideDefaultSystemContextMenuItems = false});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "hideDefaultSystemContextMenuItems": hideDefaultSystemContextMenuItems
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }

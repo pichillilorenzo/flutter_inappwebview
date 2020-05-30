@@ -365,6 +365,17 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       case "zoomOut":
         result.success(zoomOut());
         break;
+      case "clearFocus":
+        clearFocus();
+        result.success(true);
+        break;
+      case "setContextMenu":
+        {
+          Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
+          setContextMenu(contextMenu);
+        }
+        result.success(true);
+        break;
       default:
         result.notImplemented();
     }
@@ -907,6 +918,16 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
     if (webView != null)
       return webView.zoomOut();
     return false;
+  }
+
+  public void clearFocus() {
+    if (webView != null)
+      webView.clearFocus();
+  }
+
+  public void setContextMenu(Map<String, Object> contextMenu) {
+    if (webView != null)
+      webView.contextMenu = contextMenu;
   }
 
   public void dispose() {

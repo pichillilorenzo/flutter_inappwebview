@@ -52,8 +52,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     final String initialFile = (String) params.get("initialFile");
     final Map<String, String> initialData = (Map<String, String>) params.get("initialData");
     final Map<String, String> initialHeaders = (Map<String, String>) params.get("initialHeaders");
-    HashMap<String, Object> initialOptions = (HashMap<String, Object>) params.get("initialOptions");
-    HashMap<String, Object> contextMenu = (HashMap<String, Object>) params.get("contextMenu");
+    Map<String, Object> initialOptions = (Map<String, Object>) params.get("initialOptions");
+    Map<String, Object> contextMenu = (Map<String, Object>) params.get("contextMenu");
 
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
@@ -436,6 +436,23 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       case "zoomOut":
         if (webView != null) {
           result.success(webView.zoomOut());
+        } else {
+          result.success(false);
+        }
+        break;
+      case "clearFocus":
+        if (webView != null) {
+          webView.clearFocus();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "setContextMenu":
+        if (webView != null) {
+          Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
+          webView.contextMenu = contextMenu;
+          result.success(true);
         } else {
           result.success(false);
         }

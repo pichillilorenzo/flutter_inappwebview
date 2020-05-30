@@ -2301,8 +2301,7 @@ class FetchRequest {
     return toMap().toString();
   }
 
-  static FetchRequestCredential createFetchRequestCredentialFromMap(
-      credentialsMap) {
+  static FetchRequestCredential fromMap(credentialsMap) {
     if (credentialsMap != null) {
       if (credentialsMap["type"] == "default") {
         return FetchRequestCredentialDefault(
@@ -2324,7 +2323,7 @@ class FetchRequest {
             iconURL: credentialsMap["iconURL"]);
       }
     }
-    return FetchRequestCredential();
+    return null;
   }
 }
 
@@ -3063,7 +3062,7 @@ class RendererPriorityPolicy {
             rendererRequestedPriority:
                 RendererPriority.fromValue(map["rendererRequestedPriority"]),
             waivedWhenNotVisible: map["waivedWhenNotVisible"])
-        : RendererPriorityPolicy();
+        : null;
   }
 }
 

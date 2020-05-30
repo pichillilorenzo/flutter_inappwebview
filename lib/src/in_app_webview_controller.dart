@@ -704,8 +704,7 @@ class InAppWebViewController {
             Uint8List body = Uint8List.fromList(argMap["body"].cast<int>());
             String mode = argMap["mode"];
             FetchRequestCredential credentials =
-                FetchRequest.createFetchRequestCredentialFromMap(
-                    argMap["credentials"]);
+                FetchRequest.fromMap(argMap["credentials"]);
             String cache = argMap["cache"];
             String redirect = argMap["redirect"];
             String referrer = argMap["referrer"];

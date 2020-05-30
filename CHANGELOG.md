@@ -25,7 +25,7 @@
 
 - Android `clearClientCertPreferences`, `getSafeBrowsingPrivacyPolicyUrl`, `setSafeBrowsingWhitelist` webview methods are static now
 - Removed iOS event `onDidCommit`; it has been renamed to `onPageCommitVisible` and made cross-platform
-- `contextMenu` is `final` now
+- `contextMenu` webview attribute is `final` now
 
 ## 3.2.0
 

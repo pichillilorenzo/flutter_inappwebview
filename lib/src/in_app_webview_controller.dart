@@ -1597,7 +1597,7 @@ class AndroidInAppWebViewController {
     return await _controller._channel.invokeMethod('pageUp', args);
   }
 
-  ///Saves the current view as a web archive.
+  ///Saves the current WebView as a web archive.
   ///Returns the filename under which the file was saved, or `null` if saving the file failed.
   ///
   ///[basename] the filename where the archive should be placed. This value cannot be `null`.

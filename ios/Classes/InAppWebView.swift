@@ -1037,28 +1037,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
         }
         
-        if #available(iOS 9.0, *) {
-            if ((options?.incognito)!) {
-                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-            } else if ((options?.cacheEnabled)!) {
-                configuration.websiteDataStore = WKWebsiteDataStore.default()
-            }
-        }
-        
         if #available(iOS 11.0, *) {
-            if((options?.sharedCookiesEnabled)!) {
-                // More info to sending cookies with WKWebView
-                // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
-                // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
-                // See also https://forums.developer.apple.com/thread/97194
-                // check if websiteDataStore has not been initialized before
-                if(!(options?.incognito)! && !(options?.cacheEnabled)!) {
-                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-                }
-                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
-                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
-                }
-            }
             accessibilityIgnoresInvertColors = (options?.accessibilityIgnoresInvertColors)!
         }
         
@@ -1225,6 +1204,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if let schemes = options?.resourceCustomSchemes {
                 for scheme in schemes {
                     configuration.setURLSchemeHandler(CustomeSchemeHandler(), forURLScheme: scheme)
+                }
+            }
+        }
+        
+        if #available(iOS 9.0, *) {
+            if ((options?.incognito)!) {
+                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+            } else if ((options?.cacheEnabled)!) {
+                configuration.websiteDataStore = WKWebsiteDataStore.default()
+            }
+        }
+        
+        if #available(iOS 11.0, *) {
+            if((options?.sharedCookiesEnabled)!) {
+                // More info to sending cookies with WKWebView
+                // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+                // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+                // See also https://forums.developer.apple.com/thread/97194
+                // check if websiteDataStore has not been initialized before
+                if(!(options?.incognito)! && !(options?.cacheEnabled)!) {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                }
+                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
                 }
             }
         }

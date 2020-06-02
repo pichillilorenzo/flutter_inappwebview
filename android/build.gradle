@@ -8,7 +8,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:3.3.2'
+        classpath 'com.android.tools.build:gradle:3.6.3'
     }
 }
 
@@ -49,29 +49,5 @@ android {
         implementation 'androidx.browser:browser:1.2.0'
         implementation 'androidx.appcompat:appcompat:1.0.0'
         implementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
-    }
-}
-
-afterEvaluate {
-    def containsEmbeddingDependencies = false
-    for (def configuration : configurations.all) {
-        for (def dependency : configuration.dependencies) {
-            if (dependency.group == 'io.flutter' &&
-                    dependency.name.startsWith('flutter_embedding') &&
-                    dependency.isTransitive())
-            {
-                containsEmbeddingDependencies = true
-                break
-            }
-        }
-    }
-    if (!containsEmbeddingDependencies) {
-        android {
-            dependencies {
-                def lifecycle_version = "1.1.1"
-                compileOnly "android.arch.lifecycle:common-java8:$lifecycle_version"
-                compileOnly "android.arch.lifecycle:runtime:$lifecycle_version"
-            }
-        }
     }
 }

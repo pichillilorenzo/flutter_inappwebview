@@ -1,3 +1,9 @@
+## 3.3.0+3
+
+- Updated Android build.gradle version and some androidx properties
+- Fixed `Multiple sessions` [#371](https://github.com/pichillilorenzo/flutter_inappwebview/issues/371)
+- Fixed `incognito mode is broken swift` [#320](https://github.com/pichillilorenzo/flutter_inappwebview/issues/320)
+
 ## 3.3.0
 
 - Updated API docs

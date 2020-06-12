@@ -5,6 +5,7 @@ import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -22,7 +23,6 @@ import com.pichillilorenzo.flutter_inappwebview.Util;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.BinaryMessenger;
@@ -365,8 +365,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "zoomBy":
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          float zoomFactor = (float) call.argument("zoomFactor");
-          webView.zoomBy(zoomFactor);
+          double zoomFactor = (double) call.argument("zoomFactor");
+          webView.zoomBy((float) zoomFactor);
           result.success(true);
         } else {
           result.success(false);
@@ -453,6 +453,20 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
           webView.contextMenu = contextMenu;
           result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "requestFocusNodeHref":
+        if (webView != null) {
+          result.success(webView.requestFocusNodeHref());
+        } else {
+          result.success(false);
+        }
+        break;
+      case "requestImageRef":
+        if (webView != null) {
+          result.success(webView.requestImageRef());
         } else {
           result.success(false);
         }

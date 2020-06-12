@@ -43,12 +43,12 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public Boolean disableVerticalScroll = false;
   public Boolean disableHorizontalScroll = false;
   public Boolean disableContextMenu = false;
+  public Boolean supportZoom = true;
 
   public Integer textZoom = 100;
   public Boolean clearSessionCache = false;
-  public Boolean builtInZoomControls = false;
+  public Boolean builtInZoomControls = true;
   public Boolean displayZoomControls = false;
-  public Boolean supportZoom = true;
   public Boolean databaseEnabled = false;
   public Boolean domStorageEnabled = true;
   public Boolean useWideViewPort = true;

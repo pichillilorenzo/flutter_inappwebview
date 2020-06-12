@@ -203,7 +203,7 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                     webView!.evaluateJavascript(source: source, result: result)
                 }
                 else {
-                    result("")
+                    result(nil)
                 }
                 break
             case "injectJavascriptFileFromUrl":
@@ -405,6 +405,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                     webView!.getSelectedText { (value, error) in
                         if let err = error {
                             print(err.localizedDescription)
+                            result("")
+                            return
                         }
                         result(value)
                     }
@@ -418,6 +420,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                     webView!.getHitTestResult { (value, error) in
                         if let err = error {
                             print(err.localizedDescription)
+                            result(nil)
+                            return
                         }
                         result(value)
                     }
@@ -439,6 +443,34 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                     let contextMenu = arguments!["contextMenu"] as? [String: Any]
                     webView!.contextMenu = contextMenu
                     result(true)
+                } else {
+                    result(false)
+                }
+                break
+            case "requestFocusNodeHref":
+                if webView != nil {
+                    webView!.requestFocusNodeHref { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                            result(nil)
+                            return
+                        }
+                        result(value)
+                    }
+                } else {
+                    result(false)
+                }
+                break
+            case "requestImageRef":
+                if webView != nil {
+                    webView!.requestImageRef { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                            result(nil)
+                            return
+                        }
+                        result(value)
+                    }
                 } else {
                     result(false)
                 }

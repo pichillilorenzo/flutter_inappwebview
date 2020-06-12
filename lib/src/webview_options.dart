@@ -159,6 +159,9 @@ class InAppWebViewOptions
   ///Set to `true` to disable context menu. The default value is `false`.
   bool disableContextMenu;
 
+  ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
+  bool supportZoom;
+
   InAppWebViewOptions(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
@@ -183,7 +186,8 @@ class InAppWebViewOptions
       this.transparentBackground = false,
       this.disableVerticalScroll = false,
       this.disableHorizontalScroll = false,
-      this.disableContextMenu = false}) {
+      this.disableContextMenu = false,
+      this.supportZoom = true}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = Platform.isAndroid ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
@@ -221,7 +225,8 @@ class InAppWebViewOptions
       "transparentBackground": transparentBackground,
       "disableVerticalScroll": disableVerticalScroll,
       "disableHorizontalScroll": disableHorizontalScroll,
-      "disableContextMenu": disableContextMenu
+      "disableContextMenu": disableContextMenu,
+      "supportZoom": supportZoom
     };
   }
 
@@ -266,6 +271,7 @@ class InAppWebViewOptions
     options.disableVerticalScroll = map["disableVerticalScroll"];
     options.disableHorizontalScroll = map["disableHorizontalScroll"];
     options.disableContextMenu = map["disableContextMenu"];
+    options.supportZoom = map["supportZoom"];
     return options;
   }
 
@@ -289,14 +295,11 @@ class AndroidInAppWebViewOptions
   ///Set to `true` to have the session cookie cache cleared before the new window is opened.
   bool clearSessionCache;
 
-  ///Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+  ///Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `true`.
   bool builtInZoomControls;
 
   ///Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
   bool displayZoomControls;
-
-  ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
-  bool supportZoom;
 
   ///Set to `true` if you want the database storage API is enabled. The default value is `true`.
   bool databaseEnabled;
@@ -493,10 +496,9 @@ class AndroidInAppWebViewOptions
   AndroidInAppWebViewOptions({
     this.textZoom = 100,
     this.clearSessionCache = false,
-    this.builtInZoomControls = false,
+    this.builtInZoomControls = true,
     this.displayZoomControls = false,
-    this.supportZoom = true,
-    this.databaseEnabled = false,
+    this.databaseEnabled = true,
     this.domStorageEnabled = true,
     this.useWideViewPort = true,
     this.safeBrowsingEnabled = true,
@@ -553,7 +555,6 @@ class AndroidInAppWebViewOptions
       "clearSessionCache": clearSessionCache,
       "builtInZoomControls": builtInZoomControls,
       "displayZoomControls": displayZoomControls,
-      "supportZoom": supportZoom,
       "databaseEnabled": databaseEnabled,
       "domStorageEnabled": domStorageEnabled,
       "useWideViewPort": useWideViewPort,
@@ -610,7 +611,6 @@ class AndroidInAppWebViewOptions
     options.clearSessionCache = map["clearSessionCache"];
     options.builtInZoomControls = map["builtInZoomControls"];
     options.displayZoomControls = map["displayZoomControls"];
-    options.supportZoom = map["supportZoom"];
     options.databaseEnabled = map["databaseEnabled"];
     options.domStorageEnabled = map["domStorageEnabled"];
     options.useWideViewPort = map["useWideViewPort"];

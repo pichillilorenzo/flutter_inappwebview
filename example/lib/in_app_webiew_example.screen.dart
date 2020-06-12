@@ -78,8 +78,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     contextMenu: contextMenu,
-                    initialUrl: "https://github.com/flutter",
-                    // initialFile: "assets/index.html",
+                    // initialUrl: "https://github.com/flutter",
+                    initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(

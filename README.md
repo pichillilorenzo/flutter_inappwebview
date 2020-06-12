@@ -402,6 +402,10 @@ Screenshots:
 * `getHitTestResult`: Gets the hit result for hitting an HTML elements.
 * `clearFocus`: Clears the current focus. It will clear also, for example, the current text selection.
 * `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
+* `requestFocusNodeHref`: Requests the anchor or image element URL at the last tapped point.
+* `requestImageRef`: Requests the URL of the image last touched by the user.
+* `getMetaTags`: Returns the list of `<meta>` tags of the current WebView.
+* `getMetaThemeColor`: Returns an instance of `Color` representing the `content` value of the `<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
 * `static getDefaultUserAgent`: Gets the default user agent.
 
 ##### `InAppWebViewController` Android-specific methods
@@ -504,6 +508,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `disableVerticalScroll`: Set to `true` to disable vertical scroll. The default value is `false`.
 * `disableHorizontalScroll`: Set to `true` to disable horizontal scroll. The default value is `false`.
 * `disableContextMenu`: Set to `true` to disable context menu. The default value is `false`.
+* `supportZoom`: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
 
 ##### `InAppWebView` Android-specific options
 
@@ -511,9 +516,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `useOnRenderProcessGone`: Set to `true` to be able to listen at the `androidOnRenderProcessGone` event. The default value is `false`.
 * `textZoom`: Sets the text zoom of the page in percent. The default value is `100`.
 * `clearSessionCache`: Set to `true` to have the session cookie cache cleared before the new window is opened.
-* `builtInZoomControls`: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `false`.
+* `builtInZoomControls`: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `true`.
 * `displayZoomControls`: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
-* `supportZoom`: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
 * `databaseEnabled`: Set to `true` if you want the database storage API is enabled. The default value is `true`.
 * `domStorageEnabled`: Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
 * `useWideViewPort`: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
@@ -622,7 +626,7 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
 * `androidOnGeolocationPermissionsHidePrompt`: Notify the host application that a request for Geolocation permissions, made with a previous call to `androidOnGeolocationPermissionsShowPrompt` has been canceled (available only on Android).
-* `androidShouldInterceptRequest`: Notify the host application of a resource request and allow the application to return the data (available only on Android).
+* `androidShouldInterceptRequest`: Notify the host application of a resource request and allow the application to return the data (available only on Android). To use this event, the `useShouldInterceptRequest` option must be `true`.
 * `androidOnRenderProcessGone`: Event fired when the given WebView's render process has exited (available only on Android).
 * `androidOnRenderProcessResponsive`: Event called once when an unresponsive renderer currently associated with the WebView becomes responsive (available only on Android).
 * `androidOnRenderProcessUnresponsive`: Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript (available only on Android).

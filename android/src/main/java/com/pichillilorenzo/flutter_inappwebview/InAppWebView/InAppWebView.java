@@ -6,8 +6,10 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
@@ -84,6 +86,7 @@ final public class InAppWebView extends InputAwareWebView {
   public LinearLayout floatingContextMenu = null;
   public Map<String, Object> contextMenu = null;
   public Handler headlessHandler = new Handler(Looper.getMainLooper());
+  static Handler mHandler = new Handler();
 
   public Runnable checkScrollStoppedTask;
   public int initialPositionScrollStoppedTask;
@@ -1184,7 +1187,7 @@ final public class InAppWebView extends InputAwareWebView {
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-      if (newOptionsMap.get("mixedContentMode") != null && !options.mixedContentMode.equals(newOptions.mixedContentMode))
+      if (newOptionsMap.get("mixedContentMode") != null && (options.mixedContentMode == null || !options.mixedContentMode.equals(newOptions.mixedContentMode)))
         settings.setMixedContentMode(newOptions.mixedContentMode);
 
     if (newOptionsMap.get("supportMultipleWindows") != null && options.supportMultipleWindows != newOptions.supportMultipleWindows)
@@ -1213,7 +1216,7 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("cacheEnabled") != null && options.cacheEnabled != newOptions.cacheEnabled)
       setCacheEnabled(newOptions.cacheEnabled);
 
-    if (newOptionsMap.get("appCachePath") != null && !options.appCachePath.equals(newOptions.appCachePath))
+    if (newOptionsMap.get("appCachePath") != null && (options.appCachePath == null || !options.appCachePath.equals(newOptions.appCachePath)))
       settings.setAppCachePath(newOptions.appCachePath);
 
     if (newOptionsMap.get("blockNetworkImage") != null && options.blockNetworkImage != newOptions.blockNetworkImage)
@@ -1237,8 +1240,9 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("defaultTextEncodingName") != null && !options.defaultTextEncodingName.equals(newOptions.defaultTextEncodingName))
       settings.setDefaultTextEncodingName(newOptions.defaultTextEncodingName);
 
-    if (newOptionsMap.get("disabledActionModeMenuItems") != null && !options.disabledActionModeMenuItems.equals(newOptions.disabledActionModeMenuItems))
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
+      if (newOptionsMap.get("disabledActionModeMenuItems") != null && (options.disabledActionModeMenuItems == null ||
+            !options.disabledActionModeMenuItems.equals(newOptions.disabledActionModeMenuItems)))
         settings.setDisabledActionModeMenuItems(newOptions.disabledActionModeMenuItems);
 
     if (newOptionsMap.get("fantasyFontFamily") != null && !options.fantasyFontFamily.equals(newOptions.fantasyFontFamily))
@@ -1318,7 +1322,8 @@ final public class InAppWebView extends InputAwareWebView {
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     }
 
-    if (newOptionsMap.get("regexToCancelSubFramesLoading") != null && options.regexToCancelSubFramesLoading != newOptions.regexToCancelSubFramesLoading) {
+    if (newOptionsMap.get("regexToCancelSubFramesLoading") != null && (options.regexToCancelSubFramesLoading == null ||
+            !options.regexToCancelSubFramesLoading.equals(newOptions.regexToCancelSubFramesLoading))) {
       if (newOptions.regexToCancelSubFramesLoading == null)
         regexToCancelSubFramesLoadingCompiled = null;
       else
@@ -1338,13 +1343,15 @@ final public class InAppWebView extends InputAwareWebView {
     if (newOptionsMap.get("scrollBarStyle") != null && !options.scrollBarStyle.equals(newOptions.scrollBarStyle))
       setScrollBarStyle(newOptions.scrollBarStyle);
 
-    if (newOptionsMap.get("scrollBarDefaultDelayBeforeFade") != null && !options.scrollBarDefaultDelayBeforeFade.equals(newOptions.scrollBarDefaultDelayBeforeFade))
+    if (newOptionsMap.get("scrollBarDefaultDelayBeforeFade") != null && (options.scrollBarDefaultDelayBeforeFade == null ||
+            !options.scrollBarDefaultDelayBeforeFade.equals(newOptions.scrollBarDefaultDelayBeforeFade)))
       setScrollBarDefaultDelayBeforeFade(newOptions.scrollBarDefaultDelayBeforeFade);
 
     if (newOptionsMap.get("scrollbarFadingEnabled") != null && !options.scrollbarFadingEnabled.equals(newOptions.scrollbarFadingEnabled))
       setScrollbarFadingEnabled(newOptions.scrollbarFadingEnabled);
 
-    if (newOptionsMap.get("scrollBarFadeDuration") != null && !options.scrollBarFadeDuration.equals(newOptions.scrollBarFadeDuration))
+    if (newOptionsMap.get("scrollBarFadeDuration") != null && (options.scrollBarFadeDuration == null ||
+            !options.scrollBarFadeDuration.equals(newOptions.scrollBarFadeDuration)))
       setScrollBarFadeDuration(newOptions.scrollBarFadeDuration);
 
     if (newOptionsMap.get("verticalScrollbarPosition") != null && !options.verticalScrollbarPosition.equals(newOptions.verticalScrollbarPosition))
@@ -1800,6 +1807,30 @@ final public class InAppWebView extends InputAwareWebView {
         result.success(value);
       }
     });
+  }
+
+  public Map<String, Object> requestFocusNodeHref() {
+    Message msg = InAppWebView.mHandler.obtainMessage();
+    requestFocusNodeHref(msg);
+    Bundle bundle = msg.peekData();
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("src", bundle.getString("src"));
+    obj.put("url", bundle.getString("url"));
+    obj.put("title", bundle.getString("title"));
+
+    return obj;
+  }
+
+  public Map<String, Object> requestImageRef() {
+    Message msg = InAppWebView.mHandler.obtainMessage();
+    requestImageRef(msg);
+    Bundle bundle = msg.peekData();
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("url", bundle.getString("url"));
+
+    return obj;
   }
 
   @Override

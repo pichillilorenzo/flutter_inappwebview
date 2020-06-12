@@ -1,3 +1,18 @@
+## 3.4.0
+
+- Added `requestFocusNodeHref`, `requestImageRef`, `getMetaTags`, `getMetaThemeColor` webview methods
+- Added `WebStorage`, `LocalStorage` and `SessionStorage` class to manage `window.localStorage` and `window.sessionStorage` JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
+- Added `supportZoom` webview option also on iOS
+- Fixed `zoomBy`, `setOptions` webview methods on Android
+- Fixed `databaseEnabled` android webview option default value to `true`
+
+### BREAKING CHANGES
+
+- `evaluateJavascript` webview method now returns `null` on iOS if the evaluated JavaScript source returns `null`
+- `getHtml` webview method now could return `null` if it was unable to get it.
+- Moved `supportZoom` webview option to cross-platform
+- `builtInZoomControls` android webview options changed default value to `true`
+
 ## 3.3.0+3
 
 - Updated Android build.gradle version and some androidx properties

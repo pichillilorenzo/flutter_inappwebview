@@ -681,7 +681,6 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint = function(x, y) {
         EDIT_TEXT_TYPE: 9
     };
     var element = document.elementFromPoint(x, y);
-    console.log(element);
     var data = {
         type: 0,
         extra: null
@@ -732,6 +731,63 @@ let getSelectedTextJS = """
       txt = window.document.selection.createRange().text;
     }
     return txt;
+})();
+"""
+
+let lastTouchedAnchorOrImageJS = """
+window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched = null;
+window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = null;
+(function() {
+    document.addEventListener('touchstart', function(event) {
+        var target = event.target;
+        while (target) {
+            if (target.tagName === 'IMG') {
+                var img = target;
+                window.flutter_inappwebview._lastImageTouched = {
+                    src: img.src
+                };
+                var parent = img.parentNode;
+                while (parent) {
+                    if (parent.tagName === 'A') {
+                        window.flutter_inappwebview._lastAnchorOrImageTouched = {
+                            title: parent.textContent,
+                            url: parent.href,
+                            src: img.src
+                        };
+                        break;
+                    }
+                    parent = parent.parentNode;
+                }
+                return;
+            } else if (target.tagName === 'A') {
+                var link = target;
+                var images = link.getElementsByTagName('img');
+                var img = (images.length > 0) ? images[0] : null;
+                var imgSrc = (img != null) ? img.src : null;
+                window.flutter_inappwebview._lastImageTouched = (img != null) ? {src: img.src} : window.flutter_inappwebview._lastImageTouched;
+                window.flutter_inappwebview._lastAnchorOrImageTouched = {
+                    title: link.textContent,
+                    url: link.href,
+                    src: imgSrc
+                };
+                return;
+            }
+            target = target.parentNode;
+        }
+    });
+})();
+"""
+
+let originalViewPortMetaTagContentJS = """
+window.\(JAVASCRIPT_BRIDGE_NAME)._originalViewPortMetaTagContent = "";
+(function() {
+    var metaTagNodes = document.head.getElementsByTagName('meta');
+    for (var i = 0; i < metaTagNodes.length; i++) {
+        var metaTagNode = metaTagNodes[i];
+        if (metaTagNode.name === "viewport") {
+            window.\(JAVASCRIPT_BRIDGE_NAME)._originalViewPortMetaTagContent = metaTagNode.content;
+        }
+    }
 })();
 """
 
@@ -991,7 +1047,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if (options?.enableViewportScale)! {
+        let originalViewPortMetaTagContentJSScript = WKUserScript(source: originalViewPortMetaTagContentJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+        configuration.userContentController.addUserScript(originalViewPortMetaTagContentJSScript)
+        
+        if !(options?.supportZoom)! {
+            let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); document.getElementsByTagName('head')[0].appendChild(meta);"
+            let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+            configuration.userContentController.addUserScript(userScript)
+        } else if (options?.enableViewportScale)! {
             let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
             let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
             configuration.userContentController.addUserScript(userScript)
@@ -1017,6 +1080,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(printJSScript)
+        
+        let lastTouchedAnchorOrImageJSScript = WKUserScript(source: lastTouchedAnchorOrImageJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(lastTouchedAnchorOrImageJSScript)
         
         if (options?.useOnLoadResource)! {
             let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -1424,8 +1490,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if newOptionsMap["enableViewportScale"] != nil && options?.enableViewportScale != newOptions.enableViewportScale && newOptions.enableViewportScale {
-            let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
+        if newOptionsMap["enableViewportScale"] != nil && options?.enableViewportScale != newOptions.enableViewportScale {
+            var jscript = ""
+            if (newOptions.enableViewportScale) {
+                jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
+            } else {
+                jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', window.\(JAVASCRIPT_BRIDGE_NAME)._originalViewPortMetaTagContent); document.getElementsByTagName('head')[0].appendChild(meta);"
+            }
+            evaluateJavaScript(jscript, completionHandler: nil)
+        }
+        
+        if newOptionsMap["supportZoom"] != nil && options?.supportZoom != newOptions.supportZoom {
+            var jscript = ""
+            if (newOptions.supportZoom) {
+                jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', window.\(JAVASCRIPT_BRIDGE_NAME)._originalViewPortMetaTagContent); document.getElementsByTagName('head')[0].appendChild(meta);"
+            } else {
+                jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); document.getElementsByTagName('head')[0].appendChild(meta);"
+            }
             evaluateJavaScript(jscript, completionHandler: nil)
         }
         
@@ -1635,7 +1716,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             if value == nil {
-                result!("")
+                result!(nil)
                 return
             }
             
@@ -2737,6 +2818,34 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastTouchLocation.x),\(lastTouchLocation.y))", completionHandler: {(value, error) in
                 completionHandler(value, error)
             })
+        } else {
+            completionHandler(nil, nil)
+        }
+    }
+    
+    public func requestFocusNodeHref(completionHandler: @escaping ([String: Any?]?, Error?) -> Void) {
+        if configuration.preferences.javaScriptEnabled {
+            // add some delay to make it sure _lastAnchorOrImageTouched is updated
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched", completionHandler: {(value, error) in
+                    let lastAnchorOrImageTouched = value as? [String: Any?]
+                    completionHandler(lastAnchorOrImageTouched, error)
+                })
+            }
+        } else {
+            completionHandler(nil, nil)
+        }
+    }
+    
+    public func requestImageRef(completionHandler: @escaping ([String: Any?]?, Error?) -> Void) {
+        if configuration.preferences.javaScriptEnabled {
+            // add some delay to make it sure _lastImageTouched is updated
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched", completionHandler: {(value, error) in
+                    let lastImageTouched = value as? [String: Any?]
+                    completionHandler(lastImageTouched, error)
+                })
+            }
         } else {
             completionHandler(nil, nil)
         }

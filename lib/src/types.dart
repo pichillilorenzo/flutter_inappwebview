@@ -3279,3 +3279,146 @@ class AndroidWebViewPackageInfo {
     return toMap().toString();
   }
 }
+
+///Class that represents the result used by the [InAppWebViewController.requestFocusNodeHref] method.
+class RequestFocusNodeHrefResult {
+  ///The anchor's href attribute.
+  String url;
+
+  ///The anchor's text.
+  String title;
+
+  ///The image's src attribute.
+  String src;
+
+  RequestFocusNodeHrefResult(
+      {this.url,
+        this.title,
+        this.src});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url,
+      "title": title,
+      "src": src
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the result used by the [InAppWebViewController.requestImageRef] method.
+class RequestImageRefResult {
+  ///The image's url.
+  String url;
+
+  RequestImageRefResult({this.url});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents a `<meta>` HTML tag. It is used by the [InAppWebViewController.getMetaTags] method.
+class MetaTag {
+  ///The meta tag name value.
+  String name;
+  ///The meta tag content value.
+  String content;
+  ///The meta tag attributes list.
+  List<MetaTagAttribute> attrs;
+
+  MetaTag({this.name, this.content, this.attrs});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "name": name,
+      "content": content,
+      "attrs": attrs
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents an attribute of a `<meta>` HTML tag. It is used by the [MetaTag] class.
+class MetaTagAttribute {
+  ///The attribute name.
+  String name;
+  ///The attribute value.
+  String value;
+
+  MetaTagAttribute({this.name, this.value});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "name": name,
+      "value": value,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+class WebStorageType {
+  final String _value;
+
+  const WebStorageType._internal(this._value);
+
+  static WebStorageType fromValue(String value) {
+    return ([
+      "localStorage",
+      "sessionStorage",
+    ].contains(value))
+        ? WebStorageType._internal(value)
+        : null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  static const LOCAL_STORAGE =
+  const WebStorageType._internal("localStorage");
+
+  static const SESSION_STORAGE =
+  const WebStorageType._internal("sessionStorage");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}

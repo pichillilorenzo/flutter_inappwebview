@@ -380,7 +380,7 @@ abstract class WebView {
   ///
   ///[request] Object containing the details of the request.
   ///
-  ///**NOTE**: available only on Android.
+  ///**NOTE**: available only on Android. In order to be able to listen this event, you need to set [AndroidInAppWebViewOptions.useShouldInterceptRequest] option to `true`.
   ///
   ///**Official Android API**:
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)

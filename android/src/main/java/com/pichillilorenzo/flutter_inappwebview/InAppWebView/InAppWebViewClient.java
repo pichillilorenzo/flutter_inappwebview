@@ -465,8 +465,6 @@ public class InAppWebViewClient extends WebViewClient {
     }
     obj.put("message", message);
 
-    Log.d(LOG_TAG, obj.toString());
-
     channel.invokeMethod("onReceivedServerTrustAuthRequest", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {

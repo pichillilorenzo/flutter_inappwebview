@@ -3,6 +3,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:core';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,6 +19,8 @@ import 'webview_options.dart';
 import 'headless_in_app_webview.dart';
 import 'webview.dart';
 import 'in_app_webview.dart';
+import 'web_storage.dart';
+import 'util.dart';
 
 ///List of forbidden names for JavaScript handlers.
 const javaScriptHandlerForbiddenNames = [
@@ -56,6 +59,8 @@ class InAppWebViewController {
   ///iOS controller that contains only ios-specific methods
   IOSInAppWebViewController ios;
 
+  WebStorage webStorage;
+
   InAppWebViewController(dynamic id, WebView webview) {
     this._id = id;
     this._channel =
@@ -64,6 +69,7 @@ class InAppWebViewController {
     this._webview = webview;
     this.android = AndroidInAppWebViewController(this);
     this.ios = IOSInAppWebViewController(this);
+    this.webStorage = WebStorage(localStorage: LocalStorage(this), sessionStorage: SessionStorage(this));
   }
 
   InAppWebViewController.fromInAppBrowser(
@@ -789,8 +795,11 @@ class InAppWebViewController {
   ///If this doesn't work, it tries to get the content reading the file:
   ///- checking if it is an asset (`file:///`) or
   ///- downloading it using an `HttpClient` through the WebView's current url.
+  ///
+  ///Returns `null` if it was unable to get it.
   Future<String> getHtml() async {
-    var html = "";
+    String html;
+
     InAppWebViewGroupOptions options = await getOptions();
     if (options != null && options.crossPlatform.javaScriptEnabled == true) {
       html = await evaluateJavascript(
@@ -830,7 +839,7 @@ class InAppWebViewController {
     String manifestUrl;
 
     var html = await getHtml();
-    if (html.isEmpty) {
+    if (html != null && html.isEmpty) {
       return favicons;
     }
 
@@ -1503,6 +1512,121 @@ class InAppWebViewController {
     _inAppBrowser?.contextMenu = contextMenu;
   }
 
+  ///Requests the anchor or image element URL at the last tapped point.
+  ///
+  ///**NOTE**: On iOS it is implemented using JavaScript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#requestFocusNodeHref(android.os.Message)
+  Future<RequestFocusNodeHrefResult> requestFocusNodeHref() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<dynamic, dynamic> result = await _channel.invokeMethod('requestFocusNodeHref', args);
+    return result != null ? RequestFocusNodeHrefResult(
+      url: result['url'],
+      title: result['title'],
+      src: result['src'],
+    ) : null;
+  }
+
+  ///Requests the URL of the image last touched by the user.
+  ///
+  ///**NOTE**: On iOS it is implemented using JavaScript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#requestImageRef(android.os.Message)
+  Future<RequestImageRefResult> requestImageRef() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<dynamic, dynamic> result = await _channel.invokeMethod('requestImageRef', args);
+    return result != null ? RequestImageRefResult(
+      url: result['url'],
+    ) : null;
+  }
+
+  ///Returns the list of `<meta>` tags of the current WebView.
+  ///
+  ///**NOTE**: It is implemented using JavaScript.
+  Future<List<MetaTag>> getMetaTags() async {
+    List<MetaTag> metaTags = [];
+
+    List<Map<dynamic, dynamic>> metaTagList = (await evaluateJavascript(source: """
+(function() {
+  var metaTags = [];
+  var metaTagNodes = document.head.getElementsByTagName('meta');
+  for (var i = 0; i < metaTagNodes.length; i++) {
+    var metaTagNode = metaTagNodes[i];
+    
+    var otherAttributes = metaTagNode.getAttributeNames();
+    var nameIndex = otherAttributes.indexOf("name");
+    if (nameIndex !== -1) otherAttributes.splice(nameIndex, 1);
+    var contentIndex = otherAttributes.indexOf("content");
+    if (contentIndex !== -1) otherAttributes.splice(contentIndex, 1);
+    
+    var attrs = [];
+    for (var j = 0; j < otherAttributes.length; j++) {
+      var otherAttribute = otherAttributes[j];
+      attrs.push(
+        {
+          name: otherAttribute,
+          value: metaTagNode.getAttribute(otherAttribute)
+        }
+      );
+    }
+
+    metaTags.push(
+      {
+        name: metaTagNode.name,
+        content: metaTagNode.content,
+        attrs: attrs
+      }
+    );
+  }
+  return metaTags;
+})();
+    """))?.cast<Map<dynamic, dynamic>>();
+
+    if (metaTagList == null) {
+      return metaTags;
+    }
+
+    for (var metaTag in metaTagList) {
+      var attrs = <MetaTagAttribute>[];
+
+      for (var metaTagAttr in metaTag["attrs"]) {
+        attrs.add(
+          MetaTagAttribute(name: metaTagAttr["name"], value: metaTagAttr["value"])
+        );
+      }
+
+      metaTags.add(
+        MetaTag(name: metaTag["name"], content: metaTag["content"], attrs: attrs)
+      );
+    }
+
+    return metaTags;
+  }
+
+  ///Returns an instance of [Color] representing the `content` value of the
+  ///`<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
+  ///
+  ///**NOTE**: It is implemented using JavaScript.
+  Future<Color> getMetaThemeColor() async {
+    var metaTags = await getMetaTags();
+    MetaTag metaTagThemeColor;
+
+    for (var metaTag in metaTags) {
+      if (metaTag.name == "theme-color") {
+        metaTagThemeColor = metaTag;
+        break;
+      }
+    }
+
+    if (metaTagThemeColor == null) {
+      return null;
+    }
+
+    var colorValue = metaTagThemeColor.content;
+
+    return Util.convertColorFromStringRepresentation(colorValue);
+  }
+
   ///Gets the default user agent.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)
@@ -1517,6 +1641,7 @@ class AndroidInAppWebViewController {
   InAppWebViewController _controller;
 
   AndroidInAppWebViewController(InAppWebViewController controller) {
+    assert(controller != null);
     this._controller = controller;
   }
 
@@ -1719,6 +1844,7 @@ class IOSInAppWebViewController {
   InAppWebViewController _controller;
 
   IOSInAppWebViewController(InAppWebViewController controller) {
+    assert(controller != null);
     this._controller = controller;
   }
 

@@ -366,14 +366,20 @@ class InAppWebViewController {
         String protocol = call.arguments["protocol"];
         String realm = call.arguments["realm"];
         int port = call.arguments["port"];
-        int error = call.arguments["error"];
+        int androidError = call.arguments["androidError"];
+        int iosError = call.arguments["iosError"];
         String message = call.arguments["message"];
         Uint8List serverCertificate = call.arguments["serverCertificate"];
+
+        AndroidSslError androidSslError = androidError != null ? AndroidSslError.fromValue(androidError) : null;
+        IOSSslError iosSslError = iosError != null ? IOSSslError.fromValue(iosError) : null;
+
         var protectionSpace = ProtectionSpace(
             host: host, protocol: protocol, realm: realm, port: port);
         var challenge = ServerTrustChallenge(
             protectionSpace: protectionSpace,
-            error: error,
+            androidError: androidSslError,
+            iosError: iosSslError,
             message: message,
             serverCertificate: serverCertificate);
         if (_webview != null &&
@@ -811,8 +817,10 @@ class InAppWebViewController {
     if (webviewUrl.startsWith("file:///")) {
       var assetPathSplitted = webviewUrl.split("/flutter_assets/");
       var assetPath = assetPathSplitted[assetPathSplitted.length - 1];
-      var bytes = await rootBundle.load(assetPath);
-      html = utf8.decode(bytes.buffer.asUint8List());
+      try {
+        var bytes = await rootBundle.load(assetPath);
+        html = utf8.decode(bytes.buffer.asUint8List());
+      } catch (e) {}
     } else {
       HttpClient client = new HttpClient();
       var url = Uri.parse(webviewUrl);
@@ -839,7 +847,7 @@ class InAppWebViewController {
     String manifestUrl;
 
     var html = await getHtml();
-    if (html != null && html.isEmpty) {
+    if (html == null || (html != null && html.isEmpty)) {
       return favicons;
     }
 
@@ -880,8 +888,9 @@ class InAppWebViewController {
       var faviconUrl = url.scheme + "://" + url.host + "/favicon.ico";
       await client.headUrl(Uri.parse(faviconUrl));
       favicons.add(Favicon(url: faviconUrl, rel: "shortcut icon"));
-    } catch (e) {
+    } catch (e, stacktrace) {
       print("/favicon.ico file not found: " + e.toString());
+      print(stacktrace);
     }
 
     // try to get the manifest file
@@ -896,8 +905,9 @@ class InAppWebViewController {
       manifestResponse = await manifestRequest.close();
       manifestFound = manifestResponse.statusCode == 200 &&
           manifestResponse.headers.contentType?.mimeType == "application/json";
-    } catch (e) {
+    } catch (e, stacktrace) {
       print("Manifest file not found: " + e.toString());
+      print(stacktrace);
     }
 
     if (manifestFound) {
@@ -1261,26 +1271,18 @@ class InAppWebViewController {
     await _channel.invokeMethod('setOptions', args);
   }
 
-  ///Gets the current WebView options. Returns the options with `null` value if they are not set yet.
+  ///Gets the current WebView options. Returns `null` if it wasn't able to get them.
   Future<InAppWebViewGroupOptions> getOptions() async {
     Map<String, dynamic> args = <String, dynamic>{};
 
-    InAppWebViewGroupOptions inAppWebViewGroupOptions =
-        InAppWebViewGroupOptions();
     Map<dynamic, dynamic> options =
         await _channel.invokeMethod('getOptions', args);
     if (options != null) {
       options = options.cast<String, dynamic>();
-      inAppWebViewGroupOptions.crossPlatform =
-          InAppWebViewOptions.fromMap(options);
-      if (Platform.isAndroid)
-        inAppWebViewGroupOptions.android =
-            AndroidInAppWebViewOptions.fromMap(options);
-      else if (Platform.isIOS)
-        inAppWebViewGroupOptions.ios = IOSInAppWebViewOptions.fromMap(options);
+      return InAppWebViewGroupOptions.fromMap(options);
     }
 
-    return inAppWebViewGroupOptions;
+    return null;
   }
 
   ///Gets the WebHistory for this WebView. This contains the back/forward list for use in querying each item in the history stack.
@@ -1378,13 +1380,16 @@ class InAppWebViewController {
   ///
   ///[y] represents the y position to scroll to.
   ///
+  ///[animated] `true` to animate the scroll transition, `false` to make the scoll transition immediate.
+  ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
-  Future<void> scrollTo({@required int x, @required int y}) async {
+  Future<void> scrollTo({@required int x, @required int y, bool animated = false}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
+    args.putIfAbsent('animated', () => animated ?? false);
     await _channel.invokeMethod('scrollTo', args);
   }
 
@@ -1394,13 +1399,16 @@ class InAppWebViewController {
   ///
   ///[y] represents the amount of pixels to scroll by vertically.
   ///
+  ///[animated] `true` to animate the scroll transition, `false` to make the scoll transition immediate.
+  ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
-  Future<void> scrollBy({@required int x, @required int y}) async {
+  Future<void> scrollBy({@required int x, @required int y, bool animated = false}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
     args.putIfAbsent('y', () => y);
+    args.putIfAbsent('animated', () => animated ?? false);
     await _channel.invokeMethod('scrollBy', args);
   }
 
@@ -1447,13 +1455,15 @@ class InAppWebViewController {
 
   ///Performs a zoom operation in this WebView.
   ///
-  ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 to 100.0 inclusive.
+  ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 (excluded) to 100.0 (included).
   ///
   ///**NOTE**: available on Android 21+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale
   Future<void> zoomBy(double zoomFactor) async {
+    assert(!Platform.isAndroid || (Platform.isAndroid && zoomFactor > 0.01 && zoomFactor <= 100.0));
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
     return await _channel.invokeMethod('zoomBy', args);
@@ -1627,6 +1637,24 @@ class InAppWebViewController {
     return Util.convertColorFromStringRepresentation(colorValue);
   }
 
+  ///Returns the scrolled left position of the current WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/view/View#getScrollX()
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset
+  Future<int> getScrollX() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('getScrollX', args);
+  }
+
+  ///Returns the scrolled top position of the current WebView.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/view/View#getScrollY()
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset
+  Future<int> getScrollY() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('getScrollY', args);
+  }
+
   ///Gets the default user agent.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)
@@ -1764,6 +1792,16 @@ class AndroidInAppWebViewController {
   Future<void> clearHistory() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('clearHistory', args);
+  }
+
+  ///Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getCertificate()
+  Future<AndroidSslCertificate> getCertificate() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    var sslCertificateMap = (await _controller._channel.invokeMethod('getCertificate', args))?.cast<String, dynamic>();
+
+    return sslCertificateMap != null ? AndroidSslCertificate.fromMap(sslCertificateMap) : null;
   }
 
   ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.

@@ -203,36 +203,19 @@ class InAppBrowser {
     await _channel.invokeMethod('setOptions', args);
   }
 
-  ///Gets the current [InAppBrowser] options as a `Map`. Returns `null` if the options are not setted yet.
+  ///Gets the current [InAppBrowser] options. Returns `null` if it wasn't able to get them.
   Future<InAppBrowserClassOptions> getOptions() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
 
-    InAppBrowserClassOptions inAppBrowserClassOptions =
-        InAppBrowserClassOptions();
     Map<dynamic, dynamic> options =
         await _channel.invokeMethod('getOptions', args);
     if (options != null) {
       options = options.cast<String, dynamic>();
-      inAppBrowserClassOptions.crossPlatform =
-          InAppBrowserOptions.fromMap(options);
-      inAppBrowserClassOptions.inAppWebViewGroupOptions =
-          InAppWebViewGroupOptions();
-      inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
-          InAppWebViewOptions.fromMap(options);
-      if (Platform.isAndroid) {
-        inAppBrowserClassOptions.android =
-            AndroidInAppBrowserOptions.fromMap(options);
-        inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
-            AndroidInAppWebViewOptions.fromMap(options);
-      } else if (Platform.isIOS) {
-        inAppBrowserClassOptions.ios = IOSInAppBrowserOptions.fromMap(options);
-        inAppBrowserClassOptions.inAppWebViewGroupOptions.ios =
-            IOSInAppWebViewOptions.fromMap(options);
-      }
+      return InAppBrowserClassOptions.fromMap(options);
     }
 
-    return inAppBrowserClassOptions;
+    return null;
   }
 
   ///Returns `true` if the [InAppBrowser] instance is opened, otherwise `false`.

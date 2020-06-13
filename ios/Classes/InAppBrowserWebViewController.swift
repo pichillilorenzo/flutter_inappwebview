@@ -243,13 +243,15 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
             case "scrollTo":
                 let x = arguments!["x"] as! Int
                 let y = arguments!["y"] as! Int
-                webView.scrollTo(x: x, y: y)
+                let animated = arguments!["animated"] as! Bool
+                webView.scrollTo(x: x, y: y, animated: animated)
                 result(true)
                 break
             case "scrollBy":
                 let x = arguments!["x"] as! Int
                 let y = arguments!["y"] as! Int
-                webView.scrollTo(x: x, y: y)
+                let animated = arguments!["animated"] as! Bool
+                webView.scrollTo(x: x, y: y, animated: animated)
                 result(true)
                 break
             case "pauseTimers":

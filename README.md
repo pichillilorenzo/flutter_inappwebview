@@ -59,6 +59,10 @@ Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development
 
 Also, note that to use the `InAppWebView` widget on Android, it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)).
 
+**Support HTTP request**: Starting with Android 9 (API level 28), cleartext support is disabled by default:
+- Check the official [Network security configuration - "Opt out of cleartext traffic"](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted) section.
+- Also, check this StackOverflow issue answer: [Cleartext HTTP traffic not permitted](https://stackoverflow.com/a/50834600/4637638).
+
 ### IMPORTANT Note for iOS
 
 If you are starting a new fresh app, you need to create the Flutter App with `flutter create --androidx -i swift`
@@ -392,8 +396,8 @@ Screenshots:
 * `clearMatches`: Clears the highlighting surrounding text matches created by `findAllAsync()`.
 * `getTRexRunnerHtml`: Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerCss()`.
 * `getTRexRunnerCss`: Gets the css of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerHtml()`.
-* `scrollTo({@required int x, @required int y})`: Scrolls the WebView to the position.
-* `scrollBy({@required int x, @required int y})`: Moves the scrolled position of the WebView.
+* `scrollTo({@required int x, @required int y, bool animated = false})`: Scrolls the WebView to the position.
+* `scrollBy({@required int x, @required int y, bool animated = false})`: Moves the scrolled position of the WebView.
 * `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
 * `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
 * `printCurrentPage`: Prints the current page.
@@ -406,6 +410,8 @@ Screenshots:
 * `requestImageRef`: Requests the URL of the image last touched by the user.
 * `getMetaTags`: Returns the list of `<meta>` tags of the current WebView.
 * `getMetaThemeColor`: Returns an instance of `Color` representing the `content` value of the `<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
+* `getScrollX`: Returns the scrolled left position of the current WebView.
+* `getScrollY`: Returns the scrolled top position of the current WebView.
 * `static getDefaultUserAgent`: Gets the default user agent.
 
 ##### `InAppWebViewController` Android-specific methods
@@ -587,6 +593,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `isPagingEnabled`: A Boolean value that determines whether paging is enabled for the scroll view. The default value is `false`.
 * `maximumZoomScale`: A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
 * `minimumZoomScale`: A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
+* `contentInsetAdjustmentBehavior`: Configures how safe area insets are added to the adjusted content inset. The default value is `IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER`.
 
 #### `InAppWebView` Events
 

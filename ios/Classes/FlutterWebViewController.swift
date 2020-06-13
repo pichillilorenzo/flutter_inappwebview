@@ -347,7 +347,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                 if webView != nil {
                     let x = arguments!["x"] as! Int
                     let y = arguments!["y"] as! Int
-                    webView!.scrollTo(x: x, y: y)
+                    let animated = arguments!["animated"] as! Bool
+                    webView!.scrollTo(x: x, y: y, animated: animated)
                 }
                 result(true)
                 break
@@ -355,7 +356,8 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                 if webView != nil {
                     let x = arguments!["x"] as! Int
                     let y = arguments!["y"] as! Int
-                    webView!.scrollBy(x: x, y: y)
+                    let animated = arguments!["animated"] as! Bool
+                    webView!.scrollBy(x: x, y: y, animated: animated)
                 }
                 result(true)
                 break
@@ -471,6 +473,20 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                         }
                         result(value)
                     }
+                } else {
+                    result(false)
+                }
+                break
+            case "getScrollX":
+                if webView != nil {
+                    result(Int(webView!.scrollView.contentOffset.x))
+                } else {
+                    result(false)
+                }
+                break
+            case "getScrollY":
+                if webView != nil {
+                    result(Int(webView!.scrollView.contentOffset.y))
                 } else {
                     result(false)
                 }

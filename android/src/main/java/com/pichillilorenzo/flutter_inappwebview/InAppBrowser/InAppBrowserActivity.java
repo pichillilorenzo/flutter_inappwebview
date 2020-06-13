@@ -280,7 +280,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
         {
           Integer x = (Integer) call.argument("x");
           Integer y = (Integer) call.argument("y");
-          scrollTo(x, y);
+          Boolean animated = (Boolean) call.argument("animated");
+          scrollTo(x, y, animated);
         }
         result.success(true);
         break;
@@ -288,7 +289,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
         {
           Integer x = (Integer) call.argument("x");
           Integer y = (Integer) call.argument("y");
-          scrollBy(x, y);
+          Boolean animated = (Boolean) call.argument("animated");
+          scrollBy(x, y, animated);
         }
         result.success(true);
         break;
@@ -375,6 +377,21 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
           setContextMenu(contextMenu);
         }
         result.success(true);
+        break;
+      case "requestFocusNodeHref":
+        result.success(requestFocusNodeHref());
+        break;
+      case "requestImageRef":
+        result.success(requestImageRef());
+        break;
+      case "getScrollX":
+        result.success(getScrollX());
+        break;
+      case "getScrollY":
+        result.success(getScrollY());
+        break;
+      case "getCertificate":
+        result.success(getCertificate());
         break;
       default:
         result.notImplemented();
@@ -804,14 +821,14 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       result.success(false);
   }
 
-  public void scrollTo(Integer x, Integer y) {
+  public void scrollTo(Integer x, Integer y, Boolean animated) {
     if (webView != null)
-      webView.scrollTo(x, y);
+      webView.scrollTo(x, y, animated);
   }
 
-  public void scrollBy(Integer x, Integer y) {
+  public void scrollBy(Integer x, Integer y, Boolean animated) {
     if (webView != null)
-      webView.scrollBy(x, y);
+      webView.scrollBy(x, y, animated);
   }
 
   public void onPauseWebView() {
@@ -928,6 +945,36 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
   public void setContextMenu(Map<String, Object> contextMenu) {
     if (webView != null)
       webView.contextMenu = contextMenu;
+  }
+
+  public Map<String, Object> requestFocusNodeHref() {
+    if (webView != null)
+      return webView.requestFocusNodeHref();
+    return null;
+  }
+
+  public Map<String, Object> requestImageRef() {
+    if (webView != null)
+      return webView.requestImageRef();
+    return null;
+  }
+
+  public Integer getScrollX() {
+    if (webView != null)
+      return webView.getScrollX();
+    return null;
+  }
+
+  public Integer getScrollY() {
+    if (webView != null)
+      return webView.getScrollY();
+    return null;
+  }
+
+  public Map<String, Object> getCertificate() {
+    if (webView != null)
+      return webView.getSslCertificate();
+    return null;
   }
 
   public void dispose() {

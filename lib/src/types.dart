@@ -13,6 +13,7 @@ import 'http_auth_credentials_database.dart';
 import 'chrome_safari_browser.dart';
 import 'cookie_manager.dart';
 import 'web_storage_manager.dart';
+import 'web_storage.dart';
 
 var uuidGenerator = new Uuid();
 
@@ -912,12 +913,13 @@ class ServerTrustChallenge {
   ///The protection space requiring authentication.
   ProtectionSpace protectionSpace;
 
-  ///The primary error associated to the server SSL certificate.
-  ///
-  ///**NOTE**: on iOS this value is always -1.
-  int error;
+  ///Android-specific primary error associated to the server SSL certificate.
+  AndroidSslError androidError;
 
-  ///The message associated to the [error].
+  ///iOS-specific primary error associated to the server SSL certificate.
+  IOSSslError iosError;
+
+  ///The message associated to the [androidError]/[iosError].
   ///
   ///**NOTE**: on iOS this value is always an empty string.
   String message;
@@ -927,15 +929,17 @@ class ServerTrustChallenge {
 
   ServerTrustChallenge(
       {@required this.protectionSpace,
-      @required this.error,
+      this.androidError,
+      this.iosError,
       this.message,
       this.serverCertificate})
-      : assert(protectionSpace != null && error != null);
+      : assert(protectionSpace != null);
 
   Map<String, dynamic> toMap() {
     return {
       "protectionSpace": protectionSpace?.toMap(),
-      "error": error,
+      "androidError": androidError?.toValue(),
+      "iosError": iosError?.toValue(),
       "message": message,
       "serverCertificate": serverCertificate
     };
@@ -1687,6 +1691,18 @@ class InAppWebViewGroupOptions {
     return options;
   }
 
+  static InAppWebViewGroupOptions fromMap(Map<String, dynamic> options) {
+    InAppWebViewGroupOptions inAppWebViewGroupOptions = InAppWebViewGroupOptions();
+
+    inAppWebViewGroupOptions.crossPlatform = InAppWebViewOptions.fromMap(options);
+    if (Platform.isAndroid)
+      inAppWebViewGroupOptions.android = AndroidInAppWebViewOptions.fromMap(options);
+    else if (Platform.isIOS)
+      inAppWebViewGroupOptions.ios = IOSInAppWebViewOptions.fromMap(options);
+
+    return inAppWebViewGroupOptions;
+  }
+
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
@@ -1694,6 +1710,16 @@ class InAppWebViewGroupOptions {
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  InAppWebViewGroupOptions copy() {
+    return InAppWebViewGroupOptions.fromMap(this.toMap());
+  }
+
+  InAppWebViewGroupOptions copyWithValue(InAppWebViewGroupOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return InAppWebViewGroupOptions.fromMap(mergedMap);
   }
 }
 
@@ -1740,6 +1766,39 @@ class InAppBrowserClassOptions {
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  static InAppBrowserClassOptions fromMap(Map<String, dynamic> options) {
+    InAppBrowserClassOptions inAppBrowserClassOptions = InAppBrowserClassOptions();
+
+    inAppBrowserClassOptions.crossPlatform =
+        InAppBrowserOptions.fromMap(options);
+    inAppBrowserClassOptions.inAppWebViewGroupOptions =
+        InAppWebViewGroupOptions();
+    inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
+        InAppWebViewOptions.fromMap(options);
+    if (Platform.isAndroid) {
+      inAppBrowserClassOptions.android =
+          AndroidInAppBrowserOptions.fromMap(options);
+      inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
+          AndroidInAppWebViewOptions.fromMap(options);
+    } else if (Platform.isIOS) {
+      inAppBrowserClassOptions.ios = IOSInAppBrowserOptions.fromMap(options);
+      inAppBrowserClassOptions.inAppWebViewGroupOptions.ios =
+          IOSInAppWebViewOptions.fromMap(options);
+    }
+
+    return inAppBrowserClassOptions;
+  }
+
+  InAppBrowserClassOptions copy() {
+    return InAppBrowserClassOptions.fromMap(this.toMap());
+  }
+
+  InAppBrowserClassOptions copyWithValue(InAppBrowserClassOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return InAppBrowserClassOptions.fromMap(mergedMap);
   }
 }
 
@@ -2445,16 +2504,70 @@ class ContentBlockerActionType {
 
 ///Class that represents a cookie returned by the [CookieManager].
 class Cookie {
-  ///The name;
+  ///The cookie name.
   String name;
 
-  ///The value;
+  ///The cookie value.
   dynamic value;
 
-  Cookie({@required this.name, @required this.value});
+  ///The cookie expiration date in milliseconds.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  int expiresDate;
+
+  ///Indicates if the cookie is a session only cookie.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  bool isSessionOnly;
+
+  ///The cookie domain.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  String domain;
+
+  ///The cookie same site policy.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  HTTPCookieSameSitePolicy sameSite;
+
+  ///Indicates if the cookie is secure or not.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  bool isSecure;
+
+  ///Indicates if the cookie is a http only cookie.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  bool isHttpOnly;
+
+  ///The cookie path.
+  ///
+  ///**NOTE**: on Android it will be always `null`.
+  String path;
+
+  Cookie(
+      {@required this.name,
+      @required this.value,
+      this.expiresDate,
+      this.isSessionOnly,
+      this.domain,
+      this.sameSite,
+      this.isSecure,
+      this.isHttpOnly,
+      this.path});
 
   Map<String, dynamic> toMap() {
-    return {"name": name, "value": value};
+    return {
+      "name": name,
+      "value": value,
+      "expiresDate": expiresDate,
+      "isSessionOnly": isSessionOnly,
+      "domain": domain,
+      "sameSite": sameSite?.toValue(),
+      "isSecure": isSecure,
+      "isHttpOnly": isHttpOnly,
+      "path": path
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -3263,7 +3376,7 @@ class AndroidWebViewPackageInfo {
     return map != null
         ? AndroidWebViewPackageInfo(
             versionName: map["versionName"], packageName: map["packageName"])
-        : AndroidWebViewPackageInfo();
+        : null;
   }
 
   Map<String, dynamic> toMap() {
@@ -3291,17 +3404,10 @@ class RequestFocusNodeHrefResult {
   ///The image's src attribute.
   String src;
 
-  RequestFocusNodeHrefResult(
-      {this.url,
-        this.title,
-        this.src});
+  RequestFocusNodeHrefResult({this.url, this.title, this.src});
 
   Map<String, dynamic> toMap() {
-    return {
-      "url": url,
-      "title": title,
-      "src": src
-    };
+    return {"url": url, "title": title, "src": src};
   }
 
   Map<String, dynamic> toJson() {
@@ -3341,19 +3447,17 @@ class RequestImageRefResult {
 class MetaTag {
   ///The meta tag name value.
   String name;
+
   ///The meta tag content value.
   String content;
+
   ///The meta tag attributes list.
   List<MetaTagAttribute> attrs;
 
   MetaTag({this.name, this.content, this.attrs});
 
   Map<String, dynamic> toMap() {
-    return {
-      "name": name,
-      "content": content,
-      "attrs": attrs
-    };
+    return {"name": name, "content": content, "attrs": attrs};
   }
 
   Map<String, dynamic> toJson() {
@@ -3370,6 +3474,7 @@ class MetaTag {
 class MetaTagAttribute {
   ///The attribute name.
   String name;
+
   ///The attribute value.
   String value;
 
@@ -3392,6 +3497,8 @@ class MetaTagAttribute {
   }
 }
 
+///Class that represents the type of Web Storage: `localStorage` or `sessionStorage`.
+///Used by the [Storage] class.
 class WebStorageType {
   final String _value;
 
@@ -3411,14 +3518,537 @@ class WebStorageType {
   @override
   String toString() => _value;
 
-  static const LOCAL_STORAGE =
-  const WebStorageType._internal("localStorage");
+  ///`window.localStorage`: same as [SESSION_STORAGE], but persists even when the browser is closed and reopened.
+  static const LOCAL_STORAGE = const WebStorageType._internal("localStorage");
 
+  ///`window.sessionStorage`: maintains a separate storage area for each given origin that's available for the duration
+  ///of the page session (as long as the browser is open, including page reloads and restores).
   static const SESSION_STORAGE =
-  const WebStorageType._internal("sessionStorage");
+      const WebStorageType._internal("sessionStorage");
 
   bool operator ==(value) => value == _value;
 
   @override
   int get hashCode => _value.hashCode;
+}
+
+///Class that represents the same site policy of a cookie. Used by the [Cookie] class.
+class HTTPCookieSameSitePolicy {
+  final String _value;
+
+  const HTTPCookieSameSitePolicy._internal(this._value);
+
+  static HTTPCookieSameSitePolicy fromValue(String value) {
+    return ([
+      "Lax",
+      "Strict",
+      "None",
+    ].contains(value))
+        ? HTTPCookieSameSitePolicy._internal(value)
+        : null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///SameSite=Lax;
+  ///
+  ///Cookies are allowed to be sent with top-level navigations and will be sent along with GET
+  ///request initiated by third party website. This is the default value in modern browsers.
+  static const LAX = const HTTPCookieSameSitePolicy._internal("Lax");
+
+  ///SameSite=Strict;
+  ///
+  ///Cookies will only be sent in a first-party context and not be sent along with requests initiated by third party websites.
+  static const STRICT = const HTTPCookieSameSitePolicy._internal("Strict");
+
+  ///SameSite=None;
+  ///
+  ///Cookies will be sent in all contexts, i.e sending cross-origin is allowed.
+  ///`None` requires the `Secure` attribute in latest browser versions.
+  static const NONE = const HTTPCookieSameSitePolicy._internal("None");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents the Android-specific primary error associated to the server SSL certificate.
+///Used by the [ServerTrustChallenge] class.
+class AndroidSslError {
+  final int _value;
+
+  const AndroidSslError._internal(this._value);
+
+  static AndroidSslError fromValue(int value) {
+    if (value != null && value >= 0 && value <= 5)
+      return AndroidSslError._internal(value);
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SSL_EXPIRED";
+      case 2:
+        return "SSL_IDMISMATCH";
+      case 3:
+        return "SSL_UNTRUSTED";
+      case 4:
+        return "SSL_DATE_INVALID";
+      case 5:
+        return "SSL_INVALID";
+      case 0:
+      default:
+        return "SSL_NOTYETVALID";
+    }
+  }
+
+  ///The certificate is not yet valid
+  static const SSL_NOTYETVALID = const AndroidSslError._internal(0);
+
+  ///The certificate has expired
+  static const SSL_EXPIRED = const AndroidSslError._internal(1);
+
+  ///Hostname mismatch
+  static const SSL_IDMISMATCH = const AndroidSslError._internal(2);
+
+  ///The certificate authority is not trusted
+  static const SSL_UNTRUSTED = const AndroidSslError._internal(3);
+
+  ///The date of the certificate is invalid
+  static const SSL_DATE_INVALID = const AndroidSslError._internal(4);
+
+  ///A generic error occurred
+  static const SSL_INVALID = const AndroidSslError._internal(5);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents the iOS-specific primary error associated to the server SSL certificate.
+///Used by the [ServerTrustChallenge] class.
+class IOSSslError {
+  final int _value;
+
+  const IOSSslError._internal(this._value);
+
+  static IOSSslError fromValue(int value) {
+    if (value != null && [0, 3, 4, 5, 6, 7].contains(value))
+      return IOSSslError._internal(value);
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 3:
+        return "DENY";
+      case 4:
+        return "UNSPECIFIED";
+      case 5:
+        return "RECOVERABLE_TRUST_FAILURE";
+      case 6:
+        return "FATAL_TRUST_FAILURE";
+      case 7:
+        return "OTHER_ERROR";
+      case 0:
+      default:
+        return "INVALID";
+    }
+  }
+
+  ///Indicates an invalid setting or result.
+  static const INVALID = const IOSSslError._internal(0);
+
+  ///Indicates a user-configured deny; do not proceed.
+  static const DENY = const IOSSslError._internal(3);
+
+  ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
+  static const UNSPECIFIED = const IOSSslError._internal(4);
+
+  ///Indicates a trust policy failure which can be overridden by the user.
+  static const RECOVERABLE_TRUST_FAILURE = const IOSSslError._internal(5);
+
+  ///Indicates a trust failure which cannot be overridden by the user.
+  static const FATAL_TRUST_FAILURE = const IOSSslError._internal(6);
+
+  ///Indicates a failure other than that of trust evaluation.
+  static const OTHER_ERROR = const IOSSslError._internal(7);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents an iOS-specific class used to configure how safe area insets are added to the adjusted content inset.
+///
+///**NOTE**: available on iOS 11.0+.
+class IOSUIScrollViewContentInsetAdjustmentBehavior {
+  final int _value;
+
+  const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(this._value);
+
+  static IOSUIScrollViewContentInsetAdjustmentBehavior fromValue(int value) {
+    if (value != null && value >= 0 && value <= 3)
+      return IOSUIScrollViewContentInsetAdjustmentBehavior._internal(value);
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SCROLLABLE_AXES";
+      case 2:
+        return "NEVER";
+      case 3:
+        return "ALWAYS";
+      case 0:
+      default:
+        return "AUTOMATIC";
+    }
+  }
+
+  ///Automatically adjust the scroll view insets.
+  static const AUTOMATIC = const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(0);
+
+  ///Adjust the insets only in the scrollable directions.
+  static const SCROLLABLE_AXES = const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(1);
+
+  ///Do not adjust the scroll view insets.
+  static const NEVER = const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(2);
+
+  ///Always include the safe area insets in the content adjustment.
+  static const ALWAYS = const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+class AndroidSslCertificate {
+  AndroidSslCertificateDName issuedBy;
+  AndroidSslCertificateDName issuedTo;
+  int validNotAfterDate;
+  int validNotBeforeDate;
+  AndroidX509Certificate x509Certificate;
+
+  AndroidSslCertificate({
+    this.issuedBy,
+    this.issuedTo,
+    this.validNotAfterDate,
+    this.validNotBeforeDate,
+    this.x509Certificate
+  });
+
+  static AndroidSslCertificate fromMap(Map<String, dynamic> map) {
+    return map != null ? AndroidSslCertificate(
+      issuedBy: AndroidSslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
+      issuedTo: AndroidSslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
+      validNotAfterDate: map["validNotAfterDate"],
+      validNotBeforeDate: map["validNotBeforeDate"],
+      x509Certificate: AndroidX509Certificate.fromMap(map["x509Certificate"]?.cast<String, dynamic>()),
+    ) : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "issuedBy": issuedBy?.toMap(),
+      "issuedTo": issuedTo?.toMap(),
+      "validNotAfterDate": validNotAfterDate,
+      "validNotBeforeDate": validNotBeforeDate,
+      "x509Certificate": x509Certificate?.toMap(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+class AndroidSslCertificateDName {
+  // ignore: non_constant_identifier_names
+  String CName;
+  // ignore: non_constant_identifier_names
+  String DName;
+  // ignore: non_constant_identifier_names
+  String OName;
+  // ignore: non_constant_identifier_names
+  String UName;
+
+  // ignore: non_constant_identifier_names
+  AndroidSslCertificateDName({this.CName, this.DName, this.OName, this.UName});
+
+  static AndroidSslCertificateDName fromMap(Map<String, dynamic> map) {
+    return map != null ? AndroidSslCertificateDName(
+      CName: map["CName"],
+      DName: map["DName"],
+      OName: map["OName"],
+      UName: map["UName"],
+    ) : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "CName": CName,
+      "DName": DName,
+      "OName": OName,
+      "UName": UName,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+class AndroidX509Certificate {
+  int basicConstraints;
+  List<String> extendedKeyUsage;
+  AndroidX509CertificatePrincipal issuerDN;
+  List<bool> issuerUniqueID;
+  AndroidX500Principal issuerX500Principal;
+  List<bool> keyUsage;
+  int notAfter;
+  int notBefore;
+  int serialNumber;
+  String sigAlgName;
+  String sigAlgOID;
+  Uint8List sigAlgParams;
+  Uint8List signature;
+  AndroidX509CertificatePrincipal subjectDN;
+  List<bool> subjectUniqueID;
+  AndroidX500Principal subjectX500Principal;
+  // ignore: non_constant_identifier_names
+  Uint8List TBSCertificate;
+  int version;
+  Set<String> criticalExtensionOIDs;
+  Set<String> nonCriticalExtensionOIDs;
+  Uint8List encoded;
+  AndroidX509CertificatePublicKey publicKey;
+  String type;
+  bool hasUnsupportedCriticalExtension;
+  bool valid;
+
+  AndroidX509Certificate({
+    this.basicConstraints,
+    this.extendedKeyUsage,
+    this.issuerDN,
+    this.issuerUniqueID,
+    this.issuerX500Principal,
+    this.keyUsage,
+    this.notAfter,
+    this.notBefore,
+    this.serialNumber,
+    this.sigAlgName,
+    this.sigAlgOID,
+    this.sigAlgParams,
+    this.signature,
+    this.subjectDN,
+    this.subjectUniqueID,
+    this.subjectX500Principal,
+    // ignore: non_constant_identifier_names
+    this.TBSCertificate,
+    this.version,
+    this.criticalExtensionOIDs,
+    this.nonCriticalExtensionOIDs,
+    this.encoded,
+    this.publicKey,
+    this.type,
+    this.hasUnsupportedCriticalExtension,
+    this.valid
+  });
+
+  static AndroidX509Certificate fromMap(Map<String, dynamic> map) {
+    return map != null ? AndroidX509Certificate(
+      basicConstraints: map["basicConstraints"],
+      extendedKeyUsage: map["extendedKeyUsage"],
+      issuerDN: AndroidX509CertificatePrincipal.fromMap(map["issuerDN"]),
+      issuerUniqueID: map["issuerUniqueID"],
+      issuerX500Principal: AndroidX500Principal.fromMap(map["issuerX500Principal"]),
+      keyUsage: map["keyUsage"],
+      notAfter: map["notAfter"],
+      notBefore: map["notBefore"],
+      serialNumber: map["serialNumber"],
+      sigAlgName: map["sigAlgName"],
+      sigAlgOID: map["sigAlgOID"],
+      sigAlgParams: map["sigAlgParams"],
+      signature: map["signature"],
+      subjectDN: AndroidX509CertificatePrincipal.fromMap(map["subjectDN"]),
+      subjectUniqueID: map["subjectUniqueID"],
+      subjectX500Principal: AndroidX500Principal.fromMap(map["subjectX500Principal"]),
+      TBSCertificate: map["TBSCertificate"],
+      version: map["version"],
+      criticalExtensionOIDs: map["criticalExtensionOIDs"],
+      nonCriticalExtensionOIDs: map["nonCriticalExtensionOIDs"],
+      encoded: map["encoded"],
+      publicKey: AndroidX509CertificatePublicKey.fromMap(map["publicKey"]),
+      type: map["type"],
+      hasUnsupportedCriticalExtension: map["hasUnsupportedCriticalExtension"],
+      valid: map["valid"]
+    ) : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "basicConstraints": basicConstraints,
+      "extendedKeyUsage": extendedKeyUsage,
+      "issuerDN": issuerDN?.toMap(),
+      "issuerUniqueID": issuerUniqueID,
+      "issuerX500Principal": issuerX500Principal?.toMap(),
+      "keyUsage": keyUsage,
+      "notAfter": notAfter,
+      "notBefore": notBefore,
+      "serialNumber": serialNumber,
+      "sigAlgName": sigAlgName,
+      "sigAlgOID": sigAlgOID,
+      "sigAlgParams": sigAlgParams,
+      "signature": signature,
+      "subjectDN": subjectDN?.toMap(),
+      "subjectUniqueID": subjectUniqueID,
+      "subjectX500Principal": subjectX500Principal?.toMap(),
+      "TBSCertificate": TBSCertificate,
+      "version": version,
+      "criticalExtensionOIDs": criticalExtensionOIDs,
+      "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
+      "encoded": encoded,
+      "publicKey": publicKey?.toMap(),
+      "type": type,
+      "hasUnsupportedCriticalExtension": hasUnsupportedCriticalExtension,
+      "valid": valid,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+class AndroidX509CertificatePrincipal {
+  String name;
+
+  AndroidX509CertificatePrincipal({
+    this.name
+  });
+
+  static AndroidX509CertificatePrincipal fromMap(Map<String, dynamic> map) {
+    return map != null ? AndroidX509CertificatePrincipal(
+      name: map["name"],
+    ) : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "name": name,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+class AndroidX500Principal {
+  String name;
+  Uint8List encoded;
+
+  AndroidX500Principal({
+    this.name,
+    this.encoded
+  });
+
+  static AndroidX500Principal fromMap(Map<String, dynamic> map) {
+    return map != null ? AndroidX500Principal(
+      name: map["name"],
+      encoded: map["encoded"],
+    ) : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "name": name,
+      "encoded": encoded,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+class AndroidX509CertificatePublicKey {
+  String algorithm;
+  Uint8List encoded;
+  String format;
+
+  AndroidX509CertificatePublicKey({
+    this.algorithm,
+    this.encoded,
+    this.format
+  });
+
+  static AndroidX509CertificatePublicKey fromMap(Map<String, dynamic> map) {
+    return map != null ? AndroidX509CertificatePublicKey(
+      algorithm: map["algorithm"],
+      encoded: map["encoded"],
+      format: map["format"],
+    ) : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "algorithm": algorithm,
+      "encoded": encoded,
+      "format": format,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }

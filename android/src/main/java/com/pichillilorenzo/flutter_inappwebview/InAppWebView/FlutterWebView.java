@@ -5,7 +5,6 @@ import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -308,7 +307,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null) {
           Integer x = (Integer) call.argument("x");
           Integer y = (Integer) call.argument("y");
-          webView.scrollTo(x, y);
+          Boolean animated = (Boolean) call.argument("animated");
+          webView.scrollTo(x, y, animated);
         }
         result.success(true);
         break;
@@ -316,7 +316,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null) {
           Integer x = (Integer) call.argument("x");
           Integer y = (Integer) call.argument("y");
-          webView.scrollBy(x, y);
+          Boolean animated = (Boolean) call.argument("animated");
+          webView.scrollBy(x, y, animated);
         }
         result.success(true);
         break;
@@ -461,14 +462,35 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         if (webView != null) {
           result.success(webView.requestFocusNodeHref());
         } else {
-          result.success(false);
+          result.success(null);
         }
         break;
       case "requestImageRef":
         if (webView != null) {
           result.success(webView.requestImageRef());
         } else {
-          result.success(false);
+          result.success(null);
+        }
+        break;
+      case "getScrollX":
+        if (webView != null) {
+          result.success(webView.getScrollX());
+        } else {
+          result.success(null);
+        }
+        break;
+      case "getScrollY":
+        if (webView != null) {
+          result.success(webView.getScrollY());
+        } else {
+          result.success(null);
+        }
+        break;
+      case "getCertificate":
+        if (webView != null) {
+          result.success(webView.getSslCertificate());
+        } else {
+          result.success(null);
         }
         break;
       default:

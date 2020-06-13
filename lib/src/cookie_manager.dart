@@ -40,8 +40,10 @@ class CookieManager {
       String path = "/",
       int expiresDate,
       int maxAge,
-      bool isSecure}) async {
-    if (domain == null || domain.isEmpty) domain = _getDomainName(url);
+      bool isSecure,
+      bool isHttpOnly,
+      HTTPCookieSameSitePolicy sameSite}) async {
+    if (domain == null) domain = _getDomainName(url);
 
     assert(url != null && url.isNotEmpty);
     assert(name != null && name.isNotEmpty);
@@ -58,6 +60,8 @@ class CookieManager {
     args.putIfAbsent('expiresDate', () => expiresDate?.toString());
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
+    args.putIfAbsent('isHttpOnly', () => isHttpOnly);
+    args.putIfAbsent('sameSite', () => sameSite?.toValue());
 
     await _channel.invokeMethod('setCookie', args);
   }
@@ -71,10 +75,19 @@ class CookieManager {
     List<dynamic> cookieListMap =
         await _channel.invokeMethod('getCookies', args);
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
+
     List<Cookie> cookies = [];
     for (var i = 0; i < cookieListMap.length; i++) {
       cookies.add(Cookie(
-          name: cookieListMap[i]["name"], value: cookieListMap[i]["value"]));
+          name: cookieListMap[i]["name"],
+          value: cookieListMap[i]["value"],
+          expiresDate: cookieListMap[i]["expiresDate"],
+          isSessionOnly: cookieListMap[i]["isSessionOnly"],
+          domain: cookieListMap[i]["domain"],
+          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieListMap[i]["sameSite"]),
+          isSecure: cookieListMap[i]["isSecure"],
+          isHttpOnly: cookieListMap[i]["isHttpOnly"],
+          path: cookieListMap[i]["path"]));
     }
     return cookies;
   }
@@ -92,7 +105,16 @@ class CookieManager {
     for (var i = 0; i < cookies.length; i++) {
       cookies[i] = cookies[i].cast<String, dynamic>();
       if (cookies[i]["name"] == name)
-        return Cookie(name: cookies[i]["name"], value: cookies[i]["value"]);
+        return Cookie(
+            name: cookies[i]["name"],
+            value: cookies[i]["value"],
+            expiresDate: cookies[i]["expiresDate"],
+            isSessionOnly: cookies[i]["isSessionOnly"],
+            domain: cookies[i]["domain"],
+            sameSite: HTTPCookieSameSitePolicy.fromValue(cookies[i]["sameSite"]),
+            isSecure: cookies[i]["isSecure"],
+            isHttpOnly: cookies[i]["isHttpOnly"],
+            path: cookies[i]["path"]);
     }
     return null;
   }

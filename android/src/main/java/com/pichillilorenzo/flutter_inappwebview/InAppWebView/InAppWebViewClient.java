@@ -29,9 +29,11 @@ import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.Credential;
 import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
+import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayInputStream;
+import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -426,7 +428,8 @@ public class InAppWebViewClient extends WebViewClient {
     obj.put("protocol", protocol);
     obj.put("realm", realm);
     obj.put("port", port);
-    obj.put("error", error.getPrimaryError());
+    obj.put("androidError", error.getPrimaryError());
+    obj.put("iosError", null);
     obj.put("serverCertificate", null);
     try {
       X509Certificate certificate;

@@ -45,8 +45,20 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 
                 let maxAge = arguments!["maxAge"] as? Int64
                 let isSecure = arguments!["isSecure"] as? Bool
+                let isHttpOnly = arguments!["isHttpOnly"] as? Bool
+                let sameSite = arguments!["sameSite"] as? String
                 
-                MyCookieManager.setCookie(url: url, name: name, value: value, domain: domain, path: path, expiresDate: expiresDate, maxAge: maxAge, isSecure: isSecure, result: result)
+                MyCookieManager.setCookie(url: url,
+                                          name: name,
+                                          value: value,
+                                          domain: domain,
+                                          path: path,
+                                          expiresDate: expiresDate,
+                                          maxAge: maxAge,
+                                          isSecure: isSecure,
+                                          isHttpOnly: isHttpOnly,
+                                          sameSite: sameSite,
+                                          result: result)
                 break
             case "getCookies":
                 let url = arguments!["url"] as! String
@@ -82,6 +94,8 @@ class MyCookieManager: NSObject, FlutterPlugin {
                           expiresDate: Int64?,
                           maxAge: Int64?,
                           isSecure: Bool?,
+                          isHttpOnly: Bool?,
+                          sameSite: String?,
                           result: @escaping FlutterResult) {
         var properties: [HTTPCookiePropertyKey: Any] = [:]
         properties[.originURL] = url
@@ -90,6 +104,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
         properties[.domain] = domain
         properties[.path] = path
         if expiresDate != nil {
+            // convert from milliseconds
             properties[.expires] = Date(timeIntervalSince1970: TimeInterval(Double(expiresDate!)/1000))
         }
         if maxAge != nil {
@@ -98,21 +113,61 @@ class MyCookieManager: NSObject, FlutterPlugin {
         if isSecure != nil && isSecure! {
             properties[.secure] = "TRUE"
         }
+        if isHttpOnly != nil && isHttpOnly! {
+            properties[.init("HttpOnly")] = "YES"
+        }
+        if sameSite != nil {
+            if #available(iOS 13.0, *) {
+                var sameSiteValue = HTTPCookieStringPolicy(rawValue: "None")
+                switch sameSite {
+                case "Lax":
+                    sameSiteValue = HTTPCookieStringPolicy.sameSiteLax
+                case "Strict":
+                    sameSiteValue = HTTPCookieStringPolicy.sameSiteStrict
+                default:
+                    break
+                }
+                properties[.sameSitePolicy] = sameSiteValue
+            } else {
+                properties[.init("SameSite")] = sameSite
+            }
+        }
         
         let cookie = HTTPCookie(properties: properties)!
+        
         MyCookieManager.httpCookieStore!.setCookie(cookie, completionHandler: {() in
             result(true)
         })
     }
     
     public static func getCookies(url: String, result: @escaping FlutterResult) {
-        var cookieList: [[String: Any]] = []
+        var cookieList: [[String: Any?]] = []
         MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
             for cookie in cookies {
                 if cookie.domain.contains(URL(string: url)!.host!) {
+                    var sameSite: String? = nil
+                    if #available(iOS 13.0, *) {
+                        if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
+                            sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
+                        }
+                    }
+                    
+                    var expiresDateTimestamp: Int64 = -1
+                    if let expiresDate = cookie.expiresDate?.timeIntervalSince1970 {
+                        // convert to milliseconds
+                        expiresDateTimestamp = Int64(expiresDate * 1000)
+                    }
+                    
                     cookieList.append([
                         "name": cookie.name,
-                        "value": cookie.value
+                        "value": cookie.value,
+                        "expiresDate": expiresDateTimestamp != -1 ? expiresDateTimestamp : nil,
+                        "isSessionOnly": cookie.isSessionOnly,
+                        "domain": cookie.domain,
+                        "sameSite": sameSite,
+                        "isSecure": cookie.isSecure,
+                        "isHttpOnly": cookie.isHTTPOnly,
+                        "path": cookie.path,
                     ])
                 }
             }

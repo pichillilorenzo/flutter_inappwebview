@@ -1105,6 +1105,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if #available(iOS 11.0, *) {
             accessibilityIgnoresInvertColors = (options?.accessibilityIgnoresInvertColors)!
+            scrollView.contentInsetAdjustmentBehavior =
+                UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: (options?.contentInsetAdjustmentBehavior)!)!
         }
         
         configuration.suppressesIncrementalRendering = (options?.suppressesIncrementalRendering)!
@@ -1487,6 +1489,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             if newOptionsMap["accessibilityIgnoresInvertColors"] != nil && options?.accessibilityIgnoresInvertColors != newOptions.accessibilityIgnoresInvertColors {
                 accessibilityIgnoresInvertColors = newOptions.accessibilityIgnoresInvertColors
+            }
+            if newOptionsMap["contentInsetAdjustmentBehavior"] != nil && options?.contentInsetAdjustmentBehavior != newOptions.contentInsetAdjustmentBehavior {
+                scrollView.contentInsetAdjustmentBehavior =
+                    UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: newOptions.contentInsetAdjustmentBehavior)!
             }
         }
         
@@ -2542,11 +2548,41 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func onReceivedServerTrustAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
         var serverCertificateData: NSData?
         let serverTrust = challenge.protectionSpace.serverTrust!
+        
+        var secResult = SecTrustResultType.invalid
+        SecTrustEvaluate(serverTrust, &secResult);
+        
         if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
             let serverCertificateCFData = SecCertificateCopyData(serverCertificate)
             let data = CFDataGetBytePtr(serverCertificateCFData)
             let size = CFDataGetLength(serverCertificateCFData)
             serverCertificateData = NSData(bytes: data, length: size)
+        }
+        
+        let error = secResult != SecTrustResultType.proceed ? secResult.rawValue : nil
+        
+        var message = ""
+        switch secResult {
+            case .deny:
+                message = "Indicates a user-configured deny; do not proceed."
+                break
+            case .fatalTrustFailure:
+                message = "Indicates a trust failure which cannot be overridden by the user."
+                break
+            case .invalid:
+                message = "Indicates an invalid setting or result."
+                break
+            case .otherError:
+                message = "Indicates a failure other than that of trust evaluation."
+                break
+            case .recoverableTrustFailure:
+                message = "Indicates a trust policy failure which can be overridden by the user."
+                break
+            case .unspecified:
+                message = "Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified."
+                break
+            default:
+                message = ""
         }
         
         let arguments: [String: Any?] = [
@@ -2556,8 +2592,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             "port": challenge.protectionSpace.port,
             "previousFailureCount": challenge.previousFailureCount,
             "serverCertificate": serverCertificateData,
-            "error": -1,
-            "message": "",
+            "androidError": nil,
+            "iosError": error,
+            "message": message,
         ]
         channel?.invokeMethod("onReceivedServerTrustAuthRequest", arguments: arguments, result: result)
     }
@@ -2746,14 +2783,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         evaluateJavaScript("wkwebview_ClearMatches();", completionHandler: completionHandler)
     }
     
-    public func scrollTo(x: Int, y: Int) {
-        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: false)
+    public func scrollTo(x: Int, y: Int, animated: Bool) {
+        scrollView.setContentOffset(CGPoint(x: x, y: y), animated: animated)
     }
     
-    public func scrollBy(x: Int, y: Int) {
+    public func scrollBy(x: Int, y: Int, animated: Bool) {
         let newX = CGFloat(x) + scrollView.contentOffset.x
         let newY = CGFloat(y) + scrollView.contentOffset.y
-        scrollView.setContentOffset(CGPoint(x: newX, y: newY), animated: false)
+        scrollView.setContentOffset(CGPoint(x: newX, y: newY), animated: animated)
     }
     
     

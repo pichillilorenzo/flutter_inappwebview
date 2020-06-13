@@ -59,6 +59,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var isPagingEnabled = false
     var maximumZoomScale = 1.0
     var minimumZoomScale = 1.0
+    var contentInsetAdjustmentBehavior = 2 // UIScrollView.ContentInsetAdjustmentBehavior.never
     
     override init(){
         super.init()
@@ -96,6 +97,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
             realOptions["selectionGranularity"] = configuration.selectionGranularity.rawValue
             if #available(iOS 11.0, *) {
                 realOptions["accessibilityIgnoresInvertColors"] = webView.accessibilityIgnoresInvertColors
+                realOptions["contentInsetAdjustmentBehavior"] = webView.scrollView.contentInsetAdjustmentBehavior.rawValue
             }
             realOptions["decelerationRate"] = InAppWebView.getDecelerationRateString(type: webView.scrollView.decelerationRate)
             realOptions["alwaysBounceVertical"] = webView.scrollView.alwaysBounceVertical

@@ -1,10 +1,13 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
+import android.animation.ObjectAnimator;
+import android.animation.PropertyValuesHolder;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
+import android.net.http.SslCertificate;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -36,6 +39,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Keep;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -52,6 +56,11 @@ import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.security.cert.CertificateEncodingException;
+import java.security.cert.CertificateExpiredException;
+import java.security.cert.CertificateNotYetValidException;
+import java.security.cert.CertificateParsingException;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1484,6 +1493,28 @@ final public class InAppWebView extends InputAwareWebView {
     channel.invokeMethod("onScrollChanged", obj);
   }
 
+  public void scrollTo(Integer x, Integer y, Boolean animated) {
+    if (animated) {
+      PropertyValuesHolder pvhX = PropertyValuesHolder.ofInt("scrollX", x);
+      PropertyValuesHolder pvhY = PropertyValuesHolder.ofInt("scrollY", y);
+      ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, pvhX, pvhY);
+      anim.setDuration(300).start();
+    } else {
+      scrollTo(x, y);
+    }
+  }
+
+  public void scrollBy(Integer x, Integer y, Boolean animated) {
+    if (animated) {
+      PropertyValuesHolder pvhX = PropertyValuesHolder.ofInt("scrollX", getScrollX() + x);
+      PropertyValuesHolder pvhY = PropertyValuesHolder.ofInt("scrollY", getScrollY() + y);
+      ObjectAnimator anim = ObjectAnimator.ofPropertyValuesHolder(this, pvhX, pvhY);
+      anim.setDuration(300).start();
+    } else {
+      scrollBy(x, y);
+    }
+  }
+
   class DownloadStartListener implements DownloadListener {
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
@@ -1829,6 +1860,110 @@ final public class InAppWebView extends InputAwareWebView {
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("url", bundle.getString("url"));
+
+    return obj;
+  }
+
+  public Map<String, Object> getSslCertificate() {
+    SslCertificate sslCertificate = getCertificate();
+
+    SslCertificate.DName issuedByName = sslCertificate.getIssuedBy();
+    Map<String, Object> issuedBy = new HashMap<>();
+    issuedBy.put("CName", issuedByName.getCName());
+    issuedBy.put("DName", issuedByName.getDName());
+    issuedBy.put("OName", issuedByName.getOName());
+    issuedBy.put("UName", issuedByName.getUName());
+
+    SslCertificate.DName issuedToName = sslCertificate.getIssuedTo();
+    Map<String, Object> issuedTo = new HashMap<>();
+    issuedTo.put("CName", issuedToName.getCName());
+    issuedTo.put("DName", issuedToName.getDName());
+    issuedTo.put("OName", issuedToName.getOName());
+    issuedTo.put("UName", issuedToName.getUName());
+
+    Map<String, Object> x509CertificateMap = new HashMap<>();
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
+      X509Certificate x509Certificate = sslCertificate.getX509Certificate();
+      if (x509Certificate != null) {
+        x509CertificateMap.put("basicConstraints", x509Certificate.getBasicConstraints());
+        try {
+          x509CertificateMap.put("extendedKeyUsage", x509Certificate.getExtendedKeyUsage());
+        } catch (CertificateParsingException e) {
+          x509CertificateMap.put("extendedKeyUsage", null);
+        }
+
+        Map<String, Object> issuerDN = new HashMap<>();
+        issuerDN.put("name", x509Certificate.getIssuerDN().getName());
+        x509CertificateMap.put("issuerDN", issuerDN);
+
+        x509CertificateMap.put("issuerUniqueID", x509Certificate.getIssuerUniqueID());
+
+        Map<String, Object> issuerX500Principal = new HashMap<>();
+        issuerX500Principal.put("name", x509Certificate.getIssuerX500Principal().getName());
+        issuerX500Principal.put("encoded", x509Certificate.getIssuerX500Principal().getEncoded());
+        x509CertificateMap.put("issuerX500Principal", issuerX500Principal);
+
+        x509CertificateMap.put("keyUsage", x509Certificate.getKeyUsage());
+        x509CertificateMap.put("notAfter", x509Certificate.getNotAfter().getTime());
+        x509CertificateMap.put("notBefore", x509Certificate.getNotBefore().getTime());
+        x509CertificateMap.put("serialNumber", x509Certificate.getSerialNumber().longValue());
+        x509CertificateMap.put("sigAlgName", x509Certificate.getSigAlgName());
+        x509CertificateMap.put("sigAlgOID", x509Certificate.getSigAlgOID());
+        x509CertificateMap.put("sigAlgParams", x509Certificate.getSigAlgParams());
+        x509CertificateMap.put("signature", x509Certificate.getSignature());
+
+        Map<String, Object> subjectDN = new HashMap<>();
+        subjectDN.put("name", x509Certificate.getSubjectDN().getName());
+        x509CertificateMap.put("subjectDN", subjectDN);
+
+        x509CertificateMap.put("subjectUniqueID", x509Certificate.getSubjectUniqueID());
+
+        Map<String, Object> subjectX500Principal = new HashMap<>();
+        subjectX500Principal.put("name", x509Certificate.getSubjectX500Principal().getName());
+        subjectX500Principal.put("encoded", x509Certificate.getSubjectX500Principal().getEncoded());
+        x509CertificateMap.put("subjectX500Principal", subjectX500Principal);
+
+        try {
+          x509CertificateMap.put("TBSCertificate", x509Certificate.getTBSCertificate());
+        } catch (CertificateEncodingException e) {
+          x509CertificateMap.put("TBSCertificate", null);
+        }
+
+        x509CertificateMap.put("version", x509Certificate.getVersion());
+        x509CertificateMap.put("criticalExtensionOIDs", x509Certificate.getCriticalExtensionOIDs());
+        x509CertificateMap.put("nonCriticalExtensionOIDs", x509Certificate.getNonCriticalExtensionOIDs());
+        try {
+          x509CertificateMap.put("encoded", x509Certificate.getEncoded());
+        } catch (CertificateEncodingException e) {
+          x509CertificateMap.put("encoded", null);
+        }
+
+        Map<String, Object> publicKey = new HashMap<>();
+        publicKey.put("algorithm", x509Certificate.getPublicKey().getAlgorithm());
+        publicKey.put("encoded", x509Certificate.getPublicKey().getEncoded());
+        publicKey.put("format", x509Certificate.getPublicKey().getFormat());
+        x509CertificateMap.put("publicKey", publicKey);
+
+        x509CertificateMap.put("type", x509Certificate.getType());
+        x509CertificateMap.put("hasUnsupportedCriticalExtension", x509Certificate.hasUnsupportedCriticalExtension());
+
+        try {
+          x509Certificate.checkValidity();
+          x509CertificateMap.put("valid", true);
+        } catch (CertificateExpiredException e) {
+          x509CertificateMap.put("valid", false);
+        } catch (CertificateNotYetValidException e) {
+          x509CertificateMap.put("valid", false);
+        }
+      }
+    }
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("issuedBy", issuedBy);
+    obj.put("issuedTo", issuedTo);
+    obj.put("validNotAfterDate", sslCertificate.getValidNotAfterDate().getTime());
+    obj.put("validNotBeforeDate", sslCertificate.getValidNotBeforeDate().getTime());
+    obj.put("x509Certificate", x509CertificateMap);
 
     return obj;
   }

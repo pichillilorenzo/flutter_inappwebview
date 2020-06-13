@@ -17,6 +17,10 @@ class WebViewOptions {
     return null;
   }
 
+  WebViewOptions copy() {
+    return WebViewOptions.fromMap(this.toMap());
+  }
+
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
@@ -36,6 +40,10 @@ class BrowserOptions {
     return null;
   }
 
+  BrowserOptions copy() {
+    return BrowserOptions.fromMap(this.toMap());
+  }
+
   Map<String, dynamic> toJson() {
     return this.toMap();
   }
@@ -53,6 +61,10 @@ class ChromeSafariBrowserOptions {
 
   static ChromeSafariBrowserOptions fromMap(Map<String, dynamic> map) {
     return null;
+  }
+
+  ChromeSafariBrowserOptions copy() {
+    return ChromeSafariBrowserOptions.fromMap(this.toMap());
   }
 
   Map<String, dynamic> toJson() {
@@ -283,6 +295,17 @@ class InAppWebViewOptions
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  @override
+  InAppWebViewOptions copy() {
+    return InAppWebViewOptions.fromMap(this.toMap());
+  }
+
+  InAppWebViewOptions copyWithValue(InAppWebViewOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return InAppWebViewOptions.fromMap(mergedMap);
   }
 }
 
@@ -681,6 +704,17 @@ class AndroidInAppWebViewOptions
   String toString() {
     return toMap().toString();
   }
+
+  @override
+  AndroidInAppWebViewOptions copy() {
+    return AndroidInAppWebViewOptions.fromMap(this.toMap());
+  }
+
+  AndroidInAppWebViewOptions copyWithValue(AndroidInAppWebViewOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return AndroidInAppWebViewOptions.fromMap(mergedMap);
+  }
 }
 
 ///This class represents all the iOS-only WebView options available.
@@ -789,6 +823,10 @@ class IOSInAppWebViewOptions
   ///The default value is `1.0`.
   double minimumZoomScale;
 
+  ///Configures how safe area insets are added to the adjusted content inset.
+  ///The default value is [IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER].
+  IOSUIScrollViewContentInsetAdjustmentBehavior contentInsetAdjustmentBehavior;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -811,7 +849,8 @@ class IOSInAppWebViewOptions
       this.scrollsToTop = true,
       this.isPagingEnabled = false,
       this.maximumZoomScale = 1.0,
-      this.minimumZoomScale = 1.0});
+      this.minimumZoomScale = 1.0,
+      this.contentInsetAdjustmentBehavior = IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER});
 
   @override
   Map<String, dynamic> toMap() {
@@ -845,7 +884,8 @@ class IOSInAppWebViewOptions
       "scrollsToTop": scrollsToTop,
       "isPagingEnabled": isPagingEnabled,
       "maximumZoomScale": maximumZoomScale,
-      "minimumZoomScale": minimumZoomScale
+      "minimumZoomScale": minimumZoomScale,
+      "contentInsetAdjustmentBehavior": contentInsetAdjustmentBehavior.toValue()
     };
   }
 
@@ -889,6 +929,9 @@ class IOSInAppWebViewOptions
     options.isPagingEnabled = map["isPagingEnabled"];
     options.maximumZoomScale = map["maximumZoomScale"];
     options.minimumZoomScale = map["minimumZoomScale"];
+    options.contentInsetAdjustmentBehavior =
+        IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
+            map["contentInsetAdjustmentBehavior"]);
     return options;
   }
 
@@ -900,6 +943,17 @@ class IOSInAppWebViewOptions
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  @override
+  IOSInAppWebViewOptions copy() {
+    return IOSInAppWebViewOptions.fromMap(this.toMap());
+  }
+
+  IOSInAppWebViewOptions copyWithValue(IOSInAppWebViewOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return IOSInAppWebViewOptions.fromMap(mergedMap);
   }
 }
 
@@ -953,6 +1007,17 @@ class InAppBrowserOptions
   String toString() {
     return toMap().toString();
   }
+
+  @override
+  InAppBrowserOptions copy() {
+    return InAppBrowserOptions.fromMap(this.toMap());
+  }
+
+  InAppBrowserOptions copyWithValue(InAppBrowserOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return InAppBrowserOptions.fromMap(mergedMap);
+  }
 }
 
 ///This class represents all the Android-only [InAppBrowser] options available.
@@ -1002,6 +1067,17 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  @override
+  AndroidInAppBrowserOptions copy() {
+    return AndroidInAppBrowserOptions.fromMap(this.toMap());
+  }
+
+  AndroidInAppBrowserOptions copyWithValue(AndroidInAppBrowserOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return AndroidInAppBrowserOptions.fromMap(mergedMap);
   }
 }
 
@@ -1079,6 +1155,17 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   String toString() {
     return toMap().toString();
   }
+
+  @override
+  IOSInAppBrowserOptions copy() {
+    return IOSInAppBrowserOptions.fromMap(this.toMap());
+  }
+
+  IOSInAppBrowserOptions copyWithValue(IOSInAppBrowserOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return IOSInAppBrowserOptions.fromMap(mergedMap);
+  }
 }
 
 ///This class represents all the Android-only [ChromeSafariBrowser] options available.
@@ -1152,6 +1239,17 @@ class AndroidChromeCustomTabsOptions
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  @override
+  AndroidChromeCustomTabsOptions copy() {
+    return AndroidChromeCustomTabsOptions.fromMap(this.toMap());
+  }
+
+  AndroidChromeCustomTabsOptions copyWithValue(AndroidChromeCustomTabsOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return AndroidChromeCustomTabsOptions.fromMap(mergedMap);
   }
 }
 
@@ -1229,5 +1327,16 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   @override
   String toString() {
     return toMap().toString();
+  }
+
+  @override
+  IOSSafariOptions copy() {
+    return IOSSafariOptions.fromMap(this.toMap());
+  }
+
+  IOSSafariOptions copyWithValue(IOSSafariOptions webViewOptions) {
+    var mergedMap = this.toMap();
+    mergedMap.addAll(webViewOptions.toMap());
+    return IOSSafariOptions.fromMap(mergedMap);
   }
 }

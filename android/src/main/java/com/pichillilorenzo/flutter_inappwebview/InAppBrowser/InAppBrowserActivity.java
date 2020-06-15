@@ -973,7 +973,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
 
   public Map<String, Object> getCertificate() {
     if (webView != null)
-      return webView.getSslCertificate();
+      return webView.getCertificateMap();
     return null;
   }
 

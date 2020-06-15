@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -107,7 +108,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url;
                       });
-
                     },
                     onProgressChanged: (InAppWebViewController controller, int progress) {
                       setState(() {

@@ -491,6 +491,13 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
                     result(false)
                 }
                 break
+            case "getCertificate":
+                if webView != nil {
+                    result(webView!.getCertificateMap())
+                } else {
+                    result(false)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

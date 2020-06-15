@@ -1,3 +1,4 @@
+import 'dart:developer';
 import 'dart:io';
 import 'dart:async';
 import 'dart:collection';
@@ -9,6 +10,8 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
+import 'X509Certificate/asn1_distinguished_names.dart';
+import 'X509Certificate/x509_certificate.dart';
 
 import 'package:html/parser.dart' show parse;
 
@@ -369,7 +372,37 @@ class InAppWebViewController {
         int androidError = call.arguments["androidError"];
         int iosError = call.arguments["iosError"];
         String message = call.arguments["message"];
-        Uint8List serverCertificate = call.arguments["serverCertificate"];
+        Map<String, dynamic> sslCertificateMap = call.arguments["sslCertificate"]?.cast<String, dynamic>();
+
+        SslCertificate sslCertificate;
+        if (sslCertificateMap != null) {
+          if (Platform.isIOS) {
+            try {
+              X509Certificate x509certificate = X509Certificate.fromData(data: sslCertificateMap["x509Certificate"]);
+              sslCertificate = SslCertificate(
+                issuedBy: SslCertificateDName(
+                    CName: x509certificate.issuer(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                    DName: x509certificate.issuerDistinguishedName ?? "",
+                    OName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
+                    UName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+                issuedTo: SslCertificateDName(
+                    CName: x509certificate.subject(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                    DName: x509certificate.subjectDistinguishedName ?? "",
+                    OName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
+                    UName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+                validNotAfterDate: x509certificate.notAfter,
+                validNotBeforeDate: x509certificate.notBefore,
+                x509Certificate: x509certificate,
+              );
+            } catch(e, stacktrace) {
+              print(e);
+              print(stacktrace);
+              return null;
+            }
+          } else {
+            sslCertificate = SslCertificate.fromMap(sslCertificateMap);
+          }
+        }
 
         AndroidSslError androidSslError = androidError != null ? AndroidSslError.fromValue(androidError) : null;
         IOSSslError iosSslError = iosError != null ? IOSSslError.fromValue(iosError) : null;
@@ -381,7 +414,7 @@ class InAppWebViewController {
             androidError: androidSslError,
             iosError: iosSslError,
             message: message,
-            serverCertificate: serverCertificate);
+            sslCertificate: sslCertificate);
         if (_webview != null &&
             _webview.onReceivedServerTrustAuthRequest != null)
           return (await _webview.onReceivedServerTrustAuthRequest(
@@ -1655,6 +1688,46 @@ class InAppWebViewController {
     return await _channel.invokeMethod('getScrollY', args);
   }
 
+  ///Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getCertificate()
+  Future<SslCertificate> getCertificate() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+
+    Map<String, dynamic> sslCertificateMap = (await _channel.invokeMethod('getCertificate', args))?.cast<String, dynamic>();
+
+    if (sslCertificateMap != null) {
+      if (Platform.isIOS) {
+        try {
+          X509Certificate x509certificate = X509Certificate.fromData(data: sslCertificateMap["x509Certificate"]);
+          return SslCertificate(
+            issuedBy: SslCertificateDName(
+                CName: x509certificate.issuer(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                DName: x509certificate.issuerDistinguishedName ?? "",
+                OName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
+                UName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+            issuedTo: SslCertificateDName(
+                CName: x509certificate.subject(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                DName: x509certificate.subjectDistinguishedName ?? "",
+                OName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
+                UName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+            validNotAfterDate: x509certificate.notAfter,
+            validNotBeforeDate: x509certificate.notBefore,
+            x509Certificate: x509certificate,
+          );
+        } catch(e, stacktrace) {
+          print(e);
+          print(stacktrace);
+          return null;
+        }
+      } else {
+        return SslCertificate.fromMap(sslCertificateMap);
+      }
+    }
+
+    return null;
+  }
+
   ///Gets the default user agent.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)
@@ -1792,16 +1865,6 @@ class AndroidInAppWebViewController {
   Future<void> clearHistory() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _controller._channel.invokeMethod('clearHistory', args);
-  }
-
-  ///Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getCertificate()
-  Future<AndroidSslCertificate> getCertificate() async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    var sslCertificateMap = (await _controller._channel.invokeMethod('getCertificate', args))?.cast<String, dynamic>();
-
-    return sslCertificateMap != null ? AndroidSslCertificate.fromMap(sslCertificateMap) : null;
   }
 
   ///Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.

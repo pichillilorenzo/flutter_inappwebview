@@ -799,6 +799,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var channel: FlutterMethodChannel?
     var options: InAppWebViewOptions?
     var currentURL: URL?
+    var x509CertificateData: Data?
+    static var sslCertificateMap: [String: Data] = [:] // [URL host name : x509Certificate Data]
     var startPageTime: Int64 = 0
     static var credentialsProposed: [URLCredential] = []
     var lastScrollX: CGFloat = 0
@@ -1863,6 +1865,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        self.x509CertificateData = nil
+        
         self.startPageTime = currentTimeInMilliSeconds()
         onLoadStart(url: (currentURL?.absoluteString)!)
         
@@ -2557,6 +2561,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let data = CFDataGetBytePtr(serverCertificateCFData)
             let size = CFDataGetLength(serverCertificateCFData)
             serverCertificateData = NSData(bytes: data, length: size)
+            if (x509CertificateData == nil) {
+                x509CertificateData = Data(serverCertificateData!)
+                InAppWebView.sslCertificateMap[challenge.protectionSpace.host] = x509CertificateData;
+            }
         }
         
         let error = secResult != SecTrustResultType.proceed ? secResult.rawValue : nil
@@ -2591,7 +2599,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             "realm": challenge.protectionSpace.realm,
             "port": challenge.protectionSpace.port,
             "previousFailureCount": challenge.previousFailureCount,
-            "serverCertificate": serverCertificateData,
+            "sslCertificate": InAppWebView.getCertificateMap(x509Certificate:
+                ((serverCertificateData != nil) ? Data(serverCertificateData!) : nil)),
             "androidError": nil,
             "iosError": error,
             "message": message,
@@ -2890,6 +2899,29 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func clearFocus() {
         self.scrollView.subviews.first?.resignFirstResponder()
+    }
+    
+    public func getCertificate() -> Data? {
+        var x509Certificate = self.x509CertificateData
+        if x509Certificate == nil, let scheme = url?.scheme, scheme == "https",
+            let host = url?.host, let cert = InAppWebView.sslCertificateMap[host] {
+            x509Certificate = cert
+        }
+        return x509Certificate
+    }
+    
+    public func getCertificateMap() -> [String: Any?]? {
+        return InAppWebView.getCertificateMap(x509Certificate: getCertificate())
+    }
+    
+    public static func getCertificateMap(x509Certificate: Data?) -> [String: Any?]? {
+        return x509Certificate != nil ? [
+            "issuedBy": nil,
+            "issuedTo": nil,
+            "validNotAfterDate": nil,
+            "validNotBeforeDate": nil,
+            "x509Certificate": x509Certificate
+        ] : nil;
     }
     
     public func dispose() {

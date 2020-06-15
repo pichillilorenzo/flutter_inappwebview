@@ -301,7 +301,6 @@ public class InAppWebViewClient extends WebViewClient {
       url = new URL(view.getUrl());
     } catch (MalformedURLException e) {
       e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
 
       credentialsProposed = null;
       previousAuthRequestFailureCount = 0;
@@ -378,32 +377,6 @@ public class InAppWebViewClient extends WebViewClient {
     });
   }
 
-  /**
-   * SslCertificate class does not has a public getter for the underlying
-   * X509Certificate, we can only do this by hack. This only works for andorid 4.0+
-   * https://groups.google.com/forum/#!topic/android-developers/eAPJ6b7mrmg
-   */
-  public static X509Certificate getX509CertFromSslCertHack(SslCertificate sslCert) {
-    X509Certificate x509Certificate = null;
-
-    Bundle bundle = SslCertificate.saveState(sslCert);
-    byte[] bytes = bundle.getByteArray("x509-certificate");
-
-    if (bytes == null) {
-      x509Certificate = null;
-    } else {
-      try {
-        CertificateFactory certFactory = CertificateFactory.getInstance("X.509");
-        Certificate cert = certFactory.generateCertificate(new ByteArrayInputStream(bytes));
-        x509Certificate = (X509Certificate) cert;
-      } catch (CertificateException e) {
-        x509Certificate = null;
-      }
-    }
-
-    return x509Certificate;
-  }
-
   @Override
   public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
     URL url;
@@ -411,7 +384,6 @@ public class InAppWebViewClient extends WebViewClient {
       url = new URL(error.getUrl());
     } catch (MalformedURLException e) {
       e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
       handler.cancel();
       return;
     }
@@ -430,19 +402,7 @@ public class InAppWebViewClient extends WebViewClient {
     obj.put("port", port);
     obj.put("androidError", error.getPrimaryError());
     obj.put("iosError", null);
-    obj.put("serverCertificate", null);
-    try {
-      X509Certificate certificate;
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        certificate = error.getCertificate().getX509Certificate();
-      } else {
-        certificate = getX509CertFromSslCertHack(error.getCertificate());
-      }
-      obj.put("serverCertificate", certificate.getEncoded());
-    } catch (CertificateEncodingException e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG,e.getLocalizedMessage());
-    }
+    obj.put("sslCertificate", InAppWebView.getCertificateMap(error.getCertificate()));
 
     String message;
     switch (error.getPrimaryError()) {
@@ -511,7 +471,6 @@ public class InAppWebViewClient extends WebViewClient {
       url = new URL(view.getUrl());
     } catch (MalformedURLException e) {
       e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
       request.cancel();
       return;
     }
@@ -658,7 +617,6 @@ public class InAppWebViewClient extends WebViewClient {
         uri = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
       } catch (Exception e) {
         e.printStackTrace();
-        Log.d(LOG_TAG, e.getMessage());
         return null;
       }
     }
@@ -677,7 +635,6 @@ public class InAppWebViewClient extends WebViewClient {
         flutterResult = Util.invokeMethodAndWait(channel, "onLoadResourceCustomScheme", obj);
       } catch (InterruptedException e) {
         e.printStackTrace();
-        Log.e(LOG_TAG, e.getMessage());
         return null;
       }
 
@@ -691,7 +648,6 @@ public class InAppWebViewClient extends WebViewClient {
           response = webView.contentBlockerHandler.checkUrl(webView, url, res.get("content-type").toString());
         } catch (Exception e) {
           e.printStackTrace();
-          Log.e(LOG_TAG, e.getMessage());
         }
         if (response != null)
           return response;
@@ -706,7 +662,6 @@ public class InAppWebViewClient extends WebViewClient {
         response = webView.contentBlockerHandler.checkUrl(webView, url);
       } catch (Exception e) {
         e.printStackTrace();
-        Log.e(LOG_TAG, e.getMessage());
       }
     }
     return response;
@@ -763,7 +718,6 @@ public class InAppWebViewClient extends WebViewClient {
       flutterResult = Util.invokeMethodAndWait(channel, "shouldInterceptRequest", obj);
     } catch (InterruptedException e) {
       e.printStackTrace();
-      Log.e(LOG_TAG, e.getMessage());
       return null;
     }
 

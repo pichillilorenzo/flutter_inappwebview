@@ -1,6 +1,6 @@
 ## 3.4.0
 
-- Added `requestFocusNodeHref`, `requestImageRef`, `getMetaTags`, `getMetaThemeColor`, `getScrollX`, `getScrollY` webview methods
+- Added `requestFocusNodeHref`, `requestImageRef`, `getMetaTags`, `getMetaThemeColor`, `getScrollX`, `getScrollY`, `getCertificate` webview methods
 - Added `WebStorage`, `LocalStorage` and `SessionStorage` class to manage `window.localStorage` and `window.sessionStorage` JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
 - Added `supportZoom` webview option also on iOS
 - Added `HttpOnly`, `SameSite` set cookie options
@@ -8,8 +8,8 @@
 - Added `animated` option to `scrollTo` and `scrollBy` webview methods
 - Added error and message to the `ServerTrustChallenge` class for iOS (class used by the `onReceivedServerTrustAuthRequest` event)
 - Added `contentInsetAdjustmentBehavior` webview iOS-specific option
-- Added `getCertificate` android-specific webview method
 - Added `copy` and `copyWithValue` methods for webview class options
+- Added X509Certificate class and parser
 - Fixed `zoomBy`, `setOptions` webview methods on Android
 - Fixed `databaseEnabled` android webview option default value to `true`
 
@@ -20,7 +20,7 @@
 - Moved `supportZoom` webview option to cross-platform
 - `builtInZoomControls` android webview options changed default value to `true`
 - Updated `ServerTrustChallenge` class used by the `onReceivedServerTrustAuthRequest` event
-- The method `getOptions`could return null now
+- The method `getOptions` could return null now
 
 ## 3.3.0+3
 

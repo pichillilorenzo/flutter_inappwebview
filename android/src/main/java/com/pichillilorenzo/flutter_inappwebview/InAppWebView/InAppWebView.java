@@ -1864,108 +1864,56 @@ final public class InAppWebView extends InputAwareWebView {
     return obj;
   }
 
-  public Map<String, Object> getSslCertificate() {
-    SslCertificate sslCertificate = getCertificate();
+  public Map<String, Object> getCertificateMap() {
+    return InAppWebView.getCertificateMap(getCertificate());
+  }
 
-    SslCertificate.DName issuedByName = sslCertificate.getIssuedBy();
-    Map<String, Object> issuedBy = new HashMap<>();
-    issuedBy.put("CName", issuedByName.getCName());
-    issuedBy.put("DName", issuedByName.getDName());
-    issuedBy.put("OName", issuedByName.getOName());
-    issuedBy.put("UName", issuedByName.getUName());
+  public static Map<String, Object> getCertificateMap(SslCertificate sslCertificate) {
+    if (sslCertificate != null) {
+      SslCertificate.DName issuedByName = sslCertificate.getIssuedBy();
+      Map<String, Object> issuedBy = new HashMap<>();
+      issuedBy.put("CName", issuedByName.getCName());
+      issuedBy.put("DName", issuedByName.getDName());
+      issuedBy.put("OName", issuedByName.getOName());
+      issuedBy.put("UName", issuedByName.getUName());
 
-    SslCertificate.DName issuedToName = sslCertificate.getIssuedTo();
-    Map<String, Object> issuedTo = new HashMap<>();
-    issuedTo.put("CName", issuedToName.getCName());
-    issuedTo.put("DName", issuedToName.getDName());
-    issuedTo.put("OName", issuedToName.getOName());
-    issuedTo.put("UName", issuedToName.getUName());
+      SslCertificate.DName issuedToName = sslCertificate.getIssuedTo();
+      Map<String, Object> issuedTo = new HashMap<>();
+      issuedTo.put("CName", issuedToName.getCName());
+      issuedTo.put("DName", issuedToName.getDName());
+      issuedTo.put("OName", issuedToName.getOName());
+      issuedTo.put("UName", issuedToName.getUName());
 
-    Map<String, Object> x509CertificateMap = new HashMap<>();
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.Q) {
-      X509Certificate x509Certificate = sslCertificate.getX509Certificate();
-      if (x509Certificate != null) {
-        x509CertificateMap.put("basicConstraints", x509Certificate.getBasicConstraints());
+      byte[] x509CertificateData = null;
+
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         try {
-          x509CertificateMap.put("extendedKeyUsage", x509Certificate.getExtendedKeyUsage());
-        } catch (CertificateParsingException e) {
-          x509CertificateMap.put("extendedKeyUsage", null);
-        }
-
-        Map<String, Object> issuerDN = new HashMap<>();
-        issuerDN.put("name", x509Certificate.getIssuerDN().getName());
-        x509CertificateMap.put("issuerDN", issuerDN);
-
-        x509CertificateMap.put("issuerUniqueID", x509Certificate.getIssuerUniqueID());
-
-        Map<String, Object> issuerX500Principal = new HashMap<>();
-        issuerX500Principal.put("name", x509Certificate.getIssuerX500Principal().getName());
-        issuerX500Principal.put("encoded", x509Certificate.getIssuerX500Principal().getEncoded());
-        x509CertificateMap.put("issuerX500Principal", issuerX500Principal);
-
-        x509CertificateMap.put("keyUsage", x509Certificate.getKeyUsage());
-        x509CertificateMap.put("notAfter", x509Certificate.getNotAfter().getTime());
-        x509CertificateMap.put("notBefore", x509Certificate.getNotBefore().getTime());
-        x509CertificateMap.put("serialNumber", x509Certificate.getSerialNumber().longValue());
-        x509CertificateMap.put("sigAlgName", x509Certificate.getSigAlgName());
-        x509CertificateMap.put("sigAlgOID", x509Certificate.getSigAlgOID());
-        x509CertificateMap.put("sigAlgParams", x509Certificate.getSigAlgParams());
-        x509CertificateMap.put("signature", x509Certificate.getSignature());
-
-        Map<String, Object> subjectDN = new HashMap<>();
-        subjectDN.put("name", x509Certificate.getSubjectDN().getName());
-        x509CertificateMap.put("subjectDN", subjectDN);
-
-        x509CertificateMap.put("subjectUniqueID", x509Certificate.getSubjectUniqueID());
-
-        Map<String, Object> subjectX500Principal = new HashMap<>();
-        subjectX500Principal.put("name", x509Certificate.getSubjectX500Principal().getName());
-        subjectX500Principal.put("encoded", x509Certificate.getSubjectX500Principal().getEncoded());
-        x509CertificateMap.put("subjectX500Principal", subjectX500Principal);
-
-        try {
-          x509CertificateMap.put("TBSCertificate", x509Certificate.getTBSCertificate());
+          X509Certificate certificate = sslCertificate.getX509Certificate();
+          if (certificate != null) {
+            x509CertificateData = certificate.getEncoded();
+          }
         } catch (CertificateEncodingException e) {
-          x509CertificateMap.put("TBSCertificate", null);
+          e.printStackTrace();
         }
-
-        x509CertificateMap.put("version", x509Certificate.getVersion());
-        x509CertificateMap.put("criticalExtensionOIDs", x509Certificate.getCriticalExtensionOIDs());
-        x509CertificateMap.put("nonCriticalExtensionOIDs", x509Certificate.getNonCriticalExtensionOIDs());
+      } else {
         try {
-          x509CertificateMap.put("encoded", x509Certificate.getEncoded());
+          x509CertificateData = Util.getX509CertFromSslCertHack(sslCertificate).getEncoded();
         } catch (CertificateEncodingException e) {
-          x509CertificateMap.put("encoded", null);
-        }
-
-        Map<String, Object> publicKey = new HashMap<>();
-        publicKey.put("algorithm", x509Certificate.getPublicKey().getAlgorithm());
-        publicKey.put("encoded", x509Certificate.getPublicKey().getEncoded());
-        publicKey.put("format", x509Certificate.getPublicKey().getFormat());
-        x509CertificateMap.put("publicKey", publicKey);
-
-        x509CertificateMap.put("type", x509Certificate.getType());
-        x509CertificateMap.put("hasUnsupportedCriticalExtension", x509Certificate.hasUnsupportedCriticalExtension());
-
-        try {
-          x509Certificate.checkValidity();
-          x509CertificateMap.put("valid", true);
-        } catch (CertificateExpiredException e) {
-          x509CertificateMap.put("valid", false);
-        } catch (CertificateNotYetValidException e) {
-          x509CertificateMap.put("valid", false);
+          e.printStackTrace();
         }
       }
+
+      Map<String, Object> obj = new HashMap<>();
+      obj.put("issuedBy", issuedBy);
+      obj.put("issuedTo", issuedTo);
+      obj.put("validNotAfterDate", sslCertificate.getValidNotAfterDate().getTime());
+      obj.put("validNotBeforeDate", sslCertificate.getValidNotBeforeDate().getTime());
+      obj.put("x509Certificate", x509CertificateData);
+
+      return obj;
     }
 
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("issuedBy", issuedBy);
-    obj.put("issuedTo", issuedTo);
-    obj.put("validNotAfterDate", sslCertificate.getValidNotAfterDate().getTime());
-    obj.put("validNotBeforeDate", sslCertificate.getValidNotBeforeDate().getTime());
-    obj.put("x509Certificate", x509CertificateMap);
-
-    return obj;
+    return null;
   }
 
   @Override

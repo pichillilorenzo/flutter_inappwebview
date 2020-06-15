@@ -488,7 +488,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
         break;
       case "getCertificate":
         if (webView != null) {
-          result.success(webView.getSslCertificate());
+          result.success(webView.getCertificateMap());
         } else {
           result.success(null);
         }

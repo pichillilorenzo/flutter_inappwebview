@@ -2,6 +2,7 @@ import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 
+import 'X509Certificate/x509_certificate.dart';
 import 'package:uuid/uuid.dart';
 import 'package:flutter/foundation.dart';
 
@@ -924,15 +925,15 @@ class ServerTrustChallenge {
   ///**NOTE**: on iOS this value is always an empty string.
   String message;
 
-  ///The `X509Certificate` used to create the server SSL certificate.
-  Uint8List serverCertificate;
+  ///The SSL certificate used for this challenge.
+  SslCertificate sslCertificate;
 
   ServerTrustChallenge(
       {@required this.protectionSpace,
       this.androidError,
       this.iosError,
       this.message,
-      this.serverCertificate})
+      this.sslCertificate})
       : assert(protectionSpace != null);
 
   Map<String, dynamic> toMap() {
@@ -941,7 +942,7 @@ class ServerTrustChallenge {
       "androidError": androidError?.toValue(),
       "iosError": iosError?.toValue(),
       "message": message,
-      "serverCertificate": serverCertificate
+      "sslCertificate": sslCertificate?.toMap()
     };
   }
 
@@ -3741,14 +3742,25 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   int get hashCode => _value.hashCode;
 }
 
-class AndroidSslCertificate {
-  AndroidSslCertificateDName issuedBy;
-  AndroidSslCertificateDName issuedTo;
-  int validNotAfterDate;
-  int validNotBeforeDate;
-  AndroidX509Certificate x509Certificate;
+///SSL certificate info (certificate details) class.
+class SslCertificate {
 
-  AndroidSslCertificate({
+  ///Name of the entity this certificate is issued by
+  SslCertificateDName issuedBy;
+
+  ///Name of the entity this certificate is issued to
+  SslCertificateDName issuedTo;
+
+  ///Not-after date from the validity period
+  DateTime validNotAfterDate;
+
+  ///Not-before date from the validity period
+  DateTime validNotBeforeDate;
+
+  ///The original source certificate, if available.
+  X509Certificate x509Certificate;
+
+  SslCertificate({
     this.issuedBy,
     this.issuedTo,
     this.validNotAfterDate,
@@ -3756,13 +3768,21 @@ class AndroidSslCertificate {
     this.x509Certificate
   });
 
-  static AndroidSslCertificate fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidSslCertificate(
-      issuedBy: AndroidSslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
-      issuedTo: AndroidSslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
-      validNotAfterDate: map["validNotAfterDate"],
-      validNotBeforeDate: map["validNotBeforeDate"],
-      x509Certificate: AndroidX509Certificate.fromMap(map["x509Certificate"]?.cast<String, dynamic>()),
+  static SslCertificate fromMap(Map<String, dynamic> map) {
+    X509Certificate x509Certificate;
+    try {
+      x509Certificate = X509Certificate.fromData(data: map["x509Certificate"]);
+    } catch (e, stacktrace) {
+      print(e);
+      print(stacktrace);
+    }
+
+    return map != null ? SslCertificate(
+      issuedBy: SslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
+      issuedTo: SslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
+      validNotAfterDate: DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"]),
+      validNotBeforeDate: DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"]),
+      x509Certificate: x509Certificate,
     ) : null;
   }
 
@@ -3770,8 +3790,8 @@ class AndroidSslCertificate {
     return {
       "issuedBy": issuedBy?.toMap(),
       "issuedTo": issuedTo?.toMap(),
-      "validNotAfterDate": validNotAfterDate,
-      "validNotBeforeDate": validNotBeforeDate,
+      "validNotAfterDate": validNotAfterDate.millisecondsSinceEpoch,
+      "validNotBeforeDate": validNotBeforeDate.millisecondsSinceEpoch,
       "x509Certificate": x509Certificate?.toMap(),
     };
   }
@@ -3786,25 +3806,30 @@ class AndroidSslCertificate {
   }
 }
 
-class AndroidSslCertificateDName {
+///Distinguished name helper class. Used by [SslCertificate].
+class SslCertificateDName {
+  ///Common-name (CN) component of the name
   // ignore: non_constant_identifier_names
   String CName;
+  ///Distinguished name (normally includes CN, O, and OU names)
   // ignore: non_constant_identifier_names
   String DName;
+  ///Organization (O) component of the name
   // ignore: non_constant_identifier_names
   String OName;
+  ///Organizational Unit (OU) component of the name
   // ignore: non_constant_identifier_names
   String UName;
 
   // ignore: non_constant_identifier_names
-  AndroidSslCertificateDName({this.CName, this.DName, this.OName, this.UName});
+  SslCertificateDName({this.CName = "", this.DName = "", this.OName = "", this.UName = ""});
 
-  static AndroidSslCertificateDName fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidSslCertificateDName(
-      CName: map["CName"],
-      DName: map["DName"],
-      OName: map["OName"],
-      UName: map["UName"],
+  static SslCertificateDName fromMap(Map<String, dynamic> map) {
+    return map != null ? SslCertificateDName(
+      CName: map["CName"] ?? "",
+      DName: map["DName"] ?? "",
+      OName: map["OName"] ?? "",
+      UName: map["UName"] ?? "",
     ) : null;
   }
 
@@ -3814,232 +3839,6 @@ class AndroidSslCertificateDName {
       "DName": DName,
       "OName": OName,
       "UName": UName,
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-class AndroidX509Certificate {
-  int basicConstraints;
-  List<String> extendedKeyUsage;
-  AndroidX509CertificatePrincipal issuerDN;
-  List<bool> issuerUniqueID;
-  AndroidX500Principal issuerX500Principal;
-  List<bool> keyUsage;
-  int notAfter;
-  int notBefore;
-  int serialNumber;
-  String sigAlgName;
-  String sigAlgOID;
-  Uint8List sigAlgParams;
-  Uint8List signature;
-  AndroidX509CertificatePrincipal subjectDN;
-  List<bool> subjectUniqueID;
-  AndroidX500Principal subjectX500Principal;
-  // ignore: non_constant_identifier_names
-  Uint8List TBSCertificate;
-  int version;
-  Set<String> criticalExtensionOIDs;
-  Set<String> nonCriticalExtensionOIDs;
-  Uint8List encoded;
-  AndroidX509CertificatePublicKey publicKey;
-  String type;
-  bool hasUnsupportedCriticalExtension;
-  bool valid;
-
-  AndroidX509Certificate({
-    this.basicConstraints,
-    this.extendedKeyUsage,
-    this.issuerDN,
-    this.issuerUniqueID,
-    this.issuerX500Principal,
-    this.keyUsage,
-    this.notAfter,
-    this.notBefore,
-    this.serialNumber,
-    this.sigAlgName,
-    this.sigAlgOID,
-    this.sigAlgParams,
-    this.signature,
-    this.subjectDN,
-    this.subjectUniqueID,
-    this.subjectX500Principal,
-    // ignore: non_constant_identifier_names
-    this.TBSCertificate,
-    this.version,
-    this.criticalExtensionOIDs,
-    this.nonCriticalExtensionOIDs,
-    this.encoded,
-    this.publicKey,
-    this.type,
-    this.hasUnsupportedCriticalExtension,
-    this.valid
-  });
-
-  static AndroidX509Certificate fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidX509Certificate(
-      basicConstraints: map["basicConstraints"],
-      extendedKeyUsage: map["extendedKeyUsage"],
-      issuerDN: AndroidX509CertificatePrincipal.fromMap(map["issuerDN"]),
-      issuerUniqueID: map["issuerUniqueID"],
-      issuerX500Principal: AndroidX500Principal.fromMap(map["issuerX500Principal"]),
-      keyUsage: map["keyUsage"],
-      notAfter: map["notAfter"],
-      notBefore: map["notBefore"],
-      serialNumber: map["serialNumber"],
-      sigAlgName: map["sigAlgName"],
-      sigAlgOID: map["sigAlgOID"],
-      sigAlgParams: map["sigAlgParams"],
-      signature: map["signature"],
-      subjectDN: AndroidX509CertificatePrincipal.fromMap(map["subjectDN"]),
-      subjectUniqueID: map["subjectUniqueID"],
-      subjectX500Principal: AndroidX500Principal.fromMap(map["subjectX500Principal"]),
-      TBSCertificate: map["TBSCertificate"],
-      version: map["version"],
-      criticalExtensionOIDs: map["criticalExtensionOIDs"],
-      nonCriticalExtensionOIDs: map["nonCriticalExtensionOIDs"],
-      encoded: map["encoded"],
-      publicKey: AndroidX509CertificatePublicKey.fromMap(map["publicKey"]),
-      type: map["type"],
-      hasUnsupportedCriticalExtension: map["hasUnsupportedCriticalExtension"],
-      valid: map["valid"]
-    ) : null;
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "basicConstraints": basicConstraints,
-      "extendedKeyUsage": extendedKeyUsage,
-      "issuerDN": issuerDN?.toMap(),
-      "issuerUniqueID": issuerUniqueID,
-      "issuerX500Principal": issuerX500Principal?.toMap(),
-      "keyUsage": keyUsage,
-      "notAfter": notAfter,
-      "notBefore": notBefore,
-      "serialNumber": serialNumber,
-      "sigAlgName": sigAlgName,
-      "sigAlgOID": sigAlgOID,
-      "sigAlgParams": sigAlgParams,
-      "signature": signature,
-      "subjectDN": subjectDN?.toMap(),
-      "subjectUniqueID": subjectUniqueID,
-      "subjectX500Principal": subjectX500Principal?.toMap(),
-      "TBSCertificate": TBSCertificate,
-      "version": version,
-      "criticalExtensionOIDs": criticalExtensionOIDs,
-      "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
-      "encoded": encoded,
-      "publicKey": publicKey?.toMap(),
-      "type": type,
-      "hasUnsupportedCriticalExtension": hasUnsupportedCriticalExtension,
-      "valid": valid,
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-class AndroidX509CertificatePrincipal {
-  String name;
-
-  AndroidX509CertificatePrincipal({
-    this.name
-  });
-
-  static AndroidX509CertificatePrincipal fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidX509CertificatePrincipal(
-      name: map["name"],
-    ) : null;
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "name": name,
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-class AndroidX500Principal {
-  String name;
-  Uint8List encoded;
-
-  AndroidX500Principal({
-    this.name,
-    this.encoded
-  });
-
-  static AndroidX500Principal fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidX500Principal(
-      name: map["name"],
-      encoded: map["encoded"],
-    ) : null;
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "name": name,
-      "encoded": encoded,
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-class AndroidX509CertificatePublicKey {
-  String algorithm;
-  Uint8List encoded;
-  String format;
-
-  AndroidX509CertificatePublicKey({
-    this.algorithm,
-    this.encoded,
-    this.format
-  });
-
-  static AndroidX509CertificatePublicKey fromMap(Map<String, dynamic> map) {
-    return map != null ? AndroidX509CertificatePublicKey(
-      algorithm: map["algorithm"],
-      encoded: map["encoded"],
-      format: map["format"],
-    ) : null;
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "algorithm": algorithm,
-      "encoded": encoded,
-      "format": format,
     };
   }
 

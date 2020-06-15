@@ -328,6 +328,55 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
                     result(false)
                 }
                 break
+            case "requestFocusNodeHref":
+                if webView != nil {
+                    webView!.requestFocusNodeHref { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                            result(nil)
+                            return
+                        }
+                        result(value)
+                    }
+                } else {
+                    result(false)
+                }
+                break
+            case "requestImageRef":
+                if webView != nil {
+                    webView!.requestImageRef { (value, error) in
+                        if let err = error {
+                            print(err.localizedDescription)
+                            result(nil)
+                            return
+                        }
+                        result(value)
+                    }
+                } else {
+                    result(false)
+                }
+                break
+            case "getScrollX":
+                if webView != nil {
+                    result(Int(webView!.scrollView.contentOffset.x))
+                } else {
+                    result(false)
+                }
+                break
+            case "getScrollY":
+                if webView != nil {
+                    result(Int(webView!.scrollView.contentOffset.y))
+                } else {
+                    result(false)
+                }
+                break
+            case "getCertificate":
+                if webView != nil {
+                    result(webView!.getCertificateMap())
+                } else {
+                    result(false)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

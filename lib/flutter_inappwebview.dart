@@ -37,3 +37,4 @@ export 'src/http_auth_credentials_database.dart';
 export 'src/web_storage_manager.dart';
 export 'src/context_menu.dart';
 export 'src/web_storage.dart';
+export 'src/X509Certificate/main.dart';

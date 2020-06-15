@@ -9,7 +9,7 @@
 - Added error and message to the `ServerTrustChallenge` class for iOS (class used by the `onReceivedServerTrustAuthRequest` event)
 - Added `contentInsetAdjustmentBehavior` webview iOS-specific option
 - Added `copy` and `copyWithValue` methods for webview class options
-- Added X509Certificate class and parser
+- Added `SslCertificate` class and `X509Certificate` class and parser
 - Fixed `zoomBy`, `setOptions` webview methods on Android
 - Fixed `databaseEnabled` android webview option default value to `true`
 

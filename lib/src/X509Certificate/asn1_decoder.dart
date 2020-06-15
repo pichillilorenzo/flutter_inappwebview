@@ -192,8 +192,7 @@ class ASN1DERDecoder {
           byteArray.add(n);
         }
       } else {
-        break;
-        // throw ASN1OutOfBufferError();
+        throw ASN1OutOfBufferError();
       }
     }
 

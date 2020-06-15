@@ -228,16 +228,16 @@ class X509Certificate {
     return value;
   }
 
-  /// Gets the signature value (the raw signature bits) from the certificate.
+  ///Gets the signature value (the raw signature bits) from the certificate.
   List<int> get signature => asn1[0].subAtIndex(2)?.value as List<int>;
 
-  /// Gets the signature algorithm name for the certificate signature algorithm.
+  ///Gets the signature algorithm name for the certificate signature algorithm.
   String get sigAlgName => OID.fromValue(sigAlgOID ?? "")?.name();
 
-  /// Gets the signature algorithm OID string from the certificate.
+  ///Gets the signature algorithm OID string from the certificate.
   String get sigAlgOID => block1.subAtIndex(2)?.subAtIndex(0)?.value as String;
 
-  /// Gets the DER-encoded signature algorithm parameters from this certificate's signature algorithm.
+  ///Gets the DER-encoded signature algorithm parameters from this certificate's signature algorithm.
   List<int> get sigAlgParams => null;
 
   ///Gets a boolean array representing bits of the KeyUsage extension, (OID = 2.5.29.15).
@@ -262,7 +262,7 @@ class X509Certificate {
       if (sub != null && sub.length > 0) {
         var data = sub.last.subAtIndex(0)?.value as List<int>;
         int bits = (data != null && data.length > 0) ? data.first ?? 0 : 0;
-        for (var index = 0; index < 7; index++) {
+        for (var index = 0; index < 8; index++) {
           var value = bits & (1 << index).toUnsigned(8) != 0;
           result.insert(0, value);
         }
@@ -321,12 +321,53 @@ class X509Certificate {
 
   ///Gets the certificate constraints path length from the
   ///critical BasicConstraints extension, (OID = 2.5.29.19).
-  int get basicConstraints => extensionObject(oid: OID.basicConstraints)?.value as int ?? -1;
+  int get basicConstraints {
+    var sub = extensionObject(oid: OID.basicConstraints)?.block?.lastSub()?.lastSub()?.lastSub();
+    if (sub != null) {
+      if (sub.value is List<int>) {
+        return (sub.value as List<int>).length;
+      }
+    }
+    return -1;
+  }
+
+  ///Gets the raw bits from the Subject Key Identifier (SKID) extension, (OID = 2.5.29.14).
+  List<int> get subjectKeyIdentifier =>
+      extensionObject(oid: OID.subjectKeyIdentifier)?.block?.lastSub()?.lastSub()?.value ?? <int>[];
+
+  ///Gets the raw bits from the Authority Key Identifier extension, (OID = 2.5.29.35).
+  List<int> get authorityKeyIdentifier =>
+      extensionObject(oid: OID.authorityKeyIdentifier)?.block?.lastSub()?.lastSub()?.firstSub()?.value ?? <int>[];
+
+  ///Gets the list of certificate policies from the CertificatePolicies extension, (OID = 2.5.29.32).
+  List<String> get certificatePolicies =>
+      extensionObject(oid: OID.certificatePolicies)?.block?.lastSub()?.firstSub()?.sub?.map((e) => e.firstSub()?.value as String)?.toList() ?? <String>[];
+
+  ///Gets the list of CRL distribution points from the CRLDistributionPoints extension, (OID = 2.5.29.31).
+  List<String> get cRLDistributionPoints =>
+      extensionObject(oid: OID.cRLDistributionPoints)?.block?.lastSub()?.firstSub()?.sub?.map((e) => e.firstSub()?.firstSub()?.firstSub()?.value as String)?.toList() ?? <String>[];
+
+  ///Gets the map of the format (as a key) and location (as a value) of additional information
+  ///about the CA who issued the certificate in which this extension appears
+  ///from the AuthorityInfoAccess extension, (OID = 1.3.6.1.5.5.5.7.1.1).
+  Map<String, String> get authorityInfoAccess {
+    var result = <String, String>{};
+    var sub = extensionObject(oid: OID.authorityInfoAccess)?.block?.lastSub()?.firstSub()?.sub;
+    if (sub != null) {
+      sub.forEach((element) {
+        if (element.subCount() > 1) {
+          result.putIfAbsent(element.subAtIndex(0).value,
+              () => element.subAtIndex(1).value);
+        }
+      });
+    }
+    return result;
+  }
 
   List<ASN1Object> get extensionBlocks =>
       block1.atIndex(X509BlockPosition.extensions)?.subAtIndex(0)?.sub;
 
-  ///Gets the extension information of the given OID code or enum.
+  ///Gets the extension information of the given OID code or enum string value.
   X509Extension extensionObject({String oidValue, OID oid}) {
     if (oidValue == null && oid != null) {
       oidValue = oid.toValue();
@@ -346,21 +387,7 @@ class X509Certificate {
   ///Format subject/issuer information in RFC1779
   String blockDistinguishedName({@required ASN1Object block}) {
     var result = "";
-    List<ASN1DistinguishedNames> oidNames = [
-      ASN1DistinguishedNames.COMMON_NAME,
-      ASN1DistinguishedNames.DN_QUALIFIER,
-      ASN1DistinguishedNames.SERIAL_NUMBER,
-      ASN1DistinguishedNames.GIVEN_NAME,
-      ASN1DistinguishedNames.SURNAME,
-      ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME,
-      ASN1DistinguishedNames.ORGANIZATION_NAME,
-      ASN1DistinguishedNames.STREET_ADDRESS,
-      ASN1DistinguishedNames.LOCALITY_NAME,
-      ASN1DistinguishedNames.STATE_OR_PROVINCE_NAME,
-      ASN1DistinguishedNames.COUNTRY_NAME,
-      ASN1DistinguishedNames.EMAIL
-    ];
-    for (var oidName in oidNames) {
+    for (var oidName in ASN1DistinguishedNames.values) {
       var oidBlock = block.findOid(oidValue: oidName.oid());
       if (oidBlock != null) {
         if (result.isNotEmpty) {
@@ -419,6 +446,11 @@ class X509Certificate {
       "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
       "encoded": encoded,
       "publicKey": publicKey?.toMap(),
+      "subjectKeyIdentifier": subjectKeyIdentifier,
+      "authorityKeyIdentifier": authorityKeyIdentifier,
+      "certificatePolicies": certificatePolicies,
+      "cRLDistributionPoints": cRLDistributionPoints,
+      "authorityInfoAccess": authorityInfoAccess,
     };
   }
 

@@ -25,6 +25,20 @@ class ASN1Object {
     return null;
   }
 
+  ASN1Object firstSub() {
+    if (subCount() > 0) {
+      return sub.first;
+    }
+    return null;
+  }
+
+  ASN1Object lastSub() {
+    if (subCount() > 0) {
+      return sub.last;
+    }
+    return null;
+  }
+
   int subCount() {
     return sub?.length ?? 0;
   }

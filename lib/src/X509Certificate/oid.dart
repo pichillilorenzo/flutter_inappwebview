@@ -3,7 +3,7 @@ class OID {
 
   const OID._internal(this._value);
 
-  static List<OID> values = [
+  static final Set<OID> values = [
     OID.etsiQcsCompliance,
     OID.etsiQcsRetentionPeriod,
     OID.etsiQcsQcSSCD,
@@ -100,7 +100,7 @@ class OID {
     OID.codeSigning,
     OID.emailProtection,
     OID.timeStamping,
-  ];
+  ].toSet();
 
   static OID fromValue(String value) {
     return OID.values.firstWhere((element) => element.toValue() == value, orElse: () => null);

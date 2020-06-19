@@ -301,12 +301,6 @@ class InAppWebViewOptions
   InAppWebViewOptions copy() {
     return InAppWebViewOptions.fromMap(this.toMap());
   }
-
-  InAppWebViewOptions copyWithValue(InAppWebViewOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return InAppWebViewOptions.fromMap(mergedMap);
-  }
 }
 
 ///This class represents all the Android-only WebView options available.
@@ -709,12 +703,6 @@ class AndroidInAppWebViewOptions
   AndroidInAppWebViewOptions copy() {
     return AndroidInAppWebViewOptions.fromMap(this.toMap());
   }
-
-  AndroidInAppWebViewOptions copyWithValue(AndroidInAppWebViewOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return AndroidInAppWebViewOptions.fromMap(mergedMap);
-  }
 }
 
 ///This class represents all the iOS-only WebView options available.
@@ -783,7 +771,7 @@ class IOSInAppWebViewOptions
   ///**NOTE**: available on iOS 13.0+.
   bool automaticallyAdjustsScrollIndicatorInsets;
 
-  ///A Boolean value indicating whether the view ignores an accessibility request to invert its colors.
+  ///A Boolean value indicating whether the WebView ignores an accessibility request to invert its colors.
   ///The default value is `false`.
   ///
   ///**NOTE**: available on iOS 11.0+.
@@ -949,12 +937,6 @@ class IOSInAppWebViewOptions
   IOSInAppWebViewOptions copy() {
     return IOSInAppWebViewOptions.fromMap(this.toMap());
   }
-
-  IOSInAppWebViewOptions copyWithValue(IOSInAppWebViewOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return IOSInAppWebViewOptions.fromMap(mergedMap);
-  }
 }
 
 ///This class represents all the cross-platform [InAppBrowser] options available.
@@ -1012,12 +994,6 @@ class InAppBrowserOptions
   InAppBrowserOptions copy() {
     return InAppBrowserOptions.fromMap(this.toMap());
   }
-
-  InAppBrowserOptions copyWithValue(InAppBrowserOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return InAppBrowserOptions.fromMap(mergedMap);
-  }
 }
 
 ///This class represents all the Android-only [InAppBrowser] options available.
@@ -1072,12 +1048,6 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   @override
   AndroidInAppBrowserOptions copy() {
     return AndroidInAppBrowserOptions.fromMap(this.toMap());
-  }
-
-  AndroidInAppBrowserOptions copyWithValue(AndroidInAppBrowserOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return AndroidInAppBrowserOptions.fromMap(mergedMap);
   }
 }
 
@@ -1160,12 +1130,6 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   IOSInAppBrowserOptions copy() {
     return IOSInAppBrowserOptions.fromMap(this.toMap());
   }
-
-  IOSInAppBrowserOptions copyWithValue(IOSInAppBrowserOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return IOSInAppBrowserOptions.fromMap(mergedMap);
-  }
 }
 
 ///This class represents all the Android-only [ChromeSafariBrowser] options available.
@@ -1244,12 +1208,6 @@ class AndroidChromeCustomTabsOptions
   @override
   AndroidChromeCustomTabsOptions copy() {
     return AndroidChromeCustomTabsOptions.fromMap(this.toMap());
-  }
-
-  AndroidChromeCustomTabsOptions copyWithValue(AndroidChromeCustomTabsOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return AndroidChromeCustomTabsOptions.fromMap(mergedMap);
   }
 }
 
@@ -1332,11 +1290,5 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
   @override
   IOSSafariOptions copy() {
     return IOSSafariOptions.fromMap(this.toMap());
-  }
-
-  IOSSafariOptions copyWithValue(IOSSafariOptions webViewOptions) {
-    var mergedMap = this.toMap();
-    mergedMap.addAll(webViewOptions.toMap());
-    return IOSSafariOptions.fromMap(mergedMap);
   }
 }

@@ -3,12 +3,12 @@ class ASN1IdentifierClass {
 
   const ASN1IdentifierClass._internal(this._value);
 
-  static List<ASN1IdentifierClass> values = [
+  static final Set<ASN1IdentifierClass> values = [
     ASN1IdentifierClass.UNIVERSAL,
     ASN1IdentifierClass.APPLICATION,
     ASN1IdentifierClass.CONTEXT_SPECIFIC,
     ASN1IdentifierClass.PRIVATE,
-  ];
+  ].toSet();
 
   static ASN1IdentifierClass fromValue(int value) {
     if (value != null)
@@ -47,7 +47,7 @@ class ASN1IdentifierTagNumber {
 
   const ASN1IdentifierTagNumber._internal(this._value);
 
-  static List<ASN1IdentifierTagNumber> values = [
+  static final Set<ASN1IdentifierTagNumber> values = [
     ASN1IdentifierTagNumber.END_OF_CONTENT,
     ASN1IdentifierTagNumber.BOOLEAN,
     ASN1IdentifierTagNumber.INTEGER,
@@ -77,7 +77,7 @@ class ASN1IdentifierTagNumber {
     ASN1IdentifierTagNumber.UNIVERSAL_STRING,
     ASN1IdentifierTagNumber.CHARACTER_STRING,
     ASN1IdentifierTagNumber.BMP_STRING,
-  ];
+  ].toSet();
 
   static ASN1IdentifierTagNumber fromValue(int value) {
     if (value != null)

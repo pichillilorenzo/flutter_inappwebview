@@ -287,10 +287,18 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.android) {
+      var gestureRecognizers = widget.gestureRecognizers;
+      if (gestureRecognizers == null) {
+        gestureRecognizers = <Factory<OneSequenceGestureRecognizer>>[
+          Factory<OneSequenceGestureRecognizer>(
+                () => EagerGestureRecognizer(),
+          ),
+        ].toSet();
+      }
       return AndroidView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         onPlatformViewCreated: _onPlatformViewCreated,
-        gestureRecognizers: widget.gestureRecognizers,
+        gestureRecognizers: gestureRecognizers,
         layoutDirection: TextDirection.rtl,
         creationParams: <String, dynamic>{
           'initialUrl': '${Uri.parse(widget.initialUrl)}',

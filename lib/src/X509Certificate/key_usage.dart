@@ -3,7 +3,7 @@ class KeyUsage {
 
   const KeyUsage._internal(this._value);
 
-  static List<KeyUsage> values = [
+  static final Set<KeyUsage> values = [
     KeyUsage.digitalSignature,
     KeyUsage.nonRepudiation,
     KeyUsage.keyEncipherment,
@@ -13,7 +13,7 @@ class KeyUsage {
     KeyUsage.cRLSign,
     KeyUsage.encipherOnly,
     KeyUsage.decipherOnly,
-  ];
+  ].toSet();
 
   static KeyUsage fromIndex(int value) {
     return KeyUsage.values.firstWhere((element) => element.toValue() == value, orElse: () => null);

@@ -28,6 +28,9 @@ import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
+import android.view.inputmethod.EditorInfo;
+import android.view.inputmethod.InputConnection;
+import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
@@ -70,6 +73,7 @@ import java.util.regex.Pattern;
 import io.flutter.plugin.common.MethodChannel;
 import okhttp3.OkHttpClient;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.pichillilorenzo.flutter_inappwebview.InAppWebView.PreferredContentModeOptionType.fromValue;
 
 final public class InAppWebView extends InputAwareWebView {
@@ -204,7 +208,7 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "  function handleEvent(e) {" +
           "    var self = this;" +
-          "    if (window." + variableForShouldInterceptAjaxRequestJS + " == null || window." + variableForShouldInterceptAjaxRequestJS + " == true) {" +
+          "    if (" + variableForShouldInterceptAjaxRequestJS + " == null || " + variableForShouldInterceptAjaxRequestJS + " == true) {" +
           "      var headers = this.getAllResponseHeaders();" +
           "      var responseHeaders = {};" +
           "      if (headers != null) {" +
@@ -255,12 +259,12 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "  ajax.prototype.send = function(data) {" +
           "    var self = this;" +
-          "    if (window." + variableForShouldInterceptAjaxRequestJS + " == null || window." + variableForShouldInterceptAjaxRequestJS + " == true) {" +
+          "    if (" + variableForShouldInterceptAjaxRequestJS + " == null || " + variableForShouldInterceptAjaxRequestJS + " == true) {" +
           "      if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {" +
           "        this._flutter_inappwebview_already_onreadystatechange_wrapped = true;" +
           "        var onreadystatechange = this.onreadystatechange;" +
           "        this.onreadystatechange = function() {" +
-          "          if (window." + variableForShouldInterceptAjaxRequestJS + " == null || window." + variableForShouldInterceptAjaxRequestJS + " == true) {" +
+          "          if (" + variableForShouldInterceptAjaxRequestJS + " == null || " + variableForShouldInterceptAjaxRequestJS + " == true) {" +
           "            var headers = this.getAllResponseHeaders();" +
           "            var responseHeaders = {};" +
           "            if (headers != null) {" +
@@ -588,26 +592,6 @@ final public class InAppWebView extends InputAwareWebView {
           "  });" +
           "})();";
 
-  // android Workaround to hide the Keyboard when the user click outside
-  // on something not focusable such as input or a textarea.
-  static final String androidKeyboardWorkaroundFocusoutEventJS = "(function(){" +
-          "  var isFocusin = false;" +
-          "  document.addEventListener('focusin', function(e) {" +
-          "    var nodeName = e.target.nodeName.toLowerCase();" +
-          "    var isInputButton = nodeName === 'input' && e.target.type != null && e.target.type === 'button';" +
-          "    isFocusin = (['a', 'area', 'button', 'details', 'iframe', 'select', 'summary'].indexOf(nodeName) >= 0 || isInputButton) ? false : true;" +
-          "  });" +
-          "  document.addEventListener('focusout', function(e) {" +
-          "    isFocusin = false;" +
-          "    setTimeout(function() {" +
-                 isActiveElementInputEditableJS +
-          "      if (!isFocusin && !isActiveElementEditable) {" +
-          "        window." + JavaScriptBridgeInterface.name + ".callHandler('androidKeyboardWorkaroundFocusoutEvent');" +
-          "      }" +
-          "    }, 300);" +
-          "  });" +
-          "})();";
-
   public InAppWebView(Context context) {
     super(context);
   }
@@ -705,8 +689,9 @@ final public class InAppWebView extends InputAwareWebView {
     settings.setUseWideViewPort(options.useWideViewPort);
     settings.setSupportZoom(options.supportZoom);
     settings.setTextZoom(options.textZoom);
-    setVerticalScrollBarEnabled(options.verticalScrollBarEnabled);
-    setHorizontalScrollBarEnabled(options.horizontalScrollBarEnabled);
+
+    setVerticalScrollBarEnabled(!options.disableVerticalScroll && options.verticalScrollBarEnabled);
+    setHorizontalScrollBarEnabled(!options.disableHorizontalScroll && options.horizontalScrollBarEnabled);
 
     if (options.transparentBackground)
       setBackgroundColor(Color.TRANSPARENT);
@@ -780,8 +765,6 @@ final public class InAppWebView extends InputAwareWebView {
       options.scrollBarFadeDuration = getScrollBarFadeDuration();
     }
     setVerticalScrollbarPosition(options.verticalScrollbarPosition);
-    setVerticalScrollBarEnabled(!options.disableVerticalScroll);
-    setHorizontalScrollBarEnabled(!options.disableHorizontalScroll);
     setOverScrollMode(options.overScrollMode);
     if (options.networkAvailable != null) {
       setNetworkAvailable(options.networkAvailable);
@@ -1065,29 +1048,41 @@ final public class InAppWebView extends InputAwareWebView {
     headlessHandler.post(new Runnable() {
       @Override
       public void run() {
-        int height = (int) (getContentHeight() * scale + 0.5);
-
-        Bitmap b = Bitmap.createBitmap( getWidth(),
-                height, Bitmap.Config.ARGB_8888);
-        Canvas c = new Canvas(b);
-
-        draw(c);
-        int scrollOffset = (getScrollY() + getMeasuredHeight() > b.getHeight())
-                ? b.getHeight() : getScrollY();
-        Bitmap resized = Bitmap.createBitmap(
-                b, 0, scrollOffset, b.getWidth(), getMeasuredHeight());
-
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
-
-        resized.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
         try {
-          byteArrayOutputStream.close();
-        } catch (IOException e) {
-          e.printStackTrace();
-          Log.e(LOG_TAG, e.getMessage());
+          int height = (int) (getContentHeight() * scale + 0.5);
+
+          Bitmap b = Bitmap.createBitmap(getWidth(),
+                  height, Bitmap.Config.ARGB_8888);
+          Canvas c = new Canvas(b);
+
+          draw(c);
+          int scrollOffset = (getScrollY() + getMeasuredHeight() > b.getHeight())
+                  ? b.getHeight() : getScrollY();
+          Bitmap resized = Bitmap.createBitmap(
+                  b, 0, scrollOffset, b.getWidth(), getMeasuredHeight());
+
+          ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+
+          resized.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+          try {
+            byteArrayOutputStream.close();
+          } catch (IOException e) {
+            e.printStackTrace();
+            String errorMessage = e.getMessage();
+            if (errorMessage != null) {
+              Log.e(LOG_TAG, errorMessage);
+            }
+          }
+          resized.recycle();
+          result.success(byteArrayOutputStream.toByteArray());
+
+        } catch (IllegalArgumentException e) {
+          String errorMessage = e.getMessage();
+          if (errorMessage != null) {
+            Log.e(LOG_TAG, errorMessage);
+          }
+          result.success(null);
         }
-        resized.recycle();
-        result.success(byteArrayOutputStream.toByteArray());
       }
     });
   }
@@ -1367,10 +1362,10 @@ final public class InAppWebView extends InputAwareWebView {
       setVerticalScrollbarPosition(newOptions.verticalScrollbarPosition);
 
     if (newOptionsMap.get("disableVerticalScroll") != null && options.disableVerticalScroll != newOptions.disableVerticalScroll)
-      setVerticalScrollBarEnabled(!newOptions.disableVerticalScroll);
+      setVerticalScrollBarEnabled(!newOptions.disableVerticalScroll && newOptions.verticalScrollBarEnabled);
 
     if (newOptionsMap.get("disableHorizontalScroll") != null && options.disableHorizontalScroll != newOptions.disableHorizontalScroll)
-      setHorizontalScrollBarEnabled(!newOptions.disableHorizontalScroll);
+      setHorizontalScrollBarEnabled(!newOptions.disableHorizontalScroll && newOptions.horizontalScrollBarEnabled);
 
     if (newOptionsMap.get("overScrollMode") != null && !options.overScrollMode.equals(newOptions.overScrollMode))
       setOverScrollMode(newOptions.overScrollMode);
@@ -1598,6 +1593,31 @@ final public class InAppWebView extends InputAwareWebView {
   @Override
   public boolean dispatchTouchEvent(MotionEvent event) {
     return super.dispatchTouchEvent(event);
+  }
+
+  @Override
+  public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
+    InputConnection connection = super.onCreateInputConnection(outAttrs);
+    if (connection == null && containerView != null) {
+      // workaround to hide the Keyboard when the user click outside
+      // on something not focusable such as input or a textarea.
+      containerView
+        .getHandler()
+        .postDelayed(
+          new Runnable() {
+            @Override
+            public void run() {
+              InputMethodManager imm =
+                      (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+              if (imm != null && !imm.isAcceptingText()) {
+                imm.hideSoftInputFromWindow(
+                        containerView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+              }
+            }
+          },
+          128);
+    }
+    return connection;
   }
 
   @Override

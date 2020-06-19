@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 import 'dart:async';
 import 'dart:collection';
@@ -12,8 +11,6 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'X509Certificate/asn1_distinguished_names.dart';
 import 'X509Certificate/x509_certificate.dart';
-
-import 'package:html/parser.dart' show parse;
 
 import 'context_menu.dart';
 import 'types.dart';
@@ -586,11 +583,6 @@ class InAppWebViewController {
         List<dynamic> args = jsonDecode(call.arguments["args"]);
 
         switch (handlerName) {
-          case "androidKeyboardWorkaroundFocusoutEvent":
-            // android Workaround to hide the Keyboard when the user click outside
-            // on something not focusable such as input or a textarea.
-            SystemChannels.textInput.invokeMethod("TextInput.hide");
-            break;
           case "onLoadResource":
             Map<dynamic, dynamic> argMap = args[0];
             String initiatorType = argMap["initiatorType"];
@@ -883,7 +875,6 @@ class InAppWebViewController {
     if (html == null || (html != null && html.isEmpty)) {
       return favicons;
     }
-
     var assetPathBase;
 
     if (webviewUrl.startsWith("file:///")) {
@@ -891,29 +882,53 @@ class InAppWebViewController {
       assetPathBase = assetPathSplitted[0] + "/flutter_assets/";
     }
 
-    // get all link html elements
-    var document = parse(html);
-    var links = document.getElementsByTagName('link');
-    for (var link in links) {
-      var attributes = link.attributes;
-      if (attributes["rel"] == "manifest") {
-        manifestUrl = attributes["href"];
-        if (!_isUrlAbsolute(manifestUrl)) {
-          if (manifestUrl.startsWith("/")) {
-            manifestUrl = manifestUrl.substring(1);
-          }
-          manifestUrl = ((assetPathBase == null)
-                  ? url.scheme + "://" + url.host + "/"
-                  : assetPathBase) +
-              manifestUrl;
+    InAppWebViewGroupOptions options = await getOptions();
+    if (options != null && options.crossPlatform.javaScriptEnabled == true) {
+      List<Map<dynamic, dynamic>> links = (await evaluateJavascript(
+          source: """
+(function() {
+  var linkNodes = document.head.getElementsByTagName("link");
+  var links = [];
+  for (var i = 0; i < linkNodes.length; i++) {
+    var linkNode = linkNodes[i];
+    if (linkNode.rel === 'manifest') {
+      links.push(
+        {
+          rel: linkNode.rel,
+          href: linkNode.href,
+          sizes: null
         }
-        continue;
+      );
+    } else if (linkNode.rel != null && linkNode.rel.indexOf('icon') >= 0) {
+      links.push(
+        {
+          rel: linkNode.rel,
+          href: linkNode.href,
+          sizes: linkNode.sizes != null && linkNode.sizes.value != "" ? linkNode.sizes.value : null
+        }
+      );
+    }
+  }
+  return links;
+})();
+"""))?.cast<Map<dynamic, dynamic>>() ?? [];
+      for (var link in links) {
+        if (link["rel"] == "manifest") {
+          manifestUrl = link["href"];
+          if (!_isUrlAbsolute(manifestUrl)) {
+            if (manifestUrl.startsWith("/")) {
+              manifestUrl = manifestUrl.substring(1);
+            }
+            manifestUrl = ((assetPathBase == null)
+                ? url.scheme + "://" + url.host + "/"
+                : assetPathBase) +
+                manifestUrl;
+          }
+          continue;
+        }
+        favicons.addAll(_createFavicons(url, assetPathBase, link["href"],
+            link["rel"], link["sizes"], false));
       }
-      if (!attributes["rel"].contains("icon")) {
-        continue;
-      }
-      favicons.addAll(_createFavicons(url, assetPathBase, attributes["href"],
-          attributes["rel"], attributes["sizes"], false));
     }
 
     // try to get /favicon.ico
@@ -923,7 +938,7 @@ class InAppWebViewController {
       favicons.add(Favicon(url: faviconUrl, rel: "shortcut icon"));
     } catch (e, stacktrace) {
       print("/favicon.ico file not found: " + e.toString());
-      print(stacktrace);
+      // print(stacktrace);
     }
 
     // try to get the manifest file
@@ -940,7 +955,7 @@ class InAppWebViewController {
           manifestResponse.headers.contentType?.mimeType == "application/json";
     } catch (e, stacktrace) {
       print("Manifest file not found: " + e.toString());
-      print(stacktrace);
+      // print(stacktrace);
     }
 
     if (manifestFound) {
@@ -1181,6 +1196,11 @@ class InAppWebViewController {
 
   ///Evaluates JavaScript code into the WebView and returns the result of the evaluation.
   ///
+  ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
+  ///because, in these events, the [WebView] is not ready to handle it yet.
+  ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
+  ///where you know the page is ready "enough".
+  ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415017-evaluatejavascript
   Future<dynamic> evaluateJavascript({@required String source}) async {
@@ -1192,6 +1212,11 @@ class InAppWebViewController {
   }
 
   ///Injects an external JavaScript file into the WebView from a defined url.
+  ///
+  ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
+  ///because, in these events, the [WebView] is not ready to handle it yet.
+  ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
+  ///where you know the page is ready "enough".
   Future<void> injectJavascriptFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
@@ -1199,6 +1224,11 @@ class InAppWebViewController {
   }
 
   ///Injects a JavaScript file into the WebView from the flutter assets directory.
+  ///
+  ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
+  ///because, in these events, the [WebView] is not ready to handle it yet.
+  ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
+  ///where you know the page is ready "enough".
   Future<void> injectJavascriptFileFromAsset(
       {@required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
@@ -1206,6 +1236,11 @@ class InAppWebViewController {
   }
 
   ///Injects CSS into the WebView.
+  ///
+  ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
+  ///because, in these events, the [WebView] is not ready to handle it yet.
+  ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
+  ///where you know the page is ready "enough".
   Future<void> injectCSSCode({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
@@ -1213,6 +1248,11 @@ class InAppWebViewController {
   }
 
   ///Injects an external CSS file into the WebView from a defined url.
+  ///
+  ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
+  ///because, in these events, the [WebView] is not ready to handle it yet.
+  ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
+  ///where you know the page is ready "enough".
   Future<void> injectCSSFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
@@ -1220,6 +1260,11 @@ class InAppWebViewController {
   }
 
   ///Injects a CSS file into the WebView from the flutter assets directory.
+  ///
+  ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
+  ///because, in these events, the [WebView] is not ready to handle it yet.
+  ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
+  ///where you know the page is ready "enough".
   Future<void> injectCSSFileFromAsset({@required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
     await injectCSSCode(source: source);
@@ -1271,6 +1316,10 @@ class InAppWebViewController {
   ///```
   ///
   ///Forbidden names for JavaScript handlers are defined in [javaScriptHandlerForbiddenNames].
+  ///
+  ///**NOTE**: This method should be called, for example, in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events or, at least,
+  ///before you know that your JavaScript code will call the `window.flutter_inappwebview.callHandler` method,
+  ///otherwise you won't be able to intercept the JavaScript message.
   void addJavaScriptHandler(
       {@required String handlerName,
       @required JavaScriptHandlerCallback callback}) {

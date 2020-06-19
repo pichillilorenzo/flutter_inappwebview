@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.content.Context;
+import android.content.MutableContextWrapper;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
@@ -63,6 +64,11 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
               "- Take a look at the \"IMPORTANT Note for Android\" section here: https://github.com/pichillilorenzo/flutter_inappwebview#important-note-for-android\n" +
               "- See the official wiki here: https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects\n\n\n");
     }
+
+    // MutableContextWrapper mMutableContext = new MutableContextWrapper(Shared.activity);
+    // webView = new InAppWebView(mMutableContext, this, id, options, contextMenu, containerView);
+    // displayListenerProxy.onPostWebViewInitialization(displayManager);
+    // mMutableContext.setBaseContext(context);
 
     webView = new InAppWebView(Shared.activity, this, id, options, contextMenu, containerView);
     displayListenerProxy.onPostWebViewInitialization(displayManager);

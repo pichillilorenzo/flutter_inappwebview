@@ -4,7 +4,7 @@ class ASN1DistinguishedNames {
 
   const ASN1DistinguishedNames._internal(this._oid, this._representation);
 
-  static List<ASN1DistinguishedNames> values = [
+  static final Set<ASN1DistinguishedNames> values = [
     ASN1DistinguishedNames.COMMON_NAME,
     ASN1DistinguishedNames.DN_QUALIFIER,
     ASN1DistinguishedNames.SERIAL_NUMBER,
@@ -17,10 +17,12 @@ class ASN1DistinguishedNames {
     ASN1DistinguishedNames.STATE_OR_PROVINCE_NAME,
     ASN1DistinguishedNames.COUNTRY_NAME,
     ASN1DistinguishedNames.EMAIL,
-  ];
+  ].toSet();
 
   static ASN1DistinguishedNames fromValue(String oid) {
-    return ASN1DistinguishedNames.values.firstWhere((element) => element.oid() == oid, orElse: () => null);
+    if (oid != null)
+      return ASN1DistinguishedNames.values.firstWhere((element) => element.oid() == oid, orElse: () => null);
+    return null;
   }
 
   String oid() => _oid;

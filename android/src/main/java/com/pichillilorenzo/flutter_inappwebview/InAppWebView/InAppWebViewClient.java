@@ -185,9 +185,6 @@ public class InAppWebViewClient extends WebViewClient {
       js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
     }
     js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS.replaceAll("[\r\n]+", "");
-    if (flutterWebView != null) {
-      js += InAppWebView.androidKeyboardWorkaroundFocusoutEventJS.replaceAll("[\r\n]+", "");
-    }
     js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

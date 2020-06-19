@@ -26,25 +26,25 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     contextMenu = ContextMenu(
       menuItems: [
         ContextMenuItem(androidId: 1, iosId: "1", title: "Special", action: () async {
-          print("Menu item Special clicked!");
+          //print("Menu item Special clicked!");
           print(await webView.getSelectedText());
           await webView.clearFocus();
         })
       ],
       options: ContextMenuOptions(
-        hideDefaultSystemContextMenuItems: true
+        hideDefaultSystemContextMenuItems: false
       ),
       onCreateContextMenu: (hitTestResult) async {
-        print("onCreateContextMenu");
+        //print("onCreateContextMenu");
         print(hitTestResult.extra);
         print(await webView.getSelectedText());
       },
       onHideContextMenu: () {
-        print("onHideContextMenu");
+        //print("onHideContextMenu");
       },
       onContextMenuActionItemClicked: (contextMenuItemClicked) async {
         var id = (Platform.isAndroid) ? contextMenuItemClicked.androidId : contextMenuItemClicked.iosId;
-        print("onContextMenuActionItemClicked: " + id.toString() + " " + contextMenuItemClicked.title);
+       // print("onContextMenuActionItemClicked: " + id.toString() + " " + contextMenuItemClicked.title);
       }
     );
   }
@@ -80,8 +80,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     contextMenu: contextMenu,
-                    initialUrl: "https://github.com/flutter",
-                    // initialFile: "assets/index.html",
+                    // initialUrl: "https://github.com/flutter",
+                    initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(

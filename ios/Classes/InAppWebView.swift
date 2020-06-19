@@ -320,7 +320,7 @@ let interceptAjaxRequestsJS = """
   };
   function handleEvent(e) {
     var self = this;
-    if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
+    if (\(variableForShouldInterceptAjaxRequestJS) == null || \(variableForShouldInterceptAjaxRequestJS) == true) {
       var headers = this.getAllResponseHeaders();
       var responseHeaders = {};
       if (headers != null) {
@@ -371,12 +371,12 @@ let interceptAjaxRequestsJS = """
   };
   ajax.prototype.send = function(data) {
     var self = this;
-    if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
+    if (\(variableForShouldInterceptAjaxRequestJS) == null || \(variableForShouldInterceptAjaxRequestJS) == true) {
       if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {
         this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
         var onreadystatechange = this.onreadystatechange;
         this.onreadystatechange = function() {
-          if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
+          if (\(variableForShouldInterceptAjaxRequestJS) == null || \(variableForShouldInterceptAjaxRequestJS) == true) {
             var headers = this.getAllResponseHeaders();
             var responseHeaders = {};
             if (headers != null) {
@@ -1029,143 +1029,130 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
         
-        if (options?.transparentBackground)! {
-            isOpaque = false
-            backgroundColor = UIColor.clear
-            scrollView.backgroundColor = UIColor.clear
-        }
-        
-        // prevent webView from bouncing
-        if (options?.disallowOverScroll)! {
-            if responds(to: #selector(getter: scrollView)) {
-                scrollView.bounces = false
+        if let options = options {
+            if options.transparentBackground {
+                isOpaque = false
+                backgroundColor = UIColor.clear
+                scrollView.backgroundColor = UIColor.clear
             }
-            else {
-                for subview: UIView in subviews {
-                    if subview is UIScrollView {
-                        (subview as! UIScrollView).bounces = false
+            
+            // prevent webView from bouncing
+            if options.disallowOverScroll {
+                if responds(to: #selector(getter: scrollView)) {
+                    scrollView.bounces = false
+                }
+                else {
+                    for subview: UIView in subviews {
+                        if subview is UIScrollView {
+                            (subview as! UIScrollView).bounces = false
+                        }
                     }
                 }
             }
-        }
-        
-        let originalViewPortMetaTagContentJSScript = WKUserScript(source: originalViewPortMetaTagContentJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-        configuration.userContentController.addUserScript(originalViewPortMetaTagContentJSScript)
-        
-        if !(options?.supportZoom)! {
-            let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); document.getElementsByTagName('head')[0].appendChild(meta);"
-            let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-            configuration.userContentController.addUserScript(userScript)
-        } else if (options?.enableViewportScale)! {
-            let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
-            let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-            configuration.userContentController.addUserScript(userScript)
-        }
-        
-        let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(promisePolyfillJSScript)
-        
-        let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
-        configuration.userContentController.add(self, name: "callHandler")
-        
-        let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(consoleLogJSScript)
-        configuration.userContentController.add(self, name: "consoleLog")
-        configuration.userContentController.add(self, name: "consoleDebug")
-        configuration.userContentController.add(self, name: "consoleError")
-        configuration.userContentController.add(self, name: "consoleInfo")
-        configuration.userContentController.add(self, name: "consoleWarn")
-        
-        let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(findElementsAtPointJSScript)
-        
-        let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(printJSScript)
-        
-        let lastTouchedAnchorOrImageJSScript = WKUserScript(source: lastTouchedAnchorOrImageJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(lastTouchedAnchorOrImageJSScript)
-        
-        if (options?.useOnLoadResource)! {
-            let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(resourceObserverJSScript)
-        }
-        
-        let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(findTextHighlightJSScript)
-        configuration.userContentController.add(self, name: "onFindResultReceived")
-        
-        if (options?.useShouldInterceptAjaxRequest)! {
-            let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
-        }
-        
-        if (options?.useShouldInterceptFetchRequest)! {
-            let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
-        }
-        
-        if #available(iOS 11.0, *) {
-            accessibilityIgnoresInvertColors = (options?.accessibilityIgnoresInvertColors)!
-            scrollView.contentInsetAdjustmentBehavior =
-                UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: (options?.contentInsetAdjustmentBehavior)!)!
-        }
-        
-        configuration.suppressesIncrementalRendering = (options?.suppressesIncrementalRendering)!
-        allowsBackForwardNavigationGestures = (options?.allowsBackForwardNavigationGestures)!
-        if #available(iOS 9.0, *) {
-            allowsLinkPreview = (options?.allowsLinkPreview)!
-            configuration.allowsAirPlayForMediaPlayback = (options?.allowsAirPlayForMediaPlayback)!
-            configuration.allowsPictureInPictureMediaPlayback = (options?.allowsPictureInPictureMediaPlayback)!
-            if (options?.applicationNameForUserAgent != nil && (options?.applicationNameForUserAgent)! != "") {
-                configuration.applicationNameForUserAgent = (options?.applicationNameForUserAgent)!
-            }
-            if (options?.userAgent != nil && (options?.userAgent)! != "") {
-                customUserAgent = (options?.userAgent)!
-            }
-        }
-        
-        configuration.preferences.javaScriptCanOpenWindowsAutomatically = (options?.javaScriptCanOpenWindowsAutomatically)!
-        configuration.preferences.javaScriptEnabled = (options?.javaScriptEnabled)!
-        configuration.preferences.minimumFontSize = CGFloat((options?.minimumFontSize)!)
-        configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: (options?.selectionGranularity)!)!
-        
-        if #available(iOS 10.0, *) {
-            configuration.ignoresViewportScaleLimits = (options?.ignoresViewportScaleLimits)!
             
-            var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
-            for type in options?.dataDetectorTypes ?? [] {
-                let dataDetectorType = InAppWebView.getDataDetectorType(type: type)
-                dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
+            let originalViewPortMetaTagContentJSScript = WKUserScript(source: originalViewPortMetaTagContentJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+            configuration.userContentController.addUserScript(originalViewPortMetaTagContentJSScript)
+            
+            if !options.supportZoom {
+                let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); document.getElementsByTagName('head')[0].appendChild(meta);"
+                let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+                configuration.userContentController.addUserScript(userScript)
+            } else if options.enableViewportScale {
+                let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
+                let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+                configuration.userContentController.addUserScript(userScript)
             }
-            configuration.dataDetectorTypes = dataDetectorTypes
-        }
-        
-        if #available(iOS 13.0, *) {
-            configuration.preferences.isFraudulentWebsiteWarningEnabled = (options?.isFraudulentWebsiteWarningEnabled)!
-            if options?.preferredContentMode != nil {
-                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: (options?.preferredContentMode)!)!
+            
+            let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(promisePolyfillJSScript)
+            
+            let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
+            configuration.userContentController.add(self, name: "callHandler")
+            
+            let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(consoleLogJSScript)
+            configuration.userContentController.add(self, name: "consoleLog")
+            configuration.userContentController.add(self, name: "consoleDebug")
+            configuration.userContentController.add(self, name: "consoleError")
+            configuration.userContentController.add(self, name: "consoleInfo")
+            configuration.userContentController.add(self, name: "consoleWarn")
+            
+            let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(findElementsAtPointJSScript)
+            
+            let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(printJSScript)
+            
+            let lastTouchedAnchorOrImageJSScript = WKUserScript(source: lastTouchedAnchorOrImageJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(lastTouchedAnchorOrImageJSScript)
+            
+            if options.useOnLoadResource {
+                let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                configuration.userContentController.addUserScript(resourceObserverJSScript)
             }
-            scrollView.automaticallyAdjustsScrollIndicatorInsets = (options?.automaticallyAdjustsScrollIndicatorInsets)!
-        }
-        
-        scrollView.showsVerticalScrollIndicator = !(options?.disableVerticalScroll)!
-        scrollView.showsHorizontalScrollIndicator = !(options?.disableHorizontalScroll)!
-        scrollView.showsVerticalScrollIndicator = (options?.verticalScrollBarEnabled)!
-        scrollView.showsHorizontalScrollIndicator = (options?.horizontalScrollBarEnabled)!
+            
+            let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(findTextHighlightJSScript)
+            configuration.userContentController.add(self, name: "onFindResultReceived")
+            
+            if options.useShouldInterceptAjaxRequest {
+                let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
+            }
+            
+            if options.useShouldInterceptFetchRequest {
+                let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
+            }
+            
+            if #available(iOS 11.0, *) {
+                accessibilityIgnoresInvertColors = options.accessibilityIgnoresInvertColors
+                scrollView.contentInsetAdjustmentBehavior =
+                    UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: options.contentInsetAdjustmentBehavior)!
+            }
+            
+            allowsBackForwardNavigationGestures = options.allowsBackForwardNavigationGestures
+            if #available(iOS 9.0, *) {
+                allowsLinkPreview = options.allowsLinkPreview
+                configuration.allowsAirPlayForMediaPlayback = options.allowsAirPlayForMediaPlayback
+                configuration.allowsPictureInPictureMediaPlayback = options.allowsPictureInPictureMediaPlayback
+                if !options.applicationNameForUserAgent.isEmpty {
+                    configuration.applicationNameForUserAgent = options.applicationNameForUserAgent
+                }
+                if !options.userAgent.isEmpty {
+                    customUserAgent = options.userAgent
+                }
+            }
+            
+            configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
+            configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
+            configuration.preferences.minimumFontSize = CGFloat(options.minimumFontSize)
+            
+            if #available(iOS 13.0, *) {
+                configuration.preferences.isFraudulentWebsiteWarningEnabled = options.isFraudulentWebsiteWarningEnabled
+                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: options.preferredContentMode)!
+                scrollView.automaticallyAdjustsScrollIndicatorInsets = options.automaticallyAdjustsScrollIndicatorInsets
+            }
+            
+            scrollView.showsVerticalScrollIndicator = !options.disableVerticalScroll
+            scrollView.showsHorizontalScrollIndicator = !options.disableHorizontalScroll
+            scrollView.showsVerticalScrollIndicator = options.verticalScrollBarEnabled
+            scrollView.showsHorizontalScrollIndicator = options.horizontalScrollBarEnabled
 
-        scrollView.decelerationRate = InAppWebView.getDecelerationRate(type: (options?.decelerationRate)!)
-        scrollView.alwaysBounceVertical = (options?.alwaysBounceVertical)!
-        scrollView.alwaysBounceHorizontal = (options?.alwaysBounceHorizontal)!
-        scrollView.scrollsToTop = (options?.scrollsToTop)!
-        scrollView.isPagingEnabled = (options?.isPagingEnabled)!
-        scrollView.maximumZoomScale = CGFloat((options?.maximumZoomScale)!)
-        scrollView.minimumZoomScale = CGFloat((options?.minimumZoomScale)!)
-        
-        // options.debuggingEnabled is always enabled for iOS.
-        
-        if (options?.clearCache)! {
-            clearCache()
+            scrollView.decelerationRate = InAppWebView.getDecelerationRate(type: options.decelerationRate)
+            scrollView.alwaysBounceVertical = options.alwaysBounceVertical
+            scrollView.alwaysBounceHorizontal = options.alwaysBounceHorizontal
+            scrollView.scrollsToTop = options.scrollsToTop
+            scrollView.isPagingEnabled = options.isPagingEnabled
+            scrollView.maximumZoomScale = CGFloat(options.maximumZoomScale)
+            scrollView.minimumZoomScale = CGFloat(options.minimumZoomScale)
+            
+            // options.debuggingEnabled is always enabled for iOS.
+            
+            if options.clearCache {
+                clearCache()
+            }
         }
     }
     
@@ -1261,43 +1248,51 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         configuration.processPool = WKProcessPoolManager.sharedProcessPool
         
-        if #available(iOS 10.0, *) {
-            configuration.mediaTypesRequiringUserActionForPlayback = ((options?.mediaPlaybackRequiresUserGesture)!) ? .all : []
-        } else {
-            // Fallback on earlier versions
-            configuration.mediaPlaybackRequiresUserAction = (options?.mediaPlaybackRequiresUserGesture)!
-        }
-        
-        configuration.allowsInlineMediaPlayback = (options?.allowsInlineMediaPlayback)!
-        
-        if #available(iOS 11.0, *) {
-            if let schemes = options?.resourceCustomSchemes {
-                for scheme in schemes {
+        if let options = options {
+            configuration.allowsInlineMediaPlayback = options.allowsInlineMediaPlayback
+            configuration.suppressesIncrementalRendering = options.suppressesIncrementalRendering
+            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: options.selectionGranularity)!
+            
+            if #available(iOS 9.0, *) {
+                if options.incognito {
+                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                } else if options.cacheEnabled {
+                    configuration.websiteDataStore = WKWebsiteDataStore.default()
+                }
+            }
+            
+            if #available(iOS 10.0, *) {
+                configuration.ignoresViewportScaleLimits = options.ignoresViewportScaleLimits
+                
+                var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
+                for type in options.dataDetectorTypes {
+                    let dataDetectorType = InAppWebView.getDataDetectorType(type: type)
+                    dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
+                }
+                configuration.dataDetectorTypes = dataDetectorTypes
+                
+                configuration.mediaTypesRequiringUserActionForPlayback = options.mediaPlaybackRequiresUserGesture ? .all : []
+            } else {
+                // Fallback on earlier versions
+                configuration.mediaPlaybackRequiresUserAction = options.mediaPlaybackRequiresUserGesture
+            }
+            
+            if #available(iOS 11.0, *) {
+                for scheme in options.resourceCustomSchemes {
                     configuration.setURLSchemeHandler(CustomeSchemeHandler(), forURLScheme: scheme)
                 }
-            }
-        }
-        
-        if #available(iOS 9.0, *) {
-            if ((options?.incognito)!) {
-                configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-            } else if ((options?.cacheEnabled)!) {
-                configuration.websiteDataStore = WKWebsiteDataStore.default()
-            }
-        }
-        
-        if #available(iOS 11.0, *) {
-            if((options?.sharedCookiesEnabled)!) {
-                // More info to sending cookies with WKWebView
-                // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
-                // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
-                // See also https://forums.developer.apple.com/thread/97194
-                // check if websiteDataStore has not been initialized before
-                if(!(options?.incognito)! && !(options?.cacheEnabled)!) {
-                    configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-                }
-                for cookie in HTTPCookieStorage.shared.cookies ?? [] {
-                    configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
+                if options.sharedCookiesEnabled {
+                    // More info to sending cookies with WKWebView
+                    // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
+                    // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
+                    // See also https://forums.developer.apple.com/thread/97194
+                    // check if websiteDataStore has not been initialized before
+                    if(!options.incognito && options.cacheEnabled) {
+                        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                    }
+                    for cookie in HTTPCookieStorage.shared.cookies ?? [] {
+                        configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
+                    }
                 }
             }
         }
@@ -2804,17 +2799,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     
     public func pauseTimers() {
-        isPausedTimers = true
-        let script = "alert();";
-        self.evaluateJavaScript(script, completionHandler: nil)
+        if !isPausedTimers {
+            isPausedTimers = true
+            let script = "alert();";
+            self.evaluateJavaScript(script, completionHandler: nil)
+        }
     }
     
     public func resumeTimers() {
-        if let completionHandler = isPausedTimersCompletionHandler {
-            completionHandler()
-            isPausedTimersCompletionHandler = nil
+        if isPausedTimers {
+            if let completionHandler = isPausedTimersCompletionHandler {
+                self.isPausedTimersCompletionHandler = nil
+                completionHandler()
+            }
+            isPausedTimers = false
         }
-        isPausedTimers = false
     }
     
     public func printCurrentPage(printCompletionHandler: ((_ completed: Bool, _ error: Error?) -> Void)?) {
@@ -2925,6 +2924,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func dispose() {
+        if isPausedTimers, let completionHandler = isPausedTimersCompletionHandler {
+            isPausedTimersCompletionHandler = nil
+            completionHandler()
+        }
         stopLoading()
         configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog")
         configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug")

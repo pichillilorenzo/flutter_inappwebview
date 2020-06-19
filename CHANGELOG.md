@@ -3,15 +3,21 @@
 - Added `requestFocusNodeHref`, `requestImageRef`, `getMetaTags`, `getMetaThemeColor`, `getScrollX`, `getScrollY`, `getCertificate` webview methods
 - Added `WebStorage`, `LocalStorage` and `SessionStorage` class to manage `window.localStorage` and `window.sessionStorage` JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API)
 - Added `supportZoom` webview option also on iOS
-- Added `HttpOnly`, `SameSite` set cookie options
+- Added `HttpOnly`, `SameSite` cookie options
 - Updated `Cookie` class
 - Added `animated` option to `scrollTo` and `scrollBy` webview methods
 - Added error and message to the `ServerTrustChallenge` class for iOS (class used by the `onReceivedServerTrustAuthRequest` event)
 - Added `contentInsetAdjustmentBehavior` webview iOS-specific option
-- Added `copy` and `copyWithValue` methods for webview class options
+- Added `copy` methods for webview class options
 - Added `SslCertificate` class and `X509Certificate` class and parser
+- Added `values` property for all the custom Enums
+- Updated Android workaround to hide the Keyboard when the user click outside on something not focusable such as input or a textarea.
 - Fixed `zoomBy`, `setOptions` webview methods on Android
 - Fixed `databaseEnabled` android webview option default value to `true`
+- Fixed `verticalScrollBarEnabled` and `horizontalScrollBarEnabled` on Android
+- Fixed error caused by `pauseTimers` on iOS when the WebView has been disposed
+- Fixed `ignoresViewportScaleLimits`, `dataDetectorTypes`, `suppressesIncrementalRendering`, `selectionGranularity` iOS-specific option when used in `initialOptions`
+- Fixed `getFavicons` method
 
 ### BREAKING CHANGES
 

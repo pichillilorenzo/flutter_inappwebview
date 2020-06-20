@@ -874,6 +874,29 @@ class HttpAuthCredential {
   }
 }
 
+class ProtectionSpaceHttpAuthCredentials {
+  ProtectionSpace protectionSpace;
+  List<HttpAuthCredential> credentials;
+
+  ProtectionSpaceHttpAuthCredentials({this.protectionSpace, this.credentials});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "protectionSpace": protectionSpace?.toMap(),
+      "credentials": credentials?.map((credential) => credential?.toMap())?.toList()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
 ///Class used by [ServerTrustAuthResponse] class.
 class ServerTrustAuthResponseAction {
   final int _value;

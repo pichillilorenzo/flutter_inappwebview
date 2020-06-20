@@ -15,6 +15,7 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.platform.PlatformViewRegistry;
+import io.flutter.view.FlutterMain;
 import io.flutter.view.FlutterView;
 
 public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
@@ -34,6 +35,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public InAppWebViewFlutterPlugin() {}
 
   public static void registerWith(PluginRegistry.Registrar registrar) {
+    Log.d(LOG_TAG, "\n\n\nregisterWith\n\n\n");
+
     final InAppWebViewFlutterPlugin instance = new InAppWebViewFlutterPlugin();
     Shared.registrar = registrar;
     instance.onAttachedToEngine(
@@ -43,11 +46,17 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   @Override
   public void onAttachedToEngine(FlutterPluginBinding binding) {
     Shared.flutterAssets = binding.getFlutterAssets();
+
+    // Shared.activity could be null or not.
+    // It depends on who is called first between onAttachedToEngine event and onAttachedToActivity event.
+    //
+    // See https://github.com/pichillilorenzo/flutter_inappwebview/issues/390#issuecomment-647039084
     onAttachedToEngine(
-            binding.getApplicationContext(), binding.getBinaryMessenger(), null, binding.getPlatformViewRegistry(), null);
+            binding.getApplicationContext(), binding.getBinaryMessenger(), Shared.activity, binding.getPlatformViewRegistry(), null);
   }
 
   private void onAttachedToEngine(Context applicationContext, BinaryMessenger messenger, Activity activity, PlatformViewRegistry platformViewRegistry, FlutterView flutterView) {
+
     Shared.applicationContext = applicationContext;
     Shared.activity = activity;
     Shared.messenger = messenger;

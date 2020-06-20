@@ -224,10 +224,6 @@ public class InAppWebViewClient extends WebViewClient {
       CookieSyncManager.getInstance().sync();
     }
 
-    // https://issues.apache.org/jira/browse/CB-11248
-    view.clearFocus();
-    view.requestFocus();
-
     String js = InAppWebView.platformReadyJS.replaceAll("[\r\n]+", "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

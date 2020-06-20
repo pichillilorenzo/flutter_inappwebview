@@ -1056,10 +1056,20 @@ final public class InAppWebView extends InputAwareWebView {
           Canvas c = new Canvas(b);
 
           draw(c);
-          int scrollOffset = (getScrollY() + getMeasuredHeight() > b.getHeight())
-                  ? b.getHeight() : getScrollY();
+
+          int scrollY = getScrollY();
+          int measuredHeight = getMeasuredHeight();
+          int bitmapHeight = b.getHeight();
+
+          int scrollOffset = (scrollY + measuredHeight > bitmapHeight)
+                  ? (bitmapHeight - measuredHeight) : scrollY;
+
+          if (scrollOffset < 0) {
+            scrollOffset = 0;
+          }
+
           Bitmap resized = Bitmap.createBitmap(
-                  b, 0, scrollOffset, b.getWidth(), getMeasuredHeight());
+                  b, 0, scrollOffset, b.getWidth(), measuredHeight);
 
           ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
@@ -1610,6 +1620,7 @@ final public class InAppWebView extends InputAwareWebView {
               InputMethodManager imm =
                       (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
               if (imm != null && !imm.isAcceptingText()) {
+
                 imm.hideSoftInputFromWindow(
                         containerView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
               }

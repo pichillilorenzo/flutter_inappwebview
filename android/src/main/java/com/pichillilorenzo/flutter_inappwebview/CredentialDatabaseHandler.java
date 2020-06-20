@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.os.Build;
+import android.webkit.WebViewDatabase;
 
 import androidx.annotation.RequiresApi;
 
@@ -108,6 +109,7 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
         break;
       case "clearAllAuthCredentials":
         credentialDatabase.clearAllAuthCredentials();
+        WebViewDatabase.getInstance(Shared.applicationContext).clearHttpAuthUsernamePassword();
         result.success(true);
         break;
       default:

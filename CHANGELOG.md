@@ -18,6 +18,9 @@
 - Fixed error caused by `pauseTimers` on iOS when the WebView has been disposed
 - Fixed `ignoresViewportScaleLimits`, `dataDetectorTypes`, `suppressesIncrementalRendering`, `selectionGranularity` iOS-specific option when used in `initialOptions`
 - Fixed `getFavicons` method
+- Fixed `HttpAuthCredentialDatabase.removeHttpAuthCredential` on Android
+- Fixed some cases where `takeScreenshot` was not working on Android
+- Fixed `After upgrade to Android embedding V2, still get Shared.activity is null / NullPointerException on android.content.Context.getResources()` [#390](https://github.com/pichillilorenzo/flutter_inappwebview/issues/390)
 
 ### BREAKING CHANGES
 
@@ -27,6 +30,7 @@
 - `builtInZoomControls` android webview options changed default value to `true`
 - Updated `ServerTrustChallenge` class used by the `onReceivedServerTrustAuthRequest` event
 - The method `getOptions` could return null now
+- Updated `HttpAuthCredentialDatabase.getAllAuthCredentials` method return type
 
 ## 3.3.0+3
 

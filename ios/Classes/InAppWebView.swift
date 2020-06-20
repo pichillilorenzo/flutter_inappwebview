@@ -2962,4 +2962,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     deinit {
         print("InAppWebView - dealloc")
     }
+    
+//    var accessoryView: UIView?
+//
+//    // https://stackoverflow.com/a/58001395/4637638
+//    public override var inputAccessoryView: UIView? {
+//        // remove/replace the default accessory view
+//        return accessoryView
+//    }
 }

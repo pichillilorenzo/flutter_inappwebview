@@ -495,7 +495,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `useOnDownloadStart`: Set to `true` to be able to listen at the `onDownloadStart` event. The default value is `false`.
 * `useShouldInterceptAjaxRequest`: Set to `true` to be able to listen at the `shouldInterceptAjaxRequest` event. The default value is `false`.
 * `useShouldInterceptFetchRequest`: Set to `true` to be able to listen at the `shouldInterceptFetchRequest` event. The default value is `false`.
-* `clearCache`: Set to `true` to have all the browser's cache cleared before the new window is opened. The default value is `false`.
+* `clearCache`: Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
 * `userAgent`: Sets the user-agent for the WebView.
 * `applicationNameForUserAgent`: Append to the existing user-agent. Setting userAgent will override this.
 * `javaScriptEnabled`: Set to `true` to enable JavaScript. The default value is `true`.

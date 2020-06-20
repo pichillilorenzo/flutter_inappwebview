@@ -31,26 +31,30 @@ class HttpAuthCredentialDatabase {
   ///Gets a map list of all HTTP auth credentials saved.
   ///Each map contains the key `protectionSpace` of type [ProtectionSpace]
   ///and the key `credentials` of type `List<HttpAuthCredential>` that contains all the HTTP auth credentials saved for that `protectionSpace`.
-  Future<List<Map<String, dynamic>>> getAllAuthCredentials() async {
+  Future<List<ProtectionSpaceHttpAuthCredentials>> getAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
     List<dynamic> allCredentials =
         await _channel.invokeMethod('getAllAuthCredentials', args);
-    List<Map<String, dynamic>> result = [];
+
+    List<ProtectionSpaceHttpAuthCredentials> result = [];
+
     for (Map<dynamic, dynamic> map in allCredentials) {
       Map<dynamic, dynamic> protectionSpace = map["protectionSpace"];
       List<dynamic> credentials = map["credentials"];
-      result.add({
-        "protectionSpace": ProtectionSpace(
-            host: protectionSpace["host"],
-            protocol: protectionSpace["protocol"],
-            realm: protectionSpace["realm"],
-            port: protectionSpace["port"]),
-        "credentials": credentials
-            .map((credential) => HttpAuthCredential(
-                username: credential["username"],
-                password: credential["password"]))
-            .toList()
-      });
+      result.add(
+          ProtectionSpaceHttpAuthCredentials(
+              protectionSpace: ProtectionSpace(
+                  host: protectionSpace["host"],
+                  protocol: protectionSpace["protocol"],
+                  realm: protectionSpace["realm"],
+                  port: protectionSpace["port"]),
+              credentials: credentials
+                  .map((credential) => HttpAuthCredential(
+                  username: credential["username"],
+                  password: credential["password"]))
+                  .toList()
+          )
+      );
     }
     return result;
   }

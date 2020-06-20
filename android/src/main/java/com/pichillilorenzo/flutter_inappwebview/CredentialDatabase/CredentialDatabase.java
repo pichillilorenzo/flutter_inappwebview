@@ -57,7 +57,8 @@ public class CredentialDatabase {
   public void removeHttpAuthCredential(String host, String protocol, String realm, Integer port, String username, String password) {
     ProtectionSpace protectionSpace = protectionSpaceDao.find(host, protocol, realm, port);
     if (protectionSpace != null) {
-      credentialDao.find(username, password, protectionSpace.id);
+      Credential credential = credentialDao.find(username, password, protectionSpace.id);
+      credentialDao.delete(credential);
     }
   }
 

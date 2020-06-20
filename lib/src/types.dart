@@ -874,8 +874,13 @@ class HttpAuthCredential {
   }
 }
 
+///Class that represents a [ProtectionSpace] with all of its [HttpAuthCredential]s.
+///It used by [HttpAuthCredentialDatabase.getAllAuthCredentials].
 class ProtectionSpaceHttpAuthCredentials {
+  ///The protection space.
   ProtectionSpace protectionSpace;
+
+  ///The list of all its http authentication credentials.
   List<HttpAuthCredential> credentials;
 
   ProtectionSpaceHttpAuthCredentials({this.protectionSpace, this.credentials});

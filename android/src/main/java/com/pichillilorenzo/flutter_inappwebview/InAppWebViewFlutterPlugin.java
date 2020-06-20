@@ -35,8 +35,6 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public InAppWebViewFlutterPlugin() {}
 
   public static void registerWith(PluginRegistry.Registrar registrar) {
-    Log.d(LOG_TAG, "\n\n\nregisterWith\n\n\n");
-
     final InAppWebViewFlutterPlugin instance = new InAppWebViewFlutterPlugin();
     Shared.registrar = registrar;
     instance.onAttachedToEngine(

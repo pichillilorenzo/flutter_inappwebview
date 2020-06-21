@@ -419,7 +419,7 @@ Screenshots:
 
 `InAppWebViewController.webStorage` provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API):
 * `WebStorage.localStorage`: provides access to `window.localStorage`;
-* `WebStorage.sessionStorage`: provides access to `window.localStorage`.
+* `WebStorage.sessionStorage`: provides access to `window.sessionStorage`.
 
 Methods available:
 * `length`: Returns an integer representing the number of data items stored in the Storage object.

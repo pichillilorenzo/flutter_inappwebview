@@ -8,7 +8,7 @@
 - Added `animated` option to `scrollTo` and `scrollBy` webview methods
 - Added error and message to the `ServerTrustChallenge` class for iOS (class used by the `onReceivedServerTrustAuthRequest` event)
 - Added `contentInsetAdjustmentBehavior` webview iOS-specific option
-- Added `copy` methods for webview class options
+- Added `copy` methods for webview options class
 - Added `SslCertificate` class and `X509Certificate` class and parser
 - Added `values` property for all the custom Enums
 - Updated Android workaround to hide the Keyboard when the user click outside on something not focusable such as input or a textarea.

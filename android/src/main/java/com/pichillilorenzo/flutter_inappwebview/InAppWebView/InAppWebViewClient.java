@@ -253,7 +253,9 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-    super.onReceivedError(view, errorCode, description, failingUrl);
+//    // Used to show instantly a custom error page
+//    view.stopLoading();
+//    view.loadUrl("about:blank");
 
     ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = false;
     previousAuthRequestFailureCount = 0;
@@ -266,6 +268,8 @@ public class InAppWebViewClient extends WebViewClient {
     obj.put("code", errorCode);
     obj.put("message", description);
     channel.invokeMethod("onLoadError", obj);
+
+    super.onReceivedError(view, errorCode, description, failingUrl);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.M)

@@ -16,7 +16,8 @@ class KeyUsage {
   ].toSet();
 
   static KeyUsage fromIndex(int value) {
-    return KeyUsage.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+    return KeyUsage.values.firstWhere((element) => element.toValue() == value,
+        orElse: () => null);
   }
 
   int toValue() => _value;

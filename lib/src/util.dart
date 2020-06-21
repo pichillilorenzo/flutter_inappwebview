@@ -15,7 +15,6 @@ class Util {
     } else if (colorValue.startsWith("hlsa(")) {
       return Util.getColorFromHlsaString(colorValue);
     } else {
-
       /**
         This part of the code is generated using the JavaScript code below on this link: https://drafts.csswg.org/css-color/#typedef-color
 
@@ -33,7 +32,7 @@ class Util {
         code += '}';
       */
 
-      switch(colorValue) {
+      switch (colorValue) {
         case "aliceblue":
           return Util.getColorFromHex("#f0f8ff");
         case "antiquewhite":
@@ -337,8 +336,10 @@ class Util {
 
   static Color getColorFromHex(String hexString) {
     hexString = hexString.trim();
-    if (hexString.length == 4) { // convert for example #f00 to #ff0000
-      hexString = "#" + (hexString[1] * 2) + (hexString[2] * 2) + (hexString[3] * 2);
+    if (hexString.length == 4) {
+      // convert for example #f00 to #ff0000
+      hexString =
+          "#" + (hexString[1] * 2) + (hexString[2] * 2) + (hexString[3] * 2);
     }
     final buffer = StringBuffer();
     if (hexString.length == 6 || hexString.length == 7) buffer.write('ff');
@@ -363,7 +364,8 @@ class Util {
         .split(",")
         .map((rbgValue) => rbgValue.trim())
         .toList();
-    return Color.fromRGBO(int.parse(rgbaValues[0]), int.parse(rgbaValues[1]), int.parse(rgbaValues[2]), double.parse(rgbaValues[3]));
+    return Color.fromRGBO(int.parse(rgbaValues[0]), int.parse(rgbaValues[1]),
+        int.parse(rgbaValues[2]), double.parse(rgbaValues[3]));
   }
 
   static Color getColorFromHlsString(String hlsString) {
@@ -385,10 +387,11 @@ class Util {
         .map((rbgValue) => double.parse(rbgValue.trim()))
         .toList();
     var rgbaValues = hslToRgb(hlsaValues[0], hlsaValues[1], hlsaValues[2]);
-    return Color.fromRGBO(rgbaValues[0], rgbaValues[1], rgbaValues[2], hlsaValues[3]);
+    return Color.fromRGBO(
+        rgbaValues[0], rgbaValues[1], rgbaValues[2], hlsaValues[3]);
   }
 
-  static List<num> hslToRgb(double h, double s, double l){
+  static List<num> hslToRgb(double h, double s, double l) {
     double r, g, b;
 
     if (s == 0) {
@@ -396,30 +399,25 @@ class Util {
     } else {
       double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
       double p = 2 * l - q;
-      r = hueToRgb(p, q, h + 1/3);
+      r = hueToRgb(p, q, h + 1 / 3);
       g = hueToRgb(p, q, h);
-      b = hueToRgb(p, q, h - 1/3);
+      b = hueToRgb(p, q, h - 1 / 3);
     }
     var rgb = [to255(r), to255(g), to255(b)];
     return rgb;
   }
 
   static num to255(double v) {
-    return min(255, 256*v);
+    return min(255, 256 * v);
   }
 
   /// Helper method that converts hue to rgb
   static double hueToRgb(double p, double q, double t) {
-    if (t < 0)
-      t += 1;
-    if (t > 1)
-      t -= 1;
-    if (t < 1/6)
-      return p + (q - p) * 6 * t;
-    if (t < 1/2)
-      return q;
-    if (t < 2/3)
-      return p + (q - p) * (2/3 - t) * 6;
+    if (t < 0) t += 1;
+    if (t > 1) t -= 1;
+    if (t < 1 / 6) return p + (q - p) * 6 * t;
+    if (t < 1 / 2) return q;
+    if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
     return p;
   }
 }

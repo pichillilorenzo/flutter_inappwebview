@@ -291,7 +291,7 @@ class _InAppWebViewState extends State<InAppWebView> {
       if (gestureRecognizers == null) {
         gestureRecognizers = <Factory<OneSequenceGestureRecognizer>>[
           Factory<OneSequenceGestureRecognizer>(
-                () => EagerGestureRecognizer(),
+            () => EagerGestureRecognizer(),
           ),
         ].toSet();
       }

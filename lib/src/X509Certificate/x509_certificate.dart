@@ -322,7 +322,11 @@ class X509Certificate {
   ///Gets the certificate constraints path length from the
   ///critical BasicConstraints extension, (OID = 2.5.29.19).
   int get basicConstraints {
-    var sub = extensionObject(oid: OID.basicConstraints)?.block?.lastSub()?.lastSub()?.lastSub();
+    var sub = extensionObject(oid: OID.basicConstraints)
+        ?.block
+        ?.lastSub()
+        ?.lastSub()
+        ?.lastSub();
     if (sub != null) {
       if (sub.value is List<int>) {
         return (sub.value as List<int>).length;
@@ -333,31 +337,60 @@ class X509Certificate {
 
   ///Gets the raw bits from the Subject Key Identifier (SKID) extension, (OID = 2.5.29.14).
   List<int> get subjectKeyIdentifier =>
-      extensionObject(oid: OID.subjectKeyIdentifier)?.block?.lastSub()?.lastSub()?.value ?? <int>[];
+      extensionObject(oid: OID.subjectKeyIdentifier)
+          ?.block
+          ?.lastSub()
+          ?.lastSub()
+          ?.value ??
+      <int>[];
 
   ///Gets the raw bits from the Authority Key Identifier extension, (OID = 2.5.29.35).
   List<int> get authorityKeyIdentifier =>
-      extensionObject(oid: OID.authorityKeyIdentifier)?.block?.lastSub()?.lastSub()?.firstSub()?.value ?? <int>[];
+      extensionObject(oid: OID.authorityKeyIdentifier)
+          ?.block
+          ?.lastSub()
+          ?.lastSub()
+          ?.firstSub()
+          ?.value ??
+      <int>[];
 
   ///Gets the list of certificate policies from the CertificatePolicies extension, (OID = 2.5.29.32).
   List<String> get certificatePolicies =>
-      extensionObject(oid: OID.certificatePolicies)?.block?.lastSub()?.firstSub()?.sub?.map((e) => e.firstSub()?.value as String)?.toList() ?? <String>[];
+      extensionObject(oid: OID.certificatePolicies)
+          ?.block
+          ?.lastSub()
+          ?.firstSub()
+          ?.sub
+          ?.map((e) => e.firstSub()?.value as String)
+          ?.toList() ??
+      <String>[];
 
   ///Gets the list of CRL distribution points from the CRLDistributionPoints extension, (OID = 2.5.29.31).
   List<String> get cRLDistributionPoints =>
-      extensionObject(oid: OID.cRLDistributionPoints)?.block?.lastSub()?.firstSub()?.sub?.map((e) => e.firstSub()?.firstSub()?.firstSub()?.value as String)?.toList() ?? <String>[];
+      extensionObject(oid: OID.cRLDistributionPoints)
+          ?.block
+          ?.lastSub()
+          ?.firstSub()
+          ?.sub
+          ?.map((e) => e.firstSub()?.firstSub()?.firstSub()?.value as String)
+          ?.toList() ??
+      <String>[];
 
   ///Gets the map of the format (as a key) and location (as a value) of additional information
   ///about the CA who issued the certificate in which this extension appears
   ///from the AuthorityInfoAccess extension, (OID = 1.3.6.1.5.5.5.7.1.1).
   Map<String, String> get authorityInfoAccess {
     var result = <String, String>{};
-    var sub = extensionObject(oid: OID.authorityInfoAccess)?.block?.lastSub()?.firstSub()?.sub;
+    var sub = extensionObject(oid: OID.authorityInfoAccess)
+        ?.block
+        ?.lastSub()
+        ?.firstSub()
+        ?.sub;
     if (sub != null) {
       sub.forEach((element) {
         if (element.subCount() > 1) {
-          result.putIfAbsent(element.subAtIndex(0).value,
-              () => element.subAtIndex(1).value);
+          result.putIfAbsent(
+              element.subAtIndex(0).value, () => element.subAtIndex(1).value);
         }
       });
     }
@@ -413,8 +446,6 @@ class X509Certificate {
             result += quote;
           }
         }
-
-
       }
     }
     return result;

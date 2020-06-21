@@ -21,7 +21,6 @@ class ASN1DERDecoder {
       asn1obj.identifier = ASN1Identifier(nextValue);
 
       if (asn1obj.identifier.isConstructed()) {
-
         var contentData = loadSubContent(iterator: iterator);
 
         if (contentData.isEmpty) {
@@ -39,9 +38,7 @@ class ASN1DERDecoder {
           item.parent = asn1obj;
         }
       } else {
-
         if (asn1obj.identifier.typeClass() == ASN1IdentifierClass.UNIVERSAL) {
-
           var contentData = loadSubContent(iterator: iterator);
 
           asn1obj.encoded = Uint8List.fromList(contentData);
@@ -52,75 +49,62 @@ class ASN1DERDecoder {
 
           if (tagNumber == ASN1IdentifierTagNumber.END_OF_CONTENT) {
             return result;
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.BOOLEAN) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.BOOLEAN) {
             var value = contentData.length > 0 ? contentData.first : null;
             if (value != null) {
               asn1obj.value = value > 0 ? true : false;
             }
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.INTEGER) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.INTEGER) {
             while (contentData.length > 0 && contentData.first == 0) {
               contentData.removeAt(0); // remove not significant digit
             }
             asn1obj.value = contentData;
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.NULL) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.NULL) {
             asn1obj.value = null;
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
             asn1obj.value = decodeOid(contentData: contentData);
-          }
-          else if ([
+          } else if ([
             ASN1IdentifierTagNumber.UTF8_STRING,
             ASN1IdentifierTagNumber.PRINTABLE_STRING,
             ASN1IdentifierTagNumber.NUMERIC_STRING,
             ASN1IdentifierTagNumber.GENERAL_STRING,
             ASN1IdentifierTagNumber.UNIVERSAL_STRING,
             ASN1IdentifierTagNumber.CHARACTER_STRING,
-            ASN1IdentifierTagNumber.T61_STRING].contains(tagNumber)) {
+            ASN1IdentifierTagNumber.T61_STRING
+          ].contains(tagNumber)) {
             asn1obj.value = utf8.decode(contentData, allowMalformed: true);
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.BMP_STRING) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.BMP_STRING) {
             asn1obj.value = String.fromCharCodes(contentData);
-          }
-          else if ([
+          } else if ([
             ASN1IdentifierTagNumber.VISIBLE_STRING,
             ASN1IdentifierTagNumber.IA5_STRING
           ].contains(tagNumber)) {
             asn1obj.value = ascii.decode(contentData, allowInvalid: true);
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.UTC_TIME) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.UTC_TIME) {
             asn1obj.value = utcTimeToDate(contentData: contentData);
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.GENERALIZED_TIME) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.GENERALIZED_TIME) {
             asn1obj.value = generalizedTimeToDate(contentData: contentData);
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.BIT_STRING) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.BIT_STRING) {
             if (contentData.length > 0) {
               contentData.removeAt(0); // unused bits
             }
             asn1obj.value = contentData;
-          }
-          else if (tagNumber == ASN1IdentifierTagNumber.OCTET_STRING) {
+          } else if (tagNumber == ASN1IdentifierTagNumber.OCTET_STRING) {
             try {
               var subIterator = contentData.iterator;
               asn1obj.sub = parse(iterator: subIterator);
             } catch (e) {
-
               var str;
               try {
                 str = utf8.decode(contentData);
-              } catch(e) {}
+              } catch (e) {}
               if (str != null) {
                 asn1obj.value = str;
               } else {
                 asn1obj.value = contentData;
               }
-
             }
-          }
-          else {
+          } else {
             // print("unsupported tag: ${asn1obj.identifier.tagNumber()}");
             asn1obj.value = contentData;
           }
@@ -132,7 +116,7 @@ class ASN1DERDecoder {
           var str;
           try {
             str = utf8.decode(contentData);
-          } catch(e) {}
+          } catch (e) {}
           if (str != null) {
             asn1obj.value = str;
           } else {
@@ -150,8 +134,8 @@ class ASN1DERDecoder {
     if (iterator.moveNext()) {
       var first = iterator.current;
       if (first != null) {
-
-        if ((first & 0x80) != 0) { // long
+        if ((first & 0x80) != 0) {
+          // long
 
           var octetsToRead = first - 0x80;
           var data = <int>[];
@@ -165,11 +149,10 @@ class ASN1DERDecoder {
           }
 
           return toIntValue(data) ?? BigInt.from(0);
-
-        } else { // short
+        } else {
+          // short
           return BigInt.from(first);
         }
-
       }
     }
     return BigInt.from(0);
@@ -251,7 +234,7 @@ class ASN1DERDecoder {
     String utc;
     try {
       utc = utf8.decode(contentData);
-    } catch(e) {}
+    } catch (e) {}
     if (utc == null) {
       return null;
     }
@@ -268,36 +251,30 @@ class ASN1DERDecoder {
     int end;
     String c;
     // not just YYMMDDhhmmZ
-    if(utc.length > 11) {
+    if (utc.length > 11) {
       // get character after minutes
       c = utc[10];
       end = 10;
 
       // see if seconds are present
-      if(c != '+' && c != '-') {
+      if (c != '+' && c != '-') {
         // get seconds
         ss = int.parse(utc.substring(10, 12), radix: 10);
         end += 2;
       }
     }
 
-    var date = DateTime.utc(
-      year,
-      MM,
-      DD,
-      hh,
-      mm,
-      ss,
-      0
-    );
+    var date = DateTime.utc(year, MM, DD, hh, mm, ss, 0);
 
-    if(end != null) {
+    if (end != null) {
       // get +/- after end of time
       c = utc[end];
-      if(c == '+' || c == '-') {
+      if (c == '+' || c == '-') {
         // get hours+minutes offset
-        var hhoffset = int.parse(utc.substring(end + 1, end + 1 + 2), radix: 10);
-        var mmoffset = int.parse(utc.substring(end + 4, end + 4 + 2), radix: 10);
+        var hhoffset =
+            int.parse(utc.substring(end + 1, end + 1 + 2), radix: 10);
+        var mmoffset =
+            int.parse(utc.substring(end + 4, end + 4 + 2), radix: 10);
 
         // calculate offset in milliseconds
         var offset = hhoffset * 60 + mmoffset;
@@ -305,7 +282,7 @@ class ASN1DERDecoder {
 
         var offsetDuration = Duration(milliseconds: offset);
         // apply offset
-        if(c == '+') {
+        if (c == '+') {
           date.subtract(offsetDuration);
         } else {
           date.add(offsetDuration);
@@ -345,7 +322,7 @@ class ASN1DERDecoder {
     String gentime;
     try {
       gentime = utf8.decode(contentData);
-    } catch(e) {}
+    } catch (e) {}
     if (gentime == null) {
       return null;
     }
@@ -362,23 +339,25 @@ class ASN1DERDecoder {
     var offset = 0;
     var isUTC = false;
 
-    if(gentime[gentime.length - 1] == 'Z') {
+    if (gentime[gentime.length - 1] == 'Z') {
       isUTC = true;
     }
 
     var end = gentime.length - 5;
     var c = gentime[end];
-    if(c == '+' || c == '-') {
+    if (c == '+' || c == '-') {
       // get hours+minutes offset
-      var hhoffset = int.parse(gentime.substring(end + 1, end + 1 + 2), radix: 10);
-      var mmoffset = int.parse(gentime.substring(end + 4, end + 4 + 2), radix: 10);
+      var hhoffset =
+          int.parse(gentime.substring(end + 1, end + 1 + 2), radix: 10);
+      var mmoffset =
+          int.parse(gentime.substring(end + 4, end + 4 + 2), radix: 10);
 
       // calculate offset in milliseconds
       offset = hhoffset * 60 + mmoffset;
       offset *= 60000;
 
       // apply offset
-      if(c == '+') {
+      if (c == '+') {
         offset *= -1;
       }
 
@@ -386,25 +365,16 @@ class ASN1DERDecoder {
     }
 
     // check for second fraction
-    if(gentime[14] == '.') {
+    if (gentime[14] == '.') {
       fff = double.parse(gentime.substring(14)) * 1000;
     }
 
-    var date = DateTime.utc(
-        YYYY,
-        MM,
-        DD,
-        hh,
-        mm,
-        ss,
-        fff.toInt()
-    );
+    var date = DateTime.utc(YYYY, MM, DD, hh, mm, ss, fff.toInt());
 
-    if(isUTC) {
+    if (isUTC) {
       var offsetDuration = Duration(milliseconds: offset);
       date.add(offsetDuration);
     }
-
 
     return date;
   }
@@ -418,15 +388,11 @@ BigInt toIntValue(List<int> data) {
   BigInt value = BigInt.from(0);
   for (var index = 0; index < data.length; index++) {
     var byte = data[index];
-    value += BigInt.from(byte << 8*(data.length-index-1));
+    value += BigInt.from(byte << 8 * (data.length - index - 1));
   }
   return value;
 }
 
-class ASN1OutOfBufferError extends Error {
+class ASN1OutOfBufferError extends Error {}
 
-}
-
-class ASN1ParseError extends Error {
-
-}
+class ASN1ParseError extends Error {}

@@ -838,7 +838,8 @@ class IOSInAppWebViewOptions
       this.isPagingEnabled = false,
       this.maximumZoomScale = 1.0,
       this.minimumZoomScale = 1.0,
-      this.contentInsetAdjustmentBehavior = IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER});
+      this.contentInsetAdjustmentBehavior =
+          IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER});
 
   @override
   Map<String, dynamic> toMap() {

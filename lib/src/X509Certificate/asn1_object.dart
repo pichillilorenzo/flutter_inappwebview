@@ -46,12 +46,12 @@ class ASN1Object {
   ASN1Object findOid({OID oid, String oidValue}) {
     oidValue = oid != null ? oid.toValue() : oidValue;
     for (var child in (sub ?? <ASN1Object>[])) {
-      if (child.identifier?.tagNumber() == ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
+      if (child.identifier?.tagNumber() ==
+          ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
         if (child.value == oidValue) {
           return child;
         }
-      }
-      else {
+      } else {
         var result = child.findOid(oidValue: oidValue);
         if (result != null) {
           return result;
@@ -66,22 +66,23 @@ class ASN1Object {
   }
 
   String printAsn1({insets = ""}) {
-      var output = insets;
-      output += identifier?.description?.toUpperCase() ?? "";
-      output += (value != null ? ": $value" : "");
-      if (identifier?.typeClass() == ASN1IdentifierClass.UNIVERSAL && identifier?.tagNumber() == ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
-        var descr = OID.fromValue(value?.toString() ?? "")?.name();
-        if (descr != null) {
-          output += " ($descr)";
-        }
+    var output = insets;
+    output += identifier?.description?.toUpperCase() ?? "";
+    output += (value != null ? ": $value" : "");
+    if (identifier?.typeClass() == ASN1IdentifierClass.UNIVERSAL &&
+        identifier?.tagNumber() == ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
+      var descr = OID.fromValue(value?.toString() ?? "")?.name();
+      if (descr != null) {
+        output += " ($descr)";
       }
-      output += sub != null && sub.length > 0 ? " {" : "";
-      output += "\n";
-      for (var item in (sub ?? <ASN1Object>[])) {
-        output += item.printAsn1(insets: insets + "    ");
-      }
-      output += sub != null && sub.length > 0 ? "}\n" : "";
-      return output;
+    }
+    output += sub != null && sub.length > 0 ? " {" : "";
+    output += "\n";
+    for (var item in (sub ?? <ASN1Object>[])) {
+      output += item.printAsn1(insets: insets + "    ");
+    }
+    output += sub != null && sub.length > 0 ? "}\n" : "";
+    return output;
   }
 
   @override

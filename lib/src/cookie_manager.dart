@@ -84,7 +84,8 @@ class CookieManager {
           expiresDate: cookieListMap[i]["expiresDate"],
           isSessionOnly: cookieListMap[i]["isSessionOnly"],
           domain: cookieListMap[i]["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieListMap[i]["sameSite"]),
+          sameSite:
+              HTTPCookieSameSitePolicy.fromValue(cookieListMap[i]["sameSite"]),
           isSecure: cookieListMap[i]["isSecure"],
           isHttpOnly: cookieListMap[i]["isHttpOnly"],
           path: cookieListMap[i]["path"]));
@@ -111,7 +112,8 @@ class CookieManager {
             expiresDate: cookies[i]["expiresDate"],
             isSessionOnly: cookies[i]["isSessionOnly"],
             domain: cookies[i]["domain"],
-            sameSite: HTTPCookieSameSitePolicy.fromValue(cookies[i]["sameSite"]),
+            sameSite:
+                HTTPCookieSameSitePolicy.fromValue(cookies[i]["sameSite"]),
             isSecure: cookies[i]["isSecure"],
             isHttpOnly: cookies[i]["isHttpOnly"],
             path: cookies[i]["path"]);

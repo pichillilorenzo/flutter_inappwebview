@@ -69,7 +69,8 @@ class InAppWebViewController {
     this._webview = webview;
     this.android = AndroidInAppWebViewController(this);
     this.ios = IOSInAppWebViewController(this);
-    this.webStorage = WebStorage(localStorage: LocalStorage(this), sessionStorage: SessionStorage(this));
+    this.webStorage = WebStorage(
+        localStorage: LocalStorage(this), sessionStorage: SessionStorage(this));
   }
 
   InAppWebViewController.fromInAppBrowser(
@@ -369,29 +370,45 @@ class InAppWebViewController {
         int androidError = call.arguments["androidError"];
         int iosError = call.arguments["iosError"];
         String message = call.arguments["message"];
-        Map<String, dynamic> sslCertificateMap = call.arguments["sslCertificate"]?.cast<String, dynamic>();
+        Map<String, dynamic> sslCertificateMap =
+            call.arguments["sslCertificate"]?.cast<String, dynamic>();
 
         SslCertificate sslCertificate;
         if (sslCertificateMap != null) {
           if (Platform.isIOS) {
             try {
-              X509Certificate x509certificate = X509Certificate.fromData(data: sslCertificateMap["x509Certificate"]);
+              X509Certificate x509certificate = X509Certificate.fromData(
+                  data: sslCertificateMap["x509Certificate"]);
               sslCertificate = SslCertificate(
                 issuedBy: SslCertificateDName(
-                    CName: x509certificate.issuer(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                    CName: x509certificate.issuer(
+                            dn: ASN1DistinguishedNames.COMMON_NAME) ??
+                        "",
                     DName: x509certificate.issuerDistinguishedName ?? "",
-                    OName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
-                    UName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+                    OName: x509certificate.issuer(
+                            dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
+                        "",
+                    UName: x509certificate.issuer(
+                            dn: ASN1DistinguishedNames
+                                .ORGANIZATIONAL_UNIT_NAME) ??
+                        ""),
                 issuedTo: SslCertificateDName(
-                    CName: x509certificate.subject(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                    CName: x509certificate.subject(
+                            dn: ASN1DistinguishedNames.COMMON_NAME) ??
+                        "",
                     DName: x509certificate.subjectDistinguishedName ?? "",
-                    OName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
-                    UName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+                    OName: x509certificate.subject(
+                            dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
+                        "",
+                    UName: x509certificate.subject(
+                            dn: ASN1DistinguishedNames
+                                .ORGANIZATIONAL_UNIT_NAME) ??
+                        ""),
                 validNotAfterDate: x509certificate.notAfter,
                 validNotBeforeDate: x509certificate.notBefore,
                 x509Certificate: x509certificate,
               );
-            } catch(e, stacktrace) {
+            } catch (e, stacktrace) {
               print(e);
               print(stacktrace);
               return null;
@@ -401,8 +418,11 @@ class InAppWebViewController {
           }
         }
 
-        AndroidSslError androidSslError = androidError != null ? AndroidSslError.fromValue(androidError) : null;
-        IOSSslError iosSslError = iosError != null ? IOSSslError.fromValue(iosError) : null;
+        AndroidSslError androidSslError = androidError != null
+            ? AndroidSslError.fromValue(androidError)
+            : null;
+        IOSSslError iosSslError =
+            iosError != null ? IOSSslError.fromValue(iosError) : null;
 
         var protectionSpace = ProtectionSpace(
             host: host, protocol: protocol, realm: realm, port: port);
@@ -884,8 +904,7 @@ class InAppWebViewController {
 
     InAppWebViewGroupOptions options = await getOptions();
     if (options != null && options.crossPlatform.javaScriptEnabled == true) {
-      List<Map<dynamic, dynamic>> links = (await evaluateJavascript(
-          source: """
+      List<Map<dynamic, dynamic>> links = (await evaluateJavascript(source: """
 (function() {
   var linkNodes = document.head.getElementsByTagName("link");
   var links = [];
@@ -920,8 +939,8 @@ class InAppWebViewController {
               manifestUrl = manifestUrl.substring(1);
             }
             manifestUrl = ((assetPathBase == null)
-                ? url.scheme + "://" + url.host + "/"
-                : assetPathBase) +
+                    ? url.scheme + "://" + url.host + "/"
+                    : assetPathBase) +
                 manifestUrl;
           }
           continue;
@@ -1466,7 +1485,8 @@ class InAppWebViewController {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
-  Future<void> scrollTo({@required int x, @required int y, bool animated = false}) async {
+  Future<void> scrollTo(
+      {@required int x, @required int y, bool animated = false}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
@@ -1485,7 +1505,8 @@ class InAppWebViewController {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
-  Future<void> scrollBy({@required int x, @required int y, bool animated = false}) async {
+  Future<void> scrollBy(
+      {@required int x, @required int y, bool animated = false}) async {
     assert(x != null && y != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('x', () => x);
@@ -1544,7 +1565,8 @@ class InAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale
   Future<void> zoomBy(double zoomFactor) async {
-    assert(!Platform.isAndroid || (Platform.isAndroid && zoomFactor > 0.01 && zoomFactor <= 100.0));
+    assert(!Platform.isAndroid ||
+        (Platform.isAndroid && zoomFactor > 0.01 && zoomFactor <= 100.0));
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
@@ -1611,12 +1633,15 @@ class InAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#requestFocusNodeHref(android.os.Message)
   Future<RequestFocusNodeHrefResult> requestFocusNodeHref() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<dynamic, dynamic> result = await _channel.invokeMethod('requestFocusNodeHref', args);
-    return result != null ? RequestFocusNodeHrefResult(
-      url: result['url'],
-      title: result['title'],
-      src: result['src'],
-    ) : null;
+    Map<dynamic, dynamic> result =
+        await _channel.invokeMethod('requestFocusNodeHref', args);
+    return result != null
+        ? RequestFocusNodeHrefResult(
+            url: result['url'],
+            title: result['title'],
+            src: result['src'],
+          )
+        : null;
   }
 
   ///Requests the URL of the image last touched by the user.
@@ -1626,10 +1651,13 @@ class InAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#requestImageRef(android.os.Message)
   Future<RequestImageRefResult> requestImageRef() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<dynamic, dynamic> result = await _channel.invokeMethod('requestImageRef', args);
-    return result != null ? RequestImageRefResult(
-      url: result['url'],
-    ) : null;
+    Map<dynamic, dynamic> result =
+        await _channel.invokeMethod('requestImageRef', args);
+    return result != null
+        ? RequestImageRefResult(
+            url: result['url'],
+          )
+        : null;
   }
 
   ///Returns the list of `<meta>` tags of the current WebView.
@@ -1638,7 +1666,8 @@ class InAppWebViewController {
   Future<List<MetaTag>> getMetaTags() async {
     List<MetaTag> metaTags = [];
 
-    List<Map<dynamic, dynamic>> metaTagList = (await evaluateJavascript(source: """
+    List<Map<dynamic, dynamic>> metaTagList =
+        (await evaluateJavascript(source: """
 (function() {
   var metaTags = [];
   var metaTagNodes = document.head.getElementsByTagName('meta');
@@ -1682,14 +1711,12 @@ class InAppWebViewController {
       var attrs = <MetaTagAttribute>[];
 
       for (var metaTagAttr in metaTag["attrs"]) {
-        attrs.add(
-          MetaTagAttribute(name: metaTagAttr["name"], value: metaTagAttr["value"])
-        );
+        attrs.add(MetaTagAttribute(
+            name: metaTagAttr["name"], value: metaTagAttr["value"]));
       }
 
-      metaTags.add(
-        MetaTag(name: metaTag["name"], content: metaTag["content"], attrs: attrs)
-      );
+      metaTags.add(MetaTag(
+          name: metaTag["name"], content: metaTag["content"], attrs: attrs));
     }
 
     return metaTags;
@@ -1743,28 +1770,43 @@ class InAppWebViewController {
   Future<SslCertificate> getCertificate() async {
     Map<String, dynamic> args = <String, dynamic>{};
 
-    Map<String, dynamic> sslCertificateMap = (await _channel.invokeMethod('getCertificate', args))?.cast<String, dynamic>();
+    Map<String, dynamic> sslCertificateMap =
+        (await _channel.invokeMethod('getCertificate', args))
+            ?.cast<String, dynamic>();
 
     if (sslCertificateMap != null) {
       if (Platform.isIOS) {
         try {
-          X509Certificate x509certificate = X509Certificate.fromData(data: sslCertificateMap["x509Certificate"]);
+          X509Certificate x509certificate = X509Certificate.fromData(
+              data: sslCertificateMap["x509Certificate"]);
           return SslCertificate(
             issuedBy: SslCertificateDName(
-                CName: x509certificate.issuer(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                CName: x509certificate.issuer(
+                        dn: ASN1DistinguishedNames.COMMON_NAME) ??
+                    "",
                 DName: x509certificate.issuerDistinguishedName ?? "",
-                OName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
-                UName: x509certificate.issuer(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+                OName: x509certificate.issuer(
+                        dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
+                    "",
+                UName: x509certificate.issuer(
+                        dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
+                    ""),
             issuedTo: SslCertificateDName(
-                CName: x509certificate.subject(dn: ASN1DistinguishedNames.COMMON_NAME) ?? "",
+                CName: x509certificate.subject(
+                        dn: ASN1DistinguishedNames.COMMON_NAME) ??
+                    "",
                 DName: x509certificate.subjectDistinguishedName ?? "",
-                OName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ?? "",
-                UName: x509certificate.subject(dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ?? ""),
+                OName: x509certificate.subject(
+                        dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
+                    "",
+                UName: x509certificate.subject(
+                        dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
+                    ""),
             validNotAfterDate: x509certificate.notAfter,
             validNotBeforeDate: x509certificate.notBefore,
             x509Certificate: x509certificate,
           );
-        } catch(e, stacktrace) {
+        } catch (e, stacktrace) {
           print(e);
           print(stacktrace);
           return null;

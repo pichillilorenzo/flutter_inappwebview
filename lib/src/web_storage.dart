@@ -54,7 +54,7 @@ class Storage {
   Future<void> setItem({@required String key, @required dynamic value}) async {
     var encodedValue = json.encode(value);
     await _controller.evaluateJavascript(source: """
-    window.$webStorageType.setItem("$key", ${ value is String ? encodedValue : "JSON.stringify($encodedValue)" });
+    window.$webStorageType.setItem("$key", ${value is String ? encodedValue : "JSON.stringify($encodedValue)"});
     """);
   }
 
@@ -81,10 +81,10 @@ class Storage {
   }
 
   Future<List<WebStorageItem>> getItems() async {
-
     var webStorageItems = <WebStorageItem>[];
 
-    List<Map<dynamic, dynamic>> items = (await _controller.evaluateJavascript(source: """
+    List<Map<dynamic, dynamic>> items =
+        (await _controller.evaluateJavascript(source: """
 (function() {
   var webStorageItems = [];
   for(var i = 0; i < window.$webStorageType.length; i++){
@@ -105,9 +105,8 @@ class Storage {
     }
 
     for (var item in items) {
-      webStorageItems.add(
-          WebStorageItem(key: item["key"], value: item["value"])
-      );
+      webStorageItems
+          .add(WebStorageItem(key: item["key"], value: item["value"]));
     }
 
     return webStorageItems;
@@ -128,9 +127,11 @@ class Storage {
 }
 
 class LocalStorage extends Storage {
-  LocalStorage(InAppWebViewController controller) : super(controller, WebStorageType.LOCAL_STORAGE);
+  LocalStorage(InAppWebViewController controller)
+      : super(controller, WebStorageType.LOCAL_STORAGE);
 }
 
 class SessionStorage extends Storage {
-  SessionStorage(InAppWebViewController controller) : super(controller, WebStorageType.SESSION_STORAGE);
+  SessionStorage(InAppWebViewController controller)
+      : super(controller, WebStorageType.SESSION_STORAGE);
 }

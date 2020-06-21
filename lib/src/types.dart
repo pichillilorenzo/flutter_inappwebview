@@ -46,7 +46,9 @@ class ConsoleMessageLevel {
 
   static ConsoleMessageLevel fromValue(int value) {
     if (value != null)
-      return ConsoleMessageLevel.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return ConsoleMessageLevel.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -134,11 +136,12 @@ class InAppWebViewInitialData {
   ///The URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
   String historyUrl;
 
-  InAppWebViewInitialData({@required this.data,
-    this.mimeType = "text/html",
-    this.encoding = "utf8",
-    this.baseUrl = "about:blank",
-    this.historyUrl = "about:blank"});
+  InAppWebViewInitialData(
+      {@required this.data,
+      this.mimeType = "text/html",
+      this.encoding = "utf8",
+      this.baseUrl = "about:blank",
+      this.historyUrl = "about:blank"});
 
   Map<String, String> toMap() {
     return {
@@ -196,12 +199,13 @@ class WebResourceRequest {
   ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `false`.
   bool isRedirect;
 
-  WebResourceRequest({@required this.url,
-    this.headers,
-    this.method,
-    this.hasGesture,
-    this.isForMainFrame,
-    this.isRedirect});
+  WebResourceRequest(
+      {@required this.url,
+      this.headers,
+      this.method,
+      this.hasGesture,
+      this.isForMainFrame,
+      this.isRedirect});
 
   Map<String, dynamic> toMap() {
     return {
@@ -255,12 +259,13 @@ class WebResourceResponse {
   ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
   String reasonPhrase;
 
-  WebResourceResponse({this.contentType = "",
-    this.contentEncoding = "utf-8",
-    this.data,
-    this.headers,
-    this.statusCode,
-    this.reasonPhrase});
+  WebResourceResponse(
+      {this.contentType = "",
+      this.contentEncoding = "utf-8",
+      this.data,
+      this.headers,
+      this.statusCode,
+      this.reasonPhrase});
 
   Map<String, dynamic> toMap() {
     return {
@@ -294,9 +299,10 @@ class CustomSchemeResponse {
   ///Content-Enconding of the data, such as `utf-8`.
   String contentEnconding;
 
-  CustomSchemeResponse({@required this.data,
-    @required this.contentType,
-    this.contentEnconding = 'utf-8'});
+  CustomSchemeResponse(
+      {@required this.data,
+      @required this.contentType,
+      this.contentEnconding = 'utf-8'});
 
   Map<String, dynamic> toMap() {
     return {
@@ -463,10 +469,11 @@ class JsAlertResponse {
   ///Action used to confirm that the user hit confirm button.
   JsAlertResponseAction action;
 
-  JsAlertResponse({this.message = "",
-    this.handledByClient = false,
-    this.confirmButtonTitle = "",
-    this.action = JsAlertResponseAction.CONFIRM});
+  JsAlertResponse(
+      {this.message = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.action = JsAlertResponseAction.CONFIRM});
 
   Map<String, dynamic> toMap() {
     return {
@@ -521,11 +528,12 @@ class JsConfirmResponse {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsConfirmResponseAction action;
 
-  JsConfirmResponse({this.message = "",
-    this.handledByClient = false,
-    this.confirmButtonTitle = "",
-    this.cancelButtonTitle = "",
-    this.action = JsConfirmResponseAction.CANCEL});
+  JsConfirmResponse(
+      {this.message = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.action = JsConfirmResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
     return {
@@ -587,13 +595,14 @@ class JsPromptResponse {
   ///Action used to confirm that the user hit confirm or cancel button.
   JsPromptResponseAction action;
 
-  JsPromptResponse({this.message = "",
-    this.defaultValue = "",
-    this.handledByClient = false,
-    this.confirmButtonTitle = "",
-    this.cancelButtonTitle = "",
-    this.value,
-    this.action = JsPromptResponseAction.CANCEL});
+  JsPromptResponse(
+      {this.message = "",
+      this.defaultValue = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.value,
+      this.action = JsPromptResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
     return {
@@ -633,7 +642,9 @@ class SafeBrowsingThreat {
 
   static SafeBrowsingThreat fromValue(int value) {
     if (value != null)
-      return SafeBrowsingThreat.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return SafeBrowsingThreat.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -656,15 +667,15 @@ class SafeBrowsingThreat {
   }
 
   static const SAFE_BROWSING_THREAT_UNKNOWN =
-  const SafeBrowsingThreat._internal(0);
+      const SafeBrowsingThreat._internal(0);
   static const SAFE_BROWSING_THREAT_MALWARE =
-  const SafeBrowsingThreat._internal(1);
+      const SafeBrowsingThreat._internal(1);
   static const SAFE_BROWSING_THREAT_PHISHING =
-  const SafeBrowsingThreat._internal(2);
+      const SafeBrowsingThreat._internal(2);
   static const SAFE_BROWSING_THREAT_UNWANTED_SOFTWARE =
-  const SafeBrowsingThreat._internal(3);
+      const SafeBrowsingThreat._internal(3);
   static const SAFE_BROWSING_THREAT_BILLING =
-  const SafeBrowsingThreat._internal(4);
+      const SafeBrowsingThreat._internal(4);
 
   bool operator ==(value) => value == _value;
 
@@ -688,7 +699,7 @@ class SafeBrowsingResponseAction {
 
   ///Display the default interstitial.
   static const SHOW_INTERSTITIAL =
-  const SafeBrowsingResponseAction._internal(2);
+      const SafeBrowsingResponseAction._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -705,8 +716,9 @@ class SafeBrowsingResponse {
   ///Indicate the [SafeBrowsingResponseAction] to take when hitting a malicious URL.
   SafeBrowsingResponseAction action;
 
-  SafeBrowsingResponse({this.report = true,
-    this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL});
+  SafeBrowsingResponse(
+      {this.report = true,
+      this.action = SafeBrowsingResponseAction.SHOW_INTERSTITIAL});
 
   Map<String, dynamic> toMap() {
     return {"report": report, "action": action?.toValue()};
@@ -738,7 +750,7 @@ class HttpAuthResponseAction {
 
   ///Uses the credentials stored for the current host.
   static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
-  const HttpAuthResponseAction._internal(2);
+      const HttpAuthResponseAction._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -760,10 +772,11 @@ class HttpAuthResponse {
   ///Indicate the [HttpAuthResponseAction] to take in response of the authentication challenge.
   HttpAuthResponseAction action;
 
-  HttpAuthResponse({this.username = "",
-    this.password = "",
-    this.permanentPersistence = false,
-    this.action = HttpAuthResponseAction.CANCEL});
+  HttpAuthResponse(
+      {this.username = "",
+      this.password = "",
+      this.permanentPersistence = false,
+      this.action = HttpAuthResponseAction.CANCEL});
 
   Map<String, dynamic> toMap() {
     return {
@@ -888,7 +901,8 @@ class ProtectionSpaceHttpAuthCredentials {
   Map<String, dynamic> toMap() {
     return {
       "protectionSpace": protectionSpace?.toMap(),
-      "credentials": credentials?.map((credential) => credential?.toMap())?.toList()
+      "credentials":
+          credentials?.map((credential) => credential?.toMap())?.toList()
     };
   }
 
@@ -963,11 +977,12 @@ class ServerTrustChallenge {
   ///The SSL certificate used for this challenge.
   SslCertificate sslCertificate;
 
-  ServerTrustChallenge({@required this.protectionSpace,
-    this.androidError,
-    this.iosError,
-    this.message,
-    this.sslCertificate})
+  ServerTrustChallenge(
+      {@required this.protectionSpace,
+      this.androidError,
+      this.iosError,
+      this.message,
+      this.sslCertificate})
       : assert(protectionSpace != null);
 
   Map<String, dynamic> toMap() {
@@ -1027,10 +1042,11 @@ class ClientCertResponse {
   ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
   ClientCertResponseAction action;
 
-  ClientCertResponse({this.certificatePath,
-    this.certificatePassword = "",
-    this.androidKeyStoreType = "PKCS12",
-    this.action = ClientCertResponseAction.CANCEL}) {
+  ClientCertResponse(
+      {this.certificatePath,
+      this.certificatePassword = "",
+      this.androidKeyStoreType = "PKCS12",
+      this.action = ClientCertResponseAction.CANCEL}) {
     if (this.action == ClientCertResponseAction.PROCEED)
       assert(certificatePath != null && certificatePath.isNotEmpty);
   }
@@ -1123,7 +1139,9 @@ class AndroidCacheMode {
 
   static AndroidCacheMode fromValue(int value) {
     if (value != null)
-      return AndroidCacheMode.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidCacheMode.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1180,7 +1198,9 @@ class AndroidActionModeMenuItem {
 
   static AndroidActionModeMenuItem fromValue(int value) {
     if (value != null)
-      return AndroidActionModeMenuItem.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidActionModeMenuItem.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1209,11 +1229,11 @@ class AndroidActionModeMenuItem {
 
   ///Disable menu item "Web Search".
   static const MENU_ITEM_WEB_SEARCH =
-  const AndroidActionModeMenuItem._internal(2);
+      const AndroidActionModeMenuItem._internal(2);
 
   ///Disable all the action mode menu items for text processing.
   static const MENU_ITEM_PROCESS_TEXT =
-  const AndroidActionModeMenuItem._internal(4);
+      const AndroidActionModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
 
@@ -1237,7 +1257,9 @@ class AndroidForceDark {
 
   static AndroidForceDark fromValue(int value) {
     if (value != null)
-      return AndroidForceDark.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidForceDark.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1286,7 +1308,9 @@ class AndroidLayoutAlgorithm {
 
   static AndroidLayoutAlgorithm fromValue(String value) {
     if (value != null)
-      return AndroidLayoutAlgorithm.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidLayoutAlgorithm.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1303,11 +1327,11 @@ class AndroidLayoutAlgorithm {
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =
-  const AndroidLayoutAlgorithm._internal("TEXT_AUTOSIZING");
+      const AndroidLayoutAlgorithm._internal("TEXT_AUTOSIZING");
 
   ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
   static const NARROW_COLUMNS =
-  const AndroidLayoutAlgorithm._internal("NARROW_COLUMNS");
+      const AndroidLayoutAlgorithm._internal("NARROW_COLUMNS");
 
   bool operator ==(value) => value == _value;
 
@@ -1331,7 +1355,9 @@ class AndroidMixedContentMode {
 
   static AndroidMixedContentMode fromValue(int value) {
     if (value != null)
-      return AndroidMixedContentMode.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidMixedContentMode.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1353,12 +1379,12 @@ class AndroidMixedContentMode {
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
   static const MIXED_CONTENT_ALWAYS_ALLOW =
-  const AndroidMixedContentMode._internal(0);
+      const AndroidMixedContentMode._internal(0);
 
   ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
   ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
   static const MIXED_CONTENT_NEVER_ALLOW =
-  const AndroidMixedContentMode._internal(1);
+      const AndroidMixedContentMode._internal(1);
 
   ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
   ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
@@ -1366,7 +1392,7 @@ class AndroidMixedContentMode {
   ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
   ///For highest security, apps are recommended to use [AndroidMixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
   static const MIXED_CONTENT_COMPATIBILITY_MODE =
-  const AndroidMixedContentMode._internal(2);
+      const AndroidMixedContentMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -1387,7 +1413,9 @@ class IOSWKSelectionGranularity {
 
   static IOSWKSelectionGranularity fromValue(int value) {
     if (value != null)
-      return IOSWKSelectionGranularity.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSWKSelectionGranularity.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1439,7 +1467,9 @@ class IOSWKDataDetectorTypes {
 
   static IOSWKDataDetectorTypes fromValue(String value) {
     if (value != null)
-      return IOSWKDataDetectorTypes.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSWKDataDetectorTypes.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1453,7 +1483,7 @@ class IOSWKDataDetectorTypes {
 
   ///Phone numbers are detected and turned into links.
   static const PHONE_NUMBER =
-  const IOSWKDataDetectorTypes._internal("PHONE_NUMBER");
+      const IOSWKDataDetectorTypes._internal("PHONE_NUMBER");
 
   ///URLs in text are detected and turned into links.
   static const LINK = const IOSWKDataDetectorTypes._internal("LINK");
@@ -1463,23 +1493,23 @@ class IOSWKDataDetectorTypes {
 
   ///Dates and times that are in the future are detected and turned into links.
   static const CALENDAR_EVENT =
-  const IOSWKDataDetectorTypes._internal("CALENDAR_EVENT");
+      const IOSWKDataDetectorTypes._internal("CALENDAR_EVENT");
 
   ///Tracking numbers are detected and turned into links.
   static const TRACKING_NUMBER =
-  const IOSWKDataDetectorTypes._internal("TRACKING_NUMBER");
+      const IOSWKDataDetectorTypes._internal("TRACKING_NUMBER");
 
   ///Flight numbers are detected and turned into links.
   static const FLIGHT_NUMBER =
-  const IOSWKDataDetectorTypes._internal("FLIGHT_NUMBER");
+      const IOSWKDataDetectorTypes._internal("FLIGHT_NUMBER");
 
   ///Lookup suggestions are detected and turned into links.
   static const LOOKUP_SUGGESTION =
-  const IOSWKDataDetectorTypes._internal("LOOKUP_SUGGESTION");
+      const IOSWKDataDetectorTypes._internal("LOOKUP_SUGGESTION");
 
   ///Spotlight suggestions are detected and turned into links.
   static const SPOTLIGHT_SUGGESTION =
-  const IOSWKDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+      const IOSWKDataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
 
   ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
   static const ALL = const IOSWKDataDetectorTypes._internal("ALL");
@@ -1503,7 +1533,9 @@ class IOSUIScrollViewDecelerationRate {
 
   static IOSUIScrollViewDecelerationRate fromValue(String value) {
     if (value != null)
-      return IOSUIScrollViewDecelerationRate.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSUIScrollViewDecelerationRate.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1514,7 +1546,7 @@ class IOSUIScrollViewDecelerationRate {
 
   ///The default deceleration rate for a scroll view: `0.998`.
   static const NORMAL =
-  const IOSUIScrollViewDecelerationRate._internal("NORMAL");
+      const IOSUIScrollViewDecelerationRate._internal("NORMAL");
 
   ///A fast deceleration rate for a scroll view: `0.99`.
   static const FAST = const IOSUIScrollViewDecelerationRate._internal("FAST");
@@ -1539,7 +1571,9 @@ class UserPreferredContentMode {
 
   static UserPreferredContentMode fromValue(int value) {
     if (value != null)
-      return UserPreferredContentMode.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return UserPreferredContentMode.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1594,7 +1628,9 @@ class IOSUIModalPresentationStyle {
 
   static IOSUIModalPresentationStyle fromValue(int value) {
     if (value != null)
-      return IOSUIModalPresentationStyle.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSUIModalPresentationStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1644,11 +1680,11 @@ class IOSUIModalPresentationStyle {
 
   ///A view presentation style in which the presented view covers the screen.
   static const OVER_FULL_SCREEN =
-  const IOSUIModalPresentationStyle._internal(5);
+      const IOSUIModalPresentationStyle._internal(5);
 
   ///A presentation style where the content is displayed over another view controller’s content.
   static const OVER_CURRENT_CONTEXT =
-  const IOSUIModalPresentationStyle._internal(6);
+      const IOSUIModalPresentationStyle._internal(6);
 
   ///A presentation style where the content is displayed in a popover view.
   static const POPOVER = const IOSUIModalPresentationStyle._internal(7);
@@ -1682,7 +1718,9 @@ class IOSUIModalTransitionStyle {
 
   static IOSUIModalTransitionStyle fromValue(int value) {
     if (value != null)
-      return IOSUIModalTransitionStyle.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSUIModalTransitionStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1743,7 +1781,9 @@ class IOSSafariDismissButtonStyle {
 
   static IOSSafariDismissButtonStyle fromValue(int value) {
     if (value != null)
-      return IOSSafariDismissButtonStyle.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSSafariDismissButtonStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -1788,9 +1828,7 @@ class InAppWebViewGroupOptions {
   ///iOS-specific options.
   IOSInAppWebViewOptions ios;
 
-  InAppWebViewGroupOptions({this.crossPlatform,
-    this.android,
-    this.ios}) {
+  InAppWebViewGroupOptions({this.crossPlatform, this.android, this.ios}) {
     this.crossPlatform = this.crossPlatform ?? InAppWebViewOptions();
     this.android = this.android ?? AndroidInAppWebViewOptions();
     this.ios = this.ios ?? IOSInAppWebViewOptions();
@@ -1807,7 +1845,8 @@ class InAppWebViewGroupOptions {
   }
 
   static InAppWebViewGroupOptions fromMap(Map<String, dynamic> options) {
-    InAppWebViewGroupOptions inAppWebViewGroupOptions = InAppWebViewGroupOptions();
+    InAppWebViewGroupOptions inAppWebViewGroupOptions =
+        InAppWebViewGroupOptions();
 
     inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
@@ -1848,10 +1887,11 @@ class InAppBrowserClassOptions {
   ///WebView options.
   InAppWebViewGroupOptions inAppWebViewGroupOptions;
 
-  InAppBrowserClassOptions({this.crossPlatform,
-    this.android,
-    this.ios,
-    this.inAppWebViewGroupOptions}) {
+  InAppBrowserClassOptions(
+      {this.crossPlatform,
+      this.android,
+      this.ios,
+      this.inAppWebViewGroupOptions}) {
     this.crossPlatform = this.crossPlatform ?? InAppBrowserOptions();
     this.android = this.android ?? AndroidInAppBrowserOptions();
     this.ios = this.ios ?? IOSInAppBrowserOptions();
@@ -1885,7 +1925,8 @@ class InAppBrowserClassOptions {
   }
 
   static InAppBrowserClassOptions fromMap(Map<String, dynamic> options) {
-    InAppBrowserClassOptions inAppBrowserClassOptions = InAppBrowserClassOptions();
+    InAppBrowserClassOptions inAppBrowserClassOptions =
+        InAppBrowserClassOptions();
 
     inAppBrowserClassOptions.crossPlatform =
         InAppBrowserOptions.fromMap(options);
@@ -1920,10 +1961,7 @@ class ChromeSafariBrowserClassOptions {
   ///iOS-specific options.
   IOSSafariOptions ios;
 
-  ChromeSafariBrowserClassOptions({
-    this.android,
-    this.ios
-  }) {
+  ChromeSafariBrowserClassOptions({this.android, this.ios}) {
     this.android = this.android ?? AndroidChromeCustomTabsOptions();
     this.ios = this.ios ?? IOSSafariOptions();
   }
@@ -2000,7 +2038,9 @@ class AjaxRequestEventType {
 
   static AjaxRequestEventType fromValue(String value) {
     if (value != null)
-      return AjaxRequestEventType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AjaxRequestEventType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -2073,7 +2113,9 @@ class AjaxRequestReadyState {
 
   static AjaxRequestReadyState fromValue(int value) {
     if (value != null)
-      return AjaxRequestReadyState.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AjaxRequestReadyState.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -2211,25 +2253,26 @@ class AjaxRequest {
   ///Indicates the [AjaxRequestAction] that can be used to control the `XMLHttpRequest` request.
   AjaxRequestAction action;
 
-  AjaxRequest({this.data,
-    this.method,
-    this.url,
-    this.isAsync,
-    this.user,
-    this.password,
-    this.withCredentials,
-    this.headers,
-    this.readyState,
-    this.status,
-    this.responseURL,
-    this.responseType,
-    this.response,
-    this.responseText,
-    this.responseXML,
-    this.statusText,
-    this.responseHeaders,
-    this.event,
-    this.action = AjaxRequestAction.PROCEED});
+  AjaxRequest(
+      {this.data,
+      this.method,
+      this.url,
+      this.isAsync,
+      this.user,
+      this.password,
+      this.withCredentials,
+      this.headers,
+      this.readyState,
+      this.status,
+      this.responseURL,
+      this.responseType,
+      this.response,
+      this.responseText,
+      this.responseXML,
+      this.statusText,
+      this.responseHeaders,
+      this.event,
+      this.action = AjaxRequestAction.PROCEED});
 
   Map<String, dynamic> toMap() {
     return {
@@ -2450,19 +2493,20 @@ class FetchRequest {
   ///Indicates the [FetchRequestAction] that can be used to control the request.
   FetchRequestAction action;
 
-  FetchRequest({this.url,
-    this.method,
-    this.headers,
-    this.body,
-    this.mode,
-    this.credentials,
-    this.cache,
-    this.redirect,
-    this.referrer,
-    this.referrerPolicy,
-    this.integrity,
-    this.keepalive,
-    this.action = FetchRequestAction.PROCEED});
+  FetchRequest(
+      {this.url,
+      this.method,
+      this.headers,
+      this.body,
+      this.mode,
+      this.credentials,
+      this.cache,
+      this.redirect,
+      this.referrer,
+      this.referrerPolicy,
+      this.integrity,
+      this.keepalive,
+      this.action = FetchRequestAction.PROCEED});
 
   Map<String, dynamic> toMap() {
     return {
@@ -2536,7 +2580,9 @@ class ContentBlockerTriggerResourceType {
 
   static ContentBlockerTriggerResourceType fromValue(String value) {
     if (value != null)
-      return ContentBlockerTriggerResourceType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return ContentBlockerTriggerResourceType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -2546,18 +2592,18 @@ class ContentBlockerTriggerResourceType {
   String toString() => _value;
 
   static const DOCUMENT =
-  const ContentBlockerTriggerResourceType._internal('document');
+      const ContentBlockerTriggerResourceType._internal('document');
   static const IMAGE =
-  const ContentBlockerTriggerResourceType._internal('image');
+      const ContentBlockerTriggerResourceType._internal('image');
   static const STYLE_SHEET =
-  const ContentBlockerTriggerResourceType._internal('style-sheet');
+      const ContentBlockerTriggerResourceType._internal('style-sheet');
   static const SCRIPT =
-  const ContentBlockerTriggerResourceType._internal('script');
+      const ContentBlockerTriggerResourceType._internal('script');
   static const FONT = const ContentBlockerTriggerResourceType._internal('font');
   static const MEDIA =
-  const ContentBlockerTriggerResourceType._internal('media');
+      const ContentBlockerTriggerResourceType._internal('media');
   static const SVG_DOCUMENT =
-  const ContentBlockerTriggerResourceType._internal('svg-document');
+      const ContentBlockerTriggerResourceType._internal('svg-document');
 
   ///Any untyped load
   static const RAW = const ContentBlockerTriggerResourceType._internal('raw');
@@ -2581,7 +2627,9 @@ class ContentBlockerTriggerLoadType {
 
   static ContentBlockerTriggerLoadType fromValue(String value) {
     if (value != null)
-      return ContentBlockerTriggerLoadType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return ContentBlockerTriggerLoadType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -2592,11 +2640,11 @@ class ContentBlockerTriggerLoadType {
 
   ///FIRST_PARTY is triggered only if the resource has the same scheme, domain, and port as the main page resource.
   static const FIRST_PARTY =
-  const ContentBlockerTriggerLoadType._internal('first-party');
+      const ContentBlockerTriggerLoadType._internal('first-party');
 
   ///THIRD_PARTY is triggered if the resource is not from the same domain as the main page resource.
   static const THIRD_PARTY =
-  const ContentBlockerTriggerLoadType._internal('third-party');
+      const ContentBlockerTriggerLoadType._internal('third-party');
 
   bool operator ==(value) => value == _value;
 
@@ -2618,7 +2666,9 @@ class ContentBlockerActionType {
 
   static ContentBlockerActionType fromValue(String value) {
     if (value != null)
-      return ContentBlockerActionType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return ContentBlockerActionType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -2634,11 +2684,11 @@ class ContentBlockerActionType {
   ///
   ///**NOTE**: on Android, JavaScript must be enabled.
   static const CSS_DISPLAY_NONE =
-  const ContentBlockerActionType._internal('css-display-none');
+      const ContentBlockerActionType._internal('css-display-none');
 
   ///Changes a URL from http to https. URLs with a specified (nondefault) port and links using other protocols are unaffected.
   static const MAKE_HTTPS =
-  const ContentBlockerActionType._internal('make-https');
+      const ContentBlockerActionType._internal('make-https');
 
   bool operator ==(value) => value == _value;
 
@@ -2689,15 +2739,16 @@ class Cookie {
   ///**NOTE**: on Android it will be always `null`.
   String path;
 
-  Cookie({@required this.name,
-    @required this.value,
-    this.expiresDate,
-    this.isSessionOnly,
-    this.domain,
-    this.sameSite,
-    this.isSecure,
-    this.isHttpOnly,
-    this.path});
+  Cookie(
+      {@required this.name,
+      @required this.value,
+      this.expiresDate,
+      this.isSessionOnly,
+      this.domain,
+      this.sameSite,
+      this.isSecure,
+      this.isHttpOnly,
+      this.path});
 
   Map<String, dynamic> toMap() {
     return {
@@ -2751,8 +2802,9 @@ class PermissionRequestResponse {
   ///Indicate the [PermissionRequestResponseAction] to take in response of a permission request.
   PermissionRequestResponseAction action;
 
-  PermissionRequestResponse({this.resources = const [],
-    this.action = PermissionRequestResponseAction.DENY});
+  PermissionRequestResponse(
+      {this.resources = const [],
+      this.action = PermissionRequestResponseAction.DENY});
 
   Map<String, dynamic> toMap() {
     return {"resources": resources, "action": action?.toValue()};
@@ -2812,7 +2864,9 @@ class IOSWKNavigationType {
 
   static IOSWKNavigationType fromValue(int value) {
     if (value != null)
-      return IOSWKNavigationType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSWKNavigationType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -2870,13 +2924,14 @@ class ShouldOverrideUrlLoadingRequest {
   ///The type of action triggering the navigation. Available only on iOS.
   IOSWKNavigationType iosWKNavigationType;
 
-  ShouldOverrideUrlLoadingRequest({this.url,
-    this.method,
-    this.headers,
-    this.isForMainFrame,
-    this.androidHasGesture,
-    this.androidIsRedirect,
-    this.iosWKNavigationType});
+  ShouldOverrideUrlLoadingRequest(
+      {this.url,
+      this.method,
+      this.headers,
+      this.isForMainFrame,
+      this.androidHasGesture,
+      this.androidIsRedirect,
+      this.iosWKNavigationType});
 
   Map<String, dynamic> toMap() {
     return {
@@ -2914,10 +2969,11 @@ class OnCreateWindowRequest {
   ///The type of action triggering the navigation. Available only on iOS.
   IOSWKNavigationType iosWKNavigationType;
 
-  OnCreateWindowRequest({this.url,
-    this.androidIsDialog,
-    this.androidIsUserGesture,
-    this.iosWKNavigationType});
+  OnCreateWindowRequest(
+      {this.url,
+      this.androidIsDialog,
+      this.androidIsUserGesture,
+      this.iosWKNavigationType});
 
   Map<String, dynamic> toMap() {
     return {
@@ -2989,7 +3045,9 @@ class IOSWKWebsiteDataType {
 
   static IOSWKWebsiteDataType fromValue(String value) {
     if (value != null)
-      return IOSWKWebsiteDataType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSWKWebsiteDataType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3002,48 +3060,48 @@ class IOSWKWebsiteDataType {
   ///
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeFetchCache =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeFetchCache");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeFetchCache");
 
   ///On-disk caches.
   static const WKWebsiteDataTypeDiskCache =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeDiskCache");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeDiskCache");
 
   ///In-memory caches.
   static const WKWebsiteDataTypeMemoryCache =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeMemoryCache");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeMemoryCache");
 
   ///HTML offline web application caches.
   static const WKWebsiteDataTypeOfflineWebApplicationCache =
-  const IOSWKWebsiteDataType._internal(
-      "WKWebsiteDataTypeOfflineWebApplicationCache");
+      const IOSWKWebsiteDataType._internal(
+          "WKWebsiteDataTypeOfflineWebApplicationCache");
 
   ///Cookies.
   static const WKWebsiteDataTypeCookies =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeCookies");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeCookies");
 
   ///HTML session storage.
   static const WKWebsiteDataTypeSessionStorage =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeSessionStorage");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeSessionStorage");
 
   ///HTML local storage.
   static const WKWebsiteDataTypeLocalStorage =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeLocalStorage");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeLocalStorage");
 
   ///WebSQL databases.
   static const WKWebsiteDataTypeWebSQLDatabases =
-  const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeWebSQLDatabases");
+      const IOSWKWebsiteDataType._internal("WKWebsiteDataTypeWebSQLDatabases");
 
   ///IndexedDB databases.
   static const WKWebsiteDataTypeIndexedDBDatabases =
-  const IOSWKWebsiteDataType._internal(
-      "WKWebsiteDataTypeIndexedDBDatabases");
+      const IOSWKWebsiteDataType._internal(
+          "WKWebsiteDataTypeIndexedDBDatabases");
 
   ///Service worker registrations.
   ///
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeServiceWorkerRegistrations =
-  const IOSWKWebsiteDataType._internal(
-      "WKWebsiteDataTypeServiceWorkerRegistrations");
+      const IOSWKWebsiteDataType._internal(
+          "WKWebsiteDataTypeServiceWorkerRegistrations");
 
   ///Returns a set of all available website data types.
   // ignore: non_constant_identifier_names
@@ -3116,7 +3174,9 @@ class InAppWebViewHitTestResultType {
 
   static InAppWebViewHitTestResultType fromValue(int value) {
     if (value != null)
-      return InAppWebViewHitTestResultType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return InAppWebViewHitTestResultType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3162,15 +3222,15 @@ class InAppWebViewHitTestResultType {
 
   ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http.
   static const SRC_ANCHOR_TYPE =
-  const InAppWebViewHitTestResultType._internal(7);
+      const InAppWebViewHitTestResultType._internal(7);
 
   ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http + HTML::img.
   static const SRC_IMAGE_ANCHOR_TYPE =
-  const InAppWebViewHitTestResultType._internal(8);
+      const InAppWebViewHitTestResultType._internal(8);
 
   ///[InAppWebViewHitTestResult] for hitting an edit text area.
   static const EDIT_TEXT_TYPE =
-  const InAppWebViewHitTestResultType._internal(9);
+      const InAppWebViewHitTestResultType._internal(9);
 
   bool operator ==(value) => value == _value;
 
@@ -3269,7 +3329,9 @@ class RendererPriority {
 
   static RendererPriority fromValue(int value) {
     if (value != null)
-      return RendererPriority.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return RendererPriority.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3297,7 +3359,7 @@ class RendererPriority {
 
   ///The renderer associated with this WebView is bound with Android `Context#BIND_IMPORTANT`.
   static const RENDERER_PRIORITY_IMPORTANT =
-  const RendererPriority._internal(2);
+      const RendererPriority._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -3318,8 +3380,9 @@ class RendererPriorityPolicy {
   ///If true, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
   bool waivedWhenNotVisible;
 
-  RendererPriorityPolicy({@required this.rendererRequestedPriority,
-    @required this.waivedWhenNotVisible});
+  RendererPriorityPolicy(
+      {@required this.rendererRequestedPriority,
+      @required this.waivedWhenNotVisible});
 
   Map<String, dynamic> toMap() {
     return {
@@ -3340,9 +3403,9 @@ class RendererPriorityPolicy {
   static RendererPriorityPolicy fromMap(Map<String, dynamic> map) {
     return map != null
         ? RendererPriorityPolicy(
-        rendererRequestedPriority:
-        RendererPriority.fromValue(map["rendererRequestedPriority"]),
-        waivedWhenNotVisible: map["waivedWhenNotVisible"])
+            rendererRequestedPriority:
+                RendererPriority.fromValue(map["rendererRequestedPriority"]),
+            waivedWhenNotVisible: map["waivedWhenNotVisible"])
         : null;
   }
 }
@@ -3395,7 +3458,9 @@ class AndroidOverScrollMode {
 
   static AndroidOverScrollMode fromValue(int value) {
     if (value != null)
-      return AndroidOverScrollMode.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidOverScrollMode.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3419,7 +3484,7 @@ class AndroidOverScrollMode {
 
   ///Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
   static const OVER_SCROLL_IF_CONTENT_SCROLLS =
-  const AndroidOverScrollMode._internal(1);
+      const AndroidOverScrollMode._internal(1);
 
   ///Never allow a user to over-scroll this view.
   static const OVER_SCROLL_NEVER = const AndroidOverScrollMode._internal(2);
@@ -3451,7 +3516,9 @@ class AndroidScrollBarStyle {
 
   static AndroidScrollBarStyle fromValue(int value) {
     if (value != null)
-      return AndroidScrollBarStyle.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidScrollBarStyle.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3475,22 +3542,22 @@ class AndroidScrollBarStyle {
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
   static const SCROLLBARS_INSIDE_OVERLAY =
-  const AndroidScrollBarStyle._internal(0);
+      const AndroidScrollBarStyle._internal(0);
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
-  const AndroidScrollBarStyle._internal(16777216);
+      const AndroidScrollBarStyle._internal(16777216);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
   static const SCROLLBARS_OUTSIDE_OVERLAY =
-  const AndroidScrollBarStyle._internal(33554432);
+      const AndroidScrollBarStyle._internal(33554432);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
-  const AndroidScrollBarStyle._internal(50331648);
+      const AndroidScrollBarStyle._internal(50331648);
 
   bool operator ==(value) => value == _value;
 
@@ -3512,7 +3579,9 @@ class AndroidVerticalScrollbarPosition {
 
   static AndroidVerticalScrollbarPosition fromValue(int value) {
     if (value != null)
-      return AndroidVerticalScrollbarPosition.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidVerticalScrollbarPosition.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3533,15 +3602,15 @@ class AndroidVerticalScrollbarPosition {
 
   ///Position the scroll bar at the default position as determined by the system.
   static const SCROLLBAR_POSITION_DEFAULT =
-  const AndroidVerticalScrollbarPosition._internal(0);
+      const AndroidVerticalScrollbarPosition._internal(0);
 
   ///Position the scroll bar along the left edge.
   static const SCROLLBAR_POSITION_LEFT =
-  const AndroidVerticalScrollbarPosition._internal(1);
+      const AndroidVerticalScrollbarPosition._internal(1);
 
   ///Position the scroll bar along the right edge.
   static const SCROLLBAR_POSITION_RIGHT =
-  const AndroidVerticalScrollbarPosition._internal(2);
+      const AndroidVerticalScrollbarPosition._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -3562,7 +3631,7 @@ class AndroidWebViewPackageInfo {
   static AndroidWebViewPackageInfo fromMap(Map<String, dynamic> map) {
     return map != null
         ? AndroidWebViewPackageInfo(
-        versionName: map["versionName"], packageName: map["packageName"])
+            versionName: map["versionName"], packageName: map["packageName"])
         : null;
   }
 
@@ -3698,7 +3767,9 @@ class WebStorageType {
 
   static WebStorageType fromValue(String value) {
     if (value != null)
-      return WebStorageType.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return WebStorageType.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3713,7 +3784,7 @@ class WebStorageType {
   ///`window.sessionStorage`: maintains a separate storage area for each given origin that's available for the duration
   ///of the page session (as long as the browser is open, including page reloads and restores).
   static const SESSION_STORAGE =
-  const WebStorageType._internal("sessionStorage");
+      const WebStorageType._internal("sessionStorage");
 
   bool operator ==(value) => value == _value;
 
@@ -3735,7 +3806,9 @@ class HTTPCookieSameSitePolicy {
 
   static HTTPCookieSameSitePolicy fromValue(String value) {
     if (value != null)
-      return HTTPCookieSameSitePolicy.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return HTTPCookieSameSitePolicy.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3785,7 +3858,9 @@ class AndroidSslError {
 
   static AndroidSslError fromValue(int value) {
     if (value != null)
-      return AndroidSslError.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return AndroidSslError.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3852,7 +3927,9 @@ class IOSSslError {
 
   static IOSSslError fromValue(int value) {
     if (value != null)
-      return IOSSslError.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSSslError.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3918,7 +3995,9 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
 
   static IOSUIScrollViewContentInsetAdjustmentBehavior fromValue(int value) {
     if (value != null)
-      return IOSUIScrollViewContentInsetAdjustmentBehavior.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return IOSUIScrollViewContentInsetAdjustmentBehavior.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -3940,20 +4019,20 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
   }
 
   ///Automatically adjust the scroll view insets.
-  static const AUTOMATIC = const IOSUIScrollViewContentInsetAdjustmentBehavior
-      ._internal(0);
+  static const AUTOMATIC =
+      const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(0);
 
   ///Adjust the insets only in the scrollable directions.
-  static const SCROLLABLE_AXES = const IOSUIScrollViewContentInsetAdjustmentBehavior
-      ._internal(1);
+  static const SCROLLABLE_AXES =
+      const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(1);
 
   ///Do not adjust the scroll view insets.
-  static const NEVER = const IOSUIScrollViewContentInsetAdjustmentBehavior
-      ._internal(2);
+  static const NEVER =
+      const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(2);
 
   ///Always include the safe area insets in the content adjustment.
-  static const ALWAYS = const IOSUIScrollViewContentInsetAdjustmentBehavior
-      ._internal(3);
+  static const ALWAYS =
+      const IOSUIScrollViewContentInsetAdjustmentBehavior._internal(3);
 
   bool operator ==(value) => value == _value;
 
@@ -3963,7 +4042,6 @@ class IOSUIScrollViewContentInsetAdjustmentBehavior {
 
 ///SSL certificate info (certificate details) class.
 class SslCertificate {
-
   ///Name of the entity this certificate is issued by
   SslCertificateDName issuedBy;
 
@@ -3979,13 +4057,12 @@ class SslCertificate {
   ///The original source certificate, if available.
   X509Certificate x509Certificate;
 
-  SslCertificate({
-    this.issuedBy,
-    this.issuedTo,
-    this.validNotAfterDate,
-    this.validNotBeforeDate,
-    this.x509Certificate
-  });
+  SslCertificate(
+      {this.issuedBy,
+      this.issuedTo,
+      this.validNotAfterDate,
+      this.validNotBeforeDate,
+      this.x509Certificate});
 
   static SslCertificate fromMap(Map<String, dynamic> map) {
     X509Certificate x509Certificate;
@@ -3996,17 +4073,19 @@ class SslCertificate {
       print(stacktrace);
     }
 
-    return map != null ? SslCertificate(
-      issuedBy: SslCertificateDName.fromMap(
-          map["issuedBy"]?.cast<String, dynamic>()),
-      issuedTo: SslCertificateDName.fromMap(
-          map["issuedTo"]?.cast<String, dynamic>()),
-      validNotAfterDate: DateTime.fromMillisecondsSinceEpoch(
-          map["validNotAfterDate"]),
-      validNotBeforeDate: DateTime.fromMillisecondsSinceEpoch(
-          map["validNotBeforeDate"]),
-      x509Certificate: x509Certificate,
-    ) : null;
+    return map != null
+        ? SslCertificate(
+            issuedBy: SslCertificateDName.fromMap(
+                map["issuedBy"]?.cast<String, dynamic>()),
+            issuedTo: SslCertificateDName.fromMap(
+                map["issuedTo"]?.cast<String, dynamic>()),
+            validNotAfterDate:
+                DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"]),
+            validNotBeforeDate:
+                DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"]),
+            x509Certificate: x509Certificate,
+          )
+        : null;
   }
 
   Map<String, dynamic> toMap() {
@@ -4049,15 +4128,20 @@ class SslCertificateDName {
 
   SslCertificateDName(
       // ignore: non_constant_identifier_names
-      {this.CName = "", this.DName = "", this.OName = "", this.UName = ""});
+      {this.CName = "",
+      this.DName = "",
+      this.OName = "",
+      this.UName = ""});
 
   static SslCertificateDName fromMap(Map<String, dynamic> map) {
-    return map != null ? SslCertificateDName(
-      CName: map["CName"] ?? "",
-      DName: map["DName"] ?? "",
-      OName: map["OName"] ?? "",
-      UName: map["UName"] ?? "",
-    ) : null;
+    return map != null
+        ? SslCertificateDName(
+            CName: map["CName"] ?? "",
+            DName: map["DName"] ?? "",
+            OName: map["OName"] ?? "",
+            UName: map["UName"] ?? "",
+          )
+        : null;
   }
 
   Map<String, dynamic> toMap() {

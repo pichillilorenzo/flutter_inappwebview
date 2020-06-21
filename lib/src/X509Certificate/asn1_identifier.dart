@@ -12,7 +12,9 @@ class ASN1IdentifierClass {
 
   static ASN1IdentifierClass fromValue(int value) {
     if (value != null)
-      return ASN1IdentifierClass.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return ASN1IdentifierClass.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
@@ -81,41 +83,45 @@ class ASN1IdentifierTagNumber {
 
   static ASN1IdentifierTagNumber fromValue(int value) {
     if (value != null)
-      return ASN1IdentifierTagNumber.values.firstWhere((element) => element.toValue() == value, orElse: () => null);
+      return ASN1IdentifierTagNumber.values.firstWhere(
+          (element) => element.toValue() == value,
+          orElse: () => null);
     return null;
   }
 
   int toValue() => _value;
 
-  static const END_OF_CONTENT =  const ASN1IdentifierTagNumber._internal(0x00);
-  static const BOOLEAN =  const ASN1IdentifierTagNumber._internal(0x01);
-  static const INTEGER =  const ASN1IdentifierTagNumber._internal(0x02);
-  static const BIT_STRING =  const ASN1IdentifierTagNumber._internal(0x03);
-  static const OCTET_STRING =  const ASN1IdentifierTagNumber._internal(0x04);
-  static const NULL =  const ASN1IdentifierTagNumber._internal(0x05);
-  static const OBJECT_IDENTIFIER =  const ASN1IdentifierTagNumber._internal(0x06);
-  static const OBJECT_DESCRIPTOR =  const ASN1IdentifierTagNumber._internal(0x07);
-  static const EXTERNAL =  const ASN1IdentifierTagNumber._internal(0x08);
-  static const READ =  const ASN1IdentifierTagNumber._internal(0x09);
-  static const ENUMERATED =  const ASN1IdentifierTagNumber._internal(0x0A);
-  static const EMBEDDED_PDV =  const ASN1IdentifierTagNumber._internal(0x0B);
-  static const UTF8_STRING =  const ASN1IdentifierTagNumber._internal(0x0C);
-  static const RELATIVE_OID =  const ASN1IdentifierTagNumber._internal(0x0D);
-  static const SEQUENCE =  const ASN1IdentifierTagNumber._internal(0x10);
-  static const SET =  const ASN1IdentifierTagNumber._internal(0x11);
-  static const NUMERIC_STRING =  const ASN1IdentifierTagNumber._internal(0x12);
-  static const PRINTABLE_STRING =  const ASN1IdentifierTagNumber._internal(0x13);
-  static const T61_STRING =  const ASN1IdentifierTagNumber._internal(0x14);
-  static const VIDEOTEX_STRING =  const ASN1IdentifierTagNumber._internal(0x15);
-  static const IA5_STRING =  const ASN1IdentifierTagNumber._internal(0x16);
-  static const UTC_TIME =  const ASN1IdentifierTagNumber._internal(0x17);
-  static const GENERALIZED_TIME =  const ASN1IdentifierTagNumber._internal(0x18);
-  static const GRAPHIC_STRING =  const ASN1IdentifierTagNumber._internal(0x19);
-  static const VISIBLE_STRING =  const ASN1IdentifierTagNumber._internal(0x1A);
-  static const GENERAL_STRING =  const ASN1IdentifierTagNumber._internal(0x1B);
-  static const UNIVERSAL_STRING =  const ASN1IdentifierTagNumber._internal(0x1C);
-  static const CHARACTER_STRING =  const ASN1IdentifierTagNumber._internal(0x1D);
-  static const BMP_STRING =  const ASN1IdentifierTagNumber._internal(0x1E);
+  static const END_OF_CONTENT = const ASN1IdentifierTagNumber._internal(0x00);
+  static const BOOLEAN = const ASN1IdentifierTagNumber._internal(0x01);
+  static const INTEGER = const ASN1IdentifierTagNumber._internal(0x02);
+  static const BIT_STRING = const ASN1IdentifierTagNumber._internal(0x03);
+  static const OCTET_STRING = const ASN1IdentifierTagNumber._internal(0x04);
+  static const NULL = const ASN1IdentifierTagNumber._internal(0x05);
+  static const OBJECT_IDENTIFIER =
+      const ASN1IdentifierTagNumber._internal(0x06);
+  static const OBJECT_DESCRIPTOR =
+      const ASN1IdentifierTagNumber._internal(0x07);
+  static const EXTERNAL = const ASN1IdentifierTagNumber._internal(0x08);
+  static const READ = const ASN1IdentifierTagNumber._internal(0x09);
+  static const ENUMERATED = const ASN1IdentifierTagNumber._internal(0x0A);
+  static const EMBEDDED_PDV = const ASN1IdentifierTagNumber._internal(0x0B);
+  static const UTF8_STRING = const ASN1IdentifierTagNumber._internal(0x0C);
+  static const RELATIVE_OID = const ASN1IdentifierTagNumber._internal(0x0D);
+  static const SEQUENCE = const ASN1IdentifierTagNumber._internal(0x10);
+  static const SET = const ASN1IdentifierTagNumber._internal(0x11);
+  static const NUMERIC_STRING = const ASN1IdentifierTagNumber._internal(0x12);
+  static const PRINTABLE_STRING = const ASN1IdentifierTagNumber._internal(0x13);
+  static const T61_STRING = const ASN1IdentifierTagNumber._internal(0x14);
+  static const VIDEOTEX_STRING = const ASN1IdentifierTagNumber._internal(0x15);
+  static const IA5_STRING = const ASN1IdentifierTagNumber._internal(0x16);
+  static const UTC_TIME = const ASN1IdentifierTagNumber._internal(0x17);
+  static const GENERALIZED_TIME = const ASN1IdentifierTagNumber._internal(0x18);
+  static const GRAPHIC_STRING = const ASN1IdentifierTagNumber._internal(0x19);
+  static const VISIBLE_STRING = const ASN1IdentifierTagNumber._internal(0x1A);
+  static const GENERAL_STRING = const ASN1IdentifierTagNumber._internal(0x1B);
+  static const UNIVERSAL_STRING = const ASN1IdentifierTagNumber._internal(0x1C);
+  static const CHARACTER_STRING = const ASN1IdentifierTagNumber._internal(0x1D);
+  static const BMP_STRING = const ASN1IdentifierTagNumber._internal(0x1E);
 
   String toString() {
     switch (this.toValue()) {
@@ -200,11 +206,16 @@ class ASN1Identifier {
   }
 
   ASN1IdentifierTagNumber tagNumber() {
-    return ASN1IdentifierTagNumber.fromValue(rawValue & 0x1F) ?? ASN1IdentifierTagNumber.END_OF_CONTENT;
+    return ASN1IdentifierTagNumber.fromValue(rawValue & 0x1F) ??
+        ASN1IdentifierTagNumber.END_OF_CONTENT;
   }
 
   ASN1IdentifierClass typeClass() {
-    for (var tc in [ASN1IdentifierClass.APPLICATION, ASN1IdentifierClass.CONTEXT_SPECIFIC, ASN1IdentifierClass.PRIVATE]) {
+    for (var tc in [
+      ASN1IdentifierClass.APPLICATION,
+      ASN1IdentifierClass.CONTEXT_SPECIFIC,
+      ASN1IdentifierClass.PRIVATE
+    ]) {
       if ((rawValue & tc.toValue()) == tc.toValue()) {
         return tc;
       }

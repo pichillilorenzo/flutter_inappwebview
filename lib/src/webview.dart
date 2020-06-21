@@ -1,4 +1,4 @@
-import 'package:flutter_inappwebview/src/context_menu.dart';
+import 'context_menu.dart';
 
 import 'types.dart';
 import 'in_app_webview_controller.dart';
@@ -365,7 +365,7 @@ abstract class WebView {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsHidePrompt()
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller)
       androidOnGeolocationPermissionsHidePrompt;
 
   ///Notify the host application of a resource request and allow the application to return the data.

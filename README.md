@@ -412,7 +412,23 @@ Screenshots:
 * `getMetaThemeColor`: Returns an instance of `Color` representing the `content` value of the `<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
 * `getScrollX`: Returns the scrolled left position of the current WebView.
 * `getScrollY`: Returns the scrolled top position of the current WebView.
+* `getCertificate`: Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
 * `static getDefaultUserAgent`: Gets the default user agent.
+
+##### `InAppWebViewController.webStorage`
+
+`InAppWebViewController.webStorage` provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API):
+* `WebStorage.localStorage`: provides access to `window.localStorage`;
+* `WebStorage.sessionStorage`: provides access to `window.localStorage`.
+
+Methods available:
+* `length`: Returns an integer representing the number of data items stored in the Storage object.
+* `setItem({@required String key, @required dynamic value})`: When passed a `key` name and `value`, will add that key to the storage, or update that key's value if it already exists.
+* `getItem({@required String key})`: When passed a `key` name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
+* `removeItem({@required String key})`: When passed a `key` name, will remove that key from the given Storage object if it exists.
+* `getItems`: Returns the list of all items from the given Storage object.
+* `clear`: Clears all keys stored in a given Storage object.
+* `key({@required int index})`: When passed a number `index`, returns the name of the nth key in a given Storage object.
 
 ##### `InAppWebViewController` Android-specific methods
 

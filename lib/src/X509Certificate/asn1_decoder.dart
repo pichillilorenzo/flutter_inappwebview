@@ -242,7 +242,9 @@ class ASN1DERDecoder {
     // if YY >= 50 use 19xx, if YY < 50 use 20xx
     var year = int.parse(utc.substring(0, 2), radix: 10);
     year = (year >= 50) ? 1900 + year : 2000 + year;
+    // ignore: non_constant_identifier_names
     var MM = int.parse(utc.substring(2, 4), radix: 10);
+    // ignore: non_constant_identifier_names
     var DD = int.parse(utc.substring(4, 6), radix: 10);
     var hh = int.parse(utc.substring(6, 8), radix: 10);
     var mm = int.parse(utc.substring(8, 10), radix: 10);
@@ -328,8 +330,11 @@ class ASN1DERDecoder {
     }
 
     // if YY >= 50 use 19xx, if YY < 50 use 20xx
+    // ignore: non_constant_identifier_names
     var YYYY = int.parse(gentime.substring(0, 4), radix: 10);
+    // ignore: non_constant_identifier_names
     var MM = int.parse(gentime.substring(4, 6), radix: 10);
+    // ignore: non_constant_identifier_names
     var DD = int.parse(gentime.substring(6, 8), radix: 10);
     var hh = int.parse(gentime.substring(8, 10), radix: 10);
     var mm = int.parse(gentime.substring(10, 12), radix: 10);

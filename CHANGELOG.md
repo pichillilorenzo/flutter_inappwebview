@@ -1,3 +1,9 @@
+## 3.4.0+1
+
+- Update README.md
+- Update missing docs
+- Fix pub.dev Health suggestions and Analysis suggestions
+
 ## 3.4.0
 
 - Added `requestFocusNodeHref`, `requestImageRef`, `getMetaTags`, `getMetaThemeColor`, `getScrollX`, `getScrollY`, `getCertificate` webview methods

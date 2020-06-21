@@ -25,6 +25,7 @@ class ASN1IdentifierClass {
   static const CONTEXT_SPECIFIC = const ASN1IdentifierClass._internal(0x80);
   static const PRIVATE = const ASN1IdentifierClass._internal(0xC0);
 
+  @override
   String toString() {
     switch (this.toValue()) {
       case 0x00:
@@ -36,6 +37,7 @@ class ASN1IdentifierClass {
       case 0xC0:
         return "PRIVATE";
     }
+    return "";
   }
 
   bool operator ==(value) => value == _value;
@@ -123,6 +125,7 @@ class ASN1IdentifierTagNumber {
   static const CHARACTER_STRING = const ASN1IdentifierTagNumber._internal(0x1D);
   static const BMP_STRING = const ASN1IdentifierTagNumber._internal(0x1E);
 
+  @override
   String toString() {
     switch (this.toValue()) {
       case 0x00:
@@ -184,6 +187,7 @@ class ASN1IdentifierTagNumber {
       case 0x1E:
         return "BMP_STRING";
     }
+    return "";
   }
 
   bool operator ==(value) => value == _value;

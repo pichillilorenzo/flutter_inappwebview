@@ -50,7 +50,10 @@ class InAppWebViewController {
 
   // ignore: unused_field
   dynamic _id;
+
+  // ignore: unused_field
   String _inAppBrowserUuid;
+
   InAppBrowser _inAppBrowser;
 
   ///Android controller that contains only android-specific methods
@@ -59,6 +62,7 @@ class InAppWebViewController {
   ///iOS controller that contains only ios-specific methods
   IOSInAppWebViewController ios;
 
+  ///Provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
   WebStorage webStorage;
 
   InAppWebViewController(dynamic id, WebView webview) {
@@ -233,9 +237,9 @@ class InAppWebViewController {
       case "onGeolocationPermissionsHidePrompt":
         if (_webview != null &&
             _webview.androidOnGeolocationPermissionsHidePrompt != null)
-          await _webview.androidOnGeolocationPermissionsHidePrompt(this);
+          _webview.androidOnGeolocationPermissionsHidePrompt(this);
         else if (_inAppBrowser != null)
-          await _inAppBrowser.androidOnGeolocationPermissionsHidePrompt();
+          _inAppBrowser.androidOnGeolocationPermissionsHidePrompt();
         break;
       case "shouldInterceptRequest":
         String url = call.arguments["url"];
@@ -955,7 +959,7 @@ class InAppWebViewController {
       var faviconUrl = url.scheme + "://" + url.host + "/favicon.ico";
       await client.headUrl(Uri.parse(faviconUrl));
       favicons.add(Favicon(url: faviconUrl, rel: "shortcut icon"));
-    } catch (e, stacktrace) {
+    } catch (e) {
       print("/favicon.ico file not found: " + e.toString());
       // print(stacktrace);
     }
@@ -972,7 +976,7 @@ class InAppWebViewController {
       manifestResponse = await manifestRequest.close();
       manifestFound = manifestResponse.statusCode == 200 &&
           manifestResponse.headers.contentType?.mimeType == "application/json";
-    } catch (e, stacktrace) {
+    } catch (e) {
       print("Manifest file not found: " + e.toString());
       // print(stacktrace);
     }

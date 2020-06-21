@@ -970,8 +970,6 @@ class ServerTrustChallenge {
   IOSSslError iosError;
 
   ///The message associated to the [androidError]/[iosError].
-  ///
-  ///**NOTE**: on iOS this value is always an empty string.
   String message;
 
   ///The SSL certificate used for this challenge.
@@ -4129,8 +4127,11 @@ class SslCertificateDName {
   SslCertificateDName(
       // ignore: non_constant_identifier_names
       {this.CName = "",
+      // ignore: non_constant_identifier_names
       this.DName = "",
+      // ignore: non_constant_identifier_names
       this.OName = "",
+      // ignore: non_constant_identifier_names
       this.UName = ""});
 
   static SslCertificateDName fromMap(Map<String, dynamic> map) {

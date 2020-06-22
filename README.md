@@ -5,7 +5,6 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](/LICENSE)
 
 [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/LorenzoPichilli)
-[![Donate to this project using Patreon](https://img.shields.io/badge/patreon-donate-yellow.svg)](https://www.patreon.com/bePatron?u=9269604)
 
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
@@ -474,7 +473,7 @@ This event will be dispatched as soon as the platform (Android or iOS) is ready 
 ```
 
 `window.flutter_inappwebview.callHandler` returns a JavaScript [Promise](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise)
-that can be used to get the json result returned by `JavaScriptHandlerCallback.
+that can be used to get the json result returned by `JavaScriptHandlerCallback`.
 In this case, simply return data that you want to send and it will be automatically json encoded using `jsonEncode` from the `dart:convert` library.
 
 So, on the JavaScript side, to get data coming from the Dart side, you will use:

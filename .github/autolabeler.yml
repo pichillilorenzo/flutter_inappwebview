@@ -1,0 +1,8 @@
+# Configuration for probot-auto-labeler - https://github.com/probot/autolabeler
+
+# label: file | path
+android: ["/android", "*.kt", "*.java", "*gradle*", "AndroidManifest.xml"]
+iOS: ["/ios", "*.swift", "*.h", "*.m", "*.xcodeproj", "*.xcworkspace", "*.plist", "*.storyboard", "*.xcconfig", Podfile*"]
+flutter/dart: ["/lib", "*.dart"]
+documentation: ["*.md"]
+legal: ["LICENSE*", "NOTICES*"]

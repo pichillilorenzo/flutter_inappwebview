@@ -27,7 +27,8 @@ labels: bug
 | Android version      |               |
 | iOS version          |               |
 | Xcode version        |               |
-| Device information   |               |
+
+Device information: <!-- Manufacturer and model -->
 
 ## Description
 

@@ -1,3 +1,7 @@
+## 3.4.0+2
+
+- Revert default `InAppWebView.gestureRecognizers` value to null on Android
+
 ## 3.4.0+1
 
 - Update README.md

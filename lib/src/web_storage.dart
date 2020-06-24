@@ -21,6 +21,7 @@ class WebStorage {
 class WebStorageItem {
   ///Item key.
   String key;
+
   ///Item value.
   dynamic value;
 
@@ -46,7 +47,6 @@ class WebStorageItem {
 ///Class that provides methods to manage the JavaScript [Storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) object.
 ///It is used by [LocalStorage] and [SessionStorage].
 class Storage {
-
   InAppWebViewController _controller;
 
   ///The web storage type: `window.sessionStorage` or `window.localStorage`.

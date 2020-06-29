@@ -30,7 +30,8 @@ const javaScriptHandlerForbiddenNames = [
   "onAjaxProgress",
   "shouldInterceptFetchRequest",
   "onPrint",
-  "androidKeyboardWorkaroundFocusoutEvent"
+  "onWindowFocus",
+  "onWindowBlur",
 ];
 
 ///Controls a WebView, such as an [InAppWebView] widget instance, a [HeadlessInAppWebView] instance or [InAppBrowser] WebView instance.
@@ -206,21 +207,74 @@ class InAppWebViewController {
         break;
       case "onCreateWindow":
         String url = call.arguments["url"];
+        int windowId = call.arguments["windowId"];
         bool androidIsDialog = call.arguments["androidIsDialog"];
         bool androidIsUserGesture = call.arguments["androidIsUserGesture"];
         int iosWKNavigationType = call.arguments["iosWKNavigationType"];
+        bool iosIsForMainFrame = call.arguments["iosIsForMainFrame"];
 
-        OnCreateWindowRequest onCreateWindowRequest = OnCreateWindowRequest(
+        CreateWindowRequest createWindowRequest = CreateWindowRequest(
             url: url,
+            windowId: windowId,
             androidIsDialog: androidIsDialog,
             androidIsUserGesture: androidIsUserGesture,
             iosWKNavigationType:
-                IOSWKNavigationType.fromValue(iosWKNavigationType));
+                IOSWKNavigationType.fromValue(iosWKNavigationType),
+            iosIsForMainFrame: iosIsForMainFrame);
+
+        WebView webView;
+        dynamic inAppBrowserWindow;
 
         if (_webview != null && _webview.onCreateWindow != null)
-          _webview.onCreateWindow(this, onCreateWindowRequest);
+          webView = await _webview.onCreateWindow(this, createWindowRequest);
+        else if (_inAppBrowser != null) {
+          inAppBrowserWindow = await _inAppBrowser.onCreateWindow(createWindowRequest);
+          assert(
+            inAppBrowserWindow is InAppBrowser || inAppBrowserWindow is HeadlessInAppWebView,
+            "InAppBrowser.onCreateWindow should return an \"InAppBrowser\" instance or a \"HeadlessInAppWebView\" instance."
+          );
+        }
+
+        int webViewWindowId;
+
+        if (webView != null) {
+          webViewWindowId = webView.windowId;
+          assert(webViewWindowId !=
+              null, "If you are returning a WebView, then WebView.windowId should be not null. To set the " +
+              "WebView.windowId property, you should use the CreateWindowRequest.windowId property.");
+          if (webView is HeadlessInAppWebView) {
+            webView.run();
+          }
+        } else if (inAppBrowserWindow != null) {
+          if (inAppBrowserWindow is InAppBrowser) {
+            webViewWindowId = inAppBrowserWindow.windowId;
+            assert(webViewWindowId !=
+                null, "If you are returning an InAppBrowser, then InAppBrowser.windowId should be not null. To set the " +
+                "InAppBrowser.windowId property, you should use the CreateWindowRequest.windowId property.");
+            inAppBrowserWindow.openUrl(url: "about:blank");
+          }
+          else if (inAppBrowserWindow is HeadlessInAppWebView) {
+            webViewWindowId = inAppBrowserWindow.windowId;
+            assert(webViewWindowId !=
+                null, "If you are returning a HeadlessInAppWebView, then HeadlessInAppWebView.windowId should be not null. To set the " +
+                "HeadlessInAppWebView.windowId property, you should use the CreateWindowRequest.windowId property.");
+            inAppBrowserWindow.run();
+          }
+        }
+
+        return webViewWindowId;
+      case "onCloseWindow":
+        if (_webview != null && _webview.onCloseWindow != null)
+          _webview.onCloseWindow(this);
         else if (_inAppBrowser != null)
-          _inAppBrowser.onCreateWindow(onCreateWindowRequest);
+          _inAppBrowser.onCloseWindow();
+        break;
+      case "onTitleChanged":
+        String title = call.arguments["title"];
+        if (_webview != null && _webview.onTitleChanged != null)
+          _webview.onTitleChanged(this, title);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.onTitleChanged(title);
         break;
       case "onGeolocationPermissionsShowPrompt":
         String origin = call.arguments["origin"];
@@ -312,29 +366,97 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           _inAppBrowser.androidOnScaleChanged(oldScale, newScale);
         break;
-      case "onJsAlert":
-        String message = call.arguments["message"];
-        if (_webview != null && _webview.onJsAlert != null)
-          return (await _webview.onJsAlert(this, message))?.toMap();
+      case "onRequestFocus":
+        if (_webview != null && _webview.androidOnRequestFocus != null)
+          _webview.androidOnRequestFocus(this);
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsAlert(message))?.toMap();
+          _inAppBrowser.androidOnRequestFocus();
+        break;
+      case "onReceivedIcon":
+        Uint8List icon = Uint8List.fromList(call.arguments["icon"].cast<int>());
+
+        if (_webview != null && _webview.androidOnReceivedIcon != null)
+          _webview.androidOnReceivedIcon(this, icon);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.androidOnReceivedIcon(icon);
+        break;
+      case "onReceivedTouchIconUrl":
+        String url = call.arguments["url"];
+        bool precomposed = call.arguments["precomposed"];
+        if (_webview != null && _webview.androidOnReceivedTouchIconUrl != null)
+          _webview.androidOnReceivedTouchIconUrl(this, url, precomposed);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.androidOnReceivedTouchIconUrl(url, precomposed);
+        break;
+      case "onJsAlert":
+        String url = call.arguments["url"];
+        String message = call.arguments["message"];
+        bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
+
+        JsAlertRequest jsAlertRequest = JsAlertRequest(
+          url: url,
+          message: message,
+          iosIsMainFrame: iosIsMainFrame
+        );
+
+        if (_webview != null && _webview.onJsAlert != null)
+          return (await _webview.onJsAlert(this, jsAlertRequest))?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.onJsAlert(jsAlertRequest))?.toMap();
         break;
       case "onJsConfirm":
+        String url = call.arguments["url"];
         String message = call.arguments["message"];
+        bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
+
+        JsConfirmRequest jsConfirmRequest = JsConfirmRequest(
+            url: url,
+            message: message,
+            iosIsMainFrame: iosIsMainFrame
+        );
+
         if (_webview != null && _webview.onJsConfirm != null)
-          return (await _webview.onJsConfirm(this, message))?.toMap();
+          return (await _webview.onJsConfirm(this, jsConfirmRequest))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsConfirm(message))?.toMap();
+          return (await _inAppBrowser.onJsConfirm(jsConfirmRequest))?.toMap();
         break;
       case "onJsPrompt":
+        String url = call.arguments["url"];
         String message = call.arguments["message"];
         String defaultValue = call.arguments["defaultValue"];
+        bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
+
+        JsPromptRequest jsPromptRequest = JsPromptRequest(
+            url: url,
+            message: message,
+            defaultValue: defaultValue,
+            iosIsMainFrame: iosIsMainFrame
+        );
+
         if (_webview != null && _webview.onJsPrompt != null)
-          return (await _webview.onJsPrompt(this, message, defaultValue))
+          return (await _webview.onJsPrompt(this, jsPromptRequest))
               ?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsPrompt(message, defaultValue))
+          return (await _inAppBrowser.onJsPrompt(jsPromptRequest))
               ?.toMap();
+        break;
+      case "onJsBeforeUnload":
+        String url = call.arguments["url"];
+        String message = call.arguments["message"];
+        bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
+
+        JsBeforeUnloadRequest jsBeforeUnloadRequest = JsBeforeUnloadRequest(
+            url: url,
+            message: message,
+            iosIsMainFrame: iosIsMainFrame
+        );
+
+        print(jsBeforeUnloadRequest);
+
+        if (_webview != null && _webview.androidOnJsBeforeUnload != null)
+          return (await _webview.androidOnJsBeforeUnload(this, jsBeforeUnloadRequest))?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser.androidOnJsBeforeUnload(jsBeforeUnloadRequest))?.toMap();
         break;
       case "onSafeBrowsingHit":
         String url = call.arguments["url"];
@@ -347,6 +469,22 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           return (await _inAppBrowser.androidOnSafeBrowsingHit(url, threatType))
               ?.toMap();
+        break;
+      case "onReceivedLoginRequest":
+        String realm = call.arguments["realm"];
+        String account = call.arguments["account"];
+        String args = call.arguments["args"];
+
+        LoginRequest loginRequest = LoginRequest(
+          realm: realm,
+          account: account,
+          args: args
+        );
+
+        if (_webview != null && _webview.androidOnReceivedLoginRequest != null)
+          _webview.androidOnReceivedLoginRequest(this, loginRequest);
+        else if (_inAppBrowser != null)
+          _inAppBrowser.androidOnReceivedLoginRequest(loginRequest);
         break;
       case "onReceivedHttpAuthRequest":
         String host = call.arguments["host"];
@@ -801,6 +939,18 @@ class InAppWebViewController {
               _webview.onPrint(this, url);
             else if (_inAppBrowser != null) _inAppBrowser.onPrint(url);
             return null;
+          case "onWindowFocus":
+            if (_webview != null && _webview.onWindowFocus != null)
+              _webview.onWindowFocus(this);
+            else if (_inAppBrowser != null)
+              _inAppBrowser.onWindowFocus();
+            return null;
+          case "onWindowBlur":
+            if (_webview != null && _webview.onWindowBlur != null)
+              _webview.onWindowBlur(this);
+            else if (_inAppBrowser != null)
+              _inAppBrowser.onWindowBlur();
+            return null;
         }
 
         if (javaScriptHandlersMap.containsKey(handlerName)) {
@@ -822,6 +972,7 @@ class InAppWebViewController {
   ///This is not always the same as the URL passed to [WebView.onLoadStart] because although the load for that URL has begun, the current page may not have changed.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getUrl()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415005-url
   Future<String> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -831,6 +982,7 @@ class InAppWebViewController {
   ///Gets the title for the current page.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getTitle()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415015-title
   Future<String> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -840,6 +992,7 @@ class InAppWebViewController {
   ///Gets the progress for the current page. The progress value is between 0 and 100.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getProgress()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress
   Future<int> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1039,6 +1192,7 @@ class InAppWebViewController {
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414954-load
   Future<void> loadUrl(
       {@required String url, Map<String, String> headers = const {}}) async {
@@ -1071,6 +1225,7 @@ class InAppWebViewController {
   ///The [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)
+  ///
   ///**Official iOS API**:
   ///- https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring
   ///- https://developer.apple.com/documentation/webkit/wkwebview/1415011-load
@@ -1132,6 +1287,7 @@ class InAppWebViewController {
   ///Reloads the WebView.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#reload()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1141,6 +1297,7 @@ class InAppWebViewController {
   ///Goes back in the history of the WebView.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#goBack()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1150,6 +1307,7 @@ class InAppWebViewController {
   ///Returns a boolean value indicating whether the WebView can move backward.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#canGoBack()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1159,6 +1317,7 @@ class InAppWebViewController {
   ///Goes forward in the history of the WebView.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#goForward()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1168,6 +1327,7 @@ class InAppWebViewController {
   ///Returns a boolean value indicating whether the WebView can move forward.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#canGoForward()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1177,6 +1337,7 @@ class InAppWebViewController {
   ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#goBackOrForward(int)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414991-go
   Future<void> goBackOrForward({@required int steps}) async {
     assert(steps != null);
@@ -1211,6 +1372,7 @@ class InAppWebViewController {
   ///Stops the WebView from loading.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#stopLoading()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1225,6 +1387,7 @@ class InAppWebViewController {
   ///where you know the page is ready "enough".
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415017-evaluatejavascript
   Future<dynamic> evaluateJavascript({@required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1396,6 +1559,7 @@ class InAppWebViewController {
   ///The object returned from this method will not be updated to reflect any new state.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#copyBackForwardList()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist
   Future<WebHistory> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1488,6 +1652,7 @@ class InAppWebViewController {
   ///[animated] `true` to animate the scroll transition, `false` to make the scoll transition immediate.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
   Future<void> scrollTo(
       {@required int x, @required int y, bool animated = false}) async {
@@ -1508,6 +1673,7 @@ class InAppWebViewController {
   ///[animated] `true` to animate the scroll transition, `false` to make the scoll transition immediate.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset
   Future<void> scrollBy(
       {@required int x, @required int y, bool animated = false}) async {
@@ -1545,6 +1711,7 @@ class InAppWebViewController {
   ///**NOTE**: available on Android 21+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/print/PrintManager
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller
   Future<void> printCurrentPage() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1554,6 +1721,7 @@ class InAppWebViewController {
   ///Gets the height of the HTML content.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#getContentHeight()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize
   Future<int> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1567,6 +1735,7 @@ class InAppWebViewController {
   ///**NOTE**: available on Android 21+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale
   Future<void> zoomBy(double zoomFactor) async {
     assert(!Platform.isAndroid ||
@@ -1582,6 +1751,7 @@ class InAppWebViewController {
   ///**Official Android API**:
   ///- https://developer.android.com/reference/android/util/DisplayMetrics#density
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale
   Future<double> getScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1616,6 +1786,7 @@ class InAppWebViewController {
   ///Clears the current focus. It will clear also, for example, the current text selection.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/ViewGroup#clearFocus()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiresponder/1621097-resignfirstresponder
   Future<void> clearFocus() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1753,6 +1924,7 @@ class InAppWebViewController {
   ///Returns the scrolled left position of the current WebView.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#getScrollX()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset
   Future<int> getScrollX() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1762,6 +1934,7 @@ class InAppWebViewController {
   ///Returns the scrolled top position of the current WebView.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/view/View#getScrollY()
+  ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset
   Future<int> getScrollY() async {
     Map<String, dynamic> args = <String, dynamic>{};

@@ -71,7 +71,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
           Map<String, String> headers = (Map<String, String>) call.argument("headers");
           HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
-          openUrl(activity, uuid, url, options, headers, contextMenu);
+          Integer windowId = (Integer) call.argument("windowId");
+          openUrl(activity, uuid, url, options, headers, contextMenu, windowId);
         }
         result.success(true);
         break;
@@ -88,7 +89,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
           Map<String, String> headers = (Map<String, String>) call.argument("headers");
           HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
-          openUrl(activity, uuid, url, options, headers, contextMenu);
+          Integer windowId = (Integer) call.argument("windowId");
+          openUrl(activity, uuid, url, options, headers, contextMenu, windowId);
         }
         result.success(true);
         break;
@@ -101,7 +103,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           String baseUrl = (String) call.argument("baseUrl");
           String historyUrl = (String) call.argument("historyUrl");
           HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
-          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu);
+          Integer windowId = (Integer) call.argument("windowId");
+          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu, windowId);
         }
         result.success(true);
         break;
@@ -192,7 +195,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     }
   }
 
-  public void openUrl(Activity activity, String uuid, String url, HashMap<String, Object> options, Map<String, String> headers, HashMap<String, Object> contextMenu) {
+  public void openUrl(Activity activity, String uuid, String url, HashMap<String, Object> options, Map<String, String> headers,
+                      HashMap<String, Object> contextMenu, Integer windowId) {
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putString("url", url);
@@ -201,10 +205,12 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putSerializable("options", options);
     extras.putSerializable("headers", (Serializable) headers);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
+    extras.putInt("windowId", windowId != null ? windowId : -1);
     startInAppBrowserActivity(activity, extras);
   }
 
-  public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding, String baseUrl, String historyUrl, HashMap<String, Object> contextMenu) {
+  public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding,
+                       String baseUrl, String historyUrl, HashMap<String, Object> contextMenu, Integer windowId) {
     Bundle extras = new Bundle();
     extras.putBoolean("isData", true);
     extras.putString("uuid", uuid);
@@ -215,6 +221,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putString("baseUrl", baseUrl);
     extras.putString("historyUrl", historyUrl);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
+    extras.putInt("windowId", windowId != null ? windowId : -1);
     startInAppBrowserActivity(activity, extras);
   }
 

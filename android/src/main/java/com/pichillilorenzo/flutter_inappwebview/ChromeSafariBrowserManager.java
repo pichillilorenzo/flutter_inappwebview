@@ -45,7 +45,8 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
           Map<String, String> headersFallback = (Map<String, String>) call.argument("headersFallback");
           HashMap<String, Object> optionsFallback = (HashMap<String, Object>) call.argument("optionsFallback");
           HashMap<String, Object> contextMenuFallback = (HashMap<String, Object>) call.argument("contextMenuFallback");
-          open(activity, uuid, url, options, menuItemList, uuidFallback, headersFallback, optionsFallback, contextMenuFallback, result);
+          Integer windowIdFallback = (Integer) call.argument("windowIdFallback");
+          open(activity, uuid, url, options, menuItemList, uuidFallback, headersFallback, optionsFallback, contextMenuFallback, windowIdFallback, result);
         }
         break;
       default:
@@ -54,7 +55,8 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
   }
 
   public void open(Activity activity, String uuid, String url, HashMap<String, Object> options, List<HashMap<String, Object>> menuItemList, String uuidFallback,
-                   Map<String, String> headersFallback, HashMap<String, Object> optionsFallback, HashMap<String, Object> contextMenuFallback, MethodChannel.Result result) {
+                   Map<String, String> headersFallback, HashMap<String, Object> optionsFallback, HashMap<String, Object> contextMenuFallback, Integer windowIdFallback,
+                   MethodChannel.Result result) {
 
     Intent intent = null;
     Bundle extras = new Bundle();
@@ -67,6 +69,8 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
 
     extras.putSerializable("headers", (Serializable) headersFallback);
     extras.putSerializable("contextMenu", (Serializable) contextMenuFallback);
+
+    extras.putInt("windowId", windowIdFallback != null ? windowIdFallback : -1);
 
     if (CustomTabActivityHelper.isAvailable(activity)) {
       intent = new Intent(activity, ChromeCustomTabsActivity.class);

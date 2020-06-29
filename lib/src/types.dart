@@ -439,6 +439,37 @@ class GeolocationPermissionShowPromptResponse {
   }
 }
 
+///Class that represents the request of the [WebView.onJsAlert] event.
+class JsAlertRequest {
+  ///The url of the page requesting the dialog.
+  String url;
+
+  ///Message to be displayed in the window.
+  String message;
+
+  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  bool iosIsMainFrame;
+
+  JsAlertRequest({
+    this.url,
+    this.message,
+    this.iosIsMainFrame
+  });
+
+  Map<String, dynamic> toMap() {
+    return {"url": url, "message": message, "iosIsMainFrame": iosIsMainFrame};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
 ///Class used by [JsAlertResponse] class.
 class JsAlertResponseAction {
   final int _value;
@@ -482,6 +513,37 @@ class JsAlertResponse {
       "handledByClient": handledByClient,
       "action": action?.toValue()
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the request of the [WebView.onJsConfirm] event.
+class JsConfirmRequest {
+  ///The url of the page requesting the dialog.
+  String url;
+
+  ///Message to be displayed in the window.
+  String message;
+
+  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  bool iosIsMainFrame;
+
+  JsConfirmRequest({
+    this.url,
+    this.message,
+    this.iosIsMainFrame
+  });
+
+  Map<String, dynamic> toMap() {
+    return {"url": url, "message": message, "iosIsMainFrame": iosIsMainFrame};
   }
 
   Map<String, dynamic> toJson() {
@@ -555,6 +617,41 @@ class JsConfirmResponse {
   }
 }
 
+///Class that represents the request of the [WebView.onJsPrompt] event.
+class JsPromptRequest {
+  ///The url of the page requesting the dialog.
+  String url;
+
+  ///Message to be displayed in the window.
+  String message;
+
+  ///The default value displayed in the prompt dialog.
+  String defaultValue;
+
+  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  bool iosIsMainFrame;
+
+  JsPromptRequest({
+    this.url,
+    this.message,
+    this.defaultValue,
+    this.iosIsMainFrame
+  });
+
+  Map<String, dynamic> toMap() {
+    return {"url": url, "message": message, "defaultValue": defaultValue, "iosIsMainFrame": iosIsMainFrame};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
 ///Class used by [JsPromptResponse] class.
 class JsPromptResponseAction {
   final int _value;
@@ -612,6 +709,98 @@ class JsPromptResponse {
       "cancelButtonTitle": cancelButtonTitle,
       "handledByClient": handledByClient,
       "value": value,
+      "action": action?.toValue()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the request of the [WebView.androidOnJsBeforeUnload] event.
+class JsBeforeUnloadRequest {
+  ///The url of the page requesting the dialog.
+  String url;
+
+  ///Message to be displayed in the window.
+  String message;
+
+  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  bool iosIsMainFrame;
+
+  JsBeforeUnloadRequest({
+    this.url,
+    this.message,
+    this.iosIsMainFrame
+  });
+
+  Map<String, dynamic> toMap() {
+    return {"url": url, "message": message, "iosIsMainFrame": iosIsMainFrame};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class used by [JsBeforeUnloadResponse] class.
+class JsBeforeUnloadResponseAction {
+  final int _value;
+
+  const JsBeforeUnloadResponseAction._internal(this._value);
+
+  int toValue() => _value;
+
+  static const CONFIRM = const JsBeforeUnloadResponseAction._internal(0);
+  static const CANCEL = const JsBeforeUnloadResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents the response used by the [WebView.androidOnJsBeforeUnload] event to control a JavaScript alert dialog.
+class JsBeforeUnloadResponse {
+  ///Message to be displayed in the window.
+  String message;
+
+  ///Title of the confirm button.
+  String confirmButtonTitle;
+
+  ///Title of the cancel button.
+  String cancelButtonTitle;
+
+  ///Whether the client will handle the alert dialog.
+  bool handledByClient;
+
+  ///Action used to confirm that the user hit confirm button.
+  JsBeforeUnloadResponseAction action;
+
+  JsBeforeUnloadResponse(
+      {this.message = "",
+        this.handledByClient = false,
+        this.confirmButtonTitle = "",
+        this.cancelButtonTitle = "",
+        this.action = JsBeforeUnloadResponseAction.CONFIRM});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "message": message,
+      "confirmButtonTitle": confirmButtonTitle,
+      "cancelButtonTitle": cancelButtonTitle,
+      "handledByClient": handledByClient,
       "action": action?.toValue()
     };
   }
@@ -2954,10 +3143,15 @@ class ShouldOverrideUrlLoadingRequest {
 }
 
 ///Class that represents the navigation request used by the [WebView.onCreateWindow] event.
-class OnCreateWindowRequest {
-  ///Represents the url of the navigation request.
+class CreateWindowRequest {
+  ///The URL of the request.
+  ///
+  ///**NOTE**: On Android, if the window has been created using JavaScript, this will be `null`.
   String url;
 
+  ///The window id. Used by [WebView] to create a new WebView.
+  int windowId;
+  
   ///Indicates if the new window should be a dialog, rather than a full-size window. Available only on Android.
   bool androidIsDialog;
 
@@ -2967,18 +3161,24 @@ class OnCreateWindowRequest {
   ///The type of action triggering the navigation. Available only on iOS.
   IOSWKNavigationType iosWKNavigationType;
 
-  OnCreateWindowRequest(
+  ///Whether the request was made in order to fetch the main frame's document. Available only on iOS.
+  bool iosIsForMainFrame;
+
+  CreateWindowRequest(
       {this.url,
+      this.windowId,
       this.androidIsDialog,
       this.androidIsUserGesture,
-      this.iosWKNavigationType});
+      this.iosWKNavigationType,
+      this.iosIsForMainFrame});
 
   Map<String, dynamic> toMap() {
     return {
-      "url": url,
       "androidIsDialog": androidIsDialog,
       "androidIsUserGesture": androidIsUserGesture,
-      "iosWKNavigationType": iosWKNavigationType?.toValue()
+      "iosWKNavigationType": iosWKNavigationType?.toValue(),
+      "iosUrl": url,
+      "windowId": windowId
     };
   }
 
@@ -4151,6 +4351,42 @@ class SslCertificateDName {
       "DName": DName,
       "OName": OName,
       "UName": UName,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class used by [WebView.androidOnReceivedLoginRequest] event.
+class LoginRequest {
+  ///The account realm used to look up accounts.
+  String realm;
+
+  ///An optional account. If not `null`, the account should be checked against accounts on the device.
+  ///If it is a valid account, it should be used to log in the user. This value may be `null`.
+  String account;
+
+  ///Authenticator specific arguments used to log in the user.
+  String args;
+
+  LoginRequest({
+    this.realm,
+    this.account,
+    this.args
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "realm": realm,
+      "account": account,
+      "args": args
     };
   }
 

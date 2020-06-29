@@ -12,7 +12,6 @@ import SafariServices
 public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafariViewControllerDelegate {
     
     var channel: FlutterMethodChannel?
-    var tmpWindow: UIWindow?
     var safariOptions: SafariBrowserOptions?
     var uuid: String = ""
     var menuItemList: [[String: Any]] = []
@@ -48,6 +47,13 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
         onChromeSafariBrowserOpened()
     }
     
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        self.onChromeSafariBrowserClosed()
+        self.dispose()
+    }
+    
+    
     func prepareSafariBrowser() {
         if #available(iOS 11.0, *) {
             self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: (safariOptions?.dismissButtonStyle)!)!
@@ -69,11 +75,8 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     func close(result: FlutterResult?) {
         dismiss(animated: true)
         
+        // wait for the animation
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {() -> Void in
-            self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
-            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-            self.onChromeSafariBrowserClosed()
-            self.dispose()
             if result != nil {
                result!(true)
             }

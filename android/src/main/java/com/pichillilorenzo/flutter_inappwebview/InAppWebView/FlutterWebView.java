@@ -1,11 +1,11 @@
 package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.content.Context;
-import android.content.MutableContextWrapper;
 import android.hardware.display.DisplayManager;
 import android.os.Build;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.view.View;
 import android.webkit.ValueCallback;
@@ -25,6 +25,7 @@ import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.flutter.embedding.android.FlutterView;
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
@@ -54,6 +55,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     final Map<String, String> initialHeaders = (Map<String, String>) params.get("initialHeaders");
     Map<String, Object> initialOptions = (Map<String, Object>) params.get("initialOptions");
     Map<String, Object> contextMenu = (Map<String, Object>) params.get("contextMenu");
+    Integer windowId = (Integer) params.get("windowId");
 
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
@@ -70,7 +72,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
     // displayListenerProxy.onPostWebViewInitialization(displayManager);
     // mMutableContext.setBaseContext(context);
 
-    webView = new InAppWebView(Shared.activity, this, id, options, contextMenu, containerView);
+    webView = new InAppWebView(Shared.activity, this, id, windowId, options, contextMenu, containerView);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     // fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/182
@@ -89,33 +91,41 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
 
     webView.prepare();
 
-    if (initialFile != null) {
-      try {
-        initialUrl = Util.getUrlAsset(initialFile);
-      } catch (IOException e) {
-        e.printStackTrace();
-        Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
-        return;
+    if (windowId != null) {
+      Message resultMsg = InAppWebViewChromeClient.windowWebViewMessages.get(windowId);
+      if (resultMsg != null) {
+        ((WebView.WebViewTransport) resultMsg.obj).setWebView(webView);
+        resultMsg.sendToTarget();
       }
-    }
-
-    final String finalInitialUrl = initialUrl;
-    Handler handler = new Handler(Looper.getMainLooper());
-    handler.post(new Runnable() {
-      @Override
-      public void run() {
-        if (initialData != null) {
-          String data = initialData.get("data");
-          String mimeType = initialData.get("mimeType");
-          String encoding = initialData.get("encoding");
-          String baseUrl = initialData.get("baseUrl");
-          String historyUrl = initialData.get("historyUrl");
-          webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+    } else {
+      if (initialFile != null) {
+        try {
+          initialUrl = Util.getUrlAsset(initialFile);
+        } catch (IOException e) {
+          e.printStackTrace();
+          Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
+          return;
         }
-        else
-          webView.loadUrl(finalInitialUrl, initialHeaders);
       }
-    });
+
+      final String finalInitialUrl = initialUrl;
+      Handler handler = new Handler(Looper.getMainLooper());
+      handler.post(new Runnable() {
+        @Override
+        public void run() {
+          if (initialData != null) {
+            String data = initialData.get("data");
+            String mimeType = initialData.get("mimeType");
+            String encoding = initialData.get("encoding");
+            String baseUrl = initialData.get("baseUrl");
+            String historyUrl = initialData.get("historyUrl");
+            webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+          }
+          else
+            webView.loadUrl(finalInitialUrl, initialHeaders);
+        }
+      });
+    }
 
     if (containerView == null && id instanceof String) {
       Map<String, Object> obj = new HashMap<>();
@@ -513,6 +523,7 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
       }
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
+        @Override
         public void onPageFinished(WebView view, String url) {
           webView.dispose();
           webView.destroy();

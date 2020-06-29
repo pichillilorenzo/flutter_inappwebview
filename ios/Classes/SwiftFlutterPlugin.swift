@@ -37,9 +37,6 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
     
-    var tmpWindow: UIWindow?
-    private var previousStatusBarStyle = -1
-    
     public init(with registrar: FlutterPluginRegistrar) {
         super.init()
         

@@ -35,9 +35,11 @@ import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
+import android.webkit.WebChromeClient;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.webkit.WebViewClient;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -46,6 +48,7 @@ import androidx.annotation.Keep;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
+import androidx.webkit.WebViewRenderProcessClient;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -84,6 +87,7 @@ final public class InAppWebView extends InputAwareWebView {
   public FlutterWebView flutterWebView;
   public MethodChannel channel;
   public Object id;
+  public Integer windowId;
   public InAppWebViewClient inAppWebViewClient;
   public InAppWebViewChromeClient inAppWebViewChromeClient;
   public InAppWebViewRenderProcessClient inAppWebViewRenderProcessClient;
@@ -107,6 +111,13 @@ final public class InAppWebView extends InputAwareWebView {
 
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
+
+  static final String scriptsWrapperJS = "(function(){" +
+          "  if (window." + JavaScriptBridgeInterface.name + "._scriptsLoaded == null) {" +
+          "    $PLACEHOLDER_VALUE" +
+          "    window." + JavaScriptBridgeInterface.name + "._scriptsLoaded = true;" +
+          "  }" +
+          "})();";
 
   static final String consoleLogJS = "(function(console) {" +
           "   var oldLogs = {" +
@@ -138,7 +149,12 @@ final public class InAppWebView extends InputAwareWebView {
           "  window." + JavaScriptBridgeInterface.name + ".callHandler('onPrint', window.location.href);" +
           "};";
 
-  static final String platformReadyJS = "window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));";
+  static final String platformReadyJS = "(function() {" +
+          "  if (window." + JavaScriptBridgeInterface.name + "._platformReady == null) {" +
+          "    window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));" +
+          "    window." + JavaScriptBridgeInterface.name + "._platformReady = true;" +
+          "  }" +
+          "})();";
 
   static final String variableForOnLoadResourceJS = "window._flutter_inappwebview_useOnLoadResource";
   static final String enableVariableForOnLoadResourceJS = variableForOnLoadResourceJS + " = $PLACEHOLDER_VALUE;";
@@ -592,6 +608,18 @@ final public class InAppWebView extends InputAwareWebView {
           "  });" +
           "})();";
 
+  static final String onWindowFocusEventJS = "(function(){" +
+          "  window.addEventListener('focus', function(e) {" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onWindowFocus');" +
+          "  });" +
+          "})();";
+
+    static final String onWindowBlurEventJS = "(function(){" +
+          "  window.addEventListener('blur', function(e) {" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onWindowBlur');" +
+          "  });" +
+          "})();";
+
   public InAppWebView(Context context) {
     super(context);
   }
@@ -604,7 +632,7 @@ final public class InAppWebView extends InputAwareWebView {
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(Context context, Object obj, Object id, InAppWebViewOptions options, Map<String, Object> contextMenu, View containerView) {
+  public InAppWebView(Context context, Object obj, Object id, Integer windowId, InAppWebViewOptions options, Map<String, Object> contextMenu, View containerView) {
     super(context, containerView);
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
@@ -612,6 +640,7 @@ final public class InAppWebView extends InputAwareWebView {
       this.flutterWebView = (FlutterWebView) obj;
     this.channel = (this.inAppBrowserActivity != null) ? this.inAppBrowserActivity.channel : this.flutterWebView.channel;
     this.id = id;
+    this.windowId = windowId;
     this.options = options;
     this.contextMenu = contextMenu;
     Shared.activity.registerForContextMenu(this);
@@ -1949,12 +1978,22 @@ final public class InAppWebView extends InputAwareWebView {
 
   @Override
   public void dispose() {
+    if (windowId != null && InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
+      InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
+    }
+    headlessHandler.removeCallbacksAndMessages(null);
+    mHandler.removeCallbacksAndMessages(null);
+    removeJavascriptInterface(JavaScriptBridgeInterface.name);
+    removeAllViews();
+    if (checkContextMenuShouldBeClosedTask != null)
+      removeCallbacks(checkContextMenuShouldBeClosedTask);
+    if (checkScrollStoppedTask != null)
+      removeCallbacks(checkScrollStoppedTask);
     super.dispose();
   }
 
   @Override
   public void destroy() {
-    headlessHandler.removeCallbacksAndMessages(null);
     super.destroy();
   }
 }

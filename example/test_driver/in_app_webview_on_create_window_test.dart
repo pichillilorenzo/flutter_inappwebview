@@ -48,8 +48,9 @@ class InAppWebViewOnCreateWindowTestState extends WidgetTestState {
                         });
                       }
                     },
-                    onCreateWindow: (InAppWebViewController controller, OnCreateWindowRequest onCreateWindowRequest) {
-                      controller.loadUrl(url: onCreateWindowRequest.url);
+                    onCreateWindow: (InAppWebViewController controller, CreateWindowRequest createWindowRequest) async {
+                      controller.loadUrl(url: createWindowRequest.url);
+                      return null;
                     },
                   ),
                 ),

@@ -14,17 +14,16 @@ import AVFoundation
 typealias OlderClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Any?) -> Void
 typealias NewerClosureType =  @convention(c) (Any, Selector, UnsafeRawPointer, Bool, Bool, Bool, Any?) -> Void
 
-public class InAppWebView_IBWrapper: InAppWebView {
-    required init(coder: NSCoder) {
-        let config = WKWebViewConfiguration()
-        super.init(frame: .zero, configuration: config, IABController: nil, contextMenu: nil, channel: nil)
+public class InAppWebView_IBWrapper: UIView {
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
         self.translatesAutoresizingMaskIntoConstraints = false
     }
 }
 
 public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIScrollViewDelegate, WKUIDelegate, UITextFieldDelegate {
     
-    @IBOutlet var containerWebView: UIView!
+    @IBOutlet var containerWebView: InAppWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
     @IBOutlet var reloadButton: UIBarButtonItem!
     @IBOutlet var backButton: UIBarButtonItem!
@@ -43,6 +42,7 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     @IBOutlet var webView_TopFullScreenConstraint: NSLayoutConstraint!
     
     var uuid: String = ""
+    var windowId: Int64?
     var webView: InAppWebView!
     var channel: FlutterMethodChannel?
     var initURL: URL?
@@ -385,41 +385,57 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     
     public override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
+            print(containerWebView)
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
-            self.webView = InAppWebView(frame: .zero, configuration: preWebviewConfiguration, IABController: self, contextMenu: contextMenu, channel: channel!)
+            if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+                self.webView = webViewTransport.webView
+                self.webView.IABController = self
+                self.webView.contextMenu = contextMenu
+                self.webView.channel = channel!
+            } else {
+                self.webView = InAppWebView(frame: .zero,
+                                            configuration: preWebviewConfiguration,
+                                            IABController: self,
+                                            contextMenu: contextMenu,
+                                            channel: channel!)
+            }
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
             
-            if #available(iOS 11.0, *) {
-                if let contentBlockers = webView.options?.contentBlockers, contentBlockers.count > 0 {
-                    do {
-                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                        let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
-                        WKContentRuleListStore.default().compileContentRuleList(
-                            forIdentifier: "ContentBlockingRules",
-                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
-                                
-                                if let error = error {
-                                    print(error.localizedDescription)
-                                    return
-                                }
-                                
-                                let configuration = self.webView!.configuration
-                                configuration.userContentController.add(contentRuleList!)
-                                
-                                self.initLoad(initURL: self.initURL, initData: self.initData, initMimeType: self.initMimeType, initEncoding: self.initEncoding, initBaseUrl: self.initBaseUrl, initHeaders: self.initHeaders)
-                                
-                                self.onBrowserCreated()
+            if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+                self.webView.load(webViewTransport.request)
+            } else {
+                if #available(iOS 11.0, *) {
+                    if let contentBlockers = webView.options?.contentBlockers, contentBlockers.count > 0 {
+                        do {
+                            let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                            let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                            WKContentRuleListStore.default().compileContentRuleList(
+                                forIdentifier: "ContentBlockingRules",
+                                encodedContentRuleList: blockRules) { (contentRuleList, error) in
+
+                                    if let error = error {
+                                        print(error.localizedDescription)
+                                        return
+                                    }
+
+                                    let configuration = self.webView!.configuration
+                                    configuration.userContentController.add(contentRuleList!)
+
+                                    self.initLoad(initURL: self.initURL, initData: self.initData, initMimeType: self.initMimeType, initEncoding: self.initEncoding, initBaseUrl: self.initBaseUrl, initHeaders: self.initHeaders)
+
+                                    self.onBrowserCreated()
+                            }
+                            return
+                        } catch {
+                            print(error.localizedDescription)
                         }
-                        return
-                    } catch {
-                        print(error.localizedDescription)
                     }
                 }
+                
+                initLoad(initURL: initURL, initData: initData, initMimeType: initMimeType, initEncoding: initEncoding, initBaseUrl: initBaseUrl, initHeaders: initHeaders)
             }
-            
-            initLoad(initURL: initURL, initData: initData, initMimeType: initMimeType, initEncoding: initEncoding, initBaseUrl: initBaseUrl, initHeaders: initHeaders)
             
             onBrowserCreated()
         }

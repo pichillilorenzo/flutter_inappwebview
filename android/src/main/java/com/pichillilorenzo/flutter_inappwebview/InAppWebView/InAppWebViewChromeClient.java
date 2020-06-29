@@ -3,7 +3,6 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
-import android.content.ActivityNotFoundException;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -30,11 +29,11 @@ import android.webkit.PermissionRequest;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
-import android.webkit.WebViewClient;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
@@ -45,6 +44,7 @@ import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -64,6 +64,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private FlutterWebView flutterWebView;
   private InAppBrowserActivity inAppBrowserActivity;
   public MethodChannel channel;
+  public static Map<Integer, Message> windowWebViewMessages = new HashMap<>();
+  private static int windowAutoincrementId = 0;
 
   private static final String fileProviderAuthorityExtension = "flutter_inappwebview.fileprovider";
 
@@ -132,7 +134,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     this.mCustomViewCallback.onCustomViewHidden();
     this.mCustomViewCallback = null;
     activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
@@ -175,7 +176,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
     obj.put("message", message);
+    obj.put("iosIsMainFrame", null);
 
     channel.invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
       @Override
@@ -260,7 +263,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
     obj.put("message", message);
+    obj.put("iosIsMainFrame", null);
 
     channel.invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
       @Override
@@ -358,8 +363,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
     obj.put("message", message);
     obj.put("defaultValue", defaultValue);
+    obj.put("iosIsMainFrame", null);
 
     channel.invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
       @Override
@@ -473,46 +480,171 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   @Override
+  public boolean onJsBeforeUnload(final WebView view, String url, final String message,
+                           final JsResult result) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
+    obj.put("message", message);
+    obj.put("iosIsMainFrame", null);
+
+    channel.invokeMethod("onJsBeforeUnload", obj, new MethodChannel.Result() {
+      @Override
+      public void success(Object response) {
+        String responseMessage = null;
+        String confirmButtonTitle = null;
+        String cancelButtonTitle = null;
+
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          responseMessage = (String) responseMap.get("message");
+          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
+          cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
+          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
+          if (handledByClient != null && handledByClient) {
+            Integer action = (Integer) responseMap.get("action");
+            action = action != null ? action : 1;
+            switch (action) {
+              case 0:
+                result.confirm();
+                break;
+              case 1:
+              default:
+                result.cancel();
+            }
+            return;
+          }
+        }
+
+        createBeforeUnloadDialog(view, message, result, responseMessage, confirmButtonTitle, cancelButtonTitle);
+      }
+
+      @Override
+      public void error(String s, String s1, Object o) {
+        Log.e(LOG_TAG, s + ", " + s1);
+        result.cancel();
+      }
+
+      @Override
+      public void notImplemented() {
+        createConfirmDialog(view, message, result, null, null, null);
+      }
+    });
+
+    return true;
+  }
+
+  public void createBeforeUnloadDialog(WebView view, String message, final JsResult result, String responseMessage, String confirmButtonTitle, String cancelButtonTitle) {
+      String alertMessage = (responseMessage != null && !responseMessage.isEmpty()) ? responseMessage : message;
+      DialogInterface.OnClickListener confirmClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          result.confirm();
+          dialog.dismiss();
+        }
+      };
+      DialogInterface.OnClickListener cancelClickListener = new DialogInterface.OnClickListener() {
+        @Override
+        public void onClick(DialogInterface dialog, int which) {
+          result.cancel();
+          dialog.dismiss();
+        }
+      };
+
+      Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+
+      AlertDialog.Builder alertDialogBuilder = new AlertDialog.Builder(activity, R.style.Theme_AppCompat_Dialog_Alert);
+      alertDialogBuilder.setMessage(alertMessage);
+      if (confirmButtonTitle != null && !confirmButtonTitle.isEmpty()) {
+        alertDialogBuilder.setPositiveButton(confirmButtonTitle, confirmClickListener);
+      } else {
+        alertDialogBuilder.setPositiveButton(android.R.string.ok, confirmClickListener);
+      }
+      if (cancelButtonTitle != null && !cancelButtonTitle.isEmpty()) {
+        alertDialogBuilder.setNegativeButton(cancelButtonTitle, cancelClickListener);
+      } else {
+        alertDialogBuilder.setNegativeButton(android.R.string.cancel, cancelClickListener);
+      }
+
+      alertDialogBuilder.setOnCancelListener(new DialogInterface.OnCancelListener() {
+        @Override
+        public void onCancel(DialogInterface dialog) {
+          result.cancel();
+          dialog.dismiss();
+        }
+      });
+
+      AlertDialog alertDialog = alertDialogBuilder.create();
+      alertDialog.show();
+    }
+
+  @Override
   public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, final Message resultMsg) {
+    windowAutoincrementId++;
+    final int windowId = windowAutoincrementId;
+
+    WebView.HitTestResult result = view.getHitTestResult();
+    String url = result.getExtra();
+
     final Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
+    obj.put("windowId", windowId);
     obj.put("androidIsDialog", isDialog);
     obj.put("androidIsUserGesture", isUserGesture);
     obj.put("iosWKNavigationType", null);
+    obj.put("iosIsForMainFrame", null);
 
-    WebView.HitTestResult result = view.getHitTestResult();
-    String data = result.getExtra();
+    windowWebViewMessages.put(windowId, resultMsg);
 
-    if (data == null) {
-      // to get the URL, create a temp weview
-      final WebView tempWebView = new WebView(view.getContext());
-      // disable javascript
-      tempWebView.getSettings().setJavaScriptEnabled(false);
-      tempWebView.setWebViewClient(new WebViewClient(){
-        @Override
-        public void onPageStarted(WebView v, String url, Bitmap favicon) {
-          super.onPageStarted(v, url, favicon);
-
-          obj.put("url", url);
-          channel.invokeMethod("onCreateWindow", obj);
-
-          // stop webview loading
-          v.stopLoading();
-
-          // this will throw the error "Application attempted to call on a destroyed AwAutofillManager" that will kill the webview.
-          // that's ok.
-          v.destroy();
+    channel.invokeMethod("onCreateWindow", obj, new MethodChannel.Result() {
+      @Override
+      public void success(@Nullable Object result) {
+        if (result == null && InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
+          InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
         }
-      });
-      ((WebView.WebViewTransport) resultMsg.obj).setWebView(tempWebView);
-      resultMsg.sendToTarget();
-      return true;
-    }
+      }
 
-    obj.put("url", data);
-    channel.invokeMethod("onCreateWindow", obj);
-    return false;
+      @Override
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        if (InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
+          InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
+        }
+      }
+
+      @Override
+      public void notImplemented() {
+        if (InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
+          InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
+        }
+      }
+    });
+
+    return true;
+  }
+
+  @Override
+  public void onCloseWindow(WebView window) {
+    final Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+
+    channel.invokeMethod("onCloseWindow", obj);
+
+    super.onCloseWindow(window);
+  }
+
+  @Override
+  public void onRequestFocus(WebView view) {
+    final Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+
+    channel.invokeMethod("onRequestFocus", obj);
+
+    super.onCloseWindow(view);
   }
 
   @Override
@@ -588,13 +720,53 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onReceivedTitle(WebView view, String title) {
     super.onReceivedTitle(view, title);
-    if (inAppBrowserActivity != null && inAppBrowserActivity.actionBar != null && inAppBrowserActivity.options.toolbarTopFixedTitle.isEmpty())
+    if (inAppBrowserActivity != null && inAppBrowserActivity.actionBar != null && inAppBrowserActivity.options.toolbarTopFixedTitle.isEmpty()) {
       inAppBrowserActivity.actionBar.setTitle(title);
+    }
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("title", title);
+    channel.invokeMethod("onTitleChanged", obj);
   }
 
   @Override
   public void onReceivedIcon(WebView view, Bitmap icon) {
     super.onReceivedIcon(view, icon);
+
+    ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+    icon.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+    try {
+      byteArrayOutputStream.close();
+    } catch (IOException e) {
+      e.printStackTrace();
+      String errorMessage = e.getMessage();
+      if (errorMessage != null) {
+        Log.e(LOG_TAG, errorMessage);
+      }
+    }
+    icon.recycle();
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("icon", byteArrayOutputStream.toByteArray());
+    channel.invokeMethod("onReceivedIcon", obj);
+  }
+
+  @Override
+  public void onReceivedTouchIconUrl(WebView view,
+                                      String url,
+                                      boolean precomposed) {
+    super.onReceivedTouchIconUrl(view, url, precomposed);
+
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("url", url);
+    obj.put("precomposed", precomposed);
+    channel.invokeMethod("onReceivedTouchIconUrl", obj);
   }
 
   protected ViewGroup getRootView() {

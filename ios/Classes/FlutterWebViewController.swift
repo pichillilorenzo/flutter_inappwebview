@@ -39,47 +39,62 @@ public class FlutterWebViewController: FlutterMethodCallDelegate, FlutterPlatfor
         let initialHeaders = args["initialHeaders"] as? [String: String]
         let initialOptions = args["initialOptions"] as! [String: Any?]
         let contextMenu = args["contextMenu"] as? [String: Any]
+        let windowId = args["windowId"] as? Int64
 
         let options = InAppWebViewOptions()
         let _ = options.parse(options: initialOptions)
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options)
+        
+        if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+            webView = webViewTransport.webView
+            webView!.frame = myView!.bounds
+            webView!.IABController = nil
+            webView!.contextMenu = contextMenu
+            webView!.channel = channel!
+        } else {
+            webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, contextMenu: contextMenu, channel: channel!)
+        }
 
-        webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, contextMenu: contextMenu, channel: channel!)
         webView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.autoresizesSubviews = true
         myView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.addSubview(webView!)
-        
+
         webView!.options = options
         webView!.prepare()
+        
+        if windowId == nil {
+            if #available(iOS 11.0, *) {
+                self.webView!.configuration.userContentController.removeAllContentRuleLists()
+                if let contentBlockers = webView!.options?.contentBlockers, contentBlockers.count > 0 {
+                    do {
+                        let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
+                        let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
+                        WKContentRuleListStore.default().compileContentRuleList(
+                            forIdentifier: "ContentBlockingRules",
+                            encodedContentRuleList: blockRules) { (contentRuleList, error) in
 
-        if #available(iOS 11.0, *) {
-            self.webView!.configuration.userContentController.removeAllContentRuleLists()
-            if let contentBlockers = webView!.options?.contentBlockers, contentBlockers.count > 0 {
-                do {
-                    let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
-                    let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
-                    WKContentRuleListStore.default().compileContentRuleList(
-                        forIdentifier: "ContentBlockingRules",
-                        encodedContentRuleList: blockRules) { (contentRuleList, error) in
+                                if let error = error {
+                                    print(error.localizedDescription)
+                                    return
+                                }
 
-                            if let error = error {
-                                print(error.localizedDescription)
-                                return
-                            }
+                                let configuration = self.webView!.configuration
+                                configuration.userContentController.add(contentRuleList!)
 
-                            let configuration = self.webView!.configuration
-                            configuration.userContentController.add(contentRuleList!)
-
-                            self.load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+                                self.load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+                        }
+                        return
+                    } catch {
+                        print(error.localizedDescription)
                     }
-                    return
-                } catch {
-                    print(error.localizedDescription)
                 }
             }
+            load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
         }
-        load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+        else if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+            webView!.load(webViewTransport.request)
+        }
         
         if (frame.isEmpty && viewId is String) {
             /// Note: The WKWebView behaves very unreliable when rendering offscreen

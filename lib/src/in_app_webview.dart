@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -22,8 +23,12 @@ class InAppWebView extends StatefulWidget implements WebView {
   /// were not claimed by any other gesture recognizer.
   final Set<Factory<OneSequenceGestureRecognizer>> gestureRecognizers;
 
+  ///The window id of a [CreateWindowRequest.windowId].
+  final int windowId;
+
   const InAppWebView({
     Key key,
+    this.windowId,
     this.initialUrl = "about:blank",
     this.initialFile,
     this.initialData,
@@ -43,6 +48,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onDownloadStart,
     this.onLoadResourceCustomScheme,
     this.onCreateWindow,
+    this.onCloseWindow,
     this.onJsAlert,
     this.onJsConfirm,
     this.onJsPrompt,
@@ -60,6 +66,9 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onEnterFullscreen,
     this.onExitFullscreen,
     this.onPageCommitVisible,
+    this.onTitleChanged,
+    this.onWindowFocus,
+    this.onWindowBlur,
     this.androidOnSafeBrowsingHit,
     this.androidOnPermissionRequest,
     this.androidOnGeolocationPermissionsShowPrompt,
@@ -70,6 +79,11 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.androidOnRenderProcessUnresponsive,
     this.androidOnFormResubmission,
     this.androidOnScaleChanged,
+    this.androidOnRequestFocus,
+    this.androidOnReceivedIcon,
+    this.androidOnReceivedTouchIconUrl,
+    this.androidOnJsBeforeUnload,
+    this.androidOnReceivedLoginRequest,
     this.iosOnWebContentProcessDidTerminate,
     this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
     this.gestureRecognizers,
@@ -79,7 +93,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   _InAppWebViewState createState() => _InAppWebViewState();
 
   @override
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller)
       androidOnGeolocationPermissionsHidePrompt;
 
   @override
@@ -116,15 +130,19 @@ class InAppWebView extends StatefulWidget implements WebView {
   final ContextMenu contextMenu;
 
   @override
-  final Future<void> Function(InAppWebViewController controller, String url)
+  final void Function(InAppWebViewController controller, String url)
       onPageCommitVisible;
 
   @override
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller, String title)
+    onTitleChanged;
+
+  @override
+  final void Function(InAppWebViewController controller)
       iosOnDidReceiveServerRedirectForProvisionalNavigation;
 
   @override
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller)
       iosOnWebContentProcessDidTerminate;
 
   @override
@@ -143,8 +161,32 @@ class InAppWebView extends StatefulWidget implements WebView {
       onConsoleMessage;
 
   @override
-  final void Function(InAppWebViewController controller,
-      OnCreateWindowRequest onCreateWindowRequest) onCreateWindow;
+  final Future<WebView> Function(InAppWebViewController controller,
+      CreateWindowRequest onCreateWindowRequest) onCreateWindow;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    onCloseWindow;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    onWindowFocus;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    onWindowBlur;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    androidOnRequestFocus;
+
+  @override
+  final void Function(InAppWebViewController controller, Uint8List icon)
+    androidOnReceivedIcon;
+
+  @override
+  final void Function(InAppWebViewController controller, String url, bool precomposed)
+    androidOnReceivedTouchIconUrl;
 
   @override
   final void Function(InAppWebViewController controller, String url)
@@ -156,15 +198,15 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<JsAlertResponse> Function(
-      InAppWebViewController controller, String message) onJsAlert;
+      InAppWebViewController controller, JsAlertRequest jsAlertRequest) onJsAlert;
 
   @override
   final Future<JsConfirmResponse> Function(
-      InAppWebViewController controller, String message) onJsConfirm;
+      InAppWebViewController controller, JsConfirmRequest jsConfirmRequest) onJsConfirm;
 
   @override
   final Future<JsPromptResponse> Function(InAppWebViewController controller,
-      String message, String defaultValue) onJsPrompt;
+      JsPromptRequest jsPromptRequest) onJsPrompt;
 
   @override
   final void Function(InAppWebViewController controller, String url, int code,
@@ -267,7 +309,7 @@ class InAppWebView extends StatefulWidget implements WebView {
       androidOnRenderProcessResponsive;
 
   @override
-  final Future<void> Function(
+  final void Function(
           InAppWebViewController controller, RenderProcessGoneDetail detail)
       androidOnRenderProcessGone;
 
@@ -276,9 +318,18 @@ class InAppWebView extends StatefulWidget implements WebView {
       InAppWebViewController controller, String url) androidOnFormResubmission;
 
   @override
-  final Future<void> Function(
+  final void Function(
           InAppWebViewController controller, double oldScale, double newScale)
       androidOnScaleChanged;
+
+  @override
+  final Future<JsBeforeUnloadResponse> Function(
+      InAppWebViewController controller, JsBeforeUnloadRequest jsBeforeUnloadRequest)
+    androidOnJsBeforeUnload;
+
+  @override
+  final void Function(InAppWebViewController controller, LoginRequest loginRequest)
+    androidOnReceivedLoginRequest;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
@@ -298,7 +349,8 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
           'initialOptions': widget.initialOptions?.toMap() ?? {},
-          'contextMenu': widget.contextMenu?.toMap() ?? {}
+          'contextMenu': widget.contextMenu?.toMap() ?? {},
+          'windowId': widget.windowId
         },
         creationParamsCodec: const StandardMessageCodec(),
       );
@@ -332,7 +384,8 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialData': widget.initialData?.toMap(),
           'initialHeaders': widget.initialHeaders,
           'initialOptions': widget.initialOptions?.toMap() ?? {},
-          'contextMenu': widget.contextMenu?.toMap() ?? {}
+          'contextMenu': widget.contextMenu?.toMap() ?? {},
+          'windowId': widget.windowId
         },
         creationParamsCodec: const StandardMessageCodec(),
       );

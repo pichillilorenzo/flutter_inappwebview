@@ -16,9 +16,6 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
     static var registrar: FlutterPluginRegistrar?
     static var channel: FlutterMethodChannel?
     
-    var tmpWindow: UIWindow?
-    private var previousStatusBarStyle = -1
-    
     public static func register(with registrar: FlutterPluginRegistrar) {
         
     }
@@ -43,7 +40,10 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 let headersFallback = arguments!["headersFallback"] as? [String: String]
                 let optionsFallback = arguments!["optionsFallback"] as? [String: Any?]
                 let contextMenuFallback = arguments!["contextMenuFallback"] as? [String: Any]
-                open(uuid: uuid, url: url, options: options,  menuItemList: menuItemList, uuidFallback: uuidFallback, headersFallback: headersFallback, optionsFallback: optionsFallback, contextMenuFallback: contextMenuFallback, result: result)
+                let windowIdFallback = arguments!["windowIdFallback"] as? Int64
+                open(uuid: uuid, url: url, options: options,  menuItemList: menuItemList, uuidFallback: uuidFallback,
+                     headersFallback: headersFallback, optionsFallback: optionsFallback, contextMenuFallback: contextMenuFallback,
+                     windowIdFallback: windowIdFallback, result: result)
                 break
             default:
                 result(FlutterMethodNotImplemented)
@@ -51,51 +51,40 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func open(uuid: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], uuidFallback: String?, headersFallback: [String: String]?, optionsFallback: [String: Any?]?, contextMenuFallback: [String: Any]?, result: @escaping FlutterResult) {
+    public func open(uuid: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], uuidFallback: String?,
+                     headersFallback: [String: String]?, optionsFallback: [String: Any?]?, contextMenuFallback: [String: Any]?,
+                     windowIdFallback: Int64?, result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
-        if self.previousStatusBarStyle == -1 {
-            self.previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
-        }
-        
-        if !(self.tmpWindow != nil) {
-            let frame: CGRect = UIScreen.main.bounds
-            self.tmpWindow = UIWindow(frame: frame)
-        }
-        
-        let tmpController = UIViewController()
-        let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-        self.tmpWindow!.rootViewController = tmpController
-        self.tmpWindow!.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
-        self.tmpWindow!.makeKeyAndVisible()
-        
         if #available(iOS 9.0, *) {
-            let safariOptions = SafariBrowserOptions()
-            let _ = safariOptions.parse(options: options)
             
-            let safari: SafariViewController
-            
-            if #available(iOS 11.0, *) {
-                let config = SFSafariViewController.Configuration()
-                config.entersReaderIfAvailable = safariOptions.entersReaderIfAvailable
-                config.barCollapsingEnabled = safariOptions.barCollapsingEnabled
+            if let flutterViewController = UIApplication.shared.delegate?.window.unsafelyUnwrapped?.rootViewController as? FlutterViewController {
+                let safariOptions = SafariBrowserOptions()
+                let _ = safariOptions.parse(options: options)
                 
-                safari = SafariViewController(url: absoluteUrl, configuration: config)
-            } else {
-                // Fallback on earlier versions
-                safari = SafariViewController(url: absoluteUrl)
-            }
-            
-            safari.uuid = uuid
-            safari.menuItemList = menuItemList
-            safari.prepareMethodChannel()
-            safari.delegate = safari
-            safari.tmpWindow = tmpWindow
-            safari.safariOptions = safariOptions
-            safari.prepareSafariBrowser()
-            
-            tmpController.present(safari, animated: true) {
-                result(true)
+                let safari: SafariViewController
+                
+                if #available(iOS 11.0, *) {
+                    let config = SFSafariViewController.Configuration()
+                    config.entersReaderIfAvailable = safariOptions.entersReaderIfAvailable
+                    config.barCollapsingEnabled = safariOptions.barCollapsingEnabled
+                    
+                    safari = SafariViewController(url: absoluteUrl, configuration: config)
+                } else {
+                    // Fallback on earlier versions
+                    safari = SafariViewController(url: absoluteUrl)
+                }
+                
+                safari.uuid = uuid
+                safari.menuItemList = menuItemList
+                safari.prepareMethodChannel()
+                safari.delegate = safari
+                safari.safariOptions = safariOptions
+                safari.prepareSafariBrowser()
+                
+                flutterViewController.present(safari, animated: true) {
+                    result(true)
+                }
             }
             return
         }
@@ -106,7 +95,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 
                 return
             }
-            SwiftFlutterPlugin.instance!.inAppBrowserManager!.openUrl(uuid: uuidFallback!, url: url, options: optionsFallback ?? [:], headers: headersFallback ?? [:], contextMenu: contextMenuFallback ?? [:])
+            SwiftFlutterPlugin.instance!.inAppBrowserManager!.openUrl(uuid: uuidFallback!, url: url, options: optionsFallback ?? [:], headers: headersFallback ?? [:], contextMenu: contextMenuFallback ?? [:], windowId: windowIdFallback)
         }
     }
 }

@@ -628,6 +628,7 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `onDownloadStart`: Event fired when InAppWebView recognizes a downloadable file (to use this event, the `useOnDownloadStart` option must be `true`). To download the file, you can use the [flutter_downloader](https://pub.dev/packages/flutter_downloader) plugin.
 * `onLoadResourceCustomScheme`: Event fired when the InAppWebView finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a CustomSchemeResponse to load a specific resource encoded to `base64`.
 * `onCreateWindow`: Event fired when the InAppWebView requests the host application to create a new window, for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
+* `onCloseWindow`: Event fired when the host application should close the given WebView and remove it from the view system if necessary.
 * `onJsAlert`: Event fired when javascript calls the `alert()` method to display an alert dialog.
 * `onJsConfirm`: Event fired when javascript calls the `confirm()` method to display a confirm dialog.
 * `onJsPrompt`: Event fired when javascript calls the `prompt()` method to display a prompt dialog.
@@ -644,6 +645,9 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `onEnterFullscreen`: Event fired when the current page has entered full screen mode.
 * `onExitFullscreen`: Event fired when the current page has exited full screen mode.
 * `onPageCommitVisible`: Called when the web view begins to receive web content.
+* `onTitleChanged`: Event fired when a change in the document title occurred.
+* `onWindowFocus`: Event fired when the JavaScript `window` object of the WebView has received focus. This is the result of the `focus` JavaScript event applied to the `window` object.
+* `onWindowBlur`: Event fired when the JavaScript `window` object of the WebView has lost focus. This is the result of the `blur` JavaScript event applied to the `window` object.
 * `androidOnSafeBrowsingHit`: Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing (available only on Android).
 * `androidOnPermissionRequest`: Event fired when the webview is requesting permission to access the specified resources and the permission currently isn't granted or denied (available only on Android).
 * `androidOnGeolocationPermissionsShowPrompt`: Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin (available only on Android).
@@ -654,6 +658,11 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `androidOnRenderProcessUnresponsive`: Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript (available only on Android).
 * `androidOnFormResubmission`: As the host application if the browser should resend data as the requested page was a result of a POST. The default is to not resend the data (available only on Android).
 * `androidOnScaleChanged`: Event fired when the scale applied to the WebView has changed (available only on Android).
+* `androidOnRequestFocus`: Event fired when there is a request to display and focus for this WebView (available only on Android).
+* `androidOnReceivedIcon`: Event fired when there is new favicon for the current page (available only on Android).
+* `androidOnReceivedTouchIconUrl`: Event fired when there is an url for an apple-touch-icon (available only on Android).
+* `androidOnJsBeforeUnload`: Event fired when the client should display a dialog to confirm navigation away from the current page. This is the result of the `onbeforeunload` javascript event (available only on Android).
+* `androidOnReceivedLoginRequest`: Event fired when a request to automatically log in the user has been processed (available only on Android).
 * `iosOnWebContentProcessDidTerminate`: Invoked when the web view's web content process is terminated (available only on iOS).
 * `iosOnDidReceiveServerRedirectForProvisionalNavigation`: Called when a web view receives a server redirect (available only on iOS).
 

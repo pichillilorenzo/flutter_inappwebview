@@ -18,7 +18,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
     static var registrar: FlutterPluginRegistrar?
     static var channel: FlutterMethodChannel?
     
-    var tmpWindow: UIWindow?
+    // var tmpWindow: UIWindow?
     private var previousStatusBarStyle = -1
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -42,7 +42,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let options = arguments!["options"] as! [String: Any?]
                 let headers = arguments!["headers"] as! [String: String]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
-                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu)
+                let windowId = arguments!["windowId"] as? Int64
+                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId)
                 result(true)
                 break
             case "openFile":
@@ -59,7 +60,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let options = arguments!["options"] as! [String: Any?]
                 let headers = arguments!["headers"] as! [String: String]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
-                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu)
+                let windowId = arguments!["windowId"] as? Int64
+                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId)
                 result(true)
                 break
             case "openData":
@@ -70,7 +72,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let encoding = arguments!["encoding"] as! String
                 let baseUrl = arguments!["baseUrl"] as! String
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
-                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, contextMenu: contextMenu)
+                let windowId = arguments!["windowId"] as? Int64
+                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, contextMenu: contextMenu, windowId: windowId)
                 result(true)
                 break
             case "openWithSystemBrowser":
@@ -88,16 +91,14 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
             self.previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         }
         
-        if !(self.tmpWindow != nil) {
-            let frame: CGRect = UIScreen.main.bounds
-            self.tmpWindow = UIWindow(frame: frame)
-        }
+        let frame: CGRect = UIScreen.main.bounds
+        let tmpWindow = UIWindow(frame: frame)
         
         let tmpController = UIViewController()
         let baseWindowLevel = UIApplication.shared.keyWindow?.windowLevel
-        self.tmpWindow!.rootViewController = tmpController
-        self.tmpWindow!.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
-        self.tmpWindow!.makeKeyAndVisible()
+        tmpWindow.rootViewController = tmpController
+        tmpWindow.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
+        tmpWindow.makeKeyAndVisible()
         
         let browserOptions = InAppBrowserOptions()
         let _ = browserOptions.parse(options: options)
@@ -107,6 +108,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         
         let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
         let webViewController = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID) as! InAppBrowserWebViewController
+        webViewController.tmpWindow = tmpWindow
         webViewController.browserOptions = browserOptions
         webViewController.webViewOptions = webViewOptions
         webViewController.isHidden = browserOptions.hidden
@@ -115,57 +117,60 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         return webViewController
     }
     
-    public func openUrl(uuid: String, url: String, options: [String: Any?], headers: [String: String], contextMenu: [String: Any]) {
+    public func openUrl(uuid: String, url: String, options: [String: Any?], headers: [String: String],
+                        contextMenu: [String: Any], windowId: Int64?) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
         webViewController.uuid = uuid
         webViewController.prepareMethodChannel()
-        webViewController.tmpWindow = tmpWindow
         webViewController.initURL = absoluteUrl
         webViewController.initHeaders = headers
         webViewController.contextMenu = contextMenu
+        webViewController.windowId = windowId
         
         if webViewController.isHidden {
             webViewController.view.isHidden = true
-            tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
+            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
 
             })
             webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
+                webViewController.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }
         else {
-            tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
+            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
 
             })
         }
     }
     
-    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String, baseUrl: String, contextMenu: [String: Any]) {
+    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String,
+                         baseUrl: String, contextMenu: [String: Any], windowId: Int64?) {
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
         webViewController.uuid = uuid
-        webViewController.tmpWindow = tmpWindow
+        webViewController.prepareMethodChannel()
         webViewController.initData = data
         webViewController.initMimeType = mimeType
         webViewController.initEncoding = encoding
         webViewController.initBaseUrl = baseUrl
         webViewController.contextMenu = contextMenu
+        webViewController.windowId = windowId
         
         if webViewController.isHidden {
             webViewController.view.isHidden = true
-            tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
+            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
                 webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
             })
             webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
-                self.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
+                webViewController.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
                 UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             })
         }
         else {
-            tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
+            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
                 webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
             })
         }

@@ -66,24 +66,23 @@ class InAppWebViewOnJsDialogTestState extends WidgetTestState {
                       });
                     },
                     onJsAlert:
-                        (InAppWebViewController controller, String message) async {
+                        (InAppWebViewController controller, JsAlertRequest jsAlertRequest) async {
                       JsAlertResponseAction action =
-                      await createAlertDialog(context, message);
+                      await createAlertDialog(context, jsAlertRequest.message);
                       return JsAlertResponse(
                           handledByClient: true, action: action);
                     },
                     onJsConfirm:
-                        (InAppWebViewController controller, String message) async {
+                        (InAppWebViewController controller, JsConfirmRequest jsConfirmRequest) async {
                       JsConfirmResponseAction action =
-                      await createConfirmDialog(context, message);
+                      await createConfirmDialog(context, jsConfirmRequest.message);
                       return JsConfirmResponse(
                           handledByClient: true, action: action);
                     },
-                    onJsPrompt: (InAppWebViewController controller, String message,
-                        String defaultValue) async {
-                      _textFieldController.text = defaultValue;
+                    onJsPrompt: (InAppWebViewController controller, JsPromptRequest jsPromptRequest) async {
+                      _textFieldController.text = jsPromptRequest.defaultValue;
                       JsPromptResponseAction action =
-                      await createPromptDialog(context, message);
+                      await createPromptDialog(context, jsPromptRequest.message);
                       return JsPromptResponse(
                           handledByClient: true,
                           action: action,

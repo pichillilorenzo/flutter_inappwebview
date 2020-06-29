@@ -2,10 +2,8 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
-import android.net.http.SslCertificate;
 import android.net.http.SslError;
 import android.os.Build;
-import android.os.Bundle;
 import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
@@ -29,20 +27,13 @@ import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.Credential;
 import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
-import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayInputStream;
-import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.security.cert.Certificate;
-import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateException;
-import java.security.cert.CertificateFactory;
-import java.security.cert.X509Certificate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -185,7 +176,13 @@ public class InAppWebViewClient extends WebViewClient {
       js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
     }
     js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS.replaceAll("[\r\n]+", "");
+    js += InAppWebView.onWindowFocusEventJS.replaceAll("[\r\n]+", "");
+    js += InAppWebView.onWindowBlurEventJS.replaceAll("[\r\n]+", "");
     js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
+
+    js = InAppWebView.scriptsWrapperJS
+            .replace("$PLACEHOLDER_VALUE", js)
+            .replaceAll("[\r\n]+", "");
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
@@ -815,6 +812,18 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     return super.onRenderProcessGone(view, detail);
+  }
+
+  @Override
+  public void onReceivedLoginRequest(WebView view, String realm, String account, String args) {
+    Map<String, Object> obj = new HashMap<>();
+    if (inAppBrowserActivity != null)
+      obj.put("uuid", inAppBrowserActivity.uuid);
+    obj.put("realm", realm);
+    obj.put("account", account);
+    obj.put("args", args);
+
+    channel.invokeMethod("onReceivedLoginRequest", obj);
   }
 
   @Override

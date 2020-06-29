@@ -1,12 +1,24 @@
+## 4.0.0
+
+- Updated `onCreateWindow`, `onJsAlert`, `onJsConfirm`, `onJsPrompt` webview events
+- Added `onCloseWindow`, `onTitleChanged`, `onWindowFocus`, `onWindowBlur` webview events
+- Added `androidOnRequestFocus`, `androidOnReceivedIcon`, `androidOnReceivedTouchIconUrl`, `androidOnJsBeforeUnload`, `androidOnReceivedLoginRequest` Android-specific webview events
+- Fixed "SFSafariViewController doesn't open like a native iOS modal" [#403](https://github.com/pichillilorenzo/flutter_inappwebview/issues/403)
+
+### BREAKING CHANGES
+
+- Updated `onCreateWindow`, `onJsAlert`, `onJsConfirm`, `onJsPrompt` webview event
+- Renamed `OnCreateWindowRequest` class to `CreateWindowRequest`
+
 ## 3.4.0+2
 
-- Revert default `InAppWebView.gestureRecognizers` value to null on Android
+- Reverted default `InAppWebView.gestureRecognizers` value to null on Android
 
 ## 3.4.0+1
 
-- Update README.md
-- Update missing docs
-- Fix pub.dev Health suggestions and Analysis suggestions
+- Updated README.md
+- Updated missing docs
+- Fixed pub.dev Health suggestions and Analysis suggestions
 
 ## 3.4.0
 

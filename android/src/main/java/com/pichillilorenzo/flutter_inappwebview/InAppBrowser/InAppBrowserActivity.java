@@ -5,12 +5,14 @@ import android.graphics.Color;
 import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Message;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.ValueCallback;
 import android.webkit.WebChromeClient;
 import android.webkit.WebView;
@@ -25,6 +27,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
+import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewChromeClient;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebViewOptions;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
@@ -41,6 +44,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
 
   static final String LOG_TAG = "InAppBrowserActivity";
   public MethodChannel channel;
+  public Integer windowId;
   public String uuid;
   public InAppWebView webView;
   public ActionBar actionBar;
@@ -63,6 +67,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
 
     Bundle b = getIntent().getExtras();
     uuid = b.getString("uuid");
+    windowId = b.getInt("windowId");
 
     channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + uuid);
     channel.setMethodCallHandler(this);
@@ -70,6 +75,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
     setContentView(R.layout.activity_web_view);
 
     webView = findViewById(R.id.webView);
+    webView.windowId = windowId;
     webView.inAppBrowserActivity = this;
     webView.channel = channel;
 
@@ -90,19 +96,27 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
 
     prepareView();
 
-    Boolean isData = b.getBoolean("isData");
-    if (!isData) {
-      headers = (HashMap<String, String>) b.getSerializable("headers");
-      String url = b.getString("url");
-      webView.loadUrl(url, headers);
-    }
-    else {
-      String data = b.getString("data");
-      String mimeType = b.getString("mimeType");
-      String encoding = b.getString("encoding");
-      String baseUrl = b.getString("baseUrl");
-      String historyUrl = b.getString("historyUrl");
-      webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+    if (windowId != -1) {
+      Message resultMsg = InAppWebViewChromeClient.windowWebViewMessages.get(windowId);
+      if (resultMsg != null) {
+        ((WebView.WebViewTransport) resultMsg.obj).setWebView(webView);
+        resultMsg.sendToTarget();
+      }
+    } else {
+      Boolean isData = b.getBoolean("isData");
+      if (!isData) {
+        headers = (HashMap<String, String>) b.getSerializable("headers");
+        String url = b.getString("url");
+        webView.loadUrl(url, headers);
+      }
+      else {
+        String data = b.getString("data");
+        String mimeType = b.getString("mimeType");
+        String encoding = b.getString("encoding");
+        String baseUrl = b.getString("baseUrl");
+        String historyUrl = b.getString("historyUrl");
+        webView.loadDataWithBaseURL(baseUrl, data, mimeType, encoding, historyUrl);
+      }
     }
 
     Map<String, Object> obj = new HashMap<>();
@@ -565,30 +579,14 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
   }
 
   public void close(final MethodChannel.Result result) {
-    runOnUiThread(new Runnable() {
-      @Override
-      public void run() {
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onExit", obj);
 
-        Map<String, Object> obj = new HashMap<>();
-        channel.invokeMethod("onExit", obj);
+    dispose();
 
-        webView.setWebViewClient(new WebViewClient() {
-          // NB: wait for about:blank before dismissing
-          public void onPageFinished(WebView view, String url) {
-            hide();
-            finish();
-          }
-        });
-        // NB: From SDK 19: "If you call methods on WebView from any thread
-        // other than your app's UI thread, it can cause unexpected results."
-        // http://developer.android.com/guide/webapps/migrating.html#Threads
-        webView.loadUrl("about:blank");
-        if (result != null) {
-          result.success(true);
-        }
-      }
-    });
-
+    if (result != null) {
+      result.success(true);
+    }
   }
 
   public void reload() {
@@ -984,6 +982,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       if (Shared.activityPluginBinding != null) {
         Shared.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
       }
+      ViewGroup vg = (ViewGroup) (webView.getParent());
+      vg.removeView(webView);
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {
@@ -993,6 +993,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
         }
       });
       webView.loadUrl("about:blank");
+      finish();
     }
   }
 

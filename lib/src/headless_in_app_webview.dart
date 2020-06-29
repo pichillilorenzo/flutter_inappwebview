@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:flutter/services.dart';
 
 import 'context_menu.dart';
@@ -18,8 +20,12 @@ class HeadlessInAppWebView implements WebView {
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
   InAppWebViewController webViewController;
 
+  ///The window id of a [CreateWindowRequest.windowId].
+  final int windowId;
+
   HeadlessInAppWebView(
-      {this.onWebViewCreated,
+      {this.windowId,
+      this.onWebViewCreated,
       this.onLoadStart,
       this.onLoadStop,
       this.onLoadError,
@@ -32,6 +38,7 @@ class HeadlessInAppWebView implements WebView {
       this.onDownloadStart,
       this.onLoadResourceCustomScheme,
       this.onCreateWindow,
+      this.onCloseWindow,
       this.onJsAlert,
       this.onJsConfirm,
       this.onJsPrompt,
@@ -49,6 +56,9 @@ class HeadlessInAppWebView implements WebView {
       this.onEnterFullscreen,
       this.onExitFullscreen,
       this.onPageCommitVisible,
+      this.onTitleChanged,
+      this.onWindowFocus,
+      this.onWindowBlur,
       this.androidOnSafeBrowsingHit,
       this.androidOnPermissionRequest,
       this.androidOnGeolocationPermissionsShowPrompt,
@@ -59,6 +69,11 @@ class HeadlessInAppWebView implements WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       this.androidOnScaleChanged,
+      this.androidOnRequestFocus,
+      this.androidOnReceivedIcon,
+      this.androidOnReceivedTouchIconUrl,
+      this.androidOnJsBeforeUnload,
+      this.androidOnReceivedLoginRequest,
       this.iosOnWebContentProcessDidTerminate,
       this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
       this.initialUrl,
@@ -114,7 +129,7 @@ class HeadlessInAppWebView implements WebView {
   }
 
   @override
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller)
       androidOnGeolocationPermissionsHidePrompt;
 
   @override
@@ -151,15 +166,19 @@ class HeadlessInAppWebView implements WebView {
   final String initialUrl;
 
   @override
-  final Future<void> Function(InAppWebViewController controller, String url)
+  final void Function(InAppWebViewController controller, String url)
       onPageCommitVisible;
 
   @override
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller, String title)
+    onTitleChanged;
+
+  @override
+  final void Function(InAppWebViewController controller)
       iosOnDidReceiveServerRedirectForProvisionalNavigation;
 
   @override
-  final Future<void> Function(InAppWebViewController controller)
+  final void Function(InAppWebViewController controller)
       iosOnWebContentProcessDidTerminate;
 
   @override
@@ -178,8 +197,24 @@ class HeadlessInAppWebView implements WebView {
       onConsoleMessage;
 
   @override
-  final void Function(InAppWebViewController controller,
-      OnCreateWindowRequest onCreateWindowRequest) onCreateWindow;
+  final Future<WebView> Function(InAppWebViewController controller,
+      CreateWindowRequest onCreateWindowRequest) onCreateWindow;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    onCloseWindow;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    onWindowFocus;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    onWindowBlur;
+
+  @override
+  final void Function(InAppWebViewController controller)
+    androidOnRequestFocus;
 
   @override
   final void Function(InAppWebViewController controller, String url)
@@ -191,15 +226,15 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final Future<JsAlertResponse> Function(
-      InAppWebViewController controller, String message) onJsAlert;
+      InAppWebViewController controller, JsAlertRequest jsAlertRequest) onJsAlert;
 
   @override
   final Future<JsConfirmResponse> Function(
-      InAppWebViewController controller, String message) onJsConfirm;
+      InAppWebViewController controller, JsConfirmRequest jsConfirmRequest) onJsConfirm;
 
   @override
   final Future<JsPromptResponse> Function(InAppWebViewController controller,
-      String message, String defaultValue) onJsPrompt;
+      JsPromptRequest jsPromptRequest) onJsPrompt;
 
   @override
   final void Function(InAppWebViewController controller, String url, int code,
@@ -302,7 +337,7 @@ class HeadlessInAppWebView implements WebView {
       androidOnRenderProcessResponsive;
 
   @override
-  final Future<void> Function(
+  final void Function(
           InAppWebViewController controller, RenderProcessGoneDetail detail)
       androidOnRenderProcessGone;
 
@@ -311,7 +346,24 @@ class HeadlessInAppWebView implements WebView {
       InAppWebViewController controller, String url) androidOnFormResubmission;
 
   @override
-  final Future<void> Function(
+  final void Function(
           InAppWebViewController controller, double oldScale, double newScale)
       androidOnScaleChanged;
+
+  @override
+  final void Function(InAppWebViewController controller, Uint8List icon)
+    androidOnReceivedIcon;
+
+  @override
+  final void Function(InAppWebViewController controller, String url, bool precomposed)
+    androidOnReceivedTouchIconUrl;
+
+  @override
+  final Future<JsBeforeUnloadResponse> Function(
+      InAppWebViewController controller, JsBeforeUnloadRequest jsBeforeUnloadRequest)
+    androidOnJsBeforeUnload;
+
+  @override
+  final void Function(InAppWebViewController controller, LoginRequest loginRequest)
+    androidOnReceivedLoginRequest;
 }

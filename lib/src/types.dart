@@ -450,11 +450,7 @@ class JsAlertRequest {
   ///Indicates whether the request was made for the main frame. Available only on iOS.
   bool iosIsMainFrame;
 
-  JsAlertRequest({
-    this.url,
-    this.message,
-    this.iosIsMainFrame
-  });
+  JsAlertRequest({this.url, this.message, this.iosIsMainFrame});
 
   Map<String, dynamic> toMap() {
     return {"url": url, "message": message, "iosIsMainFrame": iosIsMainFrame};
@@ -536,11 +532,7 @@ class JsConfirmRequest {
   ///Indicates whether the request was made for the main frame. Available only on iOS.
   bool iosIsMainFrame;
 
-  JsConfirmRequest({
-    this.url,
-    this.message,
-    this.iosIsMainFrame
-  });
+  JsConfirmRequest({this.url, this.message, this.iosIsMainFrame});
 
   Map<String, dynamic> toMap() {
     return {"url": url, "message": message, "iosIsMainFrame": iosIsMainFrame};
@@ -631,15 +623,16 @@ class JsPromptRequest {
   ///Indicates whether the request was made for the main frame. Available only on iOS.
   bool iosIsMainFrame;
 
-  JsPromptRequest({
-    this.url,
-    this.message,
-    this.defaultValue,
-    this.iosIsMainFrame
-  });
+  JsPromptRequest(
+      {this.url, this.message, this.defaultValue, this.iosIsMainFrame});
 
   Map<String, dynamic> toMap() {
-    return {"url": url, "message": message, "defaultValue": defaultValue, "iosIsMainFrame": iosIsMainFrame};
+    return {
+      "url": url,
+      "message": message,
+      "defaultValue": defaultValue,
+      "iosIsMainFrame": iosIsMainFrame
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -734,11 +727,7 @@ class JsBeforeUnloadRequest {
   ///Indicates whether the request was made for the main frame. Available only on iOS.
   bool iosIsMainFrame;
 
-  JsBeforeUnloadRequest({
-    this.url,
-    this.message,
-    this.iosIsMainFrame
-  });
+  JsBeforeUnloadRequest({this.url, this.message, this.iosIsMainFrame});
 
   Map<String, dynamic> toMap() {
     return {"url": url, "message": message, "iosIsMainFrame": iosIsMainFrame};
@@ -790,10 +779,10 @@ class JsBeforeUnloadResponse {
 
   JsBeforeUnloadResponse(
       {this.message = "",
-        this.handledByClient = false,
-        this.confirmButtonTitle = "",
-        this.cancelButtonTitle = "",
-        this.action = JsBeforeUnloadResponseAction.CONFIRM});
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.action = JsBeforeUnloadResponseAction.CONFIRM});
 
   Map<String, dynamic> toMap() {
     return {
@@ -3151,7 +3140,7 @@ class CreateWindowRequest {
 
   ///The window id. Used by [WebView] to create a new WebView.
   int windowId;
-  
+
   ///Indicates if the new window should be a dialog, rather than a full-size window. Available only on Android.
   bool androidIsDialog;
 
@@ -4376,18 +4365,10 @@ class LoginRequest {
   ///Authenticator specific arguments used to log in the user.
   String args;
 
-  LoginRequest({
-    this.realm,
-    this.account,
-    this.args
-  });
+  LoginRequest({this.realm, this.account, this.args});
 
   Map<String, dynamic> toMap() {
-    return {
-      "realm": realm,
-      "account": account,
-      "args": args
-    };
+    return {"realm": realm, "account": account, "args": args};
   }
 
   Map<String, dynamic> toJson() {

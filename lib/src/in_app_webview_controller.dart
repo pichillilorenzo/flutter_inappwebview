@@ -228,36 +228,39 @@ class InAppWebViewController {
         if (_webview != null && _webview.onCreateWindow != null)
           webView = await _webview.onCreateWindow(this, createWindowRequest);
         else if (_inAppBrowser != null) {
-          inAppBrowserWindow = await _inAppBrowser.onCreateWindow(createWindowRequest);
+          inAppBrowserWindow =
+              await _inAppBrowser.onCreateWindow(createWindowRequest);
           assert(
-            inAppBrowserWindow is InAppBrowser || inAppBrowserWindow is HeadlessInAppWebView,
-            "InAppBrowser.onCreateWindow should return an \"InAppBrowser\" instance or a \"HeadlessInAppWebView\" instance."
-          );
+              inAppBrowserWindow is InAppBrowser ||
+                  inAppBrowserWindow is HeadlessInAppWebView,
+              "InAppBrowser.onCreateWindow should return an \"InAppBrowser\" instance or a \"HeadlessInAppWebView\" instance.");
         }
 
         int webViewWindowId;
 
         if (webView != null) {
           webViewWindowId = webView.windowId;
-          assert(webViewWindowId !=
-              null, "If you are returning a WebView, then WebView.windowId should be not null. To set the " +
-              "WebView.windowId property, you should use the CreateWindowRequest.windowId property.");
+          assert(
+              webViewWindowId != null,
+              "If you are returning a WebView, then WebView.windowId should be not null. To set the " +
+                  "WebView.windowId property, you should use the CreateWindowRequest.windowId property.");
           if (webView is HeadlessInAppWebView) {
             webView.run();
           }
         } else if (inAppBrowserWindow != null) {
           if (inAppBrowserWindow is InAppBrowser) {
             webViewWindowId = inAppBrowserWindow.windowId;
-            assert(webViewWindowId !=
-                null, "If you are returning an InAppBrowser, then InAppBrowser.windowId should be not null. To set the " +
-                "InAppBrowser.windowId property, you should use the CreateWindowRequest.windowId property.");
+            assert(
+                webViewWindowId != null,
+                "If you are returning an InAppBrowser, then InAppBrowser.windowId should be not null. To set the " +
+                    "InAppBrowser.windowId property, you should use the CreateWindowRequest.windowId property.");
             inAppBrowserWindow.openUrl(url: "about:blank");
-          }
-          else if (inAppBrowserWindow is HeadlessInAppWebView) {
+          } else if (inAppBrowserWindow is HeadlessInAppWebView) {
             webViewWindowId = inAppBrowserWindow.windowId;
-            assert(webViewWindowId !=
-                null, "If you are returning a HeadlessInAppWebView, then HeadlessInAppWebView.windowId should be not null. To set the " +
-                "HeadlessInAppWebView.windowId property, you should use the CreateWindowRequest.windowId property.");
+            assert(
+                webViewWindowId != null,
+                "If you are returning a HeadlessInAppWebView, then HeadlessInAppWebView.windowId should be not null. To set the " +
+                    "HeadlessInAppWebView.windowId property, you should use the CreateWindowRequest.windowId property.");
             inAppBrowserWindow.run();
           }
         }
@@ -266,15 +269,13 @@ class InAppWebViewController {
       case "onCloseWindow":
         if (_webview != null && _webview.onCloseWindow != null)
           _webview.onCloseWindow(this);
-        else if (_inAppBrowser != null)
-          _inAppBrowser.onCloseWindow();
+        else if (_inAppBrowser != null) _inAppBrowser.onCloseWindow();
         break;
       case "onTitleChanged":
         String title = call.arguments["title"];
         if (_webview != null && _webview.onTitleChanged != null)
           _webview.onTitleChanged(this, title);
-        else if (_inAppBrowser != null)
-          _inAppBrowser.onTitleChanged(title);
+        else if (_inAppBrowser != null) _inAppBrowser.onTitleChanged(title);
         break;
       case "onGeolocationPermissionsShowPrompt":
         String origin = call.arguments["origin"];
@@ -369,8 +370,7 @@ class InAppWebViewController {
       case "onRequestFocus":
         if (_webview != null && _webview.androidOnRequestFocus != null)
           _webview.androidOnRequestFocus(this);
-        else if (_inAppBrowser != null)
-          _inAppBrowser.androidOnRequestFocus();
+        else if (_inAppBrowser != null) _inAppBrowser.androidOnRequestFocus();
         break;
       case "onReceivedIcon":
         Uint8List icon = Uint8List.fromList(call.arguments["icon"].cast<int>());
@@ -394,10 +394,7 @@ class InAppWebViewController {
         bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
 
         JsAlertRequest jsAlertRequest = JsAlertRequest(
-          url: url,
-          message: message,
-          iosIsMainFrame: iosIsMainFrame
-        );
+            url: url, message: message, iosIsMainFrame: iosIsMainFrame);
 
         if (_webview != null && _webview.onJsAlert != null)
           return (await _webview.onJsAlert(this, jsAlertRequest))?.toMap();
@@ -410,10 +407,7 @@ class InAppWebViewController {
         bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
 
         JsConfirmRequest jsConfirmRequest = JsConfirmRequest(
-            url: url,
-            message: message,
-            iosIsMainFrame: iosIsMainFrame
-        );
+            url: url, message: message, iosIsMainFrame: iosIsMainFrame);
 
         if (_webview != null && _webview.onJsConfirm != null)
           return (await _webview.onJsConfirm(this, jsConfirmRequest))?.toMap();
@@ -430,15 +424,12 @@ class InAppWebViewController {
             url: url,
             message: message,
             defaultValue: defaultValue,
-            iosIsMainFrame: iosIsMainFrame
-        );
+            iosIsMainFrame: iosIsMainFrame);
 
         if (_webview != null && _webview.onJsPrompt != null)
-          return (await _webview.onJsPrompt(this, jsPromptRequest))
-              ?.toMap();
+          return (await _webview.onJsPrompt(this, jsPromptRequest))?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.onJsPrompt(jsPromptRequest))
-              ?.toMap();
+          return (await _inAppBrowser.onJsPrompt(jsPromptRequest))?.toMap();
         break;
       case "onJsBeforeUnload":
         String url = call.arguments["url"];
@@ -446,17 +437,18 @@ class InAppWebViewController {
         bool iosIsMainFrame = call.arguments["iosIsMainFrame"];
 
         JsBeforeUnloadRequest jsBeforeUnloadRequest = JsBeforeUnloadRequest(
-            url: url,
-            message: message,
-            iosIsMainFrame: iosIsMainFrame
-        );
+            url: url, message: message, iosIsMainFrame: iosIsMainFrame);
 
         print(jsBeforeUnloadRequest);
 
         if (_webview != null && _webview.androidOnJsBeforeUnload != null)
-          return (await _webview.androidOnJsBeforeUnload(this, jsBeforeUnloadRequest))?.toMap();
+          return (await _webview.androidOnJsBeforeUnload(
+                  this, jsBeforeUnloadRequest))
+              ?.toMap();
         else if (_inAppBrowser != null)
-          return (await _inAppBrowser.androidOnJsBeforeUnload(jsBeforeUnloadRequest))?.toMap();
+          return (await _inAppBrowser
+                  .androidOnJsBeforeUnload(jsBeforeUnloadRequest))
+              ?.toMap();
         break;
       case "onSafeBrowsingHit":
         String url = call.arguments["url"];
@@ -475,11 +467,8 @@ class InAppWebViewController {
         String account = call.arguments["account"];
         String args = call.arguments["args"];
 
-        LoginRequest loginRequest = LoginRequest(
-          realm: realm,
-          account: account,
-          args: args
-        );
+        LoginRequest loginRequest =
+            LoginRequest(realm: realm, account: account, args: args);
 
         if (_webview != null && _webview.androidOnReceivedLoginRequest != null)
           _webview.androidOnReceivedLoginRequest(this, loginRequest);
@@ -942,14 +931,12 @@ class InAppWebViewController {
           case "onWindowFocus":
             if (_webview != null && _webview.onWindowFocus != null)
               _webview.onWindowFocus(this);
-            else if (_inAppBrowser != null)
-              _inAppBrowser.onWindowFocus();
+            else if (_inAppBrowser != null) _inAppBrowser.onWindowFocus();
             return null;
           case "onWindowBlur":
             if (_webview != null && _webview.onWindowBlur != null)
               _webview.onWindowBlur(this);
-            else if (_inAppBrowser != null)
-              _inAppBrowser.onWindowBlur();
+            else if (_inAppBrowser != null) _inAppBrowser.onWindowBlur();
             return null;
         }
 

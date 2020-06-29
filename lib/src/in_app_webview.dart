@@ -135,7 +135,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final void Function(InAppWebViewController controller, String title)
-    onTitleChanged;
+      onTitleChanged;
 
   @override
   final void Function(InAppWebViewController controller)
@@ -165,28 +165,25 @@ class InAppWebView extends StatefulWidget implements WebView {
       CreateWindowRequest onCreateWindowRequest) onCreateWindow;
 
   @override
-  final void Function(InAppWebViewController controller)
-    onCloseWindow;
+  final void Function(InAppWebViewController controller) onCloseWindow;
 
   @override
-  final void Function(InAppWebViewController controller)
-    onWindowFocus;
+  final void Function(InAppWebViewController controller) onWindowFocus;
 
   @override
-  final void Function(InAppWebViewController controller)
-    onWindowBlur;
+  final void Function(InAppWebViewController controller) onWindowBlur;
 
   @override
-  final void Function(InAppWebViewController controller)
-    androidOnRequestFocus;
+  final void Function(InAppWebViewController controller) androidOnRequestFocus;
 
   @override
   final void Function(InAppWebViewController controller, Uint8List icon)
-    androidOnReceivedIcon;
+      androidOnReceivedIcon;
 
   @override
-  final void Function(InAppWebViewController controller, String url, bool precomposed)
-    androidOnReceivedTouchIconUrl;
+  final void Function(
+          InAppWebViewController controller, String url, bool precomposed)
+      androidOnReceivedTouchIconUrl;
 
   @override
   final void Function(InAppWebViewController controller, String url)
@@ -198,15 +195,18 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<JsAlertResponse> Function(
-      InAppWebViewController controller, JsAlertRequest jsAlertRequest) onJsAlert;
+          InAppWebViewController controller, JsAlertRequest jsAlertRequest)
+      onJsAlert;
 
   @override
   final Future<JsConfirmResponse> Function(
-      InAppWebViewController controller, JsConfirmRequest jsConfirmRequest) onJsConfirm;
+          InAppWebViewController controller, JsConfirmRequest jsConfirmRequest)
+      onJsConfirm;
 
   @override
-  final Future<JsPromptResponse> Function(InAppWebViewController controller,
-      JsPromptRequest jsPromptRequest) onJsPrompt;
+  final Future<JsPromptResponse> Function(
+          InAppWebViewController controller, JsPromptRequest jsPromptRequest)
+      onJsPrompt;
 
   @override
   final void Function(InAppWebViewController controller, String url, int code,
@@ -324,12 +324,13 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<JsBeforeUnloadResponse> Function(
-      InAppWebViewController controller, JsBeforeUnloadRequest jsBeforeUnloadRequest)
-    androidOnJsBeforeUnload;
+      InAppWebViewController controller,
+      JsBeforeUnloadRequest jsBeforeUnloadRequest) androidOnJsBeforeUnload;
 
   @override
-  final void Function(InAppWebViewController controller, LoginRequest loginRequest)
-    androidOnReceivedLoginRequest;
+  final void Function(
+          InAppWebViewController controller, LoginRequest loginRequest)
+      androidOnReceivedLoginRequest;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

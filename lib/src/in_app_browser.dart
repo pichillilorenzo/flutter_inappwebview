@@ -567,7 +567,6 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)
   void onTitleChanged(String title) {}
 
-
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///

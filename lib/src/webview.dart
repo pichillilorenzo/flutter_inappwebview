@@ -187,7 +187,8 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview
   final Future<JsAlertResponse> Function(
-        InAppWebViewController controller, JsAlertRequest jsAlertRequest) onJsAlert;
+          InAppWebViewController controller, JsAlertRequest jsAlertRequest)
+      onJsAlert;
 
   ///Event fired when javascript calls the `confirm()` method to display a confirm dialog.
   ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
@@ -198,7 +199,8 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview
   final Future<JsConfirmResponse> Function(
-      InAppWebViewController controller, JsConfirmRequest jsConfirmRequest) onJsConfirm;
+          InAppWebViewController controller, JsConfirmRequest jsConfirmRequest)
+      onJsConfirm;
 
   ///Event fired when javascript calls the `prompt()` method to display a prompt dialog.
   ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
@@ -208,8 +210,9 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview
-  final Future<JsPromptResponse> Function(InAppWebViewController controller,
-      JsPromptRequest jsPromptRequest) onJsPrompt;
+  final Future<JsPromptResponse> Function(
+          InAppWebViewController controller, JsPromptRequest jsPromptRequest)
+      onJsPrompt;
 
   ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
@@ -381,7 +384,7 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)
   final void Function(InAppWebViewController controller, String title)
-    onTitleChanged;
+      onTitleChanged;
 
   ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
@@ -539,7 +542,8 @@ abstract class WebView {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)
-  final void Function(InAppWebViewController controller, Uint8List icon) androidOnReceivedIcon;
+  final void Function(InAppWebViewController controller, Uint8List icon)
+      androidOnReceivedIcon;
 
   ///Event fired when there is an url for an apple-touch-icon.
   ///
@@ -550,7 +554,9 @@ abstract class WebView {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)
-  final void Function(InAppWebViewController controller, String url, bool precomposed) androidOnReceivedTouchIconUrl;
+  final void Function(
+          InAppWebViewController controller, String url, bool precomposed)
+      androidOnReceivedTouchIconUrl;
 
   ///Event fired when the client should display a dialog to confirm navigation away from the current page.
   ///This is the result of the `onbeforeunload` javascript event.
@@ -566,7 +572,8 @@ abstract class WebView {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)
   final Future<JsBeforeUnloadResponse> Function(
-      InAppWebViewController controller, JsBeforeUnloadRequest jsBeforeUnloadRequest) androidOnJsBeforeUnload;
+      InAppWebViewController controller,
+      JsBeforeUnloadRequest jsBeforeUnloadRequest) androidOnJsBeforeUnload;
 
   ///Event fired when a request to automatically log in the user has been processed.
   ///
@@ -575,7 +582,9 @@ abstract class WebView {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)
-  final void Function(InAppWebViewController controller, LoginRequest loginRequest) androidOnReceivedLoginRequest;
+  final void Function(
+          InAppWebViewController controller, LoginRequest loginRequest)
+      androidOnReceivedLoginRequest;
 
   ///Invoked when the web view's web content process is terminated.
   ///

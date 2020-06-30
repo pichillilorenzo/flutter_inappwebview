@@ -5,6 +5,10 @@
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](/LICENSE)
 
 [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/LorenzoPichilli)
+[![GitHub contributors](https://img.shields.io/github/contributors/pichillilorenzo/flutter_inappwebview)](https://github.com/pichillilorenzo/flutter_inappwebview/graphs/contributors)
+![GitHub forks](https://img.shields.io/github/forks/pichillilorenzo/flutter_inappwebview?style=social)
+![GitHub stars](https://img.shields.io/github/stars/pichillilorenzo/flutter_inappwebview?style=social)
+
 
 ![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/86118415-0ac78300-bad1-11ea-9933-31dc65744f38.png)
 

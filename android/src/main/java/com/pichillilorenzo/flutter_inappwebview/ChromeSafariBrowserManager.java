@@ -49,6 +49,9 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
           open(activity, uuid, url, options, menuItemList, uuidFallback, headersFallback, optionsFallback, contextMenuFallback, windowIdFallback, result);
         }
         break;
+      case "isAvailable":
+        result.success(CustomTabActivityHelper.isAvailable(activity));
+        break;
       default:
         result.notImplemented();
     }

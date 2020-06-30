@@ -29,10 +29,10 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        let uuid: String = arguments!["uuid"] as! String
 
         switch call.method {
             case "open":
+                let uuid: String = arguments!["uuid"] as! String
                 let url = arguments!["url"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let menuItemList = arguments!["menuItemList"] as! [[String: Any]]
@@ -44,6 +44,13 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 open(uuid: uuid, url: url, options: options,  menuItemList: menuItemList, uuidFallback: uuidFallback,
                      headersFallback: headersFallback, optionsFallback: optionsFallback, contextMenuFallback: contextMenuFallback,
                      windowIdFallback: windowIdFallback, result: result)
+                break
+            case "isAvailable":
+                if #available(iOS 9.0, *) {
+                    result(true)
+                } else {
+                    result(false)
+                }
                 break
             default:
                 result(FlutterMethodNotImplemented)

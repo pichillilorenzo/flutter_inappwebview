@@ -1256,6 +1256,7 @@ Screenshots:
 * `close`: Closes the `ChromeSafariBrowser` instance.
 * `addMenuItem`: Adds a `ChromeSafariBrowserMenuItem` to the menu.
 * `addMenuItems`: Adds a list of `ChromeSafariBrowserMenuItem` to the menu.
+* `static isAvailable`: On Android, returns `true` if Chrome Custom Tabs is available. On iOS, returns `true` if SFSafariViewController is available. Otherwise returns `false`.
 
 #### `ChromeSafariBrowser` options
 

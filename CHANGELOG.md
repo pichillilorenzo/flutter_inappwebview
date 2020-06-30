@@ -4,6 +4,7 @@
 - Added `onCloseWindow`, `onTitleChanged`, `onWindowFocus`, `onWindowBlur` webview events
 - Added `androidOnRequestFocus`, `androidOnReceivedIcon`, `androidOnReceivedTouchIconUrl`, `androidOnJsBeforeUnload`, `androidOnReceivedLoginRequest` Android-specific webview events
 - Added `disableDefaultErrorPage` Android-specific webview option
+- Added `isAvailable` ChromeSafariBrowser static method
 - Fixed "SFSafariViewController doesn't open like a native iOS modal" [#403](https://github.com/pichillilorenzo/flutter_inappwebview/issues/403)
 
 ### BREAKING CHANGES

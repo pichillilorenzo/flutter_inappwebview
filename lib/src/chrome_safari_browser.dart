@@ -109,6 +109,14 @@ class ChromeSafariBrowser {
     });
   }
 
+  ///On Android, returns `true` if Chrome Custom Tabs is available.
+  ///On iOS, returns `true` if SFSafariViewController is available.
+  ///Otherwise returns `false`.
+  static Future<bool> isAvailable() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _sharedChannel.invokeMethod("isAvailable", args);
+  }
+
   ///Event fires when the [ChromeSafariBrowser] is opened.
   void onOpened() {}
 

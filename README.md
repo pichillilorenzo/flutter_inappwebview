@@ -6,6 +6,8 @@
 
 [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/LorenzoPichilli)
 
+![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/86118415-0ac78300-bad1-11ea-9933-31dc65744f38.png)
+
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
 ### Requirements

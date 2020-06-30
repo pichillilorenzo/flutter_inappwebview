@@ -1906,7 +1906,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if (options?.useOnDownloadStart)! {
             let mimeType = navigationResponse.response.mimeType
-            if let url = navigationResponse.response.url {
+            if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
                 if mimeType != nil && !mimeType!.starts(with: "text/") {
                     onDownloadStart(url: url.absoluteString)
                     decisionHandler(.cancel)
@@ -1959,7 +1959,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         InAppWebView.credentialsProposed = []
         
-        onLoadError(url: url?.absoluteString, error: error)
+        var urlError = url?.absoluteString
+        if let info = error._userInfo as? [String: Any] {
+            if let failingUrl = info[NSURLErrorFailingURLErrorKey] as? URL {
+                urlError = failingUrl.absoluteString
+            }
+            if let failingUrlString = info[NSURLErrorFailingURLStringErrorKey] as? String {
+                urlError = failingUrlString
+            }
+        }
+        
+        onLoadError(url: urlError, error: error)
         
         if IABController != nil {
             IABController!.backButton.isEnabled = canGoBack
@@ -2439,7 +2449,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 return
             }
             else {
-                if result == nil, InAppWebView.windowWebViews[windowId] != nil {
+                var handledByClient = false
+                if result != nil, result is Bool {
+                    handledByClient = result as! Bool
+                }
+                if !handledByClient, InAppWebView.windowWebViews[windowId] != nil {
                     InAppWebView.windowWebViews.removeValue(forKey: windowId)
                 }
             }

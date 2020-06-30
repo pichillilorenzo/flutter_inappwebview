@@ -161,7 +161,7 @@ class InAppWebView extends StatefulWidget implements WebView {
       onConsoleMessage;
 
   @override
-  final Future<WebView> Function(InAppWebViewController controller,
+  final Future<bool> Function(InAppWebViewController controller,
       CreateWindowRequest onCreateWindowRequest) onCreateWindow;
 
   @override

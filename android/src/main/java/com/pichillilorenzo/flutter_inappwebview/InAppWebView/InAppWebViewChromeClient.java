@@ -602,7 +602,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     channel.invokeMethod("onCreateWindow", obj, new MethodChannel.Result() {
       @Override
       public void success(@Nullable Object result) {
-        if (result == null && InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
+        boolean handledByClient = false;
+        if (result instanceof Boolean) {
+          handledByClient = (boolean) result;
+        }
+        if (!handledByClient && InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
           InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
         }
       }
@@ -1130,6 +1134,19 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           request.deny();
         }
       });
+    }
+  }
+
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+    if (Shared.activityPluginBinding != null) {
+      Shared.activityPluginBinding.removeActivityResultListener(this);
+    }
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity = null;
+    }
+    if (flutterWebView != null) {
+      flutterWebView = null;
     }
   }
 }

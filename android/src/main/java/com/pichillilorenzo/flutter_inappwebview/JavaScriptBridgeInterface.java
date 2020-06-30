@@ -46,6 +46,10 @@ public class JavaScriptBridgeInterface {
 
   @JavascriptInterface
   public void _hideContextMenu() {
+    if (flutterWebView == null && inAppBrowserActivity == null) {
+      return;
+    }
+
     final InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
 
     final Handler handler = new Handler(Looper.getMainLooper());
@@ -61,6 +65,10 @@ public class JavaScriptBridgeInterface {
 
   @JavascriptInterface
   public void _callHandler(final String handlerName, final String _callHandlerID, final String args) {
+    if (flutterWebView == null && inAppBrowserActivity == null) {
+      return;
+    }
+
     final InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
 
     final Map<String, Object> obj = new HashMap<>();
@@ -107,5 +115,15 @@ public class JavaScriptBridgeInterface {
         });
       }
     });
+  }
+
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity = null;
+    }
+    if (flutterWebView != null) {
+      flutterWebView = null;
+    }
   }
 }

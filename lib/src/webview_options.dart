@@ -462,7 +462,7 @@ class AndroidInAppWebViewOptions
   ///The default value is `true`.
   bool hardwareAcceleration;
 
-  ///Sets whether the WebView whether supports multiple windows.
+  ///Sets whether the WebView supports multiple windows.
   ///If set to `true`, [onCreateWindow] event must be implemented by the host application. The default value is `false`.
   bool supportMultipleWindows;
 
@@ -485,7 +485,7 @@ class AndroidInAppWebViewOptions
   ///This is used to set the JavaScript property `window.navigator.isOnline` and generates the online/offline event as specified in HTML5, sec. 5.7.7.
   bool networkAvailable;
 
-  ///Specify the style of the scrollbars. The scrollbars can be overlaid or inset.
+  ///Specifies the style of the scrollbars. The scrollbars can be overlaid or inset.
   ///When inset, they add to the padding of the view. And the scrollbars can be drawn inside the padding area or on the edge of the view.
   ///For example, if a view has a background drawable and you want to draw the scrollbars inside the padding specified by the drawable,
   ///you can use SCROLLBARS_INSIDE_OVERLAY or SCROLLBARS_INSIDE_INSET. If you want them to appear at the edge of the view, ignoring the padding,
@@ -493,22 +493,26 @@ class AndroidInAppWebViewOptions
   ///The default value is [AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY].
   AndroidScrollBarStyle scrollBarStyle;
 
-  ///Set the position of the vertical scroll bar.
+  ///Sets the position of the vertical scroll bar.
   ///The default value is [AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
   AndroidVerticalScrollbarPosition verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
   int scrollBarDefaultDelayBeforeFade;
 
-  ///Define whether scrollbars will fade when the view is not scrolling.
+  ///Defines whether scrollbars will fade when the view is not scrolling.
   ///The default value is `true`.
   bool scrollbarFadingEnabled;
 
-  ///Define the scrollbar fade duration in milliseconds.
+  ///Defines the scrollbar fade duration in milliseconds.
   int scrollBarFadeDuration;
 
-  ///Set the renderer priority policy for this WebView.
+  ///Sets the renderer priority policy for this WebView.
   RendererPriorityPolicy rendererPriorityPolicy;
+
+  ///Sets whether the default Android error page should be disabled.
+  ///The default value is `false`.
+  bool disableDefaultErrorPage;
 
   AndroidInAppWebViewOptions({
     this.textZoom = 100,
@@ -563,6 +567,7 @@ class AndroidInAppWebViewOptions
     this.scrollbarFadingEnabled = true,
     this.scrollBarFadeDuration,
     this.rendererPriorityPolicy,
+    this.disableDefaultErrorPage,
   });
 
   @override
@@ -618,7 +623,8 @@ class AndroidInAppWebViewOptions
       "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
       "scrollbarFadingEnabled": scrollbarFadingEnabled,
       "scrollBarFadeDuration": scrollBarFadeDuration,
-      "rendererPriorityPolicy": rendererPriorityPolicy?.toMap()
+      "rendererPriorityPolicy": rendererPriorityPolicy?.toMap(),
+      "disableDefaultErrorPage": disableDefaultErrorPage
     };
   }
 
@@ -686,6 +692,7 @@ class AndroidInAppWebViewOptions
     options.scrollBarFadeDuration = map["scrollBarFadeDuration"];
     options.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
         map["rendererPriorityPolicy"]?.cast<String, dynamic>());
+    options.disableDefaultErrorPage = map["disableDefaultErrorPage"];
     return options;
   }
 

@@ -222,50 +222,15 @@ class InAppWebViewController {
                 IOSWKNavigationType.fromValue(iosWKNavigationType),
             iosIsForMainFrame: iosIsForMainFrame);
 
-        WebView webView;
-        dynamic inAppBrowserWindow;
+        bool result = false;
 
         if (_webview != null && _webview.onCreateWindow != null)
-          webView = await _webview.onCreateWindow(this, createWindowRequest);
+          result = await _webview.onCreateWindow(this, createWindowRequest);
         else if (_inAppBrowser != null) {
-          inAppBrowserWindow =
-              await _inAppBrowser.onCreateWindow(createWindowRequest);
-          assert(
-              inAppBrowserWindow is InAppBrowser ||
-                  inAppBrowserWindow is HeadlessInAppWebView,
-              "InAppBrowser.onCreateWindow should return an \"InAppBrowser\" instance or a \"HeadlessInAppWebView\" instance.");
+          result = await _inAppBrowser.onCreateWindow(createWindowRequest);
         }
 
-        int webViewWindowId;
-
-        if (webView != null) {
-          webViewWindowId = webView.windowId;
-          assert(
-              webViewWindowId != null,
-              "If you are returning a WebView, then WebView.windowId should be not null. To set the " +
-                  "WebView.windowId property, you should use the CreateWindowRequest.windowId property.");
-          if (webView is HeadlessInAppWebView) {
-            webView.run();
-          }
-        } else if (inAppBrowserWindow != null) {
-          if (inAppBrowserWindow is InAppBrowser) {
-            webViewWindowId = inAppBrowserWindow.windowId;
-            assert(
-                webViewWindowId != null,
-                "If you are returning an InAppBrowser, then InAppBrowser.windowId should be not null. To set the " +
-                    "InAppBrowser.windowId property, you should use the CreateWindowRequest.windowId property.");
-            inAppBrowserWindow.openUrl(url: "about:blank");
-          } else if (inAppBrowserWindow is HeadlessInAppWebView) {
-            webViewWindowId = inAppBrowserWindow.windowId;
-            assert(
-                webViewWindowId != null,
-                "If you are returning a HeadlessInAppWebView, then HeadlessInAppWebView.windowId should be not null. To set the " +
-                    "HeadlessInAppWebView.windowId property, you should use the CreateWindowRequest.windowId property.");
-            inAppBrowserWindow.run();
-          }
-        }
-
-        return webViewWindowId;
+        return result;
       case "onCloseWindow":
         if (_webview != null && _webview.onCloseWindow != null)
           _webview.onCloseWindow(this);
@@ -1222,7 +1187,10 @@ class InAppWebViewController {
       String encoding = "utf8",
       String baseUrl = "about:blank",
       String androidHistoryUrl = "about:blank"}) async {
-    assert(data != null);
+    assert(data != null &&
+        mimeType != null &&
+        encoding != null &&
+        baseUrl != null);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);

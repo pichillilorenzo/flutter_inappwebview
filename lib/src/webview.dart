@@ -132,10 +132,9 @@ abstract class WebView {
 
   ///Event fired when the [WebView] requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
-  ///The return value should be a [WebView] instance or `null`. If it returns `null`, then nothing will happen.
-  ///If it returns an [InAppWebView] instance, when it will be added to the widget tree, it will load the request.
-  ///If it returns a [HeadlessInAppWebView] instance, the [HeadlessInAppWebView.run] method will be immediately called.
-  ///Remember to use the [CreateWindowRequest.windowId] to create the new WebView instance.
+  ///If the host application chooses to honor this request, it should return `true` from this method, create a new WebView to host the window.
+  ///If the host application chooses not to honor the request, it should return `false` from this method.
+  ///The default implementation of this method does nothing and hence returns `false`.
   ///
   ///[createWindowRequest] represents the request.
   ///
@@ -150,7 +149,7 @@ abstract class WebView {
   ///[IOSInAppWebViewOptions.allowsPictureInPictureMediaPlayback], [IOSInAppWebViewOptions.isFraudulentWebsiteWarningEnabled],
   ///[IOSInAppWebViewOptions.allowsInlineMediaPlayback], [IOSInAppWebViewOptions.suppressesIncrementalRendering], [IOSInAppWebViewOptions.selectionGranularity],
   ///[IOSInAppWebViewOptions.ignoresViewportScaleLimits],
-  ///will have no effect due to a `WKWebView` limitation when creating a new window WebView: it's impossible to return a new `WKWebView`
+  ///will have no effect due to a `WKWebView` limitation when creating the new window WebView: it's impossible to return the new `WKWebView`
   ///with a different `WKWebViewConfiguration` instance (see https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview).
   ///So, these options will be inherited from the caller WebView.
   ///Also, note that calling [InAppWebViewController.setOptions] method using the controller of the new created WebView,
@@ -159,7 +158,7 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview
-  final Future<WebView> Function(InAppWebViewController controller,
+  final Future<bool> Function(InAppWebViewController controller,
       CreateWindowRequest createWindowRequest) onCreateWindow;
 
   ///Event fired when the host application should close the given WebView and remove it from the view system if necessary.

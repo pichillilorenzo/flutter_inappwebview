@@ -583,6 +583,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `scrollbarFadingEnabled`: Define whether scrollbars will fade when the view is not scrolling. The default value is `true`.
 * `scrollBarFadeDuration`: Define the scrollbar fade duration in milliseconds.
 * `rendererPriorityPolicy`: Set the renderer priority policy for this WebView.
+* `disableDefaultErrorPage`: Sets whether the default Android error page should be disabled. The default value is `false`.
 
 ##### `InAppWebView` iOS-specific options
 

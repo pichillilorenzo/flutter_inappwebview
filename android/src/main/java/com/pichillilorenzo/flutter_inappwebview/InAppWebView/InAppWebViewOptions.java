@@ -96,6 +96,7 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public Map<String, Object> rendererPriorityPolicy = new HashMap<>();
   public Boolean useShouldInterceptRequest = false;
   public Boolean useOnRenderProcessGone = false;
+  public Boolean disableDefaultErrorPage = false;
 
   @Override
   public InAppWebViewOptions parse(Map<String, Object> options) {
@@ -335,6 +336,9 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
         case "useOnRenderProcessGone":
           useOnRenderProcessGone = (Boolean) value;
           break;
+        case "disableDefaultErrorPage":
+          disableDefaultErrorPage = (Boolean) value;
+          break;
       }
     }
 
@@ -420,6 +424,7 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
     options.put("rendererPriorityPolicy", rendererPriorityPolicy);
     options.put("useShouldInterceptRequest", useShouldInterceptRequest);
     options.put("useOnRenderProcessGone", useOnRenderProcessGone);
+    options.put("disableDefaultErrorPage", disableDefaultErrorPage);
     return options;
   }
 

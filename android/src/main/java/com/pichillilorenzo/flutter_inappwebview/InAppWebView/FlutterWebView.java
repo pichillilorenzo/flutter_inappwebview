@@ -518,9 +518,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
   public void dispose() {
     channel.setMethodCallHandler(null);
     if (webView != null) {
-      if (Shared.activityPluginBinding != null) {
-        Shared.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
-      }
+      webView.inAppWebViewChromeClient.dispose();
+      webView.inAppWebViewClient.dispose();
+      webView.javaScriptBridgeInterface.dispose();
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         @Override

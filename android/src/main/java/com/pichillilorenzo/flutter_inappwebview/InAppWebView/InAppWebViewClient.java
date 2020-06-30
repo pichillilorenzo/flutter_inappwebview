@@ -66,6 +66,7 @@ public class InAppWebViewClient extends WebViewClient {
     if (webView.options.useShouldOverrideUrlLoading) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         onShouldOverrideUrlLoading(
+                webView,
                 request.getUrl().toString(),
                 request.getMethod(),
                 request.getRequestHeaders(),
@@ -74,6 +75,7 @@ public class InAppWebViewClient extends WebViewClient {
                 request.isRedirect());
       } else {
         onShouldOverrideUrlLoading(
+                webView,
                 request.getUrl().toString(),
                 request.getMethod(),
                 request.getRequestHeaders(),
@@ -102,14 +104,16 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public boolean shouldOverrideUrlLoading(WebView webView, String url) {
-    if (((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).options.useShouldOverrideUrlLoading) {
-      onShouldOverrideUrlLoading(url, "GET", null,true, false, false);
+    InAppWebView inAppWebView = (InAppWebView) webView;
+    if (inAppWebView.options.useShouldOverrideUrlLoading) {
+      onShouldOverrideUrlLoading(inAppWebView, url, "GET", null,true, false, false);
       return true;
     }
     return false;
   }
 
-  public void onShouldOverrideUrlLoading(final String url, final String method, final Map<String, String> headers, final boolean isForMainFrame, boolean hasGesture, boolean isRedirect) {
+  public void onShouldOverrideUrlLoading(final InAppWebView webView, final String url, final String method, final Map<String, String> headers,
+                                         final boolean isForMainFrame, boolean hasGesture, boolean isRedirect) {
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);
@@ -132,7 +136,6 @@ public class InAppWebViewClient extends WebViewClient {
                 if (isForMainFrame) {
                   // There isn't any way to load an URL for a frame that is not the main frame,
                   // so call this only on main frame.
-                  InAppWebView webView = ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView);
                   if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
                     webView.loadUrl(url, headers);
                   else
@@ -250,11 +253,15 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
-//    // Used to show instantly a custom error page
-//    view.stopLoading();
-//    view.loadUrl("about:blank");
 
-    ((inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView).isLoading = false;
+    final InAppWebView webView = (InAppWebView) view;
+
+    if (webView.options.disableDefaultErrorPage) {
+      webView.stopLoading();
+      webView.loadUrl("about:blank");
+    }
+
+    webView.isLoading = false;
     previousAuthRequestFailureCount = 0;
     credentialsProposed = null;
 
@@ -829,5 +836,15 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onUnhandledKeyEvent(WebView view, KeyEvent event) {
 
+  }
+
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+    if (inAppBrowserActivity != null) {
+      inAppBrowserActivity = null;
+    }
+    if (flutterWebView != null) {
+      flutterWebView = null;
+    }
   }
 }

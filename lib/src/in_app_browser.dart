@@ -341,10 +341,9 @@ class InAppBrowser {
 
   ///Event fired when the [InAppBrowser] webview requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
-  ///The return type should be an [InAppBrowser] instance, a [HeadlessInAppWebView] instance or `null`. If it returns `null`, then nothing will happen.
-  ///If it returns an [InAppBrowser] instance, the new [InAppBrowser] will be immediately opened.
-  ///If it returns a [HeadlessInAppWebView] instance, the [HeadlessInAppWebView.run] method will be immediately called.
-  ///Remember to use the [CreateWindowRequest.windowId] to create the new WebView instance.
+  ///If the host application chooses to honor this request, it should return `true` from this method, create a new WebView to host the window.
+  ///If the host application chooses not to honor the request, it should return `false` from this method.
+  ///The default implementation of this method does nothing and hence returns `false`.
   ///
   ///[createWindowRequest] represents the request.
   ///
@@ -369,7 +368,7 @@ class InAppBrowser {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview
   // ignore: missing_return
-  Future<dynamic> onCreateWindow(CreateWindowRequest createWindowRequest) {}
+  Future<bool> onCreateWindow(CreateWindowRequest createWindowRequest) {}
 
   ///Event fired when the host application should close the given WebView and remove it from the view system if necessary.
   ///At this point, WebCore has stopped any loading in this window and has removed any cross-scripting ability in javascript.

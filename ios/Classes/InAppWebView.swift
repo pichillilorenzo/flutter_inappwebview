@@ -869,6 +869,26 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         self.longPressRecognizer!.addTarget(self, action: #selector(longPressGestureDetected))
     }
     
+    override public var frame: CGRect {
+        get {
+            return super.frame
+        }
+        set {
+            super.frame = newValue
+            
+            self.scrollView.contentInset = UIEdgeInsets.zero;
+            if #available(iOS 11, *) {
+                // Above iOS 11, adjust contentInset to compensate the adjustedContentInset so the sum will
+                // always be 0.
+                if (scrollView.adjustedContentInset != UIEdgeInsets.zero) {
+                    let insetToAdjust = self.scrollView.adjustedContentInset;
+                    scrollView.contentInset = UIEdgeInsets(top: -insetToAdjust.top, left: -insetToAdjust.left,
+                                                                bottom: -insetToAdjust.bottom, right: -insetToAdjust.right);
+                }
+            }
+        }
+    }
+    
     required public init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }

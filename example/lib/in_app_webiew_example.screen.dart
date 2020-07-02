@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import 'main.dart';
 
@@ -86,7 +87,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(
                         debuggingEnabled: true,
-                        useShouldOverrideUrlLoading: true
+                        useShouldOverrideUrlLoading: true,
                       ),
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
@@ -100,7 +101,22 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       });
                     },
                     shouldOverrideUrlLoading: (controller, shouldOverrideUrlLoadingRequest) async {
-                      print("shouldOverrideUrlLoading");
+                      var url = shouldOverrideUrlLoadingRequest.url;
+                      var uri = Uri.parse(url);
+
+                      if (!["http", "https", "file",
+                        "chrome", "data", "javascript",
+                        "about"].contains(uri.scheme)) {
+                        if (await canLaunch(url)) {
+                          // Launch the App
+                          await launch(
+                            url,
+                          );
+                          // and cancel the request
+                          return ShouldOverrideUrlLoadingAction.CANCEL;
+                        }
+                      }
+
                       return ShouldOverrideUrlLoadingAction.ALLOW;
                     },
                     onLoadStop: (InAppWebViewController controller, String url) async {

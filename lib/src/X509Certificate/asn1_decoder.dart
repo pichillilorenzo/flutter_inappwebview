@@ -160,7 +160,7 @@ class ASN1DERDecoder {
 
   static List<int> loadSubContent({@required Iterator<int> iterator}) {
     var len = getContentLength(iterator: iterator);
-    int int64MaxValue = 9223372036854775807;
+    int int64MaxValue = double.maxFinite.toInt();
 
     if (len >= BigInt.from(int64MaxValue)) {
       return <int>[];

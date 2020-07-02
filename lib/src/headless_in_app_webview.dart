@@ -198,7 +198,7 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final Future<bool> Function(InAppWebViewController controller,
-      CreateWindowRequest onCreateWindowRequest) onCreateWindow;
+      CreateWindowRequest createWindowRequest) onCreateWindow;
 
   @override
   final void Function(InAppWebViewController controller) onCloseWindow;

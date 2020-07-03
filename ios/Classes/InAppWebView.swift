@@ -52,8 +52,9 @@ if (window.Promise == null) {
 let javaScriptBridgeJS = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = {};
 window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
+    var _windowId = window._flutter_inappwebview_windowId;
     var _callHandlerID = setTimeout(function(){});
-    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': arguments[0], '_callHandlerID': _callHandlerID, 'args': JSON.stringify(Array.prototype.slice.call(arguments, 1))} );
+    window.webkit.messageHandlers['callHandler'].postMessage( {'handlerName': arguments[0], '_callHandlerID': _callHandlerID, 'args': JSON.stringify(Array.prototype.slice.call(arguments, 1)), '_windowId': _windowId} );
     return new Promise(function(resolve, reject) {
         window.\(JAVASCRIPT_BRIDGE_NAME)[_callHandlerID] = resolve;
     });
@@ -63,6 +64,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
 let consoleLogJS = """
 (function(console) {
+
     var oldLogs = {
         'consoleLog': console.log,
         'consoleDebug': console.debug,
@@ -83,7 +85,9 @@ let consoleLogJS = """
                         message += ' ' + arguments[i];
                     }
                 }
-                window.webkit.messageHandlers[oldLog].postMessage(message);
+
+                var _windowId = window._flutter_inappwebview_windowId;
+                window.webkit.messageHandlers[oldLog].postMessage({'message': message, '_windowId': _windowId});
                 oldLogs[oldLog].apply(null, arguments);
             }
         })(k);
@@ -141,12 +145,17 @@ function wkwebview_FindAllAsyncForElement(element, keyword) {
           value.substr(idx + keyword.length)
         );
 
+        var _windowId = window._flutter_inappwebview_windowId;
+
         window.webkit.messageHandlers["onFindResultReceived"].postMessage(
-          JSON.stringify({
-            activeMatchOrdinal: wkwebview_CurrentHighlight,
-            numberOfMatches: wkwebview_SearchResultCount,
-            isDoneCounting: wkwebview_IsDoneCounting
-          })
+            {
+                'findResult': {
+                    'activeMatchOrdinal': wkwebview_CurrentHighlight,
+                    'numberOfMatches': wkwebview_SearchResultCount,
+                    'isDoneCounting': wkwebview_IsDoneCounting
+                },
+                '_windowId': _windowId
+            }
         );
       }
     } else if (element.nodeType == 1) {
@@ -171,12 +180,18 @@ function wkwebview_FindAllAsync(keyword) {
   wkwebview_ClearMatches();
   wkwebview_FindAllAsyncForElement(document.body, keyword.toLowerCase());
   wkwebview_IsDoneCounting = true;
+
+  var _windowId = window._flutter_inappwebview_windowId;
+
   window.webkit.messageHandlers["onFindResultReceived"].postMessage(
-    JSON.stringify({
-      activeMatchOrdinal: wkwebview_CurrentHighlight,
-      numberOfMatches: wkwebview_SearchResultCount,
-      isDoneCounting: wkwebview_IsDoneCounting
-    })
+      {
+          'findResult': {
+              'activeMatchOrdinal': wkwebview_CurrentHighlight,
+              'numberOfMatches': wkwebview_SearchResultCount,
+              'isDoneCounting': wkwebview_IsDoneCounting
+          },
+          '_windowId': _windowId
+      }
   );
 }
 
@@ -238,12 +253,17 @@ function wkwebview_FindNext(forward) {
       block: "center"
     });
 
+    var _windowId = window._flutter_inappwebview_windowId;
+
     window.webkit.messageHandlers["onFindResultReceived"].postMessage(
-      JSON.stringify({
-        activeMatchOrdinal: wkwebview_CurrentHighlight,
-        numberOfMatches: wkwebview_SearchResultCount,
-        isDoneCounting: wkwebview_IsDoneCounting
-      })
+        {
+            'findResult': {
+                'activeMatchOrdinal': wkwebview_CurrentHighlight,
+                'numberOfMatches': wkwebview_SearchResultCount,
+                'isDoneCounting': wkwebview_IsDoneCounting
+            },
+            '_windowId': _windowId
+        }
     );
   }
 }
@@ -1140,6 +1160,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 clearCache()
             }
         }
+        
+        let userScript = WKUserScript(source: "window._flutter_inappwebview_windowId = \(windowId == nil ? "null" : String(windowId!));" , injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(userScript)
         
         if windowId != nil {
             // the new created window webview has the same WKWebViewConfiguration variable reference
@@ -2812,7 +2835,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 if let r = result {
                     json = r as! String
                 }
-                self.evaluateJavaScript("if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json)); delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];}", completionHandler: nil)
+                
+                self.evaluateJavaScript("""
+if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
+    window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)](\(json));
+    delete window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)];
+}
+""", completionHandler: nil)
             }
         })
     }
@@ -2905,24 +2934,43 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     messageLevel = 1
                     break;
             }
-            onConsoleMessage(message: message.body as! String, messageLevel: messageLevel)
+            let body = message.body as! [String: Any?]
+            let consoleMessage = body["message"] as! String
+            
+            let _windowId = body["_windowId"] as? Int64
+            var webView = self
+            if let wId = _windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+                webView = webViewTransport.webView
+            }
+            webView.onConsoleMessage(message: consoleMessage, messageLevel: messageLevel)
         } else if message.name == "callHandler" {
-            let body = message.body as! [String: Any]
+            let body = message.body as! [String: Any?]
             let handlerName = body["handlerName"] as! String
             if handlerName == "onPrint" {
                 printCurrentPage(printCompletionHandler: nil)
             }
             let _callHandlerID = body["_callHandlerID"] as! Int64
             let args = body["args"] as! String
-            onCallJsHandler(handlerName: handlerName, _callHandlerID: _callHandlerID, args: args)
-        } else if message.name == "onFindResultReceived" {
-            if let resource = convertToDictionary(text: message.body as! String) {
-                let activeMatchOrdinal = resource["activeMatchOrdinal"] as! Int
-                let numberOfMatches = resource["numberOfMatches"] as! Int
-                let isDoneCounting = resource["isDoneCounting"] as! Bool
-                
-                self.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+            
+            let _windowId = body["_windowId"] as? Int64
+            var webView = self
+            if let wId = _windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+                webView = webViewTransport.webView
             }
+            webView.onCallJsHandler(handlerName: handlerName, _callHandlerID: _callHandlerID, args: args)
+        } else if message.name == "onFindResultReceived" {
+            let body = message.body as! [String: Any?]
+            let findResult = body["findResult"] as! [String: Any]
+            let activeMatchOrdinal = findResult["activeMatchOrdinal"] as! Int
+            let numberOfMatches = findResult["numberOfMatches"] as! Int
+            let isDoneCounting = findResult["isDoneCounting"] as! Bool
+            
+            let _windowId = body["_windowId"] as? Int64
+            var webView = self
+            if let wId = _windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
+                webView = webViewTransport.webView
+            }
+            webView.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
         }
     }
     

@@ -1,8 +1,9 @@
-## 4.0.0+3
+## 4.0.0+4
 
 - Reverted calling `handler.post` on Android when a WebView is created
 - Fixed iOS extra bottom padding when opening the keyboard
 - Fixed "Build for web not working – The integer literal 9223372036854775807 can't be represented exactly in JavaScript" [#429](https://github.com/pichillilorenzo/flutter_inappwebview/issues/429)
+- Fixed iOS userContentController didReceive WKScriptMessage event when using a WebView created with a `windowId`
 
 ## 4.0.0
 

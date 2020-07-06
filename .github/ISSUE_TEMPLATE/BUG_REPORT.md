@@ -2,14 +2,20 @@
 name: Bug report
 about: Something is crashing or not working as intended
 labels: bug
-
 ---
 
 <!--
     ❗️❗️❗️ IMPORTANT ❗️❗️❗️
 
-    Please, before posting a new issue, make sure to check these points!
+    DON'T DELETE THIS TEMPLATE! USE IT TO WRITE YOUR ISSUE.
+
+    If you delete this and you don't give me enough info,
+    how would you expect me to solve your issue? Thanks.
+
+    Also, before posting a new issue, make sure to check the following points!
     You may already find an answer to your problem!
+
+    ❗️❗️❗️ IMPORTANT ❗️❗️❗️
 -->
 
 - [x] I have read the [README](https://github.com/pichillilorenzo/flutter_inappwebview/blob/master/README.md)

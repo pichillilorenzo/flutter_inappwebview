@@ -85,5 +85,11 @@
                 android:resource="@xml/provider_paths"/>
         </provider>
 
+        <!-- Hybrid composition -->
+        <meta-data
+            android:name="io.flutter.embedded_views_preview"
+            android:value="true" />
+
+
     </application>
 </manifest>

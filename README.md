@@ -545,6 +545,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 
 ##### `InAppWebView` Android-specific options
 
+* `useHybridComposition`: Set to `true` to use Flutter's new Hybrid Composition rendering method, which fixes all issues [here](https://github.com/flutter/flutter/issues/61133). The default value is `false`. Note that this option requires Flutter v1.20+ and should only be used on Android 10+ for release apps, as animations will drop frames on < Android 10.
 * `useShouldInterceptRequest`: Set to `true` to be able to listen at the `androidShouldInterceptRequest` event. The default value is `false`.
 * `useOnRenderProcessGone`: Set to `true` to be able to listen at the `androidOnRenderProcessGone` event. The default value is `false`.
 * `textZoom`: Sets the text zoom of the page in percent. The default value is `100`.

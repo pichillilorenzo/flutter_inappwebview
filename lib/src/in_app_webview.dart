@@ -340,37 +340,56 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return PlatformViewLink(
-        viewType: 'com.pichillilorenzo/flutter_inappwebview',
-        surfaceFactory: (
-            BuildContext context,
-            PlatformViewController controller,
-            ) {
-          return AndroidViewSurface(
-            controller: controller,
-            gestureRecognizers: widget.gestureRecognizers ?? const <Factory<OneSequenceGestureRecognizer>>{},
-            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-          );
-        },
-        onCreatePlatformView: (PlatformViewCreationParams params) {
-          return PlatformViewsService.initSurfaceAndroidView(
-            id: params.id,
-            viewType: 'com.pichillilorenzo/flutter_inappwebview',
-            layoutDirection: TextDirection.rtl,
-            creationParams: <String, dynamic>{
-              'initialUrl': '${Uri.parse(widget.initialUrl)}',
-              'initialFile': widget.initialFile,
-              'initialData': widget.initialData?.toMap(),
-              'initialHeaders': widget.initialHeaders,
-              'initialOptions': widget.initialOptions?.toMap() ?? {}
-            },
-            creationParamsCodec: const StandardMessageCodec(),
-          )
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..addOnPlatformViewCreatedListener((id) => _onPlatformViewCreated(id))
-            ..create();
-        },
-      );
+      if (widget.initialOptions.android.useHybridComposition) {
+        return PlatformViewLink(
+          viewType: 'com.pichillilorenzo/flutter_inappwebview',
+          surfaceFactory: (
+              BuildContext context,
+              PlatformViewController controller,
+              ) {
+            return AndroidViewSurface(
+              controller: controller,
+              gestureRecognizers: widget.gestureRecognizers ?? const <Factory<OneSequenceGestureRecognizer>>{},
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            return PlatformViewsService.initSurfaceAndroidView(
+              id: params.id,
+              viewType: 'com.pichillilorenzo/flutter_inappwebview',
+              layoutDirection: TextDirection.rtl,
+              creationParams: <String, dynamic>{
+                'initialUrl': '${Uri.parse(widget.initialUrl)}',
+                'initialFile': widget.initialFile,
+                'initialData': widget.initialData?.toMap(),
+                'initialHeaders': widget.initialHeaders,
+                'initialOptions': widget.initialOptions?.toMap() ?? {}
+              },
+              creationParamsCodec: const StandardMessageCodec(),
+            )
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..addOnPlatformViewCreatedListener((id) => _onPlatformViewCreated(id))
+              ..create();
+          },
+        );
+      } else {
+        return AndroidView(
+          viewType: 'com.pichillilorenzo/flutter_inappwebview',
+          onPlatformViewCreated: _onPlatformViewCreated,
+          gestureRecognizers: widget.gestureRecognizers,
+          layoutDirection: TextDirection.rtl,
+          creationParams: <String, dynamic>{
+            'initialUrl': '${Uri.parse(widget.initialUrl)}',
+            'initialFile': widget.initialFile,
+            'initialData': widget.initialData?.toMap(),
+            'initialHeaders': widget.initialHeaders,
+            'initialOptions': widget.initialOptions?.toMap() ?? {},
+            'contextMenu': widget.contextMenu?.toMap() ?? {},
+            'windowId': widget.windowId
+          },
+          creationParamsCodec: const StandardMessageCodec(),
+        );
+      }
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',

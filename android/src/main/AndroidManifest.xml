@@ -5,6 +5,8 @@
         <activity android:theme="@style/AppTheme" android:name="com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>
         <activity android:theme="@style/ThemeTransparent" android:name="com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ChromeCustomTabsActivity" android:configChanges="orientation|screenSize"></activity>
         <receiver android:name="com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ActionBroadcastReceiver" />
+        <meta-data
+            android:name="io.flutter.embedded_views_preview"
+            android:value="true" />
     </application>
-
 </manifest>

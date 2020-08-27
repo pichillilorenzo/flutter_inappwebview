@@ -68,7 +68,8 @@ as mentioned in the 6th step of [Full-Flutter app migration](https://github.com/
 
 Because of [Flutter AndroidX compatibility](https://flutter.dev/docs/development/packages-and-plugins/androidx-compatibility), the latest version that doesn't use `AndroidX` is `0.6.0`.
 
-Also, note that to use the `InAppWebView` widget on Android, it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)).
+Also, note that to use the `InAppWebView` widget on Android, it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html))  
+or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 
 **Support HTTP request**: Starting with Android 9 (API level 28), cleartext support is disabled by default:
 - Check the official [Network security configuration - "Opt out of cleartext traffic"](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted) section.
@@ -181,7 +182,7 @@ First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](ht
 ## Usage
 
 Classes:
-- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`. Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)).
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`. Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 - [ContextMenu](#contextmenu-class): This class represents the WebView context menu.
 - [HeadlessInAppWebView](#headlessinappwebview-class): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
@@ -233,7 +234,8 @@ Keyboard support within webviews is also experimental.
 
 To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
 
-Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)).
+Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html))
+or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 
 Use `InAppWebViewController` to control the WebView instance.
 Example:
@@ -545,7 +547,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 
 ##### `InAppWebView` Android-specific options
 
-* `useHybridComposition`: Set to `true` to use Flutter's new Hybrid Composition rendering method, which fixes all issues [here](https://github.com/flutter/flutter/issues/61133). The default value is `false`. Note that this option requires Flutter v1.20+ and should only be used on Android 10+ for release apps, as animations will drop frames on < Android 10.
+* `useHybridComposition`: Set to `true` to use Flutter's new Hybrid Composition rendering method, which fixes all issues [here](https://github.com/flutter/flutter/issues/61133). The default value is `false`. Note that this option requires Flutter v1.20+ and should only be used on Android 10+ for release apps, as animations will drop frames on < Android 10 (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
 * `useShouldInterceptRequest`: Set to `true` to be able to listen at the `androidShouldInterceptRequest` event. The default value is `false`.
 * `useOnRenderProcessGone`: Set to `true` to be able to listen at the `androidOnRenderProcessGone` event. The default value is `false`.
 * `textZoom`: Sets the text zoom of the page in percent. The default value is `100`.

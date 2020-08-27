@@ -162,9 +162,7 @@ public class InAppWebViewClient extends WebViewClient {
     });
   }
 
-  @Override
-  public void onPageStarted(WebView view, String url, Bitmap favicon) {
-
+  private void loadCustomJavaScript(WebView view) {
     InAppWebView webView = (InAppWebView) view;
 
     String js = InAppWebView.consoleLogJS.replaceAll("[\r\n]+", "");
@@ -192,6 +190,14 @@ public class InAppWebViewClient extends WebViewClient {
     } else {
       webView.loadUrl("javascript:" + js);
     }
+  }
+
+  @Override
+  public void onPageStarted(WebView view, String url, Bitmap favicon) {
+
+    InAppWebView webView = (InAppWebView) view;
+
+    loadCustomJavaScript(webView);
 
     super.onPageStarted(view, url, favicon);
 
@@ -210,6 +216,9 @@ public class InAppWebViewClient extends WebViewClient {
 
   public void onPageFinished(WebView view, String url) {
     final InAppWebView webView = (InAppWebView) view;
+
+    // try to reload custom javascript if they were not loaded during the onPageStarted event
+    loadCustomJavaScript(webView);
 
     super.onPageFinished(view, url);
 

@@ -80,7 +80,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
-                    contextMenu: contextMenu,
+                    // contextMenu: contextMenu,
                     initialUrl: "https://github.com/flutter",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
@@ -89,6 +89,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         debuggingEnabled: true,
                         useShouldOverrideUrlLoading: true,
                       ),
+                      android: AndroidInAppWebViewOptions(
+                        useHybridComposition: true
+                      )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
@@ -135,7 +138,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url;
                       });
-                    }
+                    },
+                    onConsoleMessage: (controller, consoleMessage) {
+                      print(consoleMessage);
+                    },
                   ),
                 ),
               ),

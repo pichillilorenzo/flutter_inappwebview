@@ -1,3 +1,8 @@
+## 5.0.0
+
+- Added Android Hybrid Composition support "Use PlatformViewLink widget for Android WebView" [#462](https://github.com/pichillilorenzo/flutter_inappwebview/pull/462) (thanks to [plateaukao](https://github.com/plateaukao) and [tneotia](https://github.com/tneotia))
+- Fixed `window.flutter_inappwebview.callHandler is not a function` [#218](https://github.com/pichillilorenzo/flutter_inappwebview/issues/218)
+
 ## 4.0.0+4
 
 - Reverted calling `handler.post` on Android when a WebView is created

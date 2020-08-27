@@ -340,7 +340,7 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      if (widget.initialOptions.android.useHybridComposition) {
+      if (widget.initialOptions?.android?.useHybridComposition ?? false) {
         return PlatformViewLink(
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
           surfaceFactory: (

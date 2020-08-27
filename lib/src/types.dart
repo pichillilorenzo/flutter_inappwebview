@@ -272,6 +272,7 @@ class WebResourceResponse {
       "contentType": contentType,
       "contentEncoding": contentEncoding,
       "data": data,
+      "headers": headers,
       "statusCode": statusCode,
       "reasonPhrase": reasonPhrase
     };

@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
@@ -339,27 +340,42 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      return AndroidView(
-        viewType: 'com.pichillilorenzo/flutter_inappwebview',
-        onPlatformViewCreated: _onPlatformViewCreated,
-        gestureRecognizers: widget.gestureRecognizers,
-        layoutDirection: TextDirection.rtl,
-        creationParams: <String, dynamic>{
-          'initialUrl': '${Uri.parse(widget.initialUrl)}',
-          'initialFile': widget.initialFile,
-          'initialData': widget.initialData?.toMap(),
-          'initialHeaders': widget.initialHeaders,
-          'initialOptions': widget.initialOptions?.toMap() ?? {},
-          'contextMenu': widget.contextMenu?.toMap() ?? {},
-          'windowId': widget.windowId
-        },
-        creationParamsCodec: const StandardMessageCodec(),
-      );
-      // onLongPress issue: https://github.com/flutter/plugins/blob/f31d16a6ca0c4bd6849cff925a00b6823973696b/packages/webview_flutter/lib/src/webview_android.dart#L31
-      /*return GestureDetector(
-        onLongPress: () {},
-        excludeFromSemantics: true,
-        child: AndroidView(
+      if (widget.initialOptions.android.useHybridComposition) {
+        return PlatformViewLink(
+          viewType: 'com.pichillilorenzo/flutter_inappwebview',
+          surfaceFactory: (
+              BuildContext context,
+              PlatformViewController controller,
+              ) {
+            return AndroidViewSurface(
+              controller: controller,
+              gestureRecognizers: widget.gestureRecognizers ?? const <Factory<OneSequenceGestureRecognizer>>{},
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            return PlatformViewsService.initSurfaceAndroidView(
+              id: params.id,
+              viewType: 'com.pichillilorenzo/flutter_inappwebview',
+              layoutDirection: TextDirection.rtl,
+              creationParams: <String, dynamic>{
+                'initialUrl': '${Uri.parse(widget.initialUrl)}',
+                'initialFile': widget.initialFile,
+                'initialData': widget.initialData?.toMap(),
+                'initialHeaders': widget.initialHeaders,
+                'initialOptions': widget.initialOptions?.toMap() ?? {},
+                'contextMenu': widget.contextMenu?.toMap() ?? {},
+                'windowId': widget.windowId
+              },
+              creationParamsCodec: const StandardMessageCodec(),
+            )
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..addOnPlatformViewCreatedListener((id) => _onPlatformViewCreated(id))
+              ..create();
+          },
+        );
+      } else {
+        return AndroidView(
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
           onPlatformViewCreated: _onPlatformViewCreated,
           gestureRecognizers: widget.gestureRecognizers,
@@ -369,11 +385,13 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialFile': widget.initialFile,
             'initialData': widget.initialData?.toMap(),
             'initialHeaders': widget.initialHeaders,
-            'initialOptions': initialOptions
+            'initialOptions': widget.initialOptions?.toMap() ?? {},
+            'contextMenu': widget.contextMenu?.toMap() ?? {},
+            'windowId': widget.windowId
           },
           creationParamsCodec: const StandardMessageCodec(),
-        ),
-      );*/
+        );
+      }
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',

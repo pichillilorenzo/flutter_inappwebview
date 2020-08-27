@@ -217,7 +217,7 @@ public class InAppWebViewClient extends WebViewClient {
   public void onPageFinished(WebView view, String url) {
     final InAppWebView webView = (InAppWebView) view;
 
-    // try to reload custom javascript if they were not loaded during the onPageStarted event
+    // try to reload custom javascript scripts if they were not loaded during the onPageStarted event
     loadCustomJavaScript(webView);
 
     super.onPageFinished(view, url);

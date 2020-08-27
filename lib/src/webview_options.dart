@@ -1029,7 +1029,7 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   bool progressBar;
 
   AndroidInAppBrowserOptions(
-      {this.hideTitleBar = true,
+      {this.hideTitleBar = false,
       this.toolbarTopFixedTitle = "",
       this.closeOnCannotGoBack = true,
       this.progressBar = true});

@@ -363,7 +363,9 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialFile': widget.initialFile,
                 'initialData': widget.initialData?.toMap(),
                 'initialHeaders': widget.initialHeaders,
-                'initialOptions': widget.initialOptions?.toMap() ?? {}
+                'initialOptions': widget.initialOptions?.toMap() ?? {},
+                'contextMenu': widget.contextMenu?.toMap() ?? {},
+                'windowId': widget.windowId
               },
               creationParamsCodec: const StandardMessageCodec(),
             )

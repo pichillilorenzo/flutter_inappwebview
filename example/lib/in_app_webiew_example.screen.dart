@@ -123,6 +123,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       return ShouldOverrideUrlLoadingAction.ALLOW;
                     },
                     onLoadStop: (InAppWebViewController controller, String url) async {
+                      print(CookieManager)
                       print("onLoadStop $url");
                       setState(() {
                         this.url = url;

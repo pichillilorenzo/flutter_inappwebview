@@ -503,6 +503,14 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
           result.success(null);
         }
         break;
+      case "clearHistory":
+        if (webView != null) {
+          webView.clearHistory();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
       default:
         result.notImplemented();
     }

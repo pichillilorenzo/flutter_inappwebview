@@ -407,6 +407,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
       case "getCertificate":
         result.success(getCertificate());
         break;
+      case "clearHistory":
+        clearHistory();
+        result.success(true);
+        break;
       default:
         result.notImplemented();
     }
@@ -973,6 +977,11 @@ public class InAppBrowserActivity extends AppCompatActivity implements MethodCha
     if (webView != null)
       return webView.getCertificateMap();
     return null;
+  }
+
+  public void clearHistory() {
+    if (webView != null)
+      webView.clearHistory();
   }
 
   public void dispose() {

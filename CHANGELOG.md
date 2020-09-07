@@ -9,6 +9,8 @@
 - Fixed "window.flutter_inappwebview.callHandler is not a function" [#218](https://github.com/pichillilorenzo/flutter_inappwebview/issues/218)
 - Fixed "Android ContentBlocker - java.lang.NullPointerException ContentBlockerTrigger resource type" [#506](https://github.com/pichillilorenzo/flutter_inappwebview/issues/506)
 - Fixed "Android CookieManager throws error caused by websites that are sending back illegal/invalid cookies." [#476](https://github.com/pichillilorenzo/flutter_inappwebview/issues/476)
+- Fixed missing `clearHistory` webview method implementation on Android
+- Fixed iOS crash when using CookieManager getCookies for an URL and the host URL is `null`
 
 ## 4.0.0+4
 

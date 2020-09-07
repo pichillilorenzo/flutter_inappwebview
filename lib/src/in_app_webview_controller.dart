@@ -471,7 +471,7 @@ class InAppWebViewController {
 
         SslCertificate sslCertificate;
         if (sslCertificateMap != null) {
-          if (Platform.isIOS) {
+          if (defaultTargetPlatform == TargetPlatform.iOS) {
             try {
               X509Certificate x509certificate = X509Certificate.fromData(
                   data: sslCertificateMap["x509Certificate"]);
@@ -670,8 +670,8 @@ class InAppWebViewController {
               androidId: androidId, iosId: iosId, title: title, action: null);
 
           for (var menuItem in contextMenu.menuItems) {
-            if ((Platform.isAndroid && menuItem.androidId == androidId) ||
-                (Platform.isIOS && menuItem.iosId == iosId)) {
+            if ((defaultTargetPlatform == TargetPlatform.android && menuItem.androidId == androidId) ||
+                (defaultTargetPlatform == TargetPlatform.iOS && menuItem.iosId == iosId)) {
               menuItemClicked = menuItem;
               menuItem?.action();
               break;
@@ -1348,7 +1348,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
     var data = await _channel.invokeMethod('evaluateJavascript', args);
-    if (data != null && Platform.isAndroid) data = json.decode(data);
+    if (data != null && defaultTargetPlatform == TargetPlatform.android) data = json.decode(data);
     return data;
   }
 
@@ -1693,8 +1693,8 @@ class InAppWebViewController {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale
   Future<void> zoomBy(double zoomFactor) async {
-    assert(!Platform.isAndroid ||
-        (Platform.isAndroid && zoomFactor > 0.01 && zoomFactor <= 100.0));
+    assert(defaultTargetPlatform != TargetPlatform.android ||
+        (defaultTargetPlatform == TargetPlatform.android && zoomFactor > 0.01 && zoomFactor <= 100.0));
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
@@ -1907,7 +1907,7 @@ class InAppWebViewController {
             ?.cast<String, dynamic>();
 
     if (sslCertificateMap != null) {
-      if (Platform.isIOS) {
+      if (defaultTargetPlatform == TargetPlatform.iOS) {
         try {
           X509Certificate x509certificate = X509Certificate.fromData(
               data: sslCertificateMap["x509Certificate"]);

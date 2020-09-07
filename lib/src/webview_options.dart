@@ -1,4 +1,4 @@
-import 'dart:io';
+import 'package:flutter/foundation.dart';
 
 import 'content_blocker.dart';
 import 'types.dart';
@@ -201,7 +201,7 @@ class InAppWebViewOptions
       this.disableContextMenu = false,
       this.supportZoom = true}) {
     if (this.minimumFontSize == null)
-      this.minimumFontSize = Platform.isAndroid ? 8 : 0;
+      this.minimumFontSize = defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
         !this.resourceCustomSchemes.contains("https"));
   }

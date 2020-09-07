@@ -2014,9 +2014,9 @@ class InAppWebViewGroupOptions {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> options = {};
     options.addAll(this.crossPlatform?.toMap() ?? {});
-    if (Platform.isAndroid)
+    if (defaultTargetPlatform == TargetPlatform.android)
       options.addAll(this.android?.toMap() ?? {});
-    else if (Platform.isIOS) options.addAll(this.ios?.toMap() ?? {});
+    else if (defaultTargetPlatform == TargetPlatform.iOS) options.addAll(this.ios?.toMap() ?? {});
 
     return options;
   }
@@ -2027,10 +2027,10 @@ class InAppWebViewGroupOptions {
 
     inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
-    if (Platform.isAndroid)
+    if (defaultTargetPlatform == TargetPlatform.android)
       inAppWebViewGroupOptions.android =
           AndroidInAppWebViewOptions.fromMap(options);
-    else if (Platform.isIOS)
+    else if (defaultTargetPlatform == TargetPlatform.iOS)
       inAppWebViewGroupOptions.ios = IOSInAppWebViewOptions.fromMap(options);
 
     return inAppWebViewGroupOptions;
@@ -2081,10 +2081,10 @@ class InAppBrowserClassOptions {
 
     options.addAll(this.crossPlatform?.toMap() ?? {});
     options.addAll(this.inAppWebViewGroupOptions?.crossPlatform?.toMap() ?? {});
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       options.addAll(this.android?.toMap() ?? {});
       options.addAll(this.inAppWebViewGroupOptions?.android?.toMap() ?? {});
-    } else if (Platform.isIOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       options.addAll(this.ios?.toMap() ?? {});
       options.addAll(this.inAppWebViewGroupOptions?.ios?.toMap() ?? {});
     }
@@ -2111,12 +2111,12 @@ class InAppBrowserClassOptions {
         InAppWebViewGroupOptions();
     inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       inAppBrowserClassOptions.android =
           AndroidInAppBrowserOptions.fromMap(options);
       inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
           AndroidInAppWebViewOptions.fromMap(options);
-    } else if (Platform.isIOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       inAppBrowserClassOptions.ios = IOSInAppBrowserOptions.fromMap(options);
       inAppBrowserClassOptions.inAppWebViewGroupOptions.ios =
           IOSInAppWebViewOptions.fromMap(options);
@@ -2145,9 +2145,9 @@ class ChromeSafariBrowserClassOptions {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> options = {};
-    if (Platform.isAndroid)
+    if (defaultTargetPlatform == TargetPlatform.android)
       options.addAll(this.android?.toMap() ?? {});
-    else if (Platform.isIOS) options.addAll(this.ios?.toMap() ?? {});
+    else if (defaultTargetPlatform == TargetPlatform.iOS) options.addAll(this.ios?.toMap() ?? {});
 
     return options;
   }

@@ -1,6 +1,8 @@
 package com.pichillilorenzo.flutter_inappwebview.ContentBlocker;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
@@ -41,8 +43,12 @@ public class ContentBlockerTrigger {
         Boolean urlFilterIsCaseSensitive = (Boolean) map.get("url-filter-is-case-sensitive");
         List<String> resourceTypeStringList = (List<String>) map.get("resource-type");
         List<ContentBlockerTriggerResourceType> resourceType = new ArrayList<>();
-        for (String type : resourceTypeStringList) {
-            resourceType.add(ContentBlockerTriggerResourceType.fromValue(type));
+        if (resourceTypeStringList != null) {
+            for (String type : resourceTypeStringList) {
+                resourceType.add(ContentBlockerTriggerResourceType.fromValue(type));
+            }
+        } else {
+            resourceType.addAll(Arrays.asList(ContentBlockerTriggerResourceType.values()));
         }
         List<String> ifDomain = (List<String>) map.get("if-domain");
         List<String> unlessDomain = (List<String>) map.get("unless-domain");

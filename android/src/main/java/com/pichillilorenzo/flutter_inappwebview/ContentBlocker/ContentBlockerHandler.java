@@ -142,9 +142,24 @@ public class ContentBlockerHandler {
                         return new WebResourceResponse("", "", null);
 
                     case CSS_DISPLAY_NONE:
-                        final String jsScript = "function hide () { document.querySelectorAll('" + action.selector + "').forEach(function (item, index) { item.style.display = \"none\"; }); }; hide(); document.addEventListener(\"DOMContentLoaded\", function(event) { hide(); });";
+                        final String cssSelector = action.selector;
+                        final String jsScript = "(function(d) { " +
+                                "   function hide () { " +
+                                "       if (!d.getElementById('css-display-none-style')) { " +
+                                "           var c = d.createElement('style'); " +
+                                "           c.id = 'css-display-none-style'; " +
+                                "           c.innerHTML = '" + cssSelector + " { display: none !important; }'; " +
+                                "           d.body.appendChild(c); " +
+                                "       }" +
+                                "       d.querySelectorAll('" + cssSelector + "').forEach(function (item, index) { " +
+                                "           item.setAttribute('style', 'display: none !important;'); " +
+                                "       }); " +
+                                "   }; " +
+                                "   hide(); " +
+                                "   d.addEventListener('DOMContentLoaded', function(event) { hide(); }); " +
+                                "})(document);";
+
                         final Handler handler = new Handler(Looper.getMainLooper());
-                        Log.d(LOG_TAG, jsScript);
                         handler.post(new Runnable() {
                             @Override
                             public void run() {

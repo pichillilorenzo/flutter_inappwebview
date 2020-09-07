@@ -385,7 +385,6 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     
     public override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
-            print(containerWebView)
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
             if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
                 self.webView = webViewTransport.webView

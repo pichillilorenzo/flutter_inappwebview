@@ -153,7 +153,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
       for (String cookie : cookies) {
         String[] nameValue = cookie.split("=", 2);
         String name = nameValue[0].trim();
-        String value = nameValue[1].trim();
+        String value = (nameValue.length > 1) ? nameValue[1].trim() : "";
         Map<String, Object> cookieMap = new HashMap<>();
         cookieMap.put("name", name);
         cookieMap.put("value", value);

@@ -136,6 +136,7 @@ Instead, if you have already a non-swift project, you can check this issue to so
 Other useful `Info.plist` properties are:
 * `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking));
 * `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent)).
+* `io.flutter.embedded_views_preview`: A Boolean value whather to allow embedding paint context. ([Github issue](https://github.com/flutter/flutter/issues/26893#issuecomment-474725615))
 
 ### How to enable the usage of camera for HTML inputs such as `<input type="file" accept="image/*" capture>`
 

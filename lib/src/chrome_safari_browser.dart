@@ -4,6 +4,7 @@ import 'dart:collection';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../flutter_inappwebview.dart';
 import 'types.dart';
 import 'in_app_browser.dart';
 
@@ -20,8 +21,8 @@ class ChromeSafariBrowser {
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
-  ///Initialize the [ChromeSafariBrowser] instance with an [InAppBrowser] fallback instance or `null`.
-  ChromeSafariBrowser({bFallback}) {
+  ///Initialize the [ChromeSafariBrowser] instance with an [InAppBrowser] fallback instance.
+  ChromeSafariBrowser({@required InAppBrowser bFallback}) {
     uuid = uuidGenerator.v4();
     browserFallback = bFallback;
     this._channel =

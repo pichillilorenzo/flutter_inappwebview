@@ -11,6 +11,8 @@ import 'in_app_browser.dart';
 ///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 ///
 ///[browserFallback] represents the [InAppBrowser] instance fallback in case `Chrome Custom Tabs`/`SFSafariViewController` is not available.
+///
+///Note: Requires modification of Android 11+: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above
 class ChromeSafariBrowser {
   String uuid;
   InAppBrowser browserFallback;

@@ -33,19 +33,19 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
   @Override
   public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
     final Activity activity = Shared.activity;
-    final String uuid = (String) call.argument("uuid");
+    final String uuid = call.argument("uuid");
 
     switch (call.method) {
       case "open":
         {
-          String url = (String) call.argument("url");
-          HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
-          List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          String uuidFallback = (String) call.argument("uuidFallback");
-          Map<String, String> headersFallback = (Map<String, String>) call.argument("headersFallback");
-          HashMap<String, Object> optionsFallback = (HashMap<String, Object>) call.argument("optionsFallback");
-          HashMap<String, Object> contextMenuFallback = (HashMap<String, Object>) call.argument("contextMenuFallback");
-          Integer windowIdFallback = (Integer) call.argument("windowIdFallback");
+          String url = call.argument("url");
+          HashMap<String, Object> options = call.argument("options");
+          List<HashMap<String, Object>> menuItemList = call.argument("menuItemList");
+          String uuidFallback = call.argument("uuidFallback");
+          Map<String, String> headersFallback = call.argument("headersFallback");
+          HashMap<String, Object> optionsFallback = call.argument("optionsFallback");
+          HashMap<String, Object> contextMenuFallback = call.argument("contextMenuFallback");
+          Integer windowIdFallback = call.argument("windowIdFallback");
           open(activity, uuid, url, options, menuItemList, uuidFallback, headersFallback, optionsFallback, contextMenuFallback, windowIdFallback, result);
         }
         break;
@@ -71,7 +71,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 
     extras.putSerializable("headers", (Serializable) headersFallback);
-    extras.putSerializable("contextMenu", (Serializable) contextMenuFallback);
+    extras.putSerializable("contextMenu", contextMenuFallback);
 
     extras.putInt("windowId", windowIdFallback != null ? windowIdFallback : -1);
 
@@ -79,7 +79,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
       intent = new Intent(activity, ChromeCustomTabsActivity.class);
     }
     // check for webview fallback
-    else if (!CustomTabActivityHelper.isAvailable(activity) && uuidFallback != null) {
+    else if (uuidFallback != null) {
       Log.d(LOG_TAG, "WebView fallback declared.");
       // overwrite with extras fallback parameters
       extras.putString("uuid", uuidFallback);

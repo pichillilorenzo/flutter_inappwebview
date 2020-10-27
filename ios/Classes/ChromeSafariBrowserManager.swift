@@ -65,7 +65,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         
         if #available(iOS 9.0, *) {
             
-            if let flutterViewController = UIApplication.shared.delegate?.window.unsafelyUnwrapped?.rootViewController as? FlutterViewController {
+            if let flutterViewController = UIApplication.shared.delegate?.window.unsafelyUnwrapped?.rootViewController {
                 let safariOptions = SafariBrowserOptions()
                 let _ = safariOptions.parse(options: options)
                 

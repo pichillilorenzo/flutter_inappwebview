@@ -1040,6 +1040,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuOptions.hideDefaultSystemContextMenuItems {
                         return false
                     }
+                    if !contextMenuOptions.filterDefaultSystemContextMenuItems != nil && !contextMenuOptions.filterDefaultSystemContextMenuItems.contains(action.description) {
+                        return false;
+                    }
                 }
             }
             

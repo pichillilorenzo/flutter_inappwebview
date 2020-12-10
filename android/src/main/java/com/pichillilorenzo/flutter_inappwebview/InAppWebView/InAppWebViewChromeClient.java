@@ -971,6 +971,20 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     return intent;
   }
 
+  private Boolean acceptsAny(String[] types) {
+    if (isArrayEmpty(types)) {
+      return true;
+    }
+
+    for (String type : types) {
+      if (type.equals("*/*")) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
   private Boolean acceptsImages(String types) {
     String mimeType = types;
     if (types.matches("\\.\\w+")) {
@@ -981,7 +995,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   private Boolean acceptsImages(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "image");
+    return acceptsAny(types) || arrayContainsString(mimeTypes, "image");
   }
 
   private Boolean acceptsVideo(String types) {
@@ -994,7 +1008,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   private Boolean acceptsVideo(String[] types) {
     String[] mimeTypes = getAcceptedMimeType(types);
-    return isArrayEmpty(mimeTypes) || arrayContainsString(mimeTypes, "video");
+    return acceptsAny(types) || arrayContainsString(mimeTypes, "video");
   }
 
   private Boolean arrayContainsString(String[] array, String pattern) {

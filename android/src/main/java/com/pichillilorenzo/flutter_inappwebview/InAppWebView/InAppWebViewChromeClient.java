@@ -1106,31 +1106,29 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     String prefix = "";
     String suffix = "";
     String dir = "";
-    String filename = "";
 
     if (intentType.equals(MediaStore.ACTION_IMAGE_CAPTURE)) {
-      prefix = "image-";
+      prefix = "image";
       suffix = ".jpg";
       dir = Environment.DIRECTORY_PICTURES;
     } else if (intentType.equals(MediaStore.ACTION_VIDEO_CAPTURE)) {
-      prefix = "video-";
+      prefix = "video";
       suffix = ".mp4";
       dir = Environment.DIRECTORY_MOVIES;
     }
-
-    filename = prefix + String.valueOf(System.currentTimeMillis()) + suffix;
 
     // for versions below 6.0 (23) we use the old File creation & permissions model
     if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
       // only this Directory works on all tested Android versions
       // ctx.getExternalFilesDir(dir) was failing on Android 5.0 (sdk 21)
       File storageDir = Environment.getExternalStoragePublicDirectory(dir);
+      String filename = String.format("%s-%d%s", prefix, System.currentTimeMillis(), suffix);
       return new File(storageDir, filename);
     }
 
     Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
     File storageDir = activity.getApplicationContext().getExternalFilesDir(null);
-    return File.createTempFile(filename, suffix, storageDir);
+    return File.createTempFile(prefix, suffix, storageDir);
   }
 
   private Boolean isArrayEmpty(String[] arr) {

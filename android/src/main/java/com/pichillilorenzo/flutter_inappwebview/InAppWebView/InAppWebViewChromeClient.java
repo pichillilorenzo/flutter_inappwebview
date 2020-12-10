@@ -3,9 +3,11 @@ package com.pichillilorenzo.flutter_inappwebview.InAppWebView;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.ContentResolver;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -46,6 +48,7 @@ import com.pichillilorenzo.flutter_inappwebview.Shared;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -72,7 +75,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
   final String DEFAULT_MIME_TYPES = "*/*";
-  private static Uri outputFileUri;
+  private static Uri videoOutputFileUri;
+  private static Uri imageOutputFileUri;
 
   protected static final FrameLayout.LayoutParams FULLSCREEN_LAYOUT_PARAMS = new FrameLayout.LayoutParams(
           ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT, Gravity.CENTER);
@@ -810,28 +814,30 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     // this filename instead
     switch (requestCode) {
       case PICKER:
-        if (resultCode != RESULT_OK) {
-          if (InAppWebViewFlutterPlugin.filePathCallback != null) {
-            InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(null);
-          }
-        } else {
-          Uri result[] = this.getSelectedFiles(data, resultCode);
-          if (result != null) {
-            InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(result);
-          } else {
-            InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(new Uri[]{outputFileUri});
-          }
+        Uri[] results = null;
+        if (resultCode == RESULT_OK) {
+          results = getSelectedFiles(data, resultCode);
+        }
+
+        if (InAppWebViewFlutterPlugin.filePathCallback != null) {
+          InAppWebViewFlutterPlugin.filePathCallback.onReceiveValue(results);
         }
         break;
+
       case PICKER_LEGACY:
-        Uri result = resultCode != Activity.RESULT_OK ? null : data == null ? outputFileUri : data.getData();
+        Uri result = null;
+        if (resultCode == RESULT_OK) {
+          result = data != null ? data.getData() : getCapturedMediaFile();
+        }
+
         InAppWebViewFlutterPlugin.filePathCallbackLegacy.onReceiveValue(result);
         break;
-
     }
+
     InAppWebViewFlutterPlugin.filePathCallback = null;
     InAppWebViewFlutterPlugin.filePathCallbackLegacy = null;
-    outputFileUri = null;
+    imageOutputFileUri = null;
+    videoOutputFileUri = null;
 
     return true;
   }
@@ -859,6 +865,40 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
       return result;
     }
+
+    // we have a captured image or video file
+    Uri mediaUri = getCapturedMediaFile();
+    if (mediaUri != null) {
+      return new Uri[]{mediaUri};
+    }
+
+    return null;
+  }
+
+  private boolean isFileNotEmpty(Uri uri) {
+    Activity activity = inAppBrowserActivity != null ? inAppBrowserActivity : Shared.activity;
+
+    long length;
+    try {
+      AssetFileDescriptor descriptor = activity.getContentResolver().openAssetFileDescriptor(uri, "r");
+      length = descriptor.getLength();
+      descriptor.close();
+    } catch (IOException e) {
+      return false;
+    }
+
+    return length > 0;
+  }
+
+  private Uri getCapturedMediaFile() {
+    if (imageOutputFileUri != null && isFileNotEmpty(imageOutputFileUri)) {
+      return imageOutputFileUri;
+    }
+
+    if (videoOutputFileUri != null && isFileNotEmpty(videoOutputFileUri)) {
+      return videoOutputFileUri;
+    }
+
     return null;
   }
 
@@ -935,15 +975,15 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   private Intent getPhotoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-    outputFileUri = getOutputUri(MediaStore.ACTION_IMAGE_CAPTURE);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    imageOutputFileUri = getOutputUri(MediaStore.ACTION_IMAGE_CAPTURE);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, imageOutputFileUri);
     return intent;
   }
 
   private Intent getVideoIntent() {
     Intent intent = new Intent(MediaStore.ACTION_VIDEO_CAPTURE);
-    outputFileUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
-    intent.putExtra(MediaStore.EXTRA_OUTPUT, outputFileUri);
+    videoOutputFileUri = getOutputUri(MediaStore.ACTION_VIDEO_CAPTURE);
+    intent.putExtra(MediaStore.EXTRA_OUTPUT, videoOutputFileUri);
     return intent;
   }
 

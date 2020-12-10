@@ -843,12 +843,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   private Uri[] getSelectedFiles(Intent data, int resultCode) {
-    if (data == null) {
-      return null;
-    }
-
     // we have one file selected
-    if (data.getData() != null) {
+    if (data != null && data.getData() != null) {
       if (resultCode == RESULT_OK && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
         return WebChromeClient.FileChooserParams.parseResult(resultCode, data);
       } else {
@@ -857,7 +853,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     // we have multiple files selected
-    if (data.getClipData() != null) {
+    if (data != null && data.getClipData() != null) {
       final int numSelectedFiles = data.getClipData().getItemCount();
       Uri[] result = new Uri[numSelectedFiles];
       for (int i = 0; i < numSelectedFiles; i++) {

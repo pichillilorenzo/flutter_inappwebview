@@ -2025,7 +2025,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
-            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNegotiate ||
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM {
             let host = challenge.protectionSpace.host
             let prot = challenge.protectionSpace.protocol
             let realm = challenge.protectionSpace.realm

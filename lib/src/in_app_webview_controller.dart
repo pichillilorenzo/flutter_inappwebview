@@ -1397,7 +1397,7 @@ class InAppWebViewController {
   Future<void> injectCSSFileFromUrl({@required String urlFile}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
-    await _channel.invokeMethod('injectStyleFile', args);
+    await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
 
   ///Injects a CSS file into the WebView from the flutter assets directory.

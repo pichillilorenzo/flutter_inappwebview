@@ -61,6 +61,8 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var minimumZoomScale = 1.0
     var contentInsetAdjustmentBehavior = 2 // UIScrollView.ContentInsetAdjustmentBehavior.never
     
+    var allowUniversalAccessFromFileURLs = false;
+    
     override init(){
         super.init()
     }

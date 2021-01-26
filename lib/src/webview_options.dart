@@ -832,6 +832,9 @@ class IOSInAppWebViewOptions
   ///The default value is [IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER].
   IOSUIScrollViewContentInsetAdjustmentBehavior contentInsetAdjustmentBehavior;
 
+  ///Set to true to support cross-domain. The default value is `false`.
+  bool allowUniversalAccessFromFileURLs;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -856,7 +859,8 @@ class IOSInAppWebViewOptions
       this.maximumZoomScale = 1.0,
       this.minimumZoomScale = 1.0,
       this.contentInsetAdjustmentBehavior =
-          IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER});
+          IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER,
+      this.allowUniversalAccessFromFileURLs = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -891,7 +895,9 @@ class IOSInAppWebViewOptions
       "isPagingEnabled": isPagingEnabled,
       "maximumZoomScale": maximumZoomScale,
       "minimumZoomScale": minimumZoomScale,
-      "contentInsetAdjustmentBehavior": contentInsetAdjustmentBehavior.toValue()
+      "contentInsetAdjustmentBehavior":
+          contentInsetAdjustmentBehavior.toValue(),
+      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs
     };
   }
 
@@ -938,6 +944,8 @@ class IOSInAppWebViewOptions
     options.contentInsetAdjustmentBehavior =
         IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
             map["contentInsetAdjustmentBehavior"]);
+    options.allowUniversalAccessFromFileURLs =
+        map["optioallowUniversalAccessFromFileURLsns"];
     return options;
   }
 

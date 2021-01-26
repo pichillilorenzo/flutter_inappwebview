@@ -1371,6 +1371,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 configuration.dataDetectorTypes = dataDetectorTypes
                 
                 configuration.mediaTypesRequiringUserActionForPlayback = options.mediaPlaybackRequiresUserGesture ? .all : []
+                
+                configuration.setValue(options.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
             } else {
                 // Fallback on earlier versions
                 configuration.mediaPlaybackRequiresUserAction = options.mediaPlaybackRequiresUserGesture

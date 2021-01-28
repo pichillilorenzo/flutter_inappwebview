@@ -170,6 +170,28 @@ class InAppWebViewOptions
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   bool supportZoom;
 
+  ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from other file scheme URLs.
+  ///Note that some accesses such as image HTML elements don't follow same-origin rules and aren't affected by this setting.
+  ///
+  ///Don't enable this setting if you open files that may be created or altered by external sources.
+  ///Enabling this setting allows malicious scripts loaded in a `file://` context to access arbitrary local files including WebView cookies and app private data.
+  ///
+  ///Note that the value of this setting is ignored if the value of [allowUniversalAccessFromFileURLs] is `true`.
+  ///
+  ///The default value is `false`.
+  bool allowFileAccessFromFileURLs;
+
+  ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from any origin.
+  ///This includes access to content from other file scheme URLs or web contexts.
+  ///Note that some access such as image HTML elements doesn't follow same-origin rules and isn't affected by this setting.
+  ///
+  ///Don't enable this setting if you open files that may be created or altered by external sources.
+  ///Enabling this setting allows malicious scripts loaded in a `file://` context to launch cross-site scripting attacks,
+  ///either accessing arbitrary local files including WebView cookies, app private data or even credentials used on arbitrary web sites.
+  ///
+  ///The default value is `false`.
+  bool allowUniversalAccessFromFileURLs;
+
   InAppWebViewOptions(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
@@ -194,7 +216,9 @@ class InAppWebViewOptions
       this.disableVerticalScroll = false,
       this.disableHorizontalScroll = false,
       this.disableContextMenu = false,
-      this.supportZoom = true}) {
+      this.supportZoom = true,
+      this.allowFileAccessFromFileURLs = false,
+      this.allowUniversalAccessFromFileURLs = false}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
@@ -232,7 +256,9 @@ class InAppWebViewOptions
       "disableVerticalScroll": disableVerticalScroll,
       "disableHorizontalScroll": disableHorizontalScroll,
       "disableContextMenu": disableContextMenu,
-      "supportZoom": supportZoom
+      "supportZoom": supportZoom,
+      "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
+      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs
     };
   }
 
@@ -277,6 +303,8 @@ class InAppWebViewOptions
     options.disableHorizontalScroll = map["disableHorizontalScroll"];
     options.disableContextMenu = map["disableContextMenu"];
     options.supportZoom = map["supportZoom"];
+    options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
+    options.allowUniversalAccessFromFileURLs = map["allowUniversalAccessFromFileURLs"];
     return options;
   }
 
@@ -338,18 +366,8 @@ class AndroidInAppWebViewOptions
   bool allowContentAccess;
 
   ///Enables or disables file access within WebView. Note that this enables or disables file system access only.
-  ///Assets and resources are still accessible using \file:///android_asset` and `file:///android_res`. The default value is `true`.
+  ///Assets and resources are still accessible using `file:///android_asset` and `file:///android_res`. The default value is `true`.
   bool allowFileAccess;
-
-  ///Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs.
-  ///Note that the value of this setting is ignored if the value of [allowFileAccessFromFileURLs] is `true`.
-  ///Note too, that this setting affects only JavaScript access to file scheme resources. The default value is `false`.
-  bool allowFileAccessFromFileURLs;
-
-  ///Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin.
-  ///Note that this setting affects only JavaScript access to file scheme resources.
-  ///This includes access to content from other file scheme URLs. The default value is `false`.
-  bool allowUniversalAccessFromFileURLs;
 
   ///Sets the path to the Application Caches files. In order for the Application Caches API to be enabled, this option must be set a path to which the application can write.
   ///This option is used one time: repeated calls are ignored.
@@ -526,8 +544,6 @@ class AndroidInAppWebViewOptions
     this.mixedContentMode,
     this.allowContentAccess = true,
     this.allowFileAccess = true,
-    this.allowFileAccessFromFileURLs = false,
-    this.allowUniversalAccessFromFileURLs = false,
     this.appCachePath,
     this.blockNetworkImage = false,
     this.blockNetworkLoads = false,
@@ -585,8 +601,6 @@ class AndroidInAppWebViewOptions
       "mixedContentMode": mixedContentMode?.toValue(),
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
-      "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
-      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
       "appCachePath": appCachePath,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
@@ -644,9 +658,6 @@ class AndroidInAppWebViewOptions
         AndroidMixedContentMode.fromValue(map["mixedContentMode"]);
     options.allowContentAccess = map["allowContentAccess"];
     options.allowFileAccess = map["allowFileAccess"];
-    options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-    options.allowUniversalAccessFromFileURLs =
-        map["allowUniversalAccessFromFileURLs"];
     options.appCachePath = map["appCachePath"];
     options.blockNetworkImage = map["blockNetworkImage"];
     options.blockNetworkLoads = map["blockNetworkLoads"];

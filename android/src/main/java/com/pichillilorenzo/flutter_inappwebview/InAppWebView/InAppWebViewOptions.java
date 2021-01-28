@@ -43,6 +43,8 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public Boolean disableHorizontalScroll = false;
   public Boolean disableContextMenu = false;
   public Boolean supportZoom = true;
+  public Boolean allowFileAccessFromFileURLs = false;
+  public Boolean allowUniversalAccessFromFileURLs = false;
 
   public Integer textZoom = 100;
   public Boolean clearSessionCache = false;
@@ -55,8 +57,6 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public Integer mixedContentMode;
   public Boolean allowContentAccess = true;
   public Boolean allowFileAccess = true;
-  public Boolean allowFileAccessFromFileURLs = true;
-  public Boolean allowUniversalAccessFromFileURLs = true;
   public String appCachePath;
   public Boolean blockNetworkImage = false;
   public Boolean blockNetworkLoads = false;

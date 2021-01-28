@@ -1352,6 +1352,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.suppressesIncrementalRendering = options.suppressesIncrementalRendering
             configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: options.selectionGranularity)!
             
+            if options.allowUniversalAccessFromFileURLs {
+                configuration.setValue(options.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
+            }
+            
+            if options.allowFileAccessFromFileURLs {
+                configuration.preferences.setValue(options.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
+            }
+            
             if #available(iOS 9.0, *) {
                 if options.incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
@@ -1746,6 +1754,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if newOptionsMap["userAgent"] != nil && options?.userAgent != newOptions.userAgent && newOptions.userAgent != "" {
                 customUserAgent = newOptions.userAgent
             }
+        }
+        
+        if newOptionsMap["allowUniversalAccessFromFileURLs"] != nil && options?.allowUniversalAccessFromFileURLs != newOptions.allowUniversalAccessFromFileURLs {
+            configuration.setValue(newOptions.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
+        }
+        
+        if newOptionsMap["allowFileAccessFromFileURLs"] != nil && options?.allowFileAccessFromFileURLs != newOptions.allowFileAccessFromFileURLs {
+            configuration.preferences.setValue(newOptions.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
         }
         
         if newOptionsMap["clearCache"] != nil && newOptions.clearCache {

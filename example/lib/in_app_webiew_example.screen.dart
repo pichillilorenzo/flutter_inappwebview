@@ -85,7 +85,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(
-                        useShouldOverrideUrlLoading: false
+                        useShouldOverrideUrlLoading: false,
                       ),
                       android: AndroidInAppWebViewOptions(
                         useHybridComposition: true
@@ -125,6 +125,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url ?? '';
                       });
+                      print(await controller.getOptions());
                     },
                     onProgressChanged: (controller, progress) {
                       setState(() {

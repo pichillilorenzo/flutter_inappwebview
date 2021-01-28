@@ -11,7 +11,7 @@ class HeadlessInAppWebViewExampleScreen extends StatefulWidget {
 }
 
 class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebViewExampleScreen> {
-  HeadlessInAppWebView headlessWebView;
+  HeadlessInAppWebView? headlessWebView;
   String url = "";
 
   @override
@@ -22,7 +22,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
       initialUrl: "https://flutter.dev/",
       initialOptions: InAppWebViewGroupOptions(
         crossPlatform: InAppWebViewOptions(
-          debuggingEnabled: true,
+
         ),
       ),
       onWebViewCreated: (controller) {
@@ -34,19 +34,19 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
       onLoadStart: (controller, url) async {
         print("onLoadStart $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
       onLoadStop: (controller, url) async {
         print("onLoadStop $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
-      onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
+      onUpdateVisitedHistory: (controller, url, androidIsReload) {
         print("onUpdateVisitedHistory $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
     );
@@ -55,7 +55,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
   @override
   void dispose() {
     super.dispose();
-    headlessWebView.dispose();
+    headlessWebView?.dispose();
   }
 
   @override
@@ -76,8 +76,8 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
           Center(
             child: RaisedButton(
               onPressed: () async {
-                await headlessWebView.dispose();
-                await headlessWebView.run();
+                await headlessWebView?.dispose();
+                await headlessWebView?.run();
               },
               child: Text("Run HeadlessInAppWebView")),
           ),
@@ -85,7 +85,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
             child: RaisedButton(
               onPressed: () async {
                 try {
-                  await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
+                  await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
                 } on MissingPluginException catch(e) {
                   print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
                 }
@@ -95,7 +95,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
           Center(
             child: RaisedButton(
               onPressed: () {
-                headlessWebView.dispose();
+                headlessWebView?.dispose();
               },
               child: Text("Dispose HeadlessInAppWebView")),
           )

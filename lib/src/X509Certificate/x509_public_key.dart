@@ -5,17 +5,17 @@ import 'asn1_object.dart';
 import 'oid.dart';
 
 class X509PublicKey {
-  ASN1Object pkBlock;
+  ASN1Object? pkBlock;
 
   X509PublicKey({this.pkBlock});
 
-  String get algOid => pkBlock?.subAtIndex(0)?.subAtIndex(0)?.value;
+  String? get algOid => pkBlock?.subAtIndex(0)?.subAtIndex(0)?.value;
 
-  String get algName => OID.fromValue(algOid ?? "")?.name();
+  String? get algName => OID.fromValue(algOid)?.name();
 
-  String get algParams => pkBlock?.subAtIndex(0)?.subAtIndex(1)?.value;
+  String? get algParams => pkBlock?.subAtIndex(0)?.subAtIndex(1)?.value;
 
-  Uint8List get encoded {
+  Uint8List? get encoded {
     var oid = OID.fromValue(algOid);
     var keyData = pkBlock?.subAtIndex(1)?.value ?? null;
 
@@ -23,7 +23,7 @@ class X509PublicKey {
       if (oid == OID.ecPublicKey) {
         return Uint8List.fromList(keyData);
       } else if (oid == OID.rsaEncryption) {
-        List<ASN1Object> publicKeyAsn1Objects;
+        List<ASN1Object>? publicKeyAsn1Objects;
         try {
           publicKeyAsn1Objects =
               ASN1DERDecoder.decode(data: keyData.toList(growable: true));
@@ -31,7 +31,7 @@ class X509PublicKey {
 
         if (publicKeyAsn1Objects != null && publicKeyAsn1Objects.length > 0) {
           var publicKeyModulus =
-              publicKeyAsn1Objects.first?.subAtIndex(0)?.value;
+              publicKeyAsn1Objects.first.subAtIndex(0)?.value;
           if (publicKeyModulus != null) {
             return Uint8List.fromList(publicKeyModulus);
           }

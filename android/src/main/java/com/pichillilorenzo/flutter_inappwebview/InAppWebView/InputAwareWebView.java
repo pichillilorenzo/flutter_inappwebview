@@ -16,6 +16,8 @@ import android.widget.ListPopupWindow;
  * A WebView subclass that mirrors the same implementation hacks that the system WebView does in
  * order to correctly create an InputConnection.
  *
+ * These hacks are only needed in Android versions below N and exist to create an InputConnection
+ * on the WebView's dedicated input, or IME, thread. The majority of this proxying logic is in
  * https://github.com/flutter/plugins/blob/master/packages/webview_flutter/android/src/main/java/io/flutter/plugins/webviewflutter/InputAwareWebView.java
  */
 public class InputAwareWebView extends WebView {
@@ -234,9 +236,9 @@ public class InputAwareWebView extends WebView {
 
   private boolean isCalledFromListPopupWindowShow() {
     StackTraceElement[] stackTraceElements = Thread.currentThread().getStackTrace();
-    for (int i = 0; i < stackTraceElements.length; i++) {
-      if (stackTraceElements[i].getClassName().equals(ListPopupWindow.class.getCanonicalName())
-              && stackTraceElements[i].getMethodName().equals("show")) {
+    for (StackTraceElement stackTraceElement : stackTraceElements) {
+      if (stackTraceElement.getClassName().equals(ListPopupWindow.class.getCanonicalName())
+              && stackTraceElement.getMethodName().equals("show")) {
         return true;
       }
     }

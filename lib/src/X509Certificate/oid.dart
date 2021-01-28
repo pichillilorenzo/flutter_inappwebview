@@ -102,14 +102,20 @@ class OID {
     OID.timeStamping,
   ].toSet();
 
-  static OID fromValue(String value) {
-    return OID.values.firstWhere((element) => element.toValue() == value,
-        orElse: () => null);
+  static OID? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return OID.values.firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 
   String toValue() => _value;
 
-  String name() => _oidMapName[this._value];
+  String name() => _oidMapName.containsKey(this._value) ? _oidMapName[this._value]! : "";
 
   @override
   String toString() => "($_value, ${name()})";

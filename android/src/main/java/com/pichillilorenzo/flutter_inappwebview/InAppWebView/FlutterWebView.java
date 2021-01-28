@@ -67,27 +67,8 @@ public class FlutterWebView implements PlatformView, MethodCallHandler  {
               "- See the official wiki here: https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects\n\n\n");
     }
 
-    // MutableContextWrapper mMutableContext = new MutableContextWrapper(Shared.activity);
-    // webView = new InAppWebView(mMutableContext, this, id, options, contextMenu, containerView);
-    // displayListenerProxy.onPostWebViewInitialization(displayManager);
-    // mMutableContext.setBaseContext(context);
-
-    webView = new InAppWebView(Shared.activity, this, id, windowId, options, contextMenu, containerView);
+    webView = new InAppWebView(context, this, id, windowId, options, contextMenu, containerView);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
-
-    // fix https://github.com/pichillilorenzo/flutter_inappwebview/issues/182
-    try {
-      Class superClass =  webView.getClass().getSuperclass();
-      while(!superClass.getName().equals("android.view.View")) {
-        superClass = superClass.getSuperclass();
-      }
-      Field mContext = superClass.getDeclaredField("mContext");
-      mContext.setAccessible(true);
-      mContext.set(webView, context);
-    } catch (Exception e) {
-      e.printStackTrace();
-      Log.e(LOG_TAG, "Cannot find mContext for this WebView");
-    }
 
     webView.prepare();
 

@@ -26,7 +26,6 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public String userAgent = "";
   public String applicationNameForUserAgent = "";
   public Boolean javaScriptEnabled = true;
-  public Boolean debuggingEnabled = false;
   public Boolean javaScriptCanOpenWindowsAutomatically = false;
   public Boolean mediaPlaybackRequiresUserGesture = true;
   public Integer minimumFontSize = 8;
@@ -97,6 +96,7 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public Boolean useShouldInterceptRequest = false;
   public Boolean useOnRenderProcessGone = false;
   public Boolean disableDefaultErrorPage = false;
+  public Boolean useHybridComposition = false;
 
   @Override
   public InAppWebViewOptions parse(Map<String, Object> options) {
@@ -128,9 +128,6 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
           break;
         case "javaScriptEnabled":
           javaScriptEnabled = (Boolean) value;
-          break;
-        case "debuggingEnabled":
-          debuggingEnabled = (Boolean) value;
           break;
         case "javaScriptCanOpenWindowsAutomatically":
           javaScriptCanOpenWindowsAutomatically = (Boolean) value;
@@ -339,6 +336,9 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
         case "disableDefaultErrorPage":
           disableDefaultErrorPage = (Boolean) value;
           break;
+        case "useHybridComposition":
+          useHybridComposition = (Boolean) value;
+          break;
       }
     }
 
@@ -355,7 +355,6 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
     options.put("userAgent", userAgent);
     options.put("applicationNameForUserAgent", applicationNameForUserAgent);
     options.put("javaScriptEnabled", javaScriptEnabled);
-    options.put("debuggingEnabled", debuggingEnabled);
     options.put("javaScriptCanOpenWindowsAutomatically", javaScriptCanOpenWindowsAutomatically);
     options.put("mediaPlaybackRequiresUserGesture", mediaPlaybackRequiresUserGesture);
     options.put("minimumFontSize", minimumFontSize);
@@ -425,6 +424,7 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
     options.put("useShouldInterceptRequest", useShouldInterceptRequest);
     options.put("useOnRenderProcessGone", useOnRenderProcessGone);
     options.put("disableDefaultErrorPage", disableDefaultErrorPage);
+    options.put("useHybridComposition", useHybridComposition);
     return options;
   }
 

@@ -18,7 +18,6 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var userAgent = ""
     var applicationNameForUserAgent = ""
     var javaScriptEnabled = true
-    var debuggingEnabled = true
     var javaScriptCanOpenWindowsAutomatically = false
     var mediaPlaybackRequiresUserGesture = true
     var verticalScrollBarEnabled = true

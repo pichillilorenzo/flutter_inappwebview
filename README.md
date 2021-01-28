@@ -22,8 +22,8 @@ A Flutter plugin that allows you to add an inline webview, to use an headless we
 
 ## Requirements
 
-- Dart sdk: ">=2.7.0 <3.0.0"
-- Flutter: ">=1.12.13+hotfix.5"
+- Dart sdk: ">=2.12.0-0 <3.0.0"
+- Flutter: ">=1.22.0"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
@@ -74,6 +74,22 @@ or **Android API 19+** if you enable the `useHybridComposition` Android-specific
 **Support HTTP request**: Starting with Android 9 (API level 28), cleartext support is disabled by default:
 - Check the official [Network security configuration - "Opt out of cleartext traffic"](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted) section.
 - Also, check this StackOverflow issue answer: [Cleartext HTTP traffic not permitted](https://stackoverflow.com/a/50834600/4637638).
+
+#### Debugging Android WebViews
+On Android, in order to enable/disable debugging WebViews using `chrome://inspect` on Chrome, you should use the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method.
+
+For example, you could call it inside the main function:
+```dart
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
+
+  runApp(new MyApp());
+}
+```
 
 ### IMPORTANT Note for iOS
 
@@ -168,6 +184,9 @@ Add the following codes inside the `<application>` tag of your `android/app/src/
 </provider>
 ```
 
+#### Debugging iOS WebViews
+On iOS, debugging WebViews on Safari through developer tools is always enabled. There isn't a way to enable or disable it.
+
 ## Getting Started
 
 For help getting started with Flutter, view our online
@@ -241,11 +260,15 @@ Use `InAppWebViewController` to control the WebView instance.
 Example:
 ```dart
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -256,7 +279,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  InAppWebViewController webView;
+  InAppWebViewController? webView;
   String url = "";
   double progress = 0;
 
@@ -278,81 +301,75 @@ class _MyAppState extends State<MyApp> {
           title: const Text('InAppWebView Example'),
         ),
         body: Container(
-          child: Column(children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(20.0),
-              child: Text(
-                  "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
-            ),
-            Container(
-                padding: EdgeInsets.all(10.0),
-                child: progress < 1.0
-                    ? LinearProgressIndicator(value: progress)
-                    : Container()),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-                child: InAppWebView(
-                  initialUrl: "https://flutter.dev/",
-                  initialHeaders: {},
-                  initialOptions: InAppWebViewGroupOptions(
-                    crossPlatform: InAppWebViewOptions(
-                        debuggingEnabled: true,
-                    )
+            child: Column(children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                    "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
+              ),
+              Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: progress < 1.0
+                      ? LinearProgressIndicator(value: progress)
+                      : Container()),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(10.0),
+                  decoration:
+                  BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+                  child: InAppWebView(
+                    initialUrl: "https://flutter.dev/",
+                    initialHeaders: {},
+                    initialOptions: InAppWebViewGroupOptions(
+                        crossPlatform: InAppWebViewOptions(
+
+                        )
+                    ),
+                    onWebViewCreated: (InAppWebViewController controller) {
+                      webView = controller;
+                    },
+                    onLoadStart: (controller, url) {
+                      setState(() {
+                        this.url = url ?? '';
+                      });
+                    },
+                    onLoadStop: (controller, url) async {
+                      setState(() {
+                        this.url = url ?? '';
+                      });
+                    },
+                    onProgressChanged: (controller, progress) {
+                      setState(() {
+                        this.progress = progress / 100;
+                      });
+                    },
                   ),
-                  onWebViewCreated: (InAppWebViewController controller) {
-                    webView = controller;
-                  },
-                  onLoadStart: (InAppWebViewController controller, String url) {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onLoadStop: (InAppWebViewController controller, String url) async {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onProgressChanged: (InAppWebViewController controller, int progress) {
-                    setState(() {
-                      this.progress = progress / 100;
-                    });
-                  },
                 ),
               ),
-            ),
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                  child: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    if (webView != null) {
-                      webView.goBack();
-                    }
-                  },
-                ),
-                RaisedButton(
-                  child: Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    if (webView != null) {
-                      webView.goForward();
-                    }
-                  },
-                ),
-                RaisedButton(
-                  child: Icon(Icons.refresh),
-                  onPressed: () {
-                    if (webView != null) {
-                      webView.reload();
-                    }
-                  },
-                ),
-              ],
-            ),
-        ])),
+              ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  RaisedButton(
+                    child: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      webView?.goBack();
+                    },
+                  ),
+                  RaisedButton(
+                    child: Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      webView?.goForward();
+                    },
+                  ),
+                  RaisedButton(
+                    child: Icon(Icons.refresh),
+                    onPressed: () {
+                      webView?.reload();
+                    },
+                  ),
+                ],
+              ),
+            ])),
       ),
     );
   }
@@ -445,7 +462,7 @@ Methods available:
 
 ##### `InAppWebViewController` Android-specific methods
 
-Android-specific methods can be called using the `InAppWebViewController.android` attribute.
+Android-specific methods can be called using the `InAppWebViewController.android` attribute. Static methods can be called using the `AndroidInAppWebViewController` class directly.
 
 * `startSafeBrowsing`: Starts Safe Browsing initialization.
 * `clearSslPreferences`: Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
@@ -462,10 +479,11 @@ Android-specific methods can be called using the `InAppWebViewController.android
 * `static getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
 * `static setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
 * `static getCurrentWebViewPackage`: Gets the current Android WebView package info.
+* `static setWebContentsDebuggingEnabled(bool debuggingEnabled)`: Enables debugging of web contents (HTML / CSS / JavaScript) loaded into any WebViews of this application. Debugging is disabled by default.
 
 ##### `InAppWebViewController` iOS-specific methods
 
-iOS-specific methods can be called using the `InAppWebViewController.ios` attribute.
+iOS-specific methods can be called using the `InAppWebViewController.ios` attribute. Static methods can be called using the `IOSInAppWebViewController` class directly.
 
 * `hasOnlySecureContent`: A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
 * `reloadFromOrigin`: Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
@@ -528,7 +546,6 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `userAgent`: Sets the user-agent for the WebView.
 * `applicationNameForUserAgent`: Append to the existing user-agent. Setting userAgent will override this.
 * `javaScriptEnabled`: Set to `true` to enable JavaScript. The default value is `true`.
-* `debuggingEnabled`: Enables debugging of web contents (HTML / CSS / JavaScript) loaded into any WebViews of this application.
 * `javaScriptCanOpenWindowsAutomatically`: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
 * `mediaPlaybackRequiresUserGesture`: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
 * `minimumFontSize`: Sets the minimum font size. The default value is `8` for Android, `0` for iOS.
@@ -699,6 +716,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -709,8 +729,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  InAppWebViewController webView;
-  ContextMenu contextMenu;
+  InAppWebViewController? webView;
+  ContextMenu? contextMenu;
   String url = "";
   double progress = 0;
 
@@ -727,7 +747,7 @@ class _MyAppState extends State<MyApp> {
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
-          print(await webView.getSelectedText());
+          print(await webView?.getSelectedText());
         },
         onHideContextMenu: () {
           print("onHideContextMenu");
@@ -775,23 +795,23 @@ class _MyAppState extends State<MyApp> {
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true,
+
                         )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },
-                    onLoadStart: (InAppWebViewController controller, String url) {
+                    onLoadStart: (controller, url) {
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
-                    onLoadStop: (InAppWebViewController controller, String url) async {
+                    onLoadStop: (controller, url) async {
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
-                    onProgressChanged: (InAppWebViewController controller, int progress) {
+                    onProgressChanged: (controller, progress) {
                       setState(() {
                         this.progress = progress / 100;
                       });
@@ -805,25 +825,19 @@ class _MyAppState extends State<MyApp> {
                   RaisedButton(
                     child: Icon(Icons.arrow_back),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.goBack();
-                      }
+                      webView?.goBack();
                     },
                   ),
                   RaisedButton(
                     child: Icon(Icons.arrow_forward),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.goForward();
-                      }
+                      webView?.goForward();
                     },
                   ),
                   RaisedButton(
                     child: Icon(Icons.refresh),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.reload();
-                      }
+                      webView?.reload();
                     },
                   ),
                 ],
@@ -856,12 +870,16 @@ As `InAppWebView`, it has the same options and events. Use `InAppWebViewControll
 Example:
 ```dart
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -872,7 +890,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  HeadlessInAppWebView headlessWebView;
+  HeadlessInAppWebView? headlessWebView;
   String url = "";
 
   @override
@@ -883,7 +901,7 @@ class _MyAppState extends State<MyApp> {
       initialUrl: "https://flutter.dev/",
       initialOptions: InAppWebViewGroupOptions(
         crossPlatform: InAppWebViewOptions(
-          debuggingEnabled: true,
+
         ),
       ),
       onWebViewCreated: (controller) {
@@ -895,19 +913,19 @@ class _MyAppState extends State<MyApp> {
       onLoadStart: (controller, url) async {
         print("onLoadStart $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
       onLoadStop: (controller, url) async {
         print("onLoadStop $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
-      onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
+      onUpdateVisitedHistory: (controller, url, androidIsReload) {
         print("onUpdateVisitedHistory $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
     );
@@ -916,7 +934,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     super.dispose();
-    headlessWebView.dispose();
+    headlessWebView?.dispose();
   }
 
   @override
@@ -936,8 +954,8 @@ class _MyAppState extends State<MyApp> {
               Center(
                 child: RaisedButton(
                     onPressed: () async {
-                      await headlessWebView.dispose();
-                      await headlessWebView.run();
+                      await headlessWebView?.dispose();
+                      await headlessWebView?.run();
                     },
                     child: Text("Run HeadlessInAppWebView")),
               ),
@@ -945,7 +963,7 @@ class _MyAppState extends State<MyApp> {
                 child: RaisedButton(
                     onPressed: () async {
                       try {
-                        await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
+                        await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
                       } on MissingPluginException catch(e) {
                         print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
                       }
@@ -955,7 +973,7 @@ class _MyAppState extends State<MyApp> {
               Center(
                 child: RaisedButton(
                     onPressed: () {
-                      headlessWebView.dispose();
+                      headlessWebView?.dispose();
                     },
                     child: Text("Dispose HeadlessInAppWebView")),
               )
@@ -975,6 +993,8 @@ In-App Browser using native WebView.
 Create a Class that extends the `InAppBrowser` Class in order to override the callbacks to manage the browser events.
 Example:
 ```dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -985,22 +1005,22 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future onLoadStart(String url) async {
+  Future onLoadStart(url) async {
     print("\n\nStarted $url\n\n");
   }
 
   @override
-  Future onLoadStop(String url) async {
+  Future onLoadStop(url) async {
     print("\n\nStopped $url\n\n");
   }
 
   @override
-  void onLoadError(String url, int code, String message) {
+  void onLoadError(url, code, message) {
     print("Can't load $url.. Error: $message");
   }
 
   @override
-  void onProgressChanged(int progress) {
+  void onProgressChanged(progress) {
     print("Progress: $progress");
   }
 
@@ -1022,7 +1042,7 @@ class MyInAppBrowser extends InAppBrowser {
         "ms ---> duration: " +
         response.duration.toString() +
         "ms " +
-        response.url);
+        (response.url ?? ''));
   }
 
   @override
@@ -1030,13 +1050,16 @@ class MyInAppBrowser extends InAppBrowser {
     print("""
     console output:
       message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel.toValue()}
+      messageLevel: ${consoleMessage.messageLevel?.toValue()}
    """);
   }
 }
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(
     new MyApp(),
   );
@@ -1044,7 +1067,7 @@ void main() {
 
 class MyApp extends StatefulWidget {
   final MyInAppBrowser browser = new MyInAppBrowser();
-  
+
   @override
   _MyAppState createState() => new _MyAppState();
 }
@@ -1147,23 +1170,25 @@ You can initialize the `ChromeSafariBrowser` instance with an `InAppBrowser` fal
 
 Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:
 ```dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MyInAppBrowser extends InAppBrowser {
 
   @override
-  Future onLoadStart(String url) async {
+  Future onLoadStart(url) async {
     print("\n\nStarted $url\n\n");
   }
 
   @override
-  Future onLoadStop(String url) async {
+  Future onLoadStop(url) async {
     print("\n\nStopped $url\n\n");
   }
 
   @override
-  void onLoadError(String url, int code, String message) {
+  void onLoadError(url, code, message) {
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
 
@@ -1194,11 +1219,12 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 }
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    new MyApp(),
-  );
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
+  runApp(new MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -1308,6 +1334,9 @@ InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await localhostServer.start();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -1328,17 +1357,17 @@ Future main() async {
                   initialUrl: "http://localhost:8080/assets/index.html",
                   initialHeaders: {},
                   initialOptions: InAppWebViewGroupOptions(
-                      inAppWebViewOptions: InAppWebViewOptions(
-                        debuggingEnabled: true,
+                      crossPlatform: InAppWebViewOptions(
+
                       )
                   ),
-                  onWebViewCreated: (InAppWebViewController controller) {
+                  onWebViewCreated: (controller) {
   
                   },
-                  onLoadStart: (InAppWebViewController controller, String url) {
+                  onLoadStart: (controller, url) {
   
                   },
-                  onLoadStop: (InAppWebViewController controller, String url) {
+                  onLoadStop: (controller, url) {
   
                   },
                 ),

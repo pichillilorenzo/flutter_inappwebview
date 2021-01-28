@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 
 class Util {
-  static Color convertColorFromStringRepresentation(String colorValue) {
+  static Color? convertColorFromStringRepresentation(String colorValue) {
     if (colorValue.startsWith("#")) {
       return Util.getColorFromHex(colorValue);
     } else if (colorValue.startsWith("rgb(")) {
@@ -391,7 +391,7 @@ class Util {
         rgbaValues[0], rgbaValues[1], rgbaValues[2], hlsaValues[3]);
   }
 
-  static List<num> hslToRgb(double h, double s, double l) {
+  static List<int> hslToRgb(double h, double s, double l) {
     double r, g, b;
 
     if (s == 0) {
@@ -407,8 +407,8 @@ class Util {
     return rgb;
   }
 
-  static num to255(double v) {
-    return min(255, 256 * v);
+  static int to255(double v) {
+    return min(255, (256 * v).round());
   }
 
   /// Helper method that converts hue to rgb

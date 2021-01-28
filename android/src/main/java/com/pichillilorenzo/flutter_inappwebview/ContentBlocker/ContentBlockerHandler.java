@@ -109,31 +109,33 @@ public class ContentBlockerHandler {
                     latch.await();
                 }
 
-                if (!trigger.loadType.isEmpty()) {
-                    URI cUrl = new URI(webViewUrl[0]);
-                    String cHost = cUrl.getHost();
-                    int cPort = cUrl.getPort();
-                    String cScheme = cUrl.getScheme();
+                if (webViewUrl[0] != null) {
+                    if (!trigger.loadType.isEmpty()) {
+                        URI cUrl = new URI(webViewUrl[0]);
+                        String cHost = cUrl.getHost();
+                        int cPort = cUrl.getPort();
+                        String cScheme = cUrl.getScheme();
 
-                    if ( (trigger.loadType.contains("first-party") && cHost != null && !(cScheme.equals(scheme) && cHost.equals(host) && cPort == port)) ||
-                            (trigger.loadType.contains("third-party") && cHost != null && cHost.equals(host)) )
-                        return null;
-                }
-                if (!trigger.ifTopUrl.isEmpty()) {
-                    boolean matchFound = false;
-                    for (String topUrl : trigger.ifTopUrl) {
-                        if (webViewUrl[0].startsWith(topUrl)) {
-                            matchFound = true;
-                            break;
-                        }
-                    }
-                    if (!matchFound)
-                        return null;
-                }
-                if (!trigger.unlessTopUrl.isEmpty()) {
-                    for (String topUrl : trigger.unlessTopUrl)
-                        if (webViewUrl[0].startsWith(topUrl))
+                        if ( (trigger.loadType.contains("first-party") && cHost != null && !(cScheme.equals(scheme) && cHost.equals(host) && cPort == port)) ||
+                                (trigger.loadType.contains("third-party") && cHost != null && cHost.equals(host)) )
                             return null;
+                    }
+                    if (!trigger.ifTopUrl.isEmpty()) {
+                        boolean matchFound = false;
+                        for (String topUrl : trigger.ifTopUrl) {
+                            if (webViewUrl[0].startsWith(topUrl)) {
+                                matchFound = true;
+                                break;
+                            }
+                        }
+                        if (!matchFound)
+                            return null;
+                    }
+                    if (!trigger.unlessTopUrl.isEmpty()) {
+                        for (String topUrl : trigger.unlessTopUrl)
+                            if (webViewUrl[0].startsWith(topUrl))
+                                return null;
+                    }
                 }
 
                 switch (action.type) {

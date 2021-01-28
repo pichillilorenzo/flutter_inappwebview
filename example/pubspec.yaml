@@ -10,8 +10,8 @@ description: Demonstrates how to use the flutter_inappwebview plugin.
 version: 1.0.0+1
 
 environment:
-  sdk: ">=2.0.0-dev.68.0 <3.0.0"
-  flutter: ">=1.10.0 <2.0.0"
+  sdk: ">=2.12.0-0 <3.0.0"
+  flutter: ">=1.22.0"
 
 dependencies:
   flutter:
@@ -19,20 +19,26 @@ dependencies:
 
   # The following adds the Cupertino Icons font to your application.
   # Use with the CupertinoIcons class for iOS style icons.
-  cupertino_icons: ^0.1.2
-  flutter_downloader: ^1.4.4
-  path_provider: ^1.6.9
-  permission_handler: ^5.0.0+hotfix.6
-  url_launcher: ^5.4.11
+  cupertino_icons: ^1.0.2
+  flutter_downloader: ^1.5.2
+  path_provider: ^1.6.27
+  permission_handler: ^5.0.1+1
+  url_launcher: ^6.0.0-nullsafety.4
   # connectivity: ^0.4.5+6
   flutter_inappwebview:
     path: ../
 
 dev_dependencies:
-  e2e: "^0.2.0"
+  flutter_test:
+    sdk: flutter
   flutter_driver:
     sdk: flutter
-  test: any
+  # integration_test: ^1.0.2+1
+  integration_test:
+    git:
+      url: https://github.com/flutter/plugins.git
+      path: packages/integration_test
+  pedantic: ^1.8.0
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec
@@ -53,6 +59,8 @@ flutter:
     - assets/css/
     - assets/images/
     - assets/favicon.ico
+    - assets/sample_audio.ogg
+    - assets/sample_video.mp4
     - test_assets/certificate.pfx
     - test_assets/in_app_webview_initial_file_test.html
     - test_assets/in_app_webview_on_load_resource_test.html
@@ -64,6 +72,8 @@ flutter:
     - test_assets/css/
     - test_assets/images/
     - test_assets/favicon.ico
+    - test_assets/sample_audio.ogg
+    - test_assets/sample_video.mp4
 
   # To add assets to your application, add an assets section, like this:
   # assets:

@@ -10,11 +10,15 @@ class ASN1IdentifierClass {
     ASN1IdentifierClass.PRIVATE,
   ].toSet();
 
-  static ASN1IdentifierClass fromValue(int value) {
-    if (value != null)
-      return ASN1IdentifierClass.values.firstWhere(
-          (element) => element.toValue() == value,
-          orElse: () => null);
+  static ASN1IdentifierClass? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ASN1IdentifierClass.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
     return null;
   }
 
@@ -83,11 +87,15 @@ class ASN1IdentifierTagNumber {
     ASN1IdentifierTagNumber.BMP_STRING,
   ].toSet();
 
-  static ASN1IdentifierTagNumber fromValue(int value) {
-    if (value != null)
-      return ASN1IdentifierTagNumber.values.firstWhere(
-          (element) => element.toValue() == value,
-          orElse: () => null);
+  static ASN1IdentifierTagNumber? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ASN1IdentifierTagNumber.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
     return null;
   }
 

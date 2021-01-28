@@ -6,7 +6,7 @@ import 'package:mime/mime.dart';
 
 ///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server. The default [port] value is `8080`.
 class InAppLocalhostServer {
-  HttpServer _server;
+  HttpServer? _server;
   int _port = 8080;
 
   InAppLocalhostServer({int port = 8080}) {
@@ -38,7 +38,7 @@ class InAppLocalhostServer {
         this._server = server;
 
         server.listen((HttpRequest request) async {
-          var body = List<int>();
+          var body = [] as List<int>;
           var path = request.requestedUri.path;
           path = (path.startsWith('/')) ? path.substring(1) : path;
           path += (path.endsWith('/')) ? 'index.html' : '';
@@ -77,7 +77,7 @@ class InAppLocalhostServer {
   ///Closes the server.
   Future<void> close() async {
     if (this._server != null) {
-      await this._server.close(force: true);
+      await this._server!.close(force: true);
       print('Server running on http://localhost:$_port closed');
       this._server = null;
     }

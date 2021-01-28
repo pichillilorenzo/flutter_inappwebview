@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
@@ -14,8 +13,8 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 }
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
-  InAppWebViewController webView;
-  ContextMenu contextMenu;
+  InAppWebViewController? webView;
+  late ContextMenu contextMenu;
   String url = "";
   double progress = 0;
   CookieManager _cookieManager = CookieManager.instance();
@@ -28,8 +27,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       menuItems: [
         ContextMenuItem(androidId: 1, iosId: "1", title: "Special", action: () async {
           print("Menu item Special clicked!");
-          print(await webView.getSelectedText());
-          await webView.clearFocus();
+          print(await webView?.getSelectedText());
+          await webView?.clearFocus();
         })
       ],
       options: ContextMenuOptions(
@@ -38,7 +37,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       onCreateContextMenu: (hitTestResult) async {
         print("onCreateContextMenu");
         print(hitTestResult.extra);
-        print(await webView.getSelectedText());
+        print(await webView?.getSelectedText());
       },
       onHideContextMenu: () {
         print("onHideContextMenu");
@@ -81,26 +80,25 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     // contextMenu: contextMenu,
-                    initialUrl: "https://github.com/flutter",
+                    initialUrl: "https://flutter.dev/",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(
-                        debuggingEnabled: true,
-                        useShouldOverrideUrlLoading: true,
+                        useShouldOverrideUrlLoading: false
                       ),
                       android: AndroidInAppWebViewOptions(
                         useHybridComposition: true
                       )
                     ),
-                    onWebViewCreated: (InAppWebViewController controller) {
+                    onWebViewCreated: (controller) {
                       webView = controller;
                       print("onWebViewCreated");
                     },
-                    onLoadStart: (InAppWebViewController controller, String url) {
+                    onLoadStart: (controller, url) {
                       print("onLoadStart $url");
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
                     shouldOverrideUrlLoading: (controller, shouldOverrideUrlLoadingRequest) async {
@@ -122,21 +120,21 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
                       return ShouldOverrideUrlLoadingAction.ALLOW;
                     },
-                    onLoadStop: (InAppWebViewController controller, String url) async {
+                    onLoadStop: (controller, url) async {
                       print("onLoadStop $url");
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
-                    onProgressChanged: (InAppWebViewController controller, int progress) {
+                    onProgressChanged: (controller, progress) {
                       setState(() {
                         this.progress = progress / 100;
                       });
                     },
-                    onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
+                    onUpdateVisitedHistory: (controller, url, androidIsReload) {
                       print("onUpdateVisitedHistory $url");
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
                     onConsoleMessage: (controller, consoleMessage) {
@@ -151,25 +149,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   RaisedButton(
                     child: Icon(Icons.arrow_back),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.goBack();
-                      }
+                      webView?.goBack();
                     },
                   ),
                   RaisedButton(
                     child: Icon(Icons.arrow_forward),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.goForward();
-                      }
+                      webView?.goForward();
                     },
                   ),
                   RaisedButton(
                     child: Icon(Icons.refresh),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.reload();
-                      }
+                      webView?.reload();
                     },
                   ),
                 ],

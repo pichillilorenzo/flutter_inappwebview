@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'context_menu.dart';
@@ -15,23 +14,23 @@ import 'types.dart';
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
   ///Browser's UUID.
-  String uuid;
+  late String uuid;
 
   ///Context menu used by the browser. It should be set before opening the browser.
-  ContextMenu contextMenu;
+  ContextMenu? contextMenu;
 
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
   bool _isOpened = false;
-  MethodChannel _channel;
+  late MethodChannel _channel;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
   /// WebView Controller that can be used to access the [InAppWebViewController] API.
-  InAppWebViewController webViewController;
+  late InAppWebViewController webViewController;
 
   ///The window id of a [CreateWindowRequest.windowId].
-  final int windowId;
+  final int? windowId;
 
   ///
   InAppBrowser({this.windowId}) {
@@ -67,10 +66,10 @@ class InAppBrowser {
   ///
   ///[options]: Options for the [InAppBrowser].
   Future<void> openUrl(
-      {@required String url,
+      {required String url,
       Map<String, String> headers = const {},
-      InAppBrowserClassOptions options}) async {
-    assert(url != null && url.isNotEmpty);
+      InAppBrowserClassOptions? options}) async {
+    assert(url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -117,10 +116,10 @@ class InAppBrowser {
   ///
   ///[options]: Options for the [InAppBrowser].
   Future<void> openFile(
-      {@required String assetFilePath,
+      {required String assetFilePath,
       Map<String, String> headers = const {},
-      InAppBrowserClassOptions options}) async {
-    assert(assetFilePath != null && assetFilePath.isNotEmpty);
+      InAppBrowserClassOptions? options}) async {
+    assert(assetFilePath.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $assetFilePath!');
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -143,14 +142,12 @@ class InAppBrowser {
   ///
   ///The [options] parameter specifies the options for the [InAppBrowser].
   Future<void> openData(
-      {@required String data,
+      {required String data,
       String mimeType = "text/html",
       String encoding = "utf8",
       String baseUrl = "about:blank",
       String androidHistoryUrl = "about:blank",
-      InAppBrowserClassOptions options}) async {
-    assert(data != null);
-
+      InAppBrowserClassOptions? options}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('options', () => options?.toMap() ?? {});
@@ -165,8 +162,8 @@ class InAppBrowser {
   }
 
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [InAppBrowser] methods here!
-  static Future<void> openWithSystemBrowser({@required String url}) async {
-    assert(url != null && url.isNotEmpty);
+  static Future<void> openWithSystemBrowser({required String url}) async {
+    assert(url.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
     return await _sharedChannel.invokeMethod('openWithSystemBrowser', args);
@@ -202,24 +199,24 @@ class InAppBrowser {
   }
 
   ///Sets the [InAppBrowser] options with the new [options] and evaluates them.
-  Future<void> setOptions({@required InAppBrowserClassOptions options}) async {
+  Future<void> setOptions({required InAppBrowserClassOptions options}) async {
     this.throwIsNotOpened();
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('options', () => options.toMap());
     await _channel.invokeMethod('setOptions', args);
   }
 
   ///Gets the current [InAppBrowser] options. Returns `null` if it wasn't able to get them.
-  Future<InAppBrowserClassOptions> getOptions() async {
+  Future<InAppBrowserClassOptions?> getOptions() async {
     this.throwIsNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
 
-    Map<dynamic, dynamic> options =
+    Map<dynamic, dynamic>? options =
         await _channel.invokeMethod('getOptions', args);
     if (options != null) {
       options = options.cast<String, dynamic>();
-      return InAppBrowserClassOptions.fromMap(options);
+      return InAppBrowserClassOptions.fromMap(options as Map<String, dynamic>);
     }
 
     return null;
@@ -241,21 +238,21 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview
-  void onLoadStart(String url) {}
+  void onLoadStart(String? url) {}
 
   ///Event fired when the [InAppBrowser] finishes loading an [url].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview
-  void onLoadStop(String url) {}
+  void onLoadStop(String? url) {}
 
   ///Event fired when the [InAppBrowser] encounters an error loading an [url].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20int,%20java.lang.String,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview
-  void onLoadError(String url, int code, String message) {}
+  void onLoadError(String? url, int code, String message) {}
 
   ///Event fired when the [InAppBrowser] main page receives an HTTP error.
   ///
@@ -270,7 +267,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
-  void onLoadHttpError(String url, int statusCode, String description) {}
+  void onLoadHttpError(String? url, int statusCode, String description) {}
 
   ///Event fired when the current [progress] (range 0-100) of loading a page is changed.
   ///
@@ -297,8 +294,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview
-  // ignore: missing_return
-  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(
+  Future<ShouldOverrideUrlLoadingAction?>? shouldOverrideUrlLoading(
       ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) {}
 
   ///Event fired when the [InAppBrowser] webview loads a resource.
@@ -335,8 +331,7 @@ class InAppBrowser {
   ///[url] represents the url of the request.
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkurlschemehandler
-  // ignore: missing_return
-  Future<CustomSchemeResponse> onLoadResourceCustomScheme(
+  Future<CustomSchemeResponse?>? onLoadResourceCustomScheme(
       String scheme, String url) {}
 
   ///Event fired when the [InAppBrowser] webview requests the host application to create a new window,
@@ -369,8 +364,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview
-  // ignore: missing_return
-  Future<bool> onCreateWindow(CreateWindowRequest createWindowRequest) {}
+  Future<bool?>? onCreateWindow(CreateWindowRequest createWindowRequest) {}
 
   ///Event fired when the host application should close the given WebView and remove it from the view system if necessary.
   ///At this point, WebCore has stopped any loading in this window and has removed any cross-scripting ability in javascript.
@@ -396,8 +390,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onJsAlert(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview
-  // ignore: missing_return
-  Future<JsAlertResponse> onJsAlert(JsAlertRequest jsAlertRequest) {}
+  Future<JsAlertResponse?>? onJsAlert(JsAlertRequest jsAlertRequest) {}
 
   ///Event fired when javascript calls the `confirm()` method to display a confirm dialog.
   ///If [JsConfirmResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
@@ -407,8 +400,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onJsConfirm(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview
-  // ignore: missing_return
-  Future<JsConfirmResponse> onJsConfirm(JsConfirmRequest jsConfirmRequest) {}
+  Future<JsConfirmResponse?>? onJsConfirm(JsConfirmRequest jsConfirmRequest) {}
 
   ///Event fired when javascript calls the `prompt()` method to display a prompt dialog.
   ///If [JsPromptResponse.handledByClient] is `true`, the webview will assume that the client will handle the dialog.
@@ -418,8 +410,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview
-  // ignore: missing_return
-  Future<JsPromptResponse> onJsPrompt(JsPromptRequest jsPromptRequest) {}
+  Future<JsPromptResponse?>? onJsPrompt(JsPromptRequest jsPromptRequest) {}
 
   ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
@@ -428,8 +419,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
-  // ignore: missing_return
-  Future<HttpAuthResponse> onReceivedHttpAuthRequest(
+  Future<HttpAuthResponse?>? onReceivedHttpAuthRequest(
       HttpAuthChallenge challenge) {}
 
   ///Event fired when the WebView need to perform server trust authentication (certificate validation).
@@ -440,8 +430,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%20android.webkit.SslErrorHandler,%20android.net.http.SslError)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
-  // ignore: missing_return
-  Future<ServerTrustAuthResponse> onReceivedServerTrustAuthRequest(
+  Future<ServerTrustAuthResponse?>? onReceivedServerTrustAuthRequest(
       ServerTrustChallenge challenge) {}
 
   ///Notify the host application to handle an SSL client certificate request.
@@ -454,8 +443,7 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedClientCertRequest(android.webkit.WebView,%20android.webkit.ClientCertRequest)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
-  // ignore: missing_return
-  Future<ClientCertResponse> onReceivedClientCertRequest(
+  Future<ClientCertResponse?>? onReceivedClientCertRequest(
       ClientCertChallenge challenge) {}
 
   ///Event fired as find-on-page operations progress.
@@ -477,8 +465,7 @@ class InAppBrowser {
   ///[ajaxRequest] represents the `XMLHttpRequest`.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
-  // ignore: missing_return
-  Future<AjaxRequest> shouldInterceptAjaxRequest(AjaxRequest ajaxRequest) {}
+  Future<AjaxRequest?>? shouldInterceptAjaxRequest(AjaxRequest ajaxRequest) {}
 
   ///Event fired whenever the `readyState` attribute of an `XMLHttpRequest` changes.
   ///It gives the host application a chance to abort the request.
@@ -486,8 +473,7 @@ class InAppBrowser {
   ///[ajaxRequest] represents the [XMLHttpRequest].
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
-  // ignore: missing_return
-  Future<AjaxRequestAction> onAjaxReadyStateChange(AjaxRequest ajaxRequest) {}
+  Future<AjaxRequestAction?>? onAjaxReadyStateChange(AjaxRequest ajaxRequest) {}
 
   ///Event fired as an `XMLHttpRequest` progress.
   ///It gives the host application a chance to abort the request.
@@ -495,8 +481,7 @@ class InAppBrowser {
   ///[ajaxRequest] represents the [XMLHttpRequest].
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptAjaxRequest] option to `true`.
-  // ignore: missing_return
-  Future<AjaxRequestAction> onAjaxProgress(AjaxRequest ajaxRequest) {}
+  Future<AjaxRequestAction?>? onAjaxProgress(AjaxRequest ajaxRequest) {}
 
   ///Event fired when a request is sent to a server through [Fetch API](https://developer.mozilla.org/it/docs/Web/API/Fetch_API).
   ///It gives the host application a chance to take control over the request before sending it.
@@ -504,8 +489,7 @@ class InAppBrowser {
   ///[fetchRequest] represents a resource request.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useShouldInterceptFetchRequest] option to `true`.
-  // ignore: missing_return
-  Future<FetchRequest> shouldInterceptFetchRequest(FetchRequest fetchRequest) {}
+  Future<FetchRequest?>? shouldInterceptFetchRequest(FetchRequest fetchRequest) {}
 
   ///Event fired when the host application updates its visited links database.
   ///This event is also fired when the navigation state of the [InAppWebView] changes through the usage of
@@ -517,14 +501,14 @@ class InAppBrowser {
   ///[androidIsReload] indicates if this url is being reloaded. Available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)
-  void onUpdateVisitedHistory(String url, bool androidIsReload) {}
+  void onUpdateVisitedHistory(String? url, bool? androidIsReload) {}
 
   ///Event fired when `window.print()` is called from JavaScript side.
   ///
   ///[url] represents the url on which is called.
   ///
   ///**NOTE**: available on Android 21+.
-  void onPrint(String url) {}
+  void onPrint(String? url) {}
 
   ///Event fired when an HTML element of the webview has been clicked and held.
   ///
@@ -559,14 +543,14 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview
-  void onPageCommitVisible(String url) {}
+  void onPageCommitVisible(String? url) {}
 
   ///Event fired when a change in the document title occurred.
   ///
   ///[title] represents the string containing the new title of the document.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)
-  void onTitleChanged(String title) {}
+  void onTitleChanged(String? title) {}
 
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
@@ -578,9 +562,8 @@ class InAppBrowser {
   ///**NOTE**: available only on Android 27+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)
-  // ignore: missing_return
-  Future<SafeBrowsingResponse> androidOnSafeBrowsingHit(
-      String url, SafeBrowsingThreat threatType) {}
+  Future<SafeBrowsingResponse?>? androidOnSafeBrowsingHit(
+      String url, SafeBrowsingThreat? threatType) {}
 
   ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
   ///
@@ -591,8 +574,7 @@ class InAppBrowser {
   ///**NOTE**: available only on Android 23+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)
-  // ignore: missing_return
-  Future<PermissionRequestResponse> androidOnPermissionRequest(
+  Future<PermissionRequestResponse?>? androidOnPermissionRequest(
       String origin, List<String> resources) {}
 
   ///Event that notifies the host application that web content from the specified origin is attempting to use the Geolocation API, but no permission state is currently set for that origin.
@@ -604,8 +586,7 @@ class InAppBrowser {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)
-  Future<GeolocationPermissionShowPromptResponse>
-      // ignore: missing_return
+  Future<GeolocationPermissionShowPromptResponse?>?
       androidOnGeolocationPermissionsShowPrompt(String origin) {}
 
   ///Notify the host application that a request for Geolocation permissions, made with a previous call to [androidOnGeolocationPermissionsShowPrompt] has been canceled.
@@ -633,8 +614,7 @@ class InAppBrowser {
   ///**Official Android API**:
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)
   ///- https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20java.lang.String)
-  Future<WebResourceResponse>
-      // ignore: missing_return
+  Future<WebResourceResponse?>?
       androidShouldInterceptRequest(WebResourceRequest request) {}
 
   ///Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript.
@@ -655,9 +635,8 @@ class InAppBrowser {
   ///**NOTE**: available only on Android 29+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)
-  Future<WebViewRenderProcessAction>
-      // ignore: missing_return
-      androidOnRenderProcessUnresponsive(String url) {}
+  Future<WebViewRenderProcessAction?>?
+      androidOnRenderProcessUnresponsive(String? url) {}
 
   ///Event called once when an unresponsive renderer currently associated with the WebView becomes responsive.
   ///
@@ -670,9 +649,8 @@ class InAppBrowser {
   ///**NOTE**: available only on Android 29+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)
-  Future<WebViewRenderProcessAction>
-      // ignore: missing_return
-      androidOnRenderProcessResponsive(String url) {}
+  Future<WebViewRenderProcessAction?>?
+      androidOnRenderProcessResponsive(String? url) {}
 
   ///Event fired when the given WebView's render process has exited.
   ///The application's implementation of this callback should only attempt to clean up the WebView.
@@ -690,9 +668,8 @@ class InAppBrowser {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)
-  Future<FormResubmissionAction>
-      // ignore: missing_return
-      androidOnFormResubmission(String url) {}
+  Future<FormResubmissionAction?>?
+      androidOnFormResubmission(String? url) {}
 
   ///Event fired when the scale applied to the WebView has changed.
   ///
@@ -746,8 +723,7 @@ class InAppBrowser {
   ///**NOTE**: available only on Android.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onJsBeforeUnload(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)
-  // ignore: missing_return
-  Future<JsBeforeUnloadResponse> androidOnJsBeforeUnload(
+  Future<JsBeforeUnloadResponse?>? androidOnJsBeforeUnload(
       JsBeforeUnloadRequest jsBeforeUnloadRequest) {}
 
   ///Event fired when a request to automatically log in the user has been processed.

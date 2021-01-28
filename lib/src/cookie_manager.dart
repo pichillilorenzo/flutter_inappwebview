@@ -1,6 +1,5 @@
 import 'dart:async';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'types.dart';
@@ -11,19 +10,19 @@ import 'types.dart';
 ///
 ///**NOTE for iOS**: available from iOS 11.0+.
 class CookieManager {
-  static CookieManager _instance;
+  static CookieManager? _instance;
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
   ///Gets the cookie manager shared instance.
   static CookieManager instance() {
-    return (_instance != null) ? _instance : _init();
+    return (_instance != null) ? _instance! : _init();
   }
 
   static CookieManager _init() {
     _channel.setMethodCallHandler(_handleMethod);
     _instance = CookieManager();
-    return _instance;
+    return _instance!;
   }
 
   static Future<dynamic> _handleMethod(MethodCall call) async {}
@@ -33,23 +32,23 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null`, its default value will be the domain name of [url].
   Future<void> setCookie(
-      {@required String url,
-      @required String name,
-      @required String value,
-      String domain,
+      {required String url,
+      required String name,
+      required String value,
+      String? domain,
       String path = "/",
-      int expiresDate,
-      int maxAge,
-      bool isSecure,
-      bool isHttpOnly,
-      HTTPCookieSameSitePolicy sameSite}) async {
+      int? expiresDate,
+      int? maxAge,
+      bool? isSecure,
+      bool? isHttpOnly,
+      HTTPCookieSameSitePolicy? sameSite}) async {
     if (domain == null) domain = _getDomainName(url);
 
-    assert(url != null && url.isNotEmpty);
-    assert(name != null && name.isNotEmpty);
-    assert(value != null && value.isNotEmpty);
-    assert(domain != null && domain.isNotEmpty);
-    assert(path != null && path.isNotEmpty);
+    assert(url.isNotEmpty);
+    assert(name.isNotEmpty);
+    assert(value.isNotEmpty);
+    assert(domain.isNotEmpty);
+    assert(path.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
@@ -67,8 +66,8 @@ class CookieManager {
   }
 
   ///Gets all the cookies for the given [url].
-  Future<List<Cookie>> getCookies({@required String url}) async {
-    assert(url != null && url.isNotEmpty);
+  Future<List<Cookie>> getCookies({required String url}) async {
+    assert(url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
@@ -94,10 +93,10 @@ class CookieManager {
   }
 
   ///Gets a cookie by its [name] for the given [url].
-  Future<Cookie> getCookie(
-      {@required String url, @required String name}) async {
-    assert(url != null && url.isNotEmpty);
-    assert(name != null && name.isNotEmpty);
+  Future<Cookie?> getCookie(
+      {required String url, required String name}) async {
+    assert(url.isNotEmpty);
+    assert(name.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
@@ -126,16 +125,16 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
   Future<void> deleteCookie(
-      {@required String url,
-      @required String name,
+      {required String url,
+      required String name,
       String domain = "",
       String path = "/"}) async {
-    if (domain == null || domain.isEmpty) domain = _getDomainName(url);
+    if (domain.isEmpty) domain = _getDomainName(url);
 
-    assert(url != null && url.isNotEmpty);
-    assert(name != null && name.isNotEmpty);
-    assert(domain != null && url.isNotEmpty);
-    assert(path != null && url.isNotEmpty);
+    assert(url.isNotEmpty);
+    assert(name.isNotEmpty);
+    assert(url.isNotEmpty);
+    assert(url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
@@ -150,12 +149,12 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///If [domain] is `null` or empty, its default value will be the domain name of [url].
   Future<void> deleteCookies(
-      {@required String url, String domain = "", String path = "/"}) async {
-    if (domain == null || domain.isEmpty) domain = _getDomainName(url);
+      {required String url, String domain = "", String path = "/"}) async {
+    if (domain.isEmpty) domain = _getDomainName(url);
 
-    assert(url != null && url.isNotEmpty);
-    assert(domain != null && url.isNotEmpty);
-    assert(path != null && url.isNotEmpty);
+    assert(url.isNotEmpty);
+    assert(url.isNotEmpty);
+    assert(url.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
@@ -173,6 +172,7 @@ class CookieManager {
   String _getDomainName(String url) {
     Uri uri = Uri.parse(url);
     String domain = uri.host;
+    // ignore: unnecessary_null_comparison
     if (domain == null) return "";
     return domain.startsWith("www.") ? domain.substring(4) : domain;
   }

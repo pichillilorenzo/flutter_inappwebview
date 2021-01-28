@@ -15,14 +15,20 @@ class KeyUsage {
     KeyUsage.decipherOnly,
   ].toSet();
 
-  static KeyUsage fromIndex(int value) {
-    return KeyUsage.values.firstWhere((element) => element.toValue() == value,
-        orElse: () => null);
+  static KeyUsage? fromIndex(int? value) {
+    if (value != null) {
+      try {
+        return KeyUsage.values.firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
   }
 
   int toValue() => _value;
 
-  String name() => _KeyUsageMapName[this._value];
+  String name() => _KeyUsageMapName.containsKey(this._value) ? _KeyUsageMapName[this._value]! : "";
 
   @override
   String toString() => "($_value, ${name()})";

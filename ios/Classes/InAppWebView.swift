@@ -1153,7 +1153,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.maximumZoomScale = CGFloat(options.maximumZoomScale)
             scrollView.minimumZoomScale = CGFloat(options.minimumZoomScale)
             
-            // options.debuggingEnabled is always enabled for iOS,
+            // debugging is always enabled for iOS,
             // there isn't any option to set about it such as on Android.
             
             if options.clearCache {
@@ -2498,6 +2498,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
                 if !handledByClient, InAppWebView.windowWebViews[windowId] != nil {
                     InAppWebView.windowWebViews.removeValue(forKey: windowId)
+                    if let url = navigationAction.request.url {
+                        self.loadUrl(url: url, headers: nil)
+                    }
                 }
             }
         })

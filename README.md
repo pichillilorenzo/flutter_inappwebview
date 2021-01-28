@@ -201,7 +201,7 @@ First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](ht
 ## Usage
 
 Classes:
-- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`. Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. Note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 - [ContextMenu](#contextmenu-class): This class represents the WebView context menu.
 - [HeadlessInAppWebView](#headlessinappwebview-class): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
@@ -251,9 +251,7 @@ The plugin relies on Flutter's mechanism (in developers preview) for embedding A
 Known issues are tagged with the [platform-views](https://github.com/flutter/flutter/labels/a%3A%20platform-views) label in the [Flutter official repo](https://github.com/flutter/flutter).
 Keyboard support within webviews is also experimental.
 
-To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
-
-Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html))
+Note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html))
 or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 
 Use `InAppWebViewController` to control the WebView instance.

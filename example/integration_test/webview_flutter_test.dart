@@ -76,8 +76,6 @@ void main() {
     expect(currentUrl, 'https://www.google.com/');
   });
 
-  // enable this once https://github.com/flutter/flutter/issues/31510
-  // is resolved.
   testWidgets('loadUrl with headers', (WidgetTester tester) async {
     final Completer controllerCompleter =
     Completer<InAppWebViewController>();
@@ -585,7 +583,7 @@ void main() {
 
       isPaused = await controller.evaluateJavascript(source: 'isPaused();');
       expect(isPaused, true);
-    }/*, skip: true https://github.com/flutter/flutter/issues/72572 */);
+    });
   });
 
   testWidgets('getTitle', (WidgetTester tester) async {

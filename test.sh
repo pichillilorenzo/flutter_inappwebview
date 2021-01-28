@@ -1,5 +1,4 @@
 #!/bin/bash
-# flutter clean && flutter run -t ./lib/main.dart -d 'iPhone di Lorenzo' --debug --no-sound-null-safety
 
 # on linux/macOS local IP can be found using $(ipconfig getifaddr en0)
 export NODE_SERVER_IP=$1

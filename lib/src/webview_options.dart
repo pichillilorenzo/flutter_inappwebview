@@ -945,7 +945,7 @@ class IOSInAppWebViewOptions
         IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
             map["contentInsetAdjustmentBehavior"]);
     options.allowUniversalAccessFromFileURLs =
-        map["optioallowUniversalAccessFromFileURLsns"];
+        map["allowUniversalAccessFromFileURLs"];
     return options;
   }
 

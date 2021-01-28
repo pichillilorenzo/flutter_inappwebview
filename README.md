@@ -153,6 +153,9 @@ Other useful `Info.plist` properties are:
 * `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking));
 * `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent)).
 
+#### Debugging iOS WebViews
+On iOS, debugging WebViews on Safari through developer tools is always enabled. There isn't a way to enable or disable it.
+
 ### How to enable the usage of camera for HTML inputs such as `<input type="file" accept="image/*" capture>`
 
 In order to be able to use camera, for example, for taking images through `<input type="file" accept="image/*" capture>` HTML tag, you need to ask camera permission.
@@ -183,9 +186,6 @@ Add the following codes inside the `<application>` tag of your `android/app/src/
         android:resource="@xml/provider_paths" />
 </provider>
 ```
-
-#### Debugging iOS WebViews
-On iOS, debugging WebViews on Safari through developer tools is always enabled. There isn't a way to enable or disable it.
 
 ## Getting Started
 

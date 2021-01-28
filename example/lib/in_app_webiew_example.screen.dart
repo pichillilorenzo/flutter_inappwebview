@@ -125,7 +125,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url ?? '';
                       });
-                      print(await controller.getOptions());
                     },
                     onProgressChanged: (controller, progress) {
                       setState(() {

@@ -146,7 +146,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
         if let urlHost = URL(string: url)?.host {
             MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
                 for cookie in cookies {
-                    if cookie.domain.contains(urlHost) {
+                    if urlHost.hasSuffix(cookie.domain) {
                         var sameSite: String? = nil
                         if #available(iOS 13.0, *) {
                             if let sameSiteValue = cookie.sameSitePolicy?.rawValue {

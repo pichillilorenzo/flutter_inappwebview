@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'types.dart';
@@ -14,11 +13,11 @@ import 'in_app_browser.dart';
 ///
 ///Note: Requires modification of Android 11+: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above
 class ChromeSafariBrowser {
-  String uuid;
-  InAppBrowser browserFallback;
+  late String uuid;
+  InAppBrowser? browserFallback;
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   bool _isOpened = false;
-  MethodChannel _channel;
+  late MethodChannel _channel;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
@@ -48,7 +47,9 @@ class ChromeSafariBrowser {
         String url = call.arguments["url"];
         String title = call.arguments["title"];
         int id = call.arguments["id"].toInt();
-        this._menuItems[id].action(url, title);
+        if (this._menuItems[id] != null) {
+          this._menuItems[id]!.action(url, title);
+        }
         break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
@@ -67,14 +68,14 @@ class ChromeSafariBrowser {
   ///
   ///[contextMenuFallback]: Context Menu used by the [InAppBrowser] instance fallback.
   Future<void> open(
-      {@required String url,
-      ChromeSafariBrowserClassOptions options,
-      Map<String, String> headersFallback = const {},
-      InAppBrowserClassOptions optionsFallback}) async {
-    assert(url != null && url.isNotEmpty);
+      {required String url,
+      ChromeSafariBrowserClassOptions? options,
+      Map<String, String>? headersFallback = const {},
+      InAppBrowserClassOptions? optionsFallback}) async {
+    assert(url.isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
-    List<Map<String, dynamic>> menuItemList = new List();
+    List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {
       menuItemList.add({"id": value.id, "label": value.label});
     });
@@ -162,7 +163,7 @@ class ChromeSafariBrowserMenuItem {
   final void Function(String url, String title) action;
 
   ChromeSafariBrowserMenuItem(
-      {@required this.id, @required this.label, @required this.action});
+      {required this.id, required this.label, required this.action});
 
   Map<String, dynamic> toMap() {
     return {"id": id, "label": label};

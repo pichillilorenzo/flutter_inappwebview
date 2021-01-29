@@ -19,10 +19,15 @@ class ASN1DistinguishedNames {
     ASN1DistinguishedNames.EMAIL,
   ].toSet();
 
-  static ASN1DistinguishedNames fromValue(String oid) {
-    if (oid != null)
-      return ASN1DistinguishedNames.values
-          .firstWhere((element) => element.oid() == oid, orElse: () => null);
+  static ASN1DistinguishedNames? fromValue(String? oid) {
+    if (oid != null) {
+      try {
+        return ASN1DistinguishedNames.values
+            .firstWhere((element) => element.oid() == oid);
+      } catch (e) {
+        return null;
+      }
+    }
     return null;
   }
 

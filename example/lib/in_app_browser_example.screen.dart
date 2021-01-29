@@ -12,22 +12,22 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future onLoadStart(String url) async {
+  Future onLoadStart(url) async {
     print("\n\nStarted $url\n\n");
   }
 
   @override
-  Future onLoadStop(String url) async {
+  Future onLoadStop(url) async {
     print("\n\nStopped $url\n\n");
   }
 
   @override
-  void onLoadError(String url, int code, String message) {
+  void onLoadError(url, code, message) {
     print("Can't load $url.. Error: $message");
   }
 
   @override
-  void onProgressChanged(int progress) {
+  void onProgressChanged(progress) {
     print("Progress: $progress");
   }
 
@@ -38,27 +38,27 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(
-      ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
+      shouldOverrideUrlLoadingRequest) async {
     print("\n\nOverride ${shouldOverrideUrlLoadingRequest.url}\n\n");
     return ShouldOverrideUrlLoadingAction.ALLOW;
   }
 
   @override
-  void onLoadResource(LoadedResource response) {
+  void onLoadResource(response) {
     print("Started at: " +
         response.startTime.toString() +
         "ms ---> duration: " +
         response.duration.toString() +
         "ms " +
-        response.url);
+        response.url!);
   }
 
   @override
-  void onConsoleMessage(ConsoleMessage consoleMessage) {
+  void onConsoleMessage(consoleMessage) {
     print("""
     console output:
       message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel.toValue()}
+      messageLevel: ${consoleMessage.messageLevel!.toValue()}
    """);
   }
 }
@@ -96,7 +96,6 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                           options: InAppBrowserClassOptions(
                               inAppWebViewGroupOptions: InAppWebViewGroupOptions(
                                   crossPlatform: InAppWebViewOptions(
-                            debuggingEnabled: true,
                             useShouldOverrideUrlLoading: true,
                             useOnLoadResource: true,
                           ))));

@@ -7,34 +7,34 @@ import 'oid.dart';
 
 class ASN1Object {
   /// This property contains the DER encoded object
-  Uint8List encoded;
+  Uint8List? encoded;
 
   /// This property contains the decoded Swift object whenever is possible
   dynamic value;
 
-  ASN1Identifier identifier;
+  ASN1Identifier? identifier;
 
-  List<ASN1Object> sub;
+  List<ASN1Object>? sub;
 
-  ASN1Object parent;
+  ASN1Object? parent;
 
-  ASN1Object subAtIndex(int index) {
-    if (sub != null && index >= 0 && index < sub.length) {
-      return sub[index];
+  ASN1Object? subAtIndex(int index) {
+    if (sub != null && index >= 0 && index < sub!.length) {
+      return sub![index];
     }
     return null;
   }
 
-  ASN1Object firstSub() {
+  ASN1Object? firstSub() {
     if (subCount() > 0) {
-      return sub.first;
+      return sub!.first;
     }
     return null;
   }
 
-  ASN1Object lastSub() {
+  ASN1Object? lastSub() {
     if (subCount() > 0) {
-      return sub.last;
+      return sub!.last;
     }
     return null;
   }
@@ -43,7 +43,7 @@ class ASN1Object {
     return sub?.length ?? 0;
   }
 
-  ASN1Object findOid({OID oid, String oidValue}) {
+  ASN1Object? findOid({OID? oid, String? oidValue}) {
     oidValue = oid != null ? oid.toValue() : oidValue;
     for (var child in (sub ?? <ASN1Object>[])) {
       if (child.identifier?.tagNumber() ==
@@ -67,7 +67,7 @@ class ASN1Object {
 
   String printAsn1({insets = ""}) {
     var output = insets;
-    output += identifier?.description?.toUpperCase() ?? "";
+    output += identifier?.description.toUpperCase() ?? "";
     output += (value != null ? ": $value" : "");
     if (identifier?.typeClass() == ASN1IdentifierClass.UNIVERSAL &&
         identifier?.tagNumber() == ASN1IdentifierTagNumber.OBJECT_IDENTIFIER) {
@@ -76,12 +76,12 @@ class ASN1Object {
         output += " ($descr)";
       }
     }
-    output += sub != null && sub.length > 0 ? " {" : "";
+    output += sub != null && sub!.length > 0 ? " {" : "";
     output += "\n";
     for (var item in (sub ?? <ASN1Object>[])) {
       output += item.printAsn1(insets: insets + "    ");
     }
-    output += sub != null && sub.length > 0 ? "}\n" : "";
+    output += sub != null && sub!.length > 0 ? "}\n" : "";
     return output;
   }
 
@@ -90,9 +90,9 @@ class ASN1Object {
     return description;
   }
 
-  ASN1Object atIndex(X509BlockPosition x509blockPosition) {
-    if (sub != null && x509blockPosition.index < sub.length) {
-      return sub[x509blockPosition.index];
+  ASN1Object? atIndex(X509BlockPosition x509blockPosition) {
+    if (sub != null && x509blockPosition.index < sub!.length) {
+      return sub![x509blockPosition.index];
     }
     return null;
   }

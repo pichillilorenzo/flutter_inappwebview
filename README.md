@@ -22,8 +22,8 @@ A Flutter plugin that allows you to add an inline webview, to use an headless we
 
 ## Requirements
 
-- Dart sdk: ">=2.7.0 <3.0.0"
-- Flutter: ">=1.12.13+hotfix.5"
+- Dart sdk: ">=2.12.0-0 <3.0.0"
+- Flutter: ">=1.22.0"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 11`
 
@@ -75,7 +75,21 @@ or **Android API 19+** if you enable the `useHybridComposition` Android-specific
 - Check the official [Network security configuration - "Opt out of cleartext traffic"](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted) section.
 - Also, check this StackOverflow issue answer: [Cleartext HTTP traffic not permitted](https://stackoverflow.com/a/50834600/4637638).
 
-If you want to use the `ChromeSafariBrowser` on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above
+#### Debugging Android WebViews
+On Android, in order to enable/disable debugging WebViews using `chrome://inspect` on Chrome, you should use the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method.
+
+For example, you could call it inside the main function:
+```dart
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
+
+  runApp(new MyApp());
+}
+```
 
 ### IMPORTANT Note for iOS
 
@@ -139,6 +153,9 @@ Other useful `Info.plist` properties are:
 * `NSAllowsLocalNetworking`: A Boolean value indicating whether to allow loading of local resources ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowslocalnetworking));
 * `NSAllowsArbitraryLoadsInWebContent`: A Boolean value indicating whether all App Transport Security restrictions are disabled for requests made from web views ([Official wiki](https://developer.apple.com/documentation/bundleresources/information_property_list/nsapptransportsecurity/nsallowsarbitraryloadsinwebcontent)).
 
+#### Debugging iOS WebViews
+On iOS, debugging WebViews on Safari through developer tools is always enabled. There isn't a way to enable or disable it.
+
 ### How to enable the usage of camera for HTML inputs such as `<input type="file" accept="image/*" capture>`
 
 In order to be able to use camera, for example, for taking images through `<input type="file" accept="image/*" capture>` HTML tag, you need to ask camera permission.
@@ -184,11 +201,11 @@ First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](ht
 ## Usage
 
 Classes:
-- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`. Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
+- [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. Note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 - [ContextMenu](#contextmenu-class): This class represents the WebView context menu.
 - [HeadlessInAppWebView](#headlessinappwebview-class): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
-- [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
+- [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS. If you want to use the `ChromeSafariBrowser` on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` (you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
 - [CookieManager](#cookiemanager-class): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances. **NOTE for iOS**: available from iOS 11.0+.
 - [HttpAuthCredentialDatabase](#httpauthcredentialdatabase-class): This class implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
@@ -234,20 +251,22 @@ The plugin relies on Flutter's mechanism (in developers preview) for embedding A
 Known issues are tagged with the [platform-views](https://github.com/flutter/flutter/labels/a%3A%20platform-views) label in the [Flutter official repo](https://github.com/flutter/flutter).
 Keyboard support within webviews is also experimental.
 
-To use `InAppWebView` class on iOS you need to opt-in for the embedded views preview by adding a boolean property to the app's `Info.plist` file, with the key `io.flutter.embedded_views_preview` and the value `YES`.
-
-Also, note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html))
+Note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html))
 or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
 
 Use `InAppWebViewController` to control the WebView instance.
 Example:
 ```dart
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -258,7 +277,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  InAppWebViewController webView;
+  InAppWebViewController? webView;
   String url = "";
   double progress = 0;
 
@@ -280,81 +299,75 @@ class _MyAppState extends State<MyApp> {
           title: const Text('InAppWebView Example'),
         ),
         body: Container(
-          child: Column(children: <Widget>[
-            Container(
-              padding: EdgeInsets.all(20.0),
-              child: Text(
-                  "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
-            ),
-            Container(
-                padding: EdgeInsets.all(10.0),
-                child: progress < 1.0
-                    ? LinearProgressIndicator(value: progress)
-                    : Container()),
-            Expanded(
-              child: Container(
-                margin: const EdgeInsets.all(10.0),
-                decoration:
-                    BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-                child: InAppWebView(
-                  initialUrl: "https://flutter.dev/",
-                  initialHeaders: {},
-                  initialOptions: InAppWebViewGroupOptions(
-                    crossPlatform: InAppWebViewOptions(
-                        debuggingEnabled: true,
-                    )
+            child: Column(children: <Widget>[
+              Container(
+                padding: EdgeInsets.all(20.0),
+                child: Text(
+                    "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
+              ),
+              Container(
+                  padding: EdgeInsets.all(10.0),
+                  child: progress < 1.0
+                      ? LinearProgressIndicator(value: progress)
+                      : Container()),
+              Expanded(
+                child: Container(
+                  margin: const EdgeInsets.all(10.0),
+                  decoration:
+                  BoxDecoration(border: Border.all(color: Colors.blueAccent)),
+                  child: InAppWebView(
+                    initialUrl: "https://flutter.dev/",
+                    initialHeaders: {},
+                    initialOptions: InAppWebViewGroupOptions(
+                        crossPlatform: InAppWebViewOptions(
+
+                        )
+                    ),
+                    onWebViewCreated: (InAppWebViewController controller) {
+                      webView = controller;
+                    },
+                    onLoadStart: (controller, url) {
+                      setState(() {
+                        this.url = url ?? '';
+                      });
+                    },
+                    onLoadStop: (controller, url) async {
+                      setState(() {
+                        this.url = url ?? '';
+                      });
+                    },
+                    onProgressChanged: (controller, progress) {
+                      setState(() {
+                        this.progress = progress / 100;
+                      });
+                    },
                   ),
-                  onWebViewCreated: (InAppWebViewController controller) {
-                    webView = controller;
-                  },
-                  onLoadStart: (InAppWebViewController controller, String url) {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onLoadStop: (InAppWebViewController controller, String url) async {
-                    setState(() {
-                      this.url = url;
-                    });
-                  },
-                  onProgressChanged: (InAppWebViewController controller, int progress) {
-                    setState(() {
-                      this.progress = progress / 100;
-                    });
-                  },
                 ),
               ),
-            ),
-            ButtonBar(
-              alignment: MainAxisAlignment.center,
-              children: <Widget>[
-                RaisedButton(
-                  child: Icon(Icons.arrow_back),
-                  onPressed: () {
-                    if (webView != null) {
-                      webView.goBack();
-                    }
-                  },
-                ),
-                RaisedButton(
-                  child: Icon(Icons.arrow_forward),
-                  onPressed: () {
-                    if (webView != null) {
-                      webView.goForward();
-                    }
-                  },
-                ),
-                RaisedButton(
-                  child: Icon(Icons.refresh),
-                  onPressed: () {
-                    if (webView != null) {
-                      webView.reload();
-                    }
-                  },
-                ),
-              ],
-            ),
-        ])),
+              ButtonBar(
+                alignment: MainAxisAlignment.center,
+                children: <Widget>[
+                  RaisedButton(
+                    child: Icon(Icons.arrow_back),
+                    onPressed: () {
+                      webView?.goBack();
+                    },
+                  ),
+                  RaisedButton(
+                    child: Icon(Icons.arrow_forward),
+                    onPressed: () {
+                      webView?.goForward();
+                    },
+                  ),
+                  RaisedButton(
+                    child: Icon(Icons.refresh),
+                    onPressed: () {
+                      webView?.reload();
+                    },
+                  ),
+                ],
+              ),
+            ])),
       ),
     );
   }
@@ -447,7 +460,7 @@ Methods available:
 
 ##### `InAppWebViewController` Android-specific methods
 
-Android-specific methods can be called using the `InAppWebViewController.android` attribute.
+Android-specific methods can be called using the `InAppWebViewController.android` attribute. Static methods can be called using the `AndroidInAppWebViewController` class directly.
 
 * `startSafeBrowsing`: Starts Safe Browsing initialization.
 * `clearSslPreferences`: Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
@@ -464,10 +477,11 @@ Android-specific methods can be called using the `InAppWebViewController.android
 * `static getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
 * `static setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
 * `static getCurrentWebViewPackage`: Gets the current Android WebView package info.
+* `static setWebContentsDebuggingEnabled(bool debuggingEnabled)`: Enables debugging of web contents (HTML / CSS / JavaScript) loaded into any WebViews of this application. Debugging is disabled by default.
 
 ##### `InAppWebViewController` iOS-specific methods
 
-iOS-specific methods can be called using the `InAppWebViewController.ios` attribute.
+iOS-specific methods can be called using the `InAppWebViewController.ios` attribute. Static methods can be called using the `IOSInAppWebViewController` class directly.
 
 * `hasOnlySecureContent`: A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
 * `reloadFromOrigin`: Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
@@ -521,112 +535,111 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 
 ##### `InAppWebView` Cross-platform options
 
-* `useShouldOverrideUrlLoading`: Set to `true` to be able to listen at the `shouldOverrideUrlLoading` event. The default value is `false`.
-* `useOnLoadResource`: Set to `true` to be able to listen at the `onLoadResource` event. The default value is `false`.
-* `useOnDownloadStart`: Set to `true` to be able to listen at the `onDownloadStart` event. The default value is `false`.
-* `useShouldInterceptAjaxRequest`: Set to `true` to be able to listen at the `shouldInterceptAjaxRequest` event. The default value is `false`.
-* `useShouldInterceptFetchRequest`: Set to `true` to be able to listen at the `shouldInterceptFetchRequest` event. The default value is `false`.
-* `clearCache`: Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
-* `userAgent`: Sets the user-agent for the WebView.
+* `allowFileAccessFromFileURLs`: Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs. The default value is `false`.
+* `allowUniversalAccessFromFileURLs`: Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin. The default value is `false`.
 * `applicationNameForUserAgent`: Append to the existing user-agent. Setting userAgent will override this.
-* `javaScriptEnabled`: Set to `true` to enable JavaScript. The default value is `true`.
-* `debuggingEnabled`: Enables debugging of web contents (HTML / CSS / JavaScript) loaded into any WebViews of this application.
+* `cacheEnabled`: Sets whether WebView should use browser caching. The default value is `true`.
+* `clearCache`: Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
+* `contentBlockers`: List of `ContentBlocker` that are a set of rules used to block content in the browser window.
+* `disableContextMenu`: Set to `true` to disable context menu. The default value is `false`.
+* `disableHorizontalScroll`: Set to `true` to disable horizontal scroll. The default value is `false`.
+* `disableVerticalScroll`: Set to `true` to disable vertical scroll. The default value is `false`.
+* `horizontalScrollBarEnabled`: Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
+* `incognito`: Set to `true` to open a browser window with incognito mode. The default value is `false`.
 * `javaScriptCanOpenWindowsAutomatically`: Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
+* `javaScriptEnabled`: Set to `true` to enable JavaScript. The default value is `true`.
 * `mediaPlaybackRequiresUserGesture`: Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
 * `minimumFontSize`: Sets the minimum font size. The default value is `8` for Android, `0` for iOS.
-* `verticalScrollBarEnabled`: Define whether the vertical scrollbar should be drawn or not. The default value is `true`.
-* `horizontalScrollBarEnabled`: Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
-* `resourceCustomSchemes`: List of custom schemes that the WebView must handle. Use the `onLoadResourceCustomScheme` event to intercept resource requests with custom scheme.
-* `contentBlockers`: List of `ContentBlocker` that are a set of rules used to block content in the browser window.
 * `preferredContentMode`: Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is `InAppWebViewUserPreferredContentMode.RECOMMENDED`.
-* `incognito`: Set to `true` to open a browser window with incognito mode. The default value is `false`.
-* `cacheEnabled`: Sets whether WebView should use browser caching. The default value is `true`.
-* `transparentBackground`: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
-* `disableVerticalScroll`: Set to `true` to disable vertical scroll. The default value is `false`.
-* `disableHorizontalScroll`: Set to `true` to disable horizontal scroll. The default value is `false`.
-* `disableContextMenu`: Set to `true` to disable context menu. The default value is `false`.
+* `resourceCustomSchemes`: List of custom schemes that the WebView must handle. Use the `onLoadResourceCustomScheme` event to intercept resource requests with custom scheme.
 * `supportZoom`: Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
+* `transparentBackground`: Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
+* `useOnDownloadStart`: Set to `true` to be able to listen at the `onDownloadStart` event. The default value is `false`.
+* `useOnLoadResource`: Set to `true` to be able to listen at the `onLoadResource` event. The default value is `false`.
+* `useShouldInterceptAjaxRequest`: Set to `true` to be able to listen at the `shouldInterceptAjaxRequest` event. The default value is `false`.
+* `useShouldInterceptFetchRequest`: Set to `true` to be able to listen at the `shouldInterceptFetchRequest` event. The default value is `false`.
+* `useShouldOverrideUrlLoading`: Set to `true` to be able to listen at the `shouldOverrideUrlLoading` event. The default value is `false`.
+* `userAgent`: Sets the user-agent for the WebView.
+* `verticalScrollBarEnabled`: Define whether the vertical scrollbar should be drawn or not. The default value is `true`.
 
 ##### `InAppWebView` Android-specific options
 
-* `useHybridComposition`: Set to `true` to use Flutter's new Hybrid Composition rendering method, which fixes all issues [here](https://github.com/flutter/flutter/issues/61133). The default value is `false`. Note that this option requires Flutter v1.20+ and should only be used on Android 10+ for release apps, as animations will drop frames on < Android 10 (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
-* `useShouldInterceptRequest`: Set to `true` to be able to listen at the `androidShouldInterceptRequest` event. The default value is `false`.
-* `useOnRenderProcessGone`: Set to `true` to be able to listen at the `androidOnRenderProcessGone` event. The default value is `false`.
-* `textZoom`: Sets the text zoom of the page in percent. The default value is `100`.
-* `clearSessionCache`: Set to `true` to have the session cookie cache cleared before the new window is opened.
-* `builtInZoomControls`: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `true`.
-* `displayZoomControls`: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
-* `databaseEnabled`: Set to `true` if you want the database storage API is enabled. The default value is `true`.
-* `domStorageEnabled`: Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
-* `useWideViewPort`: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
-* `safeBrowsingEnabled`: Sets whether Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links.
-* `mixedContentMode`: Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
 * `allowContentAccess`: Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
 * `allowFileAccess`: Enables or disables file access within WebView. Note that this enables or disables file system access only.
-* `allowFileAccessFromFileURLs`: Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs.
-* `allowUniversalAccessFromFileURLs`: Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin.
 * `appCachePath`: Sets the path to the Application Caches files. In order for the Application Caches API to be enabled, this option must be set a path to which the application can write.
 * `blockNetworkImage`: Sets whether the WebView should not load image resources from the network (resources accessed via http and https URI schemes). The default value is `false`.
 * `blockNetworkLoads`: Sets whether the WebView should not load resources from the network. The default value is `false`.
+* `builtInZoomControls`: Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `true`.
 * `cacheMode`: Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed.
+* `clearSessionCache`: Set to `true` to have the session cookie cache cleared before the new window is opened.
 * `cursiveFontFamily`: Sets the cursive font family name. The default value is `"cursive"`.
+* `databaseEnabled`: Set to `true` if you want the database storage API is enabled. The default value is `true`.
 * `defaultFixedFontSize`: Sets the default fixed font size. The default value is `16`.
 * `defaultFontSize`: Sets the default font size. The default value is `16`.
 * `defaultTextEncodingName`: Sets the default text encoding name to use when decoding html pages. The default value is `"UTF-8"`.
+* `disableDefaultErrorPage`: Sets whether the default Android error page should be disabled. The default value is `false`.
 * `disabledActionModeMenuItems`: Disables the action mode menu items according to menuItems flag.
+* `displayZoomControls`: Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
+* `domStorageEnabled`: Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
 * `fantasyFontFamily`: Sets the fantasy font family name. The default value is `"fantasy"`.
 * `fixedFontFamily`: Sets the fixed font family name. The default value is `"monospace"`.
 * `forceDark`: Set the force dark mode for this WebView. The default value is `AndroidInAppWebViewForceDark.FORCE_DARK_OFF`.
 * `geolocationEnabled`: Sets whether Geolocation API is enabled. The default value is `true`.
+* `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
+* `initialScale`: Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of `useWideViewPort` and `loadWithOverviewMode`.
 * `layoutAlgorithm`: Sets the underlying layout algorithm. This will cause a re-layout of the WebView.
 * `loadWithOverviewMode`: Sets whether the WebView loads pages in overview mode, that is, zooms out the content to fit on screen by width.
 * `loadsImagesAutomatically`: Sets whether the WebView should load image resources. Note that this method controls loading of all images, including those embedded using the data URI scheme.
 * `minimumLogicalFontSize`: Sets the minimum logical font size. The default is `8`.
-* `initialScale`: Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of `useWideViewPort` and `loadWithOverviewMode`.
+* `mixedContentMode`: Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
 * `needInitialFocus`: Tells the WebView whether it needs to set a node. The default value is `true`.
 * `offscreenPreRaster`: Sets whether this WebView should raster tiles when it is offscreen but attached to a window.
+* `overScrollMode`: Sets the WebView's over-scroll mode. The default value is `AndroidOverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS`.
+* `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
+* `rendererPriorityPolicy`: Set the renderer priority policy for this WebView.
+* `safeBrowsingEnabled`: Sets whether Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links.
 * `sansSerifFontFamily`: Sets the sans-serif font family name. The default value is `"sans-serif"`.
+* `saveFormData`: Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
+* `scrollBarDefaultDelayBeforeFade`: Defines the delay in milliseconds that a scrollbar waits before fade out.
+* `scrollBarFadeDuration`: Define the scrollbar fade duration in milliseconds.
+* `scrollBarStyle`: Specify the style of the scrollbars. The scrollbars can be overlaid or inset. The default value is `AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY`.
+* `scrollbarFadingEnabled`: Define whether scrollbars will fade when the view is not scrolling. The default value is `true`.
 * `serifFontFamily`: Sets the serif font family name. The default value is `"sans-serif"`.
 * `standardFontFamily`: Sets the standard font family name. The default value is `"sans-serif"`.
-* `saveFormData`: Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
-* `thirdPartyCookiesEnabled`: Boolean value to enable third party cookies in the WebView.
-* `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
 * `supportMultipleWindows`: Sets whether the WebView whether supports multiple windows.
-* `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
-* `overScrollMode`: Sets the WebView's over-scroll mode. The default value is `AndroidOverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS`.
-* `scrollBarStyle`: Specify the style of the scrollbars. The scrollbars can be overlaid or inset. The default value is `AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY`.
+* `textZoom`: Sets the text zoom of the page in percent. The default value is `100`.
+* `thirdPartyCookiesEnabled`: Boolean value to enable third party cookies in the WebView.
+* `useHybridComposition`: Set to `true` to use Flutter's new Hybrid Composition rendering method, which fixes all issues [here](https://github.com/flutter/flutter/issues/61133). The default value is `false`. Note that this option requires Flutter v1.20+ and should only be used on Android 10+ for release apps, as animations will drop frames on < Android 10 (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
+* `useOnRenderProcessGone`: Set to `true` to be able to listen at the `androidOnRenderProcessGone` event. The default value is `false`.
+* `useShouldInterceptRequest`: Set to `true` to be able to listen at the `androidShouldInterceptRequest` event. The default value is `false`.
+* `useWideViewPort`: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
 * `verticalScrollbarPosition`: Set the position of the vertical scroll bar. The default value is `AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT`.
-* `scrollBarDefaultDelayBeforeFade`: Defines the delay in milliseconds that a scrollbar waits before fade out.
-* `scrollbarFadingEnabled`: Define whether scrollbars will fade when the view is not scrolling. The default value is `true`.
-* `scrollBarFadeDuration`: Define the scrollbar fade duration in milliseconds.
-* `rendererPriorityPolicy`: Set the renderer priority policy for this WebView.
-* `disableDefaultErrorPage`: Sets whether the default Android error page should be disabled. The default value is `false`.
 
 ##### `InAppWebView` iOS-specific options
 
-* `disallowOverScroll`: Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
-* `enableViewportScale`: Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
-* `suppressesIncrementalRendering`: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
+* `accessibilityIgnoresInvertColors`: A Boolean value indicating whether the view ignores an accessibility request to invert its colors. The default value is `false`.
 * `allowsAirPlayForMediaPlayback`: Set to `true` to allow AirPlay. The default value is `true`.
 * `allowsBackForwardNavigationGestures`: Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
-* `allowsLinkPreview`: Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
-* `ignoresViewportScaleLimits`: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
 * `allowsInlineMediaPlayback`: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls.
+* `allowsLinkPreview`: Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
 * `allowsPictureInPictureMediaPlayback`: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
-* `isFraudulentWebsiteWarningEnabled`: A Boolean value indicating whether warnings should be shown for suspected fraudulent content such as phishing or malware.
-* `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
-* `dataDetectorTypes`: Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
-* `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
-* `automaticallyAdjustsScrollIndicatorInsets`: Configures whether the scroll indicator insets are automatically adjusted by the system. The default value is `false`.
-* `accessibilityIgnoresInvertColors`: A Boolean value indicating whether the view ignores an accessibility request to invert its colors. The default value is `false`.
-* `decelerationRate`: A `IOSUIScrollViewDecelerationRate` value that determines the rate of deceleration after the user lifts their finger. The default value is `IOSUIScrollViewDecelerationRate.NORMAL`.
-* `alwaysBounceVertical`: A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content. The default value is `false`.
 * `alwaysBounceHorizontal`: A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view. The default value is `false`.
-* `scrollsToTop`: A Boolean value that controls whether the scroll-to-top gesture is enabled. The default value is `true`.
+* `alwaysBounceVertical`: A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content. The default value is `false`.
+* `automaticallyAdjustsScrollIndicatorInsets`: Configures whether the scroll indicator insets are automatically adjusted by the system. The default value is `false`.
+* `contentInsetAdjustmentBehavior`: Configures how safe area insets are added to the adjusted content inset. The default value is `IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER`.
+* `dataDetectorTypes`: Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
+* `decelerationRate`: A `IOSUIScrollViewDecelerationRate` value that determines the rate of deceleration after the user lifts their finger. The default value is `IOSUIScrollViewDecelerationRate.NORMAL`.
+* `disallowOverScroll`: Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
+* `enableViewportScale`: Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
+* `ignoresViewportScaleLimits`: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
+* `isFraudulentWebsiteWarningEnabled`: A Boolean value indicating whether warnings should be shown for suspected fraudulent content such as phishing or malware.
 * `isPagingEnabled`: A Boolean value that determines whether paging is enabled for the scroll view. The default value is `false`.
 * `maximumZoomScale`: A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
 * `minimumZoomScale`: A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
-* `contentInsetAdjustmentBehavior`: Configures how safe area insets are added to the adjusted content inset. The default value is `IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER`.
+* `scrollsToTop`: A Boolean value that controls whether the scroll-to-top gesture is enabled. The default value is `true`.
+* `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
+* `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
+* `suppressesIncrementalRendering`: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
 
 #### `InAppWebView` Events
 
@@ -701,6 +714,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -711,8 +727,8 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  InAppWebViewController webView;
-  ContextMenu contextMenu;
+  InAppWebViewController? webView;
+  ContextMenu? contextMenu;
   String url = "";
   double progress = 0;
 
@@ -729,7 +745,7 @@ class _MyAppState extends State<MyApp> {
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
-          print(await webView.getSelectedText());
+          print(await webView?.getSelectedText());
         },
         onHideContextMenu: () {
           print("onHideContextMenu");
@@ -777,23 +793,23 @@ class _MyAppState extends State<MyApp> {
                     initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
                         crossPlatform: InAppWebViewOptions(
-                          debuggingEnabled: true,
+
                         )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },
-                    onLoadStart: (InAppWebViewController controller, String url) {
+                    onLoadStart: (controller, url) {
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
-                    onLoadStop: (InAppWebViewController controller, String url) async {
+                    onLoadStop: (controller, url) async {
                       setState(() {
-                        this.url = url;
+                        this.url = url ?? '';
                       });
                     },
-                    onProgressChanged: (InAppWebViewController controller, int progress) {
+                    onProgressChanged: (controller, progress) {
                       setState(() {
                         this.progress = progress / 100;
                       });
@@ -807,25 +823,19 @@ class _MyAppState extends State<MyApp> {
                   RaisedButton(
                     child: Icon(Icons.arrow_back),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.goBack();
-                      }
+                      webView?.goBack();
                     },
                   ),
                   RaisedButton(
                     child: Icon(Icons.arrow_forward),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.goForward();
-                      }
+                      webView?.goForward();
                     },
                   ),
                   RaisedButton(
                     child: Icon(Icons.refresh),
                     onPressed: () {
-                      if (webView != null) {
-                        webView.reload();
-                      }
+                      webView?.reload();
                     },
                   ),
                 ],
@@ -858,12 +868,16 @@ As `InAppWebView`, it has the same options and events. Use `InAppWebViewControll
 Example:
 ```dart
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -874,7 +888,7 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  HeadlessInAppWebView headlessWebView;
+  HeadlessInAppWebView? headlessWebView;
   String url = "";
 
   @override
@@ -885,7 +899,7 @@ class _MyAppState extends State<MyApp> {
       initialUrl: "https://flutter.dev/",
       initialOptions: InAppWebViewGroupOptions(
         crossPlatform: InAppWebViewOptions(
-          debuggingEnabled: true,
+
         ),
       ),
       onWebViewCreated: (controller) {
@@ -897,19 +911,19 @@ class _MyAppState extends State<MyApp> {
       onLoadStart: (controller, url) async {
         print("onLoadStart $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
       onLoadStop: (controller, url) async {
         print("onLoadStop $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
-      onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
+      onUpdateVisitedHistory: (controller, url, androidIsReload) {
         print("onUpdateVisitedHistory $url");
         setState(() {
-          this.url = url;
+          this.url = url ?? '';
         });
       },
     );
@@ -918,7 +932,7 @@ class _MyAppState extends State<MyApp> {
   @override
   void dispose() {
     super.dispose();
-    headlessWebView.dispose();
+    headlessWebView?.dispose();
   }
 
   @override
@@ -938,8 +952,8 @@ class _MyAppState extends State<MyApp> {
               Center(
                 child: RaisedButton(
                     onPressed: () async {
-                      await headlessWebView.dispose();
-                      await headlessWebView.run();
+                      await headlessWebView?.dispose();
+                      await headlessWebView?.run();
                     },
                     child: Text("Run HeadlessInAppWebView")),
               ),
@@ -947,7 +961,7 @@ class _MyAppState extends State<MyApp> {
                 child: RaisedButton(
                     onPressed: () async {
                       try {
-                        await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
+                        await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
                       } on MissingPluginException catch(e) {
                         print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
                       }
@@ -957,7 +971,7 @@ class _MyAppState extends State<MyApp> {
               Center(
                 child: RaisedButton(
                     onPressed: () {
-                      headlessWebView.dispose();
+                      headlessWebView?.dispose();
                     },
                     child: Text("Dispose HeadlessInAppWebView")),
               )
@@ -977,6 +991,8 @@ In-App Browser using native WebView.
 Create a Class that extends the `InAppBrowser` Class in order to override the callbacks to manage the browser events.
 Example:
 ```dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -987,22 +1003,22 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future onLoadStart(String url) async {
+  Future onLoadStart(url) async {
     print("\n\nStarted $url\n\n");
   }
 
   @override
-  Future onLoadStop(String url) async {
+  Future onLoadStop(url) async {
     print("\n\nStopped $url\n\n");
   }
 
   @override
-  void onLoadError(String url, int code, String message) {
+  void onLoadError(url, code, message) {
     print("Can't load $url.. Error: $message");
   }
 
   @override
-  void onProgressChanged(int progress) {
+  void onProgressChanged(progress) {
     print("Progress: $progress");
   }
 
@@ -1024,7 +1040,7 @@ class MyInAppBrowser extends InAppBrowser {
         "ms ---> duration: " +
         response.duration.toString() +
         "ms " +
-        response.url);
+        (response.url ?? ''));
   }
 
   @override
@@ -1032,13 +1048,16 @@ class MyInAppBrowser extends InAppBrowser {
     print("""
     console output:
       message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel.toValue()}
+      messageLevel: ${consoleMessage.messageLevel?.toValue()}
    """);
   }
 }
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(
     new MyApp(),
   );
@@ -1046,7 +1065,7 @@ void main() {
 
 class MyApp extends StatefulWidget {
   final MyInAppBrowser browser = new MyInAppBrowser();
-  
+
   @override
   _MyAppState createState() => new _MyAppState();
 }
@@ -1111,27 +1130,27 @@ Specific options of the `InAppBrowser` class are:
 ##### `InAppBrowser` Cross-platform options
 
 * `hidden`: Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally. The default value is `false`.
-* `toolbarTop`: Set to `false` to hide the toolbar at the top of the WebView. The default value is `true`.
-* `toolbarTopBackgroundColor`: Set the custom background color of the toolbar at the top.
 * `hideUrlBar`: Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
+* `toolbarTopBackgroundColor`: Set the custom background color of the toolbar at the top.
+* `toolbarTop`: Set to `false` to hide the toolbar at the top of the WebView. The default value is `true`.
 
 ##### `InAppBrowser` Android-specific options
 
-* `hideTitleBar`: Set to `true` if you want the title should be displayed. The default value is `false`.
-* `toolbarTopFixedTitle`: Set the action bar's title.
 * `closeOnCannotGoBack`: Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
+* `hideTitleBar`: Set to `true` if you want the title should be displayed. The default value is `false`.
 * `progressBar`: Set to `false` to hide the progress bar at the bottom of the toolbar at the top. The default value is `true`.
+* `toolbarTopFixedTitle`: Set the action bar's title.
 
 ##### `InAppBrowser` iOS-specific options
 
-* `toolbarBottom`: Set to `false` to hide the toolbar at the bottom of the WebView. The default value is `true`.
-* `toolbarBottomBackgroundColor`: Set the custom background color of the toolbar at the bottom.
-* `toolbarBottomTranslucent`: Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
 * `closeButtonCaption`: Set the custom text for the close button.
 * `closeButtonColor`: Set the custom color for the close button.
 * `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
-* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 * `spinner`: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
+* `toolbarBottomBackgroundColor`: Set the custom background color of the toolbar at the bottom.
+* `toolbarBottomTranslucent`: Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
+* `toolbarBottom`: Set to `false` to hide the toolbar at the bottom of the WebView. The default value is `true`.
+* `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 
 #### `InAppBrowser` Events
 
@@ -1145,27 +1164,31 @@ Specific events of the `InAppBrowser` class are:
 
 [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 
+If you want to use the `ChromeSafariBrowser` on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` (you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
+
 You can initialize the `ChromeSafariBrowser` instance with an `InAppBrowser` fallback instance.
 
 Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:
 ```dart
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 class MyInAppBrowser extends InAppBrowser {
 
   @override
-  Future onLoadStart(String url) async {
+  Future onLoadStart(url) async {
     print("\n\nStarted $url\n\n");
   }
 
   @override
-  Future onLoadStop(String url) async {
+  Future onLoadStop(url) async {
     print("\n\nStopped $url\n\n");
   }
 
   @override
-  void onLoadError(String url, int code, String message) {
+  void onLoadError(url, code, message) {
     print("\n\nCan't load $url.. Error: $message\n\n");
   }
 
@@ -1196,11 +1219,12 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
   }
 }
 
-void main() {
+Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  runApp(
-    new MyApp(),
-  );
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
+  runApp(new MyApp());
 }
 
 class MyApp extends StatefulWidget {
@@ -1262,11 +1286,11 @@ Screenshots:
 
 #### `ChromeSafariBrowser` Methods
 
-* `open({@required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
-* `isOpened`: Returns `true` if the `ChromeSafariBrowser` instance is opened, otherwise `false`.
-* `close`: Closes the `ChromeSafariBrowser` instance.
 * `addMenuItem`: Adds a `ChromeSafariBrowserMenuItem` to the menu.
 * `addMenuItems`: Adds a list of `ChromeSafariBrowserMenuItem` to the menu.
+* `close`: Closes the `ChromeSafariBrowser` instance.
+* `isOpened`: Returns `true` if the `ChromeSafariBrowser` instance is opened, otherwise `false`.
+* `open({@required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
 * `static isAvailable`: On Android, returns `true` if Chrome Custom Tabs is available. On iOS, returns `true` if SFSafariViewController is available. Otherwise returns `false`.
 
 #### `ChromeSafariBrowser` options
@@ -1274,18 +1298,18 @@ Screenshots:
 ##### `ChromeSafariBrowser` Android-specific options
 
 * `addDefaultShareMenuItem`: Set to `false` if you don't want the default share item to the menu. The default value is `true`.
-* `showTitle`: Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
-* `toolbarBackgroundColor`: Set the custom background color of the toolbar.
 * `enableUrlBarHiding`: Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
 * `instantAppsEnabled`: Set to `true` to enable Instant Apps. The default value is `false`.
-* `packageName`: Set the name of the application package to handle the intent (for example `com.android.chrome`), or null to allow any application package.
 * `keepAliveEnabled`: Set to `true` to enable Keep Alive. The default value is `false`.
+* `packageName`: Set the name of the application package to handle the intent (for example `com.android.chrome`), or null to allow any application package.
+* `showTitle`: Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
+* `toolbarBackgroundColor`: Set the custom background color of the toolbar.
 
 ##### `ChromeSafariBrowser` iOS-specific options
 
-* `entersReaderIfAvailable`: Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
 * `barCollapsingEnabled`: Set to `true` to enable bar collapsing. The default value is `false`.
 * `dismissButtonStyle`: Set the custom style for the dismiss button. The default value is `IOSSafariDismissButtonStyle.DONE`.
+* `entersReaderIfAvailable`: Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
 * `preferredBarTintColor`: Set the custom background color of the navigation bar and the toolbar.
 * `preferredControlTintColor`: Set the custom color of the control buttons on the navigation bar and the toolbar.
 * `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
@@ -1310,6 +1334,9 @@ InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await localhostServer.start();
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  }
   runApp(new MyApp());
 }
 
@@ -1330,17 +1357,17 @@ Future main() async {
                   initialUrl: "http://localhost:8080/assets/index.html",
                   initialHeaders: {},
                   initialOptions: InAppWebViewGroupOptions(
-                      inAppWebViewOptions: InAppWebViewOptions(
-                        debuggingEnabled: true,
+                      crossPlatform: InAppWebViewOptions(
+
                       )
                   ),
-                  onWebViewCreated: (InAppWebViewController controller) {
+                  onWebViewCreated: (controller) {
   
                   },
-                  onLoadStart: (InAppWebViewController controller, String url) {
+                  onLoadStart: (controller, url) {
   
                   },
-                  onLoadStop: (InAppWebViewController controller, String url) {
+                  onLoadStop: (controller, url) {
   
                   },
                 ),

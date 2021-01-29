@@ -176,7 +176,9 @@ public class InAppWebViewClient extends WebViewClient {
     if (webView.options.useOnLoadResource) {
       js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
     }
-    js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS.replaceAll("[\r\n]+", "");
+    if (!webView.options.useHybridComposition) {
+      js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS.replaceAll("[\r\n]+", "");
+    }
     js += InAppWebView.onWindowFocusEventJS.replaceAll("[\r\n]+", "");
     js += InAppWebView.onWindowBlurEventJS.replaceAll("[\r\n]+", "");
     js += InAppWebView.printJS.replaceAll("[\r\n]+", "");

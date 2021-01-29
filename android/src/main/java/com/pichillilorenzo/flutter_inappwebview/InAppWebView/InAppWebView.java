@@ -677,9 +677,6 @@ final public class InAppWebView extends InputAwareWebView {
     WebSettings settings = getSettings();
 
     settings.setJavaScriptEnabled(options.javaScriptEnabled);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      setWebContentsDebuggingEnabled(options.debuggingEnabled);
-    }
     settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
     settings.setBuiltInZoomControls(options.builtInZoomControls);
     settings.setDisplayZoomControls(options.displayZoomControls);
@@ -853,7 +850,7 @@ final public class InAppWebView extends InputAwareWebView {
       }
     };
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !options.useHybridComposition) {
       checkContextMenuShouldBeClosedTask = new Runnable() {
         @Override
         public void run() {
@@ -1132,9 +1129,6 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("javaScriptEnabled") != null && options.javaScriptEnabled != newOptions.javaScriptEnabled)
       settings.setJavaScriptEnabled(newOptions.javaScriptEnabled);
-
-    if (newOptionsMap.get("debuggingEnabled") != null && options.debuggingEnabled != newOptions.debuggingEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)
-      setWebContentsDebuggingEnabled(newOptions.debuggingEnabled);
 
     if (newOptionsMap.get("useShouldInterceptAjaxRequest") != null && options.useShouldInterceptAjaxRequest != newOptions.useShouldInterceptAjaxRequest) {
       String placeholderValue = newOptions.useShouldInterceptAjaxRequest ? "true" : "false";
@@ -1505,14 +1499,11 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   @Override
-  protected void onScrollChanged (int l,
-                                  int t,
-                                  int oldl,
-                                  int oldt) {
-    super.onScrollChanged(l, t, oldl, oldt);
-
-    int x = (int) (l/scale);
-    int y = (int) (t/scale);
+  protected void onScrollChanged (int x,
+                                  int y,
+                                  int oldX,
+                                  int oldY) {
+    super.onScrollChanged(x, y, oldX, oldY);
 
     if (floatingContextMenu != null) {
       floatingContextMenu.setAlpha(0f);
@@ -1662,12 +1653,18 @@ final public class InAppWebView extends InputAwareWebView {
 
   @Override
   public ActionMode startActionMode(ActionMode.Callback callback) {
+    if (options.useHybridComposition && !options.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
+      return super.startActionMode(callback);
+    }
     return rebuildActionMode(super.startActionMode(callback), callback);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
   public ActionMode startActionMode(ActionMode.Callback callback, int type) {
+    if (options.useHybridComposition && !options.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
+      return super.startActionMode(callback, type);
+    }
     return rebuildActionMode(super.startActionMode(callback, type), callback);
   }
 
@@ -1711,6 +1708,7 @@ final public class InAppWebView extends InputAwareWebView {
         final MenuItem menuItem = actionMenu.getItem(i);
         final int itemId = menuItem.getItemId();
         final String itemTitle = menuItem.getTitle().toString();
+
         TextView text = (TextView) LayoutInflater.from(this.getContext())
                 .inflate(R.layout.floating_action_mode_item, this, false);
         text.setText(itemTitle);
@@ -1855,7 +1853,7 @@ final public class InAppWebView extends InputAwareWebView {
             "    var clientRect = range.getClientRects();" +
             "    if (clientRect.length > 0) {" +
             "      rangeY = clientRect[0].y;" +
-            "    } else if (document.activeElement) {" +
+            "    } else if (document.activeElement != null && document.activeElement.tagName.toLowerCase() !== 'iframe') {" +
             "      var boundingClientRect = document.activeElement.getBoundingClientRect();" +
             "      rangeY = boundingClientRect.y;" +
             "    }" +
@@ -1865,7 +1863,7 @@ final public class InAppWebView extends InputAwareWebView {
       @Override
       public void onReceiveValue(String value) {
         if (floatingContextMenu != null) {
-          if (value != null) {
+          if (value != null && !value.equals("null")) {
             int x = contextMenuPoint.x;
             int y = (int) ((Float.parseFloat(value) * scale) + (floatingContextMenu.getHeight() / 3.5));
             contextMenuPoint.y = y;
@@ -1873,6 +1871,7 @@ final public class InAppWebView extends InputAwareWebView {
           } else {
             floatingContextMenu.setVisibility(View.VISIBLE);
             floatingContextMenu.animate().alpha(1f).setDuration(100).setListener(null);
+            onFloatingActionGlobalLayout(contextMenuPoint.x, contextMenuPoint.y);
           }
         }
       }

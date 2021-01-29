@@ -75,6 +75,8 @@ or **Android API 19+** if you enable the `useHybridComposition` Android-specific
 - Check the official [Network security configuration - "Opt out of cleartext traffic"](https://developer.android.com/training/articles/security-config#CleartextTrafficPermitted) section.
 - Also, check this StackOverflow issue answer: [Cleartext HTTP traffic not permitted](https://stackoverflow.com/a/50834600/4637638).
 
+If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` (you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
+
 #### Debugging Android WebViews
 On Android, in order to enable/disable debugging WebViews using `chrome://inspect` on Chrome, you should use the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method.
 
@@ -205,7 +207,7 @@ Classes:
 - [ContextMenu](#contextmenu-class): This class represents the WebView context menu.
 - [HeadlessInAppWebView](#headlessinappwebview-class): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
-- [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS. If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` (you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
+- [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
 - [CookieManager](#cookiemanager-class): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances. **NOTE for iOS**: available from iOS 11.0+.
 - [HttpAuthCredentialDatabase](#httpauthcredentialdatabase-class): This class implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.

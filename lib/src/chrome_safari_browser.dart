@@ -11,7 +11,7 @@ import 'in_app_browser.dart';
 ///
 ///[browserFallback] represents the [InAppBrowser] instance fallback in case `Chrome Custom Tabs`/`SFSafariViewController` is not available.
 ///
-///Note: Requires modification of Android 11+: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above
+///**NOTE**: If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` (you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
 class ChromeSafariBrowser {
   late String uuid;
   InAppBrowser? browserFallback;

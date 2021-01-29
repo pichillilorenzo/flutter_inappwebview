@@ -79,7 +79,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
       intent = new Intent(activity, ChromeCustomTabsActivity.class);
     }
     // check for webview fallback
-    else if (!CustomTabActivityHelper.isAvailable(activity) && uuidFallback != null) {
+    else if (uuidFallback != null) {
       Log.d(LOG_TAG, "WebView fallback declared.");
       // overwrite with extras fallback parameters
       extras.putString("uuid", uuidFallback);

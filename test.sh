@@ -1,4 +1,5 @@
 #!/bin/bash
+
 # on linux/macOS local IP can be found using $(ipconfig getifaddr en0)
 export NODE_SERVER_IP=$1
 dart tool/env.dart
@@ -7,5 +8,5 @@ node index.js &
 flutter clean
 cd ../example
 flutter clean
-flutter driver -t test_driver/app.dart
+flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart
 kill $(jobs -p)

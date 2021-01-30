@@ -10,27 +10,36 @@ class ContextMenu {
   ///Event fired when the context menu for this WebView is being built.
   ///
   ///[hitTestResult] represents the hit result for hitting an HTML elements.
-  final void Function(InAppWebViewHitTestResult hitTestResult) onCreateContextMenu;
+  final void Function(InAppWebViewHitTestResult hitTestResult)?
+      onCreateContextMenu;
 
   ///Event fired when the context menu for this WebView is being hidden.
-  final void Function() onHideContextMenu;
+  final void Function()? onHideContextMenu;
 
   ///Event fired when a context menu item has been clicked.
   ///
   ///[contextMenuItemClicked] represents the [ContextMenuItem] clicked.
-  final void Function(ContextMenuItem contextMenuItemClicked) onContextMenuActionItemClicked;
+  final void Function(ContextMenuItem contextMenuItemClicked)?
+      onContextMenuActionItemClicked;
 
   ///Context menu options.
-  final ContextMenuOptions options;
+  final ContextMenuOptions? options;
 
   ///List of the custom [ContextMenuItem].
   final List<ContextMenuItem> menuItems;
 
-  ContextMenu({this.menuItems = const [], this.onCreateContextMenu, this.onHideContextMenu, this.options, this.onContextMenuActionItemClicked})
-      : assert(menuItems != null);
+  ContextMenu(
+      {this.menuItems = const [],
+      this.onCreateContextMenu,
+      this.onHideContextMenu,
+      this.options,
+      this.onContextMenuActionItemClicked});
 
   Map<String, dynamic> toMap() {
-    return {"menuItems": menuItems.map((menuItem) => menuItem?.toMap()).toList(), "options": options?.toMap()};
+    return {
+      "menuItems": menuItems.map((menuItem) => menuItem.toMap()).toList(),
+      "options": options?.toMap()
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -46,18 +55,22 @@ class ContextMenu {
 ///Class that represent an item of the [ContextMenu].
 class ContextMenuItem {
   ///Android menu item ID.
-  int androidId;
+  int? androidId;
 
   ///iOS menu item ID.
-  String iosId;
+  String? iosId;
 
   ///Menu item title.
   String title;
 
   ///Menu item action that will be called when an user clicks on it.
-  Function() action;
+  Function()? action;
 
-  ContextMenuItem({@required this.androidId, @required this.iosId, @required this.title, this.action});
+  ContextMenuItem(
+      {this.androidId,
+      this.iosId,
+      required this.title,
+      this.action});
 
   Map<String, dynamic> toMap() {
     return {"androidId": androidId, "iosId": iosId, "title": title};

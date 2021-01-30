@@ -1157,7 +1157,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.maximumZoomScale = CGFloat(options.maximumZoomScale)
             scrollView.minimumZoomScale = CGFloat(options.minimumZoomScale)
             
-            // options.debuggingEnabled is always enabled for iOS,
+            // debugging is always enabled for iOS,
             // there isn't any option to set about it such as on Android.
             
             if options.clearCache {
@@ -1355,6 +1355,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.allowsInlineMediaPlayback = options.allowsInlineMediaPlayback
             configuration.suppressesIncrementalRendering = options.suppressesIncrementalRendering
             configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: options.selectionGranularity)!
+            
+            if options.allowUniversalAccessFromFileURLs {
+                configuration.setValue(options.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
+            }
+            
+            if options.allowFileAccessFromFileURLs {
+                configuration.preferences.setValue(options.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
+            }
             
             if #available(iOS 9.0, *) {
                 if options.incognito {
@@ -1752,6 +1760,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
+        if newOptionsMap["allowUniversalAccessFromFileURLs"] != nil && options?.allowUniversalAccessFromFileURLs != newOptions.allowUniversalAccessFromFileURLs {
+            configuration.setValue(newOptions.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
+        }
+        
+        if newOptionsMap["allowFileAccessFromFileURLs"] != nil && options?.allowFileAccessFromFileURLs != newOptions.allowFileAccessFromFileURLs {
+            configuration.preferences.setValue(newOptions.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
+        }
+        
         if newOptionsMap["clearCache"] != nil && newOptions.clearCache {
             clearCache()
         }
@@ -2029,7 +2045,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
-            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest {
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNegotiate ||
+            challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodNTLM {
             let host = challenge.protectionSpace.host
             let prot = challenge.protectionSpace.protocol
             let realm = challenge.protectionSpace.realm
@@ -2502,6 +2520,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
                 if !handledByClient, InAppWebView.windowWebViews[windowId] != nil {
                     InAppWebView.windowWebViews.removeValue(forKey: windowId)
+                    if let url = navigationAction.request.url {
+                        self.loadUrl(url: url, headers: nil)
+                    }
                 }
             }
         })

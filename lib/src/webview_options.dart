@@ -14,7 +14,7 @@ class WebViewOptions {
   }
 
   static WebViewOptions fromMap(Map<String, dynamic> map) {
-    return null;
+    return new WebViewOptions();
   }
 
   WebViewOptions copy() {
@@ -37,7 +37,7 @@ class BrowserOptions {
   }
 
   static BrowserOptions fromMap(Map<String, dynamic> map) {
-    return null;
+    return new BrowserOptions();
   }
 
   BrowserOptions copy() {
@@ -60,7 +60,7 @@ class ChromeSafariBrowserOptions {
   }
 
   static ChromeSafariBrowserOptions fromMap(Map<String, dynamic> map) {
-    return null;
+    return new ChromeSafariBrowserOptions();
   }
 
   ChromeSafariBrowserOptions copy() {
@@ -105,12 +105,6 @@ class InAppWebViewOptions
   ///Set to `true` to enable JavaScript. The default value is `true`.
   bool javaScriptEnabled;
 
-  ///Enables debugging of web contents (HTML / CSS / JavaScript) loaded into any WebViews of this application.
-  ///This flag can be enabled in order to facilitate debugging of web layouts and JavaScript code running inside WebViews. The default is `false`.
-  ///
-  ///**NOTE**: on iOS the debugging mode is always enabled.
-  bool debuggingEnabled;
-
   ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   bool javaScriptCanOpenWindowsAutomatically;
 
@@ -120,7 +114,7 @@ class InAppWebViewOptions
   bool mediaPlaybackRequiresUserGesture;
 
   ///Sets the minimum font size. The default value is `8` for Android, `0` for iOS.
-  int minimumFontSize;
+  int? minimumFontSize;
 
   ///Define whether the vertical scrollbar should be drawn or not. The default value is `true`.
   bool verticalScrollBarEnabled;
@@ -141,7 +135,7 @@ class InAppWebViewOptions
   ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
   ///
   ///**NOTE**: available on iOS 13.0+.
-  UserPreferredContentMode preferredContentMode;
+  UserPreferredContentMode? preferredContentMode;
 
   ///Set to `true` to be able to listen at the [shouldInterceptAjaxRequest] event. The default value is `false`.
   bool useShouldInterceptAjaxRequest;
@@ -152,6 +146,8 @@ class InAppWebViewOptions
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
   ///
   ///**NOTE**: available on iOS 9.0+.
+  ///On Android, by setting this option to `true`, it will clear all the cookies of all WebView instances,
+  ///because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS.
   bool incognito;
 
   ///Sets whether WebView should use browser caching. The default value is `true`.
@@ -174,6 +170,28 @@ class InAppWebViewOptions
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   bool supportZoom;
 
+  ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from other file scheme URLs.
+  ///Note that some accesses such as image HTML elements don't follow same-origin rules and aren't affected by this setting.
+  ///
+  ///Don't enable this setting if you open files that may be created or altered by external sources.
+  ///Enabling this setting allows malicious scripts loaded in a `file://` context to access arbitrary local files including WebView cookies and app private data.
+  ///
+  ///Note that the value of this setting is ignored if the value of [allowUniversalAccessFromFileURLs] is `true`.
+  ///
+  ///The default value is `false`.
+  bool allowFileAccessFromFileURLs;
+
+  ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from any origin.
+  ///This includes access to content from other file scheme URLs or web contexts.
+  ///Note that some access such as image HTML elements doesn't follow same-origin rules and isn't affected by this setting.
+  ///
+  ///Don't enable this setting if you open files that may be created or altered by external sources.
+  ///Enabling this setting allows malicious scripts loaded in a `file://` context to launch cross-site scripting attacks,
+  ///either accessing arbitrary local files including WebView cookies, app private data or even credentials used on arbitrary web sites.
+  ///
+  ///The default value is `false`.
+  bool allowUniversalAccessFromFileURLs;
+
   InAppWebViewOptions(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
@@ -182,7 +200,6 @@ class InAppWebViewOptions
       this.userAgent = "",
       this.applicationNameForUserAgent = "",
       this.javaScriptEnabled = true,
-      this.debuggingEnabled = false,
       this.javaScriptCanOpenWindowsAutomatically = false,
       this.mediaPlaybackRequiresUserGesture = true,
       this.minimumFontSize,
@@ -199,7 +216,9 @@ class InAppWebViewOptions
       this.disableVerticalScroll = false,
       this.disableHorizontalScroll = false,
       this.disableContextMenu = false,
-      this.supportZoom = true}) {
+      this.supportZoom = true,
+      this.allowFileAccessFromFileURLs = false,
+      this.allowUniversalAccessFromFileURLs = false}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize = defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
@@ -221,7 +240,6 @@ class InAppWebViewOptions
       "userAgent": userAgent,
       "applicationNameForUserAgent": applicationNameForUserAgent,
       "javaScriptEnabled": javaScriptEnabled,
-      "debuggingEnabled": debuggingEnabled,
       "javaScriptCanOpenWindowsAutomatically":
           javaScriptCanOpenWindowsAutomatically,
       "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
@@ -238,13 +256,15 @@ class InAppWebViewOptions
       "disableVerticalScroll": disableVerticalScroll,
       "disableHorizontalScroll": disableHorizontalScroll,
       "disableContextMenu": disableContextMenu,
-      "supportZoom": supportZoom
+      "supportZoom": supportZoom,
+      "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
+      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs
     };
   }
 
   static InAppWebViewOptions fromMap(Map<String, dynamic> map) {
     List<ContentBlocker> contentBlockers = [];
-    List<dynamic> contentBlockersMapList = map["contentBlockers"];
+    List<dynamic>? contentBlockersMapList = map["contentBlockers"];
     if (contentBlockersMapList != null) {
       contentBlockersMapList.forEach((contentBlocker) {
         contentBlockers.add(ContentBlocker.fromMap(
@@ -261,7 +281,6 @@ class InAppWebViewOptions
     options.userAgent = map["userAgent"];
     options.applicationNameForUserAgent = map["applicationNameForUserAgent"];
     options.javaScriptEnabled = map["javaScriptEnabled"];
-    options.debuggingEnabled = map["debuggingEnabled"];
     options.javaScriptCanOpenWindowsAutomatically =
         map["javaScriptCanOpenWindowsAutomatically"];
     options.mediaPlaybackRequiresUserGesture =
@@ -284,6 +303,8 @@ class InAppWebViewOptions
     options.disableHorizontalScroll = map["disableHorizontalScroll"];
     options.disableContextMenu = map["disableContextMenu"];
     options.supportZoom = map["supportZoom"];
+    options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
+    options.allowUniversalAccessFromFileURLs = map["allowUniversalAccessFromFileURLs"];
     return options;
   }
 
@@ -339,28 +360,18 @@ class AndroidInAppWebViewOptions
   ///Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
   ///
   ///**NOTE**: available on Android 21+.
-  AndroidMixedContentMode mixedContentMode;
+  AndroidMixedContentMode? mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
   bool allowContentAccess;
 
   ///Enables or disables file access within WebView. Note that this enables or disables file system access only.
-  ///Assets and resources are still accessible using \file:///android_asset` and `file:///android_res`. The default value is `true`.
+  ///Assets and resources are still accessible using `file:///android_asset` and `file:///android_res`. The default value is `true`.
   bool allowFileAccess;
-
-  ///Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from other file scheme URLs.
-  ///Note that the value of this setting is ignored if the value of [allowFileAccessFromFileURLs] is `true`.
-  ///Note too, that this setting affects only JavaScript access to file scheme resources. The default value is `false`.
-  bool allowFileAccessFromFileURLs;
-
-  ///Sets whether JavaScript running in the context of a file scheme URL should be allowed to access content from any origin.
-  ///Note that this setting affects only JavaScript access to file scheme resources.
-  ///This includes access to content from other file scheme URLs. The default value is `false`.
-  bool allowUniversalAccessFromFileURLs;
 
   ///Sets the path to the Application Caches files. In order for the Application Caches API to be enabled, this option must be set a path to which the application can write.
   ///This option is used one time: repeated calls are ignored.
-  String appCachePath;
+  String? appCachePath;
 
   ///Sets whether the WebView should not load image resources from the network (resources accessed via http and https URI schemes). The default value is `false`.
   bool blockNetworkImage;
@@ -370,7 +381,7 @@ class AndroidInAppWebViewOptions
 
   ///Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed.
   ///When navigating back, content is not revalidated, instead the content is just retrieved from the cache. The default value is [AndroidCacheMode.LOAD_DEFAULT].
-  AndroidCacheMode cacheMode;
+  AndroidCacheMode? cacheMode;
 
   ///Sets the cursive font family name. The default value is `"cursive"`.
   String cursiveFontFamily;
@@ -387,7 +398,7 @@ class AndroidInAppWebViewOptions
   ///Disables the action mode menu items according to menuItems flag.
   ///
   ///**NOTE**: available on Android 24+.
-  AndroidActionModeMenuItem disabledActionModeMenuItems;
+  AndroidActionModeMenuItem? disabledActionModeMenuItems;
 
   ///Sets the fantasy font family name. The default value is `"fantasy"`.
   String fantasyFontFamily;
@@ -398,13 +409,13 @@ class AndroidInAppWebViewOptions
   ///Set the force dark mode for this WebView. The default value is [AndroidForceDark.FORCE_DARK_OFF].
   ///
   ///**NOTE**: available on Android 29+.
-  AndroidForceDark forceDark;
+  AndroidForceDark? forceDark;
 
   ///Sets whether Geolocation API is enabled. The default value is `true`.
   bool geolocationEnabled;
 
   ///Sets the underlying layout algorithm. This will cause a re-layout of the WebView.
-  AndroidLayoutAlgorithm layoutAlgorithm;
+  AndroidLayoutAlgorithm? layoutAlgorithm;
 
   ///Sets whether the WebView loads pages in overview mode, that is, zooms out the content to fit on screen by width.
   ///This setting is taken into account when the content width is greater than the width of the WebView control, for example, when [useWideViewPort] is enabled.
@@ -468,7 +479,7 @@ class AndroidInAppWebViewOptions
 
   ///Regular expression used by [shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
   ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
-  String regexToCancelSubFramesLoading;
+  String? regexToCancelSubFramesLoading;
 
   ///Set to `true` to enable Flutter's new Hybrid Composition. The default value is `false`.
   ///Hybrid Composition is supported starting with Flutter v1.20+.
@@ -486,11 +497,11 @@ class AndroidInAppWebViewOptions
   ///Sets the WebView's over-scroll mode.
   ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
   ///The default value is [AndroidOverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS].
-  AndroidOverScrollMode overScrollMode;
+  AndroidOverScrollMode? overScrollMode;
 
   ///Informs WebView of the network state.
   ///This is used to set the JavaScript property `window.navigator.isOnline` and generates the online/offline event as specified in HTML5, sec. 5.7.7.
-  bool networkAvailable;
+  bool? networkAvailable;
 
   ///Specifies the style of the scrollbars. The scrollbars can be overlaid or inset.
   ///When inset, they add to the padding of the view. And the scrollbars can be drawn inside the padding area or on the edge of the view.
@@ -498,28 +509,28 @@ class AndroidInAppWebViewOptions
   ///you can use SCROLLBARS_INSIDE_OVERLAY or SCROLLBARS_INSIDE_INSET. If you want them to appear at the edge of the view, ignoring the padding,
   ///then you can use SCROLLBARS_OUTSIDE_OVERLAY or SCROLLBARS_OUTSIDE_INSET.
   ///The default value is [AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY].
-  AndroidScrollBarStyle scrollBarStyle;
+  AndroidScrollBarStyle? scrollBarStyle;
 
   ///Sets the position of the vertical scroll bar.
   ///The default value is [AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
-  AndroidVerticalScrollbarPosition verticalScrollbarPosition;
+  AndroidVerticalScrollbarPosition? verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
-  int scrollBarDefaultDelayBeforeFade;
+  int? scrollBarDefaultDelayBeforeFade;
 
   ///Defines whether scrollbars will fade when the view is not scrolling.
   ///The default value is `true`.
   bool scrollbarFadingEnabled;
 
   ///Defines the scrollbar fade duration in milliseconds.
-  int scrollBarFadeDuration;
+  int? scrollBarFadeDuration;
 
   ///Sets the renderer priority policy for this WebView.
-  RendererPriorityPolicy rendererPriorityPolicy;
+  RendererPriorityPolicy? rendererPriorityPolicy;
 
   ///Sets whether the default Android error page should be disabled.
   ///The default value is `false`.
-  bool disableDefaultErrorPage;
+  bool? disableDefaultErrorPage;
 
   AndroidInAppWebViewOptions({
     this.textZoom = 100,
@@ -533,8 +544,6 @@ class AndroidInAppWebViewOptions
     this.mixedContentMode,
     this.allowContentAccess = true,
     this.allowFileAccess = true,
-    this.allowFileAccessFromFileURLs = false,
-    this.allowUniversalAccessFromFileURLs = false,
     this.appCachePath,
     this.blockNetworkImage = false,
     this.blockNetworkLoads = false,
@@ -592,8 +601,6 @@ class AndroidInAppWebViewOptions
       "mixedContentMode": mixedContentMode?.toValue(),
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
-      "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
-      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
       "appCachePath": appCachePath,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
@@ -651,9 +658,6 @@ class AndroidInAppWebViewOptions
         AndroidMixedContentMode.fromValue(map["mixedContentMode"]);
     options.allowContentAccess = map["allowContentAccess"];
     options.allowFileAccess = map["allowFileAccess"];
-    options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-    options.allowUniversalAccessFromFileURLs =
-        map["allowUniversalAccessFromFileURLs"];
     options.appCachePath = map["appCachePath"];
     options.blockNetworkImage = map["blockNetworkImage"];
     options.blockNetworkLoads = map["blockNetworkLoads"];
@@ -899,8 +903,11 @@ class IOSInAppWebViewOptions
     List<IOSWKDataDetectorTypes> dataDetectorTypes = [];
     List<String> dataDetectorTypesList =
         List<String>.from(map["dataDetectorTypes"] ?? []);
-    dataDetectorTypesList.forEach((dataDetectorType) {
-      dataDetectorTypes.add(IOSWKDataDetectorTypes.fromValue(dataDetectorType));
+    dataDetectorTypesList.forEach((dataDetectorTypeValue) {
+      var dataDetectorType = IOSWKDataDetectorTypes.fromValue(dataDetectorTypeValue);
+      if (dataDetectorType != null) {
+        dataDetectorTypes.add(dataDetectorType);
+      }
     });
 
     IOSInAppWebViewOptions options = IOSInAppWebViewOptions();
@@ -920,7 +927,7 @@ class IOSInAppWebViewOptions
     options.isFraudulentWebsiteWarningEnabled =
         map["isFraudulentWebsiteWarningEnabled"];
     options.selectionGranularity =
-        IOSWKSelectionGranularity.fromValue(map["selectionGranularity"]);
+        IOSWKSelectionGranularity.fromValue(map["selectionGranularity"])!;
     options.dataDetectorTypes = dataDetectorTypes;
     options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
     options.automaticallyAdjustsScrollIndicatorInsets =
@@ -928,7 +935,7 @@ class IOSInAppWebViewOptions
     options.accessibilityIgnoresInvertColors =
         map["accessibilityIgnoresInvertColors"];
     options.decelerationRate =
-        IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"]);
+        IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
     options.alwaysBounceVertical = map["alwaysBounceVertical"];
     options.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
     options.scrollsToTop = map["scrollsToTop"];
@@ -937,7 +944,7 @@ class IOSInAppWebViewOptions
     options.minimumZoomScale = map["minimumZoomScale"];
     options.contentInsetAdjustmentBehavior =
         IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
-            map["contentInsetAdjustmentBehavior"]);
+            map["contentInsetAdjustmentBehavior"])!;
     return options;
   }
 
@@ -1127,9 +1134,9 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
     options.closeButtonCaption = map["closeButtonCaption"];
     options.closeButtonColor = map["closeButtonColor"];
     options.presentationStyle =
-        IOSUIModalPresentationStyle.fromValue(map["presentationStyle"]);
+        IOSUIModalPresentationStyle.fromValue(map["presentationStyle"])!;
     options.transitionStyle =
-        IOSUIModalTransitionStyle.fromValue(map["transitionStyle"]);
+        IOSUIModalTransitionStyle.fromValue(map["transitionStyle"])!;
     options.spinner = map["spinner"];
     return options;
   }
@@ -1173,7 +1180,7 @@ class AndroidChromeCustomTabsOptions
   ///value of null, all components in all applications will considered.
   ///If non-null, the Intent can only match the components in the given
   ///application package.
-  String packageName;
+  String? packageName;
 
   ///Set to `true` to enable Keep Alive. The default value is `false`.
   bool keepAliveEnabled;
@@ -1285,13 +1292,13 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     options.entersReaderIfAvailable = map["entersReaderIfAvailable"];
     options.barCollapsingEnabled = map["barCollapsingEnabled"];
     options.dismissButtonStyle =
-        IOSSafariDismissButtonStyle.fromValue(map["dismissButtonStyle"]);
+        IOSSafariDismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
     options.preferredBarTintColor = map["preferredBarTintColor"];
     options.preferredControlTintColor = map["preferredControlTintColor"];
     options.presentationStyle =
-        IOSUIModalPresentationStyle.fromValue(map["presentationStyle"]);
+        IOSUIModalPresentationStyle.fromValue(map["presentationStyle"])!;
     options.transitionStyle =
-        IOSUIModalTransitionStyle.fromValue(map["transitionStyle"]);
+        IOSUIModalTransitionStyle.fromValue(map["transitionStyle"])!;
     return options;
   }
 

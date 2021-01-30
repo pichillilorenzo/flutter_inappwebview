@@ -168,7 +168,6 @@ app.post("/test-ajax-post", (req, res) => {
   res.send(JSON.stringify({
     "firstname": req.body.firstname,
     "lastname": req.body.lastname,
-    "fullname": req.body.firstname + " " + req.body.lastname,
   }))
   res.end()
 })

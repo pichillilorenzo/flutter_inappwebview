@@ -9,4 +9,11 @@
             android:name="io.flutter.embedded_views_preview"
             android:value="true" />
     </application>
+
+    <queries>
+        <intent>
+            <action android:name=
+                "android.support.customtabs.action.CustomTabsService" />
+        </intent>
+    </queries>
 </manifest>

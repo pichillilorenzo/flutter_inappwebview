@@ -18,7 +18,6 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var userAgent = ""
     var applicationNameForUserAgent = ""
     var javaScriptEnabled = true
-    var debuggingEnabled = true
     var javaScriptCanOpenWindowsAutomatically = false
     var mediaPlaybackRequiresUserGesture = true
     var verticalScrollBarEnabled = true
@@ -35,6 +34,8 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var disableHorizontalScroll = false
     var disableContextMenu = false
     var supportZoom = true
+    var allowUniversalAccessFromFileURLs = false
+    var allowFileAccessFromFileURLs = false
 
     var disallowOverScroll = false
     var enableViewportScale = false
@@ -106,6 +107,8 @@ public class InAppWebViewOptions: Options<InAppWebView> {
             realOptions["isPagingEnabled"] = webView.scrollView.isPagingEnabled
             realOptions["maximumZoomScale"] = webView.scrollView.maximumZoomScale
             realOptions["minimumZoomScale"] = webView.scrollView.minimumZoomScale
+            realOptions["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs")
+            realOptions["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs")
         }
         return realOptions
     }

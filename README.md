@@ -394,40 +394,40 @@ Screenshots:
 * `getProgress`: Gets the progress for the current page. The progress value is between 0 and 100.
 * `getHtml`: Gets the content html of the page.
 * `getFavicons`: Gets the list of all favicons for the current page.
-* `loadUrl({@required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
-* `postUrl({@required String url, @required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
-* `loadData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
-* `loadFile({@required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
+* `loadUrl({required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
+* `postUrl({required String url, required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
+* `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
+* `loadFile({required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
 * `reload`: Reloads the WebView.
 * `goBack`: Goes back in the history of the WebView.
 * `canGoBack`: Returns a boolean value indicating whether the WebView can move backward.
 * `goForward`: Goes forward in the history of the WebView.
 * `canGoForward`: Returns a boolean value indicating whether the WebView can move forward.
-* `goBackOrForward({@required int steps})`: Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
-* `canGoBackOrForward({@required int steps})`: Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
-* `goTo({@required WebHistoryItem historyItem})`: Navigates to a `WebHistoryItem` from the back-forward `WebHistory.list` and sets it as the current item.
+* `goBackOrForward({required int steps})`: Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
+* `canGoBackOrForward({required int steps})`: Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
+* `goTo({required WebHistoryItem historyItem})`: Navigates to a `WebHistoryItem` from the back-forward `WebHistory.list` and sets it as the current item.
 * `isLoading`: Check if the WebView instance is in a loading state.
 * `stopLoading`: Stops the WebView from loading.
-* `evaluateJavascript({@required String source})`: Evaluates JavaScript code into the WebView and returns the result of the evaluation.
-* `injectJavascriptFileFromUrl({@required String urlFile})`: Injects an external JavaScript file into the WebView from a defined url.
-* `injectJavascriptFileFromAsset({@required String assetFilePath})`: Injects a JavaScript file into the WebView from the flutter assets directory.
-* `injectCSSCode({@required String source})`: Injects CSS into the WebView.
-* `injectCSSFileFromUrl({@required String urlFile})`: Injects an external CSS file into the WebView from a defined url.
-* `injectCSSFileFromAsset({@required String assetFilePath})`: Injects a CSS file into the WebView from the flutter assets directory.
-* `addJavaScriptHandler({@required String handlerName, @required JavaScriptHandlerCallback callback})`: Adds a JavaScript message handler callback that listen to post messages sent from JavaScript by the handler with name `handlerName`.
-* `removeJavaScriptHandler({@required String handlerName})`: Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
+* `evaluateJavascript({required String source})`: Evaluates JavaScript code into the WebView and returns the result of the evaluation.
+* `injectJavascriptFileFromUrl({required String urlFile})`: Injects an external JavaScript file into the WebView from a defined url.
+* `injectJavascriptFileFromAsset({required String assetFilePath})`: Injects a JavaScript file into the WebView from the flutter assets directory.
+* `injectCSSCode({required String source})`: Injects CSS into the WebView.
+* `injectCSSFileFromUrl({required String urlFile})`: Injects an external CSS file into the WebView from a defined url.
+* `injectCSSFileFromAsset({required String assetFilePath})`: Injects a CSS file into the WebView from the flutter assets directory.
+* `addJavaScriptHandler({required String handlerName, required JavaScriptHandlerCallback callback})`: Adds a JavaScript message handler callback that listen to post messages sent from JavaScript by the handler with name `handlerName`.
+* `removeJavaScriptHandler({required String handlerName})`: Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
 * `takeScreenshot`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
-* `setOptions({@required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
+* `setOptions({required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
 * `getOptions`: Gets the current WebView options. Returns the options with `null` value if they are not set yet.
 * `getCopyBackForwardList`: Gets the `WebHistory` for this WebView. This contains the back/forward list for use in querying each item in the history stack.
 * `clearCache`: Clears all the webview's cache.
-* `findAllAsync({@required String find})`: Finds all instances of find on the page and highlights them. Notifies `onFindResultReceived` listener.
-* `findNext({@required bool forward})`: Highlights and scrolls to the next match found by `findAllAsync()`. Notifies `onFindResultReceived` listener.
+* `findAllAsync({required String find})`: Finds all instances of find on the page and highlights them. Notifies `onFindResultReceived` listener.
+* `findNext({required bool forward})`: Highlights and scrolls to the next match found by `findAllAsync()`. Notifies `onFindResultReceived` listener.
 * `clearMatches`: Clears the highlighting surrounding text matches created by `findAllAsync()`.
 * `getTRexRunnerHtml`: Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerCss()`.
 * `getTRexRunnerCss`: Gets the css of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerHtml()`.
-* `scrollTo({@required int x, @required int y, bool animated = false})`: Scrolls the WebView to the position.
-* `scrollBy({@required int x, @required int y, bool animated = false})`: Moves the scrolled position of the WebView.
+* `scrollTo({required int x, required int y, bool animated = false})`: Scrolls the WebView to the position.
+* `scrollBy({required int x, required int y, bool animated = false})`: Moves the scrolled position of the WebView.
 * `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
 * `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
 * `printCurrentPage`: Prints the current page.
@@ -453,12 +453,12 @@ Screenshots:
 
 Methods available:
 * `length`: Returns an integer representing the number of data items stored in the Storage object.
-* `setItem({@required String key, @required dynamic value})`: When passed a `key` name and `value`, will add that key to the storage, or update that key's value if it already exists.
-* `getItem({@required String key})`: When passed a `key` name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
-* `removeItem({@required String key})`: When passed a `key` name, will remove that key from the given Storage object if it exists.
+* `setItem({required String key, required dynamic value})`: When passed a `key` name and `value`, will add that key to the storage, or update that key's value if it already exists.
+* `getItem({required String key})`: When passed a `key` name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
+* `removeItem({required String key})`: When passed a `key` name, will remove that key from the given Storage object if it exists.
 * `getItems`: Returns the list of all items from the given Storage object.
 * `clear`: Clears all keys stored in a given Storage object.
-* `key({@required int index})`: When passed a number `index`, returns the name of the nth key in a given Storage object.
+* `key({required int index})`: When passed a number `index`, returns the name of the nth key in a given Storage object.
 
 ##### `InAppWebViewController` Android-specific methods
 
@@ -469,15 +469,15 @@ Android-specific methods can be called using the `InAppWebViewController.android
 * `pause`: Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
 * `resume`: Resumes a WebView after a previous call to `pause()`.
 * `getOriginalUrl`: Gets the URL that was originally requested for the current page.
-* `pageDown({@required bool bottom})`: Scrolls the contents of this WebView down by half the page size.
-* `pageUp({@required bool top})`: Scrolls the contents of this WebView up by half the view size.
-* `saveWebArchive({@required String basename, @required bool autoname})`: Saves the current view as a web archive.
+* `pageDown({required bool bottom})`: Scrolls the contents of this WebView down by half the page size.
+* `pageUp({required bool top})`: Scrolls the contents of this WebView up by half the view size.
+* `saveWebArchive({required String basename, required bool autoname})`: Saves the current view as a web archive.
 * `zoomIn`: Performs zoom in in this WebView.
 * `zoomOut`: Performs zoom out in this WebView.
 * `clearHistory`: Clears the internal back/forward list.
 * `static clearClientCertPreferences`: Clears the client certificate preferences stored in response to proceeding/cancelling client cert requests.
 * `static getSafeBrowsingPrivacyPolicyUrl`: Returns a URL pointing to the privacy policy for Safe Browsing reporting. This value will never be `null`.
-* `static setSafeBrowsingWhitelist({@required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
+* `static setSafeBrowsingWhitelist({required List<String> hosts})`: Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
 * `static getCurrentWebViewPackage`: Gets the current Android WebView package info.
 * `static setWebContentsDebuggingEnabled(bool debuggingEnabled)`: Enables debugging of web contents (HTML / CSS / JavaScript) loaded into any WebViews of this application. Debugging is disabled by default.
 
@@ -645,7 +645,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 
 #### `InAppWebView` Events
 
-Event names that starts with `android` or `ios` are events platform-specific.  
+Event names that starts with `android` or `ios` are events platform-specific.
 
 * `onWebViewCreated`: Event fired when the InAppWebView is created.
 * `onLoadStart`: Event fired when the InAppWebView starts to load an url.
@@ -857,7 +857,7 @@ class _MyAppState extends State<MyApp> {
 
 * `onCreateContextMenu`: Event fired when the context menu for this WebView is being built.
 * `onHideContextMenu`: Event fired when the context menu for this WebView is being hidden.
-* `onContextMenuActionItemClicked`: Event fired when a context menu item has been clicked. 
+* `onContextMenuActionItemClicked`: Event fired when a context menu item has been clicked.
 
 ### `HeadlessInAppWebView` class
 
@@ -1113,20 +1113,20 @@ Screenshots:
 #### `InAppBrowser` Methods
 
 * `open({String url = "about:blank", Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens an `url` in a new `InAppBrowser` instance.
-* `openFile({@required String assetFilePath, Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens the given `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open`.
-* `openData({@required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String historyUrl = "about:blank", InAppBrowserClassOptions options})`: Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
-* `openWithSystemBrowser({@required String url})`: This is a static method that opens an `url` in the system browser. You wont be able to use the `InAppBrowser` methods here!
+* `openFile({required String assetFilePath, Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens the given `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open`.
+* `openData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String historyUrl = "about:blank", InAppBrowserClassOptions options})`: Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
+* `openWithSystemBrowser({required String url})`: This is a static method that opens an `url` in the system browser. You wont be able to use the `InAppBrowser` methods here!
 * `show`: Displays an `InAppBrowser` window that was opened hidden. Calling this has no effect if the `InAppBrowser` was already visible.
 * `hide`: Hides the `InAppBrowser` window. Calling this has no effect if the `InAppBrowser` was already hidden.
 * `close`: Closes the `InAppBrowser` window.
 * `isHidden`: Check if the Web View of the `InAppBrowser` instance is hidden.
-* `setOptions({@required InAppBrowserClassOptions options})`: Sets the `InAppBrowser` options with the new `options` and evaluates them.
+* `setOptions({required InAppBrowserClassOptions options})`: Sets the `InAppBrowser` options with the new `options` and evaluates them.
 * `getOptions`: Gets the current `InAppBrowser` options as a `Map`. Returns `null` if the options are not setted yet.
 * `isOpened`: Returns `true` if the `InAppBrowser` instance is opened, otherwise `false`.
 
 #### `InAppBrowser` options
 
-They are the same of the `InAppWebView` class. 
+They are the same of the `InAppWebView` class.
 Specific options of the `InAppBrowser` class are:
 
 ##### `InAppBrowser` Cross-platform options
@@ -1156,7 +1156,7 @@ Specific options of the `InAppBrowser` class are:
 
 #### `InAppBrowser` Events
 
-They are the same of the `InAppWebView` class, except for `InAppWebView.onWebViewCreated` event. 
+They are the same of the `InAppWebView` class, except for `InAppWebView.onWebViewCreated` event.
 Specific events of the `InAppBrowser` class are:
 
 * `onBrowserCreated`: Event fired when the `InAppBrowser` is created.
@@ -1292,7 +1292,7 @@ Screenshots:
 * `addMenuItems`: Adds a list of `ChromeSafariBrowserMenuItem` to the menu.
 * `close`: Closes the `ChromeSafariBrowser` instance.
 * `isOpened`: Returns `true` if the `ChromeSafariBrowser` instance is opened, otherwise `false`.
-* `open({@required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
+* `open({required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
 * `static isAvailable`: On Android, returns `true` if Chrome Custom Tabs is available. On iOS, returns `true` if SFSafariViewController is available. Otherwise returns `false`.
 
 #### `ChromeSafariBrowser` options
@@ -1364,13 +1364,13 @@ Future main() async {
                       )
                   ),
                   onWebViewCreated: (controller) {
-  
+
                   },
                   onLoadStart: (controller, url) {
-  
+
                   },
                   onLoadStop: (controller, url) {
-  
+
                   },
                 ),
               ),
@@ -1397,17 +1397,23 @@ This class implements a singleton object (shared instance) which manages the coo
 On Android, it is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).
 On iOS, it is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
 
-**NOTE for iOS**: available from iOS 11.0+.
+**NOTE for iOS below 11.0 (LIMITED SUPPORT!)**: in this case, almost all of the methods (`CookieManager.deleteAllCookies` and `IOSCookieManager.getAllCookies` are not supported!) has been implemented using JavaScript because there is no other way to work with them on iOS below 11.0. See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
 
 #### `CookieManager` methods
 
 * `instance`: Gets the cookie manager shared instance.
-* `setCookie({@required String url, @required String name, @required String value, String domain, String path = "/", int expiresDate, int maxAge, bool isSecure })`: Sets a cookie for the given `url`. Any existing cookie with the same `host`, `path` and `name` will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
-* `getCookies({@required String url})`: Gets all the cookies for the given `url`.
-* `getCookie({@required String url, @required String name})`: Gets a cookie by its `name` for the given `url`.
-* `deleteCookie({@required String url, @required String name, String domain = "", String path = "/"})`: Removes a cookie by its `name` for the given `url`, `domain` and `path`.
-* `deleteCookies({@required String url, String domain = "", String path = "/"})`: Removes all cookies for the given `url`, `domain` and `path`.
+* `setCookie({required String url, required String name, required String value, String? domain, String path = "/", int? expiresDate, int? maxAge, bool? isSecure, bool? isHttpOnly, HTTPCookieSameSitePolicy? sameSite, InAppWebViewController? iosBelow11WebViewController})`: Sets a cookie for the given `url`. Any existing cookie with the same `host`, `path` and `name` will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
+* `getCookies({required String url, InAppWebViewController? iosBelow11WebViewController})`: Gets all the cookies for the given `url`.
+* `getCookie({required String url, required String name, InAppWebViewController? iosBelow11WebViewController})`: Gets a cookie by its `name` for the given `url`.
+* `deleteCookie({required String url, required String name, String domain = "", String path = "/", InAppWebViewController? iosBelow11WebViewController})`: Removes a cookie by its `name` for the given `url`, `domain` and `path`.
+* `deleteCookies({required String url, String domain = "", String path = "/", InAppWebViewController? iosBelow11WebViewController})`: Removes all cookies for the given `url`, `domain` and `path`.
 * `deleteAllCookies()`: Removes all cookies.
+
+#### `CookieManager` iOS-specific methods
+
+iOS-specific methods can be called using the `CookieManager.instance().ios` attribute.
+
+* `getAllCookies()`: Fetches all stored cookies.
 
 ### `HttpAuthCredentialDatabase` class
 
@@ -1419,17 +1425,17 @@ On Android, this class has a custom implementation using `android.database.sqlit
 
 * `instance`: Gets the database shared instance.
 * `getAllAuthCredentials`: Gets a map list of all HTTP auth credentials saved.
-* `getHttpAuthCredentials({@required ProtectionSpace protectionSpace})`: Gets all the HTTP auth credentials saved for that `protectionSpace`.
-* `setHttpAuthCredential({@required ProtectionSpace protectionSpace, @required HttpAuthCredential credential})`: Saves an HTTP auth `credential` for that `protectionSpace`.
-* `removeHttpAuthCredential({@required ProtectionSpace protectionSpace, @required HttpAuthCredential credential})`: Removes an HTTP auth `credential` for that `protectionSpace`.
-* `removeHttpAuthCredentials({@required ProtectionSpace protectionSpace})`: Removes all the HTTP auth credentials saved for that `protectionSpace`.
+* `getHttpAuthCredentials({required ProtectionSpace protectionSpace})`: Gets all the HTTP auth credentials saved for that `protectionSpace`.
+* `setHttpAuthCredential({required ProtectionSpace protectionSpace, required HttpAuthCredential credential})`: Saves an HTTP auth `credential` for that `protectionSpace`.
+* `removeHttpAuthCredential({required ProtectionSpace protectionSpace, required HttpAuthCredential credential})`: Removes an HTTP auth `credential` for that `protectionSpace`.
+* `removeHttpAuthCredentials({required ProtectionSpace protectionSpace})`: Removes all the HTTP auth credentials saved for that `protectionSpace`.
 * `clearAllAuthCredentials()`: Removes all the HTTP auth credentials saved in the database.
 
 ### `WebStorageManager` class
 
 This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 
-On Android, it is implemented using [WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html). 
+On Android, it is implemented using [WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html).
 On iOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore)
 
 **NOTE for iOS**: available from iOS 9.0+.
@@ -1446,9 +1452,9 @@ Android-specific methods can be called using the `WebStorageManager.instance().a
 
 * `getOrigins`: Gets the origins currently using either the Application Cache or Web SQL Database APIs.
 * `deleteAllData`: Clears all storage currently being used by the JavaScript storage APIs.
-* `deleteOrigin({@required String origin})`: Clears the storage currently being used by both the Application Cache and Web SQL Database APIs by the given `origin`.
-* `getQuotaForOrigin({@required String origin})`: Gets the storage quota for the Web SQL Database API for the given `origin`.
-* `getUsageForOrigin({@required String origin})`: Gets the amount of storage currently being used by both the Application Cache and Web SQL Database APIs by the given `origin`.
+* `deleteOrigin({required String origin})`: Clears the storage currently being used by both the Application Cache and Web SQL Database APIs by the given `origin`.
+* `getQuotaForOrigin({required String origin})`: Gets the storage quota for the Web SQL Database API for the given `origin`.
+* `getUsageForOrigin({required String origin})`: Gets the amount of storage currently being used by both the Application Cache and Web SQL Database APIs by the given `origin`.
 
 #### `WebStorageManager` iOS-specific methods
 
@@ -1456,6 +1462,6 @@ iOS-specific methods can be called using the `WebStorageManager.instance().ios` 
 
 `IOSWebStorageManager` class represents various types of data that a website might make use of. This includes cookies, disk and memory caches, and persistent data such as WebSQL, IndexedDB databases, and local storage.
 
-* `fetchDataRecords({@required Set<IOSWKWebsiteDataType> dataTypes})`: Fetches data records containing the given website data types.
-* `removeDataFor({@required Set<IOSWKWebsiteDataType> dataTypes, @required List<IOSWKWebsiteDataRecord> dataRecords})`: Removes website data of the given types for the given data records.
-* `removeDataModifiedSince({@required Set<IOSWKWebsiteDataType> dataTypes, @required DateTime date})`: Removes all website data of the given types that has been modified since the given date.
+* `fetchDataRecords({required Set<IOSWKWebsiteDataType> dataTypes})`: Fetches data records containing the given website data types.
+* `removeDataFor({required Set<IOSWKWebsiteDataType> dataTypes, required List<IOSWKWebsiteDataRecord> dataRecords})`: Removes website data of the given types for the given data records.
+* `removeDataModifiedSince({required Set<IOSWKWebsiteDataType> dataTypes, required DateTime date})`: Removes all website data of the given types that has been modified since the given date.

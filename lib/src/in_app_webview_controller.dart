@@ -1981,7 +1981,7 @@ class InAppWebViewController {
   }
 }
 
-///InAppWebViewControllerAndroid class represents the Android controller that contains only android-specific methods for the WebView.
+///Class represents the Android controller that contains only android-specific methods for the WebView.
 class AndroidInAppWebViewController {
   late InAppWebViewController _controller;
 
@@ -2195,7 +2195,7 @@ class AndroidInAppWebViewController {
   }
 }
 
-///InAppWebViewControllerIOS class represents the iOS controller that contains only ios-specific methods for the WebView.
+///Class represents the iOS controller that contains only iOS-specific methods for the WebView.
 class IOSInAppWebViewController {
   late InAppWebViewController _controller;
 

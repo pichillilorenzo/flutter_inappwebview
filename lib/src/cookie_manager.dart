@@ -13,7 +13,7 @@ import 'types.dart';
 ///On Android, it is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).
 ///On iOS, it is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
 ///
-///**NOTE for iOS below 11.0 (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] is not supported!)
+///**NOTE for iOS below 11.0 (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] and [IOSCookieManager.getAllCookies] are not supported!)
 ///has been implemented using JavaScript because there is no other way to work with them on iOS below 11.0.
 ///See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
 class CookieManager {
@@ -21,7 +21,10 @@ class CookieManager {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
-  ///Gets the cookie manager shared instance.
+  ///Contains only iOS-specific methods of [CookieManager].
+  late IOSCookieManager ios;
+
+  ///Gets the [CookieManager] shared instance.
   static CookieManager instance() {
     return (_instance != null) ? _instance! : _init();
   }
@@ -29,6 +32,7 @@ class CookieManager {
   static CookieManager _init() {
     _channel.setMethodCallHandler(_handleMethod);
     _instance = CookieManager();
+    _instance!.ios = IOSCookieManager.instance();
     return _instance!;
   }
 
@@ -401,5 +405,49 @@ class CookieManager {
   String _getCookieExpirationDate(int expiresDate) {
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
     return DateFormat('EEE, d MMM yyyy hh:mm:ss', "en_US").format(dateTime) + ' GMT';
+  }
+}
+
+///Class that contains only iOS-specific methods of [CookieManager].
+class IOSCookieManager {
+  static IOSCookieManager? _instance;
+
+  ///Gets the [IOSCookieManager] shared instance.
+  static IOSCookieManager instance() {
+    return (_instance != null) ? _instance! : _init();
+  }
+
+  static IOSCookieManager _init() {
+    _instance = IOSCookieManager();
+    return _instance!;
+  }
+
+  ///Fetches all stored cookies.
+  ///
+  ///**NOTE**: available on iOS 11.0+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies
+  Future<List<Cookie>> getAllCookies() async {
+    List<Cookie> cookies = [];
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    List<dynamic> cookieListMap =
+    await CookieManager._channel.invokeMethod('getAllCookies', args);
+    cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
+
+    cookieListMap.forEach((cookieMap) {
+      cookies.add(Cookie(
+          name: cookieMap["name"],
+          value: cookieMap["value"],
+          expiresDate: cookieMap["expiresDate"],
+          isSessionOnly: cookieMap["isSessionOnly"],
+          domain: cookieMap["domain"],
+          sameSite:
+          HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          isSecure: cookieMap["isSecure"],
+          isHttpOnly: cookieMap["isHttpOnly"],
+          path: cookieMap["path"]));
+    });
+    return cookies;
   }
 }

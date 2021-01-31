@@ -32,7 +32,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
         })
       ],
       options: ContextMenuOptions(
-        hideDefaultSystemContextMenuItems: true
+        hideDefaultSystemContextMenuItems: false
       ),
       onCreateContextMenu: (hitTestResult) async {
         print("onCreateContextMenu");
@@ -125,6 +125,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url ?? '';
                       });
+                      debugPrint((await _cookieManager.ios.getAllCookies()).toString(), wrapWidth: 1024);
                     },
                     onProgressChanged: (controller, progress) {
                       setState(() {

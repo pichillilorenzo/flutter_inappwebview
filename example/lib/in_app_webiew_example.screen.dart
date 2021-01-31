@@ -125,7 +125,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url ?? '';
                       });
-                      debugPrint((await _cookieManager.ios.getAllCookies()).toString(), wrapWidth: 1024);
                     },
                     onProgressChanged: (controller, progress) {
                       setState(() {

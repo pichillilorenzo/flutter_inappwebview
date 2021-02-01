@@ -14,6 +14,14 @@
 
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
+## API Reference
+
+See the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the **full documentation**.
+
+Note that the API shown in this `README.md` file shows only a **part** of the documentation and, also, that conforms to the **GitHub master branch only**!
+So, here you could have methods, options, and events that **aren't published/released yet**!
+If you need a specific version, please change the **GitHub branch** of this repository to your version or use the **online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/)** (recommended).
+
 ## Articles/Resources
 
 - [InAppWebView: The Real Power of WebViews in Flutter](https://medium.com/flutter-community/inappwebview-the-real-power-of-webviews-in-flutter-c6d52374209d?source=friends_link&sk=cb74487219bcd85e610a670ee0b447d0)
@@ -213,14 +221,6 @@ Classes:
 - [HttpAuthCredentialDatabase](#httpauthcredentialdatabase-class): This class implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
 - [WebStorageManager](#webstoragemanager-class): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 
-## API Reference
-
-See the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the full documentation.
-
-The API showed in this `README.md` file shows only a part of the documentation that conforms to the master branch only. 
-So, here you could have methods, options, and events that aren't published yet.
-If you need a specific version, change the **GitHub branch** to your version or use the **online API Reference** (recommended).
-
 ### Load a file inside `assets` folder
 
 To be able to load your local files (assets, js, css, etc.), you need to add them in the `assets` section of the `pubspec.yaml` file, otherwise they cannot be found!
@@ -389,60 +389,67 @@ Screenshots:
 
 ##### `InAppWebViewController` Cross-platform methods
 
-* `getUrl`: Gets the URL for the current page.
-* `getTitle`: Gets the title for the current page.
-* `getProgress`: Gets the progress for the current page. The progress value is between 0 and 100.
-* `getHtml`: Gets the content html of the page.
-* `getFavicons`: Gets the list of all favicons for the current page.
-* `loadUrl({required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
-* `postUrl({required String url, required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
-* `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
-* `loadFile({required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
-* `reload`: Reloads the WebView.
-* `goBack`: Goes back in the history of the WebView.
-* `canGoBack`: Returns a boolean value indicating whether the WebView can move backward.
-* `goForward`: Goes forward in the history of the WebView.
-* `canGoForward`: Returns a boolean value indicating whether the WebView can move forward.
-* `goBackOrForward({required int steps})`: Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
-* `canGoBackOrForward({required int steps})`: Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
-* `goTo({required WebHistoryItem historyItem})`: Navigates to a `WebHistoryItem` from the back-forward `WebHistory.list` and sets it as the current item.
-* `isLoading`: Check if the WebView instance is in a loading state.
-* `stopLoading`: Stops the WebView from loading.
-* `evaluateJavascript({required String source})`: Evaluates JavaScript code into the WebView and returns the result of the evaluation.
-* `injectJavascriptFileFromUrl({required String urlFile})`: Injects an external JavaScript file into the WebView from a defined url.
-* `injectJavascriptFileFromAsset({required String assetFilePath})`: Injects a JavaScript file into the WebView from the flutter assets directory.
-* `injectCSSCode({required String source})`: Injects CSS into the WebView.
-* `injectCSSFileFromUrl({required String urlFile})`: Injects an external CSS file into the WebView from a defined url.
-* `injectCSSFileFromAsset({required String assetFilePath})`: Injects a CSS file into the WebView from the flutter assets directory.
 * `addJavaScriptHandler({required String handlerName, required JavaScriptHandlerCallback callback})`: Adds a JavaScript message handler callback that listen to post messages sent from JavaScript by the handler with name `handlerName`.
-* `removeJavaScriptHandler({required String handlerName})`: Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
-* `takeScreenshot`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
-* `setOptions({required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
-* `getOptions`: Gets the current WebView options. Returns the options with `null` value if they are not set yet.
-* `getCopyBackForwardList`: Gets the `WebHistory` for this WebView. This contains the back/forward list for use in querying each item in the history stack.
+* `addUserScript(UserScript userScript)`: Injects the specified `userScript` into the webpage’s content.
+* `addUserScripts(List<UserScript> userScripts)`: Injects the `userScripts` into the webpage’s content.
+* `canGoBackOrForward({required int steps})`: Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
+* `canGoBack`: Returns a boolean value indicating whether the WebView can move backward.
+* `canGoForward`: Returns a boolean value indicating whether the WebView can move forward.
 * `clearCache`: Clears all the webview's cache.
+* `clearFocus`: Clears the current focus. It will clear also, for example, the current text selection.
+* `clearMatches`: Clears the highlighting surrounding text matches created by `findAllAsync()`.
+* `evaluateJavascript({required String source})`: Evaluates JavaScript code into the WebView and returns the result of the evaluation.
 * `findAllAsync({required String find})`: Finds all instances of find on the page and highlights them. Notifies `onFindResultReceived` listener.
 * `findNext({required bool forward})`: Highlights and scrolls to the next match found by `findAllAsync()`. Notifies `onFindResultReceived` listener.
-* `clearMatches`: Clears the highlighting surrounding text matches created by `findAllAsync()`.
-* `getTRexRunnerHtml`: Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerCss()`.
-* `getTRexRunnerCss`: Gets the css of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerHtml()`.
-* `scrollTo({required int x, required int y, bool animated = false})`: Scrolls the WebView to the position.
-* `scrollBy({required int x, required int y, bool animated = false})`: Moves the scrolled position of the WebView.
-* `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
-* `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
-* `printCurrentPage`: Prints the current page.
-* `getScale`: Gets the current scale of this WebView.
-* `getSelectedText`: Gets the selected text.
+* `getCertificate`: Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
+* `getContentHeight`: Gets the height of the HTML content.
+* `getCopyBackForwardList`: Gets the `WebHistory` for this WebView. This contains the back/forward list for use in querying each item in the history stack.
+* `getFavicons`: Gets the list of all favicons for the current page.
 * `getHitTestResult`: Gets the hit result for hitting an HTML elements.
-* `clearFocus`: Clears the current focus. It will clear also, for example, the current text selection.
-* `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
-* `requestFocusNodeHref`: Requests the anchor or image element URL at the last tapped point.
-* `requestImageRef`: Requests the URL of the image last touched by the user.
+* `getHtml`: Gets the content html of the page.
 * `getMetaTags`: Returns the list of `<meta>` tags of the current WebView.
 * `getMetaThemeColor`: Returns an instance of `Color` representing the `content` value of the `<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
+* `getOptions`: Gets the current WebView options. Returns the options with `null` value if they are not set yet.
+* `getProgress`: Gets the progress for the current page. The progress value is between 0 and 100.
+* `getScale`: Gets the current scale of this WebView.
 * `getScrollX`: Returns the scrolled left position of the current WebView.
 * `getScrollY`: Returns the scrolled top position of the current WebView.
-* `getCertificate`: Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).
+* `getSelectedText`: Gets the selected text.
+* `getTRexRunnerCss`: Gets the css of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerHtml()`.
+* `getTRexRunnerHtml`: Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with `getTRexRunnerCss()`.
+* `getTitle`: Gets the title for the current page.
+* `getUrl`: Gets the URL for the current page.
+* `goBackOrForward({required int steps})`: Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
+* `goBack`: Goes back in the history of the WebView.
+* `goForward`: Goes forward in the history of the WebView.
+* `goTo({required WebHistoryItem historyItem})`: Navigates to a `WebHistoryItem` from the back-forward `WebHistory.list` and sets it as the current item.
+* `injectCSSCode({required String source})`: Injects CSS into the WebView.
+* `injectCSSFileFromAsset({required String assetFilePath})`: Injects a CSS file into the WebView from the flutter assets directory.
+* `injectCSSFileFromUrl({required String urlFile})`: Injects an external CSS file into the WebView from a defined url.
+* `injectJavascriptFileFromAsset({required String assetFilePath})`: Injects a JavaScript file into the WebView from the flutter assets directory.
+* `injectJavascriptFileFromUrl({required String urlFile})`: Injects an external JavaScript file into the WebView from a defined url.
+* `isLoading`: Check if the WebView instance is in a loading state.
+* `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
+* `loadFile({required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
+* `loadUrl({required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
+* `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
+* `postUrl({required String url, required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
+* `printCurrentPage`: Prints the current page.
+* `reload`: Reloads the WebView.
+* `removeAllUserScripts()`: Removes all the user scripts from the webpage’s content.
+* `removeJavaScriptHandler({required String handlerName})`: Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
+* `removeUserScript(UserScript userScript)`: Removes the specified `userScript` from the webpage’s content.
+* `removeUserScripts(List<UserScript> userScripts)`: Removes the `userScripts` from the webpage’s content.
+* `requestFocusNodeHref`: Requests the anchor or image element URL at the last tapped point.
+* `requestImageRef`: Requests the URL of the image last touched by the user.
+* `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
+* `scrollBy({required int x, required int y, bool animated = false})`: Moves the scrolled position of the WebView.
+* `scrollTo({required int x, required int y, bool animated = false})`: Scrolls the WebView to the position.
+* `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
+* `setOptions({required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
+* `stopLoading`: Stops the WebView from loading.
+* `takeScreenshot`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
+* `zoomBy`: Performs a zoom operation in this WebView.
 * `static getDefaultUserAgent`: Gets the default user agent.
 
 ##### `InAppWebViewController.webStorage`

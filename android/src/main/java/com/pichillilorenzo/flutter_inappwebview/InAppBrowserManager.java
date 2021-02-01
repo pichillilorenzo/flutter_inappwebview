@@ -72,7 +72,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           Map<String, String> headers = (Map<String, String>) call.argument("headers");
           HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
           Integer windowId = (Integer) call.argument("windowId");
-          openUrl(activity, uuid, url, options, headers, contextMenu, windowId);
+          List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
+          openUrl(activity, uuid, url, options, headers, contextMenu, windowId, initialUserScripts);
         }
         result.success(true);
         break;
@@ -90,7 +91,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           Map<String, String> headers = (Map<String, String>) call.argument("headers");
           HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
           Integer windowId = (Integer) call.argument("windowId");
-          openUrl(activity, uuid, url, options, headers, contextMenu, windowId);
+          List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
+          openUrl(activity, uuid, url, options, headers, contextMenu, windowId, initialUserScripts);
         }
         result.success(true);
         break;
@@ -104,7 +106,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           String historyUrl = (String) call.argument("historyUrl");
           HashMap<String, Object> contextMenu = (HashMap<String, Object>) call.argument("contextMenu");
           Integer windowId = (Integer) call.argument("windowId");
-          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu, windowId);
+          List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
+          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu, windowId, initialUserScripts);
         }
         result.success(true);
         break;
@@ -196,7 +199,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
   }
 
   public void openUrl(Activity activity, String uuid, String url, HashMap<String, Object> options, Map<String, String> headers,
-                      HashMap<String, Object> contextMenu, Integer windowId) {
+                      HashMap<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putString("url", url);
@@ -206,11 +209,12 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putSerializable("headers", (Serializable) headers);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
+    extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
     startInAppBrowserActivity(activity, extras);
   }
 
   public void openData(Activity activity, String uuid, HashMap<String, Object> options, String data, String mimeType, String encoding,
-                       String baseUrl, String historyUrl, HashMap<String, Object> contextMenu, Integer windowId) {
+                       String baseUrl, String historyUrl, HashMap<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
     Bundle extras = new Bundle();
     extras.putBoolean("isData", true);
     extras.putString("uuid", uuid);
@@ -222,6 +226,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putString("historyUrl", historyUrl);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
+    extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
     startInAppBrowserActivity(activity, extras);
   }
 

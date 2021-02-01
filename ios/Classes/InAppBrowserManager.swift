@@ -43,7 +43,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let headers = arguments!["headers"] as! [String: String]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
-                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId)
+                let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
+                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openFile":
@@ -61,7 +62,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let headers = arguments!["headers"] as! [String: String]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
-                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId)
+                let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
+                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openData":
@@ -73,7 +75,9 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let baseUrl = arguments!["baseUrl"] as! String
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
-                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, contextMenu: contextMenu, windowId: windowId)
+                let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
+                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl,
+                         contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openWithSystemBrowser":
@@ -118,16 +122,16 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
     }
     
     public func openUrl(uuid: String, url: String, options: [String: Any?], headers: [String: String],
-                        contextMenu: [String: Any], windowId: Int64?) {
+                        contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
         webViewController.uuid = uuid
-        webViewController.prepareMethodChannel()
         webViewController.initURL = absoluteUrl
         webViewController.initHeaders = headers
         webViewController.contextMenu = contextMenu
         webViewController.windowId = windowId
+        webViewController.initUserScripts = initialUserScripts ?? []
         
         if webViewController.isHidden {
             webViewController.view.isHidden = true
@@ -147,17 +151,17 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
     }
     
     public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String,
-                         baseUrl: String, contextMenu: [String: Any], windowId: Int64?) {
+                         baseUrl: String, contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
         webViewController.uuid = uuid
-        webViewController.prepareMethodChannel()
         webViewController.initData = data
         webViewController.initMimeType = mimeType
         webViewController.initEncoding = encoding
         webViewController.initBaseUrl = baseUrl
         webViewController.contextMenu = contextMenu
         webViewController.windowId = windowId
+        webViewController.initUserScripts = initialUserScripts ?? []
         
         if webViewController.isHidden {
             webViewController.view.isHidden = true

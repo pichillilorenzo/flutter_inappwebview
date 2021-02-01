@@ -90,6 +90,7 @@ class ChromeSafariBrowser {
     args.putIfAbsent('optionsFallback', () => optionsFallback?.toMap() ?? {});
     args.putIfAbsent('contextMenuFallback',
         () => browserFallback?.contextMenu?.toMap() ?? {});
+    args.putIfAbsent('initialUserScriptsFallback', () => browserFallback?.initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     await _sharedChannel.invokeMethod('open', args);
     this._isOpened = true;
   }

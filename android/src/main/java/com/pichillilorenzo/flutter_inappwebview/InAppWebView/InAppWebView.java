@@ -104,6 +104,7 @@ final public class InAppWebView extends InputAwareWebView {
   public Map<String, Object> contextMenu = null;
   public Handler headlessHandler = new Handler(Looper.getMainLooper());
   static Handler mHandler = new Handler();
+  public List<Map<String, Object>> userScripts = new ArrayList<>();
 
   public Runnable checkScrollStoppedTask;
   public int initialPositionScrollStoppedTask;
@@ -632,7 +633,10 @@ final public class InAppWebView extends InputAwareWebView {
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(Context context, Object obj, Object id, Integer windowId, InAppWebViewOptions options, Map<String, Object> contextMenu, View containerView) {
+  public InAppWebView(Context context, Object obj, Object id,
+                      Integer windowId, InAppWebViewOptions options,
+                      Map<String, Object> contextMenu, View containerView,
+                      List<Map<String, Object>> userScripts) {
     super(context, containerView);
     if (obj instanceof InAppBrowserActivity)
       this.inAppBrowserActivity = (InAppBrowserActivity) obj;
@@ -643,6 +647,7 @@ final public class InAppWebView extends InputAwareWebView {
     this.windowId = windowId;
     this.options = options;
     this.contextMenu = contextMenu;
+    this.userScripts = userScripts;
     Shared.activity.registerForContextMenu(this);
   }
 
@@ -1973,6 +1978,18 @@ final public class InAppWebView extends InputAwareWebView {
     }
 
     return null;
+  }
+
+  public boolean addUserScript(Map<String, Object> userScript) {
+    return userScripts.add(userScript);
+  }
+
+  public Map<String, Object> removeUserScript(int index) {
+    return userScripts.remove(index);
+  }
+
+  public void removeAllUserScripts() {
+    userScripts.clear();
   }
 
   @Override

@@ -45,6 +45,7 @@ class InAppWebViewController {
       MethodChannel('com.pichillilorenzo/flutter_inappwebview_static');
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
+  List<UserScript> _userScripts = [];
 
   // ignore: unused_field
   bool _isOpened = false;
@@ -72,14 +73,16 @@ class InAppWebViewController {
         MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
     this._webview = webview;
+    this._userScripts = List<UserScript>.from(webview.initialUserScripts ?? []);
     this._init();
   }
 
   InAppWebViewController.fromInAppBrowser(
-      String uuid, MethodChannel channel, InAppBrowser inAppBrowser) {
+      String uuid, MethodChannel channel, InAppBrowser inAppBrowser, UnmodifiableListView<UserScript>? initialUserScripts) {
     this._inAppBrowserUuid = uuid;
     this._channel = channel;
     this._inAppBrowser = inAppBrowser;
+    this._userScripts = List<UserScript>.from(initialUserScripts ?? []);
     this._init();
   }
 
@@ -1970,6 +1973,59 @@ class InAppWebViewController {
     }
 
     return null;
+  }
+
+  ///Injects the specified [userScript] into the webpage’s content.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript
+  Future<void> addUserScript(UserScript userScript) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('userScript', () => userScript.toMap());
+    if (!_userScripts.contains(userScript)) {
+      _userScripts.add(userScript);
+      await _channel.invokeMethod('addUserScript', args);
+    }
+  }
+
+  ///Injects the [userScripts] into the webpage’s content.
+  Future<void> addUserScripts(List<UserScript> userScripts) async {
+    for (var i = 0; i < userScripts.length; i++) {
+      await addUserScript(userScripts[i]);
+    }
+  }
+
+  ///Removes the specified [userScript] from the webpage’s content.
+  ///User scripts already loaded into the webpage's content cannot be removed. This will have effect only on the next page load.
+  ///Returns `true` if [userScript] was in the list, `false` otherwise.
+  Future<bool> removeUserScript(UserScript userScript) async {
+    var index = _userScripts.indexOf(userScript);
+    if (index == -1) {
+      return false;
+    }
+
+    _userScripts.remove(userScript);
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('index', () => index);
+    await _channel.invokeMethod('removeUserScript', args);
+
+    return true;
+  }
+
+  ///Removes the [userScripts] from the webpage’s content.
+  ///User scripts already loaded into the webpage's content cannot be removed. This will have effect only on the next page load.
+  Future<void> removeUserScripts(List<UserScript> userScripts) async {
+    for (var i = 0; i < userScripts.length; i++) {
+      await removeUserScript(userScripts[i]);
+    }
+  }
+
+  ///Removes all the user scripts from the webpage’s content.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts
+  Future<void> removeAllUserScripts() async {
+    _userScripts.clear();
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('removeAllUserScripts', args);
   }
 
   ///Gets the default user agent.

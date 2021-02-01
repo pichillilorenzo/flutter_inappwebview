@@ -858,6 +858,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     // in order to have the same behavior as Android
     var activateShouldOverrideUrlLoading = false
     var contextMenu: [String: Any]?
+    var userScripts: [WKUserScript] = []
     
     // https://github.com/mozilla-mobile/firefox-ios/blob/50531a7e9e4d459fb11d4fcb7d4322e08103501f/Client/Frontend/Browser/ContextMenuHelper.swift
     fileprivate var nativeHighlightLongPressRecognizer: UILongPressGestureRecognizer?
@@ -1161,17 +1162,52 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        let userScript = WKUserScript(source: "window._flutter_inappwebview_windowId = \(windowId == nil ? "null" : String(windowId!));" , injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(userScript)
+        prepareAndAddUserScripts()
         
         if windowId != nil {
             // the new created window webview has the same WKWebViewConfiguration variable reference
             return
         }
         
-        configuration.userContentController = WKUserContentController()
         configuration.preferences = WKPreferences()
+        if let options = options {
+            if #available(iOS 9.0, *) {
+                configuration.allowsAirPlayForMediaPlayback = options.allowsAirPlayForMediaPlayback
+                configuration.allowsPictureInPictureMediaPlayback = options.allowsPictureInPictureMediaPlayback
+                if !options.applicationNameForUserAgent.isEmpty {
+                    configuration.applicationNameForUserAgent = options.applicationNameForUserAgent
+                }
+            }
+            
+            configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
+            configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
+            configuration.preferences.minimumFontSize = CGFloat(options.minimumFontSize)
+            
+            if #available(iOS 13.0, *) {
+                configuration.preferences.isFraudulentWebsiteWarningEnabled = options.isFraudulentWebsiteWarningEnabled
+                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: options.preferredContentMode)!
+            }
+        }
+    }
+    
+    public func prepareAndAddUserScripts() -> Void {
+        addWindowIdUserScript()
+        if windowId != nil {
+            // the new created window webview has the same WKWebViewConfiguration variable reference
+            return
+        }
         
+        configuration.userContentController = WKUserContentController()
+        addPluginUserScripts()
+        addAllUserScripts()
+    }
+    
+    func addWindowIdUserScript() -> Void {
+        let userScriptWindowId = WKUserScript(source: "window._flutter_inappwebview_windowId = \(windowId == nil ? "null" : String(windowId!));" , injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(userScriptWindowId)
+    }
+    
+    func addPluginUserScripts() -> Void {
         if let options = options {
            
             let originalViewPortMetaTagContentJSScript = WKUserScript(source: originalViewPortMetaTagContentJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
@@ -1192,14 +1228,20 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
             configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
+            configuration.userContentController.removeScriptMessageHandler(forName: "callHandler")
             configuration.userContentController.add(self, name: "callHandler")
             
             let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
             configuration.userContentController.addUserScript(consoleLogJSScript)
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog")
             configuration.userContentController.add(self, name: "consoleLog")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug")
             configuration.userContentController.add(self, name: "consoleDebug")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleError")
             configuration.userContentController.add(self, name: "consoleError")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleInfo")
             configuration.userContentController.add(self, name: "consoleInfo")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn")
             configuration.userContentController.add(self, name: "consoleWarn")
             
             let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -1218,6 +1260,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
             configuration.userContentController.addUserScript(findTextHighlightJSScript)
+            configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
             configuration.userContentController.add(self, name: "onFindResultReceived")
             
             let onWindowFocusEventJSScript = WKUserScript(source: onWindowFocusEventJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -1235,24 +1278,55 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
                 configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
             }
-            
-            if #available(iOS 9.0, *) {
-                configuration.allowsAirPlayForMediaPlayback = options.allowsAirPlayForMediaPlayback
-                configuration.allowsPictureInPictureMediaPlayback = options.allowsPictureInPictureMediaPlayback
-                if !options.applicationNameForUserAgent.isEmpty {
-                    configuration.applicationNameForUserAgent = options.applicationNameForUserAgent
-                }
-            }
-            
-            configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
-            configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
-            configuration.preferences.minimumFontSize = CGFloat(options.minimumFontSize)
-            
-            if #available(iOS 13.0, *) {
-                configuration.preferences.isFraudulentWebsiteWarningEnabled = options.isFraudulentWebsiteWarningEnabled
-                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: options.preferredContentMode)!
-            }
         }
+    }
+    
+    func addAllUserScripts() -> Void {
+        for userScript in userScripts {
+            configuration.userContentController.addUserScript(userScript)
+        }
+    }
+    
+    public func addUserScript(wkUserScript: WKUserScript) -> Void {
+        userScripts.append(wkUserScript)
+        configuration.userContentController.addUserScript(wkUserScript)
+    }
+    
+    public func appendUserScript(userScript: [String: Any]) -> Void {
+        let wkUserScript = WKUserScript(source: userScript["source"] as! String,
+                                        injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
+                                        forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool)
+        userScripts.append(wkUserScript)
+    }
+    
+    public func appendUserScripts(wkUserScripts: [WKUserScript]) -> Void {
+        for wkUserScript in wkUserScripts {
+            userScripts.append(wkUserScript)
+        }
+    }
+    
+    public func appendUserScripts(userScripts: [[String: Any]]) -> Void {
+        for userScript in userScripts {
+            appendUserScript(userScript: userScript)
+        }
+    }
+    
+    public func removeUserScript(at index: Int) -> Void {
+        userScripts.remove(at: index)
+        // there isn't a way to remove a specific user script using WKUserContentController,
+        // so we remove all the user scripts and, then, we add them again without the one that has been removed
+        configuration.userContentController.removeAllUserScripts()
+        addWindowIdUserScript()
+        addPluginUserScripts()
+        addAllUserScripts()
+    }
+    
+    public func removeAllUserScripts() -> Void {
+        userScripts.removeAll()
+        configuration.userContentController.removeAllUserScripts()
+        // add all the necessary base WKUserScripts of this plugin again
+        addWindowIdUserScript()
+        addPluginUserScripts()
     }
     
     @available(iOS 10.0, *)
@@ -2000,7 +2074,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         InAppWebView.credentialsProposed = []
         evaluateJavaScript(platformReadyJS, completionHandler: nil)
         onLoadStop(url: url?.absoluteString)
-                
+        
         if IABController != nil {
             IABController!.updateUrlTextField(url: currentURL?.absoluteString ?? "")
             IABController!.backButton.isEnabled = canGoBack
@@ -2257,8 +2331,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             _ in completionHandler()}
         );
         
-        let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window!.rootViewController!)
-        presentingViewController.present(alertController, animated: true, completion: {})
+        if let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window?.rootViewController!) {
+            presentingViewController.present(alertController, animated: true, completion: {})
+        } else {
+            completionHandler()
+        }
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptAlertPanelWithMessage message: String,
@@ -2320,8 +2397,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             completionHandler(false)
         }))
         
-        let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window!.rootViewController!)
-        presentingViewController.present(alertController, animated: true, completion: nil)
+        if let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window?.rootViewController!) {
+            presentingViewController.present(alertController, animated: true, completion: nil)
+        } else {
+            completionHandler(false)
+        }
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo,
@@ -2393,8 +2473,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             completionHandler(nil)
         }))
         
-        let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window!.rootViewController!)
-        presentingViewController.present(alertController, animated: true, completion: nil)
+        if let presentingViewController = ((self.IABController != nil) ? self.IABController! : self.window?.rootViewController!) {
+            presentingViewController.present(alertController, animated: true, completion: nil)
+        } else {
+            completionHandler(nil)
+        }
     }
     
     public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt message: String, defaultText defaultValue: String?, initiatedByFrame frame: WKFrameInfo,
@@ -3158,6 +3241,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn")
             configuration.userContentController.removeScriptMessageHandler(forName: "callHandler")
             configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
+            if #available(iOS 14.0, *) {
+                configuration.userContentController.removeAllScriptMessageHandlers()
+            }
             configuration.userContentController.removeAllUserScripts()
             if #available(iOS 11.0, *) {
                 configuration.userContentController.removeAllContentRuleLists()

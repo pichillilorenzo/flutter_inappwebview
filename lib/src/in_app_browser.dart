@@ -19,8 +19,9 @@ class InAppBrowser {
   ///Context menu used by the browser. It should be set before opening the browser.
   ContextMenu? contextMenu;
 
-  Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
-      HashMap<String, JavaScriptHandlerCallback>();
+  ///Initial list of user scripts to be loaded at start or end of a page loading.
+  UnmodifiableListView<UserScript>? initialUserScripts;
+
   bool _isOpened = false;
   late MethodChannel _channel;
   static const MethodChannel _sharedChannel =
@@ -33,14 +34,14 @@ class InAppBrowser {
   final int? windowId;
 
   ///
-  InAppBrowser({this.windowId}) {
+  InAppBrowser({this.windowId, this.initialUserScripts}) {
     uuid = uuidGenerator.v4();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$uuid');
     this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
     webViewController =
-        new InAppWebViewController.fromInAppBrowser(uuid, this._channel, this);
+        new InAppWebViewController.fromInAppBrowser(uuid, this._channel, this, this.initialUserScripts);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
@@ -79,6 +80,7 @@ class InAppBrowser {
     args.putIfAbsent('options', () => options?.toMap() ?? {});
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
+    args.putIfAbsent('initialUserScripts', () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     await _sharedChannel.invokeMethod('openUrl', args);
   }
 
@@ -129,6 +131,7 @@ class InAppBrowser {
     args.putIfAbsent('options', () => options?.toMap() ?? {});
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
+    args.putIfAbsent('initialUserScripts', () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     await _sharedChannel.invokeMethod('openFile', args);
   }
 
@@ -158,6 +161,7 @@ class InAppBrowser {
     args.putIfAbsent('historyUrl', () => androidHistoryUrl);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
+    args.putIfAbsent('initialUserScripts', () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     await _sharedChannel.invokeMethod('openData', args);
   }
 

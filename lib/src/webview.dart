@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'context_menu.dart';
@@ -621,6 +622,11 @@ abstract class WebView {
   ///Context menu which contains custom menu items to be shown when [ContextMenu] is presented.
   final ContextMenu? contextMenu;
 
+  ///Initial list of user scripts to be loaded at start or end of a page loading.
+  ///To add or remove user scripts, you have to use the [InAppWebViewController]'s methods such as [InAppWebViewController.addUserScript],
+  ///[InAppWebViewController.removeUserScript], [InAppWebViewController.removeAllUserScripts], etc.
+  final UnmodifiableListView<UserScript>? initialUserScripts;
+
   WebView(
       {this.windowId,
       this.onWebViewCreated,
@@ -679,5 +685,6 @@ abstract class WebView {
       this.initialData,
       this.initialHeaders,
       this.initialOptions,
-      this.contextMenu});
+      this.contextMenu,
+      this.initialUserScripts});
 }

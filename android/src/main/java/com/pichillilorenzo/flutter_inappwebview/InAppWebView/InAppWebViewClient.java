@@ -162,44 +162,99 @@ public class InAppWebViewClient extends WebViewClient {
     });
   }
 
-  private void loadCustomJavaScript(WebView view) {
+  private void loadCustomJavaScriptOnPageStarted(WebView view) {
     InAppWebView webView = (InAppWebView) view;
 
-    String js = InAppWebView.consoleLogJS.replaceAll("[\r\n]+", "");
-    js += JavaScriptBridgeInterface.flutterInAppBroserJSClass.replaceAll("[\r\n]+", "");
-    if (webView.options.useShouldInterceptAjaxRequest) {
-      js += InAppWebView.interceptAjaxRequestsJS.replaceAll("[\r\n]+", "");
-    }
-    if (webView.options.useShouldInterceptFetchRequest) {
-      js += InAppWebView.interceptFetchRequestsJS.replaceAll("[\r\n]+", "");
-    }
-    if (webView.options.useOnLoadResource) {
-      js += InAppWebView.resourceObserverJS.replaceAll("[\r\n]+", "");
-    }
-    if (!webView.options.useHybridComposition) {
-      js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS.replaceAll("[\r\n]+", "");
-    }
-    js += InAppWebView.onWindowFocusEventJS.replaceAll("[\r\n]+", "");
-    js += InAppWebView.onWindowBlurEventJS.replaceAll("[\r\n]+", "");
-    js += InAppWebView.printJS.replaceAll("[\r\n]+", "");
+    String js = preparePluginUserScripts(webView);
+    js += prepareUserScriptsAtDocumentStart(webView);
 
     js = InAppWebView.scriptsWrapperJS
-            .replace("$PLACEHOLDER_VALUE", js)
-            .replaceAll("[\r\n]+", "");
+            .replace("$PLACEHOLDER_VALUE", js);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
     } else {
-      webView.loadUrl("javascript:" + js);
+      webView.loadUrl("javascript:" + js.replaceAll("[\r\n]+", ""));
     }
+  }
+
+  private void loadCustomJavaScriptOnPageFinished(WebView view) {
+    InAppWebView webView = (InAppWebView) view;
+
+    // try to reload also custom scripts if they were not loaded during the onPageStarted event
+    String js = preparePluginUserScripts(webView);
+    js += prepareUserScriptsAtDocumentStart(webView);
+    js += prepareUserScriptsAtDocumentEnd(webView);
+
+    js = InAppWebView.scriptsWrapperJS
+            .replace("$PLACEHOLDER_VALUE", js);
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      webView.evaluateJavascript(js, (ValueCallback<String>) null);
+    } else {
+      webView.loadUrl("javascript:" + js.replaceAll("[\r\n]+", ""));
+    }
+  }
+
+  private String preparePluginUserScripts(InAppWebView webView) {
+    String js = InAppWebView.consoleLogJS;
+    js += JavaScriptBridgeInterface.flutterInAppBroserJSClass;
+    if (webView.options.useShouldInterceptAjaxRequest) {
+      js += InAppWebView.interceptAjaxRequestsJS;
+    }
+    if (webView.options.useShouldInterceptFetchRequest) {
+      js += InAppWebView.interceptFetchRequestsJS;
+    }
+    if (webView.options.useOnLoadResource) {
+      js += InAppWebView.resourceObserverJS;
+    }
+    if (!webView.options.useHybridComposition) {
+      js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS;
+    }
+    js += InAppWebView.onWindowFocusEventJS;
+    js += InAppWebView.onWindowBlurEventJS;
+    js += InAppWebView.printJS;
+
+    return js;
+  }
+
+  private String prepareUserScriptsAtDocumentStart(InAppWebView webView) {
+    StringBuilder js = new StringBuilder();
+
+    for (Map<String, Object> userScript : webView.userScripts) {
+      Integer injectionTime = (Integer) userScript.get("injectionTime");
+      if (injectionTime == null || injectionTime == 0) {
+        String source = (String) userScript.get("source");
+        if (source != null) {
+          js.append("(function(){").append(source).append("})();");
+        }
+      }
+    }
+
+    return js.toString();
+  }
+
+  private String prepareUserScriptsAtDocumentEnd(InAppWebView webView) {
+    StringBuilder js = new StringBuilder();
+
+    for (Map<String, Object> userScript : webView.userScripts) {
+      Integer injectionTime = (Integer) userScript.get("injectionTime");
+      if (injectionTime == 1) {
+        String source = (String) userScript.get("source");
+        if (source != null) {
+          js.append("(function(){").append(source).append("})();");
+        }
+      }
+    }
+
+    return js.toString();
   }
 
   @Override
   public void onPageStarted(WebView view, String url, Bitmap favicon) {
+    final InAppWebView webView = (InAppWebView) view;
 
-    InAppWebView webView = (InAppWebView) view;
-
-    loadCustomJavaScript(webView);
+    loadCustomJavaScriptOnPageStarted(webView);
 
     super.onPageStarted(view, url, favicon);
 
@@ -219,8 +274,7 @@ public class InAppWebViewClient extends WebViewClient {
   public void onPageFinished(WebView view, String url) {
     final InAppWebView webView = (InAppWebView) view;
 
-    // try to reload custom javascript scripts if they were not loaded during the onPageStarted event
-    loadCustomJavaScript(webView);
+    loadCustomJavaScriptOnPageFinished(webView);
 
     super.onPageFinished(view, url);
 
@@ -228,19 +282,19 @@ public class InAppWebViewClient extends WebViewClient {
     previousAuthRequestFailureCount = 0;
     credentialsProposed = null;
 
-    // CB-10395 InAppBrowserManager's WebView not storing cookies reliable to local device storage
+    // WebView not storing cookies reliable to local device storage
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       CookieManager.getInstance().flush();
     } else {
       CookieSyncManager.getInstance().sync();
     }
 
-    String js = InAppWebView.platformReadyJS.replaceAll("[\r\n]+", "");
+    String js = InAppWebView.platformReadyJS;
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
     } else {
-      webView.loadUrl("javascript:" + js);
+      webView.loadUrl("javascript:" + js.replaceAll("[\r\n]+", ""));
     }
 
     Map<String, Object> obj = new HashMap<>();
@@ -251,7 +305,7 @@ public class InAppWebViewClient extends WebViewClient {
   }
 
   @Override
-  public void doUpdateVisitedHistory (WebView view, String url, boolean isReload) {
+  public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
     Map<String, Object> obj = new HashMap<>();
     if (inAppBrowserActivity != null)
       obj.put("uuid", inAppBrowserActivity.uuid);

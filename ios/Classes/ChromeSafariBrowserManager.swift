@@ -41,9 +41,10 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 let optionsFallback = arguments!["optionsFallback"] as? [String: Any?]
                 let contextMenuFallback = arguments!["contextMenuFallback"] as? [String: Any]
                 let windowIdFallback = arguments!["windowIdFallback"] as? Int64
+                let initialUserScriptsFallback = arguments!["initialUserScriptsFallback"] as? [[String: Any]]
                 open(uuid: uuid, url: url, options: options,  menuItemList: menuItemList, uuidFallback: uuidFallback,
                      headersFallback: headersFallback, optionsFallback: optionsFallback, contextMenuFallback: contextMenuFallback,
-                     windowIdFallback: windowIdFallback, result: result)
+                     windowIdFallback: windowIdFallback, initialUserScriptsFallback: initialUserScriptsFallback, result: result)
                 break
             case "isAvailable":
                 if #available(iOS 9.0, *) {
@@ -60,7 +61,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
     
     public func open(uuid: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], uuidFallback: String?,
                      headersFallback: [String: String]?, optionsFallback: [String: Any?]?, contextMenuFallback: [String: Any]?,
-                     windowIdFallback: Int64?, result: @escaping FlutterResult) {
+                     windowIdFallback: Int64?, initialUserScriptsFallback: [[String: Any]]?, result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
         if #available(iOS 9.0, *) {
@@ -104,7 +105,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 
                 return
             }
-            SwiftFlutterPlugin.instance!.inAppBrowserManager!.openUrl(uuid: uuidFallback!, url: url, options: optionsFallback ?? [:], headers: headersFallback ?? [:], contextMenu: contextMenuFallback ?? [:], windowId: windowIdFallback)
+            SwiftFlutterPlugin.instance!.inAppBrowserManager!.openUrl(uuid: uuidFallback!, url: url, options: optionsFallback ?? [:], headers: headersFallback ?? [:], contextMenu: contextMenuFallback ?? [:], windowId: windowIdFallback, initialUserScripts: initialUserScriptsFallback)
         }
     }
 }

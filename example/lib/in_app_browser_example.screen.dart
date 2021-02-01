@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -6,6 +7,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'main.dart';
 
 class MyInAppBrowser extends InAppBrowser {
+
+  MyInAppBrowser({int? windowId, UnmodifiableListView<UserScript>? initialUserScripts}) : super(windowId: windowId, initialUserScripts: initialUserScripts);
+
   @override
   Future onBrowserCreated() async {
     print("\n\nBrowser Created!\n\n");
@@ -18,6 +22,7 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   Future onLoadStop(url) async {
+    print(await this.webViewController.getTitle());
     print("\n\nStopped $url\n\n");
   }
 

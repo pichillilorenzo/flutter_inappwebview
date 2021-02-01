@@ -21,7 +21,7 @@ public class InAppWebView_IBWrapper: UIView {
     }
 }
 
-public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIScrollViewDelegate, WKUIDelegate, UITextFieldDelegate {
+public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelegate, WKUIDelegate, UITextFieldDelegate {
     
     @IBOutlet var containerWebView: InAppWebView_IBWrapper!
     @IBOutlet var closeButton: UIButton!
@@ -58,333 +58,17 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
     var isHidden = false
     var viewPrepared = false
     var previousStatusBarStyle = -1
+    var initUserScripts: [[String: Any]] = []
+    var methodCallDelegate: InAppWebViewMethodHandler?
     
     required init(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)!
     }
     
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        
-    }
-    
-    public func prepareMethodChannel() {
-        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        SwiftFlutterPlugin.instance!.registrar!.addMethodCallDelegate(self, channel: channel!)
-    }
-    
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let arguments = call.arguments as? NSDictionary
-
-        switch call.method {
-            case "getUrl":
-                result(webView.url?.absoluteString)
-                break
-            case "getTitle":
-                result(webView.title)
-                break
-            case "getProgress":
-                let progress = Int(webView.estimatedProgress * 100)
-                result(progress)
-                break
-            case "loadUrl":
-                 let url = arguments!["url"] as! String
-               let headers = arguments!["headers"] as? [String: String]
-               let absoluteUrl = URL(string: url)!.absoluteURL
-               webView.loadUrl(url: absoluteUrl, headers: headers)
-                result(true)
-                break
-            case "loadData":
-                let data = arguments!["data"] as! String
-                let mimeType = arguments!["mimeType"] as! String
-                let encoding = arguments!["encoding"] as! String
-                let baseUrl = arguments!["baseUrl"] as! String
-                webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
-                result(true)
-                break
-            case "postUrl":
-                let url = arguments!["url"] as! String
-                let postData = arguments!["postData"] as! FlutterStandardTypedData
-                let absoluteUrl = URL(string: url)!.absoluteURL
-                webView.postUrl(url: absoluteUrl, postData: postData.data, completionHandler: { () -> Void in
-                    result(true)
-                })
-                break
-            case "loadFile":
-                let url = arguments!["url"] as! String
-                let headers = arguments!["headers"] as? [String: String]
-                do {
-                    try webView.loadFile(url: url, headers: headers)
-                    result(true)
-                }
-                catch let error as NSError {
-                    dump(error)
-                    result(FlutterError(code: "InAppBrowserWebViewController", message: error.localizedDescription, details: nil))
-                }
-                break
-            case "close":
-                close()
-                result(true)
-                break
-            case "show":
-                show()
-                result(true)
-                break
-            case "hide":
-                hide()
-                result(true)
-                break
-            case "reload":
-                webView.reload()
-                result(true)
-                break
-            case "goBack":
-                webView.goBack()
-                result(true)
-                break
-            case "canGoBack":
-                result(webView.canGoBack)
-                break
-            case "goForward":
-                webView.goForward()
-                result(true)
-                break
-            case "canGoForward":
-                result(webView.canGoForward)
-                break
-            case "goBackOrForward":
-                let steps = arguments!["steps"] as! Int
-                webView.goBackOrForward(steps: steps)
-                result(true)
-                break
-            case "canGoBackOrForward":
-                let steps = arguments!["steps"] as! Int
-                result(webView.canGoBackOrForward(steps: steps))
-                break
-            case "isLoading":
-                result(webView.isLoading == true)
-                break
-            case "stopLoading":
-                webView.stopLoading()
-                result(true)
-                break
-            case "isHidden":
-                result(isHidden == true)
-                break
-            case "evaluateJavascript":
-                let source = arguments!["source"] as! String
-                webView.evaluateJavascript(source: source, result: result)
-                break
-            case "injectJavascriptFileFromUrl":
-                let urlFile = arguments!["urlFile"] as! String
-                webView.injectJavascriptFileFromUrl(urlFile: urlFile)
-                result(true)
-                break
-            case "injectCSSCode":
-                let source = arguments!["source"] as! String
-                webView.injectCSSCode(source: source)
-                result(true)
-                break
-            case "injectCSSFileFromUrl":
-                let urlFile = arguments!["urlFile"] as! String
-                webView.injectCSSFileFromUrl(urlFile: urlFile)
-                result(true)
-                break
-            case "takeScreenshot":
-                webView.takeScreenshot(completionHandler: { (screenshot) -> Void in
-                    result(screenshot)
-                })
-                break
-            case "setOptions":
-                let inAppBrowserOptions = InAppBrowserOptions()
-                let inAppBrowserOptionsMap = arguments!["options"] as! [String: Any]
-                let _ = inAppBrowserOptions.parse(options: inAppBrowserOptionsMap)
-                self.setOptions(newOptions: inAppBrowserOptions, newOptionsMap: inAppBrowserOptionsMap)
-                result(true)
-                break
-            case "getOptions":
-                result(getOptions())
-                break
-            case "getCopyBackForwardList":
-                result(webView.getCopyBackForwardList())
-                break
-            case "findAllAsync":
-                let find = arguments!["find"] as! String
-                webView.findAllAsync(find: find, completionHandler: {(value, error) in
-                    if error != nil {
-                        result(FlutterError(code: "InAppBrowserWebViewController", message: error?.localizedDescription, details: nil))
-                        return
-                    }
-                    result(true)
-                })
-                break
-            case "findNext":
-                let forward = arguments!["forward"] as! Bool
-                webView.findNext(forward: forward, completionHandler: {(value, error) in
-                    if error != nil {
-                        result(FlutterError(code: "InAppBrowserWebViewController", message: error?.localizedDescription, details: nil))
-                        return
-                    }
-                    result(true)
-                })
-                break
-            case "clearMatches":
-                webView.clearMatches(completionHandler: {(value, error) in
-                    if error != nil {
-                        result(FlutterError(code: "InAppBrowserWebViewController", message: error?.localizedDescription, details: nil))
-                        return
-                    }
-                    result(true)
-                })
-                break
-            case "clearCache":
-                webView.clearCache()
-                result(true)
-                break
-            case "scrollTo":
-                let x = arguments!["x"] as! Int
-                let y = arguments!["y"] as! Int
-                let animated = arguments!["animated"] as! Bool
-                webView.scrollTo(x: x, y: y, animated: animated)
-                result(true)
-                break
-            case "scrollBy":
-                let x = arguments!["x"] as! Int
-                let y = arguments!["y"] as! Int
-                let animated = arguments!["animated"] as! Bool
-                webView.scrollTo(x: x, y: y, animated: animated)
-                result(true)
-                break
-            case "pauseTimers":
-               webView.pauseTimers()
-               result(true)
-               break
-            case "resumeTimers":
-                webView.resumeTimers()
-                result(true)
-                break
-            case "printCurrentPage":
-                webView.printCurrentPage(printCompletionHandler: {(completed, error) in
-                    if !completed, let _ = error {
-                        result(false)
-                        return
-                    }
-                    result(true)
-                })
-                break
-            case "getContentHeight":
-                result(webView.getContentHeight())
-                break
-            case "reloadFromOrigin":
-                webView.reloadFromOrigin()
-                result(true)
-                break
-            case "getScale":
-                result(webView.getScale())
-                break
-            case "hasOnlySecureContent":
-                result(webView.hasOnlySecureContent)
-                break
-            case "getSelectedText":
-                if webView != nil {
-                    webView!.getSelectedText { (value, error) in
-                        if let err = error {
-                            print(err.localizedDescription)
-                        }
-                        result(value)
-                    }
-                }
-                else {
-                    result(nil)
-                }
-                break
-            case "getHitTestResult":
-                if webView != nil {
-                    webView!.getHitTestResult { (value, error) in
-                        if let err = error {
-                            print(err.localizedDescription)
-                        }
-                        result(value)
-                    }
-                }
-                else {
-                    result(nil)
-                }
-                break
-            case "clearFocus":
-                if webView != nil {
-                    webView!.clearFocus()
-                    result(true)
-                } else {
-                    result(false)
-                }
-                
-                break
-            case "setContextMenu":
-                if webView != nil {
-                    let contextMenu = arguments!["contextMenu"] as? [String: Any]
-                    webView!.contextMenu = contextMenu
-                    result(true)
-                } else {
-                    result(false)
-                }
-                break
-            case "requestFocusNodeHref":
-                if webView != nil {
-                    webView!.requestFocusNodeHref { (value, error) in
-                        if let err = error {
-                            print(err.localizedDescription)
-                            result(nil)
-                            return
-                        }
-                        result(value)
-                    }
-                } else {
-                    result(false)
-                }
-                break
-            case "requestImageRef":
-                if webView != nil {
-                    webView!.requestImageRef { (value, error) in
-                        if let err = error {
-                            print(err.localizedDescription)
-                            result(nil)
-                            return
-                        }
-                        result(value)
-                    }
-                } else {
-                    result(false)
-                }
-                break
-            case "getScrollX":
-                if webView != nil {
-                    result(Int(webView!.scrollView.contentOffset.x))
-                } else {
-                    result(false)
-                }
-                break
-            case "getScrollY":
-                if webView != nil {
-                    result(Int(webView!.scrollView.contentOffset.y))
-                } else {
-                    result(false)
-                }
-                break
-            case "getCertificate":
-                if webView != nil {
-                    result(webView!.getCertificateMap())
-                } else {
-                    result(false)
-                }
-                break
-            default:
-                result(FlutterMethodNotImplemented)
-                break
-        }
-    }
-    
     public override func viewWillAppear(_ animated: Bool) {
         if !viewPrepared {
+            channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+            
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
             if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
                 self.webView = webViewTransport.webView
@@ -398,6 +82,11 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
                                             contextMenu: contextMenu,
                                             channel: channel!)
             }
+            
+            methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
+            channel!.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
+            
+            self.webView.appendUserScripts(userScripts: initUserScripts)
             self.containerWebView.addSubview(self.webView)
             prepareConstraints()
             prepareWebView()
@@ -456,6 +145,11 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
         
         urlField.delegate = self
         urlField.text = self.initURL?.absoluteString
+        urlField.backgroundColor = .white
+        urlField.textColor = .black
+        urlField.layer.borderWidth = 1.0
+        urlField.layer.borderColor = UIColor.lightGray.cgColor
+        urlField.layer.cornerRadius = 4
         
         closeButton.addTarget(self, action: #selector(self.close), for: .touchUpInside)
         
@@ -799,6 +493,8 @@ public class InAppBrowserWebViewController: UIViewController, FlutterPlugin, UIS
         onExit()
         channel?.setMethodCallHandler(nil)
         channel = nil
+        methodCallDelegate?.webView = nil
+        methodCallDelegate = nil
     }
     
     public func onBrowserCreated() {

@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
@@ -81,7 +82,8 @@ class HeadlessInAppWebView implements WebView {
       this.initialData,
       this.initialHeaders,
       this.initialOptions,
-      this.contextMenu}) {
+      this.contextMenu,
+      this.initialUserScripts}) {
     uuid = uuidGenerator.v4();
     webViewController = new InAppWebViewController(uuid, this);
   }
@@ -115,7 +117,8 @@ class HeadlessInAppWebView implements WebView {
               'initialHeaders': this.initialHeaders,
               'initialOptions': this.initialOptions?.toMap() ?? {},
               'contextMenu': this.contextMenu?.toMap() ?? {},
-              'windowId': this.windowId
+              'windowId': this.windowId,
+              'initialUserScripts': this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
             });
     await _sharedChannel.invokeMethod('createHeadlessWebView', args);
   }
@@ -167,6 +170,9 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final String? initialUrl;
+
+  @override
+  final UnmodifiableListView<UserScript>? initialUserScripts;
 
   @override
   final void Function(InAppWebViewController controller, String? url)?

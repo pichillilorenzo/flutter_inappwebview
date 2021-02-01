@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -35,6 +36,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialData,
     this.initialHeaders = const {},
     this.initialOptions,
+    this.initialUserScripts,
     this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
@@ -126,6 +128,9 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final String? initialUrl;
+
+  @override
+  final UnmodifiableListView<UserScript>? initialUserScripts;
 
   @override
   final ContextMenu? contextMenu;
@@ -365,7 +370,8 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialHeaders': widget.initialHeaders,
                 'initialOptions': widget.initialOptions?.toMap() ?? {},
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
-                'windowId': widget.windowId
+                'windowId': widget.windowId,
+                'initialUserScripts': widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
               },
               creationParamsCodec: const StandardMessageCodec(),
             )
@@ -387,7 +393,8 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialHeaders': widget.initialHeaders,
             'initialOptions': widget.initialOptions?.toMap() ?? {},
             'contextMenu': widget.contextMenu?.toMap() ?? {},
-            'windowId': widget.windowId
+            'windowId': widget.windowId,
+            'initialUserScripts': widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
           },
           creationParamsCodec: const StandardMessageCodec(),
         );
@@ -404,7 +411,8 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialHeaders': widget.initialHeaders,
           'initialOptions': widget.initialOptions?.toMap() ?? {},
           'contextMenu': widget.contextMenu?.toMap() ?? {},
-          'windowId': widget.windowId
+          'windowId': widget.windowId,
+          'initialUserScripts': widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         },
         creationParamsCodec: const StandardMessageCodec(),
       );

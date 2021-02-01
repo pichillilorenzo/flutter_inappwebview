@@ -217,7 +217,7 @@ Classes:
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
-- [CookieManager](#cookiemanager-class): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances. **NOTE for iOS**: available from iOS 11.0+.
+- [CookieManager](#cookiemanager-class): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances. **LIMITED SUPPORT for iOS below 11.0**.
 - [HttpAuthCredentialDatabase](#httpauthcredentialdatabase-class): This class implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
 - [WebStorageManager](#webstoragemanager-class): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 

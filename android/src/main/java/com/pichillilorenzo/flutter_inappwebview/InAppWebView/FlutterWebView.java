@@ -97,7 +97,6 @@ public class FlutterWebView implements PlatformView {
 
     if (containerView == null && id instanceof String) {
       Map<String, Object> obj = new HashMap<>();
-      obj.put("uuid", id);
       channel.invokeMethod("onHeadlessWebViewCreated", obj);
     }
   }

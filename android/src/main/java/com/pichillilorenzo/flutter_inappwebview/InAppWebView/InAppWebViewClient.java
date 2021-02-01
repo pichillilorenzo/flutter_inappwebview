@@ -115,8 +115,6 @@ public class InAppWebViewClient extends WebViewClient {
   public void onShouldOverrideUrlLoading(final InAppWebView webView, final String url, final String method, final Map<String, String> headers,
                                          final boolean isForMainFrame, boolean hasGesture, boolean isRedirect) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("method", method);
     obj.put("headers", headers);
@@ -264,8 +262,6 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     channel.invokeMethod("onLoadStart", obj);
   }
@@ -298,8 +294,6 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     channel.invokeMethod("onLoadStop", obj);
   }
@@ -307,8 +301,6 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void doUpdateVisitedHistory(WebView view, String url, boolean isReload) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("androidIsReload", isReload);
     channel.invokeMethod("onUpdateVisitedHistory", obj);
@@ -331,8 +323,6 @@ public class InAppWebViewClient extends WebViewClient {
     credentialsProposed = null;
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", failingUrl);
     obj.put("code", errorCode);
     obj.put("message", description);
@@ -347,8 +337,6 @@ public class InAppWebViewClient extends WebViewClient {
     super.onReceivedHttpError(view, request, errorResponse);
     if(request.isForMainFrame()) {
       Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("url", request.getUrl().toString());
       obj.put("statusCode", errorResponse.getStatusCode());
       obj.put("description", errorResponse.getReasonPhrase());
@@ -381,8 +369,6 @@ public class InAppWebViewClient extends WebViewClient {
     previousAuthRequestFailureCount++;
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("host", host);
     obj.put("protocol", protocol);
     obj.put("realm", realm);
@@ -460,8 +446,6 @@ public class InAppWebViewClient extends WebViewClient {
     final int port = url.getPort();
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("host", host);
     obj.put("protocol", protocol);
     obj.put("realm", realm);
@@ -545,8 +529,6 @@ public class InAppWebViewClient extends WebViewClient {
     final String realm = null;
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("host", request.getHost());
     obj.put("protocol", protocol);
     obj.put("realm", realm);
@@ -603,8 +585,6 @@ public class InAppWebViewClient extends WebViewClient {
     webView.scale = newScale;
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("oldScale", oldScale);
     obj.put("newScale", newScale);
     channel.invokeMethod("onScaleChanged", obj);
@@ -614,8 +594,6 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onSafeBrowsingHit(final WebView view, final WebResourceRequest request, final int threatType, final SafeBrowsingResponse callback) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", request.getUrl().toString());
     obj.put("threatType", threatType);
 
@@ -691,8 +669,6 @@ public class InAppWebViewClient extends WebViewClient {
 
     if (webView.options.resourceCustomSchemes != null && webView.options.resourceCustomSchemes.contains(scheme)) {
       final Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("url", url);
       obj.put("scheme", scheme);
 
@@ -770,8 +746,6 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     final Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("method", method);
     obj.put("headers", headers);
@@ -814,8 +788,6 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onFormResubmission (final WebView view, final Message dontResend, final Message resend) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", view.getUrl());
 
     channel.invokeMethod("onFormResubmission", obj, new MethodChannel.Result() {
@@ -857,8 +829,6 @@ public class InAppWebViewClient extends WebViewClient {
   public void onPageCommitVisible(WebView view, String url) {
     super.onPageCommitVisible(view, url);
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     channel.invokeMethod("onPageCommitVisible", obj);
   }
@@ -873,8 +843,6 @@ public class InAppWebViewClient extends WebViewClient {
       Integer rendererPriorityAtExit = detail.rendererPriorityAtExit();
 
       Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("didCrash", didCrash);
       obj.put("rendererPriorityAtExit", rendererPriorityAtExit);
 
@@ -889,8 +857,6 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onReceivedLoginRequest(WebView view, String realm, String account, String args) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("realm", realm);
     obj.put("account", account);
     obj.put("args", args);

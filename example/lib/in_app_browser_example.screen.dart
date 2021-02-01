@@ -22,7 +22,6 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   Future onLoadStop(url) async {
-    print(await this.webViewController.getTitle());
     print("\n\nStopped $url\n\n");
   }
 

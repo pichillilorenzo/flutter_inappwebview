@@ -88,14 +88,12 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
         if (navigationEvent == TAB_SHOWN && !onChromeSafariBrowserOpened) {
           onChromeSafariBrowserOpened = true;
           Map<String, Object> obj = new HashMap<>();
-          obj.put("uuid", uuid);
           channel.invokeMethod("onChromeSafariBrowserOpened", obj);
         }
 
         if (navigationEvent == NAVIGATION_FINISHED && !onChromeSafariBrowserCompletedInitialLoad) {
           onChromeSafariBrowserCompletedInitialLoad = true;
           Map<String, Object> obj = new HashMap<>();
-          obj.put("uuid", uuid);
           channel.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", obj);
         }
       }
@@ -197,7 +195,6 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     customTabsSession = null;
     finish();
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", uuid);
     channel.invokeMethod("onChromeSafariBrowserClosed", obj);
   }
 

@@ -822,8 +822,6 @@ final public class InAppWebView extends InputAwareWebView {
       @Override
       public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
         Map<String, Object> obj = new HashMap<>();
-        if (inAppBrowserActivity != null)
-          obj.put("uuid", inAppBrowserActivity.uuid);
         obj.put("activeMatchOrdinal", activeMatchOrdinal);
         obj.put("numberOfMatches", numberOfMatches);
         obj.put("isDoneCounting", isDoneCounting);
@@ -928,8 +926,6 @@ final public class InAppWebView extends InputAwareWebView {
         hitTestResultMap.put("extra", hitTestResult.getExtra());
 
         Map<String, Object> obj = new HashMap<>();
-        if (inAppBrowserActivity != null)
-          obj.put("uuid", inAppBrowserActivity.uuid);
         obj.put("hitTestResult", hitTestResultMap);
         channel.invokeMethod("onLongPressHitTestResult", obj);
         return false;
@@ -1516,8 +1512,6 @@ final public class InAppWebView extends InputAwareWebView {
     }
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("x", x);
     obj.put("y", y);
     channel.invokeMethod("onScrollChanged", obj);
@@ -1549,8 +1543,6 @@ final public class InAppWebView extends InputAwareWebView {
     @Override
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
       Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("url", url);
       channel.invokeMethod("onDownloadStart", obj);
     }
@@ -1610,8 +1602,6 @@ final public class InAppWebView extends InputAwareWebView {
     hitTestResultMap.put("extra", hitTestResult.getExtra());
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("hitTestResult", hitTestResultMap);
     channel.invokeMethod("onCreateContextMenu", obj);
   }
@@ -1724,8 +1714,6 @@ final public class InAppWebView extends InputAwareWebView {
             callback.onActionItemClicked(actionMode, menuItem);
 
             Map<String, Object> obj = new HashMap<>();
-            if (inAppBrowserActivity != null)
-              obj.put("uuid", inAppBrowserActivity.uuid);
             obj.put("androidId", itemId);
             obj.put("iosId", null);
             obj.put("title", itemTitle);
@@ -1750,8 +1738,6 @@ final public class InAppWebView extends InputAwareWebView {
           hideContextMenu();
 
           Map<String, Object> obj = new HashMap<>();
-          if (inAppBrowserActivity != null)
-            obj.put("uuid", inAppBrowserActivity.uuid);
           obj.put("androidId", itemId);
           obj.put("iosId", null);
           obj.put("title", itemTitle);
@@ -1837,8 +1823,6 @@ final public class InAppWebView extends InputAwareWebView {
 
   public void onHideContextMenu() {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     channel.invokeMethod("onHideContextMenu", obj);
   }
 

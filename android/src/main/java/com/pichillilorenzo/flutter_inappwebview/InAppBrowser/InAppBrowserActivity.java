@@ -120,7 +120,6 @@ public class InAppBrowserActivity extends AppCompatActivity {
     }
 
     Map<String, Object> obj = new HashMap<>();
-    obj.put("uuid", uuid);
     channel.invokeMethod("onBrowserCreated", obj);
   }
 

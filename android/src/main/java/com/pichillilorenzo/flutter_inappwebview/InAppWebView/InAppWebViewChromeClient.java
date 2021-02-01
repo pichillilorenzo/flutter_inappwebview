@@ -139,8 +139,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     this.mCustomViewCallback = null;
     activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     channel.invokeMethod("onExitFullscreen", obj);
   }
 
@@ -169,8 +167,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     ((FrameLayout) decorView).addView(this.mCustomView, FULLSCREEN_LAYOUT_PARAMS);
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     channel.invokeMethod("onEnterFullscreen", obj);
   }
 
@@ -178,8 +174,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onJsAlert(final WebView view, String url, final String message,
                            final JsResult result) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("message", message);
     obj.put("iosIsMainFrame", null);
@@ -265,8 +259,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onJsConfirm(final WebView view, String url, final String message,
                              final JsResult result) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("message", message);
     obj.put("iosIsMainFrame", null);
@@ -365,8 +357,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onJsPrompt(final WebView view, String url, final String message,
                             final String defaultValue, final JsPromptResult result) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("message", message);
     obj.put("defaultValue", defaultValue);
@@ -487,8 +477,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onJsBeforeUnload(final WebView view, String url, final String message,
                            final JsResult result) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("message", message);
     obj.put("iosIsMainFrame", null);
@@ -592,8 +580,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     String url = result.getExtra();
 
     final Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("windowId", windowId);
     obj.put("androidIsDialog", isDialog);
@@ -636,9 +622,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onCloseWindow(WebView window) {
     final Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
-
     channel.invokeMethod("onCloseWindow", obj);
 
     super.onCloseWindow(window);
@@ -647,9 +630,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onRequestFocus(WebView view) {
     final Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
-
     channel.invokeMethod("onRequestFocus", obj);
 
     super.onCloseWindow(view);
@@ -658,8 +638,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onGeolocationPermissionsShowPrompt(final String origin, final GeolocationPermissions.Callback callback) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("origin", origin);
     channel.invokeMethod("onGeolocationPermissionsShowPrompt", obj, new MethodChannel.Result() {
       @Override
@@ -686,16 +664,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onGeolocationPermissionsHidePrompt() {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     channel.invokeMethod("onGeolocationPermissionsHidePrompt", obj);
   }
 
   @Override
   public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("message", consoleMessage.message());
     obj.put("messageLevel", consoleMessage.messageLevel().ordinal());
     channel.invokeMethod("onConsoleMessage", obj);
@@ -717,8 +691,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("progress", progress);
     channel.invokeMethod("onProgressChanged", obj);
 
@@ -733,8 +705,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("title", title);
     channel.invokeMethod("onTitleChanged", obj);
   }
@@ -757,8 +727,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     icon.recycle();
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("icon", byteArrayOutputStream.toByteArray());
     channel.invokeMethod("onReceivedIcon", obj);
   }
@@ -770,8 +738,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     super.onReceivedTouchIconUrl(view, url, precomposed);
 
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", url);
     obj.put("precomposed", precomposed);
     channel.invokeMethod("onReceivedTouchIconUrl", obj);
@@ -1142,8 +1108,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public void onPermissionRequest(final PermissionRequest request) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       Map<String, Object> obj = new HashMap<>();
-      if (inAppBrowserActivity != null)
-        obj.put("uuid", inAppBrowserActivity.uuid);
       obj.put("origin", request.getOrigin().toString());
       obj.put("resources", Arrays.asList(request.getResources()));
       channel.invokeMethod("onPermissionRequest", obj, new MethodChannel.Result() {

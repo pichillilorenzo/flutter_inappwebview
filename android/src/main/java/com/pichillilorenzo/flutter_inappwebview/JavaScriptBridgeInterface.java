@@ -72,8 +72,6 @@ public class JavaScriptBridgeInterface {
     final InAppWebView webView = (inAppBrowserActivity != null) ? inAppBrowserActivity.webView : flutterWebView.webView;
 
     final Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("handlerName", handlerName);
     obj.put("args", args);
 

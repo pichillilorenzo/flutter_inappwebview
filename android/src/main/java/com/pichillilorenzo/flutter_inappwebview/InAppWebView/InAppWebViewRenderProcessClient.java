@@ -35,8 +35,6 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
   @Override
   public void onRenderProcessUnresponsive(@NonNull WebView view, @Nullable final WebViewRenderProcess renderer) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", view.getUrl());
     channel.invokeMethod("onRenderProcessUnresponsive", obj, new MethodChannel.Result() {
 
@@ -69,8 +67,6 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
   @Override
   public void onRenderProcessResponsive(@NonNull WebView view, @Nullable final WebViewRenderProcess renderer) {
     Map<String, Object> obj = new HashMap<>();
-    if (inAppBrowserActivity != null)
-      obj.put("uuid", inAppBrowserActivity.uuid);
     obj.put("url", view.getUrl());
     channel.invokeMethod("onRenderProcessResponsive", obj, new MethodChannel.Result() {
 

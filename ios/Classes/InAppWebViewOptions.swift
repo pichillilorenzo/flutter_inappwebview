@@ -61,6 +61,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var maximumZoomScale = 1.0
     var minimumZoomScale = 1.0
     var contentInsetAdjustmentBehavior = 2 // UIScrollView.ContentInsetAdjustmentBehavior.never
+    var isDirectionalLockEnabled = false
     
     override init(){
         super.init()
@@ -109,6 +110,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
             realOptions["minimumZoomScale"] = webView.scrollView.minimumZoomScale
             realOptions["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs")
             realOptions["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs")
+            realOptions["isDirectionalLockEnabled"] = webView.scrollView.isDirectionalLockEnabled
         }
         return realOptions
     }

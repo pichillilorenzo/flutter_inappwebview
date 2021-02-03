@@ -836,6 +836,14 @@ class IOSInAppWebViewOptions
   ///The default value is [IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER].
   IOSUIScrollViewContentInsetAdjustmentBehavior contentInsetAdjustmentBehavior;
 
+  ///A Boolean value that determines whether scrolling is disabled in a particular direction.
+  ///If this property is `false`, scrolling is permitted in both horizontal and vertical directions.
+  ///If this property is `true` and the user begins dragging in one general direction (horizontally or vertically),
+  ///the scroll view disables scrolling in the other direction.
+  ///If the drag direction is diagonal, then scrolling will not be locked and the user can drag in any direction until the drag completes.
+  ///The default value is `false`.
+  bool isDirectionalLockEnabled;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -860,7 +868,8 @@ class IOSInAppWebViewOptions
       this.maximumZoomScale = 1.0,
       this.minimumZoomScale = 1.0,
       this.contentInsetAdjustmentBehavior =
-          IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER});
+          IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER,
+      this.isDirectionalLockEnabled = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -895,7 +904,8 @@ class IOSInAppWebViewOptions
       "isPagingEnabled": isPagingEnabled,
       "maximumZoomScale": maximumZoomScale,
       "minimumZoomScale": minimumZoomScale,
-      "contentInsetAdjustmentBehavior": contentInsetAdjustmentBehavior.toValue()
+      "contentInsetAdjustmentBehavior": contentInsetAdjustmentBehavior.toValue(),
+      "isDirectionalLockEnabled": isDirectionalLockEnabled,
     };
   }
 
@@ -945,6 +955,7 @@ class IOSInAppWebViewOptions
     options.contentInsetAdjustmentBehavior =
         IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
             map["contentInsetAdjustmentBehavior"])!;
+    options.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
     return options;
   }
 

@@ -32,6 +32,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
         
         myView = UIView(frame: frame)
+        myView!.clipsToBounds = true
         
         let initialUrl = args["initialUrl"] as? String
         let initialFile = args["initialFile"] as? String

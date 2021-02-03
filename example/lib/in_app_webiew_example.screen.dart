@@ -87,9 +87,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(
                         useShouldOverrideUrlLoading: false,
+                        mediaPlaybackRequiresUserGesture: false,
                       ),
                       android: AndroidInAppWebViewOptions(
-                        useHybridComposition: true
+                        useHybridComposition: true,
+                      ),
+                      ios: IOSInAppWebViewOptions(
+                        allowsInlineMediaPlayback: true,
                       )
                     ),
                     onWebViewCreated: (controller) {
@@ -139,7 +143,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       });
                     },
                     onConsoleMessage: (controller, consoleMessage) {
-                      print(consoleMessage);
+                      // print(consoleMessage);
                     },
                   ),
                 ),

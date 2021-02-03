@@ -1145,6 +1145,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.showsHorizontalScrollIndicator = !options.disableHorizontalScroll
             scrollView.showsVerticalScrollIndicator = options.verticalScrollBarEnabled
             scrollView.showsHorizontalScrollIndicator = options.horizontalScrollBarEnabled
+            scrollView.isScrollEnabled = !(options.disableVerticalScroll && options.disableHorizontalScroll)
+            scrollView.isDirectionalLockEnabled = options.isDirectionalLockEnabled
 
             scrollView.decelerationRate = InAppWebView.getDecelerationRate(type: options.decelerationRate)
             scrollView.alwaysBounceVertical = options.alwaysBounceVertical
@@ -1790,6 +1792,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.showsHorizontalScrollIndicator = newOptions.horizontalScrollBarEnabled
         }
         
+        if newOptionsMap["isDirectionalLockEnabled"] != nil && options?.isDirectionalLockEnabled != newOptions.isDirectionalLockEnabled {
+            scrollView.isDirectionalLockEnabled = newOptions.isDirectionalLockEnabled
+        }
+        
         if newOptionsMap["decelerationRate"] != nil && options?.decelerationRate != newOptions.decelerationRate {
             scrollView.decelerationRate = InAppWebView.getDecelerationRate(type: newOptions.decelerationRate)
         }
@@ -1865,6 +1871,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         self.options = newOptions
+        
+        if let options = self.options {
+            scrollView.isScrollEnabled = !(options.disableVerticalScroll && options.disableHorizontalScroll)
+        }
     }
     
     func getOptions() -> [String: Any?]? {

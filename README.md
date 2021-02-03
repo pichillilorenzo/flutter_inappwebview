@@ -643,6 +643,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `ignoresViewportScaleLimits`: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
 * `isFraudulentWebsiteWarningEnabled`: A Boolean value indicating whether warnings should be shown for suspected fraudulent content such as phishing or malware.
 * `isPagingEnabled`: A Boolean value that determines whether paging is enabled for the scroll view. The default value is `false`.
+* `isDirectionalLockEnabled`: A Boolean value that determines whether scrolling is disabled in a particular direction.
 * `maximumZoomScale`: A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
 * `minimumZoomScale`: A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
 * `scrollsToTop`: A Boolean value that controls whether the scroll-to-top gesture is enabled. The default value is `true`.

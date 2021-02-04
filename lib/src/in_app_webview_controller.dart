@@ -929,6 +929,7 @@ class InAppWebViewController {
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
     }
+    return null;
   }
 
   ///Gets the URL for the current page.

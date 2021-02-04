@@ -4601,7 +4601,7 @@ class UserScript {
 ///
 ///**NOTE for iOS 14.0+**: this class represents the native [WKContentWorld](https://developer.apple.com/documentation/webkit/wkcontentworld) class.
 ///
-///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` equals to [name] to the webpage's content that contains only the scripts
+///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` equals to `flutter_inappwebview_[name]` to the webpage's content that contains only the scripts
 ///in order to define a new scope of execution for JavaScript code. Unfortunately, there isn't any other way to do it.
 ///For any [ContentWorld], except [ContentWorld.page], if you need to access to the `window` or `document` global Object,
 ///you need to use `window.top` and `window.top.document` because the code runs inside an `<iframe>`.

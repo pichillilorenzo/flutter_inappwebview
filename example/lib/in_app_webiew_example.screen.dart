@@ -81,7 +81,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
                     // contextMenu: contextMenu,
-                    initialUrl: "https://flutter.dev/",
+                    initialUrl: "https://flutter.dev",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
                     initialUserScripts: UnmodifiableListView<UserScript>([
@@ -91,12 +91,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       crossPlatform: InAppWebViewOptions(
                         useShouldOverrideUrlLoading: false,
                         mediaPlaybackRequiresUserGesture: false,
+                        clearCache: true
                       ),
                       android: AndroidInAppWebViewOptions(
                         useHybridComposition: true,
                       ),
                       ios: IOSInAppWebViewOptions(
                         allowsInlineMediaPlayback: true,
+                        // limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
                       )
                     ),
                     onWebViewCreated: (controller) {

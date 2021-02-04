@@ -38,3 +38,5 @@ export 'src/web_storage_manager.dart';
 export 'src/context_menu.dart';
 export 'src/web_storage.dart';
 export 'src/X509Certificate/main.dart';
+export 'src/android/service_worker_controller.dart';
+export 'src/android/webview_feature.dart';

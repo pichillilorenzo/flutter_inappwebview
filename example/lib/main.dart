@@ -12,6 +12,8 @@ import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart'
 
 // InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
+AndroidServiceWorkerController serviceWorkerController = AndroidServiceWorkerController.instance();
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Permission.camera.request();
@@ -19,6 +21,16 @@ Future main() async {
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
+
+  if (await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST)) {
+    serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
+      shouldInterceptRequest: (request) async {
+        print(request);
+        return null;
+      },
+    );
+  }
+
   runApp(MyApp());
 }
 

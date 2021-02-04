@@ -29,6 +29,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public static MyCookieManager myCookieManager;
   public static CredentialDatabaseHandler credentialDatabaseHandler;
   public static MyWebStorage myWebStorage;
+  public static ServiceWorkerManager serviceWorkerManager;
+  public static WebViewFeatureManager webViewFeatureManager;
   public static ValueCallback<Uri> filePathCallbackLegacy;
   public static ValueCallback<Uri[]> filePathCallback;
 
@@ -65,12 +67,17 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
     platformViewRegistry.registerViewFactory(
                     "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(messenger, flutterView));
+
     inAppWebViewStatic = new InAppWebViewStatic(messenger);
     myCookieManager = new MyCookieManager(messenger);
     myWebStorage = new MyWebStorage(messenger);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      serviceWorkerManager = new ServiceWorkerManager(messenger);
+    }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       credentialDatabaseHandler = new CredentialDatabaseHandler(messenger);
     }
+    webViewFeatureManager = new WebViewFeatureManager(messenger);
   }
 
   @Override
@@ -102,6 +109,14 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (inAppWebViewStatic != null) {
       inAppWebViewStatic.dispose();
       inAppWebViewStatic = null;
+    }
+    if (serviceWorkerManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      serviceWorkerManager.dispose();
+      serviceWorkerManager = null;
+    }
+    if (webViewFeatureManager != null) {
+      webViewFeatureManager.dispose();
+      webViewFeatureManager = null;
     }
     filePathCallbackLegacy = null;
     filePathCallback = null;

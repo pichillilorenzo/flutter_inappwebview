@@ -35,20 +35,16 @@ import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
-import android.webkit.WebChromeClient;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
-import android.webkit.WebViewClient;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import androidx.annotation.Keep;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
-import androidx.webkit.WebViewRenderProcessClient;
 
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.ContentBlocker.ContentBlockerAction;
@@ -63,9 +59,6 @@ import com.pichillilorenzo.flutter_inappwebview.Util;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
-import java.security.cert.CertificateExpiredException;
-import java.security.cert.CertificateNotYetValidException;
-import java.security.cert.CertificateParsingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -131,10 +124,11 @@ final public class InAppWebView extends InputAwareWebView {
           "}";
 
   static final String contentWorldWrapperJS = "(function() {" +
-          "  var iframe = document.getElementById('$CONTENT_WORLD_NAME');" +
+          "  var iframeId = '" + JavaScriptBridgeInterface.name + "_$CONTENT_WORLD_NAME';" +
+          "  var iframe = document.getElementById(iframeId);" +
           "  if (iframe == null) {" +
           "    iframe = document.createElement('iframe');" +
-          "    iframe.id = '$CONTENT_WORLD_NAME';" +
+          "    iframe.id = iframeId;" +
           "    iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
           "    document.body.append(iframe);" +
           "  }" +

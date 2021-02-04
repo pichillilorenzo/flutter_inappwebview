@@ -34,7 +34,6 @@ public abstract class RequestPermissionHandler implements ActivityCompat.OnReque
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String permissions[], @NonNull int[] grantResults) {
-        Log.d("asdasd", "\n\na asd asd \n\n");
         if ((grantResults.length > 0) && (grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
             List<Runnable> callbacks = actionDictionary.get(requestCode);
             for (Runnable runnable : callbacks) {

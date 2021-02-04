@@ -31,7 +31,7 @@ If you need a specific version, please change the **GitHub branch** of this repo
 ## Requirements
 
 - Dart sdk: ">=2.12.0-0 <3.0.0"
-- Flutter: ">=1.22.0"
+- Flutter: ">=1.22.2"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 12`
 

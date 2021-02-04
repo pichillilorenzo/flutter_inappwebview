@@ -33,7 +33,7 @@ If you need a specific version, please change the **GitHub branch** of this repo
 - Dart sdk: ">=2.12.0-0 <3.0.0"
 - Flutter: ">=1.22.0"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
-- iOS: `--ios-language swift`, Xcode version `>= 11`
+- iOS: `--ios-language swift`, Xcode version `>= 12`
 
 ### IMPORTANT Note for Android and iOS
 
@@ -494,6 +494,7 @@ iOS-specific methods can be called using the `InAppWebViewController.ios` attrib
 
 * `hasOnlySecureContent`: A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
 * `reloadFromOrigin`: Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
+* `static handlesURLScheme(String urlScheme)`: Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
 
 ##### About the JavaScript handler
 
@@ -643,9 +644,12 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `ignoresViewportScaleLimits`: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
 * `isFraudulentWebsiteWarningEnabled`: A Boolean value indicating whether warnings should be shown for suspected fraudulent content such as phishing or malware.
 * `isPagingEnabled`: A Boolean value that determines whether paging is enabled for the scroll view. The default value is `false`.
-* `isDirectionalLockEnabled`: A Boolean value that determines whether scrolling is disabled in a particular direction.
+* `isDirectionalLockEnabled`: A Boolean value that determines whether scrolling is disabled in a particular direction. The default value is `false`.
+* `limitsNavigationsToAppBoundDomains`: A Boolean value that indicates whether the web view limits navigation to pages within the app’s domain. The default value is `false`.
 * `maximumZoomScale`: A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
+* `mediaType`: The media type for the contents of the web view. The default value is `null`.
 * `minimumZoomScale`: A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content. The default value is `1.0`.
+* `pageZoom`: The scale factor by which the web view scales content relative to its bounds. The default value is `1.0`.
 * `scrollsToTop`: A Boolean value that controls whether the scroll-to-top gesture is enabled. The default value is `true`.
 * `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
 * `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.

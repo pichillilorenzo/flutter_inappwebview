@@ -62,6 +62,9 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var minimumZoomScale = 1.0
     var contentInsetAdjustmentBehavior = 2 // UIScrollView.ContentInsetAdjustmentBehavior.never
     var isDirectionalLockEnabled = false
+    var mediaType: String? = nil
+    var pageZoom = 1.0
+    var limitsNavigationsToAppBoundDomains = false
     
     override init(){
         super.init()
@@ -78,7 +81,6 @@ public class InAppWebViewOptions: Options<InAppWebView> {
                 realOptions["allowsLinkPreview"] = webView.allowsLinkPreview
                 realOptions["allowsPictureInPictureMediaPlayback"] = configuration.allowsPictureInPictureMediaPlayback
             }
-            realOptions["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
             realOptions["javaScriptCanOpenWindowsAutomatically"] = configuration.preferences.javaScriptCanOpenWindowsAutomatically
             if #available(iOS 10.0, *) {
                 realOptions["mediaPlaybackRequiresUserGesture"] = configuration.mediaTypesRequiringUserActionForPlayback == .all
@@ -111,6 +113,13 @@ public class InAppWebViewOptions: Options<InAppWebView> {
             realOptions["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs")
             realOptions["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs")
             realOptions["isDirectionalLockEnabled"] = webView.scrollView.isDirectionalLockEnabled
+            realOptions["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
+            if #available(iOS 14.0, *) {
+                realOptions["mediaType"] = webView.mediaType
+                realOptions["pageZoom"] = Float(webView.pageZoom)
+                realOptions["limitsNavigationsToAppBoundDomains"] = configuration.limitsNavigationsToAppBoundDomains
+                realOptions["javaScriptEnabled"] = configuration.defaultWebpagePreferences.allowsContentJavaScript
+            }
         }
         return realOptions
     }

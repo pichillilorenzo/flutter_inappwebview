@@ -84,6 +84,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialUrl: "https://flutter.dev/",
                     // initialFile: "assets/index.html",
                     initialHeaders: {},
+                    initialUserScripts: UnmodifiableListView<UserScript>([
+
+                    ]),
                     initialOptions: InAppWebViewGroupOptions(
                       crossPlatform: InAppWebViewOptions(
                         useShouldOverrideUrlLoading: false,
@@ -143,7 +146,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       });
                     },
                     onConsoleMessage: (controller, consoleMessage) {
-                      // print(consoleMessage);
+                      print(consoleMessage);
                     },
                   ),
                 ),

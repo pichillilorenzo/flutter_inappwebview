@@ -113,12 +113,44 @@ final public class InAppWebView extends InputAwareWebView {
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
 
-  static final String scriptsWrapperJS = "(function(){" +
-          "  if (window." + JavaScriptBridgeInterface.name + "._scriptsLoaded == null) {" +
+  static final String pluginScriptsWrapperJS = "(function(){" +
+          "  if (window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded == null || !window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded) {" +
           "    $PLACEHOLDER_VALUE" +
-          "    window." + JavaScriptBridgeInterface.name + "._scriptsLoaded = true;" +
+          "    window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded = true;" +
           "  }" +
           "})();";
+
+  static final String userScriptsAtDocumentStartWrapperJS = "if (window." + JavaScriptBridgeInterface.name + "._userScriptsAtDocumentStartLoaded == null || !window." + JavaScriptBridgeInterface.name + "._userScriptsAtDocumentStartLoaded) {" +
+          "  $PLACEHOLDER_VALUE" +
+          "  window." + JavaScriptBridgeInterface.name + "._userScriptsAtDocumentStartLoaded = true;" +
+          "}";
+
+  static final String userScriptsAtDocumentEndWrapperJS = "if (window." + JavaScriptBridgeInterface.name + "._userScriptsAtDocumentEndLoaded == null || !window." + JavaScriptBridgeInterface.name + "._userScriptsAtDocumentEndLoaded) {" +
+          "  $PLACEHOLDER_VALUE" +
+          "  window." + JavaScriptBridgeInterface.name + "._userScriptsAtDocumentEndLoaded = true;" +
+          "}";
+
+  static final String contentWorldWrapperJS = "(function() {" +
+          "  var iframe = document.getElementById('$CONTENT_WORLD_NAME');" +
+          "  if (iframe == null) {" +
+          "    iframe = document.createElement('iframe');" +
+          "    iframe.id = '$CONTENT_WORLD_NAME';" +
+          "    iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
+          "    document.body.append(iframe);" +
+          "  }" +
+          "  var script = iframe.contentWindow.document.createElement('script');" +
+          "  var sourceEncoded = $JSON_SOURCE_ENCODED;" +
+          "  script.innerHTML = sourceEncoded.source;" +
+          "  iframe.contentWindow.document.body.append(script);" +
+          "})();";
+
+  static final String documentReadyWrapperJS = "if (document.readyState === 'interactive' || document.readyState === 'complete') { " +
+          "  $PLACEHOLDER_VALUE" +
+          "} else {" +
+          "  document.addEventListener('DOMContentLoaded', function() {" +
+          "     $PLACEHOLDER_VALUE" +
+          "  });" +
+          "}";
 
   static final String consoleLogJS = "(function(console) {" +
           "   var oldLogs = {" +
@@ -147,11 +179,15 @@ final public class InAppWebView extends InputAwareWebView {
           "})(window.console);";
 
   static final String printJS = "window.print = function() {" +
-          "  window." + JavaScriptBridgeInterface.name + ".callHandler('onPrint', window.location.href);" +
+          "  if (window.top == null || window.top === window) {" +
+          "     window." + JavaScriptBridgeInterface.name + ".callHandler('onPrint', window.location.href);" +
+          "  } else {" +
+          "     window.top.print();" +
+          "  }" +
           "};";
 
   static final String platformReadyJS = "(function() {" +
-          "  if (window." + JavaScriptBridgeInterface.name + "._platformReady == null) {" +
+          "  if ((window.top == null || window.top === window) && window." + JavaScriptBridgeInterface.name + "._platformReady == null) {" +
           "    window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));" +
           "    window." + JavaScriptBridgeInterface.name + "._platformReady = true;" +
           "  }" +
@@ -171,8 +207,8 @@ final public class InAppWebView extends InputAwareWebView {
           "   observer.observe({entryTypes: ['resource']});" +
           "})();";
 
-  static final String variableForShouldInterceptAjaxRequestJS = "window._flutter_inappwebview_useShouldInterceptAjaxRequest";
-  static final String enableVariableForShouldInterceptAjaxRequestJS = variableForShouldInterceptAjaxRequestJS + " = $PLACEHOLDER_VALUE;";
+  static final String variableForShouldInterceptAjaxRequestJS = "_flutter_inappwebview_useShouldInterceptAjaxRequest";
+  static final String enableVariableForShouldInterceptAjaxRequestJS = "window." + variableForShouldInterceptAjaxRequestJS + " = $PLACEHOLDER_VALUE;";
 
   static final String interceptAjaxRequestsJS = "(function(ajax) {" +
           "  var send = ajax.prototype.send;" +
@@ -225,7 +261,8 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "  function handleEvent(e) {" +
           "    var self = this;" +
-          "    if (" + variableForShouldInterceptAjaxRequestJS + " == null || " + variableForShouldInterceptAjaxRequestJS + " == true) {" +
+          "    var w = (window.top == null || window.top === window) ? window : window.top;" +
+          "    if (w." + variableForShouldInterceptAjaxRequestJS + " == null || w." + variableForShouldInterceptAjaxRequestJS + " == true) {" +
           "      var headers = this.getAllResponseHeaders();" +
           "      var responseHeaders = {};" +
           "      if (headers != null) {" +
@@ -276,12 +313,14 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "  ajax.prototype.send = function(data) {" +
           "    var self = this;" +
-          "    if (" + variableForShouldInterceptAjaxRequestJS + " == null || " + variableForShouldInterceptAjaxRequestJS + " == true) {" +
+          "    var w = (window.top == null || window.top === window) ? window : window.top;" +
+          "    if (w." + variableForShouldInterceptAjaxRequestJS + " == null || w." + variableForShouldInterceptAjaxRequestJS + " == true) {" +
           "      if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {" +
           "        this._flutter_inappwebview_already_onreadystatechange_wrapped = true;" +
           "        var onreadystatechange = this.onreadystatechange;" +
           "        this.onreadystatechange = function() {" +
-          "          if (" + variableForShouldInterceptAjaxRequestJS + " == null || " + variableForShouldInterceptAjaxRequestJS + " == true) {" +
+          "          var w = (window.top == null || window.top === window) ? window : window.top;" +
+          "          if (w." + variableForShouldInterceptAjaxRequestJS + " == null || w." + variableForShouldInterceptAjaxRequestJS + " == true) {" +
           "            var headers = this.getAllResponseHeaders();" +
           "            var responseHeaders = {};" +
           "            if (headers != null) {" +
@@ -384,8 +423,8 @@ final public class InAppWebView extends InputAwareWebView {
           "  };" +
           "})(window.XMLHttpRequest);";
 
-  static final String  variableForShouldInterceptFetchRequestsJS = "window._flutter_inappwebview_useShouldInterceptFetchRequest";
-  static final String  enableVariableForShouldInterceptFetchRequestsJS = variableForShouldInterceptFetchRequestsJS + " = $PLACEHOLDER_VALUE;";
+  static final String  variableForShouldInterceptFetchRequestsJS = "_flutter_inappwebview_useShouldInterceptFetchRequest";
+  static final String  enableVariableForShouldInterceptFetchRequestsJS = "window." + variableForShouldInterceptFetchRequestsJS + " = $PLACEHOLDER_VALUE;";
 
   static final String interceptFetchRequestsJS = "(function(fetch) {" +
           "  if (fetch == null) {" +
@@ -454,7 +493,8 @@ final public class InAppWebView extends InputAwareWebView {
           "    return credentials;" +
           "  }" +
           "  window.fetch = async function(resource, init) {" +
-          "    if (window." + variableForShouldInterceptFetchRequestsJS + " == null || window." + variableForShouldInterceptFetchRequestsJS + " == true) {" +
+          "    var w = (window.top == null || window.top === window) ? window : window.top;" +
+          "    if (w." + variableForShouldInterceptFetchRequestsJS + " == null || w." + variableForShouldInterceptFetchRequestsJS + " == true) {" +
           "      var fetchRequest = {" +
           "        url: null," +
           "        method: null," +

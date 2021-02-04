@@ -844,6 +844,28 @@ class IOSInAppWebViewOptions
   ///The default value is `false`.
   bool isDirectionalLockEnabled;
 
+  ///The media type for the contents of the web view.
+  ///When the value of this property is `null`, the web view derives the current media type from the CSS media property of its content.
+  ///If you assign a value other than `null` to this property, the web view uses the value you provide instead.
+  ///The default value of this property is `null`.
+  ///
+  ///**NOTE**: available on iOS 14.0+.
+  String? mediaType;
+
+  ///The scale factor by which the web view scales content relative to its bounds.
+  ///The default value of this property is `1.0`, which displays the content without any scaling.
+  ///Changing the value of this property is equivalent to setting the CSS `zoom` property on all page content.
+  ///
+  ///**NOTE**: available on iOS 14.0+.
+  double pageZoom;
+
+  ///A Boolean value that indicates whether the web view limits navigation to pages within the app’s domain.
+  ///Check [App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/) for more details.
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: available on iOS 14.0+.
+  bool limitsNavigationsToAppBoundDomains;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -869,7 +891,10 @@ class IOSInAppWebViewOptions
       this.minimumZoomScale = 1.0,
       this.contentInsetAdjustmentBehavior =
           IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER,
-      this.isDirectionalLockEnabled = false});
+      this.isDirectionalLockEnabled = false,
+      this.mediaType,
+      this.pageZoom = 1.0,
+      this.limitsNavigationsToAppBoundDomains = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -906,6 +931,9 @@ class IOSInAppWebViewOptions
       "minimumZoomScale": minimumZoomScale,
       "contentInsetAdjustmentBehavior": contentInsetAdjustmentBehavior.toValue(),
       "isDirectionalLockEnabled": isDirectionalLockEnabled,
+      "mediaType": mediaType,
+      "pageZoom": pageZoom,
+      "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
     };
   }
 
@@ -956,6 +984,9 @@ class IOSInAppWebViewOptions
         IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
             map["contentInsetAdjustmentBehavior"])!;
     options.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
+    options.mediaType = map["mediaType"];
+    options.pageZoom = map["pageZoom"];
+    options.limitsNavigationsToAppBoundDomains = map["limitsNavigationsToAppBoundDomains"];
     return options;
   }
 

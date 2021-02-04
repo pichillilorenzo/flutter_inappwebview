@@ -4571,10 +4571,20 @@ class UserScript {
   ///The default value is `true`. Available only on iOS.
   bool iosForMainFrameOnly;
 
-  UserScript({required this.source, required this.injectionTime, this.iosForMainFrameOnly = true});
+  ///**NOTE for iOS 14.0+**: The namespace in which to evaluate the script.
+  ///This parameter doesn’t apply to changes your script makes to the underlying web content, such as the document’s DOM structure.
+  ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///For more information about content worlds, see [WKContentWorld](https://developer.apple.com/documentation/webkit/wkcontentworld).
+  ContentWorld? contentWorld;
+
+  UserScript({required this.source, required this.injectionTime, this.iosForMainFrameOnly = true, this.contentWorld});
 
   Map<String, dynamic> toMap() {
-    return {"source": source, "injectionTime": injectionTime.toValue(), "iosForMainFrameOnly": iosForMainFrameOnly};
+    return {"source": source,
+      "injectionTime": injectionTime.toValue(),
+      "iosForMainFrameOnly": iosForMainFrameOnly,
+      "contentWorld": contentWorld?.name
+    };
   }
 
   Map<String, dynamic> toJson() {
@@ -4585,4 +4595,29 @@ class UserScript {
   String toString() {
     return toMap().toString();
   }
+}
+
+///Class that represents an object that defines a scope of execution for JavaScript code, and which you use to prevent conflicts between different scripts.
+///
+///**NOTE for iOS 14.0+**: this class represents the native [WKContentWorld](https://developer.apple.com/documentation/webkit/wkcontentworld) class.
+///
+///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` equals to [name] to the webpage's content that contains only the scripts
+///in order to define a new scope of execution for JavaScript code. Unfortunately, there isn't any other way to do it.
+///For any [ContentWorld], except [ContentWorld.page], if you need to access to the `window` or `document` global Object,
+///you need to use `window.top` and `window.top.document` because the code runs inside an `<iframe>`.
+class ContentWorld {
+  ///The name of a custom content world.
+  final String name;
+
+  ///Returns the custom content world with the specified name.
+  ContentWorld.world({required this.name});
+
+  ///The default world for clients.
+  static ContentWorld defaultClient = ContentWorld.world(name: "defaultClient");
+
+  ///The content world for the current webpage’s content.
+  ///This property contains the content world for scripts that the current webpage executes.
+  ///Be careful when manipulating variables in this content world.
+  ///If you modify a variable with the same name as one the webpage uses, you may unintentionally disrupt the normal operation of that page.
+  static ContentWorld page = ContentWorld.world(name: "page");
 }

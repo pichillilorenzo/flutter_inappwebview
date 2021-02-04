@@ -8,7 +8,9 @@
 - Added `UserScript` and `UserScriptInjectionTime` classes
 - Added `initialUserScripts` WebView option
 - Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts` WebView methods
-- Added `isDirectionalLockEnabled` iOS-specific webview option
+- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains` iOS-specific webview options
+- Added `handlesURLScheme` iOS-specific webview method
+- Added `ContentWorld` class
 - Updated integration tests
 - Merge "Upgraded appcompat to 1.2.0-rc-02" [#465](https://github.com/pichillilorenzo/flutter_inappwebview/pull/465) (thanks to [andreidiaconu](https://github.com/andreidiaconu))
 - Merge "Added missing field 'headers' which returned by WebResourceResponse.toMap()" [#490](https://github.com/pichillilorenzo/flutter_inappwebview/pull/490) (thanks to [Doflatango](https://github.com/Doflatango))
@@ -32,6 +34,7 @@
 ### BREAKING CHANGES
 
 - Minimum Flutter version required is `1.22.0` and Dart SDK `>=2.12.0-0 <3.0.0`
+- iOS Xcode version `>= 12`
 - Removed `debuggingEnabled` WebView option; on Android you should use now the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method; on iOS, debugging is always enabled
 - `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options moved from Android-specific options to cross-platform options.
 

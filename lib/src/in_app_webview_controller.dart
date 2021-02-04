@@ -2275,4 +2275,18 @@ class IOSInAppWebViewController {
     return await _controller._channel
         .invokeMethod('hasOnlySecureContent', args);
   }
+
+  ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
+  ///
+  ///[urlScheme] represents the URL scheme associated with the resource.
+  ///
+  ///**NOTE**: available only on iOS 11.0+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme
+  static Future<bool> handlesURLScheme(String urlScheme) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('urlScheme', () => urlScheme);
+    return await InAppWebViewController._staticChannel
+        .invokeMethod('handlesURLScheme', args);
+  }
 }

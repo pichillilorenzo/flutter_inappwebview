@@ -29,6 +29,9 @@ import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivit
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
 import java.net.URI;
@@ -163,11 +166,10 @@ public class InAppWebViewClient extends WebViewClient {
   private void loadCustomJavaScriptOnPageStarted(WebView view) {
     InAppWebView webView = (InAppWebView) view;
 
-    String js = preparePluginUserScripts(webView);
-    js += prepareUserScriptsAtDocumentStart(webView);
+    String jsPluginScripts = preparePluginUserScripts(webView);
+    String jsUserScriptsAtDocumentStart = prepareUserScriptsAtDocumentStart(webView);
 
-    js = InAppWebView.scriptsWrapperJS
-            .replace("$PLACEHOLDER_VALUE", js);
+    String js = wrapPluginAndUserScripts(jsPluginScripts, jsUserScriptsAtDocumentStart, null);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
@@ -180,12 +182,11 @@ public class InAppWebViewClient extends WebViewClient {
     InAppWebView webView = (InAppWebView) view;
 
     // try to reload also custom scripts if they were not loaded during the onPageStarted event
-    String js = preparePluginUserScripts(webView);
-    js += prepareUserScriptsAtDocumentStart(webView);
-    js += prepareUserScriptsAtDocumentEnd(webView);
+    String jsPluginScripts = preparePluginUserScripts(webView);
+    String jsUserScriptsAtDocumentStart = prepareUserScriptsAtDocumentStart(webView);
+    String jsUserScriptsAtDocumentEnd = prepareUserScriptsAtDocumentEnd(webView);
 
-    js = InAppWebView.scriptsWrapperJS
-            .replace("$PLACEHOLDER_VALUE", js);
+    String js = wrapPluginAndUserScripts(jsPluginScripts, jsUserScriptsAtDocumentStart, jsUserScriptsAtDocumentEnd);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
@@ -196,7 +197,7 @@ public class InAppWebViewClient extends WebViewClient {
 
   private String preparePluginUserScripts(InAppWebView webView) {
     String js = InAppWebView.consoleLogJS;
-    js += JavaScriptBridgeInterface.flutterInAppBroserJSClass;
+    js += JavaScriptBridgeInterface.callHandlerScriptJS;
     if (webView.options.useShouldInterceptAjaxRequest) {
       js += InAppWebView.interceptAjaxRequestsJS;
     }
@@ -223,8 +224,33 @@ public class InAppWebViewClient extends WebViewClient {
       Integer injectionTime = (Integer) userScript.get("injectionTime");
       if (injectionTime == null || injectionTime == 0) {
         String source = (String) userScript.get("source");
+        String contentWorldName = (String) userScript.get("contentWorld");
         if (source != null) {
-          js.append("(function(){").append(source).append("})();");
+          if (contentWorldName != null && !contentWorldName.equals("page")) {
+            String jsPluginScripts = preparePluginUserScripts(webView);
+            source = jsPluginScripts + "\n" + source;
+          }
+
+          JSONObject sourceEncoded = new JSONObject();
+          try {
+            // encode the javascript source in order to escape special chars and quotes
+            sourceEncoded.put("source", source);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+
+          String sourceWrapped = contentWorldName == null || contentWorldName.equals("page") ? source :
+                  InAppWebView.contentWorldWrapperJS.replace("$CONTENT_WORLD_NAME", contentWorldName)
+                          .replace("$CONTENT_WORLD_NAME", contentWorldName)
+                          .replace("$JSON_SOURCE_ENCODED", sourceEncoded.toString());
+
+          if (contentWorldName != null && !contentWorldName.equals("page")) {
+            // adds another wrapper because sometimes document.body is not ready and it is undefined, causing an error and not adding the iframe element.
+            sourceWrapped = InAppWebView.documentReadyWrapperJS.replace("$PLACEHOLDER_VALUE", sourceWrapped)
+                    .replace("$PLACEHOLDER_VALUE", sourceWrapped);
+          }
+
+          js.append(sourceWrapped);
         }
       }
     }
@@ -237,15 +263,43 @@ public class InAppWebViewClient extends WebViewClient {
 
     for (Map<String, Object> userScript : webView.userScripts) {
       Integer injectionTime = (Integer) userScript.get("injectionTime");
-      if (injectionTime == 1) {
+      if (injectionTime != null && injectionTime == 1) {
         String source = (String) userScript.get("source");
+        String contentWorldName = (String) userScript.get("contentWorld");
         if (source != null) {
-          js.append("(function(){").append(source).append("})();");
+          if (contentWorldName != null && !contentWorldName.equals("page")) {
+            String jsPluginScripts = preparePluginUserScripts(webView);
+            source = jsPluginScripts + "\n" + source;
+          }
+
+          JSONObject sourceEncoded = new JSONObject();
+          try {
+            // encode the javascript source in order to escape special chars and quotes
+            sourceEncoded.put("source", source);
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+
+          String sourceWrapped = contentWorldName == null || contentWorldName.equals("page") ? source :
+                  InAppWebView.contentWorldWrapperJS.replace("$CONTENT_WORLD_NAME", contentWorldName)
+                          .replace("$CONTENT_WORLD_NAME", contentWorldName)
+                          .replace("$JSON_SOURCE_ENCODED", sourceEncoded.toString());
+          js.append(sourceWrapped);
         }
       }
     }
 
     return js.toString();
+  }
+  
+  private String wrapPluginAndUserScripts(String jsPluginScripts, @Nullable String jsUserScriptsAtDocumentStart, @Nullable String jsUserScriptsAtDocumentEnd) {
+    String jsPluginScriptsWrapped = InAppWebView.pluginScriptsWrapperJS
+            .replace("$PLACEHOLDER_VALUE", jsPluginScripts);
+    String jsUserScriptsAtDocumentStartWrapped = jsUserScriptsAtDocumentStart == null || jsUserScriptsAtDocumentStart.isEmpty() ? "" :
+            InAppWebView.userScriptsAtDocumentStartWrapperJS.replace("$PLACEHOLDER_VALUE", jsUserScriptsAtDocumentStart);
+    String jsUserScriptsAtDocumentEndWrapped = jsUserScriptsAtDocumentEnd == null || jsUserScriptsAtDocumentEnd.isEmpty() ? "" :
+            InAppWebView.userScriptsAtDocumentEndWrapperJS.replace("$PLACEHOLDER_VALUE", jsUserScriptsAtDocumentEnd);
+    return jsPluginScriptsWrapped + "\n" + jsUserScriptsAtDocumentStartWrapped + "\n" + jsUserScriptsAtDocumentEndWrapped;
   }
 
   @Override

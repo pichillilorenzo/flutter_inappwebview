@@ -285,8 +285,8 @@ let resourceObserverJS = """
 })();
 """
 
-let variableForShouldInterceptAjaxRequestJS = "window._flutter_inappwebview_useShouldInterceptAjaxRequest"
-let enableVariableForShouldInterceptAjaxRequestJS = "\(variableForShouldInterceptAjaxRequestJS) = $PLACEHOLDER_VALUE;"
+let variableForShouldInterceptAjaxRequestJS = "_flutter_inappwebview_useShouldInterceptAjaxRequest"
+let enableVariableForShouldInterceptAjaxRequestJS = "window.\(variableForShouldInterceptAjaxRequestJS) = $PLACEHOLDER_VALUE;"
 
 let interceptAjaxRequestsJS = """
 (function(ajax) {
@@ -340,7 +340,7 @@ let interceptAjaxRequestsJS = """
   };
   function handleEvent(e) {
     var self = this;
-    if (\(variableForShouldInterceptAjaxRequestJS) == null || \(variableForShouldInterceptAjaxRequestJS) == true) {
+    if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
       var headers = this.getAllResponseHeaders();
       var responseHeaders = {};
       if (headers != null) {
@@ -391,12 +391,12 @@ let interceptAjaxRequestsJS = """
   };
   ajax.prototype.send = function(data) {
     var self = this;
-    if (\(variableForShouldInterceptAjaxRequestJS) == null || \(variableForShouldInterceptAjaxRequestJS) == true) {
+    if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
       if (!this._flutter_inappwebview_already_onreadystatechange_wrapped) {
         this._flutter_inappwebview_already_onreadystatechange_wrapped = true;
         var onreadystatechange = this.onreadystatechange;
         this.onreadystatechange = function() {
-          if (\(variableForShouldInterceptAjaxRequestJS) == null || \(variableForShouldInterceptAjaxRequestJS) == true) {
+          if (window.\(variableForShouldInterceptAjaxRequestJS) == null || window.\(variableForShouldInterceptAjaxRequestJS) == true) {
             var headers = this.getAllResponseHeaders();
             var responseHeaders = {};
             if (headers != null) {
@@ -500,8 +500,8 @@ let interceptAjaxRequestsJS = """
 })(window.XMLHttpRequest);
 """
 
-let variableForShouldInterceptFetchRequestsJS = "window._flutter_inappwebview_useShouldInterceptFetchRequest"
-let enableVariableForShouldInterceptFetchRequestsJS = "\(variableForShouldInterceptFetchRequestsJS) = $PLACEHOLDER_VALUE;"
+let variableForShouldInterceptFetchRequestsJS = "_flutter_inappwebview_useShouldInterceptFetchRequest"
+let enableVariableForShouldInterceptFetchRequestsJS = "window.\(variableForShouldInterceptFetchRequestsJS) = $PLACEHOLDER_VALUE;"
 
 let interceptFetchRequestsJS = """
 (function(fetch) {
@@ -763,13 +763,13 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = null;
         while (target) {
             if (target.tagName === 'IMG') {
                 var img = target;
-                window.flutter_inappwebview._lastImageTouched = {
+                window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = {
                     src: img.src
                 };
                 var parent = img.parentNode;
                 while (parent) {
                     if (parent.tagName === 'A') {
-                        window.flutter_inappwebview._lastAnchorOrImageTouched = {
+                        window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched = {
                             title: parent.textContent,
                             url: parent.href,
                             src: img.src
@@ -784,8 +784,8 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = null;
                 var images = link.getElementsByTagName('img');
                 var img = (images.length > 0) ? images[0] : null;
                 var imgSrc = (img != null) ? img.src : null;
-                window.flutter_inappwebview._lastImageTouched = (img != null) ? {src: img.src} : window.flutter_inappwebview._lastImageTouched;
-                window.flutter_inappwebview._lastAnchorOrImageTouched = {
+                window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = (img != null) ? {src: img.src} : window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched;
+                window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched = {
                     title: link.textContent,
                     url: link.href,
                     src: imgSrc
@@ -876,6 +876,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     static var windowWebViews: [Int64:WebViewTransport] = [:]
     static var windowAutoincrementId: Int64 = 0;
+    
+    var userScriptsContentWorlds: [String] = ["defaultClient", "page"]
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, contextMenu: [String: Any]?, channel: FlutterMethodChannel?) {
         super.init(frame: frame, configuration: configuration)
@@ -1059,7 +1061,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
 
     public func prepare() {
-        
         self.scrollView.addGestureRecognizer(self.longPressRecognizer!)
         
         addObserver(self,
@@ -1156,6 +1157,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.maximumZoomScale = CGFloat(options.maximumZoomScale)
             scrollView.minimumZoomScale = CGFloat(options.minimumZoomScale)
             
+            if #available(iOS 14.0, *) {
+                mediaType = options.mediaType
+                pageZoom = CGFloat(options.pageZoom)
+            }
+            
             // debugging is always enabled for iOS,
             // there isn't any option to set about it such as on Android.
             
@@ -1182,12 +1188,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
-            configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
             configuration.preferences.minimumFontSize = CGFloat(options.minimumFontSize)
             
             if #available(iOS 13.0, *) {
                 configuration.preferences.isFraudulentWebsiteWarningEnabled = options.isFraudulentWebsiteWarningEnabled
                 configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: options.preferredContentMode)!
+            }
+            
+            configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
+            if #available(iOS 14.0, *) {
+                configuration.defaultWebpagePreferences.allowsContentJavaScript = options.javaScriptEnabled
             }
         }
     }
@@ -1209,22 +1219,51 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addUserScript(userScriptWindowId)
     }
     
-    func addPluginUserScripts() -> Void {
-        if let options = options {
-           
-            let originalViewPortMetaTagContentJSScript = WKUserScript(source: originalViewPortMetaTagContentJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-            configuration.userContentController.addUserScript(originalViewPortMetaTagContentJSScript)
+    @available(iOS 14.0, *)
+    func addSharedPluginUserScriptsBetweenContentWorlds(contentWorlds: [WKContentWorld]) -> Void {
+        for contentWorld in contentWorlds {
+            let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+            configuration.userContentController.addUserScript(promisePolyfillJSScript)
             
-            if !options.supportZoom {
-                let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); document.getElementsByTagName('head')[0].appendChild(meta);"
-                let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-                configuration.userContentController.addUserScript(userScript)
-            } else if options.enableViewportScale {
-                let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
-                let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
-                configuration.userContentController.addUserScript(userScript)
+            let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+            configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
+            configuration.userContentController.removeScriptMessageHandler(forName: "callHandler", contentWorld: contentWorld)
+            configuration.userContentController.add(self, contentWorld: contentWorld, name: "callHandler")
+            
+            let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+            configuration.userContentController.addUserScript(consoleLogJSScript)
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog", contentWorld: contentWorld)
+            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleLog")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug", contentWorld: contentWorld)
+            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleDebug")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleError", contentWorld: contentWorld)
+            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleError")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleInfo", contentWorld: contentWorld)
+            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleInfo")
+            configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn", contentWorld: contentWorld)
+            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleWarn")
+            
+            if let options = options {
+                if options.useShouldInterceptAjaxRequest {
+                    let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+                    configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
+                }
+                
+                if options.useShouldInterceptFetchRequest {
+                    let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+                    configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
+                }
             }
-            
+        }
+    }
+    
+    func addPluginUserScripts() -> Void {
+        if #available(iOS 14.0, *) {
+            let contentWorlds = userScriptsContentWorlds.map { (contentWorldName) -> WKContentWorld in
+                return getContentWorld(name: contentWorldName)
+            }
+            addSharedPluginUserScriptsBetweenContentWorlds(contentWorlds: contentWorlds)
+        } else {
             let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
             configuration.userContentController.addUserScript(promisePolyfillJSScript)
             
@@ -1246,39 +1285,56 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn")
             configuration.userContentController.add(self, name: "consoleWarn")
             
-            let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(findElementsAtPointJSScript)
+            if let options = options {
+                if options.useShouldInterceptAjaxRequest {
+                    let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                    configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
+                }
+                
+                if options.useShouldInterceptFetchRequest {
+                    let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                    configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
+                }
+            }
+        }
+        
+        let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(findElementsAtPointJSScript)
+        
+        let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(printJSScript)
+        
+        let lastTouchedAnchorOrImageJSScript = WKUserScript(source: lastTouchedAnchorOrImageJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(lastTouchedAnchorOrImageJSScript)
+        
+        let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(findTextHighlightJSScript)
+        configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
+        configuration.userContentController.add(self, name: "onFindResultReceived")
+        
+        let onWindowFocusEventJSScript = WKUserScript(source: onWindowFocusEventJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(onWindowFocusEventJSScript)
+        
+        let onWindowBlurEventJSScript = WKUserScript(source: onWindowBlurEventJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+        configuration.userContentController.addUserScript(onWindowBlurEventJSScript)
+        
+        if let options = options {
+            let originalViewPortMetaTagContentJSScript = WKUserScript(source: originalViewPortMetaTagContentJS, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+            configuration.userContentController.addUserScript(originalViewPortMetaTagContentJSScript)
             
-            let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(printJSScript)
-            
-            let lastTouchedAnchorOrImageJSScript = WKUserScript(source: lastTouchedAnchorOrImageJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(lastTouchedAnchorOrImageJSScript)
+            if !options.supportZoom {
+                let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no'); document.getElementsByTagName('head')[0].appendChild(meta);"
+                let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+                configuration.userContentController.addUserScript(userScript)
+            } else if options.enableViewportScale {
+                let jscript = "var meta = document.createElement('meta'); meta.setAttribute('name', 'viewport'); meta.setAttribute('content', 'width=device-width'); document.getElementsByTagName('head')[0].appendChild(meta);"
+                let userScript = WKUserScript(source: jscript, injectionTime: .atDocumentEnd, forMainFrameOnly: true)
+                configuration.userContentController.addUserScript(userScript)
+            }
             
             if options.useOnLoadResource {
                 let resourceObserverJSScript = WKUserScript(source: resourceObserverJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
                 configuration.userContentController.addUserScript(resourceObserverJSScript)
-            }
-            
-            let findTextHighlightJSScript = WKUserScript(source: findTextHighlightJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(findTextHighlightJSScript)
-            configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
-            configuration.userContentController.add(self, name: "onFindResultReceived")
-            
-            let onWindowFocusEventJSScript = WKUserScript(source: onWindowFocusEventJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(onWindowFocusEventJSScript)
-            
-            let onWindowBlurEventJSScript = WKUserScript(source: onWindowBlurEventJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-            configuration.userContentController.addUserScript(onWindowBlurEventJSScript)
-            
-            if options.useShouldInterceptAjaxRequest {
-                let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-                configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
-            }
-            
-            if options.useShouldInterceptFetchRequest {
-                let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-                configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
             }
         }
     }
@@ -1295,10 +1351,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func appendUserScript(userScript: [String: Any]) -> Void {
-        let wkUserScript = WKUserScript(source: userScript["source"] as! String,
-                                        injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
-                                        forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool)
-        userScripts.append(wkUserScript)
+        var wkUserScript: WKUserScript?
+        if #available(iOS 14.0, *), let contentWorldName = userScript["contentWorld"] as? String {
+            if !userScriptsContentWorlds.contains(contentWorldName) {
+                userScriptsContentWorlds.append(contentWorldName)
+            }
+            wkUserScript = WKUserScript(source: userScript["source"] as! String,
+                                            injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
+                                            forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool,
+                                            in: getContentWorld(name: contentWorldName))
+        } else {
+            wkUserScript = WKUserScript(source: userScript["source"] as! String,
+                                            injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
+                                            forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool)
+        }
+        userScripts.append(wkUserScript!)
     }
     
     public func appendUserScripts(wkUserScripts: [WKUserScript]) -> Void {
@@ -1329,6 +1396,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         // add all the necessary base WKUserScripts of this plugin again
         addWindowIdUserScript()
         addPluginUserScripts()
+    }
+    
+    @available(iOS 14.0, *)
+    func getContentWorld(name: String) -> WKContentWorld {
+        switch name {
+        case "defaultClient":
+            return WKContentWorld.defaultClient
+        case "page":
+            return WKContentWorld.page
+        default:
+            return WKContentWorld.world(name: name)
+        }
     }
     
     @available(iOS 10.0, *)
@@ -1477,6 +1556,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
                     }
                 }
+            }
+            
+            if #available(iOS 14.0, *) {
+                configuration.limitsNavigationsToAppBoundDomains = options.limitsNavigationsToAppBoundDomains
             }
         }
         
@@ -1739,10 +1822,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = newOptions.javaScriptCanOpenWindowsAutomatically
         }
         
-        if newOptionsMap["javaScriptEnabled"] != nil && options?.javaScriptEnabled != newOptions.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
-        }
-        
         if newOptionsMap["minimumFontSize"] != nil && options?.minimumFontSize != newOptions.minimumFontSize {
             configuration.preferences.minimumFontSize = CGFloat(newOptions.minimumFontSize)
         }
@@ -1848,6 +1927,27 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             clearCache()
         }
         
+        if newOptionsMap["javaScriptEnabled"] != nil && options?.javaScriptEnabled != newOptions.javaScriptEnabled {
+            configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
+        }
+        if #available(iOS 14.0, *) {
+            if options?.mediaType != newOptions.mediaType {
+                mediaType = newOptions.mediaType
+            }
+            
+            if newOptionsMap["pageZoom"] != nil && options?.pageZoom != newOptions.pageZoom {
+                pageZoom = CGFloat(newOptions.pageZoom)
+            }
+            
+            if newOptionsMap["limitsNavigationsToAppBoundDomains"] != nil && options?.limitsNavigationsToAppBoundDomains != newOptions.limitsNavigationsToAppBoundDomains {
+                configuration.limitsNavigationsToAppBoundDomains = newOptions.limitsNavigationsToAppBoundDomains
+            }
+            
+            if newOptionsMap["javaScriptEnabled"] != nil && options?.javaScriptEnabled != newOptions.javaScriptEnabled {
+                configuration.defaultWebpagePreferences.allowsContentJavaScript = newOptions.javaScriptEnabled
+            }
+        }
+        
         if #available(iOS 11.0, *), newOptionsMap["contentBlockers"] != nil {
             configuration.userContentController.removeAllContentRuleLists()
             let contentBlockers = newOptions.contentBlockers
@@ -1870,11 +1970,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        self.options = newOptions
+        scrollView.isScrollEnabled = !(newOptions.disableVerticalScroll && newOptions.disableHorizontalScroll)
         
-        if let options = self.options {
-            scrollView.isScrollEnabled = !(options.disableVerticalScroll && options.disableHorizontalScroll)
-        }
+        self.options = newOptions
     }
     
     func getOptions() -> [String: Any?]? {
@@ -3253,6 +3351,11 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
             if #available(iOS 14.0, *) {
                 configuration.userContentController.removeAllScriptMessageHandlers()
+                for contentWorldName in userScriptsContentWorlds {
+                    let contentWorld = getContentWorld(name: contentWorldName)
+                    configuration.userContentController.removeAllScriptMessageHandlers(from: contentWorld)
+                    configuration.userContentController.removeAllScriptMessageHandlers(from: contentWorld)
+                }
             }
             configuration.userContentController.removeAllUserScripts()
             if #available(iOS 11.0, *) {

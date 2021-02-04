@@ -20,15 +20,15 @@ Future main() async {
   // await Permission.microphone.request();
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
-  }
 
-  if (await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST)) {
-    serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
-      shouldInterceptRequest: (request) async {
-        print(request);
-        return null;
-      },
-    );
+    if (await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST)) {
+      serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
+        shouldInterceptRequest: (request) async {
+          print(request);
+          return null;
+        },
+      );
+    }
   }
 
   runApp(MyApp());

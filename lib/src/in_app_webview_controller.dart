@@ -1351,7 +1351,14 @@ class InAppWebViewController {
     await _channel.invokeMethod('stopLoading', args);
   }
 
-  ///Evaluates JavaScript code into the WebView and returns the result of the evaluation.
+  ///Evaluates JavaScript [source] code into the WebView and returns the result of the evaluation.
+  ///
+  ///[contentWorld], on iOS, it represents the namespace in which to evaluate the JavaScript [source] code.
+  ///Instead, on Android, it will run the [source] code into an iframe.
+  ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
+  ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///For more information about content worlds, see [ContentWorld].
+  ///Available on iOS 14.0+.
   ///
   ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
   ///because, in these events, the [WebView] is not ready to handle it yet.
@@ -1360,10 +1367,13 @@ class InAppWebViewController {
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
   ///
-  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415017-evaluatejavascript
-  Future<dynamic> evaluateJavascript({required String source}) async {
+  ///**Official iOS API**:
+  ///- https://developer.apple.com/documentation/webkit/wkwebview/1415017-evaluatejavascript
+  ///- https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript
+  Future<dynamic> evaluateJavascript({required String source, ContentWorld? contentWorld}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
+    args.putIfAbsent('contentWorld', () => contentWorld?.name);
     var data = await _channel.invokeMethod('evaluateJavascript', args);
     if (data != null && defaultTargetPlatform == TargetPlatform.android) data = json.decode(data);
     return data;

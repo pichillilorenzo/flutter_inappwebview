@@ -26,11 +26,7 @@ import androidx.annotation.RequiresApi;
 import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.Credential;
 import com.pichillilorenzo.flutter_inappwebview.CredentialDatabase.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity;
-import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.Util;
-
-import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.net.MalformedURLException;
@@ -166,10 +162,10 @@ public class InAppWebViewClient extends WebViewClient {
   private void loadCustomJavaScriptOnPageStarted(WebView view) {
     InAppWebView webView = (InAppWebView) view;
 
-    String jsPluginScripts = preparePluginUserScripts(webView);
+    String jsPluginScriptsWrapped = webView.prepareAndWrapPluginUserScripts();
     String jsUserScriptsAtDocumentStart = prepareUserScriptsAtDocumentStart(webView);
 
-    String js = wrapPluginAndUserScripts(jsPluginScripts, jsUserScriptsAtDocumentStart, null);
+    String js = wrapPluginAndUserScripts(jsPluginScriptsWrapped, jsUserScriptsAtDocumentStart, null);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
@@ -182,11 +178,11 @@ public class InAppWebViewClient extends WebViewClient {
     InAppWebView webView = (InAppWebView) view;
 
     // try to reload also custom scripts if they were not loaded during the onPageStarted event
-    String jsPluginScripts = preparePluginUserScripts(webView);
+    String jsPluginScriptsWrapped = webView.prepareAndWrapPluginUserScripts();
     String jsUserScriptsAtDocumentStart = prepareUserScriptsAtDocumentStart(webView);
     String jsUserScriptsAtDocumentEnd = prepareUserScriptsAtDocumentEnd(webView);
 
-    String js = wrapPluginAndUserScripts(jsPluginScripts, jsUserScriptsAtDocumentStart, jsUserScriptsAtDocumentEnd);
+    String js = wrapPluginAndUserScripts(jsPluginScriptsWrapped, jsUserScriptsAtDocumentStart, jsUserScriptsAtDocumentEnd);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       webView.evaluateJavascript(js, (ValueCallback<String>) null);
@@ -194,57 +190,25 @@ public class InAppWebViewClient extends WebViewClient {
       webView.loadUrl("javascript:" + js.replaceAll("[\r\n]+", ""));
     }
   }
-
-  private String preparePluginUserScripts(InAppWebView webView) {
-    String js = InAppWebView.consoleLogJS;
-    js += JavaScriptBridgeInterface.callHandlerScriptJS;
-    if (webView.options.useShouldInterceptAjaxRequest) {
-      js += InAppWebView.interceptAjaxRequestsJS;
-    }
-    if (webView.options.useShouldInterceptFetchRequest) {
-      js += InAppWebView.interceptFetchRequestsJS;
-    }
-    if (webView.options.useOnLoadResource) {
-      js += InAppWebView.resourceObserverJS;
-    }
-    if (!webView.options.useHybridComposition) {
-      js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS;
-    }
-    js += InAppWebView.onWindowFocusEventJS;
-    js += InAppWebView.onWindowBlurEventJS;
-    js += InAppWebView.printJS;
-
-    return js;
-  }
-
-  private String prepareUserScriptsAtDocumentStart(InAppWebView webView) {
+  
+  private String prepareUserScripts(InAppWebView webView, int atDocumentInjectionTime) {
     StringBuilder js = new StringBuilder();
 
     for (Map<String, Object> userScript : webView.userScripts) {
       Integer injectionTime = (Integer) userScript.get("injectionTime");
-      if (injectionTime == null || injectionTime == 0) {
+      if ((injectionTime == null && atDocumentInjectionTime == 0) || (injectionTime != null && injectionTime == atDocumentInjectionTime)) {
         String source = (String) userScript.get("source");
         String contentWorldName = (String) userScript.get("contentWorld");
         if (source != null) {
           if (contentWorldName != null && !contentWorldName.equals("page")) {
-            String jsPluginScripts = preparePluginUserScripts(webView);
+            String jsPluginScripts = webView.prepareAndWrapPluginUserScripts();
             source = jsPluginScripts + "\n" + source;
           }
-
-          JSONObject sourceEncoded = new JSONObject();
-          try {
-            // encode the javascript source in order to escape special chars and quotes
-            sourceEncoded.put("source", source);
-          } catch (JSONException e) {
-            e.printStackTrace();
+          if (contentWorldName != null && !webView.userScriptsContentWorlds.contains(contentWorldName)) {
+            webView.userScriptsContentWorlds.add(contentWorldName);
           }
-
-          String sourceWrapped = contentWorldName == null || contentWorldName.equals("page") ? source :
-                  InAppWebView.contentWorldWrapperJS.replace("$CONTENT_WORLD_NAME", contentWorldName)
-                          .replace("$CONTENT_WORLD_NAME", contentWorldName)
-                          .replace("$JSON_SOURCE_ENCODED", sourceEncoded.toString());
-
-          if (contentWorldName != null && !contentWorldName.equals("page")) {
+          String sourceWrapped = webView.wrapSourceCodeInContentWorld(contentWorldName, source);
+          if (atDocumentInjectionTime == 0 && contentWorldName != null && !contentWorldName.equals("page")) {
             // adds another wrapper because sometimes document.body is not ready and it is undefined, causing an error and not adding the iframe element.
             sourceWrapped = InAppWebView.documentReadyWrapperJS.replace("$PLACEHOLDER_VALUE", sourceWrapped)
                     .replace("$PLACEHOLDER_VALUE", sourceWrapped);
@@ -258,43 +222,15 @@ public class InAppWebViewClient extends WebViewClient {
     return js.toString();
   }
 
+  private String prepareUserScriptsAtDocumentStart(InAppWebView webView) {
+    return prepareUserScripts(webView, 0);
+  }
+
   private String prepareUserScriptsAtDocumentEnd(InAppWebView webView) {
-    StringBuilder js = new StringBuilder();
-
-    for (Map<String, Object> userScript : webView.userScripts) {
-      Integer injectionTime = (Integer) userScript.get("injectionTime");
-      if (injectionTime != null && injectionTime == 1) {
-        String source = (String) userScript.get("source");
-        String contentWorldName = (String) userScript.get("contentWorld");
-        if (source != null) {
-          if (contentWorldName != null && !contentWorldName.equals("page")) {
-            String jsPluginScripts = preparePluginUserScripts(webView);
-            source = jsPluginScripts + "\n" + source;
-          }
-
-          JSONObject sourceEncoded = new JSONObject();
-          try {
-            // encode the javascript source in order to escape special chars and quotes
-            sourceEncoded.put("source", source);
-          } catch (JSONException e) {
-            e.printStackTrace();
-          }
-
-          String sourceWrapped = contentWorldName == null || contentWorldName.equals("page") ? source :
-                  InAppWebView.contentWorldWrapperJS.replace("$CONTENT_WORLD_NAME", contentWorldName)
-                          .replace("$CONTENT_WORLD_NAME", contentWorldName)
-                          .replace("$JSON_SOURCE_ENCODED", sourceEncoded.toString());
-          js.append(sourceWrapped);
-        }
-      }
-    }
-
-    return js.toString();
+    return prepareUserScripts(webView, 1);
   }
   
-  private String wrapPluginAndUserScripts(String jsPluginScripts, @Nullable String jsUserScriptsAtDocumentStart, @Nullable String jsUserScriptsAtDocumentEnd) {
-    String jsPluginScriptsWrapped = InAppWebView.pluginScriptsWrapperJS
-            .replace("$PLACEHOLDER_VALUE", jsPluginScripts);
+  private String wrapPluginAndUserScripts(String jsPluginScriptsWrapped, @Nullable String jsUserScriptsAtDocumentStart, @Nullable String jsUserScriptsAtDocumentEnd) {
     String jsUserScriptsAtDocumentStartWrapped = jsUserScriptsAtDocumentStart == null || jsUserScriptsAtDocumentStart.isEmpty() ? "" :
             InAppWebView.userScriptsAtDocumentStartWrapperJS.replace("$PLACEHOLDER_VALUE", jsUserScriptsAtDocumentStart);
     String jsUserScriptsAtDocumentEndWrapped = jsUserScriptsAtDocumentEnd == null || jsUserScriptsAtDocumentEnd.isEmpty() ? "" :
@@ -305,6 +241,7 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onPageStarted(WebView view, String url, Bitmap favicon) {
     final InAppWebView webView = (InAppWebView) view;
+    webView.resetUserScriptsContentWorlds();
 
     loadCustomJavaScriptOnPageStarted(webView);
 

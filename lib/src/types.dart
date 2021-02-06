@@ -4599,12 +4599,15 @@ class UserScript {
 
 ///Class that represents an object that defines a scope of execution for JavaScript code, and which you use to prevent conflicts between different scripts.
 ///
-///**NOTE for iOS 14.0+**: this class represents the native [WKContentWorld](https://developer.apple.com/documentation/webkit/wkcontentworld) class.
+///**NOTE for iOS**: available on iOS 14.0+. This class represents the native [WKContentWorld](https://developer.apple.com/documentation/webkit/wkcontentworld) class.
 ///
-///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` equals to `flutter_inappwebview_[name]` to the webpage's content that contains only the scripts
-///in order to define a new scope of execution for JavaScript code. Unfortunately, there isn't any other way to do it.
-///For any [ContentWorld], except [ContentWorld.page], if you need to access to the `window` or `document` global Object,
-///you need to use `window.top` and `window.top.document` because the code runs inside an `<iframe>`.
+///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` equals to `flutter_inappwebview_[name]`
+///to the webpage's content that contains only the inline `<script>` HTML elements in order to define a new scope of execution for JavaScript code.
+///Unfortunately, there isn't any other way to do it.
+///There are some limitations:
+///- for any [ContentWorld], except [ContentWorld.page] (that is the webpage itself), if you need to access to the `window` or `document` global Object,
+///you need to use `window.top` and `window.top.document` because the code runs inside an `<iframe>`;
+///- also, the execution of the inline `<script>` could be blocked by the `Content-Security-Policy` header.
 class ContentWorld {
   ///The name of a custom content world.
   final String name;

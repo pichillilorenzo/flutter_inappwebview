@@ -30,15 +30,15 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 result( (webView != nil) ? Int(webView!.estimatedProgress * 100) : nil )
                 break
             case "loadUrl":
-                let url = (arguments!["url"] as? String)!
-                let headers = (arguments!["headers"] as? [String: String])!
+                let url = arguments!["url"] as! String
+                let headers = arguments!["headers"] as! [String: String]
                 webView?.loadUrl(url: URL(string: url)!, headers: headers)
                 result(true)
                 break
             case "postUrl":
                 if webView != nil {
-                    let url = (arguments!["url"] as? String)!
-                    let postData = (arguments!["postData"] as? FlutterStandardTypedData)!
+                    let url = arguments!["url"] as! String
+                    let postData = arguments!["postData"] as! FlutterStandardTypedData
                     webView!.postUrl(url: URL(string: url)!, postData: postData.data, completionHandler: { () -> Void in
                         result(true)
                     })
@@ -48,16 +48,16 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 }
                 break
             case "loadData":
-                let data = (arguments!["data"] as? String)!
-                let mimeType = (arguments!["mimeType"] as? String)!
-                let encoding = (arguments!["encoding"] as? String)!
-                let baseUrl = (arguments!["baseUrl"] as? String)!
+                let data = arguments!["data"] as! String
+                let mimeType = arguments!["mimeType"] as! String
+                let encoding = arguments!["encoding"] as! String
+                let baseUrl = arguments!["baseUrl"] as! String
                 webView?.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
                 result(true)
                 break
             case "loadFile":
-                let url = (arguments!["url"] as? String)!
-                let headers = (arguments!["headers"] as? [String: String])!
+                let url = arguments!["url"] as! String
+                let headers = arguments!["headers"] as! [String: String]
                 
                 do {
                     try webView?.loadFile(url: url, headers: headers)
@@ -70,25 +70,26 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "evaluateJavascript":
                 if webView != nil {
-                    let source = (arguments!["source"] as? String)!
-                    webView!.evaluateJavascript(source: source, result: result)
+                    let source = arguments!["source"] as! String
+                    let contentWorldName = arguments!["contentWorld"] as? String
+                    webView!.evaluateJavascript(source: source, contentWorldName: contentWorldName, result: result)
                 }
                 else {
                     result(nil)
                 }
                 break
             case "injectJavascriptFileFromUrl":
-                let urlFile = (arguments!["urlFile"] as? String)!
+                let urlFile = arguments!["urlFile"] as! String
                 webView?.injectJavascriptFileFromUrl(urlFile: urlFile)
                 result(true)
                 break
             case "injectCSSCode":
-                let source = (arguments!["source"] as? String)!
+                let source = arguments!["source"] as! String
                 webView?.injectCSSCode(source: source)
                 result(true)
                 break
             case "injectCSSFileFromUrl":
-                let urlFile = (arguments!["urlFile"] as? String)!
+                let urlFile = arguments!["urlFile"] as! String
                 webView?.injectCSSFileFromUrl(urlFile: urlFile)
                 result(true)
                 break
@@ -111,12 +112,12 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 result(webView?.canGoForward ?? false)
                 break
             case "goBackOrForward":
-                let steps = (arguments!["steps"] as? Int)!
+                let steps = arguments!["steps"] as! Int
                 webView?.goBackOrForward(steps: steps)
                 result(true)
                 break
             case "canGoBackOrForward":
-                let steps = (arguments!["steps"] as? Int)!
+                let steps = arguments!["steps"] as! Int
                 result(webView?.canGoBackOrForward(steps: steps) ?? false)
                 break
             case "stopLoading":

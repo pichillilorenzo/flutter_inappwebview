@@ -16,6 +16,7 @@ import android.os.Message;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
+import android.util.ArraySet;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
@@ -42,6 +43,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -56,14 +58,19 @@ import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.security.cert.CertificateEncodingException;
 import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -106,8 +113,12 @@ final public class InAppWebView extends InputAwareWebView {
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
 
+  public Set<String> userScriptsContentWorlds = new HashSet<String>() {{
+    add("page");
+  }};
+
   static final String pluginScriptsWrapperJS = "(function(){" +
-          "  if (window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded == null || !window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded) {" +
+          "  if (window." + JavaScriptBridgeInterface.name + " == null || window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded == null || !window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded) {" +
           "    $PLACEHOLDER_VALUE" +
           "    window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded = true;" +
           "  }" +
@@ -187,8 +198,8 @@ final public class InAppWebView extends InputAwareWebView {
           "  }" +
           "})();";
 
-  static final String variableForOnLoadResourceJS = "window._flutter_inappwebview_useOnLoadResource";
-  static final String enableVariableForOnLoadResourceJS = variableForOnLoadResourceJS + " = $PLACEHOLDER_VALUE;";
+  static final String variableForOnLoadResourceJS = "_flutter_inappwebview_useOnLoadResource";
+  static final String enableVariableForOnLoadResourceJS = "window." + variableForOnLoadResourceJS + " = $PLACEHOLDER_VALUE;";
 
   static final String resourceObserverJS = "(function() {" +
           "   var observer = new PerformanceObserver(function(list) {" +
@@ -1169,7 +1180,9 @@ final public class InAppWebView extends InputAwareWebView {
       String placeholderValue = newOptions.useShouldInterceptAjaxRequest ? "true" : "false";
       String sourceJs = InAppWebView.enableVariableForShouldInterceptAjaxRequestJS.replace("$PLACEHOLDER_VALUE", placeholderValue);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        evaluateJavascript(sourceJs, (ValueCallback<String>) null);
+        for (String contentWorldName : userScriptsContentWorlds) {
+          evaluateJavascript(sourceJs, contentWorldName, null);
+        }
       } else {
         loadUrl("javascript:" + sourceJs);
       }
@@ -1179,7 +1192,9 @@ final public class InAppWebView extends InputAwareWebView {
       String placeholderValue = newOptions.useShouldInterceptFetchRequest ? "true" : "false";
       String sourceJs = InAppWebView.enableVariableForShouldInterceptFetchRequestsJS.replace("$PLACEHOLDER_VALUE", placeholderValue);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-        evaluateJavascript(sourceJs, (ValueCallback<String>) null);
+        for (String contentWorldName : userScriptsContentWorlds) {
+          evaluateJavascript(sourceJs, contentWorldName, null);
+        }
       } else {
         loadUrl("javascript:" + sourceJs);
       }
@@ -1457,7 +1472,7 @@ final public class InAppWebView extends InputAwareWebView {
     return (options != null) ? options.getRealOptions(this) : null;
   }
 
-  public void injectDeferredObject(String source, String jsWrapper, final MethodChannel.Result result) {
+  public void injectDeferredObject(String source, @Nullable final String contentWorldName, String jsWrapper, final MethodChannel.Result result) {
     String scriptToInject = source;
     if (jsWrapper != null) {
       org.json.JSONArray jsonEsc = new org.json.JSONArray();
@@ -1472,39 +1487,58 @@ final public class InAppWebView extends InputAwareWebView {
       public void run() {
         if (Build.VERSION.SDK_INT < Build.VERSION_CODES.KITKAT) {
           // This action will have the side-effect of blurring the currently focused element
-          loadUrl("javascript:" + finalScriptToInject);
+          loadUrl("javascript:" + finalScriptToInject.replaceAll("[\r\n]+", ""));
           result.success("");
         } else {
-          evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
-            @Override
-            public void onReceiveValue(String s) {
-              if (result == null)
-                return;
-              result.success(s);
+          if (contentWorldName != null && !contentWorldName.equals("page")) {
+            String sourceToInject = finalScriptToInject;
+            if (!userScriptsContentWorlds.contains(contentWorldName)) {
+              userScriptsContentWorlds.add(contentWorldName);
+              // Add only the first time all the plugin scripts needed.
+              String jsPluginScripts = prepareAndWrapPluginUserScripts();
+              sourceToInject = jsPluginScripts + "\n" + sourceToInject;
             }
-          });
+            sourceToInject = wrapSourceCodeInContentWorld(contentWorldName, sourceToInject);
+            evaluateJavascript(sourceToInject, new ValueCallback<String>() {
+              @Override
+              public void onReceiveValue(String s) {
+                if (result == null)
+                  return;
+                result.success(s);
+              }
+            });
+          } else {
+            evaluateJavascript(finalScriptToInject, new ValueCallback<String>() {
+              @Override
+              public void onReceiveValue(String s) {
+                if (result == null)
+                  return;
+                result.success(s);
+              }
+            });
+          }
         }
       }
     });
   }
 
-  public void evaluateJavascript(String source, MethodChannel.Result result) {
-    injectDeferredObject(source, null, result);
+  public void evaluateJavascript(String source, String contentWorldName, MethodChannel.Result result) {
+    injectDeferredObject(source, contentWorldName, null, result);
   }
 
   public void injectJavascriptFileFromUrl(String urlFile) {
     String jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
-    injectDeferredObject(urlFile, jsWrapper, null);
+    injectDeferredObject(urlFile, null, jsWrapper, null);
   }
 
   public void injectCSSCode(String source) {
     String jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
-    injectDeferredObject(source, jsWrapper, null);
+    injectDeferredObject(source, null, jsWrapper, null);
   }
 
   public void injectCSSFileFromUrl(String urlFile) {
     String jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
-    injectDeferredObject(urlFile, jsWrapper, null);
+    injectDeferredObject(urlFile, null, jsWrapper, null);
   }
 
   public HashMap<String, Object> getCopyBackForwardList() {
@@ -1999,6 +2033,10 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public boolean addUserScript(Map<String, Object> userScript) {
+    String contentWorldName = (String) userScript.get("contentWorld");
+    if (contentWorldName != null && !userScriptsContentWorlds.contains(contentWorldName)) {
+      userScriptsContentWorlds.add(contentWorldName);
+    }
     return userScripts.add(userScript);
   }
 
@@ -2008,6 +2046,52 @@ final public class InAppWebView extends InputAwareWebView {
 
   public void removeAllUserScripts() {
     userScripts.clear();
+  }
+  
+  public void resetUserScriptsContentWorlds() {
+    userScriptsContentWorlds.clear();
+    userScriptsContentWorlds.add("page");
+  }
+
+  public String prepareAndWrapPluginUserScripts() {
+    String js = JavaScriptBridgeInterface.callHandlerScriptJS;
+    js += InAppWebView.consoleLogJS;
+    if (options.useShouldInterceptAjaxRequest) {
+      js += InAppWebView.interceptAjaxRequestsJS;
+    }
+    if (options.useShouldInterceptFetchRequest) {
+      js += InAppWebView.interceptFetchRequestsJS;
+    }
+    if (options.useOnLoadResource) {
+      js += InAppWebView.resourceObserverJS;
+    }
+    if (!options.useHybridComposition) {
+      js += InAppWebView.checkGlobalKeyDownEventToHideContextMenuJS;
+    }
+    js += InAppWebView.onWindowFocusEventJS;
+    js += InAppWebView.onWindowBlurEventJS;
+    js += InAppWebView.printJS;
+
+    String jsWrapped = InAppWebView.pluginScriptsWrapperJS
+            .replace("$PLACEHOLDER_VALUE", js);
+
+    return jsWrapped;
+  }
+
+  public String wrapSourceCodeInContentWorld(@Nullable String contentWorldName, String source) {
+    JSONObject sourceEncoded = new JSONObject();
+    try {
+      // encode the javascript source in order to escape special chars and quotes
+      sourceEncoded.put("source", source);
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
+
+    String sourceWrapped = contentWorldName == null || contentWorldName.equals("page") ? source :
+            InAppWebView.contentWorldWrapperJS.replace("$CONTENT_WORLD_NAME", contentWorldName)
+                    .replace("$JSON_SOURCE_ENCODED", sourceEncoded.toString());
+
+    return sourceWrapped;
   }
 
   @Override

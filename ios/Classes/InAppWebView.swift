@@ -58,7 +58,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
     return new Promise(function(resolve, reject) {
         window.\(JAVASCRIPT_BRIDGE_NAME)[_callHandlerID] = resolve;
     });
-}
+};
 """
 
 // the message needs to be concatenated with '' in order to have the same behavior like on Android
@@ -269,8 +269,8 @@ function wkwebview_FindNext(forward) {
 }
 """
 
-let variableForOnLoadResourceJS = "window._flutter_inappwebview_useOnLoadResource"
-let enableVariableForOnLoadResourceJS = "\(variableForOnLoadResourceJS) = $PLACEHOLDER_VALUE;"
+let variableForOnLoadResourceJS = "_flutter_inappwebview_useOnLoadResource"
+let enableVariableForOnLoadResourceJS = "window.\(variableForOnLoadResourceJS) = $PLACEHOLDER_VALUE;"
 
 let resourceObserverJS = """
 (function() {
@@ -877,7 +877,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     static var windowWebViews: [Int64:WebViewTransport] = [:]
     static var windowAutoincrementId: Int64 = 0;
     
-    var userScriptsContentWorlds: [String] = ["defaultClient", "page"]
+    var userScriptsContentWorlds: [String] = ["page"]
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, contextMenu: [String: Any]?, channel: FlutterMethodChannel?) {
         super.init(frame: frame, configuration: configuration)
@@ -1219,60 +1219,88 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addUserScript(userScriptWindowId)
     }
     
-    @available(iOS 14.0, *)
-    func addSharedPluginUserScriptsBetweenContentWorlds(contentWorlds: [WKContentWorld]) -> Void {
-        for contentWorld in contentWorlds {
-            let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
-            configuration.userContentController.addUserScript(promisePolyfillJSScript)
+    func getAllPluginUserScriptMergedJS() -> String {
+        var allPluginUserScriptMergedJS = promisePolyfillJS + "\n" +
+            javaScriptBridgeJS + "\n" +
+            consoleLogJS + "\n" +
+            printJS + "\n"
+        if let options = options {
+            if options.useShouldInterceptAjaxRequest {
+                allPluginUserScriptMergedJS += interceptAjaxRequestsJS + "\n"
+            }
             
-            let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
-            configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
-            configuration.userContentController.removeScriptMessageHandler(forName: "callHandler", contentWorld: contentWorld)
-            configuration.userContentController.add(self, contentWorld: contentWorld, name: "callHandler")
-            
-            let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
-            configuration.userContentController.addUserScript(consoleLogJSScript)
-            configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog", contentWorld: contentWorld)
-            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleLog")
-            configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug", contentWorld: contentWorld)
-            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleDebug")
-            configuration.userContentController.removeScriptMessageHandler(forName: "consoleError", contentWorld: contentWorld)
-            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleError")
-            configuration.userContentController.removeScriptMessageHandler(forName: "consoleInfo", contentWorld: contentWorld)
-            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleInfo")
-            configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn", contentWorld: contentWorld)
-            configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleWarn")
-            
-            if let options = options {
-                if options.useShouldInterceptAjaxRequest {
-                    let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
-                    configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
-                }
-                
-                if options.useShouldInterceptFetchRequest {
-                    let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
-                    configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
-                }
+            if options.useShouldInterceptFetchRequest {
+                allPluginUserScriptMergedJS += interceptFetchRequestsJS + "\n"
             }
         }
+        return allPluginUserScriptMergedJS
     }
     
-    func addPluginUserScripts() -> Void {
-        if #available(iOS 14.0, *) {
-            let contentWorlds = userScriptsContentWorlds.map { (contentWorldName) -> WKContentWorld in
-                return getContentWorld(name: contentWorldName)
+    @available(iOS 14.0, *)
+    func addSharedPluginUserScriptsInContentWorld(contentWorldName: String) -> Void {
+        let contentWorld = getContentWorld(name: contentWorldName)
+        
+        let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+        configuration.userContentController.addUserScript(promisePolyfillJSScript)
+        
+        let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+        configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
+        configuration.userContentController.removeScriptMessageHandler(forName: "callHandler", contentWorld: contentWorld)
+        configuration.userContentController.add(self, contentWorld: contentWorld, name: "callHandler")
+        
+        let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+        configuration.userContentController.addUserScript(consoleLogJSScript)
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog", contentWorld: contentWorld)
+        configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleLog")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleDebug", contentWorld: contentWorld)
+        configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleDebug")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleError", contentWorld: contentWorld)
+        configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleError")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleInfo", contentWorld: contentWorld)
+        configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleInfo")
+        configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn", contentWorld: contentWorld)
+        configuration.userContentController.add(self, contentWorld: contentWorld, name: "consoleWarn")
+        
+        if let options = options {
+            if options.useShouldInterceptAjaxRequest {
+                let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+                configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
             }
-            addSharedPluginUserScriptsBetweenContentWorlds(contentWorlds: contentWorlds)
+            
+            if options.useShouldInterceptFetchRequest {
+                let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+                configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
+            }
+        }
+        
+        let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false, in: contentWorld)
+        configuration.userContentController.addUserScript(printJSScript)
+    }
+    
+    func addSharedPluginUserScriptsInContentWorlds() -> Void {
+        if #available(iOS 14.0, *) {
+            for contentWorldName in userScriptsContentWorlds {
+                addSharedPluginUserScriptsInContentWorld(contentWorldName: contentWorldName)
+            }
         } else {
-            let promisePolyfillJSScript = WKUserScript(source: promisePolyfillJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            let promisePolyfillJSScript = WKUserScript(
+                source: promisePolyfillJS,
+                injectionTime: .atDocumentStart,
+                forMainFrameOnly: false)
             configuration.userContentController.addUserScript(promisePolyfillJSScript)
             
-            let javaScriptBridgeJSScript = WKUserScript(source: javaScriptBridgeJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            let javaScriptBridgeJSScript = WKUserScript(
+                source: javaScriptBridgeJS,
+                injectionTime: .atDocumentStart,
+                forMainFrameOnly: false)
             configuration.userContentController.addUserScript(javaScriptBridgeJSScript)
             configuration.userContentController.removeScriptMessageHandler(forName: "callHandler")
             configuration.userContentController.add(self, name: "callHandler")
             
-            let consoleLogJSScript = WKUserScript(source: consoleLogJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            let consoleLogJSScript = WKUserScript(
+                source: consoleLogJS,
+                injectionTime: .atDocumentStart,
+                forMainFrameOnly: false)
             configuration.userContentController.addUserScript(consoleLogJSScript)
             configuration.userContentController.removeScriptMessageHandler(forName: "consoleLog")
             configuration.userContentController.add(self, name: "consoleLog")
@@ -1287,22 +1315,32 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             if let options = options {
                 if options.useShouldInterceptAjaxRequest {
-                    let interceptAjaxRequestsJSScript = WKUserScript(source: interceptAjaxRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                    let interceptAjaxRequestsJSScript = WKUserScript(
+                        source: interceptAjaxRequestsJS,
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false)
                     configuration.userContentController.addUserScript(interceptAjaxRequestsJSScript)
                 }
                 
                 if options.useShouldInterceptFetchRequest {
-                    let interceptFetchRequestsJSScript = WKUserScript(source: interceptFetchRequestsJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+                    let interceptFetchRequestsJSScript = WKUserScript(
+                        source: interceptFetchRequestsJS,
+                        injectionTime: .atDocumentStart,
+                        forMainFrameOnly: false)
                     configuration.userContentController.addUserScript(interceptFetchRequestsJSScript)
                 }
             }
+            
+            let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
+            configuration.userContentController.addUserScript(printJSScript)
         }
+    }
+    
+    func addPluginUserScripts() -> Void {
+        addSharedPluginUserScriptsInContentWorlds()
         
         let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(findElementsAtPointJSScript)
-        
-        let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
-        configuration.userContentController.addUserScript(printJSScript)
         
         let lastTouchedAnchorOrImageJSScript = WKUserScript(source: lastTouchedAnchorOrImageJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
         configuration.userContentController.addUserScript(lastTouchedAnchorOrImageJSScript)
@@ -1352,18 +1390,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func appendUserScript(userScript: [String: Any]) -> Void {
         var wkUserScript: WKUserScript?
-        if #available(iOS 14.0, *), let contentWorldName = userScript["contentWorld"] as? String {
-            if !userScriptsContentWorlds.contains(contentWorldName) {
-                userScriptsContentWorlds.append(contentWorldName)
-            }
+        let contentWorldName = userScript["contentWorld"] as? String
+        if contentWorldName != nil, !userScriptsContentWorlds.contains(contentWorldName!) {
+            userScriptsContentWorlds.append(contentWorldName!)
+        }
+        if #available(iOS 14.0, *), let contentWorldName = contentWorldName {
             wkUserScript = WKUserScript(source: userScript["source"] as! String,
                                             injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
                                             forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool,
                                             in: getContentWorld(name: contentWorldName))
         } else {
             wkUserScript = WKUserScript(source: userScript["source"] as! String,
-                                            injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
-                                            forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool)
+                                        injectionTime: WKUserScriptInjectionTime.init(rawValue: userScript["injectionTime"] as! Int) ?? .atDocumentStart,
+                                        forMainFrameOnly: userScript["iosForMainFrameOnly"] as! Bool)
         }
         userScripts.append(wkUserScript!)
     }
@@ -1784,17 +1823,35 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if newOptionsMap["useOnLoadResource"] != nil && options?.useOnLoadResource != newOptions.useOnLoadResource && newOptions.useOnLoadResource {
             let placeholderValue = newOptions.useOnLoadResource ? "true" : "false"
-            evaluateJavaScript(enableVariableForOnLoadResourceJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue), completionHandler: nil)
+            let source = enableVariableForOnLoadResourceJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue)
+            evaluateJavaScript(source, completionHandler: nil)
         }
         
         if newOptionsMap["useShouldInterceptAjaxRequest"] != nil && options?.useShouldInterceptAjaxRequest != newOptions.useShouldInterceptAjaxRequest && newOptions.useShouldInterceptAjaxRequest {
             let placeholderValue = newOptions.useShouldInterceptAjaxRequest ? "true" : "false"
-            evaluateJavaScript(enableVariableForShouldInterceptAjaxRequestJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue), completionHandler: nil)
+            let source = enableVariableForShouldInterceptAjaxRequestJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue)
+            if #available(iOS 14.0, *) {
+                for contentWorldName in userScriptsContentWorlds {
+                    let contentWorld = getContentWorld(name: contentWorldName)
+                    evaluateJavaScript(source, in: nil, in: contentWorld, completionHandler: nil)
+                }
+            } else {
+                evaluateJavaScript(source, completionHandler: nil)
+            }
         }
         
         if newOptionsMap["useShouldInterceptFetchRequest"] != nil && options?.useShouldInterceptFetchRequest != newOptions.useShouldInterceptFetchRequest && newOptions.useShouldInterceptFetchRequest {
             let placeholderValue = newOptions.useShouldInterceptFetchRequest ? "true" : "false"
-            evaluateJavaScript(enableVariableForShouldInterceptFetchRequestsJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue), completionHandler: nil)
+
+            let source = enableVariableForShouldInterceptAjaxRequestJS.replacingOccurrences(of: "$PLACEHOLDER_VALUE", with: placeholderValue)
+            if #available(iOS 14.0, *) {
+                for contentWorldName in userScriptsContentWorlds {
+                    let contentWorld = getContentWorld(name: contentWorldName)
+                    evaluateJavaScript(source, in: nil, in: contentWorld, completionHandler: nil)
+                }
+            } else {
+                evaluateJavaScript(source, completionHandler: nil)
+            }
         }
         
         if newOptionsMap["mediaPlaybackRequiresUserGesture"] != nil && options?.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture {
@@ -2000,7 +2057,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func injectDeferredObject(source: String, withWrapper jsWrapper: String?, result: FlutterResult?) {
+    public func injectDeferredObject(source: String,  contentWorldName: String?, withWrapper jsWrapper: String?, result: FlutterResult?) {
         var jsToInject = source
         if let wrapper = jsWrapper {
             let jsonData: Data? = try? JSONSerialization.data(withJSONObject: [source], options: [])
@@ -2008,42 +2065,71 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let sourceString: String? = (sourceArrayString! as NSString).substring(with: NSRange(location: 1, length: (sourceArrayString?.count ?? 0) - 2))
             jsToInject = String(format: wrapper, sourceString!)
         }
-        evaluateJavaScript(jsToInject, completionHandler: {(value, error) in
-            if result == nil {
-                return
+        
+        if #available(iOS 14.0, *), let contentWorldName = contentWorldName {
+            if !userScriptsContentWorlds.contains(contentWorldName) {
+                userScriptsContentWorlds.append(contentWorldName)
+                addSharedPluginUserScriptsInContentWorld(contentWorldName: contentWorldName)
+                // Add only the first time all the plugin user scripts needed.
+                // In the next page load, it will use the WKUserScripts loaded
+                jsToInject = getAllPluginUserScriptMergedJS() + "\n" + jsToInject
             }
-            
-            if error != nil {
-                let userInfo = (error! as NSError).userInfo
-                self.onConsoleMessage(message: userInfo["WKJavaScriptExceptionMessage"] as? String ?? "", messageLevel: 3)
+            let contentWorld = getContentWorld(name: contentWorldName)
+            evaluateJavaScript(jsToInject, in: nil, in: contentWorld) { (evalResult) in
+                guard let result = result else {
+                    return
+                }
+                
+                switch (evalResult) {
+                case .success(let value):
+                    result(value)
+                    return
+                case .failure(let error):
+                    let userInfo = (error as NSError).userInfo
+                    self.onConsoleMessage(message: userInfo["WKJavaScriptExceptionMessage"] as? String ?? "", messageLevel: 3)
+                    break
+                }
+                
+                result(nil)
             }
-            
-            if value == nil {
-                result!(nil)
-                return
+        } else {
+            evaluateJavaScript(jsToInject) { (value, error) in
+                guard let result = result else {
+                    return
+                }
+                
+                if error != nil {
+                    let userInfo = (error! as NSError).userInfo
+                    self.onConsoleMessage(message: userInfo["WKJavaScriptExceptionMessage"] as? String ?? "", messageLevel: 3)
+                }
+                
+                if value == nil {
+                    result(nil)
+                    return
+                }
+                
+                result(value)
             }
-            
-            result!(value)
-        })
+        }
     }
     
-    public func evaluateJavascript(source: String, result: FlutterResult?) {
-        injectDeferredObject(source: source, withWrapper: nil, result: result)
+    public func evaluateJavascript(source: String, contentWorldName: String?, result: FlutterResult?) {
+        injectDeferredObject(source: source, contentWorldName: contentWorldName, withWrapper: nil, result: result)
     }
     
     public func injectJavascriptFileFromUrl(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
+        injectDeferredObject(source: urlFile, contentWorldName: nil, withWrapper: jsWrapper, result: nil)
     }
     
     public func injectCSSCode(source: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(source: source, withWrapper: jsWrapper, result: nil)
+        injectDeferredObject(source: source, contentWorldName: nil, withWrapper: jsWrapper, result: nil)
     }
     
     public func injectCSSFileFromUrl(urlFile: String) {
         let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
-        injectDeferredObject(source: urlFile, withWrapper: jsWrapper, result: nil)
+        injectDeferredObject(source: urlFile, contentWorldName: nil, withWrapper: jsWrapper, result: nil)
     }
     
     public func getCopyBackForwardList() -> [String: Any] {
@@ -2181,6 +2267,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         currentURL = url
         InAppWebView.credentialsProposed = []
         evaluateJavaScript(platformReadyJS, completionHandler: nil)
+
         onLoadStop(url: url?.absoluteString)
         
         if IABController != nil {

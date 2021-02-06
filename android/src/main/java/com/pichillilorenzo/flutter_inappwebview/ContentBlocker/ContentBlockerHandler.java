@@ -166,7 +166,7 @@ public class ContentBlockerHandler {
                             @Override
                             public void run() {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-                                    webView.evaluateJavascript(jsScript, (MethodChannel.Result) null);
+                                    webView.evaluateJavascript(jsScript, null);
                                 } else {
                                     webView.loadUrl("javascript:" + jsScript);
                                 }

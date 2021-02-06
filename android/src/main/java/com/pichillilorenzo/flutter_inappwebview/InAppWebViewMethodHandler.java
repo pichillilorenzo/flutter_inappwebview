@@ -74,7 +74,8 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "evaluateJavascript":
         if (webView != null) {
           String source = (String) call.argument("source");
-          webView.evaluateJavascript(source, result);
+          String contentWorldName = (String) call.argument("contentWorld");
+          webView.evaluateJavascript(source, contentWorldName, result);
         }
         else {
           result.success(null);

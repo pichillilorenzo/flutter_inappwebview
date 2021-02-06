@@ -16,7 +16,6 @@ import android.os.Message;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
-import android.util.ArraySet;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;

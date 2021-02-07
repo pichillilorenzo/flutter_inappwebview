@@ -29,7 +29,6 @@ import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivit
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayInputStream;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -341,10 +340,10 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onReceivedHttpAuthRequest(final WebView view, final HttpAuthHandler handler, final String host, final String realm) {
 
-    URL url;
+    URI uri;
     try {
-      url = new URL(view.getUrl());
-    } catch (MalformedURLException e) {
+      uri = new URI(view.getUrl());
+    } catch (URISyntaxException e) {
       e.printStackTrace();
 
       credentialsProposed = null;
@@ -354,8 +353,8 @@ public class InAppWebViewClient extends WebViewClient {
       return;
     }
 
-    final String protocol = url.getProtocol();
-    final int port = url.getPort();
+    final String protocol = uri.getScheme();
+    final int port = uri.getPort();
 
     previousAuthRequestFailureCount++;
 
@@ -422,19 +421,19 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError error) {
-    URL url;
+    URI uri;
     try {
-      url = new URL(error.getUrl());
-    } catch (MalformedURLException e) {
+      uri = new URI(view.getUrl());
+    } catch (URISyntaxException e) {
       e.printStackTrace();
       handler.cancel();
       return;
     }
 
-    final String host = url.getHost();
-    final String protocol = url.getProtocol();
+    final String host = uri.getHost();
+    final String protocol = uri.getScheme();
     final String realm = null;
-    final int port = url.getPort();
+    final int port = uri.getPort();
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("host", host);
@@ -507,16 +506,16 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onReceivedClientCertRequest(final WebView view, final ClientCertRequest request) {
 
-    URL url;
+    URI uri;
     try {
-      url = new URL(view.getUrl());
-    } catch (MalformedURLException e) {
+      uri = new URI(view.getUrl());
+    } catch (URISyntaxException e) {
       e.printStackTrace();
       request.cancel();
       return;
     }
 
-    final String protocol = url.getProtocol();
+    final String protocol = uri.getScheme();
     final String realm = null;
 
     Map<String, Object> obj = new HashMap<>();

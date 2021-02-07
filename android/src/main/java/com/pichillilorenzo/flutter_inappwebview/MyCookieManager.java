@@ -1,10 +1,18 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
+import android.annotation.TargetApi;
+import android.content.Context;
+import android.os.AsyncTask;
 import android.os.Build;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.Message;
 import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
+
+import androidx.annotation.Nullable;
 
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
@@ -16,6 +24,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
+import java.util.concurrent.Executors;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
@@ -29,10 +38,13 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
   public static MethodChannel channel;
   public static CookieManager cookieManager;
 
+  // As CookieManager was synchronous before API 21 this class emulates the async behavior on <21.
+  private static final boolean USES_LEGACY_STORE = Build.VERSION.SDK_INT < 21;
+
   public MyCookieManager(BinaryMessenger messenger) {
     channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_cookiemanager");
     channel.setMethodCallHandler(this);
-    cookieManager = CookieManager.getInstance();
+    cookieManager = getCookieManager();
   }
 
   @Override
@@ -92,6 +104,40 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     }
   }
 
+  /**
+   * Instantiating CookieManager will load the Chromium task taking a 100ish ms so we do it lazily
+   * to make sure it's done on a background thread as needed.
+   *
+   * https://github.com/facebook/react-native/blob/1903f6680d9750e244d97c3cd4a9f755a9a47c61/ReactAndroid/src/main/java/com/facebook/react/modules/network/ForwardingCookieHandler.java#L132
+   */
+  static private @Nullable CookieManager getCookieManager() {
+    if (cookieManager == null) {
+      try {
+        cookieManager = CookieManager.getInstance();
+      } catch (IllegalArgumentException ex) {
+        // https://bugs.chromium.org/p/chromium/issues/detail?id=559720
+        return null;
+      } catch (Exception exception) {
+        String message = exception.getMessage();
+        // We cannot catch MissingWebViewPackageException as it is in a private / system API
+        // class. This validates the exception's message to ensure we are only handling this
+        // specific exception.
+        // https://android.googlesource.com/platform/frameworks/base/+/master/core/java/android/webkit/WebViewFactory.java#348
+        if (message != null
+                && exception
+                .getClass()
+                .getCanonicalName()
+                .equals("android.webkit.WebViewFactory.MissingWebViewPackageException")) {
+          return null;
+        } else {
+          throw exception;
+        }
+      }
+    }
+
+    return cookieManager;
+  }
+
   public static void setCookie(String url,
                                String name,
                                String value,
@@ -103,6 +149,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
                                Boolean isHttpOnly,
                                String sameSite,
                                final MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) return;
 
     String cookieValue = name + "=" + value + "; Domain=" + domain + "; Path=" + path;
 
@@ -146,6 +194,9 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
 
     final List<Map<String, Object>> cookieListMap = new ArrayList<>();
 
+    cookieManager = getCookieManager();
+    if (cookieManager == null) return cookieListMap;
+
     String cookiesString = cookieManager.getCookie(url);
 
     if (cookiesString != null) {
@@ -173,6 +224,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
   }
 
   public static void deleteCookie(String url, String name, String domain, String path, final MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) return;
 
     String cookieValue = name + "=; Path=" + path + "; Domain=" + domain + "; Max-Age=-1;";
 
@@ -196,6 +249,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
   }
 
   public static void deleteCookies(String url, String domain, String path, final MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) return;
 
     CookieSyncManager cookieSyncMngr = null;
 
@@ -228,6 +283,8 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
   }
 
   public static void deleteAllCookies(final MethodChannel.Result result) {
+    cookieManager = getCookieManager();
+    if (cookieManager == null) return;
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       cookieManager.removeAllCookies(new ValueCallback<Boolean>() {

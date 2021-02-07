@@ -7,7 +7,8 @@
 - Added `IOSCookieManager` class and `CookieManager.instance().ios.getAllCookies` iOS-specific method
 - Added `UserScript`, `UserScriptInjectionTime`, `ContentWorld`, `AndroidWebViewFeature`, `AndroidServiceWorkerController`, `AndroidServiceWorkerClient` classes
 - Added `initialUserScripts` WebView option
-- Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts` WebView methods
+- Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
+- Added `contentWorld` argument to `evaluateJavascript` WebView method
 - Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains` iOS-specific webview options
 - Added `handlesURLScheme` iOS-specific webview method
 - Updated integration tests
@@ -29,13 +30,16 @@
 - Fixed missing `clearHistory` webview method implementation on Android
 - Fixed iOS crash when using CookieManager getCookies for an URL and the host URL is `null`
 - Fixed "IOS does not support allowUniversalAccessFromFileURLs" [#654](https://github.com/pichillilorenzo/flutter_inappwebview/issues/654)
+- Fixed "Failed to load WebView provider: No WebView installed" [#642](https://github.com/pichillilorenzo/flutter_inappwebview/issues/642)
+- Fixed "java.net.MalformedURLException: unknown protocol: wss - Error using library sipml5 in flutter_inappwebview" [#614](https://github.com/pichillilorenzo/flutter_inappwebview/issues/614)
 
 ### BREAKING CHANGES
 
 - Minimum Flutter version required is `1.22.0` and Dart SDK `>=2.12.0-0 <3.0.0`
 - iOS Xcode version `>= 12`
 - Removed `debuggingEnabled` WebView option; on Android you should use now the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method; on iOS, debugging is always enabled
-- `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options moved from Android-specific options to cross-platform options.
+- `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options moved from Android-specific options to cross-platform options
+- Added `callAsyncJavaScript` name to the list of javaScriptHandlerForbiddenNames
 
 ## 4.0.0+4
 

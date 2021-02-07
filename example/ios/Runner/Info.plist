@@ -59,7 +59,7 @@
 	</array>
 	<key>NSBonjourServices</key>
 	<array>
-		<string></string>
+		<string>_dartobservatory._tcp</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>

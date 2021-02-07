@@ -2,12 +2,19 @@ package com.pichillilorenzo.flutter_inappwebview;
 
 import android.content.res.AssetManager;
 import android.net.http.SslCertificate;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.IBinder;
 import android.os.Looper;
 import android.os.Parcelable;
 import android.util.Log;
+
+import androidx.annotation.RequiresApi;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -22,6 +29,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
@@ -233,5 +241,21 @@ public class Util {
     }
 
     return x509Certificate;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+  public static String JSONStringify(Object value) {
+    if (value == null) {
+      return "null";
+    }
+    if (value instanceof Map) {
+      return new JSONObject((Map<String, Object>) value).toString();
+    } else if (value instanceof List) {
+      return new JSONArray((List<Object>) value).toString();
+    } else if (value instanceof String) {
+      return JSONObject.quote((String) value);
+    } else {
+      return JSONObject.wrap(value).toString();
+    }
   }
 }

@@ -384,6 +384,17 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 webView?.removeAllUserScripts()
                 result(true)
                 break
+            case "callAsyncJavaScript":
+                if webView != nil, #available(iOS 10.3, *) {
+                    let functionBody = arguments!["functionBody"] as! String
+                    let functionArguments = arguments!["arguments"] as! [String:Any]
+                    let contentWorldName = arguments!["contentWorld"] as? String
+                    webView!.callAsyncJavaScript(functionBody: functionBody, arguments: functionArguments, contentWorldName: contentWorldName, result: result)
+                }
+                else {
+                    result(nil)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

@@ -827,6 +827,19 @@ let onWindowBlurEventJS = """
 })();
 """
 
+let callAsyncJavaScriptBelowIOS14WrapperJS = """
+(function(obj) {
+    (async function($FUNCTION_ARGUMENT_NAMES) {
+        $FUNCTION_BODY
+    })($FUNCTION_ARGUMENT_VALUES).then(function(value) {
+        window.webkit.messageHandlers['onCallAsyncJavaScriptResultBelowIOS14Received'].postMessage({'value': value, 'error': null, 'resultUuid': '$RESULT_UUID'});
+    }).catch(function(error) {
+        window.webkit.messageHandlers['onCallAsyncJavaScriptResultBelowIOS14Received'].postMessage({'value': null, 'error': error, 'resultUuid': '$RESULT_UUID'});
+    });
+    return null;
+})($FUNCTION_ARGUMENTS_OBJ);
+"""
+
 var SharedLastTouchPointTimestamp: [InAppWebView: Int64] = [:]
 
 public class WebViewTransport: NSObject {
@@ -878,6 +891,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     static var windowAutoincrementId: Int64 = 0;
     
     var userScriptsContentWorlds: [String] = ["page"]
+    
+    var callAsyncJavaScriptBelowIOS14Results: [String:FlutterResult] = [:]
     
     init(frame: CGRect, configuration: WKWebViewConfiguration, IABController: InAppBrowserWebViewController?, contextMenu: [String: Any]?, channel: FlutterMethodChannel?) {
         super.init(frame: frame, configuration: configuration)
@@ -1333,6 +1348,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             let printJSScript = WKUserScript(source: printJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
             configuration.userContentController.addUserScript(printJSScript)
+            
+            configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
+            configuration.userContentController.add(self, name: "onCallAsyncJavaScriptResultBelowIOS14Received")
         }
     }
     
@@ -2113,8 +2131,77 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func evaluateJavascript(source: String, contentWorldName: String?, result: FlutterResult?) {
+    public func evaluateJavascript(source: String, contentWorldName: String?, result: @escaping FlutterResult) {
         injectDeferredObject(source: source, contentWorldName: contentWorldName, withWrapper: nil, result: result)
+    }
+    
+    @available(iOS 10.3, *)
+    public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], contentWorldName: String?, result: @escaping FlutterResult) {
+        var jsToInject = functionBody
+        if #available(iOS 14.0, *) {
+            var contentWorld = WKContentWorld.page
+            if let contentWorldName = contentWorldName {
+                contentWorld = getContentWorld(name: contentWorldName)
+                if !userScriptsContentWorlds.contains(contentWorldName) {
+                    userScriptsContentWorlds.append(contentWorldName)
+                    addSharedPluginUserScriptsInContentWorld(contentWorldName: contentWorldName)
+                    // Add only the first time all the plugin user scripts needed.
+                    // In the next page load, it will use the WKUserScripts loaded
+                    jsToInject = getAllPluginUserScriptMergedJS() + "\n" + jsToInject
+                }
+            }
+            callAsyncJavaScript(jsToInject, arguments: arguments, in: nil, in: contentWorld) { (evalResult) in
+                var body: [String: Any?] = [
+                    "value": nil,
+                    "error": nil
+                ]
+                
+                switch (evalResult) {
+                case .success(let value):
+                    body["value"] = value
+                    break
+                case .failure(let error):
+                    body["error"] = error
+                    break
+                }
+                
+                result(body)
+            }
+        } else {
+            let resultUuid = NSUUID().uuidString
+            callAsyncJavaScriptBelowIOS14Results[resultUuid] = result
+            
+            var functionArgumentNamesList: [String] = []
+            var functionArgumentValuesList: [String] = []
+            let keys = arguments.keys
+            keys.forEach { (key) in
+                functionArgumentNamesList.append(key)
+                functionArgumentValuesList.append("obj.\(key)")
+            }
+            
+            let functionArgumentNames = functionArgumentNamesList.joined(separator: ", ")
+            let functionArgumentValues = functionArgumentValuesList.joined(separator: ", ")
+            
+            jsToInject = callAsyncJavaScriptBelowIOS14WrapperJS
+                .replacingOccurrences(of: "$FUNCTION_ARGUMENT_NAMES", with: functionArgumentNames)
+                .replacingOccurrences(of: "$FUNCTION_ARGUMENT_VALUES", with: functionArgumentValues)
+                .replacingOccurrences(of: "$FUNCTION_ARGUMENTS_OBJ", with: JSONStringify(value: arguments))
+                .replacingOccurrences(of: "$FUNCTION_BODY", with: jsToInject)
+                .replacingOccurrences(of: "$RESULT_UUID", with: resultUuid)
+            
+            evaluateJavaScript(jsToInject) { (value, error) in
+                if error != nil {
+                    let userInfo = (error! as NSError).userInfo
+                    self.onConsoleMessage(message:
+                                            userInfo["WKJavaScriptExceptionMessage"] as? String ??
+                                            userInfo["NSLocalizedDescription"] as? String ??
+                                            "",
+                                          messageLevel: 3)
+                    result(nil)
+                    self.callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
+                }
+            }
+        }
     }
     
     public func injectJavascriptFileFromUrl(urlFile: String) {
@@ -3270,6 +3357,16 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 webView = webViewTransport.webView
             }
             webView.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
+        } else if message.name == "onCallAsyncJavaScriptResultBelowIOS14Received" {
+            let body = message.body as! [String: Any?]
+            let resultUuid = body["resultUuid"] as! String
+            if let result = callAsyncJavaScriptBelowIOS14Results[resultUuid] {
+                result([
+                        "value": body["value"],
+                        "error": body["error"]
+                ])
+                callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
+            }
         }
     }
     
@@ -3436,6 +3533,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             configuration.userContentController.removeScriptMessageHandler(forName: "consoleWarn")
             configuration.userContentController.removeScriptMessageHandler(forName: "callHandler")
             configuration.userContentController.removeScriptMessageHandler(forName: "onFindResultReceived")
+            configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
             if #available(iOS 14.0, *) {
                 configuration.userContentController.removeAllScriptMessageHandlers()
                 for contentWorldName in userScriptsContentWorlds {
@@ -3469,6 +3567,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         if let wId = windowId, InAppWebView.windowWebViews[wId] != nil {
             InAppWebView.windowWebViews.removeValue(forKey: wId)
         }
+        callAsyncJavaScriptBelowIOS14Results.removeAll()
         super.removeFromSuperview()
     }
     

@@ -16,6 +16,7 @@ import android.os.Message;
 import android.print.PrintAttributes;
 import android.print.PrintDocumentAdapter;
 import android.print.PrintManager;
+import android.text.TextUtils;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.ActionMode;
@@ -42,6 +43,7 @@ import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.webkit.WebViewCompat;
@@ -67,9 +69,11 @@ import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -115,6 +119,8 @@ final public class InAppWebView extends InputAwareWebView {
   public Set<String> userScriptsContentWorlds = new HashSet<String>() {{
     add("page");
   }};
+
+  public Map<String, MethodChannel.Result> callAsyncJavaScriptResults = new HashMap<>();
 
   static final String pluginScriptsWrapperJS = "(function(){" +
           "  if (window." + JavaScriptBridgeInterface.name + " == null || window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded == null || !window." + JavaScriptBridgeInterface.name + "._pluginScriptsLoaded) {" +
@@ -659,11 +665,22 @@ final public class InAppWebView extends InputAwareWebView {
           "  });" +
           "})();";
 
-    static final String onWindowBlurEventJS = "(function(){" +
-          "  window.addEventListener('blur', function(e) {" +
-          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onWindowBlur');" +
-          "  });" +
-          "})();";
+  static final String onWindowBlurEventJS = "(function(){" +
+        "  window.addEventListener('blur', function(e) {" +
+        "    window." + JavaScriptBridgeInterface.name + ".callHandler('onWindowBlur');" +
+        "  });" +
+        "})();";
+
+  static final String callAsyncJavaScriptWrapperJS = "(function(obj) {" +
+        "  (async function($FUNCTION_ARGUMENT_NAMES) {" +
+        "    $FUNCTION_BODY" +
+        "  })($FUNCTION_ARGUMENT_VALUES).then(function(value) {" +
+        "    window." + JavaScriptBridgeInterface.name + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '$RESULT_UUID'});" +
+        "  }).catch(function(error) {" +
+        "    window." + JavaScriptBridgeInterface.name + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error, 'resultUuid': '$RESULT_UUID'});" +
+        "  });" +
+        "  return null;" +
+        "})($FUNCTION_ARGUMENTS_OBJ);";
 
   public InAppWebView(Context context) {
     super(context);
@@ -1521,7 +1538,7 @@ final public class InAppWebView extends InputAwareWebView {
     });
   }
 
-  public void evaluateJavascript(String source, String contentWorldName, MethodChannel.Result result) {
+  public void evaluateJavascript(String source, @Nullable String contentWorldName, MethodChannel.Result result) {
     injectDeferredObject(source, contentWorldName, null, result);
   }
 
@@ -2093,6 +2110,47 @@ final public class InAppWebView extends InputAwareWebView {
     return sourceWrapped;
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public void callAsyncJavaScript(String functionBody, Map<String, Object> arguments, @Nullable String contentWorldName, @NonNull MethodChannel.Result result) {
+    String resultUuid = UUID.randomUUID().toString();
+    callAsyncJavaScriptResults.put(resultUuid, result);
+
+    JSONObject functionArguments = new JSONObject(arguments);
+    Iterator<String> keys = functionArguments.keys();
+
+    List<String> functionArgumentNamesList = new ArrayList<>();
+    List<String> functionArgumentValuesList = new ArrayList<>();
+    while (keys.hasNext()) {
+      String key = keys.next();
+      functionArgumentNamesList.add(key);
+      functionArgumentValuesList.add("obj." + key);
+    }
+
+    String functionArgumentNames = TextUtils.join(", ", functionArgumentNamesList);
+    String functionArgumentValues = TextUtils.join(", ", functionArgumentValuesList);
+    String functionArgumentsObj = Util.JSONStringify(arguments);
+
+    String sourceToInject = InAppWebView.callAsyncJavaScriptWrapperJS
+            .replace("$FUNCTION_ARGUMENT_NAMES", functionArgumentNames)
+            .replace("$FUNCTION_ARGUMENT_VALUES", functionArgumentValues)
+            .replace("$FUNCTION_ARGUMENTS_OBJ", functionArgumentsObj)
+            .replace("$FUNCTION_BODY", functionBody)
+            .replace("$RESULT_UUID", resultUuid);
+
+    if (contentWorldName != null && !contentWorldName.equals("page")) {
+      if (!userScriptsContentWorlds.contains(contentWorldName)) {
+        userScriptsContentWorlds.add(contentWorldName);
+        // Add only the first time all the plugin scripts needed.
+        String jsPluginScripts = prepareAndWrapPluginUserScripts();
+        sourceToInject = jsPluginScripts + "\n" + sourceToInject;
+      }
+      sourceToInject = wrapSourceCodeInContentWorld(contentWorldName, sourceToInject);
+
+    }
+
+    evaluateJavascript(sourceToInject,  null);
+  }
+
   @Override
   public void dispose() {
     if (windowId != null && InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
@@ -2106,6 +2164,7 @@ final public class InAppWebView extends InputAwareWebView {
       removeCallbacks(checkContextMenuShouldBeClosedTask);
     if (checkScrollStoppedTask != null)
       removeCallbacks(checkScrollStoppedTask);
+    callAsyncJavaScriptResults.clear();
     super.dispose();
   }
 

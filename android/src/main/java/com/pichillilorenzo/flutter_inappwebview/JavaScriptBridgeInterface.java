@@ -11,6 +11,10 @@ import com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivit
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.FlutterWebView;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebView.InAppWebView;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.HashMap;
 import java.util.Map;
 
@@ -96,6 +100,21 @@ public class JavaScriptBridgeInterface {
 
         if (handlerName.equals("onPrint") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           webView.printCurrentPage();
+        } else if (handlerName.equals("callAsyncJavaScript")) {
+          try {
+            JSONArray arguments = new JSONArray(args);
+            JSONObject jsonObject = arguments.getJSONObject(0);
+            String resultUuid = jsonObject.getString("resultUuid");
+            if (webView.callAsyncJavaScriptResults.containsKey(resultUuid)) {
+              MethodChannel.Result callAsyncJavaScriptResult = webView.callAsyncJavaScriptResults.get(resultUuid);
+              callAsyncJavaScriptResult.success(jsonObject.toString());
+
+              webView.callAsyncJavaScriptResults.remove(resultUuid);
+            }
+          } catch (JSONException e) {
+            e.printStackTrace();
+          }
+          return;
         }
 
         channel.invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {

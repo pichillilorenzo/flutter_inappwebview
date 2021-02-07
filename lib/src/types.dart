@@ -4623,4 +4623,41 @@ class ContentWorld {
   ///Be careful when manipulating variables in this content world.
   ///If you modify a variable with the same name as one the webpage uses, you may unintentionally disrupt the normal operation of that page.
   static ContentWorld page = ContentWorld.world(name: "page");
+
+  Map<String, dynamic> toMap() {
+    return {"name": name};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents either a success or a failure, including an associated value in each case for [InAppWebViewController.callAsyncJavaScript].
+class CallAsyncJavaScriptResult {
+  ///It contains the success value.
+  dynamic value;
+
+  ///It contains the failure value.
+  dynamic error;
+
+  CallAsyncJavaScriptResult({this.value, this.error});
+
+  Map<String, dynamic> toMap() {
+    return {"value": value, "error": error};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
 }

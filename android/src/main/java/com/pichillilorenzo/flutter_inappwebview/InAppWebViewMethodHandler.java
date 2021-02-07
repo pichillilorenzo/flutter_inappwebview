@@ -438,6 +438,17 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         }
         result.success(true);
         break;
+      case "callAsyncJavaScript":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          String functionBody = (String) call.argument("functionBody");
+          Map<String, Object> functionArguments = (Map<String, Object>) call.argument("arguments");
+          String contentWorldName = (String) call.argument("contentWorld");
+          webView.callAsyncJavaScript(functionBody, functionArguments, contentWorldName, result);
+        }
+        else {
+          result.success(null);
+        }
+        break;
       default:
         result.notImplemented();
     }

@@ -18,10 +18,22 @@
 		EDC1147F21735BC200D2247A /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 97C146FA1CF9000F007C117D /* Main.storyboard */; };
 /* End PBXBuildFile section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		6174FE1725CEB74E00A5020C /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
-		26ADC1E5EAF404A509D528C5 /* Pods_Runner_copy.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Runner_copy.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = AppFrameworkInfo.plist; path = Flutter/AppFrameworkInfo.plist; sourceTree = "<group>"; };
 		61FF72FF23634CA10069C557 /* libsqlite3.tbd */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.text-based-dylib-definition"; name = libsqlite3.tbd; path = usr/lib/libsqlite3.tbd; sourceTree = SDKROOT; };
 		61FF730123634DD10069C557 /* flutter_downloader.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = flutter_downloader.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -59,7 +71,6 @@
 			children = (
 				61FF730123634DD10069C557 /* flutter_downloader.framework */,
 				61FF72FF23634CA10069C557 /* libsqlite3.tbd */,
-				26ADC1E5EAF404A509D528C5 /* Pods_Runner_copy.framework */,
 				B0FC2CF7A6002799890B3102 /* Pods_Runner.framework */,
 			);
 			name = Frameworks;
@@ -141,6 +152,7 @@
 				97C146EC1CF9000F007C117D /* Resources */,
 				3B06AD1E1E4923F5004D2608 /* Thin Binary */,
 				903A9F2558754FA70D0A7EA8 /* [CP] Embed Pods Frameworks */,
+				6174FE1725CEB74E00A5020C /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
@@ -157,6 +169,7 @@
 		97C146E61CF9000F007C117D /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
+				LastSwiftUpdateCheck = 1240;
 				LastUpgradeCheck = 1110;
 				ORGANIZATIONNAME = "The Chromium Authors";
 				TargetAttributes = {

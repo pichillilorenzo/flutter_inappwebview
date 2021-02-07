@@ -32,6 +32,7 @@ const javaScriptHandlerForbiddenNames = [
   "onPrint",
   "onWindowFocus",
   "onWindowBlur",
+  "callAsyncJavaScript"
 ];
 
 ///Controls a WebView, such as an [InAppWebView] widget instance, a [HeadlessInAppWebView] instance or [InAppBrowser] WebView instance.
@@ -2037,6 +2038,46 @@ class InAppWebViewController {
     _userScripts.clear();
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('removeAllUserScripts', args);
+  }
+
+  ///Executes the specified string as an asynchronous JavaScript function.
+  ///
+  ///[functionBody] is the JavaScript string to use as the function body.
+  ///This method treats the string as an anonymous JavaScript function body and calls it with the named arguments in the arguments parameter.
+  ///
+  ///[arguments] is a dictionary of the arguments to pass to the function call.
+  ///Each key in the dictionary corresponds to the name of an argument in the [functionBody] string,
+  ///and the value of that key is the value to use during the evaluation of the code.
+  ///Supported value types can be found in the official Flutter docs:
+  ///[Platform channel data types support and codecs](https://flutter.dev/docs/development/platform-integration/platform-channels#codec),
+  ///except for [Uint8List], [Int32List], [Int64List], and [Float64List] that should be converted into a [List].
+  ///All items in an array or dictionary must also be one of the supported types.
+  ///
+  ///[contentWorld], on iOS, it represents the namespace in which to evaluate the JavaScript [source] code.
+  ///Instead, on Android, it will run the [source] code into an iframe.
+  ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
+  ///Those changes remain visible to all scripts, regardless of which content world you specify.
+  ///For more information about content worlds, see [ContentWorld].
+  ///Available on iOS 14.0+.
+  ///
+  ///**NOTE for iOS**: available only on iOS 10.3+.
+  ///
+  ///**NOTE for Android**: available only on Android 21+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript
+  Future<CallAsyncJavaScriptResult?> callAsyncJavaScript({required String functionBody, Map<String, dynamic> arguments = const <String, dynamic>{}, ContentWorld? contentWorld}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('functionBody', () => functionBody);
+    args.putIfAbsent('arguments', () => arguments);
+    args.putIfAbsent('contentWorld', () => contentWorld?.name);
+    var data = await _channel.invokeMethod('callAsyncJavaScript', args);
+    if (data == null) {
+      return null;
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
+      data = json.decode(data);
+    }
+    return CallAsyncJavaScriptResult(value: data["value"], error: data["error"]);
   }
 
   ///Gets the default user agent.

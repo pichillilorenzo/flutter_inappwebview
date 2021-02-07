@@ -450,7 +450,7 @@ Screenshots:
 * `setOptions({required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
 * `stopLoading`: Stops the WebView from loading.
 * `takeScreenshot`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
-* `zoomBy`: Performs a zoom operation in this WebView.
+* `zoomBy({required double zoomFactor, bool iosAnimated = false})`: Performs a zoom operation in this WebView.
 * `static getDefaultUserAgent`: Gets the default user agent.
 
 ##### `InAppWebViewController.webStorage`

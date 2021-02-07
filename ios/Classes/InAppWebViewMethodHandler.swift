@@ -269,6 +269,11 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
             case "getContentHeight":
                 result(webView?.getContentHeight())
                 break
+            case "zoomBy":
+                let zoomFactor = arguments!["zoomFactor"] as! Float
+                webView?.zoomBy(zoomFactor: zoomFactor)
+                result(true)
+                break
             case "reloadFromOrigin":
                 webView?.reloadFromOrigin()
                 result(true)

@@ -3437,9 +3437,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         return Int64(scrollView.contentSize.height)
     }
     
-    public func zoomBy(zoomFactor: Float) {
+    public func zoomBy(zoomFactor: Float, animated: Bool) {
         let currentZoomScale = scrollView.zoomScale
-        scrollView.setZoomScale(currentZoomScale * CGFloat(zoomFactor), animated: false)
+        scrollView.setZoomScale(currentZoomScale * CGFloat(zoomFactor), animated: animated)
     }
     
     public func getScale() -> Float {

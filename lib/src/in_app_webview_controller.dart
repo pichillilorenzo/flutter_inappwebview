@@ -1716,17 +1716,20 @@ class InAppWebViewController {
   ///
   ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 (excluded) to 100.0 (included).
   ///
+  ///[iosAnimated] `true` to animate the transition to the new scale, `false` to make the transition immediate. Available only on iOS.
+  ///
   ///**NOTE**: available on Android 21+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale
-  Future<void> zoomBy(double zoomFactor) async {
+  Future<void> zoomBy({required double zoomFactor, bool iosAnimated = false}) async {
     assert(defaultTargetPlatform != TargetPlatform.android ||
         (defaultTargetPlatform == TargetPlatform.android && zoomFactor > 0.01 && zoomFactor <= 100.0));
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('zoomFactor', () => zoomFactor);
+    args.putIfAbsent('iosAnimated', () => iosAnimated);
     return await _channel.invokeMethod('zoomBy', args);
   }
 

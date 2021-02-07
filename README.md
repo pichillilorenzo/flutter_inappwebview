@@ -392,13 +392,14 @@ Screenshots:
 * `addJavaScriptHandler({required String handlerName, required JavaScriptHandlerCallback callback})`: Adds a JavaScript message handler callback that listen to post messages sent from JavaScript by the handler with name `handlerName`.
 * `addUserScript(UserScript userScript)`: Injects the specified `userScript` into the webpage’s content.
 * `addUserScripts(List<UserScript> userScripts)`: Injects the `userScripts` into the webpage’s content.
+* `callAsyncJavaScript({required String functionBody, Map<String, dynamic> arguments = const <String, dynamic>{}, ContentWorld? contentWorld})`: Executes the specified string as an asynchronous JavaScript function.
 * `canGoBackOrForward({required int steps})`: Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
 * `canGoBack`: Returns a boolean value indicating whether the WebView can move backward.
 * `canGoForward`: Returns a boolean value indicating whether the WebView can move forward.
 * `clearCache`: Clears all the webview's cache.
 * `clearFocus`: Clears the current focus. It will clear also, for example, the current text selection.
 * `clearMatches`: Clears the highlighting surrounding text matches created by `findAllAsync()`.
-* `evaluateJavascript({required String source})`: Evaluates JavaScript code into the WebView and returns the result of the evaluation.
+* `evaluateJavascript({required String source, ContentWorld? contentWorld})`: Evaluates JavaScript code into the WebView and returns the result of the evaluation.
 * `findAllAsync({required String find})`: Finds all instances of find on the page and highlights them. Notifies `onFindResultReceived` listener.
 * `findNext({required bool forward})`: Highlights and scrolls to the next match found by `findAllAsync()`. Notifies `onFindResultReceived` listener.
 * `getCertificate`: Gets the SSL certificate for the main top-level page or null if there is no certificate (the site is not secure).

@@ -449,7 +449,7 @@ Screenshots:
 * `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
 * `setOptions({required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
 * `stopLoading`: Stops the WebView from loading.
-* `takeScreenshot`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
+* `takeScreenshot({ScreenshotConfiguration? screenshotConfiguration})`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
 * `zoomBy({required double zoomFactor, bool iosAnimated = false})`: Performs a zoom operation in this WebView.
 * `static getDefaultUserAgent`: Gets the default user agent.
 
@@ -493,6 +493,7 @@ Android-specific methods can be called using the `InAppWebViewController.android
 
 iOS-specific methods can be called using the `InAppWebViewController.ios` attribute. Static methods can be called using the `IOSInAppWebViewController` class directly.
 
+* `createPdf({IOSWKPDFConfiguration? iosWKPdfConfiguration})`: Generates PDF data from the web view’s contents asynchronously.
 * `hasOnlySecureContent`: A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
 * `reloadFromOrigin`: Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
 * `static handlesURLScheme(String urlScheme)`: Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.

@@ -2336,6 +2336,15 @@ class IOSInAppWebViewController {
         .invokeMethod('hasOnlySecureContent', args);
   }
 
+  ///Generates PDF data from the web view’s contents asynchronously.
+  ///
+  ///[iosWKPdfConfiguration] represents the object that specifies the portion of the web view to capture as PDF data.
+  Future<Uint8List?> createPdf({IOSWKPDFConfiguration? iosWKPdfConfiguration}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('iosWKPdfConfiguration', () => iosWKPdfConfiguration?.toMap());
+    return await _controller._channel.invokeMethod('createPdf', args);
+  }
+
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
   ///
   ///[urlScheme] represents the URL scheme associated with the resource.

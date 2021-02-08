@@ -138,6 +138,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url ?? '';
                       });
+
                       // RenderObject renderBox = webViewKey.currentContext!.findRenderObject()!;
                       // print(renderBox.paintBounds.size);
                     },

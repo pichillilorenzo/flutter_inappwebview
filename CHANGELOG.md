@@ -5,12 +5,12 @@
 - Added `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options also for iOS (also thanks to [liranhao](https://github.com/liranhao))
 - Added limited cookies support on iOS below 11.0 using JavaScript
 - Added `IOSCookieManager` class and `CookieManager.instance().ios.getAllCookies` iOS-specific method
-- Added `UserScript`, `UserScriptInjectionTime`, `ContentWorld`, `AndroidWebViewFeature`, `AndroidServiceWorkerController`, `AndroidServiceWorkerClient`, `ScreenshotConfiguration` classes
+- Added `UserScript`, `UserScriptInjectionTime`, `ContentWorld`, `AndroidWebViewFeature`, `AndroidServiceWorkerController`, `AndroidServiceWorkerClient`, `ScreenshotConfiguration`, `IOSWKPDFConfiguration` classes
 - Added `initialUserScripts` WebView option
 - Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
-- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains` iOS-specific webview options
-- Added `handlesURLScheme` iOS-specific webview method
+- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains` iOS-specific WebView options
+- Added `handlesURLScheme`, `createPdf` iOS-specific WebView methods
 - Added `iosAnimated` optional argument to `zoomBy` WebView method
 - Added `screenshotConfiguration` optional argument to `takeScreenshot` WebView method
 - Updated integration tests

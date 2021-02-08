@@ -402,6 +402,17 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(nil)
                 }
                 break
+            case "createPdf":
+                if webView != nil {
+                    let configuration = arguments!["iosWKPdfConfiguration"] as? [String: Any?]
+                    webView!.createPdf(configuration: configuration, completionHandler: { (pdf) -> Void in
+                        result(pdf)
+                    })
+                }
+                else {
+                    result(nil)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

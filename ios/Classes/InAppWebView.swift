@@ -1742,6 +1742,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func createPdf (configuration: [String: Any?]?, completionHandler: @escaping (_ pdf: Data?) -> Void) {
+        if #available(iOS 14.0, *) {
+            let pdfConfiguration: WKPDFConfiguration = .init()
+            if let configuration = configuration {
+                if let rect = configuration["rect"] as? [String: Double] {
+                    pdfConfiguration.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
+                }
+            }
+            createPDF(configuration: pdfConfiguration) { (result) in
+                switch (result) {
+                case .success(let data):
+                    completionHandler(data)
+                    return
+                case .failure(let error):
+                    print(error.localizedDescription)
+                    completionHandler(nil)
+                    return
+                }
+            }
+        } else {
+            completionHandler(nil)
+        }
+    }
+    
     public func loadUrl(url: URL, headers: [String: String]?) {
         var request = URLRequest(url: url)
         currentURL = url

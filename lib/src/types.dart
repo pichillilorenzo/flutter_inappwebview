@@ -168,7 +168,7 @@ class InAppWebViewInitialData {
 }
 
 ///Class representing a resource request of the WebView used by the event [WebView.androidShouldInterceptRequest].
-///Available only on Android.
+///**NOTE**: available only on Android.
 ///
 ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebResourceRequest
 class WebResourceRequest {
@@ -177,12 +177,12 @@ class WebResourceRequest {
 
   ///The headers associated with the request.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `null`.
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always `null`.
   Map<String, String>? headers;
 
   ///The method associated with the request, for example `GET`.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it will be always "GET".
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always "GET".
   String? method;
 
   ///Gets whether a gesture (such as a click) was associated with the request.
@@ -190,17 +190,17 @@ class WebResourceRequest {
   ///the sequence of events which caused the request to be created was initiated by a user
   ///gesture.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `false`.
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? hasGesture;
 
   ///Whether the request was made in order to fetch the main frame's document.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `true`.
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always `true`.
   bool? isForMainFrame;
 
   ///Whether the request was a result of a server-side redirect.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it will be always `false`.
+  ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? isRedirect;
 
   WebResourceRequest(
@@ -233,7 +233,7 @@ class WebResourceRequest {
 }
 
 ///Class representing a resource response of the WebView used by the event [WebView.androidShouldInterceptRequest].
-///Available only on Android.
+///**NOTE**: available only on Android.
 ///
 ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebResourceResponse
 class WebResourceResponse {
@@ -248,19 +248,19 @@ class WebResourceResponse {
 
   ///The headers for the resource response. If [headers] isn't `null`, then you need to set also [statusCode] and [reasonPhrase].
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
+  ///**NOTE**: available on Android 21+. For Android < 21 it won't be used.
   Map<String, String>? headers;
 
   ///The status code needs to be in the ranges [100, 299], [400, 599]. Causing a redirect by specifying a 3xx code is not supported.
   ///If statusCode is set, then you need to set also [headers] and [reasonPhrase]. This value cannot be `null`.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
+  ///**NOTE**: available on Android 21+. For Android < 21 it won't be used.
   int? statusCode;
 
   ///The phrase describing the status code, for example `"OK"`. Must be non-empty.
   ///If reasonPhrase is set, then you need to set also [headers] and [reasonPhrase]. This value cannot be `null`.
   ///
-  ///**NOTE**: Available on Android 21+. For Android < 21 it won't be used.
+  ///**NOTE**: available on Android 21+. For Android < 21 it won't be used.
   String? reasonPhrase;
 
   WebResourceResponse(
@@ -452,7 +452,9 @@ class JsAlertRequest {
   ///Message to be displayed in the window.
   String? message;
 
-  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  ///Indicates whether the request was made for the main frame.
+  ///
+  ///**NOTE**: available only on iOS.
   bool? iosIsMainFrame;
 
   JsAlertRequest({this.url, this.message, this.iosIsMainFrame});
@@ -534,7 +536,9 @@ class JsConfirmRequest {
   ///Message to be displayed in the window.
   String? message;
 
-  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  ///Indicates whether the request was made for the main frame.
+  ///
+  ///**NOTE**: available only on iOS.
   bool? iosIsMainFrame;
 
   JsConfirmRequest({this.url, this.message, this.iosIsMainFrame});
@@ -625,7 +629,9 @@ class JsPromptRequest {
   ///The default value displayed in the prompt dialog.
   String? defaultValue;
 
-  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  ///Indicates whether the request was made for the main frame.
+  ///
+  ///**NOTE**: available only on iOS.
   bool? iosIsMainFrame;
 
   JsPromptRequest(
@@ -729,7 +735,9 @@ class JsBeforeUnloadRequest {
   ///Message to be displayed in the window.
   String? message;
 
-  ///Indicates whether the request was made for the main frame. Available only on iOS.
+  ///Indicates whether the request was made for the main frame.
+  ///
+  ///**NOTE**: available only on iOS.
   bool? iosIsMainFrame;
 
   JsBeforeUnloadRequest({this.url, this.message, this.iosIsMainFrame});
@@ -3168,13 +3176,17 @@ class ShouldOverrideUrlLoadingRequest {
   ///the sequence of events which caused the request to be created was initiated by a user
   ///gesture.
   ///
-  ///Available only on Android. On Android < 24, this is always `false`.
+  ///**NOTE**: available only on Android. On Android < 24, this is always `false`.
   bool? androidHasGesture;
 
-  ///Gets whether the request was a result of a server-side redirect. Available only on Android. On Android < 21, this is always `false`.
+  ///Gets whether the request was a result of a server-side redirect.
+  ///
+  ///**NOTE**: available only on Android. On Android < 21, this is always `false`.
   bool? androidIsRedirect;
 
-  ///The type of action triggering the navigation. Available only on iOS.
+  ///The type of action triggering the navigation.
+  ///
+  ///**NOTE**: available only on iOS.
   IOSWKNavigationType? iosWKNavigationType;
 
   ShouldOverrideUrlLoadingRequest(
@@ -3218,16 +3230,24 @@ class CreateWindowRequest {
   ///The window id. Used by [WebView] to create a new WebView.
   int windowId;
 
-  ///Indicates if the new window should be a dialog, rather than a full-size window. Available only on Android.
+  ///Indicates if the new window should be a dialog, rather than a full-size window.
+  ///
+  ///**NOTE**: available only on Android.
   bool? androidIsDialog;
 
-  ///Indicates if the request was initiated by a user gesture, such as the user clicking a link. Available only on Android.
+  ///Indicates if the request was initiated by a user gesture, such as the user clicking a link.
+  ///
+  ///**NOTE**: available only on Android.
   bool? androidIsUserGesture;
 
-  ///The type of action triggering the navigation. Available only on iOS.
+  ///The type of action triggering the navigation.
+  ///
+  ///**NOTE**: available only on iOS.
   IOSWKNavigationType? iosWKNavigationType;
 
-  ///Whether the request was made in order to fetch the main frame's document. Available only on iOS.
+  ///Whether the request was made in order to fetch the main frame's document.
+  ///
+  ///**NOTE**: available only on iOS.
   bool? iosIsForMainFrame;
 
   CreateWindowRequest(
@@ -4568,7 +4588,9 @@ class UserScript {
 
   ///A Boolean value that indicates whether to inject the script into the main frame.
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
-  ///The default value is `true`. Available only on iOS.
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available only on iOS.
   bool iosForMainFrameOnly;
 
   ///**NOTE for iOS 14.0+**: The namespace in which to evaluate the script.
@@ -4650,6 +4672,169 @@ class CallAsyncJavaScriptResult {
 
   Map<String, dynamic> toMap() {
     return {"value": value, "error": error};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///A class that represents a structure that contains the location and dimensions of a rectangle.
+class InAppWebViewRect {
+  ///
+  double x;
+  ///
+  double y;
+  ///
+  double width;
+  ///
+  double height;
+
+  InAppWebViewRect({required this.x, required this.y, required this.width, required this.height}) {
+    assert(this.x >= 0 && this.y >= 0 && this.width >= 0 && this.height >= 0);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {"x": x, "y": y, "width": width, "height": height};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the known formats a bitmap can be compressed into.
+class CompressFormat {
+  final String _value;
+
+  const CompressFormat._internal(this._value);
+
+  static final Set<CompressFormat> values = [
+    CompressFormat.JPEG,
+    CompressFormat.PNG,
+    CompressFormat.WEBP,
+    CompressFormat.WEBP_LOSSY,
+    CompressFormat.WEBP_LOSSLESS,
+  ].toSet();
+
+  static CompressFormat? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return CompressFormat.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///Compress to the `PNG` format.
+  ///PNG is lossless, so `quality` is ignored.
+  static const PNG = const CompressFormat._internal("PNG");
+
+  ///Compress to the `JPEG` format.
+  ///Quality of `0` means compress for the smallest size.
+  ///`100` means compress for max visual quality.
+  static const JPEG = const CompressFormat._internal("JPEG");
+
+  ///Compress to the `WEBP` lossy format.
+  ///Quality of `0` means compress for the smallest size.
+  ///`100` means compress for max visual quality.
+  ///
+  ///**NOTE**: available only on Android.
+  static const WEBP = const CompressFormat._internal("WEBP");
+
+  ///Compress to the `WEBP` lossy format.
+  ///Quality of `0` means compress for the smallest size.
+  ///`100` means compress for max visual quality.
+  ///
+  ///**NOTE**: available only on Android.
+  ///
+  ///**NOTE for Android**: available on Android 30+.
+  static const WEBP_LOSSY = const CompressFormat._internal("WEBP_LOSSY");
+
+  ///Compress to the `WEBP` lossless format.
+  ///Quality refers to how much effort to put into compression.
+  ///A value of `0` means to compress quickly, resulting in a relatively large file size.
+  ///`100` means to spend more time compressing, resulting in a smaller file.
+  ///
+  ///**NOTE**: available only on Android.
+  ///
+  ///**NOTE for Android**: available on Android 30+.
+  static const WEBP_LOSSLESS = const CompressFormat._internal("WEBP_LOSSLESS");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+
+///Class that represents the configuration data to use when generating an image from a web view’s contents using [InAppWebViewController.takeScreenshot].
+///
+///**NOTE for iOS**: available from iOS 11.0+.
+class ScreenshotConfiguration {
+  ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
+  ///The default value of this property is `null`, which captures everything in the view’s bounds rectangle.
+  ///If you specify a custom rectangle, it must lie within the bounds rectangle of the [WebView] object.
+  InAppWebViewRect? rect;
+
+  ///The width of the captured image, in points.
+  ///Use this property to scale the generated image to the specified width.
+  ///The web view maintains the aspect ratio of the captured content, but scales it to match the width you specify.
+  ///
+  ///The default value of this property is `null`, which returns an image whose size matches the original size of the captured rectangle.
+  double? snapshotWidth;
+
+  ///The compression format of the captured image.
+  ///The default value is [CompressFormat.PNG].
+  CompressFormat compressFormat;
+
+  ///Hint to the compressor, `0-100`. The value is interpreted differently depending on the [CompressFormat].
+  ///[CompressFormat.PNG] is lossless, so this value is ignored.
+  int quality;
+
+  ///A Boolean value that indicates whether to take the snapshot after incorporating any pending screen updates.
+  ///The default value of this property is `true`, which causes the web view to incorporate any recent changes to the view’s content and then generate the snapshot.
+  ///If you change the value to `false`, the [WebView] takes the snapshot immediately, and before incorporating any new changes.
+  ///
+  ///**NOTE**: available only on iOS.
+  ///
+  ///**NOTE for iOS**: available only on iOS. Available from iOS 13.0+.
+  bool iosAfterScreenUpdates;
+
+  ScreenshotConfiguration({
+    this.rect,
+    this.snapshotWidth,
+    this.compressFormat = CompressFormat.PNG,
+    this.quality = 100,
+    this.iosAfterScreenUpdates = true}) {
+    assert(this.quality >= 0);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "rect": rect?.toMap(),
+      "snapshotWidth": snapshotWidth,
+      "compressFormat": compressFormat.toValue(),
+      "quality": quality,
+      "iosAfterScreenUpdates": iosAfterScreenUpdates};
   }
 
   Map<String, dynamic> toJson() {

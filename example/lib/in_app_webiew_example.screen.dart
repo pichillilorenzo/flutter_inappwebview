@@ -14,6 +14,8 @@ class InAppWebViewExampleScreen extends StatefulWidget {
 }
 
 class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
+  final GlobalKey webViewKey = GlobalKey();
+
   InAppWebViewController? webView;
   late ContextMenu contextMenu;
   String url = "";
@@ -80,6 +82,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
+                    key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrl: "https://flutter.dev",
                     // initialFile: "assets/index.html",
@@ -135,6 +138,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       setState(() {
                         this.url = url ?? '';
                       });
+                      // RenderObject renderBox = webViewKey.currentContext!.findRenderObject()!;
+                      // print(renderBox.paintBounds.size);
                     },
                     onProgressChanged: (controller, progress) {
                       setState(() {

@@ -1700,12 +1700,40 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             : currentIndex + steps >= 0
     }
     
-    public func takeScreenshot (completionHandler: @escaping (_ screenshot: Data?) -> Void) {
+    public func takeScreenshot (with: [String: Any?]?, completionHandler: @escaping (_ screenshot: Data?) -> Void) {
         if #available(iOS 11.0, *) {
-            takeSnapshot(with: nil, completionHandler: {(image, error) -> Void in
+            var snapshotConfiguration: WKSnapshotConfiguration? = nil
+            if let with = with {
+                snapshotConfiguration = WKSnapshotConfiguration()
+                if let rect = with["rect"] as? [String: Double] {
+                    snapshotConfiguration!.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
+                }
+                if let snapshotWidth = with["snapshotWidth"] as? Double {
+                    snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
+                }
+                if #available(iOS 13.0, *), let afterScreenUpdates = with["iosAfterScreenUpdates"] as? Bool {
+                    snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
+                }
+            }
+            takeSnapshot(with: snapshotConfiguration, completionHandler: {(image, error) -> Void in
                 var imageData: Data? = nil
                 if let screenshot = image {
-                    imageData = screenshot.pngData()!
+                    if let with = with {
+                        switch with["compressFormat"] as! String {
+                        case "JPEG":
+                            let quality = Float(with["quality"] as! Int) / 100
+                            imageData = screenshot.jpegData(compressionQuality: CGFloat(quality))!
+                            break
+                        case "PNG":
+                            imageData = screenshot.pngData()!
+                            break
+                        default:
+                            imageData = screenshot.pngData()!
+                        }
+                    }
+                    else {
+                        imageData = screenshot.pngData()!
+                    }
                 }
                 completionHandler(imageData)
             })

@@ -129,7 +129,8 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "takeScreenshot":
                 if webView != nil {
-                    webView!.takeScreenshot(completionHandler: { (screenshot) -> Void in
+                    let screenshotConfiguration = arguments!["screenshotConfiguration"] as? [String: Any?]
+                    webView!.takeScreenshot(with: screenshotConfiguration, completionHandler: { (screenshot) -> Void in
                         result(screenshot)
                     })
                 }

@@ -1132,7 +1132,7 @@ final public class InAppWebView extends InputAwareWebView {
     WebStorage.getInstance().deleteAllData();
   }
 
-  public void takeScreenshot(final MethodChannel.Result result) {
+  public void takeScreenshot(final Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
     headlessHandler.post(new Runnable() {
       @Override
       public void run() {
@@ -1156,29 +1156,59 @@ final public class InAppWebView extends InputAwareWebView {
             scrollOffset = 0;
           }
 
-          Bitmap resized = Bitmap.createBitmap(
-                  b, 0, scrollOffset, b.getWidth(), measuredHeight);
+          int rectX = 0;
+          int rectY = scrollOffset;
+          int rectWidth = b.getWidth();
+          int rectHeight = measuredHeight;
+
+          Bitmap resized = Bitmap.createBitmap(b, rectX, rectY, rectWidth, rectHeight);
+
+          Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
+          if (rect != null) {
+            rectX = (int) Math.floor(rect.get("x") * scale + 0.5);
+            rectY = (int) Math.floor(rect.get("y") * scale + 0.5);
+            rectWidth = Math.min(resized.getWidth(), (int) Math.floor(rect.get("width") * scale + 0.5));
+            rectHeight = Math.min(resized.getHeight(), (int) Math.floor(rect.get("height") * scale + 0.5));
+            resized = Bitmap.createBitmap(
+                    b,
+                    rectX,
+                    rectY,
+                    rectWidth,
+                    rectHeight);
+          }
+
+          Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
+          if (snapshotWidth != null) {
+            int dstWidth = (int) Math.floor(snapshotWidth * scale + 0.5);
+            float ratioBitmap = (float) resized.getWidth() / (float) resized.getHeight();
+            int dstHeight = (int) ((float) dstWidth / ratioBitmap);
+            resized = Bitmap.createScaledBitmap(resized, dstWidth, dstHeight, true);
+          }
 
           ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-          resized.compress(Bitmap.CompressFormat.PNG, 100, byteArrayOutputStream);
+          Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
+          try {
+            compressFormat = Bitmap.CompressFormat.valueOf((String) screenshotConfiguration.get("compressFormat"));
+          } catch (IllegalArgumentException e) {
+            e.printStackTrace();
+          }
+
+          resized.compress(
+                  compressFormat,
+                  (Integer) screenshotConfiguration.get("quality"),
+                  byteArrayOutputStream);
+
           try {
             byteArrayOutputStream.close();
           } catch (IOException e) {
             e.printStackTrace();
-            String errorMessage = e.getMessage();
-            if (errorMessage != null) {
-              Log.e(LOG_TAG, errorMessage);
-            }
           }
           resized.recycle();
           result.success(byteArrayOutputStream.toByteArray());
 
         } catch (IllegalArgumentException e) {
-          String errorMessage = e.getMessage();
-          if (errorMessage != null) {
-            Log.e(LOG_TAG, errorMessage);
-          }
+          e.printStackTrace();
           result.success(null);
         }
       }

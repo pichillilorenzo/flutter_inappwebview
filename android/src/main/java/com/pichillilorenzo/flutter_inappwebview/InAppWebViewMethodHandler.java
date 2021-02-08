@@ -140,8 +140,10 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         result.success((webView != null) && webView.isLoading());
         break;
       case "takeScreenshot":
-        if (webView != null)
-          webView.takeScreenshot(result);
+        if (webView != null) {
+          Map<String, Object> screenshotConfiguration = (Map<String, Object>) call.argument("screenshotConfiguration");
+          webView.takeScreenshot(screenshotConfiguration, result);
+        }
         else
           result.success(null);
         break;

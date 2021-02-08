@@ -1504,13 +1504,16 @@ class InAppWebViewController {
     return this.javaScriptHandlersMap.remove(handlerName);
   }
 
-  ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
+  ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a [Uint8List]. Returns `null` if it wasn't be able to take it.
+  ///
+  ///[screenshotConfiguration] represents the configuration data to use when generating an image from a web view’s contents.
   ///
   ///**NOTE for iOS**: available from iOS 11.0+.
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot
-  Future<Uint8List?> takeScreenshot() async {
+  Future<Uint8List?> takeScreenshot({ScreenshotConfiguration? screenshotConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('screenshotConfiguration', () => screenshotConfiguration?.toMap());
     return await _channel.invokeMethod('takeScreenshot', args);
   }
 
@@ -1716,7 +1719,8 @@ class InAppWebViewController {
   ///
   ///[zoomFactor] represents the zoom factor to apply. On Android, the zoom factor will be clamped to the Webview's zoom limits and, also, this value must be in the range 0.01 (excluded) to 100.0 (included).
   ///
-  ///[iosAnimated] `true` to animate the transition to the new scale, `false` to make the transition immediate. Available only on iOS.
+  ///[iosAnimated] `true` to animate the transition to the new scale, `false` to make the transition immediate.
+  ///**NOTE**: available only on iOS.
   ///
   ///**NOTE**: available on Android 21+.
   ///
@@ -1748,7 +1752,8 @@ class InAppWebViewController {
   ///Gets the selected text.
   ///
   ///**NOTE**: This method is implemented with using JavaScript.
-  ///Available only on Android 19+.
+  ///
+  ///**NOTE for Android**: available only on Android 19+.
   Future<String?> getSelectedText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getSelectedText', args);

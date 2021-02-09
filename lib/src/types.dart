@@ -3157,6 +3157,181 @@ class IOSWKNavigationType {
   int get hashCode => _value.hashCode;
 }
 
+///An iOS-specific Class that represents the constants used to specify interaction with the cached responses.
+class IOSURLRequestCachePolicy {
+  final int _value;
+
+  const IOSURLRequestCachePolicy._internal(this._value);
+
+  static final Set<IOSURLRequestCachePolicy> values = [
+    IOSURLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
+    IOSURLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
+    IOSURLRequestCachePolicy.RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA,
+    IOSURLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD,
+    IOSURLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD,
+    IOSURLRequestCachePolicy.RELOAD_REVALIDATING_CACHE_DATA,
+  ].toSet();
+
+  static IOSURLRequestCachePolicy? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return IOSURLRequestCachePolicy.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "RELOAD_IGNORING_LOCAL_CACHE_DATA";
+      case 2:
+        return "RETURN_CACHE_DATA_ELSE_LOAD";
+      case 3:
+        return "RETURN_CACHE_DATA_DONT_LOAD";
+      case 4:
+        return "RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA";
+      case 5:
+        return "RELOAD_REVALIDATING_CACHE_DATA";
+      case 0:
+      default:
+        return "USE_PROTOCOL_CACHE_POLICY";
+    }
+  }
+
+  ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
+  ///This is the default policy for URL load requests.
+  static const USE_PROTOCOL_CACHE_POLICY = const IOSURLRequestCachePolicy._internal(0);
+
+  ///The URL load should be loaded only from the originating source.
+  ///This policy specifies that no existing cache data should be used to satisfy a URL load request.
+  ///
+  ///**NOTE**: Always use this policy if you are making HTTP or HTTPS byte-range requests.
+  static const RELOAD_IGNORING_LOCAL_CACHE_DATA = const IOSURLRequestCachePolicy._internal(1);
+
+  ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
+  static const RETURN_CACHE_DATA_ELSE_LOAD = const IOSURLRequestCachePolicy._internal(2);
+
+  ///Use existing cache data, regardless or age or expiration date, and fail if no cached data is available.
+  ///
+  ///If there is no existing data in the cache corresponding to a URL load request,
+  ///no attempt is made to load the data from the originating source, and the load is considered to have failed.
+  ///This constant specifies a behavior that is similar to an “offline” mode.
+  static const RETURN_CACHE_DATA_DONT_LOAD = const IOSURLRequestCachePolicy._internal(3);
+
+  ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA = const IOSURLRequestCachePolicy._internal(4);
+
+  ///Use cache data if the origin source can validate it; otherwise, load from the origin.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_REVALIDATING_CACHE_DATA = const IOSURLRequestCachePolicy._internal(5);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///An iOS-specific Class that represents the constants that specify how a request uses network resources.
+class IOSURLRequestNetworkServiceType {
+  final int _value;
+
+  const IOSURLRequestNetworkServiceType._internal(this._value);
+
+  static final Set<IOSURLRequestNetworkServiceType> values = [
+    IOSURLRequestNetworkServiceType.DEFAULT,
+    IOSURLRequestNetworkServiceType.VIDEO,
+    IOSURLRequestNetworkServiceType.BACKGROUND,
+    IOSURLRequestNetworkServiceType.VOICE,
+    IOSURLRequestNetworkServiceType.RESPONSIVE_DATA,
+    IOSURLRequestNetworkServiceType.AV_STREAMING,
+    IOSURLRequestNetworkServiceType.RESPONSIVE_AV,
+    IOSURLRequestNetworkServiceType.CALL_SIGNALING,
+  ].toSet();
+
+  static IOSURLRequestNetworkServiceType? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return IOSURLRequestNetworkServiceType.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 2:
+        return "VIDEO";
+      case 3:
+        return "BACKGROUND";
+      case 4:
+        return "VOICE";
+      case 6:
+        return "RESPONSIVE_DATA";
+      case 8:
+        return "AV_STREAMING";
+      case 9:
+        return "RESPONSIVE_AV";
+      case 11:
+        return "CALL_SIGNALING";
+      case 0:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  ///A service type for standard network traffic.
+  static const DEFAULT = const IOSURLRequestNetworkServiceType._internal(0);
+
+  ///A service type for video traffic.
+  static const VIDEO = const IOSURLRequestNetworkServiceType._internal(2);
+
+  ///A service type for background traffic.
+  ///
+  ///You should specify this type if your app is performing a download that was not requested by the user—for example,
+  ///prefetching content so that it will be available when the user chooses to view it.
+  static const BACKGROUND = const IOSURLRequestNetworkServiceType._internal(3);
+
+  ///A service type for voice traffic.
+  static const VOICE = const IOSURLRequestNetworkServiceType._internal(4);
+
+  ///A service type for data that the user is actively waiting for.
+  ///
+  ///Use this service type for interactive situations where the user is anticipating a quick response, like instant messaging or completing a purchase.
+  static const RESPONSIVE_DATA = const IOSURLRequestNetworkServiceType._internal(6);
+
+  ///A service type for streaming audio/video data.
+  static const AV_STREAMING = const IOSURLRequestNetworkServiceType._internal(8);
+
+  ///A service type for responsive (time-sensitive) audio/video data.
+  static const RESPONSIVE_AV = const IOSURLRequestNetworkServiceType._internal(9);
+
+  ///A service type for call signaling.
+  ///
+  ///Use this service type with network traffic that establishes, maintains, or tears down a VoIP call.
+  static const CALL_SIGNALING = const IOSURLRequestNetworkServiceType._internal(11);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///Class that represents the navigation request used by the [WebView.shouldOverrideUrlLoading] event.
 class ShouldOverrideUrlLoadingRequest {
   ///Represents the url of the navigation request.
@@ -3189,6 +3364,46 @@ class ShouldOverrideUrlLoadingRequest {
   ///**NOTE**: available only on iOS.
   IOSWKNavigationType? iosWKNavigationType;
 
+  ///A Boolean value indicating whether the request is allowed to use the built-in cellular radios to satisfy the request.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? iosAllowsCellularAccess;
+
+  ///A Boolean value that indicates whether the request may use the network when the user has specified Low Data Mode.
+  ///
+  ///**NOTE**: available only on iOS 13.0+.
+  bool? iosAllowsConstrainedNetworkAccess;
+
+  ///A Boolean value that indicates whether connections may use a network interface that the system considers expensive.
+  ///
+  ///**NOTE**: available only on iOS 13.0+.
+  bool? iosAllowsExpensiveNetworkAccess;
+
+  ///The request’s cache policy.
+  ///
+  ///**NOTE**: available only on iOS.
+  IOSURLRequestCachePolicy? iosCachePolicy;
+
+  ///A Boolean value indicating whether cookies will be sent with and set for this request.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? iosHttpShouldHandleCookies;
+
+  ///A Boolean value indicating whether the request should transmit before the previous response is received.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? iosHttpShouldUsePipelining;
+
+  ///The service type associated with this request.
+  ///
+  ///**NOTE**: available only on iOS.
+  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
+
+  ///The timeout interval of the request.
+  ///
+  ///**NOTE**: available only on iOS.
+  double? iosTimeoutInterval;
+
   ShouldOverrideUrlLoadingRequest(
       {required this.url,
       this.method,
@@ -3196,7 +3411,15 @@ class ShouldOverrideUrlLoadingRequest {
       required this.isForMainFrame,
       this.androidHasGesture,
       this.androidIsRedirect,
-      this.iosWKNavigationType});
+      this.iosWKNavigationType,
+      this.iosAllowsCellularAccess,
+      this.iosAllowsConstrainedNetworkAccess,
+      this.iosAllowsExpensiveNetworkAccess,
+      this.iosCachePolicy,
+      this.iosHttpShouldHandleCookies,
+      this.iosHttpShouldUsePipelining,
+      this.iosNetworkServiceType,
+      this.iosTimeoutInterval});
 
   Map<String, dynamic> toMap() {
     return {
@@ -3206,7 +3429,15 @@ class ShouldOverrideUrlLoadingRequest {
       "isForMainFrame": isForMainFrame,
       "androidHasGesture": androidHasGesture,
       "androidIsRedirect": androidIsRedirect,
-      "iosWKNavigationType": iosWKNavigationType?.toValue()
+      "iosWKNavigationType": iosWKNavigationType?.toValue(),
+      "iosAllowsCellularAccess": iosAllowsCellularAccess,
+      "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
+      "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
+      "iosCachePolicy": iosCachePolicy?.toValue(),
+      "iosHttpShouldHandleCookies": iosHttpShouldHandleCookies,
+      "iosHttpShouldUsePipelining": iosHttpShouldUsePipelining,
+      "iosNetworkServiceType": iosNetworkServiceType?.toValue(),
+      "iosTimeoutInterval": iosTimeoutInterval,
     };
   }
 
@@ -3250,21 +3481,78 @@ class CreateWindowRequest {
   ///**NOTE**: available only on iOS.
   bool? iosIsForMainFrame;
 
+  ///A Boolean value indicating whether the request is allowed to use the built-in cellular radios to satisfy the request.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? iosAllowsCellularAccess;
+
+  ///A Boolean value that indicates whether the request may use the network when the user has specified Low Data Mode.
+  ///
+  ///**NOTE**: available only on iOS 13.0+.
+  bool? iosAllowsConstrainedNetworkAccess;
+
+  ///A Boolean value that indicates whether connections may use a network interface that the system considers expensive.
+  ///
+  ///**NOTE**: available only on iOS 13.0+.
+  bool? iosAllowsExpensiveNetworkAccess;
+
+  ///The request’s cache policy.
+  ///
+  ///**NOTE**: available only on iOS.
+  IOSURLRequestCachePolicy? iosCachePolicy;
+
+  ///A Boolean value indicating whether cookies will be sent with and set for this request.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? iosHttpShouldHandleCookies;
+
+  ///A Boolean value indicating whether the request should transmit before the previous response is received.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? iosHttpShouldUsePipelining;
+
+  ///The service type associated with this request.
+  ///
+  ///**NOTE**: available only on iOS.
+  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
+
+  ///The timeout interval of the request.
+  ///
+  ///**NOTE**: available only on iOS.
+  double? iosTimeoutInterval;
+
   CreateWindowRequest(
       {this.url,
       required this.windowId,
       this.androidIsDialog,
       this.androidIsUserGesture,
       this.iosWKNavigationType,
-      this.iosIsForMainFrame});
+      this.iosIsForMainFrame,
+      this.iosAllowsCellularAccess,
+      this.iosAllowsConstrainedNetworkAccess,
+      this.iosAllowsExpensiveNetworkAccess,
+      this.iosCachePolicy,
+      this.iosHttpShouldHandleCookies,
+      this.iosHttpShouldUsePipelining,
+      this.iosNetworkServiceType,
+      this.iosTimeoutInterval});
 
   Map<String, dynamic> toMap() {
     return {
+      "url": url,
+      "windowId": windowId,
       "androidIsDialog": androidIsDialog,
       "androidIsUserGesture": androidIsUserGesture,
       "iosWKNavigationType": iosWKNavigationType?.toValue(),
-      "url": url,
-      "windowId": windowId
+      "iosIsForMainFrame": iosIsForMainFrame,
+      "iosAllowsCellularAccess": iosAllowsCellularAccess,
+      "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
+      "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
+      "iosCachePolicy": iosCachePolicy?.toValue(),
+      "iosHttpShouldHandleCookies": iosHttpShouldHandleCookies,
+      "iosHttpShouldUsePipelining": iosHttpShouldUsePipelining,
+      "iosNetworkServiceType": iosNetworkServiceType?.toValue(),
+      "iosTimeoutInterval": iosTimeoutInterval,
     };
   }
 
@@ -5160,5 +5448,87 @@ class CSSLinkHtmlTagAttributes {
   @override
   String toString() {
     return toMap().toString();
+  }
+}
+
+///An iOS-specific Class that represents the navigation response used by the [WebView.iosOnNavigationResponse] event.
+class IOSNavigationResponse {
+
+  ///The URL for the response.
+  String? url;
+
+  ///A Boolean value that indicates whether the response targets the web view’s main frame.
+  bool isForMainFrame;
+
+  ///A Boolean value that indicates whether WebKit is capable of displaying the response’s MIME type natively.
+  bool canShowMIMEType;
+
+  ///The expected length of the response’s content.
+  int expectedContentLength;
+
+  ///The MIME type of the response.
+  String? mimeType;
+
+  ///A suggested filename for the response data.
+  String? suggestedFilename;
+
+  ///The name of the text encoding provided by the response’s originating source.
+  String? textEncodingName;
+
+  IOSNavigationResponse({this.url,
+    required this.isForMainFrame,
+    required this.canShowMIMEType,
+    required this.expectedContentLength,
+    this.mimeType,
+    this.suggestedFilename,
+    this.textEncodingName
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": this.url,
+      "isForMainFrame": this.isForMainFrame,
+      "canShowMIMEType": this.canShowMIMEType,
+      "expectedContentLength": this.expectedContentLength,
+      "mimeType": this.mimeType,
+      "suggestedFilename": this.suggestedFilename,
+      "textEncodingName": this.textEncodingName,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that is used by [WebView.iosOnNavigationResponse] event.
+///It represents the policy to pass back to the decision handler.
+class IOSNavigationResponseAction {
+  final int _value;
+
+  const IOSNavigationResponseAction._internal(this._value);
+
+  int toValue() => _value;
+
+  ///Cancel the navigation.
+  static const CANCEL = const IOSNavigationResponseAction._internal(0);
+
+  ///Allow the navigation to continue.
+  static const ALLOW = const IOSNavigationResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": _value,
+    };
   }
 }

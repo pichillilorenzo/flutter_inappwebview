@@ -89,6 +89,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.androidOnReceivedLoginRequest,
     this.iosOnWebContentProcessDidTerminate,
     this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+    this.iosOnNavigationResponse,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -150,6 +151,11 @@ class InAppWebView extends StatefulWidget implements WebView {
   @override
   final void Function(InAppWebViewController controller)?
       iosOnWebContentProcessDidTerminate;
+
+  @override
+  final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
+      IOSNavigationResponse navigationResponse)?
+      iosOnNavigationResponse;
 
   @override
   final Future<AjaxRequestAction> Function(

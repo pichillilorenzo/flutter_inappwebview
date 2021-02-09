@@ -662,6 +662,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
 * `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
 * `suppressesIncrementalRendering`: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
+* `useOnNavigationResponse`: Set to `true` to be able to listen at the `iosOnNavigationResponse` event. The default value is `false`.
 
 #### `InAppWebView` Events
 

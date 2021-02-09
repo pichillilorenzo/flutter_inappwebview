@@ -65,6 +65,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var mediaType: String? = nil
     var pageZoom = 1.0
     var limitsNavigationsToAppBoundDomains = false
+    var useOnNavigationResponse = false
     
     override init(){
         super.init()

@@ -146,6 +146,14 @@ class InAppWebViewController {
         bool? androidHasGesture = call.arguments["androidHasGesture"];
         bool? androidIsRedirect = call.arguments["androidIsRedirect"];
         int? iosWKNavigationType = call.arguments["iosWKNavigationType"];
+        bool? iosAllowsCellularAccess = call.arguments["iosAllowsCellularAccess"];
+        bool? iosAllowsConstrainedNetworkAccess = call.arguments["iosAllowsConstrainedNetworkAccess"];
+        bool? iosAllowsExpensiveNetworkAccess = call.arguments["iosAllowsExpensiveNetworkAccess"];
+        int? iosCachePolicy = call.arguments["iosCachePolicy"];
+        bool? iosHttpShouldHandleCookies = call.arguments["iosHttpShouldHandleCookies"];
+        bool? iosHttpShouldUsePipelining = call.arguments["iosHttpShouldUsePipelining"];
+        int? iosNetworkServiceType = call.arguments["iosNetworkServiceType"];
+        double? iosTimeoutInterval = call.arguments["iosTimeoutInterval"];
 
         ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest =
             ShouldOverrideUrlLoadingRequest(
@@ -156,7 +164,15 @@ class InAppWebViewController {
                 androidHasGesture: androidHasGesture,
                 androidIsRedirect: androidIsRedirect,
                 iosWKNavigationType:
-                    IOSWKNavigationType.fromValue(iosWKNavigationType));
+                    IOSWKNavigationType.fromValue(iosWKNavigationType),
+                iosAllowsCellularAccess: iosAllowsCellularAccess,
+                iosAllowsConstrainedNetworkAccess: iosAllowsConstrainedNetworkAccess,
+                iosAllowsExpensiveNetworkAccess: iosAllowsExpensiveNetworkAccess,
+                iosCachePolicy: IOSURLRequestCachePolicy.fromValue(iosCachePolicy),
+                iosHttpShouldHandleCookies: iosHttpShouldHandleCookies,
+                iosHttpShouldUsePipelining: iosHttpShouldUsePipelining,
+                iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromValue(iosNetworkServiceType),
+                iosTimeoutInterval: iosTimeoutInterval);
 
         if (_webview != null && _webview!.shouldOverrideUrlLoading != null)
           return (await _webview!.shouldOverrideUrlLoading!(
@@ -221,6 +237,14 @@ class InAppWebViewController {
         bool? androidIsUserGesture = call.arguments["androidIsUserGesture"];
         int? iosWKNavigationType = call.arguments["iosWKNavigationType"];
         bool? iosIsForMainFrame = call.arguments["iosIsForMainFrame"];
+        bool? iosAllowsCellularAccess = call.arguments["iosAllowsCellularAccess"];
+        bool? iosAllowsConstrainedNetworkAccess = call.arguments["iosAllowsConstrainedNetworkAccess"];
+        bool? iosAllowsExpensiveNetworkAccess = call.arguments["iosAllowsExpensiveNetworkAccess"];
+        int? iosCachePolicy = call.arguments["iosCachePolicy"];
+        bool? iosHttpShouldHandleCookies = call.arguments["iosHttpShouldHandleCookies"];
+        bool? iosHttpShouldUsePipelining = call.arguments["iosHttpShouldUsePipelining"];
+        int? iosNetworkServiceType = call.arguments["iosNetworkServiceType"];
+        double? iosTimeoutInterval = call.arguments["iosTimeoutInterval"];
 
         CreateWindowRequest createWindowRequest = CreateWindowRequest(
             url: url,
@@ -229,7 +253,15 @@ class InAppWebViewController {
             androidIsUserGesture: androidIsUserGesture,
             iosWKNavigationType:
                 IOSWKNavigationType.fromValue(iosWKNavigationType),
-            iosIsForMainFrame: iosIsForMainFrame);
+            iosIsForMainFrame: iosIsForMainFrame,
+            iosAllowsCellularAccess: iosAllowsCellularAccess,
+            iosAllowsConstrainedNetworkAccess: iosAllowsConstrainedNetworkAccess,
+            iosAllowsExpensiveNetworkAccess: iosAllowsExpensiveNetworkAccess,
+            iosCachePolicy: IOSURLRequestCachePolicy.fromValue(iosCachePolicy),
+            iosHttpShouldHandleCookies: iosHttpShouldHandleCookies,
+            iosHttpShouldUsePipelining: iosHttpShouldUsePipelining,
+            iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromValue(iosNetworkServiceType),
+            iosTimeoutInterval: iosTimeoutInterval);
 
         bool? result = false;
 
@@ -613,6 +645,35 @@ class InAppWebViewController {
           _webview!.iosOnDidReceiveServerRedirectForProvisionalNavigation!(this);
         else if (_inAppBrowser != null)
           _inAppBrowser!.iosOnDidReceiveServerRedirectForProvisionalNavigation();
+        break;
+      case "onNavigationResponse":
+        String? url = call.arguments["url"];
+        bool isForMainFrame = call.arguments["isForMainFrame"];
+        bool canShowMIMEType = call.arguments["canShowMIMEType"];
+        int expectedContentLength = call.arguments["expectedContentLength"];
+        String? mimeType = call.arguments["mimeType"];
+        String? suggestedFilename = call.arguments["suggestedFilename"];
+        String? textEncodingName = call.arguments["textEncodingName"];
+
+        IOSNavigationResponse iosOnNavigationResponse =
+        IOSNavigationResponse(
+          url: url,
+          isForMainFrame: isForMainFrame,
+          canShowMIMEType: canShowMIMEType,
+          expectedContentLength: expectedContentLength,
+          mimeType: mimeType,
+          suggestedFilename: suggestedFilename,
+          textEncodingName: textEncodingName
+        );
+
+        if (_webview != null && _webview!.iosOnNavigationResponse != null)
+          return (await _webview!.iosOnNavigationResponse!(
+              this, iosOnNavigationResponse))
+              ?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser!
+              .iosOnNavigationResponse(iosOnNavigationResponse))
+              ?.toMap();
         break;
       case "onLongPressHitTestResult":
         Map<dynamic, dynamic>? hitTestResultMap =

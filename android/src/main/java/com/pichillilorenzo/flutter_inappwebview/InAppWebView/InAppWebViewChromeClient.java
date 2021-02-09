@@ -586,6 +586,14 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     obj.put("androidIsUserGesture", isUserGesture);
     obj.put("iosWKNavigationType", null);
     obj.put("iosIsForMainFrame", null);
+    obj.put("iosAllowsCellularAccess", null);
+    obj.put("iosAllowsConstrainedNetworkAccess", null);
+    obj.put("iosAllowsExpensiveNetworkAccess", null);
+    obj.put("iosCachePolicy", null);
+    obj.put("iosHttpShouldHandleCookies", null);
+    obj.put("iosHttpShouldUsePipelining", null);
+    obj.put("iosNetworkServiceType", null);
+    obj.put("iosTimeoutInterval", null);
 
     windowWebViewMessages.put(windowId, resultMsg);
 

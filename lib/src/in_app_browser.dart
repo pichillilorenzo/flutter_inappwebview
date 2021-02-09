@@ -753,6 +753,16 @@ class InAppBrowser {
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview
   void iosOnDidReceiveServerRedirectForProvisionalNavigation() {}
 
+  ///Called when a web view asks for permission to navigate to new content after the response to the navigation request is known.
+  ///
+  ///[navigationResponse] represents the navigation response.
+  ///
+  ///**NOTE**: available only on iOS.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
+  Future<IOSNavigationResponseAction?>?
+    iosOnNavigationResponse(IOSNavigationResponse navigationResponse) {}
+
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
       throw Exception([

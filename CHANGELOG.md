@@ -9,12 +9,14 @@
 - Added `initialUserScripts` WebView option
 - Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
-- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains` iOS-specific WebView options
+- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse` iOS-specific WebView options
 - Added `handlesURLScheme`, `createPdf`, `createWebArchiveData` iOS-specific WebView methods
+- Added `iosOnNavigationResponse` iOS-specific WebView events
 - Added `iosAnimated` optional argument to `zoomBy` WebView method
 - Added `screenshotConfiguration` optional argument to `takeScreenshot` WebView method
 - Added `scriptHtmlTagAttributes` optional argument to `injectJavascriptFileFromUrl` WebView method
 - Added `cssLinkHtmlTagAttributes` optional argument to `injectCSSFileFromUrl` WebView method
+- Added new iOS-specific attributes to `ShouldOverrideUrlLoadingRequest` and `CreateWindowRequest` classes
 - Updated integration tests
 - Merge "Upgraded appcompat to 1.2.0-rc-02" [#465](https://github.com/pichillilorenzo/flutter_inappwebview/pull/465) (thanks to [andreidiaconu](https://github.com/andreidiaconu))
 - Merge "Added missing field 'headers' which returned by WebResourceResponse.toMap()" [#490](https://github.com/pichillilorenzo/flutter_inappwebview/pull/490) (thanks to [Doflatango](https://github.com/Doflatango))

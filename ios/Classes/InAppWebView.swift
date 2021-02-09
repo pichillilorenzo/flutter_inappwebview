@@ -2402,17 +2402,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return result;
     }
     
+    @available(iOS 13.0, *)
+    public func webView(_ webView: WKWebView,
+                 decidePolicyFor navigationAction: WKNavigationAction,
+                 preferences: WKWebpagePreferences,
+                 decisionHandler: @escaping (WKNavigationActionPolicy, WKWebpagePreferences) -> Void) {
+        self.webView(webView, decidePolicyFor: navigationAction, decisionHandler: {(navigationActionPolicy) -> Void in
+            decisionHandler(navigationActionPolicy, preferences)
+        })
+    }
+    
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         
-        if let url = navigationAction.request.url {
+        if navigationAction.request.url != nil {
             
-            if activateShouldOverrideUrlLoading && (options?.useShouldOverrideUrlLoading)! {
-                
-                let isForMainFrame = navigationAction.targetFrame?.isMainFrame ?? false
-                
-                shouldOverrideUrlLoading(url: url, method: navigationAction.request.httpMethod, headers: navigationAction.request.allHTTPHeaderFields, isForMainFrame: isForMainFrame, navigationType: navigationAction.navigationType, result: { (result) -> Void in
+            if activateShouldOverrideUrlLoading, let useShouldOverrideUrlLoading = options?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading {
+                shouldOverrideUrlLoading(navigationAction: navigationAction, result: { (result) -> Void in
                     if result is FlutterError {
                         print((result as! FlutterError).message ?? "")
                         decisionHandler(.allow)
@@ -2475,18 +2482,55 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if (options?.useOnDownloadStart)! {
+        let useOnNavigationResponse = options?.useOnNavigationResponse
+        
+        if useOnNavigationResponse != nil, useOnNavigationResponse! {
+            onNavigationResponse(navigationResponse: navigationResponse, result: { (result) -> Void in
+                if result is FlutterError {
+                    print((result as! FlutterError).message ?? "")
+                    decisionHandler(.allow)
+                    return
+                }
+                else if (result as? NSObject) == FlutterMethodNotImplemented {
+                    decisionHandler(.allow)
+                    return
+                }
+                else {
+                    var response: [String: Any]
+                    if let r = result {
+                        response = r as! [String: Any]
+                        var action = response["action"] as? Int
+                        action = action != nil ? action : 0;
+                        switch action {
+                            case 1:
+                                decisionHandler(.allow)
+                                break
+                            default:
+                                decisionHandler(.cancel)
+                        }
+                        return;
+                    }
+                    decisionHandler(.allow)
+                }
+            })
+        }
+        
+        if let useOnDownloadStart = options?.useOnDownloadStart, useOnDownloadStart {
             let mimeType = navigationResponse.response.mimeType
             if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
                 if mimeType != nil && !mimeType!.starts(with: "text/") {
                     onDownloadStart(url: url.absoluteString)
-                    decisionHandler(.cancel)
+                    if useOnNavigationResponse == nil || !useOnNavigationResponse! {
+                        decisionHandler(.cancel)
+                    }
                     return
                 }
             }
         }
         
-        decisionHandler(.allow)
+        if useOnNavigationResponse == nil || !useOnNavigationResponse! {
+            decisionHandler(.allow)
+        }
     }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
@@ -2758,7 +2802,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         return identityAndTrust;
     }
-
     
     func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
         let title = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
@@ -3008,13 +3051,28 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         InAppWebView.windowWebViews[windowId] = webViewTransport
         windowWebView.stopLoading()
         
+        var iosAllowsConstrainedNetworkAccess: Bool? = nil
+        var iosAllowsExpensiveNetworkAccess: Bool? = nil
+        if #available(iOS 13.0, *) {
+            iosAllowsConstrainedNetworkAccess = navigationAction.request.allowsConstrainedNetworkAccess
+            iosAllowsExpensiveNetworkAccess = navigationAction.request.allowsExpensiveNetworkAccess
+        }
+        
         let arguments: [String: Any?] = [
             "url": navigationAction.request.url?.absoluteString,
             "windowId": windowId,
             "androidIsDialog": nil,
             "androidIsUserGesture": nil,
             "iosWKNavigationType": navigationAction.navigationType.rawValue,
-            "iosIsForMainFrame": navigationAction.targetFrame?.isMainFrame ?? false
+            "iosIsForMainFrame": navigationAction.targetFrame?.isMainFrame ?? false,
+            "iosAllowsCellularAccess": navigationAction.request.allowsCellularAccess,
+            "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
+            "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
+            "iosCachePolicy": navigationAction.request.cachePolicy.rawValue,
+            "iosHttpShouldHandleCookies": navigationAction.request.httpShouldHandleCookies,
+            "iosHttpShouldUsePipelining": navigationAction.request.httpShouldUsePipelining,
+            "iosNetworkServiceType": navigationAction.request.networkServiceType.rawValue,
+            "iosTimeoutInterval": navigationAction.request.timeoutInterval,
         ]
         channel?.invokeMethod("onCreateWindow", arguments: arguments, result: { (result) -> Void in
             if result is FlutterError {
@@ -3218,17 +3276,44 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         channel?.invokeMethod("onLoadResourceCustomScheme", arguments: arguments, result: result)
     }
     
-    public func shouldOverrideUrlLoading(url: URL, method: String?, headers: [String: String]?, isForMainFrame: Bool, navigationType: WKNavigationType, result: FlutterResult?) {
+    public func shouldOverrideUrlLoading(navigationAction: WKNavigationAction, result: FlutterResult?) {
+        var iosAllowsConstrainedNetworkAccess: Bool? = nil
+        var iosAllowsExpensiveNetworkAccess: Bool? = nil
+        if #available(iOS 13.0, *) {
+            iosAllowsConstrainedNetworkAccess = navigationAction.request.allowsConstrainedNetworkAccess
+            iosAllowsExpensiveNetworkAccess = navigationAction.request.allowsExpensiveNetworkAccess
+        }
         let arguments: [String: Any?] = [
-            "url": url.absoluteString,
-            "method": method,
-            "headers": headers,
-            "isForMainFrame": isForMainFrame,
+            "url": navigationAction.request.url?.absoluteString,
+            "method": navigationAction.request.httpMethod,
+            "headers": navigationAction.request.allHTTPHeaderFields,
+            "isForMainFrame": navigationAction.targetFrame?.isMainFrame ?? false,
             "androidHasGesture": nil,
             "androidIsRedirect": nil,
-            "iosWKNavigationType": navigationType.rawValue
+            "iosWKNavigationType": navigationAction.navigationType.rawValue,
+            "iosAllowsCellularAccess": navigationAction.request.allowsCellularAccess,
+            "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
+            "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
+            "iosCachePolicy": navigationAction.request.cachePolicy.rawValue,
+            "iosHttpShouldHandleCookies": navigationAction.request.httpShouldHandleCookies,
+            "iosHttpShouldUsePipelining": navigationAction.request.httpShouldUsePipelining,
+            "iosNetworkServiceType": navigationAction.request.networkServiceType.rawValue,
+            "iosTimeoutInterval": navigationAction.request.timeoutInterval,
         ]
         channel?.invokeMethod("shouldOverrideUrlLoading", arguments: arguments, result: result)
+    }
+    
+    public func onNavigationResponse(navigationResponse: WKNavigationResponse, result: FlutterResult?) {
+        let arguments: [String: Any?] = [
+            "url": navigationResponse.response.url?.absoluteString,
+            "isForMainFrame": navigationResponse.isForMainFrame,
+            "canShowMIMEType": navigationResponse.canShowMIMEType,
+            "expectedContentLength": navigationResponse.response.expectedContentLength,
+            "mimeType": navigationResponse.response.mimeType,
+            "suggestedFilename": navigationResponse.response.suggestedFilename,
+            "textEncodingName": navigationResponse.response.textEncodingName,
+        ]
+        channel?.invokeMethod("onNavigationResponse", arguments: arguments, result: result)
     }
     
     public func onReceivedHttpAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {

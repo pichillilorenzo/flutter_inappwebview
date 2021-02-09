@@ -77,6 +77,7 @@ class HeadlessInAppWebView implements WebView {
       this.androidOnReceivedLoginRequest,
       this.iosOnWebContentProcessDidTerminate,
       this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+      this.iosOnNavigationResponse,
       this.initialUrl,
       this.initialFile,
       this.initialData,
@@ -189,6 +190,11 @@ class HeadlessInAppWebView implements WebView {
   @override
   final void Function(InAppWebViewController controller)?
       iosOnWebContentProcessDidTerminate;
+
+  @override
+  final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
+      IOSNavigationResponse navigationResponse)?
+      iosOnNavigationResponse;
 
   @override
   final Future<AjaxRequestAction> Function(

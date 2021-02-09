@@ -604,6 +604,17 @@ abstract class WebView {
   final void Function(InAppWebViewController controller)?
       iosOnDidReceiveServerRedirectForProvisionalNavigation;
 
+  ///Called when a web view asks for permission to navigate to new content after the response to the navigation request is known.
+  ///
+  ///[navigationResponse] represents the navigation response.
+  ///
+  ///**NOTE**: available only on iOS.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
+  final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
+      IOSNavigationResponse navigationResponse)?
+      iosOnNavigationResponse;
+
   ///Initial url that will be loaded.
   final String? initialUrl;
 
@@ -680,6 +691,7 @@ abstract class WebView {
       this.androidOnReceivedLoginRequest,
       this.iosOnWebContentProcessDidTerminate,
       this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+      this.iosOnNavigationResponse,
       this.initialUrl,
       this.initialFile,
       this.initialData,

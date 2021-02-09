@@ -120,6 +120,15 @@ public class InAppWebViewClient extends WebViewClient {
     obj.put("androidHasGesture", hasGesture);
     obj.put("androidIsRedirect", isRedirect);
     obj.put("iosWKNavigationType", null);
+    obj.put("iosAllowsCellularAccess", null);
+    obj.put("iosAllowsConstrainedNetworkAccess", null);
+    obj.put("iosAllowsExpensiveNetworkAccess", null);
+    obj.put("iosCachePolicy", null);
+    obj.put("iosHttpShouldHandleCookies", null);
+    obj.put("iosHttpShouldUsePipelining", null);
+    obj.put("iosNetworkServiceType", null);
+    obj.put("iosTimeoutInterval", null);
+
     channel.invokeMethod("shouldOverrideUrlLoading", obj, new MethodChannel.Result() {
       @Override
       public void success(Object response) {

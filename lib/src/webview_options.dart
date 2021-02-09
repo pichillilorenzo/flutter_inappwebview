@@ -80,13 +80,13 @@ class ChromeSafariBrowserOptions {
 ///This class represents all the cross-platform WebView options available.
 class InAppWebViewOptions
     implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
-  ///Set to `true` to be able to listen at the [shouldOverrideUrlLoading] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
   bool useShouldOverrideUrlLoading;
 
-  ///Set to `true` to be able to listen at the [onLoadResource] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event. The default value is `false`.
   bool useOnLoadResource;
 
-  ///Set to `true` to be able to listen at the [onDownloadStart] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onDownloadStart] event. The default value is `false`.
   bool useOnDownloadStart;
 
   ///Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
@@ -122,7 +122,7 @@ class InAppWebViewOptions
   ///Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
   bool horizontalScrollBarEnabled;
 
-  ///List of custom schemes that the WebView must handle. Use the [onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
+  ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
   ///
   ///**NOTE**: available on iOS 11.0+.
   List<String> resourceCustomSchemes;
@@ -137,10 +137,10 @@ class InAppWebViewOptions
   ///**NOTE**: available on iOS 13.0+.
   UserPreferredContentMode? preferredContentMode;
 
-  ///Set to `true` to be able to listen at the [shouldInterceptAjaxRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event. The default value is `false`.
   bool useShouldInterceptAjaxRequest;
 
-  ///Set to `true` to be able to listen at the [shouldInterceptFetchRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event. The default value is `false`.
   bool useShouldInterceptFetchRequest;
 
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
@@ -474,10 +474,10 @@ class AndroidInAppWebViewOptions
   bool hardwareAcceleration;
 
   ///Sets whether the WebView supports multiple windows.
-  ///If set to `true`, [onCreateWindow] event must be implemented by the host application. The default value is `false`.
+  ///If set to `true`, [WebView.onCreateWindow] event must be implemented by the host application. The default value is `false`.
   bool supportMultipleWindows;
 
-  ///Regular expression used by [shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
+  ///Regular expression used by [WebView.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
   ///If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
   String? regexToCancelSubFramesLoading;
 
@@ -866,6 +866,9 @@ class IOSInAppWebViewOptions
   ///**NOTE**: available on iOS 14.0+.
   bool limitsNavigationsToAppBoundDomains;
 
+  ///Set to `true` to be able to listen at the [WebView.iosOnNavigationResponse] event. The default value is `false`.
+  bool useOnNavigationResponse;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -894,7 +897,8 @@ class IOSInAppWebViewOptions
       this.isDirectionalLockEnabled = false,
       this.mediaType,
       this.pageZoom = 1.0,
-      this.limitsNavigationsToAppBoundDomains = false});
+      this.limitsNavigationsToAppBoundDomains = false,
+      this.useOnNavigationResponse = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -934,6 +938,7 @@ class IOSInAppWebViewOptions
       "mediaType": mediaType,
       "pageZoom": pageZoom,
       "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
+      "useOnNavigationResponse": useOnNavigationResponse,
     };
   }
 
@@ -987,6 +992,7 @@ class IOSInAppWebViewOptions
     options.mediaType = map["mediaType"];
     options.pageZoom = map["pageZoom"];
     options.limitsNavigationsToAppBoundDomains = map["limitsNavigationsToAppBoundDomains"];
+    options.useOnNavigationResponse = map["useOnNavigationResponse"];
     return options;
   }
 

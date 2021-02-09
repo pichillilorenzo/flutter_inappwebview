@@ -1700,70 +1700,117 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             : currentIndex + steps >= 0
     }
     
+    @available(iOS 11.0, *)
     public func takeScreenshot (with: [String: Any?]?, completionHandler: @escaping (_ screenshot: Data?) -> Void) {
-        if #available(iOS 11.0, *) {
-            var snapshotConfiguration: WKSnapshotConfiguration? = nil
-            if let with = with {
-                snapshotConfiguration = WKSnapshotConfiguration()
-                if let rect = with["rect"] as? [String: Double] {
-                    snapshotConfiguration!.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
-                }
-                if let snapshotWidth = with["snapshotWidth"] as? Double {
-                    snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
-                }
-                if #available(iOS 13.0, *), let afterScreenUpdates = with["iosAfterScreenUpdates"] as? Bool {
-                    snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
-                }
+        var snapshotConfiguration: WKSnapshotConfiguration? = nil
+        if let with = with {
+            snapshotConfiguration = WKSnapshotConfiguration()
+            if let rect = with["rect"] as? [String: Double] {
+                snapshotConfiguration!.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
             }
-            takeSnapshot(with: snapshotConfiguration, completionHandler: {(image, error) -> Void in
-                var imageData: Data? = nil
-                if let screenshot = image {
-                    if let with = with {
-                        switch with["compressFormat"] as! String {
-                        case "JPEG":
-                            let quality = Float(with["quality"] as! Int) / 100
-                            imageData = screenshot.jpegData(compressionQuality: CGFloat(quality))!
-                            break
-                        case "PNG":
-                            imageData = screenshot.pngData()!
-                            break
-                        default:
-                            imageData = screenshot.pngData()!
-                        }
-                    }
-                    else {
+            if let snapshotWidth = with["snapshotWidth"] as? Double {
+                snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
+            }
+            if #available(iOS 13.0, *), let afterScreenUpdates = with["iosAfterScreenUpdates"] as? Bool {
+                snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
+            }
+        }
+        takeSnapshot(with: snapshotConfiguration, completionHandler: {(image, error) -> Void in
+            var imageData: Data? = nil
+            if let screenshot = image {
+                if let with = with {
+                    switch with["compressFormat"] as! String {
+                    case "JPEG":
+                        let quality = Float(with["quality"] as! Int) / 100
+                        imageData = screenshot.jpegData(compressionQuality: CGFloat(quality))!
+                        break
+                    case "PNG":
+                        imageData = screenshot.pngData()!
+                        break
+                    default:
                         imageData = screenshot.pngData()!
                     }
                 }
-                completionHandler(imageData)
-            })
-        } else {
-            completionHandler(nil)
+                else {
+                    imageData = screenshot.pngData()!
+                }
+            }
+            completionHandler(imageData)
+        })
+    }
+    
+    @available(iOS 14.0, *)
+    public func createPdf (configuration: [String: Any?]?, completionHandler: @escaping (_ pdf: Data?) -> Void) {
+        let pdfConfiguration: WKPDFConfiguration = .init()
+        if let configuration = configuration {
+            if let rect = configuration["rect"] as? [String: Double] {
+                pdfConfiguration.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
+            }
+        }
+        createPDF(configuration: pdfConfiguration) { (result) in
+            switch (result) {
+            case .success(let data):
+                completionHandler(data)
+                return
+            case .failure(let error):
+                print(error.localizedDescription)
+                completionHandler(nil)
+                return
+            }
         }
     }
     
-    public func createPdf (configuration: [String: Any?]?, completionHandler: @escaping (_ pdf: Data?) -> Void) {
-        if #available(iOS 14.0, *) {
-            let pdfConfiguration: WKPDFConfiguration = .init()
-            if let configuration = configuration {
-                if let rect = configuration["rect"] as? [String: Double] {
-                    pdfConfiguration.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
-                }
+    @available(iOS 14.0, *)
+    public func createWebArchiveData (dataCompletionHandler: @escaping (_ webArchiveData: Data?) -> Void) {
+        createWebArchiveData(completionHandler: { (result) in
+            switch (result) {
+            case .success(let data):
+                dataCompletionHandler(data)
+                return
+            case .failure(let error):
+                print(error.localizedDescription)
+                dataCompletionHandler(nil)
+                return
             }
-            createPDF(configuration: pdfConfiguration) { (result) in
-                switch (result) {
-                case .success(let data):
-                    completionHandler(data)
-                    return
-                case .failure(let error):
+        })
+    }
+    
+    @available(iOS 14.0, *)
+    public func saveWebArchive (filePath: String, autoname: Bool, completionHandler: @escaping (_ path: String?) -> Void) {
+        createWebArchiveData(dataCompletionHandler: { (webArchiveData) in
+            if let webArchiveData = webArchiveData {
+                var localUrl = URL(fileURLWithPath: filePath)
+                if autoname {
+                    if let url = self.url {
+                        // tries to mimic Android saveWebArchive method
+                        let invalidCharacters = CharacterSet(charactersIn: "\\/:*?\"<>|")
+                                    .union(.newlines)
+                                    .union(.illegalCharacters)
+                                    .union(.controlCharacters)
+                                
+                        let currentPageUrlFileName = url.path
+                            .components(separatedBy: invalidCharacters)
+                            .joined(separator: "")
+                        
+                        let fullPath = filePath + "/" + currentPageUrlFileName + ".webarchive"
+                        localUrl = URL(fileURLWithPath: fullPath)
+                    } else {
+                        completionHandler(nil)
+                        return
+                    }
+                }
+                do {
+                    try webArchiveData.write(to: localUrl)
+                    completionHandler(localUrl.path)
+                } catch {
+                    // Catch any errors
                     print(error.localizedDescription)
                     completionHandler(nil)
-                    return
                 }
+            } else {
+                completionHandler(nil)
             }
-        } else {
-            completionHandler(nil)
-        }
+        })
     }
     
     public func loadUrl(url: URL, headers: [String: String]?) {

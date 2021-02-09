@@ -10,7 +10,7 @@
 - Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
 - Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains` iOS-specific WebView options
-- Added `handlesURLScheme`, `createPdf` iOS-specific WebView methods
+- Added `handlesURLScheme`, `createPdf`, `createWebArchiveData` iOS-specific WebView methods
 - Added `iosAnimated` optional argument to `zoomBy` WebView method
 - Added `screenshotConfiguration` optional argument to `takeScreenshot` WebView method
 - Updated integration tests
@@ -44,6 +44,7 @@
 - `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options moved from Android-specific options to cross-platform options
 - Added `callAsyncJavaScript` name to the list of javaScriptHandlerForbiddenNames
 - Changed `zoomBy` WebView method signature
+- Moved `saveWebArchive` WebView method from Android-specific to cross-platform
 
 ## 4.0.0+4
 

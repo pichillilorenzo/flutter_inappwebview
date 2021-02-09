@@ -128,7 +128,7 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 result(webView?.isLoading ?? false)
                 break
             case "takeScreenshot":
-                if webView != nil {
+                if webView != nil, #available(iOS 11.0, *) {
                     let screenshotConfiguration = arguments!["screenshotConfiguration"] as? [String: Any?]
                     webView!.takeScreenshot(with: screenshotConfiguration, completionHandler: { (screenshot) -> Void in
                         result(screenshot)
@@ -403,10 +403,32 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 }
                 break
             case "createPdf":
-                if webView != nil {
+                if webView != nil, #available(iOS 14.0, *) {
                     let configuration = arguments!["iosWKPdfConfiguration"] as? [String: Any?]
                     webView!.createPdf(configuration: configuration, completionHandler: { (pdf) -> Void in
                         result(pdf)
+                    })
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "createWebArchiveData":
+                if webView != nil, #available(iOS 14.0, *) {
+                    webView!.createWebArchiveData(dataCompletionHandler: { (webArchiveData) -> Void in
+                        result(webArchiveData)
+                    })
+                }
+                else {
+                    result(nil)
+                }
+                break
+            case "saveWebArchive":
+                if webView != nil, #available(iOS 14.0, *) {
+                    let filePath = arguments!["filePath"] as! String
+                    let autoname = arguments!["autoname"] as! Bool
+                    webView!.saveWebArchive(filePath: filePath, autoname: autoname, completionHandler: { (path) -> Void in
+                        result(path)
                     })
                 }
                 else {

@@ -18,6 +18,7 @@ Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Permission.camera.request();
   // await Permission.microphone.request();
+  // await Permission.storage.request();
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
 

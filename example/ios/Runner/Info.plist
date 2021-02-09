@@ -2,8 +2,10 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>InAppWebView requires access to documents folder</string>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>InAppWebView requires acess to mic.</string>
+	<string>InAppWebView requires access to mic.</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>en</string>
 	<key>CFBundleExecutable</key>
@@ -64,7 +66,7 @@
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
 	<key>NSCameraUsageDescription</key>
-	<string>InAppWebView requires acess to cam.</string>
+	<string>InAppWebView requires access to cam.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Allow Flutter tools on your computer to connect and debug your application.</string>
 </dict>

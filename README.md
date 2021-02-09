@@ -494,6 +494,7 @@ Android-specific methods can be called using the `InAppWebViewController.android
 iOS-specific methods can be called using the `InAppWebViewController.ios` attribute. Static methods can be called using the `IOSInAppWebViewController` class directly.
 
 * `createPdf({IOSWKPDFConfiguration? iosWKPdfConfiguration})`: Generates PDF data from the web view’s contents asynchronously.
+* `createWebArchiveData`: Creates a web archive of the web view’s current contents asynchronously.
 * `hasOnlySecureContent`: A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
 * `reloadFromOrigin`: Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
 * `static handlesURLScheme(String urlScheme)`: Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.

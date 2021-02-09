@@ -1508,7 +1508,7 @@ class InAppWebViewController {
   ///
   ///[screenshotConfiguration] represents the configuration data to use when generating an image from a web view’s contents.
   ///
-  ///**NOTE for iOS**: available from iOS 11.0+.
+  ///**NOTE for iOS**: available on iOS 11.0+.
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot
   Future<Uint8List?> takeScreenshot({ScreenshotConfiguration? screenshotConfiguration}) async {
@@ -2088,6 +2088,35 @@ class InAppWebViewController {
     return CallAsyncJavaScriptResult(value: data["value"], error: data["error"]);
   }
 
+  ///Saves the current WebView as a web archive.
+  ///Returns the file path under which the web archive file was saved, or `null` if saving the file failed.
+  ///
+  ///[filePath] represents the file path where the archive should be placed. This value cannot be `null`.
+  ///
+  ///[autoname] if `false`, takes [filePath] to be a file.
+  ///If `true`, [filePath] is assumed to be a directory in which a filename will be chosen according to the URL of the current page.
+  ///
+  ///**NOTE for iOS**: Available on iOS 14.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
+  ///
+  ///**NOTE for Android**: if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
+  Future<String?> saveWebArchive(
+      {required String filePath, bool autoname = false}) async {
+    if (!autoname) {
+      if (Platform.isAndroid) {
+        assert(filePath.endsWith("." + WebArchiveFormat.MHT.toValue()));
+      } else if (Platform.isIOS) {
+        assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toValue()));
+      }
+    }
+    
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("filePath", () => filePath);
+    args.putIfAbsent("autoname", () => autoname);
+    return await _channel.invokeMethod('saveWebArchive', args);
+  }
+
   ///Gets the default user agent.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)
@@ -2178,23 +2207,6 @@ class AndroidInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("top", () => top);
     return await _controller._channel.invokeMethod('pageUp', args);
-  }
-
-  ///Saves the current WebView as a web archive.
-  ///Returns the filename under which the file was saved, or `null` if saving the file failed.
-  ///
-  ///[basename] the filename where the archive should be placed. This value cannot be `null`.
-  ///
-  ///[autoname] if `false`, takes basename to be a file.
-  ///If `true`, [basename] is assumed to be a directory in which a filename will be chosen according to the URL of the current page.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)
-  Future<String?> saveWebArchive(
-      {required String basename, required bool autoname}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("basename", () => basename);
-    args.putIfAbsent("autoname", () => autoname);
-    return await _controller._channel.invokeMethod('saveWebArchive', args);
   }
 
   ///Performs zoom in in this WebView.
@@ -2337,12 +2349,28 @@ class IOSInAppWebViewController {
   }
 
   ///Generates PDF data from the web view’s contents asynchronously.
+  ///Returns `null` if a problem occurred.
   ///
   ///[iosWKPdfConfiguration] represents the object that specifies the portion of the web view to capture as PDF data.
+  ///
+  ///**NOTE**: available only on iOS 14.0+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf
   Future<Uint8List?> createPdf({IOSWKPDFConfiguration? iosWKPdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('iosWKPdfConfiguration', () => iosWKPdfConfiguration?.toMap());
     return await _controller._channel.invokeMethod('createPdf', args);
+  }
+
+  ///Creates a web archive of the web view’s current contents asynchronously.
+  ///Returns `null` if a problem occurred.
+  ///
+  ///**NOTE**: available only on iOS 14.0+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/3650491-createwebarchivedata
+  Future<Uint8List?> createWebArchiveData() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _controller._channel.invokeMethod('createWebArchiveData', args);
   }
 
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.

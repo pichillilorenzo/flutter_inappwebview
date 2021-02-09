@@ -338,9 +338,9 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         break;
       case "saveWebArchive":
         if (webView != null) {
-          String basename = (String) call.argument("basename");
+          String filePath = (String) call.argument("filePath");
           boolean autoname = (boolean) call.argument("autoname");
-          webView.saveWebArchive(basename, autoname, new ValueCallback<String>() {
+          webView.saveWebArchive(filePath, autoname, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
               result.success(value);

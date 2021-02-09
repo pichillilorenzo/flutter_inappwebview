@@ -115,6 +115,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url ?? '';
                       });
                     },
+                    androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
+                      return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
+                    },
                     shouldOverrideUrlLoading: (controller, shouldOverrideUrlLoadingRequest) async {
                       var url = shouldOverrideUrlLoadingRequest.url;
                       var uri = Uri.parse(url);

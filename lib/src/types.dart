@@ -4914,3 +4914,251 @@ class WebArchiveFormat {
   @override
   int get hashCode => _value.hashCode;
 }
+
+///Class that represents the `crossorigin` content attribute on media elements is a CORS settings attribute.
+class CrossOriginHtmlAttribute {
+  final String _value;
+
+  const CrossOriginHtmlAttribute._internal(this._value);
+
+  static final Set<CrossOriginHtmlAttribute> values = [
+    CrossOriginHtmlAttribute.ANONYMOUS,
+    CrossOriginHtmlAttribute.USE_CREDENTIALS,
+  ].toSet();
+
+  static CrossOriginHtmlAttribute? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return CrossOriginHtmlAttribute.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///CORS requests for this element will have the credentials flag set to 'same-origin'.
+  static const ANONYMOUS = const CrossOriginHtmlAttribute._internal("anonymous");
+
+  ///CORS requests for this element will have the credentials flag set to 'include'.
+  static const USE_CREDENTIALS = const CrossOriginHtmlAttribute._internal("use-credentials");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents which Referrer header to send when fetching a resource `<link>` or a `<script>` (or resources fetched by the `<script>`).
+///Used by [ScriptHtmlTagAttributes] and [CSSLinkHtmlTagAttributes].
+class ReferrerPolicyHtmlAttribute {
+  final String _value;
+
+  const ReferrerPolicyHtmlAttribute._internal(this._value);
+
+  static final Set<ReferrerPolicyHtmlAttribute> values = [
+    ReferrerPolicyHtmlAttribute.NO_REFERRER,
+    ReferrerPolicyHtmlAttribute.NO_REFERRER_WHEN_DOWNGRADE,
+    ReferrerPolicyHtmlAttribute.ORIGIN,
+    ReferrerPolicyHtmlAttribute.ORIGIN_WHEN_CROSS_ORIGIN,
+    ReferrerPolicyHtmlAttribute.SAME_ORIGIN,
+    ReferrerPolicyHtmlAttribute.STRICT_ORIGIN,
+    ReferrerPolicyHtmlAttribute.STRICT_ORIGIN_WHEN_CROSS_ORIGIN,
+    ReferrerPolicyHtmlAttribute.UNSAFE_URL,
+  ].toSet();
+
+  static ReferrerPolicyHtmlAttribute? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return ReferrerPolicyHtmlAttribute.values.firstWhere(
+                (element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///The Referer header will not be sent.
+  static const NO_REFERRER = const ReferrerPolicyHtmlAttribute._internal("no-referrer");
+
+  ///The Referer header will not be sent to origins without TLS (HTTPS).
+  static const NO_REFERRER_WHEN_DOWNGRADE = const ReferrerPolicyHtmlAttribute._internal("no-referrer-when-downgrade");
+
+  ///The sent referrer will be limited to the origin of the referring page: its scheme, host, and port.
+  static const ORIGIN = const ReferrerPolicyHtmlAttribute._internal("origin");
+
+  ///The referrer sent to other origins will be limited to the scheme, the host, and the port.
+  ///Navigations on the same origin will still include the path.
+  static const ORIGIN_WHEN_CROSS_ORIGIN = const ReferrerPolicyHtmlAttribute._internal("origin-when-cross-origin");
+
+  ///A referrer will be sent for same origin, but cross-origin requests will contain no referrer information.
+  static const SAME_ORIGIN = const ReferrerPolicyHtmlAttribute._internal("same-origin");
+
+  ///Only send the origin of the document as the referrer when the protocol security level stays the same (e.g. HTTPS -> HTTPS),
+  ///but don't send it to a less secure destination (e.g. HTTPS -> HTTP).
+  static const STRICT_ORIGIN = const ReferrerPolicyHtmlAttribute._internal("strict-origin");
+
+  ///Send a full URL when performing a same-origin request, but only send the origin when the protocol security level stays the same (e.g.HTTPS -> HTTPS),
+  ///and send no header to a less secure destination (e.g. HTTPS -> HTTP).
+  static const STRICT_ORIGIN_WHEN_CROSS_ORIGIN = const ReferrerPolicyHtmlAttribute._internal("strict-origin-when-cross-origin");
+
+  ///The referrer will include the origin and the path (but not the fragment, password, or username).
+  ///This value is unsafe, because it leaks origins and paths from TLS-protected resources to insecure origins.
+  static const UNSAFE_URL = const ReferrerPolicyHtmlAttribute._internal("unsafe-url");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents the possible the `<script>` HTML attributes to be set used by [InAppWebViewController.injectJavascriptFileFromUrl].
+class ScriptHtmlTagAttributes {
+  
+  ///This attribute indicates the type of script represented. The value of this attribute will be in one of the following categories.
+  ///The default value is `text/javascript`.
+  String type;
+
+  ///The HTML [id] attribute is used to specify a unique id for the `<script>` HTML element.
+  String? id;
+
+  ///For classic scripts, if the [async] attribute is present,
+  ///then the classic script will be fetched in parallel to parsing and evaluated as soon as it is available.
+  ///
+  ///For module scripts, if the [async] attribute is present then the scripts and all their dependencies will be executed in the defer queue,
+  ///therefore they will get fetched in parallel to parsing and evaluated as soon as they are available.
+  ///
+  ///This attribute allows the elimination of parser-blocking JavaScript where the browser
+  ///would have to load and evaluate scripts before continuing to parse.
+  ///[defer] has a similar effect in this case.
+  ///
+  ///This is a boolean attribute: the presence of a boolean attribute on an element represents the true value,
+  ///and the absence of the attribute represents the false value.
+  bool? async;
+
+  ///This Boolean attribute is set to indicate to a browser that the script is meant to be executed after the document has been parsed, but before firing `DOMContentLoaded`.
+  ///
+  ///Scripts with the [defer] attribute will prevent the `DOMContentLoaded` event from firing until the script has loaded and finished evaluating.
+  ///
+  ///Scripts with the [defer] attribute will execute in the order in which they appear in the document.
+  ///
+  ///This attribute allows the elimination of parser-blocking JavaScript where the browser would have to load and evaluate scripts before continuing to parse.
+  ///[async] has a similar effect in this case.
+  bool? defer;
+
+  ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
+  ///To allow error logging for sites which use a separate domain for static media, use this attribute.
+  CrossOriginHtmlAttribute? crossOrigin;
+
+  ///This attribute contains inline metadata that a user agent can use to verify that a fetched resource has been delivered free of unexpected manipulation.
+  String? integrity;
+
+  ///This Boolean attribute is set to indicate that the script should not be executed in browsers that support ES2015 modules — in effect,
+  ///this can be used to serve fallback scripts to older browsers that do not support modular JavaScript code.
+  bool? noModule;
+
+  ///A cryptographic nonce (number used once) to whitelist scripts in a script-src Content-Security-Policy.
+  ///The server must generate a unique nonce value each time it transmits a policy.
+  ///It is critical to provide a nonce that cannot be guessed as bypassing a resource's policy is otherwise trivial.
+  String? nonce;
+
+  ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
+  ReferrerPolicyHtmlAttribute? referrerPolicy;
+
+  ScriptHtmlTagAttributes({this.type = "text/javascript", this.id, this.async, this.defer, this.crossOrigin, this.integrity, this.noModule, this.nonce, this.referrerPolicy});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "type": this.type,
+      "id": this.id,
+      "async": this.async,
+      "defer": this.defer,
+      "crossOrigin": this.crossOrigin?.toValue(),
+      "integrity": this.integrity,
+      "noModule": this.noModule,
+      "nonce": this.nonce,
+      "referrerPolicy": this.referrerPolicy?.toValue(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the possible CSS stylesheet `<link>` HTML attributes to be set used by [InAppWebViewController.injectCSSFileFromUrl].
+class CSSLinkHtmlTagAttributes {
+
+  ///The HTML [id] attribute is used to specify a unique id for the `<link>` HTML element.
+  String? id;
+
+  ///This attribute specifies the media that the linked resource applies to. Its value must be a media type / media query.
+  ///This attribute is mainly useful when linking to external stylesheets — it allows the user agent to pick the best adapted one for the device it runs on.
+  String? media;
+
+  ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
+  ///To allow error logging for sites which use a separate domain for static media, use this attribute.
+  CrossOriginHtmlAttribute? crossOrigin;
+
+  ///This attribute contains inline metadata that a user agent can use to verify that a fetched resource has been delivered free of unexpected manipulation.
+  String? integrity;
+
+  ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
+  ReferrerPolicyHtmlAttribute? referrerPolicy;
+
+  ///The [disabled] Boolean attribute indicates whether or not the described stylesheet should be loaded and applied to the document.
+  ///If [disabled] is specified in the HTML when it is loaded, the stylesheet will not be loaded during page load.
+  ///Instead, the stylesheet will be loaded on-demand, if and when the [disabled] attribute is changed to `false` or removed.
+  ///
+  ///Setting the [disabled] property in the DOM causes the stylesheet to be removed from the document's `DocumentOrShadowRoot.styleSheets` list.
+  bool? disabled;
+
+  ///Specify alternative style sheets.
+  bool? alternate;
+
+  ///The title attribute has special semantics on the `<link>` element.
+  ///When used on a `<link rel="stylesheet">` it defines a preferred or an alternate stylesheet.
+  ///Incorrectly using it may cause the stylesheet to be ignored.
+  String? title;
+
+  CSSLinkHtmlTagAttributes({this.id, this.media, this.crossOrigin, this.integrity, this.referrerPolicy, this.disabled, this.alternate, this.title});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "id": this.id,
+      "media": this.media,
+      "crossOrigin": this.crossOrigin?.toValue(),
+      "integrity": this.integrity,
+      "referrerPolicy": this.referrerPolicy?.toValue(),
+      "disabled": this.disabled,
+      "alternate": this.alternate,
+      "title": this.title,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}

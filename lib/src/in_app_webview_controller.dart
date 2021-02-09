@@ -1382,17 +1382,20 @@ class InAppWebViewController {
 
   ///Injects an external JavaScript file into the WebView from a defined url.
   ///
+  ///[scriptHtmlTagAttributes] represents the possible the `<script>` HTML attributes to be set.
+  ///
   ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
   ///because, in these events, the [WebView] is not ready to handle it yet.
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
-  Future<void> injectJavascriptFileFromUrl({required String urlFile}) async {
+  Future<void> injectJavascriptFileFromUrl({required String urlFile, ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
+    args.putIfAbsent('scriptHtmlTagAttributes', () => scriptHtmlTagAttributes?.toMap());
     await _channel.invokeMethod('injectJavascriptFileFromUrl', args);
   }
 
-  ///Injects a JavaScript file into the WebView from the flutter assets directory.
+  ///Evaluates the content of a JavaScript file into the WebView from the flutter assets directory.
   ///
   ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
   ///because, in these events, the [WebView] is not ready to handle it yet.
@@ -1418,13 +1421,16 @@ class InAppWebViewController {
 
   ///Injects an external CSS file into the WebView from a defined url.
   ///
+  ///[cssLinkHtmlTagAttributes] represents the possible CSS stylesheet `<link>` HTML attributes to be set.
+  ///
   ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
   ///because, in these events, the [WebView] is not ready to handle it yet.
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
-  Future<void> injectCSSFileFromUrl({required String urlFile}) async {
+  Future<void> injectCSSFileFromUrl({required String urlFile, CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlFile', () => urlFile);
+    args.putIfAbsent('cssLinkHtmlTagAttributes', () => cssLinkHtmlTagAttributes?.toMap());
     await _channel.invokeMethod('injectCSSFileFromUrl', args);
   }
 

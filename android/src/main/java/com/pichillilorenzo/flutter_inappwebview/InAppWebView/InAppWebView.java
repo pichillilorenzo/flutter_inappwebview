@@ -1523,7 +1523,7 @@ final public class InAppWebView extends InputAwareWebView {
     return (options != null) ? options.getRealOptions(this) : null;
   }
 
-  public void injectDeferredObject(String source, @Nullable final String contentWorldName, String jsWrapper, final MethodChannel.Result result) {
+  public void injectDeferredObject(String source, @Nullable final String contentWorldName, String jsWrapper, @Nullable final MethodChannel.Result result) {
     String scriptToInject = source;
     if (jsWrapper != null) {
       org.json.JSONArray jsonEsc = new org.json.JSONArray();
@@ -1577,18 +1577,95 @@ final public class InAppWebView extends InputAwareWebView {
     injectDeferredObject(source, contentWorldName, null, result);
   }
 
-  public void injectJavascriptFileFromUrl(String urlFile) {
-    String jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %s; d.body.appendChild(c); })(document);";
+  public void injectJavascriptFileFromUrl(String urlFile, @Nullable Map<String, Object> scriptHtmlTagAttributes) {
+    String scriptAttributes = "";
+    if (scriptHtmlTagAttributes != null) {
+      String typeAttr = (String) scriptHtmlTagAttributes.get("type");
+      if (typeAttr != null) {
+        scriptAttributes += " script.type = '" + typeAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String idAttr = (String) scriptHtmlTagAttributes.get("id");
+      if (idAttr != null) {
+        scriptAttributes += " script.id = '" + idAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      Boolean asyncAttr = (Boolean) scriptHtmlTagAttributes.get("async");
+      if (asyncAttr != null && asyncAttr) {
+        scriptAttributes += " script.async = true; ";
+      }
+      Boolean deferAttr = (Boolean) scriptHtmlTagAttributes.get("defer");
+      if (deferAttr != null && deferAttr) {
+        scriptAttributes += " script.defer = true; ";
+      }
+      String crossOriginAttr = (String) scriptHtmlTagAttributes.get("crossOrigin");
+      if (crossOriginAttr != null) {
+        scriptAttributes += " script.crossOrigin = '" + crossOriginAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String integrityAttr = (String) scriptHtmlTagAttributes.get("integrity");
+      if (integrityAttr != null) {
+        scriptAttributes += " script.integrity = '" + integrityAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      Boolean noModuleAttr = (Boolean) scriptHtmlTagAttributes.get("noModule");
+      if (noModuleAttr != null && noModuleAttr) {
+        scriptAttributes += " script.noModule = true; ";
+      }
+      String nonceAttr = (String) scriptHtmlTagAttributes.get("nonce");
+      if (nonceAttr != null) {
+        scriptAttributes += " script.nonce = '" + nonceAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String referrerPolicyAttr = (String) scriptHtmlTagAttributes.get("referrerPolicy");
+      if (referrerPolicyAttr != null) {
+        scriptAttributes += " script.referrerPolicy = '" + referrerPolicyAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+    }
+    String jsWrapper = "(function(d) { var script = d.createElement('script'); " + scriptAttributes +
+            " script.src = %s; d.body.appendChild(script); })(document);";
     injectDeferredObject(urlFile, null, jsWrapper, null);
   }
 
   public void injectCSSCode(String source) {
-    String jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %s; d.body.appendChild(c); })(document);";
+    String jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %s; d.body.appendChild(style); })(document);";
     injectDeferredObject(source, null, jsWrapper, null);
   }
 
-  public void injectCSSFileFromUrl(String urlFile) {
-    String jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet'; c.type='text/css'; c.href = %s; d.head.appendChild(c); })(document);";
+  public void injectCSSFileFromUrl(String urlFile, @Nullable Map<String, Object> cssLinkHtmlTagAttributes) {
+    String cssLinkAttributes = "";
+    String alternateStylesheet = "";
+    if (cssLinkHtmlTagAttributes != null) {
+      String idAttr = (String) cssLinkHtmlTagAttributes.get("id");
+      if (idAttr != null) {
+        cssLinkAttributes += " link.id = '" + idAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String mediaAttr = (String) cssLinkHtmlTagAttributes.get("media");
+      if (mediaAttr != null) {
+        cssLinkAttributes += " link.media = '" + mediaAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String crossOriginAttr = (String) cssLinkHtmlTagAttributes.get("crossOrigin");
+      if (crossOriginAttr != null) {
+        cssLinkAttributes += " link.crossOrigin = '" + crossOriginAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String integrityAttr = (String) cssLinkHtmlTagAttributes.get("integrity");
+      if (integrityAttr != null) {
+        cssLinkAttributes += " link.integrity = '" + integrityAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      String referrerPolicyAttr = (String) cssLinkHtmlTagAttributes.get("referrerPolicy");
+      if (referrerPolicyAttr != null) {
+        cssLinkAttributes += " link.referrerPolicy = '" + referrerPolicyAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+      Boolean disabledAttr = (Boolean) cssLinkHtmlTagAttributes.get("disabled");
+      if (disabledAttr != null && disabledAttr) {
+        cssLinkAttributes += " link.disabled = true; ";
+      }
+      Boolean alternateAttr = (Boolean) cssLinkHtmlTagAttributes.get("alternate");
+      if (alternateAttr != null && alternateAttr) {
+        alternateStylesheet = "alternate ";
+      }
+      String titleAttr = (String) cssLinkHtmlTagAttributes.get("title");
+      if (titleAttr != null) {
+        cssLinkAttributes += " link.title = '" + titleAttr.replaceAll("'", "\\\\'") + "'; ";
+      }
+    }
+    String jsWrapper = "(function(d) { var link = d.createElement('link'); link.rel='" + alternateStylesheet + "stylesheet'; link.type='text/css'; " +
+            cssLinkAttributes + " link.href = %s; d.head.appendChild(link); })(document);";
     injectDeferredObject(urlFile, null, jsWrapper, null);
   }
 

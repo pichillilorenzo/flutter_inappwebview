@@ -2303,18 +2303,76 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    public func injectJavascriptFileFromUrl(urlFile: String) {
-        let jsWrapper = "(function(d) { var c = d.createElement('script'); c.src = %@; d.body.appendChild(c); })(document);"
+    public func injectJavascriptFileFromUrl(urlFile: String, scriptHtmlTagAttributes: [String:Any?]?) {
+        var scriptAttributes = ""
+        if let scriptHtmlTagAttributes = scriptHtmlTagAttributes {
+            if let typeAttr = scriptHtmlTagAttributes["type"] as? String {
+                scriptAttributes += " script.type = '\(typeAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let idAttr = scriptHtmlTagAttributes["id"] as? String {
+                scriptAttributes += " script.id = '\(idAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let asyncAttr = scriptHtmlTagAttributes["async"] as? Bool, asyncAttr {
+                scriptAttributes += " script.async = true; "
+            }
+            if let deferAttr = scriptHtmlTagAttributes["defer"] as? Bool, deferAttr {
+                scriptAttributes += " script.defer = true; "
+            }
+            if let crossOriginAttr = scriptHtmlTagAttributes["crossOrigin"] as? String {
+                scriptAttributes += " script.crossOrigin = '\(crossOriginAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let integrityAttr = scriptHtmlTagAttributes["integrity"] as? String {
+                scriptAttributes += " script.integrity = '\(integrityAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let noModuleAttr = scriptHtmlTagAttributes["noModule"] as? Bool, noModuleAttr {
+                scriptAttributes += " script.noModule = true; "
+            }
+            if let nonceAttr = scriptHtmlTagAttributes["nonce"] as? String {
+                scriptAttributes += " script.nonce = '\(nonceAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let referrerPolicyAttr = scriptHtmlTagAttributes["referrerPolicy"] as? String {
+                scriptAttributes += " script.referrerPolicy = '\(referrerPolicyAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+        }
+        let jsWrapper = "(function(d) { var script = d.createElement('script'); \(scriptAttributes) script.src = %@; d.body.appendChild(script); })(document);"
         injectDeferredObject(source: urlFile, contentWorldName: nil, withWrapper: jsWrapper, result: nil)
     }
     
     public func injectCSSCode(source: String) {
-        let jsWrapper = "(function(d) { var c = d.createElement('style'); c.innerHTML = %@; d.body.appendChild(c); })(document);"
+        let jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %@; d.body.appendChild(style); })(document);"
         injectDeferredObject(source: source, contentWorldName: nil, withWrapper: jsWrapper, result: nil)
     }
     
-    public func injectCSSFileFromUrl(urlFile: String) {
-        let jsWrapper = "(function(d) { var c = d.createElement('link'); c.rel='stylesheet', c.type='text/css'; c.href = %@; d.body.appendChild(c); })(document);"
+    public func injectCSSFileFromUrl(urlFile: String, cssLinkHtmlTagAttributes: [String:Any?]?) {
+        var cssLinkAttributes = ""
+        var alternateStylesheet = ""
+        if let cssLinkHtmlTagAttributes = cssLinkHtmlTagAttributes {
+            if let idAttr = cssLinkHtmlTagAttributes["id"] as? String {
+                cssLinkAttributes += " link.id = '\(idAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let mediaAttr = cssLinkHtmlTagAttributes["media"] as? String {
+                cssLinkAttributes += " link.media = '\(mediaAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let crossOriginAttr = cssLinkHtmlTagAttributes["crossOrigin"] as? String {
+                cssLinkAttributes += " link.crossOrigin = '\(crossOriginAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let integrityAttr = cssLinkHtmlTagAttributes["integrity"] as? String {
+                cssLinkAttributes += " link.integrity = '\(integrityAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let referrerPolicyAttr = cssLinkHtmlTagAttributes["referrerPolicy"] as? String {
+                cssLinkAttributes += " link.referrerPolicy = '\(referrerPolicyAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+            if let disabledAttr = cssLinkHtmlTagAttributes["disabled"] as? Bool, disabledAttr {
+                cssLinkAttributes += " link.disabled = true; "
+            }
+            if let alternateAttr = cssLinkHtmlTagAttributes["alternate"] as? Bool, alternateAttr {
+                alternateStylesheet = "alternate "
+            }
+            if let titleAttr = cssLinkHtmlTagAttributes["title"] as? String {
+                cssLinkAttributes += " link.title = '\(titleAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+            }
+        }
+        let jsWrapper = "(function(d) { var link = d.createElement('link'); link.rel='\(alternateStylesheet)stylesheet', link.type='text/css'; \(cssLinkAttributes) link.href = %@; d.body.appendChild(link); })(document);"
         injectDeferredObject(source: urlFile, contentWorldName: nil, withWrapper: jsWrapper, result: nil)
     }
     

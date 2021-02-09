@@ -80,7 +80,8 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "injectJavascriptFileFromUrl":
                 let urlFile = arguments!["urlFile"] as! String
-                webView?.injectJavascriptFileFromUrl(urlFile: urlFile)
+                let scriptHtmlTagAttributes = arguments!["scriptHtmlTagAttributes"] as? [String:Any?]
+                webView?.injectJavascriptFileFromUrl(urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes)
                 result(true)
                 break
             case "injectCSSCode":
@@ -90,7 +91,8 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "injectCSSFileFromUrl":
                 let urlFile = arguments!["urlFile"] as! String
-                webView?.injectCSSFileFromUrl(urlFile: urlFile)
+                let cssLinkHtmlTagAttributes = arguments!["cssLinkHtmlTagAttributes"] as? [String:Any?]
+                webView?.injectCSSFileFromUrl(urlFile: urlFile, cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes)
                 result(true)
                 break
             case "reload":

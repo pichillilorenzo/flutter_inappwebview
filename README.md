@@ -1,7 +1,10 @@
 # Flutter InAppWebView Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappwebview.svg)](https://pub.dartlang.org/packages/flutter_inappwebview)
-[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://stackoverflow.com/questions/tagged/flutter+webview?sort=votes)
+[![pub points](https://badges.bar/flutter_inappwebview/pub%20points)](https://pub.dev/packages/flutter_inappwebview/score)
+[![popularity](https://badges.bar/flutter_inappwebview/popularity)](https://pub.dev/packages/flutter_inappwebview/score)
+[![likes](https://badges.bar/flutter_inappwebview/likes)](https://pub.dev/packages/flutter_inappwebview/score)
+[![Awesome Flutter](https://img.shields.io/badge/Awesome-Flutter-blue.svg?longCache=true&style=flat-square)](https://stackoverflow.com/questions/tagged/flutter-inappwebview)
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](/LICENSE)
 
 [![Donate to this project using Paypal](https://img.shields.io/badge/paypal-donate-yellow.svg)](https://www.paypal.me/LorenzoPichilli)
@@ -21,6 +24,8 @@ See the online [API Reference](https://pub.dartlang.org/documentation/flutter_in
 Note that the API shown in this `README.md` file shows only a **part** of the documentation and, also, that conforms to the **GitHub master branch only**!
 So, here you could have methods, options, and events that **aren't published/released yet**!
 If you need a specific version, please change the **GitHub branch** of this repository to your version or use the **online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/)** (recommended).
+
+Also, check the [example/integration_test/webview_flutter_test.dart](https://github.com/pichillilorenzo/flutter_inappwebview/blob/master/example/integration_test/webview_flutter_test.dart) file for code examples.
 
 ## Articles/Resources
 
@@ -426,9 +431,9 @@ Screenshots:
 * `goTo({required WebHistoryItem historyItem})`: Navigates to a `WebHistoryItem` from the back-forward `WebHistory.list` and sets it as the current item.
 * `injectCSSCode({required String source})`: Injects CSS into the WebView.
 * `injectCSSFileFromAsset({required String assetFilePath})`: Injects a CSS file into the WebView from the flutter assets directory.
-* `injectCSSFileFromUrl({required String urlFile})`: Injects an external CSS file into the WebView from a defined url.
+* `injectCSSFileFromUrl({required String urlFile, CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes})`: Injects an external CSS file into the WebView from a defined url.
 * `injectJavascriptFileFromAsset({required String assetFilePath})`: Injects a JavaScript file into the WebView from the flutter assets directory.
-* `injectJavascriptFileFromUrl({required String urlFile})`: Injects an external JavaScript file into the WebView from a defined url.
+* `injectJavascriptFileFromUrl({required String urlFile, ScriptHtmlTagAttributes? scriptHtmlTagAttributes})`: Injects an external JavaScript file into the WebView from a defined url.
 * `isLoading`: Check if the WebView instance is in a loading state.
 * `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
 * `loadFile({required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.

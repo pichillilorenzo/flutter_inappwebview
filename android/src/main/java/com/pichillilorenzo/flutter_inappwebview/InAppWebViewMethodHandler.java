@@ -84,7 +84,8 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "injectJavascriptFileFromUrl":
         if (webView != null) {
           String urlFile = (String) call.argument("urlFile");
-          webView.injectJavascriptFileFromUrl(urlFile);
+          Map<String, Object> scriptHtmlTagAttributes = (Map<String, Object>) call.argument("scriptHtmlTagAttributes");
+          webView.injectJavascriptFileFromUrl(urlFile, scriptHtmlTagAttributes);
         }
         result.success(true);
         break;
@@ -98,7 +99,8 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "injectCSSFileFromUrl":
         if (webView != null) {
           String urlFile = (String) call.argument("urlFile");
-          webView.injectCSSFileFromUrl(urlFile);
+          Map<String, Object> cssLinkHtmlTagAttributes = (Map<String, Object>) call.argument("cssLinkHtmlTagAttributes");
+          webView.injectCSSFileFromUrl(urlFile, cssLinkHtmlTagAttributes);
         }
         result.success(true);
         break;

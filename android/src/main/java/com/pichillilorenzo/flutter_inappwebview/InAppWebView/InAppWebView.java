@@ -2048,7 +2048,7 @@ final public class InAppWebView extends InputAwareWebView {
       @Override
       public void onReceiveValue(String value) {
         if (floatingContextMenu != null) {
-          if (value != null && !value.equals("null")) {
+          if (value != null && !value.equalsIgnoreCase("null")) {
             int x = contextMenuPoint.x;
             int y = (int) ((Float.parseFloat(value) * scale) + (floatingContextMenu.getHeight() / 3.5));
             contextMenuPoint.y = y;
@@ -2068,7 +2068,7 @@ final public class InAppWebView extends InputAwareWebView {
     evaluateJavascript(getSelectedTextJS, new ValueCallback<String>() {
       @Override
       public void onReceiveValue(String value) {
-        value = (value != null) ? value.substring(1, value.length() - 1) : null;
+        value = (value != null && !value.equalsIgnoreCase("null")) ? value.substring(1, value.length() - 1) : null;
         resultCallback.onReceiveValue(value);
       }
     });

@@ -4,11 +4,13 @@ import com.pichillilorenzo.flutter_inappwebview.Options;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 public class ContextMenuOptions implements Options<Object> {
   public static final String LOG_TAG = "ContextMenuOptions";
 
   public Boolean hideDefaultSystemContextMenuItems = false;
+  public List<String> filterDefaultSystemContextMenuItems = null;
 
   public ContextMenuOptions parse(Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
@@ -21,6 +23,9 @@ public class ContextMenuOptions implements Options<Object> {
       switch (key) {
         case "hideDefaultSystemContextMenuItems":
           hideDefaultSystemContextMenuItems = (Boolean) value;
+          break;
+        case "filterDefaultSystemContextMenuItems":
+          filterDefaultSystemContextMenuItems = (List<String>) value;
           break;
       }
     }

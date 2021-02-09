@@ -10,6 +10,8 @@ import Foundation
 class ContextMenuOptions: Options<NSObject> {
     
     var hideDefaultSystemContextMenuItems = false;
+    // var filterDefaultSystemContextMenuItems = [String]();
+    var filterDefaultSystemContextMenuItems : [String]? = nil;
 
     override init(){
         super.init()

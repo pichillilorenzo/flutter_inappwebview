@@ -91,11 +91,18 @@ class ContextMenuOptions {
   ///Whether all the default system context menu items should be hidden or not. The default value is `false`.
   bool hideDefaultSystemContextMenuItems;
 
-  ContextMenuOptions({this.hideDefaultSystemContextMenuItems = false});
+  ///List containing allowed system context menu items. The default value is `null`.
+  List<String> filterDefaultSystemContextMenuItems;
+
+  ContextMenuOptions({
+    this.hideDefaultSystemContextMenuItems = false,
+    this.filterDefaultSystemContextMenuItems = null,
+  });
 
   Map<String, dynamic> toMap() {
     return {
-      "hideDefaultSystemContextMenuItems": hideDefaultSystemContextMenuItems
+      "hideDefaultSystemContextMenuItems": hideDefaultSystemContextMenuItems,
+      "filterDefaultSystemContextMenuItems": filterDefaultSystemContextMenuItems,
     };
   }
 

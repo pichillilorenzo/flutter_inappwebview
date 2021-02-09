@@ -444,6 +444,7 @@ Screenshots:
 * `requestFocusNodeHref`: Requests the anchor or image element URL at the last tapped point.
 * `requestImageRef`: Requests the URL of the image last touched by the user.
 * `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
+* `saveWebArchive({required String filePath, bool autoname = false})`: Saves the current view as a web archive.
 * `scrollBy({required int x, required int y, bool animated = false})`: Moves the scrolled position of the WebView.
 * `scrollTo({required int x, required int y, bool animated = false})`: Scrolls the WebView to the position.
 * `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
@@ -479,7 +480,6 @@ Android-specific methods can be called using the `InAppWebViewController.android
 * `getOriginalUrl`: Gets the URL that was originally requested for the current page.
 * `pageDown({required bool bottom})`: Scrolls the contents of this WebView down by half the page size.
 * `pageUp({required bool top})`: Scrolls the contents of this WebView up by half the view size.
-* `saveWebArchive({required String basename, required bool autoname})`: Saves the current view as a web archive.
 * `zoomIn`: Performs zoom in in this WebView.
 * `zoomOut`: Performs zoom out in this WebView.
 * `clearHistory`: Clears the internal back/forward list.

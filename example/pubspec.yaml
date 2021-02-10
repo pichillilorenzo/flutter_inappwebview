@@ -11,7 +11,7 @@ version: 1.0.0+1
 
 environment:
   sdk: ">=2.12.0-0 <3.0.0"
-  flutter: ">=1.22.0"
+  flutter: ">=1.22.2"
 
 dependencies:
   flutter:
@@ -33,11 +33,13 @@ dev_dependencies:
     sdk: flutter
   flutter_driver:
     sdk: flutter
-  # integration_test: ^1.0.2+1
   integration_test:
-    git:
-      url: https://github.com/flutter/plugins.git
-      path: packages/integration_test
+    sdk: flutter
+  # integration_test: ^1.0.2+1
+#  integration_test:
+#    git:
+#      url: https://github.com/flutter/plugins.git
+#      path: packages/integration_test
   pedantic: ^1.8.0
 
 # For information on the generic Dart part of this file, see the

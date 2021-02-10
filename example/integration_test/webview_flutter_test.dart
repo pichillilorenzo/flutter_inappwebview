@@ -774,7 +774,7 @@ void main() {
       scrollPosY = await controller.getScrollY();
       expect(scrollPosX, X_SCROLL * 2);
       expect(scrollPosY, Y_SCROLL * 2);
-    });
+    }, skip: !Platform.isAndroid);
   }, skip: !Platform.isAndroid);
 
   group('shouldOverrideUrlLoading', () {

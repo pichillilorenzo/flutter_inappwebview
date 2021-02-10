@@ -17,6 +17,9 @@ task:
     - flutter channel master
     - flutter upgrade
     - git fetch origin master
+  submodules_script:
+    - git submodule init
+    - git submodule update
   matrix:
     - name: test_plugin_ios
       env:
@@ -40,8 +43,8 @@ task:
     ABI: "x86"
   container:
     image: cirrusci/flutter:latest
-    cpu: 6
-    memory: 12G
+    cpu: 8
+    memory: 16G
     kvm: true
   install_node_script:
     - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
@@ -54,6 +57,10 @@ task:
   upgrade_script:
     - flutter channel master
     - flutter upgrade
+    - git fetch origin master
+  submodules_script:
+    - git submodule init
+    - git submodule update
   matrix:
     - name: test_plugin_android
       env:

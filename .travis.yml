@@ -49,7 +49,8 @@ jobs:
         - 'android-sdk-license-.+'
         - 'google-gdk-license-.+'
       before_install:
-        - yes | sdkmanager "platforms;android-30"
+        - sdkmanager tools
+        - sdkmanager "system-images;android-30;google_apis;x86" > /dev/null
         - echo no | avdmanager --verbose create avd --force -n test -k "system-images;android-30;google_apis;x86"
         - emulator -avd test -verbose -no-window -no-audio &
         - ./scripts/android-wait-for-emulator.sh

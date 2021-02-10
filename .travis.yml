@@ -54,13 +54,13 @@ jobs:
           - android-30
           - sys-img-x86-android-30
       licenses:
-        - 'android-sdk-preview-license-52d11cd2'
+        - 'android-sdk-preview-license-.+'
         - 'android-sdk-license-.+'
         - 'google-gdk-license-.+'
       before_install:
-        - yes | sdkmanager --licenses
-        - sdkmanager tools > /dev/null
-        - sdkmanager "system-images;android-30;google_apis;x86" > /dev/null
+        - yes | sdkmanager --update
+        - yes | sdkmanager tools
+        - yes | sdkmanager "system-images;android-30;google_apis;x86"
         - echo no | avdmanager --verbose create avd --force -n test -k "system-images;android-30;google_apis;x86"
         - emulator -avd test -verbose -no-window -no-audio &
         - ./scripts/android-wait-for-emulator.sh

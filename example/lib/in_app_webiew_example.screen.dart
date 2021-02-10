@@ -101,7 +101,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       ),
                       ios: IOSInAppWebViewOptions(
                         allowsInlineMediaPlayback: true,
-                        applePayAPIEnabled: false,
                         // limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
                       )
                     ),

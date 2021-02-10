@@ -874,7 +874,7 @@ class IOSInAppWebViewOptions
   ///
   ///**IMPORTANT NOTE**: As written in the official [Safari 13 Release Notes](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API),
   ///it won't work if any script injection APIs is used (such as [InAppWebViewController.evaluateJavascript] or [UserScript]).
-  ///So, when this attribute is `true`, all the methods, options and events implemented using JavaScript won't be called or won't do anything and the result will always be `null`.
+  ///So, when this attribute is `true`, all the methods, options, and events implemented using JavaScript won't be called or won't do anything and the result will always be `null`.
   ///
   ///Methods affected:
   ///- [InAppWebViewController.addUserScript]

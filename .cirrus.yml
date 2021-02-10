@@ -1,64 +1,37 @@
-#task:
-#  env:
-#    EMULATOR_API_LEVEL: 30
-#    ABI: "google_apis;x86"
-#  # Xcode 12 task
-#  osx_instance:
-#    image: big-sur-xcode-12.4
-#  install_node_script:
-#    - brew install node
-#    - cd ./nodejs_server_test_auth_basic_and_ssl
-#    - npm install
-#  upgrade_script:
-#    - sudo gem install cocoapods
-#    #- flutter channel stable
-#    #- flutter upgrade
-#    #- flutter channel beta
-#    #- flutter upgrade
-#    #- flutter channel dev
-#    #- flutter upgrade
-##    - flutter channel master
-##    - flutter upgrade
-##    - git fetch origin master
-#  matrix:
-##    - name: test_plugin_ios
-##      env:
-##        matrix:
-##          CHANNEL: "master"
-##          #CHANNEL: "dev"
-##          #CHANNEL: "beta"
-##          #CHANNEL: "stable"
-##      script:
-##        - xcrun simctl list
-##        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
-##        - flutter channel $CHANNEL
-##        - ./scripts/test.sh $(ipconfig getifaddr en0)
-#    - name: test_plugin_android
-#      env:
-#        matrix:
-#          CHANNEL: "master"
-#          #CHANNEL: "dev"
-#          #CHANNEL: "beta"
-#          #CHANNEL: "stable"
-#      install_images_script:
-#        - mkdir -p .android && touch ~/.android/repositories.cfg
-#        #- sdkmanager --list
-#        - sdkmanager "system-images;android-$EMULATOR_API_LEVEL;$ABI"
-#        - (yes || true) | sdkmanager --licenses
-#      create_device_script:
-#        echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ABI"
-#      start_emulator_background_script:
-#        $ANDROID_SDK_ROOT/emulator/emulator -verbose -avd test -no-audio -no-window
-#      pub_cache:
-#        folder: ~/.pub-cache
-#      wait_for_emulator_script:
-#        #- adb wait-for-device
-#        - ./scripts/android-wait-for-emulator.sh
-#        #- adb shell input keyevent 82
-#      flutter_change_channel_script: flutter channel $CHANNEL
-#      doctor_script: flutter doctor -v
-#      devices_script: flutter devices
-#      script: ./scripts/test.sh $(ipconfig getifaddr en0)
+task:
+  # Xcode 12 task
+  osx_instance:
+    image: big-sur-xcode-12.4
+  install_node_script:
+    - brew install node
+    - cd ./nodejs_server_test_auth_basic_and_ssl
+    - npm install
+  upgrade_script:
+    - sudo gem install cocoapods
+    #- flutter channel stable
+    #- flutter upgrade
+    #- flutter channel beta
+    #- flutter upgrade
+    #- flutter channel dev
+    #- flutter upgrade
+    - flutter channel master
+    - flutter upgrade
+    - git fetch origin master
+  matrix:
+    - name: test_plugin_ios
+      env:
+        matrix:
+          CHANNEL: "master"
+          #CHANNEL: "dev"
+          #CHANNEL: "beta"
+          #CHANNEL: "stable"
+      test_script:
+        - xcrun simctl list
+        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
+        - flutter channel $CHANNEL
+        - ./scripts/test.sh $(ipconfig getifaddr en0)
+      pub_cache:
+        folder: ~/.pub-cache
 
 task:
   env:
@@ -67,8 +40,8 @@ task:
     ABI: "x86"
   container:
     image: cirrusci/flutter:latest
-    cpu: 4
-    memory: 10G
+    cpu: 6
+    memory: 12G
     kvm: true
   install_node_script:
     - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
@@ -122,6 +95,6 @@ task:
         - export NVM_DIR="$HOME/.nvm"
         - source "$NVM_DIR/nvm.sh"  # This loads nvm
         - nvm use node
-        - ./scripts/test.sh $(ipconfig getifaddr en0)
+        - ./scripts/test.sh $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
       pub_cache:
         folder: ~/.pub-cache

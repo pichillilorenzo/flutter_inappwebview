@@ -1,5 +1,9 @@
 language: dart
 
+branches:
+  only:
+    - master
+
 jobs:
   include:
     - stage: iOS Integration Tests
@@ -28,6 +32,7 @@ jobs:
         - xcrun simctl list
         - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-3 | xargs xcrun simctl boot
       script:
+        - flutter channel master
         - ./scripts/test.sh $(ipconfig getifaddr en0)
       cache:
         directories:
@@ -37,6 +42,10 @@ jobs:
     - stage: Android Integration Tests
       language: android
       dist: trusty
+      addons:
+        apt:
+          packages:
+            - iproute2
       android:
         components:
           - tools
@@ -79,7 +88,8 @@ jobs:
         - export NVM_DIR="$HOME/.nvm"
         - source "$NVM_DIR/nvm.sh"  # This loads nvm
         - nvm use node
-        - ./scripts/test.sh $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
+        - flutter channel master
+        - ./scripts/test.sh $(ip route get 1 | awk '{print $NF;exit}')
       cache:
         directories:
           - $HOME/.pub-cache

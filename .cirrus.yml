@@ -1,4 +1,5 @@
 task:
+  only_if: $CIRRUS_BRANCH == 'master'
   # Xcode 12 task
   osx_instance:
     image: big-sur-xcode-12.4
@@ -37,6 +38,7 @@ task:
         folder: ~/.pub-cache
 
 task:
+  only_if: $CIRRUS_BRANCH == 'master'
   env:
     API: 30
     GOO: "google_apis"
@@ -102,6 +104,7 @@ task:
         - export NVM_DIR="$HOME/.nvm"
         - source "$NVM_DIR/nvm.sh"  # This loads nvm
         - nvm use node
-        - ./scripts/test.sh $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
+        - flutter channel $CHANNEL
+        - ./scripts/test.sh $(ip route get 1 | awk '{print $NF;exit}')
       pub_cache:
         folder: ~/.pub-cache

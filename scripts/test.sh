@@ -8,7 +8,7 @@ function error() {
 }
 
 # on macOS local IP can be found using $(ipconfig getifaddr en0)
-# on linux local IP can be found using $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}')
+# on linux local IP can be found using $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') or $(ip route get 1 | awk '{print $NF;exit}')
 export NODE_SERVER_IP=$1
 FAILED=0
 

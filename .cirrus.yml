@@ -10,6 +10,8 @@ task:
     - sudo gem install cocoapods
     #- flutter channel stable
     #- flutter upgrade
+    #- flutter channel beta
+    #- flutter upgrade
     #- flutter channel dev
     #- flutter upgrade
 #    - flutter channel master
@@ -21,6 +23,7 @@ task:
 #        matrix:
 #          CHANNEL: "master"
 #          #CHANNEL: "dev"
+#          #CHANNEL: "beta"
 #          #CHANNEL: "stable"
 #      script:
 #        - xcrun simctl list
@@ -32,6 +35,7 @@ task:
         matrix:
           CHANNEL: "master"
           #CHANNEL: "dev"
+          #CHANNEL: "beta"
           #CHANNEL: "stable"
       script:
         - mkdir -p .android && touch ~/.android/repositories.cfg
@@ -39,7 +43,7 @@ task:
         - sdkmanager "platform-tools" "system-images;android-30;google_apis;x86"
         - (yes || true) | sdkmanager --licenses
         - echo no | avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;google_apis;x86"
-        - emulator -avd Flutter-Android -no-audio -no-window
+        - echo no | emulator -avd Flutter-Android -no-audio -no-window
         - adb wait-for-device
         - adb shell input keyevent 82
         - flutter channel $CHANNEL

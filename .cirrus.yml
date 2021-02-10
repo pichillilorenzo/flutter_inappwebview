@@ -1,0 +1,33 @@
+task:
+  # Xcode 12 task
+  osx_instance:
+    image: big-sur-xcode-12.4
+  upgrade_script:
+    - brew install node
+    - cd ./nodejs_server_test_auth_basic_and_ssl
+    - npm install
+    - cd ..
+    - sudo gem install cocoapods
+    #- flutter channel stable
+    #- flutter upgrade
+    - flutter channel dev
+    - flutter upgrade
+    - flutter channel master
+    - flutter upgrade
+    - git fetch origin master
+  submodules_script:
+    - git submodule init
+    - git submodule update
+  create_simulator_script:
+    - xcrun simctl list
+    - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
+  matrix:
+    - name: build_plugin
+      env:
+        matrix:
+          CHANNEL: "master"
+          CHANNEL: "dev"
+          #CHANNEL: "stable"
+      script:
+        - flutter channel $CHANNEL
+        - ./test.sh $(ipconfig getifaddr en0)

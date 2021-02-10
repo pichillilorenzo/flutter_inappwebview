@@ -10,8 +10,8 @@ task:
     - sudo gem install cocoapods
     #- flutter channel stable
     #- flutter upgrade
-    - flutter channel dev
-    - flutter upgrade
+    #- flutter channel dev
+    #- flutter upgrade
     - flutter channel master
     - flutter upgrade
     - git fetch origin master
@@ -26,7 +26,7 @@ task:
       env:
         matrix:
           CHANNEL: "master"
-          CHANNEL: "dev"
+          #CHANNEL: "dev"
           #CHANNEL: "stable"
       script:
         - flutter channel $CHANNEL

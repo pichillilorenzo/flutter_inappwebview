@@ -1,5 +1,8 @@
 #!/bin/bash
 
+readonly SCRIPT_PATH="$( cd "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+readonly PROJECT_DIR="$(dirname $SCRIPT_PATH)"
+
 function error() {
   echo "$@" 1>&2
 }
@@ -8,13 +11,13 @@ function error() {
 export NODE_SERVER_IP=$1
 FAILED=0
 
-dart tool/env.dart
+dart $PROJECT_DIR/tool/env.dart
 
-cd nodejs_server_test_auth_basic_and_ssl
+cd $PROJECT_DIR/nodejs_server_test_auth_basic_and_ssl
 node index.js &
 
 flutter clean
-cd ../example
+cd $PROJECT_DIR/example
 flutter clean
 flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart
 

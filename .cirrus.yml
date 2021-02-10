@@ -1,4 +1,9 @@
 task:
+  only_if: $CIRRUS_PR == ''
+  skip: '!changesInclude(".cirrus.yml")'
+  env:
+    ANDROID_EMULATOR_API_LEVEL: 30
+    ANDROID_ABI: "google_apis;x86"
   # Xcode 12 task
   osx_instance:
     image: big-sur-xcode-12.4
@@ -29,7 +34,7 @@ task:
 #        - xcrun simctl list
 #        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
 #        - flutter channel $CHANNEL
-#        - ./test.sh $(ipconfig getifaddr en0)
+#        - ./scripts/test.sh $(ipconfig getifaddr en0)
     - name: test_plugin_android
       env:
         matrix:
@@ -37,19 +42,22 @@ task:
           #CHANNEL: "dev"
           #CHANNEL: "beta"
           #CHANNEL: "stable"
-      create_avd_script:
-        - mkdir -p .android && touch ~/.android/repositories.cfg
-        - sdkmanager --list
-        - sdkmanager "system-images;android-30;google_apis;x86"
-        - (yes || true) | sdkmanager --licenses
-        - OUTPUT_AVD=$(avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;google_apis;x86" --device "Nexus 6P")
-        - echo $OUTPUT_AVD
-        - emulator -list-avds
+      install_images_script:
+        #- mkdir -p .android && touch ~/.android/repositories.cfg
+        #- sdkmanager --list
+        - sdkmanager "system-images;android-$ANDROID_EMULATOR_API_LEVEL;$ANDROID_ABI"
+        #- (yes || true) | sdkmanager --licenses
+      create_device_script:
+        echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
       start_emulator_background_script:
-        - emulator -avd Flutter-Android -no-audio -no-window
+        $ANDROID_SDK_HOME/emulator/emulator-headless -VERBOSE -avd TEST -no-audio -no-window
+      pub_cache:
+        folder: ~/.pub-cache
       wait_for_emulator_script:
-        - adb wait-for-device
-        - adb shell input keyevent 82
-      script:
-        - flutter channel $CHANNEL
-        - ./test.sh $(ipconfig getifaddr en0)
+        #- adb wait-for-device
+        - ./scripts/android-wait-for-emulator.sh
+        #- adb shell input keyevent 82
+      flutter_change_channel_script: flutter channel $CHANNEL
+      doctor_script: flutter doctor -v
+      devices_script: flutter devices
+      script: ./scripts/test.sh $(ipconfig getifaddr en0)

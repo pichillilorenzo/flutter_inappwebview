@@ -31,15 +31,15 @@ task:
         - flutter channel $CHANNEL
         - ./test.sh $(ipconfig getifaddr en0)
     - name: test_plugin_android
-        env:
-          matrix:
-            CHANNEL: "master"
-            #CHANNEL: "dev"
-            #CHANNEL: "stable"
-        script:
-          - echo no | avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;default;armeabi-v7a"
-          - $ANDROID_HOME/emulator/emulator -avd Flutter-Android -no-audio -no-window
-          - adb wait-for-device
-          - adb shell input keyevent 82
-          - flutter channel $CHANNEL
-          - ./test.sh $(ipconfig getifaddr en0)
+      env:
+        matrix:
+          CHANNEL: "master"
+          #CHANNEL: "dev"
+          #CHANNEL: "stable"
+      script:
+        - echo no | avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;default;armeabi-v7a"
+        - $ANDROID_HOME/emulator/emulator -avd Flutter-Android -no-audio -no-window
+        - adb wait-for-device
+        - adb shell input keyevent 82
+        - flutter channel $CHANNEL
+        - ./test.sh $(ipconfig getifaddr en0)

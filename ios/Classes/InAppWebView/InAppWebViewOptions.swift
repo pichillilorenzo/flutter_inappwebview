@@ -66,9 +66,18 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var pageZoom = 1.0
     var limitsNavigationsToAppBoundDomains = false
     var useOnNavigationResponse = false
+    var applePayAPIEnabled = false
     
     override init(){
         super.init()
+    }
+    
+    override func parse(options: [String: Any?]) -> InAppWebViewOptions {
+        let _ = super.parse(options: options)
+        if #available(iOS 13.0, *) {} else {
+            applePayAPIEnabled = false
+        }
+        return self
     }
     
     override func getRealOptions(obj: InAppWebView?) -> [String: Any?] {

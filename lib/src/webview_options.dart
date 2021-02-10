@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'content_blocker.dart';
 import 'types.dart';
@@ -869,6 +870,59 @@ class IOSInAppWebViewOptions
   ///Set to `true` to be able to listen at the [WebView.iosOnNavigationResponse] event. The default value is `false`.
   bool useOnNavigationResponse;
 
+  ///Set to `true` to enable Apple Pay API for the [WebView] at its first page load or on the next page load (using [InAppWebViewController.setOptions]). The default value is `false`.
+  ///
+  ///**IMPORTANT NOTE**: As written in the official [Safari 13 Release Notes](https://developer.apple.com/documentation/safari-release-notes/safari-13-release-notes#Payment-Request-API),
+  ///it won't work if any script injection APIs is used (such as [InAppWebViewController.evaluateJavascript] or [UserScript]).
+  ///So, when this attribute is `true`, all the methods, options and events implemented using JavaScript won't be called or won't do anything and the result will always be `null`.
+  ///
+  ///Methods affected:
+  ///- [InAppWebViewController.addUserScript]
+  ///- [InAppWebViewController.addUserScripts]
+  ///- [InAppWebViewController.removeUserScript]
+  ///- [InAppWebViewController.removeUserScripts]
+  ///- [InAppWebViewController.removeAllUserScripts]
+  ///- [InAppWebViewController.evaluateJavascript]
+  ///- [InAppWebViewController.callAsyncJavaScript]
+  ///- [InAppWebViewController.injectJavascriptFileFromUrl]
+  ///- [InAppWebViewController.injectJavascriptFileFromAsset]
+  ///- [InAppWebViewController.injectCSSCode]
+  ///- [InAppWebViewController.injectCSSFileFromUrl]
+  ///- [InAppWebViewController.injectCSSFileFromAsset]
+  ///- [InAppWebViewController.findAllAsync]
+  ///- [InAppWebViewController.findNext]
+  ///- [InAppWebViewController.clearMatches]
+  ///- [InAppWebViewController.pauseTimers]
+  ///- [InAppWebViewController.getSelectedText]
+  ///- [InAppWebViewController.getHitTestResult]
+  ///- [InAppWebViewController.requestFocusNodeHref]
+  ///- [InAppWebViewController.requestImageRef]
+  ///
+  ///Options affected:
+  ///- [WebView.initialUserScripts]
+  ///- [InAppWebViewOptions.supportZoom]
+  ///- [InAppWebViewOptions.useOnLoadResource]
+  ///- [InAppWebViewOptions.useShouldInterceptAjaxRequest]
+  ///- [InAppWebViewOptions.useShouldInterceptFetchRequest]
+  ///- [IOSInAppWebViewOptions.enableViewportScale]
+  ///
+  ///Events affected:
+  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
+  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
+  ///- [WebView.onLoadResource]
+  ///- [WebView.shouldInterceptAjaxRequest]
+  ///- [WebView.onAjaxReadyStateChange]
+  ///- [WebView.onAjaxProgress]
+  ///- [WebView.shouldInterceptFetchRequest]
+  ///- [WebView.onConsoleMessage]
+  ///- [WebView.onPrint]
+  ///- [WebView.onWindowFocus]
+  ///- [WebView.onWindowBlur]
+  ///- [WebView.onFindResultReceived]
+  ///
+  ///**NOTE**: available on iOS 13.0+.
+  bool applePayAPIEnabled;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -898,7 +952,8 @@ class IOSInAppWebViewOptions
       this.mediaType,
       this.pageZoom = 1.0,
       this.limitsNavigationsToAppBoundDomains = false,
-      this.useOnNavigationResponse = false});
+      this.useOnNavigationResponse = false,
+      this.applePayAPIEnabled = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -939,6 +994,7 @@ class IOSInAppWebViewOptions
       "pageZoom": pageZoom,
       "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
       "useOnNavigationResponse": useOnNavigationResponse,
+      "applePayAPIEnabled": applePayAPIEnabled,
     };
   }
 
@@ -993,6 +1049,7 @@ class IOSInAppWebViewOptions
     options.pageZoom = map["pageZoom"];
     options.limitsNavigationsToAppBoundDomains = map["limitsNavigationsToAppBoundDomains"];
     options.useOnNavigationResponse = map["useOnNavigationResponse"];
+    options.applePayAPIEnabled = map["applePayAPIEnabled"];
     return options;
   }
 

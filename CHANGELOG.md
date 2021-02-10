@@ -9,7 +9,7 @@
 - Added `initialUserScripts` WebView option
 - Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
-- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse` iOS-specific WebView options
+- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse`, `applePayAPIEnabled` iOS-specific WebView options
 - Added `handlesURLScheme`, `createPdf`, `createWebArchiveData` iOS-specific WebView methods
 - Added `iosOnNavigationResponse` and `iosShouldAllowDeprecatedTLS` iOS-specific WebView events
 - Added `iosAnimated` optional argument to `zoomBy` WebView method

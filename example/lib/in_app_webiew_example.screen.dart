@@ -95,13 +95,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       crossPlatform: InAppWebViewOptions(
                         useShouldOverrideUrlLoading: false,
                         mediaPlaybackRequiresUserGesture: false,
-                        clearCache: true
                       ),
                       android: AndroidInAppWebViewOptions(
                         useHybridComposition: true,
                       ),
                       ios: IOSInAppWebViewOptions(
                         allowsInlineMediaPlayback: true,
+                        applePayAPIEnabled: false,
                         // limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
                       )
                     ),

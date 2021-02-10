@@ -995,8 +995,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(touchLocation.x),\(touchLocation.y))", completionHandler: {(value, error) in
             if error != nil {
                 print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
-            } else {
+            } else if let value = value {
                 self.onLongPressHitTestResult(hitTestResult: value as! [String: Any?])
+            } else {
+                self.onLongPressHitTestResult(hitTestResult: [:])
             }
         })
     }
@@ -1218,6 +1220,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func prepareAndAddUserScripts() -> Void {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        
         addWindowIdUserScript()
         if windowId != nil {
             // the new created window webview has the same WKWebViewConfiguration variable reference
@@ -1355,6 +1361,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     func addPluginUserScripts() -> Void {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
         addSharedPluginUserScriptsInContentWorlds()
         
         let findElementsAtPointJSScript = WKUserScript(source: findElementsAtPointJS, injectionTime: .atDocumentStart, forMainFrameOnly: false)
@@ -1402,6 +1411,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func addUserScript(wkUserScript: WKUserScript) -> Void {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        
         userScripts.append(wkUserScript)
         configuration.userContentController.addUserScript(wkUserScript)
     }
@@ -1442,6 +1455,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         // there isn't a way to remove a specific user script using WKUserContentController,
         // so we remove all the user scripts and, then, we add them again without the one that has been removed
         configuration.userContentController.removeAllUserScripts()
+        
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        
         addWindowIdUserScript()
         addPluginUserScripts()
         addAllUserScripts()
@@ -1450,6 +1468,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func removeAllUserScripts() -> Void {
         userScripts.removeAll()
         configuration.userContentController.removeAllUserScripts()
+        
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        
         // add all the necessary base WKUserScripts of this plugin again
         addWindowIdUserScript()
         addPluginUserScripts()
@@ -1639,9 +1662,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
                     if error != nil {
                         print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
-                    } else {
+                    } else if let value = value {
                         let hitTestResult = value as! [String: Any?]
                         arguments["hitTestResult"] = hitTestResult
+                        self.channel?.invokeMethod("onCreateContextMenu", arguments: arguments)
+                    } else {
                         self.channel?.invokeMethod("onCreateContextMenu", arguments: arguments)
                     }
                 })
@@ -1867,6 +1892,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     func setOptions(newOptions: InAppWebViewOptions, newOptionsMap: [String: Any]) {
         
+        // MUST be the first! In this way, all the options that uses evaluateJavaScript can be applied/blocked!
+        if #available(iOS 13.0, *) {
+            if newOptionsMap["applePayAPIEnabled"] != nil && options?.applePayAPIEnabled != newOptions.applePayAPIEnabled {
+                if let options = options {
+                    options.applePayAPIEnabled = newOptions.applePayAPIEnabled
+                }
+                if !newOptions.applePayAPIEnabled {
+                    // re-add WKUserScripts for the next page load
+                    prepareAndAddUserScripts()
+                } else {
+                    configuration.userContentController.removeAllUserScripts()
+                }
+            }
+        }
+        
         if newOptionsMap["transparentBackground"] != nil && options?.transparentBackground != newOptions.transparentBackground {
             if newOptions.transparentBackground {
                 isOpaque = false
@@ -1950,7 +1990,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if #available(iOS 14.0, *) {
                 for contentWorldName in userScriptsContentWorlds {
                     let contentWorld = getContentWorld(name: contentWorldName)
-                    evaluateJavaScript(source, in: nil, in: contentWorld, completionHandler: nil)
+                    evaluateJavaScript(source, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                 }
             } else {
                 evaluateJavaScript(source, completionHandler: nil)
@@ -1964,7 +2004,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if #available(iOS 14.0, *) {
                 for contentWorldName in userScriptsContentWorlds {
                     let contentWorld = getContentWorld(name: contentWorldName)
-                    evaluateJavaScript(source, in: nil, in: contentWorld, completionHandler: nil)
+                    evaluateJavaScript(source, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                 }
             } else {
                 evaluateJavaScript(source, completionHandler: nil)
@@ -2192,7 +2232,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 jsToInject = getAllPluginUserScriptMergedJS() + "\n" + jsToInject
             }
             let contentWorld = getContentWorld(name: contentWorldName)
-            evaluateJavaScript(jsToInject, in: nil, in: contentWorld) { (evalResult) in
+            evaluateJavaScript(jsToInject, frame: nil, contentWorld: contentWorld) { (evalResult) in
                 guard let result = result else {
                     return
                 }
@@ -2230,12 +2270,42 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+            return
+        }
+        super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
+    }
+    
+    @available(iOS 14.0, *)
+    public func evaluateJavaScript(_ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        super.evaluateJavaScript(javaScript, in: frame, in: contentWorld, completionHandler: completionHandler)
+    }
+    
     public func evaluateJavascript(source: String, contentWorldName: String?, result: @escaping FlutterResult) {
         injectDeferredObject(source: source, contentWorldName: contentWorldName, withWrapper: nil, result: result)
     }
     
+    @available(iOS 14.0, *)
+    public func callAsyncJavaScript(_ functionBody: String, arguments: [String : Any] = [:], frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: contentWorld, completionHandler: completionHandler)
+    }
+    
     @available(iOS 10.3, *)
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], contentWorldName: String?, result: @escaping FlutterResult) {
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            result(nil)
+        }
+        
         var jsToInject = functionBody
         if #available(iOS 14.0, *) {
             var contentWorld = WKContentWorld.page
@@ -2249,7 +2319,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     jsToInject = getAllPluginUserScriptMergedJS() + "\n" + jsToInject
                 }
             }
-            callAsyncJavaScript(jsToInject, arguments: arguments, in: nil, in: contentWorld) { (evalResult) in
+            callAsyncJavaScript(jsToInject, arguments: arguments, frame: nil, contentWorld: contentWorld) { (evalResult) in
                 var body: [String: Any?] = [
                     "value": nil,
                     "error": nil

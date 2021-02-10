@@ -46,9 +46,9 @@ task:
         - sdkmanager "system-images;android-$ANDROID_EMULATOR_API_LEVEL;$ANDROID_ABI"
         - (yes || true) | sdkmanager --licenses
       create_device_script:
-        echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
+        echo no | avdmanager create avd --force -n test -k "system-images;android-$ANDROID_EMULATOR_API_LEVEL;$ANDROID_ABI"
       start_emulator_background_script:
-        $ANDROID_SDK_ROOT/emulator/emulator-headless -VERBOSE -avd TEST -no-audio -no-window
+        $ANDROID_SDK_ROOT/emulator/emulator-headless -verbose -avd test -no-audio -no-window
       pub_cache:
         folder: ~/.pub-cache
       wait_for_emulator_script:

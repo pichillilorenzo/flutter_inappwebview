@@ -1,27 +1,23 @@
 language: dart
 
-env:
-  global:
-    - DARTSDK=./flutter/bin/cache/dart-sdk/bin
-    - DARTFMT=$DARTSDK/dartfmt
-    - FLUTTER=./flutter/bin/flutter
-    - FLUTTER_UP=../flutter/bin/flutter
-    - FLUTTER_GITHUB=https://github.com/flutter/flutter.git
-    - PACKAGES=packages
-    - ANDROID_API=30
-
 install:
+  - source ~/.zprofile
   - export HOMEBREW_NO_AUTO_UPDATE=1
   - brew install node
   - brew install libimobiledevice ideviceinstaller ios-deploy
   - brew install cocoapods || echo 'ignore exit(1)'
   - brew link --overwrite cocoapods
-  - git clone $FLUTTER_GITHUB -b stable --depth 1
-  - $FLUTTER upgrade
-  - $FLUTTER channel master
-  - $FLUTTER upgrade
-  - $FLUTTER doctor
-  - $FLUTTER pub get
+  - echo 'export FLUTTER_HOME=$HOME/flutter' >> ~/.zprofile
+  - echo 'export PATH=$HOME/flutter:$HOME/flutter/bin/:$HOME/flutter/bin/cache/dart-sdk/bin:$PATH' >> ~/.zprofile
+  - source ~/.zprofile
+  - git clone https://github.com/flutter/flutter.git $FLUTTER_HOME
+  - cd $FLUTTER_HOME
+  - git checkout beta
+  - git checkout stable
+  - flutter doctor
+  - flutter channel master
+  - flutter upgrade
+  - flutter doctor
 
 jobs:
   include:

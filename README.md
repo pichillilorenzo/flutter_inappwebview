@@ -643,7 +643,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `allowsPictureInPictureMediaPlayback`: Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
 * `alwaysBounceHorizontal`: A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view. The default value is `false`.
 * `alwaysBounceVertical`: A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content. The default value is `false`.
-* `applePayAPIEnabled`: A
+* `applePayAPIEnabled`: Set to `true` to enable Apple Pay API for the WebView at its first page load or on the next page load (using `InAppWebViewController.setOptions`). See the documentation for more info and to know the cons of enabling this option. The default value is `false`.
 * `automaticallyAdjustsScrollIndicatorInsets`: Configures whether the scroll indicator insets are automatically adjusted by the system. The default value is `false`.
 * `contentInsetAdjustmentBehavior`: Configures how safe area insets are added to the adjusted content inset. The default value is `IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER`.
 * `dataDetectorTypes`: Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.

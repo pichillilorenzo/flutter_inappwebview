@@ -1,6 +1,4 @@
 task:
-  only_if: $CIRRUS_PR == ''
-  skip: '!changesInclude(".cirrus.yml")'
   env:
     ANDROID_EMULATOR_API_LEVEL: 30
     ANDROID_ABI: "google_apis;x86"
@@ -43,10 +41,10 @@ task:
           #CHANNEL: "beta"
           #CHANNEL: "stable"
       install_images_script:
-        #- mkdir -p .android && touch ~/.android/repositories.cfg
+        - mkdir -p .android && touch ~/.android/repositories.cfg
         #- sdkmanager --list
         - sdkmanager "system-images;android-$ANDROID_EMULATOR_API_LEVEL;$ANDROID_ABI"
-        #- (yes || true) | sdkmanager --licenses
+        - (yes || true) | sdkmanager --licenses
       create_device_script:
         echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ANDROID_ABI"
       start_emulator_background_script:

@@ -11,10 +11,17 @@ env:
     - ANDROID_API=30
 
 install:
-  - git clone $FLUTTER_GITHUB -b master --depth 1
+  - export HOMEBREW_NO_AUTO_UPDATE=1
+  - brew install node
+  - brew install libimobiledevice ideviceinstaller ios-deploy
+  - brew install cocoapods || echo 'ignore exit(1)'
+  - brew link --overwrite cocoapods
+  - git clone $FLUTTER_GITHUB -b stable --depth 1
+  - $FLUTTER upgrade
+  - $FLUTTER channel master
+  - $FLUTTER upgrade
   - $FLUTTER doctor
   - $FLUTTER pub get
-
 
 jobs:
   include:
@@ -22,15 +29,9 @@ jobs:
       os: osx
       osx_image: xcode12.3
       before_script:
-        - brew install node
         - cd ./nodejs_server_test_auth_basic_and_ssl
         - npm install
         - cd ..
-        - open /Applications/Xcode.app/Contents/Developer/Applications/Simulator.app
-        - export HOMEBREW_NO_AUTO_UPDATE=1
-        - brew install libimobiledevice ideviceinstaller ios-deploy
-        - brew install cocoapods || echo 'ignore exit(1)'
-        - brew link --overwrite cocoapods
         - xcrun simctl list
         - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-3 | xargs xcrun simctl boot
       script:

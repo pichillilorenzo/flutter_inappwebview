@@ -42,9 +42,7 @@ task:
         - sdkmanager --list
         - sdkmanager "system-images;android-30;google_apis;x86"
         - (yes || true) | sdkmanager --licenses
-        - echo "no" | avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;google_apis;x86" --device "Nexus 6P"
-      show_avd_list_script:
-        - which emulator
+        - avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;google_apis;x86" --device "Nexus 6P"
         - emulator -list-avds
       start_emulator_background_script:
         - emulator -avd Flutter-Android -no-audio -no-window

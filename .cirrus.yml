@@ -35,7 +35,7 @@ task:
           #CHANNEL: "stable"
       script:
         - mkdir -p .android && touch ~/.android/repositories.cfg
-        - (yes || true) | sdkmanager "platform-tools" "platforms;android-30"
+        - sdkmanager "platform-tools" "platforms;system-images;android-30;default;armeabi-v7a"
         - (yes || true) | sdkmanager --licenses
         - echo no | avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;default;armeabi-v7a"
         - $ANDROID_HOME/emulator/emulator -avd Flutter-Android -no-audio -no-window

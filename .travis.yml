@@ -16,6 +16,7 @@ install:
   - flutter channel master
   - flutter upgrade
   - flutter doctor
+  - cd $HOME
 
 jobs:
   include:

@@ -1,38 +1,83 @@
-task:
-  env:
-    ANDROID_EMULATOR_API_LEVEL: 30
-    ANDROID_ABI: "google_apis;x86"
-  # Xcode 12 task
-  osx_instance:
-    image: big-sur-xcode-12.4
-  install_node_script:
-    - brew install node
-    - cd ./nodejs_server_test_auth_basic_and_ssl
-    - npm install
-  upgrade_script:
-    - sudo gem install cocoapods
-    #- flutter channel stable
-    #- flutter upgrade
-    #- flutter channel beta
-    #- flutter upgrade
-    #- flutter channel dev
-    #- flutter upgrade
-#    - flutter channel master
-#    - flutter upgrade
-#    - git fetch origin master
-  matrix:
-#    - name: test_plugin_ios
+#task:
+#  env:
+#    EMULATOR_API_LEVEL: 30
+#    ABI: "google_apis;x86"
+#  # Xcode 12 task
+#  osx_instance:
+#    image: big-sur-xcode-12.4
+#  install_node_script:
+#    - brew install node
+#    - cd ./nodejs_server_test_auth_basic_and_ssl
+#    - npm install
+#  upgrade_script:
+#    - sudo gem install cocoapods
+#    #- flutter channel stable
+#    #- flutter upgrade
+#    #- flutter channel beta
+#    #- flutter upgrade
+#    #- flutter channel dev
+#    #- flutter upgrade
+##    - flutter channel master
+##    - flutter upgrade
+##    - git fetch origin master
+#  matrix:
+##    - name: test_plugin_ios
+##      env:
+##        matrix:
+##          CHANNEL: "master"
+##          #CHANNEL: "dev"
+##          #CHANNEL: "beta"
+##          #CHANNEL: "stable"
+##      script:
+##        - xcrun simctl list
+##        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
+##        - flutter channel $CHANNEL
+##        - ./scripts/test.sh $(ipconfig getifaddr en0)
+#    - name: test_plugin_android
 #      env:
 #        matrix:
 #          CHANNEL: "master"
 #          #CHANNEL: "dev"
 #          #CHANNEL: "beta"
 #          #CHANNEL: "stable"
-#      script:
-#        - xcrun simctl list
-#        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
-#        - flutter channel $CHANNEL
-#        - ./scripts/test.sh $(ipconfig getifaddr en0)
+#      install_images_script:
+#        - mkdir -p .android && touch ~/.android/repositories.cfg
+#        #- sdkmanager --list
+#        - sdkmanager "system-images;android-$EMULATOR_API_LEVEL;$ABI"
+#        - (yes || true) | sdkmanager --licenses
+#      create_device_script:
+#        echo no | avdmanager create avd --force -n test -k "system-images;android-$EMULATOR_API_LEVEL;$ABI"
+#      start_emulator_background_script:
+#        $ANDROID_SDK_ROOT/emulator/emulator -verbose -avd test -no-audio -no-window
+#      pub_cache:
+#        folder: ~/.pub-cache
+#      wait_for_emulator_script:
+#        #- adb wait-for-device
+#        - ./scripts/android-wait-for-emulator.sh
+#        #- adb shell input keyevent 82
+#      flutter_change_channel_script: flutter channel $CHANNEL
+#      doctor_script: flutter doctor -v
+#      devices_script: flutter devices
+#      script: ./scripts/test.sh $(ipconfig getifaddr en0)
+
+task:
+  env:
+    API: 30
+    GOO: "google_apis"
+    ABI: "x86"
+  container:
+    image: cirrusci/flutter:latest
+    kvm: true
+  install_node_script:
+    - curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.37.2/install.sh | bash
+    - export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")" [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+    - nvm install node
+    - cd ./nodejs_server_test_auth_basic_and_ssl
+    - npm install
+  upgrade_script:
+    - flutter channel master
+    - flutter upgrade
+  matrix:
     - name: test_plugin_android
       env:
         matrix:
@@ -40,22 +85,36 @@ task:
           #CHANNEL: "dev"
           #CHANNEL: "beta"
           #CHANNEL: "stable"
-      install_images_script:
-        - mkdir -p .android && touch ~/.android/repositories.cfg
-        #- sdkmanager --list
-        - sdkmanager "system-images;android-$ANDROID_EMULATOR_API_LEVEL;$ANDROID_ABI"
-        - (yes || true) | sdkmanager --licenses
-      create_device_script:
-        echo no | avdmanager create avd --force -n test -k "system-images;android-$ANDROID_EMULATOR_API_LEVEL;$ANDROID_ABI"
+      fix_kvm_script:
+        - |
+          if [[ $ABI =~ "x86" ]]; then
+            sudo chown cirrus:cirrus /dev/kvm
+          fi
+      install_emulator_script:
+        - sdkmanager "system-images;android-$API;$GOO;$ABI" > /dev/null
+      create_emulator_script:
+        - echo no | avdmanager --verbose create avd --force -n test -k "system-images;android-$API;$GOO;$ABI"
       start_emulator_background_script:
-        $ANDROID_SDK_ROOT/emulator/emulator -verbose -avd test -no-audio -no-window
+        - EMU_PARAMS="
+          -avd test
+          -verbose
+          -no-window
+          -no-audio
+          "
+        - |
+          EMU_COMMAND=emulator
+          if [[ $ABI =~ "x86" ]]; then
+            EMU_COMMAND="emulator-headless"
+          else
+            # emulate graphics if running on ARM
+            EMU_PARAMS="${EMU_PARAMS} -gpu swiftshader"
+          fi
+        - ${ANDROID_HOME}/emulator/${EMU_COMMAND} ${EMU_PARAMS}
+      wait_for_emulator_script:
+        - ./scripts/android-wait-for-emulator.sh
+      doctor_script: flutter doctor -v
+      test_script:
+        - export PATH="$PATH":"$HOME/.pub-cache/bin"
+        - ./scripts/test.sh $(ipconfig getifaddr en0)
       pub_cache:
         folder: ~/.pub-cache
-      wait_for_emulator_script:
-        #- adb wait-for-device
-        - ./scripts/android-wait-for-emulator.sh
-        #- adb shell input keyevent 82
-      flutter_change_channel_script: flutter channel $CHANNEL
-      doctor_script: flutter doctor -v
-      devices_script: flutter devices
-      script: ./scripts/test.sh $(ipconfig getifaddr en0)

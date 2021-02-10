@@ -88,11 +88,11 @@ task:
           #CHANNEL: "dev"
           #CHANNEL: "beta"
           #CHANNEL: "stable"
-      fix_kvm_script:
-        - |
-          if [[ $ABI =~ "x86" ]]; then
-            sudo chown cirrus:cirrus /dev/kvm
-          fi
+#      fix_kvm_script:
+#        - |
+#          if [[ $ABI =~ "x86" ]]; then
+#            sudo chown cirrus:cirrus /dev/kvm
+#          fi
       install_emulator_script:
         - sdkmanager "system-images;android-$API;$GOO;$ABI" > /dev/null
       create_emulator_script:

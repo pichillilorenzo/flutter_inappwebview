@@ -608,7 +608,8 @@ abstract class WebView {
   ///
   ///[navigationResponse] represents the navigation response.
   ///
-  ///**NOTE**: available only on iOS.
+  ///**NOTE**: available only on iOS. In order to be able to listen this event, you need to set [IOSInAppWebViewOptions.useOnNavigationResponse] option to `true`.
+  ///
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
   final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,

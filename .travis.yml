@@ -24,6 +24,8 @@ jobs:
       os: osx
       osx_image: xcode12.3
       before_script:
+        - pwd
+        - cd ./flutter_inappwebview
         - cd ./nodejs_server_test_auth_basic_and_ssl
         - npm install
         - cd ..

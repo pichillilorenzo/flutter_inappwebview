@@ -1,15 +1,13 @@
 language: dart
 
 install:
-  - source ~/.zprofile
   - export HOMEBREW_NO_AUTO_UPDATE=1
   - brew install node
   - brew install libimobiledevice ideviceinstaller ios-deploy
   - brew install cocoapods || echo 'ignore exit(1)'
   - brew link --overwrite cocoapods
-  - echo 'export FLUTTER_HOME=$HOME/flutter' >> ~/.zprofile
-  - echo 'export PATH=$HOME/flutter:$HOME/flutter/bin/:$HOME/flutter/bin/cache/dart-sdk/bin:$PATH' >> ~/.zprofile
-  - source ~/.zprofile
+  - export FLUTTER_HOME=$HOME/flutter
+  - export PATH=$HOME/flutter:$HOME/flutter/bin/:$HOME/flutter/bin/cache/dart-sdk/bin:$PATH
   - git clone https://github.com/flutter/flutter.git $FLUTTER_HOME
   - cd $FLUTTER_HOME
   - git checkout beta

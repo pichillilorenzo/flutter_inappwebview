@@ -12,24 +12,21 @@ task:
     #- flutter upgrade
     #- flutter channel dev
     #- flutter upgrade
-    - flutter channel master
-    - flutter upgrade
-    - git fetch origin master
-  submodules_script:
-    - git submodule init
-    - git submodule update
+#    - flutter channel master
+#    - flutter upgrade
+#    - git fetch origin master
   matrix:
-    - name: test_plugin_ios
-      env:
-        matrix:
-          CHANNEL: "master"
-          #CHANNEL: "dev"
-          #CHANNEL: "stable"
-      script:
-        - xcrun simctl list
-        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
-        - flutter channel $CHANNEL
-        - ./test.sh $(ipconfig getifaddr en0)
+#    - name: test_plugin_ios
+#      env:
+#        matrix:
+#          CHANNEL: "master"
+#          #CHANNEL: "dev"
+#          #CHANNEL: "stable"
+#      script:
+#        - xcrun simctl list
+#        - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
+#        - flutter channel $CHANNEL
+#        - ./test.sh $(ipconfig getifaddr en0)
     - name: test_plugin_android
       env:
         matrix:
@@ -38,7 +35,7 @@ task:
           #CHANNEL: "stable"
       script:
         - mkdir -p .android && touch ~/.android/repositories.cfg
-        - yes | sdkmanager --licenses
+        - (yes || true) | sdkmanager --licenses
         - echo no | avdmanager create avd --force -n Flutter-Android -k "system-images;android-30;default;armeabi-v7a"
         - $ANDROID_HOME/emulator/emulator -avd Flutter-Android -no-audio -no-window
         - adb wait-for-device

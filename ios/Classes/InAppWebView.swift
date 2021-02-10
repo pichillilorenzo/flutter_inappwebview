@@ -3106,6 +3106,39 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return windowWebView
     }
     
+    public func webView(_ webView: WKWebView,
+                        authenticationChallenge challenge: URLAuthenticationChallenge,
+                        shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
+        shouldAllowDeprecatedTLS(challenge: challenge, result: {(result) -> Void in
+            if result is FlutterError {
+                print((result as! FlutterError).message ?? "")
+            }
+            else if (result as? NSObject) == FlutterMethodNotImplemented {
+                decisionHandler(false)
+            }
+            else {
+                var response: [String: Any]
+                if let r = result {
+                    response = r as! [String: Any]
+                    var action = response["action"] as? Int
+                    action = action != nil ? action : 0;
+                    switch action {
+                        case 0:
+                            decisionHandler(false)
+                            break
+                        case 1:
+                            decisionHandler(true)
+                            break
+                        default:
+                            decisionHandler(false)
+                    }
+                    return;
+                }
+                decisionHandler(false)
+            }
+        })
+    }
+    
     public func webViewDidClose(_ webView: WKWebView) {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onCloseWindow", arguments: arguments)
@@ -3394,6 +3427,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             "port": challenge.protectionSpace.port
         ]
         channel?.invokeMethod("onReceivedClientCertRequest", arguments: arguments, result: result)
+    }
+    
+    public func shouldAllowDeprecatedTLS(challenge: URLAuthenticationChallenge, result: FlutterResult?) {
+        let arguments: [String: Any?] = [
+            "host": challenge.protectionSpace.host,
+            "protocol": challenge.protectionSpace.protocol,
+            "realm": challenge.protectionSpace.realm,
+            "port": challenge.protectionSpace.port,
+            "previousFailureCount": challenge.previousFailureCount
+        ]
+        channel?.invokeMethod("shouldAllowDeprecatedTLS", arguments: arguments, result: result)
     }
     
     public func onJsAlert(frame: WKFrameInfo, message: String, result: FlutterResult?) {

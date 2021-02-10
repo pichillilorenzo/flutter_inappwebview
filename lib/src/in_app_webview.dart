@@ -90,6 +90,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.iosOnWebContentProcessDidTerminate,
     this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
     this.iosOnNavigationResponse,
+    this.iosShouldAllowDeprecatedTLS,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -156,6 +157,11 @@ class InAppWebView extends StatefulWidget implements WebView {
   final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
       IOSNavigationResponse navigationResponse)?
       iosOnNavigationResponse;
+
+  @override
+  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)?
+    iosShouldAllowDeprecatedTLS;
 
   @override
   final Future<AjaxRequestAction> Function(
@@ -263,7 +269,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<HttpAuthResponse?> Function(
-          InAppWebViewController controller, HttpAuthChallenge challenge)?
+          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
       onReceivedHttpAuthRequest;
 
   @override

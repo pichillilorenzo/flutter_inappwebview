@@ -11,7 +11,7 @@
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
 - Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse` iOS-specific WebView options
 - Added `handlesURLScheme`, `createPdf`, `createWebArchiveData` iOS-specific WebView methods
-- Added `iosOnNavigationResponse` iOS-specific WebView events
+- Added `iosOnNavigationResponse` and `iosShouldAllowDeprecatedTLS` iOS-specific WebView events
 - Added `iosAnimated` optional argument to `zoomBy` WebView method
 - Added `screenshotConfiguration` optional argument to `takeScreenshot` WebView method
 - Added `scriptHtmlTagAttributes` optional argument to `injectJavascriptFileFromUrl` WebView method
@@ -50,6 +50,7 @@
 - Added `callAsyncJavaScript` name to the list of javaScriptHandlerForbiddenNames
 - Changed `zoomBy` WebView method signature
 - Moved `saveWebArchive` WebView method from Android-specific to cross-platform
+- Renamed `HttpAuthChallenge` to `URLAuthenticationChallenge`
 
 ## 4.0.0+4
 

@@ -719,6 +719,8 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `androidOnReceivedLoginRequest`: Event fired when a request to automatically log in the user has been processed (available only on Android).
 * `iosOnWebContentProcessDidTerminate`: Invoked when the web view's web content process is terminated (available only on iOS).
 * `iosOnDidReceiveServerRedirectForProvisionalNavigation`: Called when a web view receives a server redirect (available only on iOS).
+* `iosOnNavigationResponse`: Called when a web view asks for permission to navigate to new content after the response to the navigation request is known (available only on iOS).
+* `iosShouldAllowDeprecatedTLS`: Called when a web view asks whether to continue with a connection that uses a deprecated version of TLS (v1.0 and v1.1) (available only on iOS).
 
 ### `ContextMenu` class
 

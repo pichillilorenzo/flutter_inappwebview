@@ -218,13 +218,13 @@ abstract class WebView {
 
   ///Event fired when the WebView received an HTTP authentication request. The default behavior is to cancel the request.
   ///
-  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [HttpAuthChallenge].
+  ///[challenge] contains data about host, port, protocol, realm, etc. as specified in the [URLAuthenticationChallenge].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
   final Future<HttpAuthResponse?> Function(
-          InAppWebViewController controller, HttpAuthChallenge challenge)?
+          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
       onReceivedHttpAuthRequest;
 
   ///Event fired when the WebView need to perform server trust authentication (certificate validation).
@@ -615,6 +615,17 @@ abstract class WebView {
       IOSNavigationResponse navigationResponse)?
       iosOnNavigationResponse;
 
+  ///Called when a web view asks whether to continue with a connection that uses a deprecated version of TLS (v1.0 and v1.1).
+  ///
+  ///[challenge] represents the authentication challenge.
+  ///
+  ///**NOTE**: available only on iOS 14.0+.
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview
+  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)?
+  iosShouldAllowDeprecatedTLS;
+
   ///Initial url that will be loaded.
   final String? initialUrl;
 
@@ -692,6 +703,7 @@ abstract class WebView {
       this.iosOnWebContentProcessDidTerminate,
       this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
       this.iosOnNavigationResponse,
+      this.iosShouldAllowDeprecatedTLS,
       this.initialUrl,
       this.initialFile,
       this.initialData,

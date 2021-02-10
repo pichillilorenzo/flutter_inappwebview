@@ -995,14 +995,14 @@ class HttpAuthResponse {
 
 ///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
 ///It provides all the information about the challenge.
-class HttpAuthChallenge {
+class URLAuthenticationChallenge {
   ///A count of previous failed authentication attempts.
   int previousFailureCount;
 
   ///The protection space requiring authentication.
   ProtectionSpace? protectionSpace;
 
-  HttpAuthChallenge(
+  URLAuthenticationChallenge(
       {required this.previousFailureCount, required this.protectionSpace});
 
   Map<String, dynamic> toMap() {
@@ -5520,6 +5520,33 @@ class IOSNavigationResponseAction {
 
   ///Allow the navigation to continue.
   static const ALLOW = const IOSNavigationResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": _value,
+    };
+  }
+}
+
+///Class that is used by [WebView.iosShouldAllowDeprecatedTLS] event.
+///It represents the policy to pass back to the decision handler.
+class IOSShouldAllowDeprecatedTLSAction {
+  final int _value;
+
+  const IOSShouldAllowDeprecatedTLSAction._internal(this._value);
+
+  int toValue() => _value;
+
+  ///Cancel the navigation.
+  static const CANCEL = const IOSShouldAllowDeprecatedTLSAction._internal(0);
+
+  ///Allow the navigation to continue.
+  static const ALLOW = const IOSShouldAllowDeprecatedTLSAction._internal(1);
 
   bool operator ==(value) => value == _value;
 

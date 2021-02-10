@@ -489,7 +489,7 @@ class InAppWebViewController {
         int previousFailureCount = call.arguments["previousFailureCount"];
         var protectionSpace = ProtectionSpace(
             host: host, protocol: protocol, realm: realm, port: port);
-        var challenge = HttpAuthChallenge(
+        var challenge = URLAuthenticationChallenge(
             previousFailureCount: previousFailureCount,
             protectionSpace: protectionSpace);
         if (_webview != null && _webview!.onReceivedHttpAuthRequest != null)
@@ -673,6 +673,27 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           return (await _inAppBrowser!
               .iosOnNavigationResponse(iosOnNavigationResponse))
+              ?.toMap();
+        break;
+      case "shouldAllowDeprecatedTLS":
+        String host = call.arguments["host"];
+        String protocol = call.arguments["protocol"];
+        String? realm = call.arguments["realm"];
+        int? port = call.arguments["port"];
+        int previousFailureCount = call.arguments["previousFailureCount"];
+        var protectionSpace = ProtectionSpace(
+            host: host, protocol: protocol, realm: realm, port: port);
+        var challenge = URLAuthenticationChallenge(
+            previousFailureCount: previousFailureCount,
+            protectionSpace: protectionSpace);
+
+        if (_webview != null && _webview!.iosShouldAllowDeprecatedTLS != null)
+          return (await _webview!.iosShouldAllowDeprecatedTLS!(
+              this, challenge))
+              ?.toMap();
+        else if (_inAppBrowser != null)
+          return (await _inAppBrowser!
+              .iosShouldAllowDeprecatedTLS(challenge))
               ?.toMap();
         break;
       case "onLongPressHitTestResult":

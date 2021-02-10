@@ -78,6 +78,7 @@ class HeadlessInAppWebView implements WebView {
       this.iosOnWebContentProcessDidTerminate,
       this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
       this.iosOnNavigationResponse,
+      this.iosShouldAllowDeprecatedTLS,
       this.initialUrl,
       this.initialFile,
       this.initialData,
@@ -197,6 +198,11 @@ class HeadlessInAppWebView implements WebView {
       iosOnNavigationResponse;
 
   @override
+  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)?
+    iosShouldAllowDeprecatedTLS;
+
+  @override
   final Future<AjaxRequestAction> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       onAjaxProgress;
@@ -293,7 +299,7 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final Future<HttpAuthResponse?> Function(
-          InAppWebViewController controller, HttpAuthChallenge challenge)?
+          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
       onReceivedHttpAuthRequest;
 
   @override

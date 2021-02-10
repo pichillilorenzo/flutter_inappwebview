@@ -16,7 +16,7 @@ install:
   - flutter channel master
   - flutter upgrade
   - flutter doctor
-  - cd $HOME/pichillilorenzo/flutter_inappwebview
+  - cd $TRAVIS_BUILD_DIR
 
 jobs:
   include:
@@ -24,9 +24,9 @@ jobs:
       os: osx
       osx_image: xcode12.3
       before_script:
-        - cd ./nodejs_server_test_auth_basic_and_ssl
+        - cd $TRAVIS_BUILD_DIR/nodejs_server_test_auth_basic_and_ssl
         - npm install
-        - cd ..
+        - cd $TRAVIS_BUILD_DIR
         - xcrun simctl list
         - xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-3 | xargs xcrun simctl boot
       script:

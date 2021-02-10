@@ -107,7 +107,7 @@ task:
         - |
           EMU_COMMAND=emulator
           if [[ $ABI =~ "x86" ]]; then
-            EMU_COMMAND="emulator-headless"
+            EMU_COMMAND="emulator"
           else
             # emulate graphics if running on ARM
             EMU_PARAMS="${EMU_PARAMS} -gpu swiftshader"

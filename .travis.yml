@@ -16,7 +16,7 @@ install:
   - flutter channel master
   - flutter upgrade
   - flutter doctor
-  - cd $HOME
+  - cd $HOME/pichillilorenzo/flutter_inappwebview
 
 jobs:
   include:
@@ -24,8 +24,6 @@ jobs:
       os: osx
       osx_image: xcode12.3
       before_script:
-        - pwd
-        - cd ./flutter_inappwebview
         - cd ./nodejs_server_test_auth_basic_and_ssl
         - npm install
         - cd ..

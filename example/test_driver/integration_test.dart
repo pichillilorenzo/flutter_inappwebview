@@ -1,12 +1,9 @@
-// @dart = 2.9
-
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter_driver/flutter_driver.dart';
 
 Future<void> main() async {
-  await Future.delayed(Duration(seconds: 1));
   final FlutterDriver driver = await FlutterDriver.connect();
   final String data =
       await driver.requestData(null, timeout: const Duration(minutes: 1));

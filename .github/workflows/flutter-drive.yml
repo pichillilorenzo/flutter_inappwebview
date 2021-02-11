@@ -1,0 +1,43 @@
+# Name of your workflow.
+name: flutter drive
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the main branch
+  push:
+    branches:
+      - main
+# A workflow run is made up of one or more jobs.
+jobs:
+  # id of job, a string that is unique to the "jobs" node above.
+  drive:
+    # Creates a build matrix for your jobs. You can define different
+    # variations of an environment to run each job in.
+    strategy:
+      # A set of different configurations of the virtual
+      # environment.
+      # matrix:
+      # When set to true, GitHub cancels all in-progress jobs if any
+      # matrix job fails.
+      fail-fast: false
+    # The type of machine to run the job on.
+    runs-on: macOS-latest
+    # Contains a sequence of tasks.
+    steps:
+      # A name for your step to display on GitHub.
+      - name: "Start Simulator"
+        run: |
+          xcrun simctl list
+          xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
+      # The branch or tag ref that triggered the workflow will be
+      # checked out.
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+      # Sets up a flutter environment.
+      # https://github.com/marketplace/actions/flutter-action
+      - uses: subosito/flutter-action@v1.4.0
+        with:
+          channel: 'master' # 'stable' or 'dev' or 'beta'
+      - name: "Run Flutter Driver tests"
+        run: |
+          flutter pub get
+          ./scripts/test.sh $(ipconfig getifaddr en0)

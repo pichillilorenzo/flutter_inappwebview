@@ -58,6 +58,7 @@ jobs:
         - 'android-sdk-license-.+'
         - 'google-gdk-license-.+'
       before_install:
+        - mkdir -p .android && touch ~/.android/repositories.cfg
         - yes | sdkmanager --update
         - yes | sdkmanager tools
         - yes | sdkmanager "system-images;android-30;google_apis;x86"

@@ -32,6 +32,13 @@ jobs:
       # checked out.
       # https://github.com/actions/checkout
       - uses: actions/checkout@v2
+      # Sets up cache
+      - name: Cache multiple paths
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.pub-cache
+            **/node_modules
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
       - name: "Install Flutter"
@@ -75,14 +82,13 @@ jobs:
       # checked out.
       # https://github.com/actions/checkout
       - uses: actions/checkout@v2
-      # Sets up android emulator
-      - name: "Android Emulator Runner"
-        uses: ReactiveCircus/android-emulator-runner@v2.14.3
+      # Sets up cache
+      - name: Cache multiple paths
+        uses: actions/cache@v2
         with:
-          api-level: 30
-          target: google_apis
-          avd-name: Flutter-Android
-          script: ./example/android/gradlew connectedCheck
+          path: |
+            ~/.pub-cache
+            **/node_modules
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
       - name: "Install Flutter"
@@ -101,8 +107,14 @@ jobs:
           cd ./nodejs_server_test_auth_basic_and_ssl
           npm install
           cd ..
-      - name: "Run iOS Flutter Integration Test"
+      - name: "Install flutter dependencies"
         run: |
           flutter pub get
-          flutter devices
-          ./scripts/test.sh $(ipconfig getifaddr en0)
+      # Sets up android emulator
+      - name: "Run Android Flutter Integration Test"
+        uses: ReactiveCircus/android-emulator-runner@v2.14.3
+        with:
+          api-level: 30
+          target: google_apis
+          avd-name: Flutter-Android
+          script: ./scripts/test.sh $(ipconfig getifaddr en0)

@@ -36,7 +36,11 @@ jobs:
       # https://github.com/marketplace/actions/flutter-action
       - uses: subosito/flutter-action@v1.4.0
         with:
-          channel: 'master' # 'stable' or 'dev' or 'beta'
+          channel: 'dev' # 'stable' or 'dev' or 'beta'
+      - name: "Change Flutter channel to master"
+        run: |
+          flutter channel master
+          flutter upgrade
       - uses: actions/setup-node@v2
         with:
           node-version: '14'

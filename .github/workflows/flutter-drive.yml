@@ -6,6 +6,9 @@ on:
   push:
     branches:
       - master
+  pull_request:
+    branches:
+      - master
 # A workflow run is made up of one or more jobs.
 jobs:
   # id of job, a string that is unique to the "jobs" node above.
@@ -116,7 +119,7 @@ jobs:
       - name: "Run Android Flutter Integration Test"
         uses: ReactiveCircus/android-emulator-runner@v2.14.3
         with:
-          api-level: 30
-          target: google_apis
+          api-level: 29
+          target: default
           avd-name: Flutter-Android
           script: ./scripts/test.sh $(ipconfig getifaddr en0)

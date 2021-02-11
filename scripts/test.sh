@@ -20,7 +20,7 @@ node index.js &
 flutter clean
 cd $PROJECT_DIR/example
 flutter clean
-flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart
+flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart --verbose
 
 if [ $? -eq 0 ]; then
   echo "Integration tests passed successfully."

@@ -1117,9 +1117,9 @@ void main() {
       final InAppWebViewController controller = await controllerCompleter.future;
 
       await controller
-          .evaluateJavascript(source: 'window.open("https://www.google.com")');
+          .evaluateJavascript(source: 'window.open("https://github.com/flutter");');
       await pageLoads.stream.first;
-      expect(await controller.getUrl(), contains('google.com'));
+      expect(await controller.getUrl(), contains('github.com/flutter'));
 
       await controller.goBack();
       await pageLoads.stream.first;

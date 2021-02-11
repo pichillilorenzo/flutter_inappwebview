@@ -27,7 +27,7 @@ jobs:
       - name: "Start Simulator"
         run: |
           xcrun simctl list
-          xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-4 | xargs xcrun simctl boot
+          xcrun simctl create Flutter-iPhone com.apple.CoreSimulator.SimDeviceType.iPhone-12 com.apple.CoreSimulator.SimRuntime.iOS-14-3 | xargs xcrun simctl boot
       # The branch or tag ref that triggered the workflow will be
       # checked out.
       # https://github.com/actions/checkout

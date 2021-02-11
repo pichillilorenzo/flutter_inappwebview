@@ -1625,6 +1625,7 @@ void main() {
             initialOptions: InAppWebViewGroupOptions(
                 crossPlatform: InAppWebViewOptions(
                   clearCache: true,
+                  javaScriptCanOpenWindowsAutomatically: true,
                 )
             ),
             onWebViewCreated: (controller) {
@@ -1657,7 +1658,6 @@ void main() {
             initialOptions: InAppWebViewGroupOptions(
                 crossPlatform: InAppWebViewOptions(
                   clearCache: true,
-                  javaScriptCanOpenWindowsAutomatically: true,
                 )
             ),
             onWebViewCreated: (controller) {

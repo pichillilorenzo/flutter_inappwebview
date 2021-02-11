@@ -52,4 +52,54 @@ jobs:
       - name: "Run iOS Flutter Integration Test"
         run: |
           flutter pub get
+          flutter devices
+          ./scripts/test.sh $(ipconfig getifaddr en0)
+
+  # id of job, a string that is unique to the "jobs" node above.
+  android_integration_test_drive:
+    # Creates a build matrix for your jobs. You can define different
+    # variations of an environment to run each job in.
+    strategy:
+      # A set of different configurations of the virtual
+      # environment.
+      # matrix:
+      # When set to true, GitHub cancels all in-progress jobs if any
+      # matrix job fails.
+      fail-fast: false
+    # The type of machine to run the job on.
+    runs-on: macOS-latest
+    # Contains a sequence of tasks.
+    steps:
+      # The branch or tag ref that triggered the workflow will be
+      # checked out.
+      # https://github.com/actions/checkout
+      - uses: actions/checkout@v2
+      # Sets up android emulator
+      - name: "Android Emulator Runner"
+        uses: ReactiveCircus/android-emulator-runner@v2.14.3
+          with:
+            api-level: 30
+            target: google_apis
+            avd-name: Flutter-Android
+      # Sets up a flutter environment.
+      # https://github.com/marketplace/actions/flutter-action
+      - uses: subosito/flutter-action@v1.4.0
+        with:
+          channel: 'dev' # 'stable' or 'dev' or 'beta'
+      - name: "Change Flutter channel to master"
+        run: |
+          flutter channel master
+          flutter upgrade
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: "Install npm dependencies"
+        run: |
+          cd ./nodejs_server_test_auth_basic_and_ssl
+          npm install
+          cd ..
+      - name: "Run iOS Flutter Integration Test"
+        run: |
+          flutter pub get
+          flutter devices
           ./scripts/test.sh $(ipconfig getifaddr en0)

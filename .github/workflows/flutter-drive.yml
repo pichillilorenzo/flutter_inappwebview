@@ -9,7 +9,7 @@ on:
 # A workflow run is made up of one or more jobs.
 jobs:
   # id of job, a string that is unique to the "jobs" node above.
-  drive:
+  ios_integration_test_drive:
     # Creates a build matrix for your jobs. You can define different
     # variations of an environment to run each job in.
     strategy:
@@ -37,7 +37,7 @@ jobs:
       - uses: subosito/flutter-action@v1.4.0
         with:
           channel: 'master' # 'stable' or 'dev' or 'beta'
-      - name: "Run Flutter Driver tests"
+      - name: "Run iOS Flutter Integration Test"
         run: |
           flutter pub get
           ./scripts/test.sh $(ipconfig getifaddr en0)

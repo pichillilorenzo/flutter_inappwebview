@@ -2142,7 +2142,7 @@ setTimeout(function() {
   });
 
   testWidgets('onWindowFocus', (WidgetTester tester) async {
-    final Completer<String> onWindowFocusCompleter = Completer<String>();
+    final Completer<void> onWindowFocusCompleter = Completer<void>();
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
@@ -2162,7 +2162,7 @@ setTimeout(function() {
   });
 
   testWidgets('onWindowBlur', (WidgetTester tester) async {
-    final Completer<String> onWindowBlurCompleter = Completer<String>();
+    final Completer<void> onWindowBlurCompleter = Completer<void>();
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,

@@ -34,7 +34,8 @@ jobs:
       - uses: actions/checkout@v2
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
-      - uses: subosito/flutter-action@v1.4.0
+      - name: "Install Flutter"
+        uses: subosito/flutter-action@v1.4.0
         with:
           channel: 'dev' # 'stable' or 'dev' or 'beta'
       - name: "Change Flutter channel to master"
@@ -77,13 +78,14 @@ jobs:
       # Sets up android emulator
       - name: "Android Emulator Runner"
         uses: ReactiveCircus/android-emulator-runner@v2.14.3
-          with:
-            api-level: 30
-            target: google_apis
-            avd-name: Flutter-Android
+        with:
+          api-level: 30
+          target: google_apis
+          avd-name: Flutter-Android
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
-      - uses: subosito/flutter-action@v1.4.0
+      - name: "Install Flutter"
+        uses: subosito/flutter-action@v1.4.0
         with:
           channel: 'dev' # 'stable' or 'dev' or 'beta'
       - name: "Change Flutter channel to master"

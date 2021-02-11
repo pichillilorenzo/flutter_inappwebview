@@ -12,7 +12,7 @@ on:
 # A workflow run is made up of one or more jobs.
 jobs:
   # id of job, a string that is unique to the "jobs" node above.
-  android_integration_test:
+  android_integration_tests:
     # Creates a build matrix for your jobs. You can define different
     # variations of an environment to run each job in.
     strategy:
@@ -24,7 +24,7 @@ jobs:
       fail-fast: false
     # The type of machine to run the job on.
     runs-on: macOS-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     # Contains a sequence of tasks.
     steps:
       # The branch or tag ref that triggered the workflow will be

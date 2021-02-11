@@ -1863,6 +1863,11 @@ final public class InAppWebView extends InputAwareWebView {
           final ActionMode actionMode,
           final ActionMode.Callback callback
   ) {
+    // fix Android 10 clipboard not working properly https://github.com/pichillilorenzo/flutter_inappwebview/issues/678
+    if (!options.useHybridComposition) {
+      onWindowFocusChanged(isFocused());
+    }
+
     boolean hasBeenRemovedAndRebuilt = false;
     if (floatingContextMenu != null) {
       hideContextMenu();

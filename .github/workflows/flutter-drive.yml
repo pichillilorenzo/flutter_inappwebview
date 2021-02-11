@@ -82,6 +82,7 @@ jobs:
           api-level: 30
           target: google_apis
           avd-name: Flutter-Android
+          script: ./example/android/gradlew connectedCheck
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
       - name: "Install Flutter"

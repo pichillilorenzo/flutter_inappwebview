@@ -39,6 +39,7 @@ jobs:
           path: |
             ~/.pub-cache
             **/node_modules
+          key: ${{ runner.os }}-pub-and-node_modules }}
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
       - name: "Install Flutter"
@@ -89,6 +90,7 @@ jobs:
           path: |
             ~/.pub-cache
             **/node_modules
+          key: ${{ runner.os }}-pub-and-node_modules }}
       # Sets up a flutter environment.
       # https://github.com/marketplace/actions/flutter-action
       - name: "Install Flutter"

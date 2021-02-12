@@ -1838,18 +1838,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         })
     }
     
-    public func loadUrl(url: URL, headers: [String: String]?) {
-        var request = URLRequest(url: url)
-        currentURL = url
-        if headers != nil {
-            if let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest {
-                for (key, value) in headers! {
-                    mutableRequest.setValue(value, forHTTPHeaderField: key)
+    public func loadUrl(url: URL, headers: [String: String]?, allowingReadAccessTo: URL?) {
+        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo, url.scheme == "file", allowingReadAccessTo.scheme == "file" {
+            loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
+        } else {
+            var request = URLRequest(url: url)
+            currentURL = url
+            if headers != nil {
+                if let mutableRequest = (request as NSURLRequest).mutableCopy() as? NSMutableURLRequest {
+                    for (key, value) in headers! {
+                        mutableRequest.setValue(value, forHTTPHeaderField: key)
+                    }
+                    request = mutableRequest as URLRequest
                 }
-                request = mutableRequest as URLRequest
             }
+            load(request)
         }
-        load(request)
     }
     
     public func postUrl(url: URL, postData: Data, completionHandler: @escaping () -> Void) {
@@ -1887,7 +1891,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if assetURL == nil {
             throw NSError(domain: url + " asset file cannot be found!", code: 0)
         }
-        loadUrl(url: assetURL!, headers: headers)
+        loadUrl(url: assetURL!, headers: headers, allowingReadAccessTo: nil)
     }
     
     func setOptions(newOptions: InAppWebViewOptions, newOptionsMap: [String: Any]) {
@@ -3167,7 +3171,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 if !handledByClient, InAppWebView.windowWebViews[windowId] != nil {
                     InAppWebView.windowWebViews.removeValue(forKey: windowId)
                     if let url = navigationAction.request.url {
-                        self.loadUrl(url: url, headers: nil)
+                        self.loadUrl(url: url, headers: nil, allowingReadAccessTo: nil)
                     }
                 }
             }
@@ -3435,9 +3439,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let serverTrust = challenge.protectionSpace.serverTrust!
         
         var secResult = SecTrustResultType.invalid
-        SecTrustEvaluate(serverTrust, &secResult);
+        let secTrustEvaluateStatus = SecTrustEvaluate(serverTrust, &secResult);
         
-        if let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
+        if secTrustEvaluateStatus == errSecSuccess, let serverCertificate = SecTrustGetCertificateAtIndex(serverTrust, 0) {
             let serverCertificateCFData = SecCertificateCopyData(serverCertificate)
             let data = CFDataGetBytePtr(serverCertificateCFData)
             let size = CFDataGetLength(serverCertificateCFData)

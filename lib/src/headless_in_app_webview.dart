@@ -70,7 +70,6 @@ class HeadlessInAppWebView implements WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       this.androidOnScaleChanged,
-      this.androidOnRequestFocus,
       this.androidOnReceivedIcon,
       this.androidOnReceivedTouchIconUrl,
       this.androidOnJsBeforeUnload,
@@ -229,9 +228,6 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final void Function(InAppWebViewController controller)? onWindowBlur;
-
-  @override
-  final void Function(InAppWebViewController controller)? androidOnRequestFocus;
 
   @override
   final void Function(InAppWebViewController controller, String url)?

@@ -67,6 +67,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var limitsNavigationsToAppBoundDomains = false
     var useOnNavigationResponse = false
     var applePayAPIEnabled = false
+    var allowingReadAccessTo: String? = nil
     
     override init(){
         super.init()

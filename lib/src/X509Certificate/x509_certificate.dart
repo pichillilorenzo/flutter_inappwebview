@@ -131,7 +131,7 @@ class X509Certificate {
   String? get issuerDistinguishedName {
     var issuerBlock = block1?.atIndex(X509BlockPosition.issuer);
     if (issuerBlock != null) {
-      return blockDistinguishedName(block: issuerBlock);
+      return ASN1DistinguishedNames.string(block: issuerBlock);
     }
     return null;
   }
@@ -175,7 +175,7 @@ class X509Certificate {
   String? get subjectDistinguishedName {
     var subjectBlock = block1?.atIndex(X509BlockPosition.subject);
     if (subjectBlock != null) {
-      return blockDistinguishedName(block: subjectBlock);
+      return ASN1DistinguishedNames.string(block: subjectBlock);
     }
     return null;
   }
@@ -278,11 +278,11 @@ class X509Certificate {
 
   ///Gets a collection of subject alternative names from the SubjectAltName extension, (OID = 2.5.29.17).
   List<String> get subjectAlternativeNames =>
-      extensionObject(oid: OID.subjectAltName)?.valueAsStrings ?? <String>[];
+      extensionObject(oid: OID.subjectAltName)?.alternativeNameAsStrings ?? <String>[];
 
   ///Gets a collection of issuer alternative names from the IssuerAltName extension, (OID = 2.5.29.18).
   List<String> get issuerAlternativeNames =>
-      extensionObject(oid: OID.issuerAltName)?.valueAsStrings ?? <String>[];
+      extensionObject(oid: OID.issuerAltName)?.alternativeNameAsStrings ?? <String>[];
 
   ///Gets the informations of the public key from this certificate.
   X509PublicKey? get publicKey {
@@ -321,81 +321,24 @@ class X509Certificate {
 
   ///Gets the certificate constraints path length from the
   ///critical BasicConstraints extension, (OID = 2.5.29.19).
-  int get basicConstraints {
-    var sub = extensionObject(oid: OID.basicConstraints)
-        ?.block
-        ?.lastSub()
-        ?.lastSub()
-        ?.lastSub();
-    if (sub != null) {
-      if (sub.value is List<int>) {
-        return (sub.value as List<int>).length;
-      }
-    }
-    return -1;
-  }
+  BasicConstraintExtension? get basicConstraints => extensionObject(oid: OID.basicConstraints) as BasicConstraintExtension?;
 
   ///Gets the raw bits from the Subject Key Identifier (SKID) extension, (OID = 2.5.29.14).
-  List<int> get subjectKeyIdentifier =>
-      extensionObject(oid: OID.subjectKeyIdentifier)
-          ?.block
-          ?.lastSub()
-          ?.lastSub()
-          ?.value ??
-      <int>[];
+  SubjectKeyIdentifierExtension? get subjectKeyIdentifier => extensionObject(oid: OID.subjectKeyIdentifier) as SubjectKeyIdentifierExtension?;
 
   ///Gets the raw bits from the Authority Key Identifier extension, (OID = 2.5.29.35).
-  List<int> get authorityKeyIdentifier =>
-      extensionObject(oid: OID.authorityKeyIdentifier)
-          ?.block
-          ?.lastSub()
-          ?.lastSub()
-          ?.firstSub()
-          ?.value ??
-      <int>[];
+  AuthorityKeyIdentifierExtension? get authorityKeyIdentifier => extensionObject(oid: OID.authorityKeyIdentifier) as AuthorityKeyIdentifierExtension?;
 
   ///Gets the list of certificate policies from the CertificatePolicies extension, (OID = 2.5.29.32).
-  List<String> get certificatePolicies =>
-      extensionObject(oid: OID.certificatePolicies)
-          ?.block
-          ?.lastSub()
-          ?.firstSub()
-          ?.sub
-          ?.map((e) => e.firstSub()?.value as String)
-          .toList() ??
-      <String>[];
+  CertificatePoliciesExtension? get certificatePolicies => extensionObject(oid: OID.certificatePolicies) as CertificatePoliciesExtension?;
 
   ///Gets the list of CRL distribution points from the CRLDistributionPoints extension, (OID = 2.5.29.31).
-  List<String> get cRLDistributionPoints =>
-      extensionObject(oid: OID.cRLDistributionPoints)
-          ?.block
-          ?.lastSub()
-          ?.firstSub()
-          ?.sub
-          ?.map((e) => e.firstSub()?.firstSub()?.firstSub()?.value as String)
-          .toList() ??
-      <String>[];
+  CRLDistributionPointsExtension? get cRLDistributionPoints => extensionObject(oid: OID.cRLDistributionPoints) as CRLDistributionPointsExtension?;
 
   ///Gets the map of the format (as a key) and location (as a value) of additional information
   ///about the CA who issued the certificate in which this extension appears
   ///from the AuthorityInfoAccess extension, (OID = 1.3.6.1.5.5.5.7.1.1).
-  Map<String, String> get authorityInfoAccess {
-    var result = <String, String>{};
-    var sub = extensionObject(oid: OID.authorityInfoAccess)
-        ?.block
-        ?.lastSub()
-        ?.firstSub()
-        ?.sub;
-    if (sub != null) {
-      sub.forEach((element) {
-        if (element.subCount() > 1) {
-          result.putIfAbsent(
-              element.subAtIndex(0)!.value, () => element.subAtIndex(1)!.value);
-        }
-      });
-    }
-    return result;
-  }
+  AuthorityInfoAccessExtension? get authorityInfoAccess => extensionObject(oid: OID.authorityInfoAccess) as AuthorityInfoAccessExtension?;
 
   List<ASN1Object>? get extensionBlocks =>
       block1?.atIndex(X509BlockPosition.extensions)?.subAtIndex(0)?.sub;
@@ -410,44 +353,23 @@ class X509Certificate {
           ?.findOid(oidValue: oidValue)
           ?.parent;
       if (block != null) {
+        if (oidValue == OID.basicConstraints.toValue()) {
+          return BasicConstraintExtension(block: block);
+        } else if (oidValue == OID.subjectKeyIdentifier.toValue()) {
+          return SubjectKeyIdentifierExtension(block: block);
+        } else if (oidValue == OID.authorityInfoAccess.toValue()) {
+          return AuthorityInfoAccessExtension(block: block);
+        } else if (oidValue == OID.authorityKeyIdentifier.toValue()) {
+          return AuthorityKeyIdentifierExtension(block: block);
+        } else if (oidValue == OID.certificatePolicies.toValue()) {
+          return CertificatePoliciesExtension(block: block);
+        } else if (oidValue == OID.cRLDistributionPoints.toValue()) {
+          return CRLDistributionPointsExtension(block: block);
+        }
         return X509Extension(block: block);
       }
     }
     return null;
-  }
-
-  ///Format subject/issuer information in RFC1779
-  String blockDistinguishedName({required ASN1Object block}) {
-    var result = "";
-    for (var oidName in ASN1DistinguishedNames.values) {
-      var oidBlock = block.findOid(oidValue: oidName.oid());
-      if (oidBlock != null) {
-        if (result.isNotEmpty) {
-          result += ", ";
-        }
-        result += oidName.representation();
-        result += "=";
-
-        var sub = oidBlock.parent?.sub;
-        if (sub != null && sub.length > 0) {
-          var value = sub.last.value as String?;
-          if (value != null) {
-            var specialChar = ",+=\n<>#;\\";
-            var quote = "";
-            for (var i = 0; i < value.length; i++) {
-              var char = value[i];
-              if (specialChar.contains(char)) {
-                quote = "\"";
-              }
-            }
-            result += quote;
-            result += value;
-            result += quote;
-          }
-        }
-      }
-    }
-    return result;
   }
 
   @override
@@ -457,7 +379,7 @@ class X509Certificate {
 
   Map<String, dynamic> toMap() {
     return {
-      "basicConstraints": basicConstraints,
+      "basicConstraints": basicConstraints?.toMap(),
       "subjectAlternativeNames": subjectAlternativeNames,
       "issuerAlternativeNames": issuerAlternativeNames,
       "extendedKeyUsage": extendedKeyUsage,
@@ -476,11 +398,11 @@ class X509Certificate {
       "nonCriticalExtensionOIDs": nonCriticalExtensionOIDs,
       "encoded": encoded,
       "publicKey": publicKey?.toMap(),
-      "subjectKeyIdentifier": subjectKeyIdentifier,
-      "authorityKeyIdentifier": authorityKeyIdentifier,
-      "certificatePolicies": certificatePolicies,
-      "cRLDistributionPoints": cRLDistributionPoints,
-      "authorityInfoAccess": authorityInfoAccess,
+      "subjectKeyIdentifier": subjectKeyIdentifier?.toMap(),
+      "authorityKeyIdentifier": authorityKeyIdentifier?.toMap(),
+      "certificatePolicies": certificatePolicies?.toMap(),
+      "cRLDistributionPoints": cRLDistributionPoints?.toMap(),
+      "authorityInfoAccess": authorityInfoAccess?.toMap(),
     };
   }
 

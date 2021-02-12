@@ -1,5 +1,7 @@
 import 'dart:typed_data';
 
+import 'package:flutter_inappwebview/src/X509Certificate/asn1_der_encoder.dart';
+
 import 'asn1_decoder.dart';
 import 'asn1_object.dart';
 import 'oid.dart';
@@ -14,6 +16,14 @@ class X509PublicKey {
   String? get algName => OID.fromValue(algOid)?.name();
 
   String? get algParams => pkBlock?.subAtIndex(0)?.subAtIndex(1)?.value;
+
+  Uint8List? get derEncodedKey {
+    var value = pkBlock?.encoded;
+    if (value != null) {
+      return ASN1DEREncoder.encodeSequence(content: value);
+    }
+    return null;
+  }
 
   Uint8List? get encoded {
     var oid = OID.fromValue(algOid);

@@ -23,6 +23,7 @@ public class WebViewFeatureManager implements MethodChannel.MethodCallHandler {
       case "isFeatureSupported":
         String feature = (String) call.argument("feature");
         result.success(WebViewFeature.isFeatureSupported(feature));
+        break;
       default:
         result.notImplemented();
     }

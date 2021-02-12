@@ -437,7 +437,7 @@ Screenshots:
 * `isLoading`: Check if the WebView instance is in a loading state.
 * `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
 * `loadFile({required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
-* `loadUrl({required String url, Map<String, String> headers = const {}})`: Loads the given url with optional headers specified as a map from name to value.
+* `loadUrl({required String url, Map<String, String> headers = const {}, String? iosAllowingReadAccessTo})`: Loads the given url with optional headers specified as a map from name to value.
 * `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
 * `postUrl({required String url, required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
 * `printCurrentPage`: Prints the current page.
@@ -636,6 +636,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 ##### `InAppWebView` iOS-specific options
 
 * `accessibilityIgnoresInvertColors`: A Boolean value indicating whether the view ignores an accessibility request to invert its colors. The default value is `false`.
+* `allowingReadAccessTo`: Used in combination with `WebView.initialUrl` (with `file://` scheme), it represents the URL from which to read the web content. This URL must be a file-based URL (with `file://` scheme).
 * `allowsAirPlayForMediaPlayback`: Set to `true` to allow AirPlay. The default value is `true`.
 * `allowsBackForwardNavigationGestures`: Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
 * `allowsInlineMediaPlayback`: Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls.
@@ -713,7 +714,6 @@ Event names that starts with `android` or `ios` are events platform-specific.
 * `androidOnRenderProcessUnresponsive`: Event called when the renderer currently associated with the WebView becomes unresponsive as a result of a long running blocking task such as the execution of JavaScript (available only on Android).
 * `androidOnFormResubmission`: As the host application if the browser should resend data as the requested page was a result of a POST. The default is to not resend the data (available only on Android).
 * `androidOnScaleChanged`: Event fired when the scale applied to the WebView has changed (available only on Android).
-* `androidOnRequestFocus`: Event fired when there is a request to display and focus for this WebView (available only on Android).
 * `androidOnReceivedIcon`: Event fired when there is new favicon for the current page (available only on Android).
 * `androidOnReceivedTouchIconUrl`: Event fired when there is an url for an apple-touch-icon (available only on Android).
 * `androidOnJsBeforeUnload`: Event fired when the client should display a dialog to confirm navigation away from the current page. This is the result of the `onbeforeunload` javascript event (available only on Android).

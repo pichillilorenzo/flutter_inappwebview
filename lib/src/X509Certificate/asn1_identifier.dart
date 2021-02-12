@@ -206,15 +206,16 @@ class ASN1IdentifierTagNumber {
 
 class ASN1Identifier {
   int rawValue;
+  static int constructedTag = 0x20;
 
   ASN1Identifier(this.rawValue);
 
   bool isPrimitive() {
-    return (rawValue & 0x20) == 0;
+    return (rawValue & ASN1Identifier.constructedTag) == 0;
   }
 
   bool isConstructed() {
-    return (rawValue & 0x20) != 0;
+    return (rawValue & ASN1Identifier.constructedTag) != 0;
   }
 
   ASN1IdentifierTagNumber tagNumber() {

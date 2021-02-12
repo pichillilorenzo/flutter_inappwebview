@@ -569,7 +569,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
       AlertDialog alertDialog = alertDialogBuilder.create();
       alertDialog.show();
-    }
+  }
 
   @Override
   public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, final Message resultMsg) {
@@ -633,14 +633,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     channel.invokeMethod("onCloseWindow", obj);
 
     super.onCloseWindow(window);
-  }
-
-  @Override
-  public void onRequestFocus(WebView view) {
-    final Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onRequestFocus", obj);
-
-    super.onCloseWindow(view);
   }
 
   @Override

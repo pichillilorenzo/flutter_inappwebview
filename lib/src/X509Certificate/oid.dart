@@ -100,6 +100,11 @@ class OID {
     OID.codeSigning,
     OID.emailProtection,
     OID.timeStamping,
+    OID.pkcsSha256,
+    OID.sha2Family,
+    OID.sha3_244,
+    OID.sha3_256,
+    OID.sha3_384,
   ].toSet();
 
   static OID? fromValue(String? value) {
@@ -174,10 +179,15 @@ class OID {
   static const dateOfBirth = const OID._internal("1.3.6.1.5.5.7.9.1");
   static const desCBC = const OID._internal("1.3.14.3.2.7");
   static const sha1 = const OID._internal("1.3.14.3.2.26");
+  static const pkcsSha256 = const OID._internal("1.3.6.1.4.1.22554.1.2.1");
+  static const sha2Family = const OID._internal("1.3.6.1.4.1.22554.1.2");
+  static const sha3_244 = const OID._internal("2.16.840.1.101.3.4.2.7");
+  static const sha3_256 = const OID._internal("2.16.840.1.101.3.4.2.8");
+  static const sha3_384 = const OID._internal("2.16.840.1.101.3.4.2.9");
+  static const md5 = const OID._internal("0.2.262.1.10.1.3.2");
   static const sha256 = const OID._internal("2.16.840.1.101.3.4.2.1");
   static const sha384 = const OID._internal("2.16.840.1.101.3.4.2.2");
   static const sha512 = const OID._internal("2.16.840.1.101.3.4.2.3");
-  static const md5 = const OID._internal("1.2.840.113549.2.5");
   static const VeriSignEVpolicy =
       const OID._internal("2.16.840.1.113733.1.7.23.6");
   static const extendedValidation = const OID._internal("2.23.140.1.1");
@@ -278,10 +288,15 @@ class OID {
     "1.3.6.1.5.5.7.9.1": "dateOfBirth",
     "1.3.14.3.2.7": "desCBC",
     "1.3.14.3.2.26": "sha1",
+    "1.3.6.1.4.1.22554.1.2.1": "pkcsSha256",
+    "1.3.6.1.4.1.22554.1.2": "sha2Family",
+    "2.16.840.1.101.3.4.2.7": "sha3_244",
+    "2.16.840.1.101.3.4.2.8": "sha3_256",
+    "2.16.840.1.101.3.4.2.9": "sha3_384",
     "2.16.840.1.101.3.4.2.1": "sha256",
     "2.16.840.1.101.3.4.2.2": "sha384",
     "2.16.840.1.101.3.4.2.3": "sha512",
-    "1.2.840.113549.2.5": "md5",
+    "0.2.262.1.10.1.3.2": "md5",
     "2.16.840.1.113733.1.7.23.6": "VeriSign EV policy",
     "2.23.140.1.1": "extendedValidation",
     "2.23.140.1.2.2": "organizationValidated",

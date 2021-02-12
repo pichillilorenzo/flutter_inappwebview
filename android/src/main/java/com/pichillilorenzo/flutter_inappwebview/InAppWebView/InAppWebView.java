@@ -666,21 +666,21 @@ final public class InAppWebView extends InputAwareWebView {
           "})();";
 
   static final String onWindowBlurEventJS = "(function(){" +
-        "  window.addEventListener('blur', function(e) {" +
-        "    window." + JavaScriptBridgeInterface.name + ".callHandler('onWindowBlur');" +
-        "  });" +
-        "})();";
+          "  window.addEventListener('blur', function(e) {" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('onWindowBlur');" +
+          "  });" +
+          "})();";
 
   static final String callAsyncJavaScriptWrapperJS = "(function(obj) {" +
-        "  (async function($FUNCTION_ARGUMENT_NAMES) {" +
-        "    $FUNCTION_BODY" +
-        "  })($FUNCTION_ARGUMENT_VALUES).then(function(value) {" +
-        "    window." + JavaScriptBridgeInterface.name + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '$RESULT_UUID'});" +
-        "  }).catch(function(error) {" +
-        "    window." + JavaScriptBridgeInterface.name + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error, 'resultUuid': '$RESULT_UUID'});" +
-        "  });" +
-        "  return null;" +
-        "})($FUNCTION_ARGUMENTS_OBJ);";
+          "  (async function($FUNCTION_ARGUMENT_NAMES) {" +
+          "    $FUNCTION_BODY" +
+          "  })($FUNCTION_ARGUMENT_VALUES).then(function(value) {" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('callAsyncJavaScript', {'value': value, 'error': null, 'resultUuid': '$RESULT_UUID'});" +
+          "  }).catch(function(error) {" +
+          "    window." + JavaScriptBridgeInterface.name + ".callHandler('callAsyncJavaScript', {'value': null, 'error': error, 'resultUuid': '$RESULT_UUID'});" +
+          "  });" +
+          "  return null;" +
+          "})($FUNCTION_ARGUMENTS_OBJ);";
 
   public InAppWebView(Context context) {
     super(context);
@@ -1864,8 +1864,8 @@ final public class InAppWebView extends InputAwareWebView {
           final ActionMode.Callback callback
   ) {
     // fix Android 10 clipboard not working properly https://github.com/pichillilorenzo/flutter_inappwebview/issues/678
-    if (!options.useHybridComposition) {
-      onWindowFocusChanged(isFocused());
+    if (!options.useHybridComposition && containerView != null) {
+      onWindowFocusChanged(containerView.isFocused());
     }
 
     boolean hasBeenRemovedAndRebuilt = false;

@@ -71,12 +71,12 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
             
             let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
             if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
-                self.webView = webViewTransport.webView
-                self.webView.IABController = self
-                self.webView.contextMenu = contextMenu
-                self.webView.channel = channel!
+                webView = webViewTransport.webView
+                webView.IABController = self
+                webView.contextMenu = contextMenu
+                webView.channel = channel!
             } else {
-                self.webView = InAppWebView(frame: .zero,
+                webView = InAppWebView(frame: .zero,
                                             configuration: preWebviewConfiguration,
                                             IABController: self,
                                             contextMenu: contextMenu,
@@ -86,8 +86,8 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
             methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
             channel!.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
             
-            self.webView.appendUserScripts(userScripts: initUserScripts)
-            self.containerWebView.addSubview(self.webView)
+            webView.appendUserScripts(userScripts: initUserScripts)
+            containerWebView.addSubview(webView)
             prepareConstraints()
             prepareWebView()
             
@@ -111,7 +111,7 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
                                     let configuration = self.webView!.configuration
                                     configuration.userContentController.add(contentRuleList!)
 
-                                    self.initLoad(initURL: self.initURL, initData: self.initData, initMimeType: self.initMimeType, initEncoding: self.initEncoding, initBaseUrl: self.initBaseUrl, initHeaders: self.initHeaders)
+                                    self.initLoad()
 
                                     self.onBrowserCreated()
                             }
@@ -122,7 +122,7 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
                     }
                 }
                 
-                initLoad(initURL: initURL, initData: initData, initMimeType: initMimeType, initEncoding: initEncoding, initBaseUrl: initBaseUrl, initHeaders: initHeaders)
+                initLoad()
             }
             
             onBrowserCreated()
@@ -131,9 +131,16 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
         super.viewWillAppear(animated)
     }
     
-    public func initLoad(initURL: URL?, initData: String?, initMimeType: String?, initEncoding: String?, initBaseUrl: String?, initHeaders: [String: String]?) {
-        if self.initData == nil {
-            loadUrl(url: self.initURL!, headers: self.initHeaders)
+    public func initLoad() {
+        if initData == nil, let initURL = initURL {
+            var allowingReadAccessToURL: URL? = nil
+            if let allowingReadAccessTo = webView.options?.allowingReadAccessTo, initURL.scheme == "file" {
+                allowingReadAccessToURL = URL(string: allowingReadAccessTo)
+                if allowingReadAccessToURL?.scheme != "file" {
+                    allowingReadAccessToURL = nil
+                }
+            }
+            loadUrl(url: initURL, headers: initHeaders, allowingReadAccessTo: allowingReadAccessToURL)
         }
         else {
             webView.loadData(data: initData!, mimeType: initMimeType!, encoding: initEncoding!, baseUrl: initBaseUrl!)
@@ -144,29 +151,29 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
         super.viewDidLoad()
         
         urlField.delegate = self
-        urlField.text = self.initURL?.absoluteString
+        urlField.text = initURL?.absoluteString
         urlField.backgroundColor = .white
         urlField.textColor = .black
         urlField.layer.borderWidth = 1.0
         urlField.layer.borderColor = UIColor.lightGray.cgColor
         urlField.layer.cornerRadius = 4
         
-        closeButton.addTarget(self, action: #selector(self.close), for: .touchUpInside)
+        closeButton.addTarget(self, action: #selector(close), for: .touchUpInside)
         
         forwardButton.target = self
-        forwardButton.action = #selector(self.goForward)
+        forwardButton.action = #selector(goForward)
         
         forwardButton.target = self
-        forwardButton.action = #selector(self.goForward)
+        forwardButton.action = #selector(goForward)
         
         backButton.target = self
-        backButton.action = #selector(self.goBack)
+        backButton.action = #selector(goBack)
         
         reloadButton.target = self
-        reloadButton.action = #selector(self.reload)
+        reloadButton.action = #selector(reload)
         
         shareButton.target = self
-        shareButton.action = #selector(self.share)
+        shareButton.action = #selector(share)
         
         spinner.hidesWhenStopped = true
         spinner.isHidden = false
@@ -184,53 +191,53 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
     }
     
     public func prepareConstraints () {
-        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
-        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: self.containerWebView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.view, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
+        containerWebView_BottomFullScreenConstraint = NSLayoutConstraint(item: containerWebView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
+        containerWebView_TopFullScreenConstraint = NSLayoutConstraint(item: containerWebView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: view, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
         
         webView.translatesAutoresizingMaskIntoConstraints = false
-        let height = NSLayoutConstraint(item: self.webView!, attribute: .height, relatedBy: .equal, toItem: containerWebView, attribute: .height, multiplier: 1, constant: 0)
-        let width = NSLayoutConstraint(item: self.webView!, attribute: .width, relatedBy: .equal, toItem: containerWebView, attribute: .width, multiplier: 1, constant: 0)
-        let leftConstraint = NSLayoutConstraint(item: self.webView!, attribute: .leftMargin, relatedBy: .equal, toItem: containerWebView, attribute: .leftMargin, multiplier: 1, constant: 0)
-        let rightConstraint = NSLayoutConstraint(item: self.webView!, attribute: .rightMargin, relatedBy: .equal, toItem: containerWebView, attribute: .rightMargin, multiplier: 1, constant: 0)
-        let bottomContraint = NSLayoutConstraint(item: self.webView!, attribute: .bottomMargin, relatedBy: .equal, toItem: containerWebView, attribute: .bottomMargin, multiplier: 1, constant: 0)
+        let height = NSLayoutConstraint(item: webView!, attribute: .height, relatedBy: .equal, toItem: containerWebView, attribute: .height, multiplier: 1, constant: 0)
+        let width = NSLayoutConstraint(item: webView!, attribute: .width, relatedBy: .equal, toItem: containerWebView, attribute: .width, multiplier: 1, constant: 0)
+        let leftConstraint = NSLayoutConstraint(item: webView!, attribute: .leftMargin, relatedBy: .equal, toItem: containerWebView, attribute: .leftMargin, multiplier: 1, constant: 0)
+        let rightConstraint = NSLayoutConstraint(item: webView!, attribute: .rightMargin, relatedBy: .equal, toItem: containerWebView, attribute: .rightMargin, multiplier: 1, constant: 0)
+        let bottomContraint = NSLayoutConstraint(item: webView!, attribute: .bottomMargin, relatedBy: .equal, toItem: containerWebView, attribute: .bottomMargin, multiplier: 1, constant: 0)
         containerWebView.addConstraints([height, width, leftConstraint, rightConstraint, bottomContraint])
         
-        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: webView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
-        webView_TopFullScreenConstraint = NSLayoutConstraint(item: webView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: self.containerWebView, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
+        webView_BottomFullScreenConstraint = NSLayoutConstraint(item: webView!, attribute: NSLayoutConstraint.Attribute.bottom, relatedBy: NSLayoutConstraint.Relation.equal, toItem: containerWebView, attribute: NSLayoutConstraint.Attribute.bottom, multiplier: 1, constant: 0)
+        webView_TopFullScreenConstraint = NSLayoutConstraint(item: webView!, attribute: NSLayoutConstraint.Attribute.top, relatedBy: NSLayoutConstraint.Relation.equal, toItem: containerWebView, attribute: NSLayoutConstraint.Attribute.top, multiplier: 1, constant: 0)
     }
     
     public func prepareWebView() {
-        self.webView.options = webViewOptions
-        self.webView.prepare()
+        webView.options = webViewOptions
+        webView.prepare()
         
         if (browserOptions?.hideUrlBar)! {
-            self.urlField.isHidden = true
-            self.urlField.isEnabled = false
+            urlField.isHidden = true
+            urlField.isEnabled = false
         }
         
         if (browserOptions?.toolbarTop)! {
             if browserOptions?.toolbarTopBackgroundColor != "" {
-                self.toolbarTop.backgroundColor = color(fromHexString: (browserOptions?.toolbarTopBackgroundColor)!)
+                toolbarTop.backgroundColor = color(fromHexString: (browserOptions?.toolbarTopBackgroundColor)!)
             }
         }
         else {
-            self.toolbarTop.isHidden = true
-            self.toolbarTop_BottomToWebViewTopConstraint.isActive = false
-            self.containerWebView_TopFullScreenConstraint.isActive = true
-            self.webView_TopFullScreenConstraint.isActive = true
+            toolbarTop.isHidden = true
+            toolbarTop_BottomToWebViewTopConstraint.isActive = false
+            containerWebView_TopFullScreenConstraint.isActive = true
+            webView_TopFullScreenConstraint.isActive = true
         }
         
         if (browserOptions?.toolbarBottom)! {
             if browserOptions?.toolbarBottomBackgroundColor != "" {
-                self.toolbarBottom.backgroundColor = color(fromHexString: (browserOptions?.toolbarBottomBackgroundColor)!)
+                toolbarBottom.backgroundColor = color(fromHexString: (browserOptions?.toolbarBottomBackgroundColor)!)
             }
-            self.toolbarBottom.isTranslucent = (browserOptions?.toolbarBottomTranslucent)!
+            toolbarBottom.isTranslucent = (browserOptions?.toolbarBottomTranslucent)!
         }
         else {
-            self.toolbarBottom.isHidden = true
-            self.toolbarBottom_TopToWebViewBottomConstraint.isActive = false
-            self.containerWebView_BottomFullScreenConstraint.isActive = true
-            self.webView_BottomFullScreenConstraint.isActive = true
+            toolbarBottom.isHidden = true
+            toolbarBottom_TopToWebViewBottomConstraint.isActive = false
+            containerWebView_BottomFullScreenConstraint.isActive = true
+            webView_BottomFullScreenConstraint.isActive = true
         }
         
         if browserOptions?.closeButtonCaption != "" {
@@ -242,12 +249,12 @@ public class InAppBrowserWebViewController: UIViewController, UIScrollViewDelega
     }
     
     public func prepareBeforeViewWillAppear() {
-        self.modalPresentationStyle = UIModalPresentationStyle(rawValue: (browserOptions?.presentationStyle)!)!
-        self.modalTransitionStyle = UIModalTransitionStyle(rawValue: (browserOptions?.transitionStyle)!)!
+        modalPresentationStyle = UIModalPresentationStyle(rawValue: (browserOptions?.presentationStyle)!)!
+        modalTransitionStyle = UIModalTransitionStyle(rawValue: (browserOptions?.transitionStyle)!)!
     }
     
-    public func loadUrl(url: URL, headers: [String: String]?) {
-        webView.loadUrl(url: url, headers: headers)
+    public func loadUrl(url: URL, headers: [String: String]?, allowingReadAccessTo: URL?) {
+        webView.loadUrl(url: url, headers: headers, allowingReadAccessTo: allowingReadAccessTo)
         updateUrlTextField(url: (webView.currentURL?.absoluteString)!)
     }
     

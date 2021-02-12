@@ -9,13 +9,14 @@
 - Added `initialUserScripts` WebView option
 - Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
-- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse`, `applePayAPIEnabled` iOS-specific WebView options
+- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse`, `applePayAPIEnabled`, `allowingReadAccessTo` iOS-specific WebView options
 - Added `handlesURLScheme`, `createPdf`, `createWebArchiveData` iOS-specific WebView methods
 - Added `iosOnNavigationResponse` and `iosShouldAllowDeprecatedTLS` iOS-specific WebView events
 - Added `iosAnimated` optional argument to `zoomBy` WebView method
 - Added `screenshotConfiguration` optional argument to `takeScreenshot` WebView method
 - Added `scriptHtmlTagAttributes` optional argument to `injectJavascriptFileFromUrl` WebView method
 - Added `cssLinkHtmlTagAttributes` optional argument to `injectCSSFileFromUrl` WebView method
+- Added `iosAllowingReadAccessTo` iOS-specific optional argument to `loadUrl` WebView method
 - Added new iOS-specific attributes to `ShouldOverrideUrlLoadingRequest` and `CreateWindowRequest` classes
 - Updated integration tests
 - Merge "Upgraded appcompat to 1.2.0-rc-02" [#465](https://github.com/pichillilorenzo/flutter_inappwebview/pull/465) (thanks to [andreidiaconu](https://github.com/andreidiaconu))
@@ -52,6 +53,8 @@
 - Changed `zoomBy` WebView method signature
 - Moved `saveWebArchive` WebView method from Android-specific to cross-platform
 - Renamed `HttpAuthChallenge` to `URLAuthenticationChallenge`
+- Deleted `androidOnRequestFocus` event because it is never called
+- Updated `basicConstraints`, `subjectKeyIdentifier`, `authorityKeyIdentifier`, `certificatePolicies`, `cRLDistributionPoints`, `authorityInfoAccess` attributes type of `X509Certificate`
 
 ## 4.0.0+4
 

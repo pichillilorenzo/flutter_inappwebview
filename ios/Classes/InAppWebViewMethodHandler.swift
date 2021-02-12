@@ -32,7 +32,12 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
             case "loadUrl":
                 let url = arguments!["url"] as! String
                 let headers = arguments!["headers"] as! [String: String]
-                webView?.loadUrl(url: URL(string: url)!, headers: headers)
+                let allowingReadAccessTo = arguments!["iosAllowingReadAccessTo"] as? String
+                var allowingReadAccessToURL: URL? = nil
+                if let allowingReadAccessTo = allowingReadAccessTo {
+                    allowingReadAccessToURL = URL(string: allowingReadAccessTo)
+                }
+                webView?.loadUrl(url: URL(string: url)!, headers: headers, allowingReadAccessTo: allowingReadAccessToURL)
                 result(true)
                 break
             case "postUrl":

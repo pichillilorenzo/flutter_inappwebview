@@ -9,7 +9,7 @@ class ASN1Object {
   /// This property contains the DER encoded object
   Uint8List? encoded;
 
-  /// This property contains the decoded Swift object whenever is possible
+  /// This property contains the decoded object whenever is possible
   dynamic value;
 
   ASN1Identifier? identifier;
@@ -94,6 +94,24 @@ class ASN1Object {
     if (sub != null && x509blockPosition.index < sub!.length) {
       return sub![x509blockPosition.index];
     }
+    return null;
+  }
+
+  String? get asString {
+    var string = value as String?;
+    if (string != null) {
+      return string;
+    }
+
+    if (sub != null && sub!.length > 0) {
+      for (var item in sub!) {
+        var itemAsString = item.asString;
+        if (itemAsString != null) {
+          return itemAsString;
+        }
+      }
+    }
+
     return null;
   }
 }

@@ -10,6 +10,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '.env.dart';
 
@@ -118,6 +119,127 @@ void main() {
         .evaluateJavascript(source: 'document.documentElement.innerText');
     expect(content.contains('flutter_test_header'), isTrue);
   });
+
+  group("iOS loadFileURL", () {
+    late Directory appSupportDir;
+    late File fileHtml;
+    late File fileJs;
+
+    setUpAll(() async {
+      appSupportDir = (await getApplicationSupportDirectory())!;
+
+      final Directory htmlFolder = Directory('${appSupportDir.path}/html/');
+      if(!await htmlFolder.exists()){
+        await htmlFolder.create(recursive: true);
+      }
+
+      final Directory jsFolder = Directory('${appSupportDir.path}/js/');
+      if(!await jsFolder.exists()){
+        await jsFolder.create(recursive: true);
+      }
+
+      var html = """
+      <!DOCTYPE html><html>
+      <head>
+        <title>file scheme</title>
+      </head>
+      <body>
+        <script src="../js/main.js"></script>
+      </body>
+      </html>
+    """;
+      fileHtml = File(htmlFolder.path + "index.html");
+      fileHtml.writeAsStringSync(html);
+
+      var js = """
+      console.log('message');
+      """;
+      fileJs = File(jsFolder.path + "main.js");
+      fileJs.writeAsStringSync(js);
+    });
+
+    testWidgets('initialUrl with file:// scheme and allowingReadAccessTo', (WidgetTester tester) async {
+      final Completer<ConsoleMessage?> consoleMessageShouldNotComplete = Completer<ConsoleMessage?>();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrl: Uri.encodeFull('file://${fileHtml.path}'),
+            onConsoleMessage: (controller, consoleMessage) {
+              consoleMessageShouldNotComplete.complete(consoleMessage);
+            },
+          ),
+        ),
+      );
+      var result = await consoleMessageShouldNotComplete.future
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
+      expect(result, null);
+
+      final Completer<ConsoleMessage> consoleMessageCompleter = Completer<ConsoleMessage>();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrl: Uri.encodeFull('file://${fileHtml.path}'),
+            initialOptions: InAppWebViewGroupOptions(
+                ios: IOSInAppWebViewOptions(
+                    allowingReadAccessTo: Uri.encodeFull('file://${appSupportDir.path}/')
+                )
+            ),
+            onConsoleMessage: (controller, consoleMessage) {
+              consoleMessageCompleter.complete(consoleMessage);
+            },
+          ),
+        ),
+      );
+      final ConsoleMessage consoleMessage = await consoleMessageCompleter.future;
+      expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
+      expect(consoleMessage.message, 'message');
+    });
+
+    testWidgets('loadUrl with file:// scheme and iosAllowingReadAccessTo argument', (WidgetTester tester) async {
+      final Completer<ConsoleMessage?> consoleMessageShouldNotComplete = Completer<ConsoleMessage?>();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            onWebViewCreated: (controller) {
+              controller.loadUrl(url: Uri.encodeFull('file://${fileHtml.path}'));
+            },
+            onConsoleMessage: (controller, consoleMessage) {
+              consoleMessageShouldNotComplete.complete(consoleMessage);
+            },
+          ),
+        ),
+      );
+      var result = await consoleMessageShouldNotComplete.future
+          .timeout(const Duration(seconds: 2), onTimeout: () => null);
+      expect(result, null);
+
+      final Completer<ConsoleMessage> consoleMessageCompleter = Completer<ConsoleMessage>();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            onWebViewCreated: (controller) {
+              controller.loadUrl(url: Uri.encodeFull('file://${fileHtml.path}'),
+                  iosAllowingReadAccessTo: Uri.encodeFull('file://${appSupportDir.path}/'));
+            },
+            onConsoleMessage: (controller, consoleMessage) {
+              consoleMessageCompleter.complete(consoleMessage);
+            },
+          ),
+        ),
+      );
+      final ConsoleMessage consoleMessage = await consoleMessageCompleter.future;
+      expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
+      expect(consoleMessage.message, 'message');
+    });
+  }, skip: !Platform.isIOS);
 
   testWidgets('JavaScript Handler', (WidgetTester tester) async {
 
@@ -1080,7 +1202,7 @@ void main() {
         await pageLoads.stream.first;
         final InAppWebViewController controller = await controllerCompleter.future;
 
-        await controller.evaluateJavascript(source: 'window.open("about:blank", "_blank")');
+        await controller.evaluateJavascript(source: 'window.open("about:blank", "_blank");');
         await pageLoads.stream.first;
         final String? currentUrl = await controller.getUrl();
         expect(currentUrl, 'about:blank');

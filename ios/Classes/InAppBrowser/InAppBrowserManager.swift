@@ -166,7 +166,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         if webViewController.isHidden {
             webViewController.view.isHidden = true
             webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
-                webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+                
             })
             webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
                 webViewController.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
@@ -175,7 +175,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         }
         else {
             webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
-                webViewController.webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+                
             })
         }
     }

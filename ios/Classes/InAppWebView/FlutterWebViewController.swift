@@ -134,9 +134,9 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
     }
     
     public func load(initialUrl: String?, initialFile: String?, initialData: [String: String]?, initialHeaders: [String: String]?) {
-        if initialFile != nil {
+        if let initialFile = initialFile {
             do {
-                try webView!.loadFile(url: initialFile!, headers: initialHeaders)
+                try webView?.loadFile(url: initialFile, headers: initialHeaders)
             }
             catch let error as NSError {
                 dump(error)
@@ -144,15 +144,22 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
             return
         }
         
-        if initialData != nil {
-            let data = initialData!["data"]!
-            let mimeType = initialData!["mimeType"]!
-            let encoding = initialData!["encoding"]!
-            let baseUrl = initialData!["baseUrl"]!
-            webView!.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+        if let initialData = initialData {
+            let data = initialData["data"]!
+            let mimeType = initialData["mimeType"]!
+            let encoding = initialData["encoding"]!
+            let baseUrl = initialData["baseUrl"]!
+            webView?.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
         }
-        else if let url = URL(string: initialUrl!) {
-            webView!.loadUrl(url: url, headers: initialHeaders)
+        else if let initialUrl = initialUrl, let url = URL(string: initialUrl) {
+            var allowingReadAccessToURL: URL? = nil
+            if let allowingReadAccessTo = webView?.options?.allowingReadAccessTo, url.scheme == "file" {
+                allowingReadAccessToURL = URL(string: allowingReadAccessTo)
+                if allowingReadAccessToURL?.scheme != "file" {
+                    allowingReadAccessToURL = nil
+                }
+            }
+            webView?.loadUrl(url: url, headers: initialHeaders, allowingReadAccessTo: allowingReadAccessToURL)
         }
     }
 }

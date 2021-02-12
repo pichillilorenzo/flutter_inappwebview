@@ -1,3 +1,5 @@
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+
 class ASN1DistinguishedNames {
   final String _oid;
   final String _representation;
@@ -67,4 +69,40 @@ class ASN1DistinguishedNames {
 
   @override
   int get hashCode => _oid.hashCode;
+
+  /// Format subject/issuer information in RFC1779
+  static String string({required ASN1Object block}) {
+    var result = "";
+    var oidNames = ASN1DistinguishedNames.values;
+    for (var oidName in oidNames) {
+      var oidBlock = block.findOid(oidValue: oidName.oid());
+      if (oidBlock == null) {
+        continue;
+      }
+      if (result.isNotEmpty) {
+        result += ", ";
+      }
+      result += oidName.representation();
+      result += "=";
+
+      String? value;
+      try {
+        value = oidBlock.parent?.sub?.last.value as String?;
+      } catch (e) {}
+      if (value != null) {
+        result += quote(value);
+      }
+    }
+    return result;
+  }
+
+  static String quote(String string) {
+      var specialChars = [",", "+", "=", "\n", "<", ">", "#", ";", "\\"];
+      for (var specialChar in specialChars) {
+        if (string.contains(specialChar)) {
+          return "\"" + string + "\"";
+        }
+      }
+      return string;
+  }
 }

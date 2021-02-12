@@ -923,6 +923,12 @@ class IOSInAppWebViewOptions
   ///**NOTE**: available on iOS 13.0+.
   bool applePayAPIEnabled;
 
+  ///Used in combination with [WebView.initialUrl] (using the `file://` scheme), it represents the URL from which to read the web content.
+  ///This URL must be a file-based URL (using the `file://` scheme).
+  ///Specify the same value as the [WebView.initialUrl] parameter to prevent WebView from reading any other content.
+  ///Specify a directory to give WebView permission to read additional files in the specified directory.
+  String? allowingReadAccessTo;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -953,7 +959,10 @@ class IOSInAppWebViewOptions
       this.pageZoom = 1.0,
       this.limitsNavigationsToAppBoundDomains = false,
       this.useOnNavigationResponse = false,
-      this.applePayAPIEnabled = false});
+      this.applePayAPIEnabled = false,
+      this.allowingReadAccessTo}) {
+    assert(allowingReadAccessTo == null || allowingReadAccessTo!.startsWith("file://"));
+  }
 
   @override
   Map<String, dynamic> toMap() {
@@ -995,6 +1004,7 @@ class IOSInAppWebViewOptions
       "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
       "useOnNavigationResponse": useOnNavigationResponse,
       "applePayAPIEnabled": applePayAPIEnabled,
+      "allowingReadAccessTo": allowingReadAccessTo,
     };
   }
 
@@ -1050,6 +1060,7 @@ class IOSInAppWebViewOptions
     options.limitsNavigationsToAppBoundDomains = map["limitsNavigationsToAppBoundDomains"];
     options.useOnNavigationResponse = map["useOnNavigationResponse"];
     options.applePayAPIEnabled = map["applePayAPIEnabled"];
+    options.allowingReadAccessTo = map["allowingReadAccessTo"];
     return options;
   }
 

@@ -373,11 +373,6 @@ class InAppWebViewController {
         else if (_inAppBrowser != null)
           _inAppBrowser!.androidOnScaleChanged(oldScale, newScale);
         break;
-      case "onRequestFocus":
-        if (_webview != null && _webview!.androidOnRequestFocus != null)
-          _webview!.androidOnRequestFocus!(this);
-        else if (_inAppBrowser != null) _inAppBrowser!.androidOnRequestFocus();
-        break;
       case "onReceivedIcon":
         Uint8List icon = Uint8List.fromList(call.arguments["icon"].cast<int>());
 
@@ -1250,15 +1245,26 @@ class InAppWebViewController {
 
   ///Loads the given [url] with optional [headers] specified as a map from name to value.
   ///
+  ///[iosAllowingReadAccessTo], used in combination with [url] (using the `file://` scheme),
+  ///is an iOS-specific argument that represents the URL from which to read the web content.
+  ///This URL must be a file-based URL (using the `file://` scheme).
+  ///Specify the same value as the URL parameter to prevent WebView from reading any other content.
+  ///Specify a directory to give WebView permission to read additional files in the specified directory.
+  ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)
   ///
-  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414954-load
+  ///**Official iOS API**:
+  ///- https://developer.apple.com/documentation/webkit/wkwebview/1414954-load
+  ///- if [iosAllowingReadAccessTo] is used, https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl
   Future<void> loadUrl(
-      {required String url, Map<String, String> headers = const {}}) async {
+      {required String url, Map<String, String> headers = const {}, String? iosAllowingReadAccessTo}) async {
     assert(url.isNotEmpty);
+    assert(iosAllowingReadAccessTo == null || iosAllowingReadAccessTo.startsWith("file://"));
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url);
     args.putIfAbsent('headers', () => headers);
+    args.putIfAbsent('iosAllowingReadAccessTo', () => iosAllowingReadAccessTo);
     await _channel.invokeMethod('loadUrl', args);
   }
 

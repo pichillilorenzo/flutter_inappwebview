@@ -529,14 +529,6 @@ abstract class WebView {
           InAppWebViewController controller, double oldScale, double newScale)?
       androidOnScaleChanged;
 
-  ///Event fired when there is a request to display and focus for this WebView.
-  ///This may happen due to another WebView opening a link in this WebView and requesting that this WebView be displayed.
-  ///
-  ///**NOTE**: available only on Android.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)
-  final void Function(InAppWebViewController controller)? androidOnRequestFocus;
-
   ///Event fired when there is new favicon for the current page.
   ///
   ///[icon] represents the favicon for the current page.
@@ -696,7 +688,6 @@ abstract class WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       this.androidOnScaleChanged,
-      this.androidOnRequestFocus,
       this.androidOnReceivedIcon,
       this.androidOnReceivedTouchIconUrl,
       this.androidOnJsBeforeUnload,

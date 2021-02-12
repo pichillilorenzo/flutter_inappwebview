@@ -193,9 +193,9 @@ class ASN1DERDecoder {
   }
 
   /// Decode DER OID bytes to String with dot notation
-  static String decodeOid({required List<int> contentData}) {
+  static String? decodeOid({required List<int> contentData}) {
     if (contentData.isEmpty) {
-      return "";
+      return null;
     }
 
     var oid = "";
@@ -392,6 +392,16 @@ class ASN1DERDecoder {
     }
 
     return date;
+  }
+
+  static List<int> sequenceContent({required List<int> data}) {
+    var iterator = data.iterator;
+    iterator.moveNext();
+    try {
+      return loadSubContent(iterator: iterator);
+    } catch (e) {
+      return data;
+    }
   }
 }
 

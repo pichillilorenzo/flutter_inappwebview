@@ -371,7 +371,9 @@ public class InAppBrowserActivity extends AppCompatActivity {
         Shared.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
       }
       ViewGroup vg = (ViewGroup) (webView.getParent());
-      vg.removeView(webView);
+      if (vg != null) {
+        vg.removeView(webView);
+      }
       webView.setWebChromeClient(new WebChromeClient());
       webView.setWebViewClient(new WebViewClient() {
         public void onPageFinished(WebView view, String url) {

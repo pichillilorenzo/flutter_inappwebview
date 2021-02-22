@@ -18,7 +18,8 @@ class KeyUsage {
   static KeyUsage? fromIndex(int? value) {
     if (value != null) {
       try {
-        return KeyUsage.values.firstWhere((element) => element.toValue() == value);
+        return KeyUsage.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -28,7 +29,9 @@ class KeyUsage {
 
   int toValue() => _value;
 
-  String name() => _KeyUsageMapName.containsKey(this._value) ? _KeyUsageMapName[this._value]! : "";
+  String name() => _KeyUsageMapName.containsKey(this._value)
+      ? _KeyUsageMapName[this._value]!
+      : "";
 
   @override
   String toString() => "($_value, ${name()})";

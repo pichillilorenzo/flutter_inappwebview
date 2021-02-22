@@ -35,7 +35,6 @@ class BrowserOptions {
   }
 }
 
-
 ///Class that represents the options that can be used for an [InAppBrowser] WebView.
 class InAppBrowserClassOptions {
   ///Cross-platform options.
@@ -52,9 +51,9 @@ class InAppBrowserClassOptions {
 
   InAppBrowserClassOptions(
       {InAppBrowserOptions? crossPlatform,
-        AndroidInAppBrowserOptions? android,
-        IOSInAppBrowserOptions? ios,
-        InAppWebViewGroupOptions? inAppWebViewGroupOptions}) {
+      AndroidInAppBrowserOptions? android,
+      IOSInAppBrowserOptions? ios,
+      InAppWebViewGroupOptions? inAppWebViewGroupOptions}) {
     this.crossPlatform = crossPlatform ?? InAppBrowserOptions();
     this.android = android ?? AndroidInAppBrowserOptions();
     this.ios = ios ?? IOSInAppBrowserOptions();
@@ -89,7 +88,7 @@ class InAppBrowserClassOptions {
 
   static InAppBrowserClassOptions fromMap(Map<String, dynamic> options) {
     InAppBrowserClassOptions inAppBrowserClassOptions =
-    InAppBrowserClassOptions();
+        InAppBrowserClassOptions();
 
     inAppBrowserClassOptions.crossPlatform =
         InAppBrowserOptions.fromMap(options);
@@ -157,7 +156,8 @@ class InAppBrowserOptions
     InAppBrowserOptions options = InAppBrowserOptions();
     options.hidden = map["hidden"];
     options.hideToolbarTop = map["hideToolbarTop"];
-    options.toolbarTopBackgroundColor = UtilColor.fromHex(map["toolbarTopBackgroundColor"]);
+    options.toolbarTopBackgroundColor =
+        UtilColor.fromHex(map["toolbarTopBackgroundColor"]);
     options.hideUrlBar = map["hideUrlBar"];
     options.hideProgressBar = map["hideProgressBar"];
     return options;

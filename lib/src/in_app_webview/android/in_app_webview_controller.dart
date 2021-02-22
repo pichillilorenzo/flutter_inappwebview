@@ -9,7 +9,6 @@ import '../../types.dart';
 
 ///Class represents the Android controller that contains only android-specific methods for the WebView.
 class AndroidInAppWebViewController {
-
   late MethodChannel _channel;
   static MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
 
@@ -130,8 +129,7 @@ class AndroidInAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#clearClientCertPreferences(java.lang.Runnable)
   static Future<void> clearClientCertPreferences() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _staticChannel
-        .invokeMethod('clearClientCertPreferences', args);
+    await _staticChannel.invokeMethod('clearClientCertPreferences', args);
   }
 
   ///Returns a URL pointing to the privacy policy for Safe Browsing reporting.
@@ -141,8 +139,8 @@ class AndroidInAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()
   static Future<Uri?> getSafeBrowsingPrivacyPolicyUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    String? url = await _staticChannel
-        .invokeMethod('getSafeBrowsingPrivacyPolicyUrl', args);
+    String? url = await _staticChannel.invokeMethod(
+        'getSafeBrowsingPrivacyPolicyUrl', args);
     return url != null ? Uri.parse(url) : null;
   }
 
@@ -167,8 +165,7 @@ class AndroidInAppWebViewController {
       {required List<String> hosts}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('hosts', () => hosts);
-    return await _staticChannel
-        .invokeMethod('setSafeBrowsingWhitelist', args);
+    return await _staticChannel.invokeMethod('setSafeBrowsingWhitelist', args);
   }
 
   ///If WebView has already been loaded into the current process this method will return the package that was used to load it.
@@ -184,9 +181,9 @@ class AndroidInAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getCurrentWebViewPackage(android.content.Context)
   static Future<AndroidWebViewPackageInfo?> getCurrentWebViewPackage() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? packageInfo = (await _staticChannel
-            .invokeMethod('getCurrentWebViewPackage', args))
-        ?.cast<String, dynamic>();
+    Map<String, dynamic>? packageInfo =
+        (await _staticChannel.invokeMethod('getCurrentWebViewPackage', args))
+            ?.cast<String, dynamic>();
     return AndroidWebViewPackageInfo.fromMap(packageInfo);
   }
 
@@ -199,11 +196,11 @@ class AndroidInAppWebViewController {
   ///**NOTE**: available only on Android 19+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setWebContentsDebuggingEnabled(boolean)
-  static Future<void> setWebContentsDebuggingEnabled(bool debuggingEnabled) async {
+  static Future<void> setWebContentsDebuggingEnabled(
+      bool debuggingEnabled) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('debuggingEnabled', () => debuggingEnabled);
-    return await _staticChannel
-        .invokeMethod('setWebContentsDebuggingEnabled', args);
+    return await _staticChannel.invokeMethod(
+        'setWebContentsDebuggingEnabled', args);
   }
 }
-

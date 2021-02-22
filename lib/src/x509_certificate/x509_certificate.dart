@@ -96,7 +96,9 @@ class X509Certificate {
   }
 
   String get description =>
-      asn1?.fold("", (value, element) => (value ?? '') + element.description + '\n') ?? '';
+      asn1?.fold(
+          "", (value, element) => (value ?? '') + element.description + '\n') ??
+      '';
 
   ///Checks that the given date is within the certificate's validity period.
   bool checkValidity({DateTime? date}) {
@@ -222,20 +224,22 @@ class X509Certificate {
 
   ///Gets the notAfter date from the validity period of the certificate.
   DateTime? get notAfter {
-    var value = block1?.atIndex(X509BlockPosition.dateValidity)
+    var value = block1
+        ?.atIndex(X509BlockPosition.dateValidity)
         ?.subAtIndex(1)
         ?.value as DateTime?;
     return value;
   }
 
   ///Gets the signature value (the raw signature bits) from the certificate.
-  List<int>? get signature =>  asn1?[0].subAtIndex(2)?.value as List<int>;
+  List<int>? get signature => asn1?[0].subAtIndex(2)?.value as List<int>;
 
   ///Gets the signature algorithm name for the certificate signature algorithm.
   String? get sigAlgName => OID.fromValue(sigAlgOID ?? '')?.name();
 
   ///Gets the signature algorithm OID string from the certificate.
-  String? get sigAlgOID => block1?.subAtIndex(2)?.subAtIndex(0)?.value as String?;
+  String? get sigAlgOID =>
+      block1?.subAtIndex(2)?.subAtIndex(0)?.value as String?;
 
   ///Gets the DER-encoded signature algorithm parameters from this certificate's signature algorithm.
   List<int>? get sigAlgParams => null;
@@ -278,11 +282,13 @@ class X509Certificate {
 
   ///Gets a collection of subject alternative names from the SubjectAltName extension, (OID = 2.5.29.17).
   List<String> get subjectAlternativeNames =>
-      extensionObject(oid: OID.subjectAltName)?.alternativeNameAsStrings ?? <String>[];
+      extensionObject(oid: OID.subjectAltName)?.alternativeNameAsStrings ??
+      <String>[];
 
   ///Gets a collection of issuer alternative names from the IssuerAltName extension, (OID = 2.5.29.18).
   List<String> get issuerAlternativeNames =>
-      extensionObject(oid: OID.issuerAltName)?.alternativeNameAsStrings ?? <String>[];
+      extensionObject(oid: OID.issuerAltName)?.alternativeNameAsStrings ??
+      <String>[];
 
   ///Gets the informations of the public key from this certificate.
   X509PublicKey? get publicKey {
@@ -321,24 +327,35 @@ class X509Certificate {
 
   ///Gets the certificate constraints path length from the
   ///critical BasicConstraints extension, (OID = 2.5.29.19).
-  BasicConstraintExtension? get basicConstraints => extensionObject(oid: OID.basicConstraints) as BasicConstraintExtension?;
+  BasicConstraintExtension? get basicConstraints =>
+      extensionObject(oid: OID.basicConstraints) as BasicConstraintExtension?;
 
   ///Gets the raw bits from the Subject Key Identifier (SKID) extension, (OID = 2.5.29.14).
-  SubjectKeyIdentifierExtension? get subjectKeyIdentifier => extensionObject(oid: OID.subjectKeyIdentifier) as SubjectKeyIdentifierExtension?;
+  SubjectKeyIdentifierExtension? get subjectKeyIdentifier =>
+      extensionObject(oid: OID.subjectKeyIdentifier)
+          as SubjectKeyIdentifierExtension?;
 
   ///Gets the raw bits from the Authority Key Identifier extension, (OID = 2.5.29.35).
-  AuthorityKeyIdentifierExtension? get authorityKeyIdentifier => extensionObject(oid: OID.authorityKeyIdentifier) as AuthorityKeyIdentifierExtension?;
+  AuthorityKeyIdentifierExtension? get authorityKeyIdentifier =>
+      extensionObject(oid: OID.authorityKeyIdentifier)
+          as AuthorityKeyIdentifierExtension?;
 
   ///Gets the list of certificate policies from the CertificatePolicies extension, (OID = 2.5.29.32).
-  CertificatePoliciesExtension? get certificatePolicies => extensionObject(oid: OID.certificatePolicies) as CertificatePoliciesExtension?;
+  CertificatePoliciesExtension? get certificatePolicies =>
+      extensionObject(oid: OID.certificatePolicies)
+          as CertificatePoliciesExtension?;
 
   ///Gets the list of CRL distribution points from the CRLDistributionPoints extension, (OID = 2.5.29.31).
-  CRLDistributionPointsExtension? get cRLDistributionPoints => extensionObject(oid: OID.cRLDistributionPoints) as CRLDistributionPointsExtension?;
+  CRLDistributionPointsExtension? get cRLDistributionPoints =>
+      extensionObject(oid: OID.cRLDistributionPoints)
+          as CRLDistributionPointsExtension?;
 
   ///Gets the map of the format (as a key) and location (as a value) of additional information
   ///about the CA who issued the certificate in which this extension appears
   ///from the AuthorityInfoAccess extension, (OID = 1.3.6.1.5.5.5.7.1.1).
-  AuthorityInfoAccessExtension? get authorityInfoAccess => extensionObject(oid: OID.authorityInfoAccess) as AuthorityInfoAccessExtension?;
+  AuthorityInfoAccessExtension? get authorityInfoAccess =>
+      extensionObject(oid: OID.authorityInfoAccess)
+          as AuthorityInfoAccessExtension?;
 
   List<ASN1Object>? get extensionBlocks =>
       block1?.atIndex(X509BlockPosition.extensions)?.subAtIndex(0)?.sub;
@@ -349,7 +366,8 @@ class X509Certificate {
       oidValue = oid.toValue();
     }
     if (oidValue != null) {
-      var block = block1?.atIndex(X509BlockPosition.extensions)
+      var block = block1
+          ?.atIndex(X509BlockPosition.extensions)
           ?.findOid(oidValue: oidValue)
           ?.parent;
       if (block != null) {

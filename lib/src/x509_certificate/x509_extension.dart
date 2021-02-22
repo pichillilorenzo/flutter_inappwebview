@@ -87,7 +87,7 @@ class X509Extension {
     for (var item in sub) {
       var name = generalName(item: item);
       if (name != null) {
-      result.add(name);
+        result.add(name);
       }
     }
     return result;
@@ -139,7 +139,8 @@ class X509Extension {
 class BasicConstraintExtension extends X509Extension {
   BasicConstraintExtension({required block}) : super(block: block);
 
-  bool get isCA => valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value as bool? ?? false;
+  bool get isCA =>
+      valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value as bool? ?? false;
 
   int? get pathLenConstraint {
     var data = valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value as List<int>?;
@@ -270,11 +271,12 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
   List<int>? get keyIdentifier {
     var sequence = valueAsBlock?.subAtIndex(0)?.sub;
     if (sequence == null) {
-        return null;
+      return null;
     }
     ASN1Object? sub;
     try {
-      sub = sequence.firstWhere((element) => element.identifier?.tagNumber().toValue() == 0);
+      sub = sequence.firstWhere(
+          (element) => element.identifier?.tagNumber().toValue() == 0);
       return sub.encoded;
     } catch (e) {}
     return null;
@@ -287,7 +289,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     }
     ASN1Object? sub;
     try {
-      sub = sequence.firstWhere((element) => element.identifier?.tagNumber().toValue() == 1);
+      sub = sequence.firstWhere(
+          (element) => element.identifier?.tagNumber().toValue() == 1);
       List<String>? result;
       if (sub.sub != null) {
         result = <String>[];
@@ -310,7 +313,8 @@ class AuthorityKeyIdentifierExtension extends X509Extension {
     }
     ASN1Object? sub;
     try {
-      sub = sequence.firstWhere((element) => element.identifier?.tagNumber().toValue() == 2);
+      sub = sequence.firstWhere(
+          (element) => element.identifier?.tagNumber().toValue() == 2);
       return sub.encoded;
     } catch (e) {}
     return null;
@@ -356,6 +360,7 @@ class CertificatePolicyQualifier {
     return toMap();
   }
 }
+
 class CertificatePolicy {
   String oid;
   List<CertificatePolicyQualifier>? qualifiers;

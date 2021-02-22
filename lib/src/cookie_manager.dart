@@ -76,9 +76,17 @@ class CookieManager {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       var version = double.tryParse(iosInfo.systemVersion);
       if (version != null && version < 11.0) {
-        await _setCookieWithJavaScript(url: url, name: name, value: value, domain: domain,
-            path: path, expiresDate: expiresDate, maxAge: maxAge, isSecure: isSecure,
-            sameSite: sameSite, webViewController: iosBelow11WebViewController);
+        await _setCookieWithJavaScript(
+            url: url,
+            name: name,
+            value: value,
+            domain: domain,
+            path: path,
+            expiresDate: expiresDate,
+            maxAge: maxAge,
+            isSecure: isSecure,
+            sameSite: sameSite,
+            webViewController: iosBelow11WebViewController);
         return;
       }
     }
@@ -100,35 +108,32 @@ class CookieManager {
 
   Future<void> _setCookieWithJavaScript(
       {required Uri url,
-        required String name,
-        required String value,
-        required String domain,
-        String path = "/",
-        int? expiresDate,
-        int? maxAge,
-        bool? isSecure,
-        HTTPCookieSameSitePolicy? sameSite,
-        InAppWebViewController? webViewController}) async {
-    var cookieValue = name + "=" + value + "; Domain=" + domain + "; Path=" + path;
+      required String name,
+      required String value,
+      required String domain,
+      String path = "/",
+      int? expiresDate,
+      int? maxAge,
+      bool? isSecure,
+      HTTPCookieSameSitePolicy? sameSite,
+      InAppWebViewController? webViewController}) async {
+    var cookieValue =
+        name + "=" + value + "; Domain=" + domain + "; Path=" + path;
 
     if (expiresDate != null)
       cookieValue += "; Expires=" + _getCookieExpirationDate(expiresDate);
 
-    if (maxAge != null)
-      cookieValue += "; Max-Age=" + maxAge.toString();
+    if (maxAge != null) cookieValue += "; Max-Age=" + maxAge.toString();
 
-    if (isSecure != null && isSecure)
-      cookieValue += "; Secure";
+    if (isSecure != null && isSecure) cookieValue += "; Secure";
 
-    if (sameSite != null)
-      cookieValue += "; SameSite=" + sameSite.toValue();
+    if (sameSite != null) cookieValue += "; SameSite=" + sameSite.toValue();
 
     cookieValue += ";";
 
     if (webViewController != null) {
       InAppWebViewGroupOptions? options = await webViewController.getOptions();
-      if (options != null &&
-          options.crossPlatform.javaScriptEnabled) {
+      if (options != null && options.crossPlatform.javaScriptEnabled) {
         await webViewController.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
         return;
@@ -158,7 +163,9 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
   ///If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be found!).
-  Future<List<Cookie>> getCookies({required Uri url, InAppWebViewController? iosBelow11WebViewController}) async {
+  Future<List<Cookie>> getCookies(
+      {required Uri url,
+      InAppWebViewController? iosBelow11WebViewController}) async {
     assert(url.toString().isNotEmpty);
 
     if (Platform.isIOS) {
@@ -166,7 +173,8 @@ class CookieManager {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       var version = double.tryParse(iosInfo.systemVersion);
       if (version != null && version < 11.0) {
-        return await _getCookiesWithJavaScript(url: url, webViewController: iosBelow11WebViewController);
+        return await _getCookiesWithJavaScript(
+            url: url, webViewController: iosBelow11WebViewController);
       }
     }
 
@@ -185,8 +193,7 @@ class CookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite:
-          HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));
@@ -194,24 +201,26 @@ class CookieManager {
     return cookies;
   }
 
-  Future<List<Cookie>> _getCookiesWithJavaScript({required Uri url, InAppWebViewController? webViewController}) async {
+  Future<List<Cookie>> _getCookiesWithJavaScript(
+      {required Uri url, InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 
     List<Cookie> cookies = [];
 
     if (webViewController != null) {
       InAppWebViewGroupOptions? options = await webViewController.getOptions();
-      if (options != null &&
-          options.crossPlatform.javaScriptEnabled) {
-        List<String> documentCookies = (await webViewController.evaluateJavascript(source: 'document.cookie') as String)
-            .split(';').map((documentCookie) => documentCookie.trim()).toList();
+      if (options != null && options.crossPlatform.javaScriptEnabled) {
+        List<String> documentCookies = (await webViewController
+                .evaluateJavascript(source: 'document.cookie') as String)
+            .split(';')
+            .map((documentCookie) => documentCookie.trim())
+            .toList();
         documentCookies.forEach((documentCookie) {
           List<String> cookie = documentCookie.split('=');
           cookies.add(Cookie(
             name: cookie[0],
             value: cookie[1],
-          )
-          );
+          ));
         });
         return cookies;
       }
@@ -227,15 +236,17 @@ class CookieManager {
     await headlessWebView.run();
     await pageLoaded.future;
 
-    List<String> documentCookies = (await headlessWebView.webViewController.evaluateJavascript(source: 'document.cookie') as String)
-        .split(';').map((documentCookie) => documentCookie.trim()).toList();
+    List<String> documentCookies = (await headlessWebView.webViewController
+            .evaluateJavascript(source: 'document.cookie') as String)
+        .split(';')
+        .map((documentCookie) => documentCookie.trim())
+        .toList();
     documentCookies.forEach((documentCookie) {
       List<String> cookie = documentCookie.split('=');
       cookies.add(Cookie(
         name: cookie[0],
         value: cookie[1],
-      )
-      );
+      ));
     });
     await headlessWebView.dispose();
     return cookies;
@@ -251,8 +262,9 @@ class CookieManager {
   ///If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be found!).
   Future<Cookie?> getCookie(
-      {required Uri url, required String name, InAppWebViewController? iosBelow11WebViewController}) async {
-
+      {required Uri url,
+      required String name,
+      InAppWebViewController? iosBelow11WebViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
@@ -261,8 +273,11 @@ class CookieManager {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       var version = double.tryParse(iosInfo.systemVersion);
       if (version != null && version < 11.0) {
-        List<Cookie> cookies = await _getCookiesWithJavaScript(url: url, webViewController: iosBelow11WebViewController);
-        return cookies.cast<Cookie?>().firstWhere((cookie) => cookie!.name == name, orElse: () => null);
+        List<Cookie> cookies = await _getCookiesWithJavaScript(
+            url: url, webViewController: iosBelow11WebViewController);
+        return cookies
+            .cast<Cookie?>()
+            .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
       }
     }
 
@@ -315,7 +330,14 @@ class CookieManager {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       var version = double.tryParse(iosInfo.systemVersion);
       if (version != null && version < 11.0) {
-        await _setCookieWithJavaScript(url: url, name: name, value: "", path: path, domain: domain, maxAge: -1, webViewController: iosBelow11WebViewController);
+        await _setCookieWithJavaScript(
+            url: url,
+            name: name,
+            value: "",
+            path: path,
+            domain: domain,
+            maxAge: -1,
+            webViewController: iosBelow11WebViewController);
         return;
       }
     }
@@ -340,8 +362,10 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!).
   Future<void> deleteCookies(
-      {required Uri url, String domain = "", String path = "/",
-        InAppWebViewController? iosBelow11WebViewController}) async {
+      {required Uri url,
+      String domain = "",
+      String path = "/",
+      InAppWebViewController? iosBelow11WebViewController}) async {
     if (domain.isEmpty) domain = _getDomainName(url);
 
     assert(url.toString().isNotEmpty);
@@ -351,9 +375,17 @@ class CookieManager {
       IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
       var version = double.tryParse(iosInfo.systemVersion);
       if (version != null && version < 11.0) {
-        List<Cookie> cookies = await _getCookiesWithJavaScript(url: url, webViewController: iosBelow11WebViewController);
+        List<Cookie> cookies = await _getCookiesWithJavaScript(
+            url: url, webViewController: iosBelow11WebViewController);
         for (var i = 0; i < cookies.length; i++) {
-          await _setCookieWithJavaScript(url: url, name: cookies[i].name, value: "", path: path, domain: domain, maxAge: -1, webViewController: iosBelow11WebViewController);
+          await _setCookieWithJavaScript(
+              url: url,
+              name: cookies[i].name,
+              value: "",
+              path: path,
+              domain: domain,
+              maxAge: -1,
+              webViewController: iosBelow11WebViewController);
         }
         return;
       }
@@ -383,7 +415,8 @@ class CookieManager {
 
   String _getCookieExpirationDate(int expiresDate) {
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
-    return DateFormat('EEE, d MMM yyyy hh:mm:ss', "en_US").format(dateTime) + ' GMT';
+    return DateFormat('EEE, d MMM yyyy hh:mm:ss', "en_US").format(dateTime) +
+        ' GMT';
   }
 }
 
@@ -411,7 +444,7 @@ class IOSCookieManager {
 
     Map<String, dynamic> args = <String, dynamic>{};
     List<dynamic> cookieListMap =
-    await CookieManager._channel.invokeMethod('getAllCookies', args);
+        await CookieManager._channel.invokeMethod('getAllCookies', args);
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {
@@ -421,8 +454,7 @@ class IOSCookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite:
-          HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));

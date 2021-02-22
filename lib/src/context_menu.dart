@@ -65,10 +65,7 @@ class ContextMenuItem {
   Function()? action;
 
   ContextMenuItem(
-      {this.androidId,
-      this.iosId,
-      required this.title,
-      this.action});
+      {this.androidId, this.iosId, required this.title, this.action});
 
   Map<String, dynamic> toMap() {
     return {"androidId": androidId, "iosId": iosId, "title": title};

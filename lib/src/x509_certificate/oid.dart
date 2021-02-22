@@ -120,7 +120,8 @@ class OID {
 
   String toValue() => _value;
 
-  String name() => _oidMapName.containsKey(this._value) ? _oidMapName[this._value]! : "";
+  String name() =>
+      _oidMapName.containsKey(this._value) ? _oidMapName[this._value]! : "";
 
   @override
   String toString() => "($_value, ${name()})";

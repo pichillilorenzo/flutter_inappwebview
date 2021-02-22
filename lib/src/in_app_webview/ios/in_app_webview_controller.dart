@@ -33,9 +33,11 @@ class IOSInAppWebViewController {
   ///**NOTE**: available only on iOS 14.0+.
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf
-  Future<Uint8List?> createPdf({IOSWKPDFConfiguration? iosWKPdfConfiguration}) async {
+  Future<Uint8List?> createPdf(
+      {IOSWKPDFConfiguration? iosWKPdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('iosWKPdfConfiguration', () => iosWKPdfConfiguration?.toMap());
+    args.putIfAbsent(
+        'iosWKPdfConfiguration', () => iosWKPdfConfiguration?.toMap());
     return await _channel.invokeMethod('createPdf', args);
   }
 
@@ -55,8 +57,7 @@ class IOSInAppWebViewController {
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1415002-hasonlysecurecontent
   Future<bool> hasOnlySecureContent() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel
-        .invokeMethod('hasOnlySecureContent', args);
+    return await _channel.invokeMethod('hasOnlySecureContent', args);
   }
 
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
@@ -69,7 +70,6 @@ class IOSInAppWebViewController {
   static Future<bool> handlesURLScheme(String urlScheme) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlScheme', () => urlScheme);
-    return await _staticChannel
-        .invokeMethod('handlesURLScheme', args);
+    return await _staticChannel.invokeMethod('handlesURLScheme', args);
   }
 }

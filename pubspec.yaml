@@ -10,9 +10,9 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  uuid: ^3.0.0-nullsafety.0
-  mime: ^1.0.0-nullsafety.0
-  intl: ^0.17.0-nullsafety.2
+  uuid: ^3.0.0-nullsafety.1
+  mime: ^1.0.0
+  intl: ^0.17.0
   device_info: ^2.0.0-nullsafety.2
 
 dev_dependencies:

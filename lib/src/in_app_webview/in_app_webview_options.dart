@@ -41,7 +41,10 @@ class InAppWebViewGroupOptions {
   ///iOS-specific options.
   late IOSInAppWebViewOptions ios;
 
-  InAppWebViewGroupOptions({InAppWebViewOptions? crossPlatform, AndroidInAppWebViewOptions? android, IOSInAppWebViewOptions? ios}) {
+  InAppWebViewGroupOptions(
+      {InAppWebViewOptions? crossPlatform,
+      AndroidInAppWebViewOptions? android,
+      IOSInAppWebViewOptions? ios}) {
     this.crossPlatform = crossPlatform ?? InAppWebViewOptions();
     this.android = android ?? AndroidInAppWebViewOptions();
     this.ios = ios ?? IOSInAppWebViewOptions();
@@ -52,14 +55,15 @@ class InAppWebViewGroupOptions {
     options.addAll(this.crossPlatform.toMap());
     if (defaultTargetPlatform == TargetPlatform.android)
       options.addAll(this.android.toMap());
-    else if (defaultTargetPlatform == TargetPlatform.iOS) options.addAll(this.ios.toMap());
+    else if (defaultTargetPlatform == TargetPlatform.iOS)
+      options.addAll(this.ios.toMap());
 
     return options;
   }
 
   static InAppWebViewGroupOptions fromMap(Map<String, dynamic> options) {
     InAppWebViewGroupOptions inAppWebViewGroupOptions =
-    InAppWebViewGroupOptions();
+        InAppWebViewGroupOptions();
 
     inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
@@ -229,7 +233,8 @@ class InAppWebViewOptions
       this.allowFileAccessFromFileURLs = false,
       this.allowUniversalAccessFromFileURLs = false}) {
     if (this.minimumFontSize == null)
-      this.minimumFontSize = defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
+      this.minimumFontSize =
+          defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
         !this.resourceCustomSchemes.contains("https"));
   }
@@ -313,7 +318,8 @@ class InAppWebViewOptions
     options.disableContextMenu = map["disableContextMenu"];
     options.supportZoom = map["supportZoom"];
     options.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-    options.allowUniversalAccessFromFileURLs = map["allowUniversalAccessFromFileURLs"];
+    options.allowUniversalAccessFromFileURLs =
+        map["allowUniversalAccessFromFileURLs"];
     return options;
   }
 

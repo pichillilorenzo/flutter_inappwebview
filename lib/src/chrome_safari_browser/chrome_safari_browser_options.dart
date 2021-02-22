@@ -43,7 +43,8 @@ class ChromeSafariBrowserClassOptions {
     Map<String, dynamic> options = {};
     if (defaultTargetPlatform == TargetPlatform.android)
       options.addAll(this.android?.toMap() ?? {});
-    else if (defaultTargetPlatform == TargetPlatform.iOS) options.addAll(this.ios?.toMap() ?? {});
+    else if (defaultTargetPlatform == TargetPlatform.iOS)
+      options.addAll(this.ios?.toMap() ?? {});
 
     return options;
   }

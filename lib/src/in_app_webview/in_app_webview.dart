@@ -113,8 +113,10 @@ class InAppWebView extends StatefulWidget implements WebView {
       List<String> resources)? androidOnPermissionRequest;
 
   @override
-  final Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
-      Uri url, SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
+  final Future<SafeBrowsingResponse?> Function(
+      InAppWebViewController controller,
+      Uri url,
+      SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
   @override
   final InAppWebViewInitialData? initialData;
@@ -151,14 +153,14 @@ class InAppWebView extends StatefulWidget implements WebView {
       iosOnWebContentProcessDidTerminate;
 
   @override
-  final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
-      IOSWKNavigationResponse navigationResponse)?
-      iosOnNavigationResponse;
+  final Future<IOSNavigationResponseAction?> Function(
+      InAppWebViewController controller,
+      IOSWKNavigationResponse navigationResponse)? iosOnNavigationResponse;
 
   @override
-  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller,
-      URLAuthenticationChallenge challenge)?
-    iosShouldAllowDeprecatedTLS;
+  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(
+      InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? iosShouldAllowDeprecatedTLS;
 
   @override
   final Future<AjaxRequestAction> Function(
@@ -235,12 +237,10 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<CustomSchemeResponse?> Function(
-          InAppWebViewController controller, Uri url)?
-      onLoadResourceCustomScheme;
+      InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
 
   @override
-  final void Function(InAppWebViewController controller, Uri? url)?
-      onLoadStart;
+  final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
@@ -257,19 +257,17 @@ class InAppWebView extends StatefulWidget implements WebView {
       onProgressChanged;
 
   @override
-  final Future<ClientCertResponse?> Function(
-          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
-      onReceivedClientCertRequest;
+  final Future<ClientCertResponse?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? onReceivedClientCertRequest;
 
   @override
-  final Future<HttpAuthResponse?> Function(
-          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
-      onReceivedHttpAuthRequest;
+  final Future<HttpAuthResponse?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? onReceivedHttpAuthRequest;
 
   @override
   final Future<ServerTrustAuthResponse?> Function(
-          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
-      onReceivedServerTrustAuthRequest;
+      InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? onReceivedServerTrustAuthRequest;
 
   @override
   final void Function(InAppWebViewController controller, int x, int y)?
@@ -354,12 +352,13 @@ class _InAppWebViewState extends State<InAppWebView> {
         return PlatformViewLink(
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
           surfaceFactory: (
-              BuildContext context,
-              PlatformViewController controller,
-              ) {
+            BuildContext context,
+            PlatformViewController controller,
+          ) {
             return AndroidViewSurface(
               controller: controller as AndroidViewController,
-              gestureRecognizers: widget.gestureRecognizers ?? const <Factory<OneSequenceGestureRecognizer>>{},
+              gestureRecognizers: widget.gestureRecognizers ??
+                  const <Factory<OneSequenceGestureRecognizer>>{},
               hitTestBehavior: PlatformViewHitTestBehavior.opaque,
             );
           },
@@ -369,18 +368,23 @@ class _InAppWebViewState extends State<InAppWebView> {
               viewType: 'com.pichillilorenzo/flutter_inappwebview',
               layoutDirection: TextDirection.rtl,
               creationParams: <String, dynamic>{
-                'initialUrlRequest': (widget.initialUrlRequest ?? URLRequest(url: Uri.parse("about:blank"))).toMap(),
+                'initialUrlRequest': (widget.initialUrlRequest ??
+                        URLRequest(url: Uri.parse("about:blank")))
+                    .toMap(),
                 'initialFile': widget.initialFile,
                 'initialData': widget.initialData?.toMap(),
                 'initialOptions': widget.initialOptions?.toMap() ?? {},
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
                 'windowId': widget.windowId,
-                'initialUserScripts': widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+                'initialUserScripts':
+                    widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
+                        [],
               },
               creationParamsCodec: const StandardMessageCodec(),
             )
               ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-              ..addOnPlatformViewCreatedListener((id) => _onPlatformViewCreated(id))
+              ..addOnPlatformViewCreatedListener(
+                  (id) => _onPlatformViewCreated(id))
               ..create();
           },
         );
@@ -391,13 +395,16 @@ class _InAppWebViewState extends State<InAppWebView> {
           gestureRecognizers: widget.gestureRecognizers,
           layoutDirection: TextDirection.rtl,
           creationParams: <String, dynamic>{
-            'initialUrlRequest': (widget.initialUrlRequest ?? URLRequest(url: Uri.parse("about:blank"))).toMap(),
+            'initialUrlRequest': (widget.initialUrlRequest ??
+                    URLRequest(url: Uri.parse("about:blank")))
+                .toMap(),
             'initialFile': widget.initialFile,
             'initialData': widget.initialData?.toMap(),
             'initialOptions': widget.initialOptions?.toMap() ?? {},
             'contextMenu': widget.contextMenu?.toMap() ?? {},
             'windowId': widget.windowId,
-            'initialUserScripts': widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            'initialUserScripts':
+                widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
           },
           creationParamsCodec: const StandardMessageCodec(),
         );
@@ -408,13 +415,16 @@ class _InAppWebViewState extends State<InAppWebView> {
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: widget.gestureRecognizers,
         creationParams: <String, dynamic>{
-          'initialUrlRequest': (widget.initialUrlRequest ?? URLRequest(url: Uri.parse("about:blank"))).toMap(),
+          'initialUrlRequest': (widget.initialUrlRequest ??
+                  URLRequest(url: Uri.parse("about:blank")))
+              .toMap(),
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialOptions': widget.initialOptions?.toMap() ?? {},
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
-          'initialUserScripts': widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+          'initialUserScripts':
+              widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
         },
         creationParamsCodec: const StandardMessageCodec(),
       );

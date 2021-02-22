@@ -76,8 +76,10 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
     options.toolbarTopTranslucent = map["toolbarTopTranslucent"];
     options.toolbarTopTintColor = UtilColor.fromHex(map["toolbarTopTintColor"]);
     options.hideToolbarBottom = map["hideToolbarBottom"];
-    options.toolbarBottomBackgroundColor = UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
-    options.toolbarBottomTintColor = UtilColor.fromHex(map["toolbarBottomTintColor"]);
+    options.toolbarBottomBackgroundColor =
+        UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
+    options.toolbarBottomTintColor =
+        UtilColor.fromHex(map["toolbarBottomTintColor"]);
     options.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
     options.closeButtonCaption = map["closeButtonCaption"];
     options.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);

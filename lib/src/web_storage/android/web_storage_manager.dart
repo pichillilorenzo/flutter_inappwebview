@@ -50,8 +50,7 @@ class AndroidWebStorageManager {
   Future<int> getQuotaForOrigin({required String origin}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("origin", () => origin);
-    return await _staticChannel
-        .invokeMethod('getQuotaForOrigin', args);
+    return await _staticChannel.invokeMethod('getQuotaForOrigin', args);
   }
 
   ///Gets the amount of storage currently being used by both the Application Cache and Web SQL Database APIs by the given [origin].
@@ -59,7 +58,6 @@ class AndroidWebStorageManager {
   Future<int> getUsageForOrigin({required String origin}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("origin", () => origin);
-    return await _staticChannel
-        .invokeMethod('getUsageForOrigin', args);
+    return await _staticChannel.invokeMethod('getUsageForOrigin', args);
   }
 }

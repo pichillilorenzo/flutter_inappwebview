@@ -21,8 +21,7 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview
-  final void Function(InAppWebViewController controller, Uri? url)?
-      onLoadStart;
+  final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
   ///Event fired when the [WebView] finishes loading an [url].
   ///
@@ -126,8 +125,7 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkurlschemehandler
   final Future<CustomSchemeResponse?> Function(
-          InAppWebViewController controller, Uri url)?
-      onLoadResourceCustomScheme;
+      InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
 
   ///Event fired when the [WebView] requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
@@ -221,9 +219,8 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview
-  final Future<HttpAuthResponse?> Function(
-          InAppWebViewController controller, HttpAuthenticationChallenge challenge)?
-      onReceivedHttpAuthRequest;
+  final Future<HttpAuthResponse?> Function(InAppWebViewController controller,
+      HttpAuthenticationChallenge challenge)? onReceivedHttpAuthRequest;
 
   ///Event fired when the WebView need to perform server trust authentication (certificate validation).
   ///The host application must return either [ServerTrustAuthResponse] instance with [ServerTrustAuthResponseAction.CANCEL] or [ServerTrustAuthResponseAction.PROCEED].
@@ -396,8 +393,10 @@ abstract class WebView {
   ///**NOTE**: available only on Android 27+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)
-  final Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
-      Uri url, SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
+  final Future<SafeBrowsingResponse?> Function(
+      InAppWebViewController controller,
+      Uri url,
+      SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
   ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
   ///
@@ -602,9 +601,9 @@ abstract class WebView {
   ///
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
-  final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
-      IOSWKNavigationResponse navigationResponse)?
-      iosOnNavigationResponse;
+  final Future<IOSNavigationResponseAction?> Function(
+      InAppWebViewController controller,
+      IOSWKNavigationResponse navigationResponse)? iosOnNavigationResponse;
 
   ///Called when a web view asks whether to continue with a connection that uses a deprecated version of TLS (v1.0 and v1.1).
   ///
@@ -613,9 +612,9 @@ abstract class WebView {
   ///**NOTE**: available only on iOS 14.0+.
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview
-  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller,
-      URLAuthenticationChallenge challenge)?
-  iosShouldAllowDeprecatedTLS;
+  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(
+      InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? iosShouldAllowDeprecatedTLS;
 
   ///Initial url request that will be loaded.
   ///

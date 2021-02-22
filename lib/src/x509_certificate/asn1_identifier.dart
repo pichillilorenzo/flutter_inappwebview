@@ -13,8 +13,8 @@ class ASN1IdentifierClass {
   static ASN1IdentifierClass? fromValue(int? value) {
     if (value != null) {
       try {
-        return ASN1IdentifierClass.values.firstWhere(
-                (element) => element.toValue() == value);
+        return ASN1IdentifierClass.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -90,8 +90,8 @@ class ASN1IdentifierTagNumber {
   static ASN1IdentifierTagNumber? fromValue(int? value) {
     if (value != null) {
       try {
-        return ASN1IdentifierTagNumber.values.firstWhere(
-                (element) => element.toValue() == value);
+        return ASN1IdentifierTagNumber.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }

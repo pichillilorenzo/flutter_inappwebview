@@ -113,13 +113,16 @@ class HeadlessInAppWebView implements WebView {
     args.putIfAbsent(
         'params',
         () => <String, dynamic>{
-              'initialUrlRequest': (this.initialUrlRequest ?? URLRequest(url: Uri.parse("about:blank"))).toMap(),
+              'initialUrlRequest': (this.initialUrlRequest ??
+                      URLRequest(url: Uri.parse("about:blank")))
+                  .toMap(),
               'initialFile': this.initialFile,
               'initialData': this.initialData?.toMap(),
               'initialOptions': this.initialOptions?.toMap() ?? {},
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
-              'initialUserScripts': this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+              'initialUserScripts':
+                  this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
             });
     await _sharedChannel.invokeMethod('createHeadlessWebView', args);
   }
@@ -151,8 +154,10 @@ class HeadlessInAppWebView implements WebView {
       List<String> resources)? androidOnPermissionRequest;
 
   @override
-  final Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
-      Uri url, SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
+  final Future<SafeBrowsingResponse?> Function(
+      InAppWebViewController controller,
+      Uri url,
+      SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
   @override
   final InAppWebViewInitialData? initialData;
@@ -189,14 +194,14 @@ class HeadlessInAppWebView implements WebView {
       iosOnWebContentProcessDidTerminate;
 
   @override
-  final Future<IOSNavigationResponseAction?> Function(InAppWebViewController controller,
-      IOSWKNavigationResponse navigationResponse)?
-      iosOnNavigationResponse;
+  final Future<IOSNavigationResponseAction?> Function(
+      InAppWebViewController controller,
+      IOSWKNavigationResponse navigationResponse)? iosOnNavigationResponse;
 
   @override
-  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller,
-      URLAuthenticationChallenge challenge)?
-    iosShouldAllowDeprecatedTLS;
+  final Future<IOSShouldAllowDeprecatedTLSAction?> Function(
+      InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? iosShouldAllowDeprecatedTLS;
 
   @override
   final Future<AjaxRequestAction> Function(
@@ -264,12 +269,10 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final Future<CustomSchemeResponse?> Function(
-          InAppWebViewController controller, Uri url)?
-      onLoadResourceCustomScheme;
+      InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
 
   @override
-  final void Function(InAppWebViewController controller, Uri? url)?
-      onLoadStart;
+  final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
@@ -286,19 +289,17 @@ class HeadlessInAppWebView implements WebView {
       onProgressChanged;
 
   @override
-  final Future<ClientCertResponse?> Function(
-          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
-      onReceivedClientCertRequest;
+  final Future<ClientCertResponse?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? onReceivedClientCertRequest;
 
   @override
-  final Future<HttpAuthResponse?> Function(
-          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
-      onReceivedHttpAuthRequest;
+  final Future<HttpAuthResponse?> Function(InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? onReceivedHttpAuthRequest;
 
   @override
   final Future<ServerTrustAuthResponse?> Function(
-          InAppWebViewController controller, URLAuthenticationChallenge challenge)?
-      onReceivedServerTrustAuthRequest;
+      InAppWebViewController controller,
+      URLAuthenticationChallenge challenge)? onReceivedServerTrustAuthRequest;
 
   @override
   final void Function(InAppWebViewController controller, int x, int y)?

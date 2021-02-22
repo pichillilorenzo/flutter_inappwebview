@@ -65,8 +65,10 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     options.barCollapsingEnabled = map["barCollapsingEnabled"];
     options.dismissButtonStyle =
         IOSSafariDismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
-    options.preferredBarTintColor = UtilColor.fromHex(map["preferredBarTintColor"]);
-    options.preferredControlTintColor = UtilColor.fromHex(map["preferredControlTintColor"]);
+    options.preferredBarTintColor =
+        UtilColor.fromHex(map["preferredBarTintColor"]);
+    options.preferredControlTintColor =
+        UtilColor.fromHex(map["preferredControlTintColor"]);
     options.presentationStyle =
         IOSUIModalPresentationStyle.fromValue(map["presentationStyle"])!;
     options.transitionStyle =

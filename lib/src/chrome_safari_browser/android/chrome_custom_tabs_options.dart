@@ -62,7 +62,8 @@ class AndroidChromeCustomTabsOptions
         new AndroidChromeCustomTabsOptions();
     options.addDefaultShareMenuItem = map["addDefaultShareMenuItem"];
     options.showTitle = map["showTitle"];
-    options.toolbarBackgroundColor = UtilColor.fromHex(map["toolbarBackgroundColor"]);
+    options.toolbarBackgroundColor =
+        UtilColor.fromHex(map["toolbarBackgroundColor"]);
     options.enableUrlBarHiding = map["enableUrlBarHiding"];
     options.instantAppsEnabled = map["instantAppsEnabled"];
     options.packageName = map["packageName"];

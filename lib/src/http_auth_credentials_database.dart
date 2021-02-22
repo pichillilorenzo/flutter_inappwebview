@@ -38,7 +38,8 @@ class HttpAuthCredentialDatabase {
     List<URLProtectionSpaceHttpAuthCredentials> result = [];
 
     for (Map<dynamic, dynamic> map in allCredentials) {
-      var element = URLProtectionSpaceHttpAuthCredentials.fromMap(map.cast<String, dynamic>());
+      var element = URLProtectionSpaceHttpAuthCredentials.fromMap(
+          map.cast<String, dynamic>());
       if (element != null) {
         result.add(element);
       }

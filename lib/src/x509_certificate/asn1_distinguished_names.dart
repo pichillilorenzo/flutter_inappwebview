@@ -97,12 +97,12 @@ class ASN1DistinguishedNames {
   }
 
   static String quote(String string) {
-      var specialChars = [",", "+", "=", "\n", "<", ">", "#", ";", "\\"];
-      for (var specialChar in specialChars) {
-        if (string.contains(specialChar)) {
-          return "\"" + string + "\"";
-        }
+    var specialChars = [",", "+", "=", "\n", "<", ">", "#", ";", "\\"];
+    for (var specialChar in specialChars) {
+      if (string.contains(specialChar)) {
+        return "\"" + string + "\"";
       }
-      return string;
+    }
+    return string;
   }
 }

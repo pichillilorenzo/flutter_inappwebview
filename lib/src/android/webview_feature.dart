@@ -59,8 +59,8 @@ class AndroidWebViewFeature {
   static AndroidWebViewFeature? fromValue(String? value) {
     if (value != null) {
       try {
-        return AndroidWebViewFeature.values.firstWhere(
-                (element) => element.toValue() == value);
+        return AndroidWebViewFeature.values
+            .firstWhere((element) => element.toValue() == value);
       } catch (e) {
         return null;
       }
@@ -74,127 +74,174 @@ class AndroidWebViewFeature {
   String toString() => _value;
 
   ///
-  static const CREATE_WEB_MESSAGE_CHANNEL = const AndroidWebViewFeature._internal("CREATE_WEB_MESSAGE_CHANNEL");
+  static const CREATE_WEB_MESSAGE_CHANNEL =
+      const AndroidWebViewFeature._internal("CREATE_WEB_MESSAGE_CHANNEL");
 
   ///
-  static const DISABLED_ACTION_MODE_MENU_ITEMS = const AndroidWebViewFeature._internal("DISABLED_ACTION_MODE_MENU_ITEMS");
+  static const DISABLED_ACTION_MODE_MENU_ITEMS =
+      const AndroidWebViewFeature._internal("DISABLED_ACTION_MODE_MENU_ITEMS");
 
   ///
   static const FORCE_DARK = const AndroidWebViewFeature._internal("FORCE_DARK");
 
   ///
-  static const FORCE_DARK_STRATEGY = const AndroidWebViewFeature._internal("FORCE_DARK_STRATEGY");
+  static const FORCE_DARK_STRATEGY =
+      const AndroidWebViewFeature._internal("FORCE_DARK_STRATEGY");
 
   ///
-  static const GET_WEB_CHROME_CLIENT = const AndroidWebViewFeature._internal("GET_WEB_CHROME_CLIENT");
+  static const GET_WEB_CHROME_CLIENT =
+      const AndroidWebViewFeature._internal("GET_WEB_CHROME_CLIENT");
 
   ///
-  static const GET_WEB_VIEW_CLIENT = const AndroidWebViewFeature._internal("GET_WEB_VIEW_CLIENT");
+  static const GET_WEB_VIEW_CLIENT =
+      const AndroidWebViewFeature._internal("GET_WEB_VIEW_CLIENT");
 
   ///
-  static const GET_WEB_VIEW_RENDERER = const AndroidWebViewFeature._internal("GET_WEB_VIEW_RENDERER");
+  static const GET_WEB_VIEW_RENDERER =
+      const AndroidWebViewFeature._internal("GET_WEB_VIEW_RENDERER");
 
   ///
-  static const MULTI_PROCESS = const AndroidWebViewFeature._internal("MULTI_PROCESS");
+  static const MULTI_PROCESS =
+      const AndroidWebViewFeature._internal("MULTI_PROCESS");
 
   ///
-  static const OFF_SCREEN_PRERASTER = const AndroidWebViewFeature._internal("OFF_SCREEN_PRERASTER");
+  static const OFF_SCREEN_PRERASTER =
+      const AndroidWebViewFeature._internal("OFF_SCREEN_PRERASTER");
 
   ///
-  static const POST_WEB_MESSAGE = const AndroidWebViewFeature._internal("POST_WEB_MESSAGE");
+  static const POST_WEB_MESSAGE =
+      const AndroidWebViewFeature._internal("POST_WEB_MESSAGE");
 
   ///
-  static const PROXY_OVERRIDE = const AndroidWebViewFeature._internal("PROXY_OVERRIDE");
+  static const PROXY_OVERRIDE =
+      const AndroidWebViewFeature._internal("PROXY_OVERRIDE");
 
   ///
-  static const RECEIVE_HTTP_ERROR = const AndroidWebViewFeature._internal("RECEIVE_HTTP_ERROR");
+  static const RECEIVE_HTTP_ERROR =
+      const AndroidWebViewFeature._internal("RECEIVE_HTTP_ERROR");
 
   ///
-  static const RECEIVE_WEB_RESOURCE_ERROR = const AndroidWebViewFeature._internal("RECEIVE_WEB_RESOURCE_ERROR");
+  static const RECEIVE_WEB_RESOURCE_ERROR =
+      const AndroidWebViewFeature._internal("RECEIVE_WEB_RESOURCE_ERROR");
 
   ///
-  static const SAFE_BROWSING_ALLOWLIST = const AndroidWebViewFeature._internal("SAFE_BROWSING_ALLOWLIST");
+  static const SAFE_BROWSING_ALLOWLIST =
+      const AndroidWebViewFeature._internal("SAFE_BROWSING_ALLOWLIST");
 
   ///
-  static const SAFE_BROWSING_ENABLE = const AndroidWebViewFeature._internal("SAFE_BROWSING_ENABLE");
+  static const SAFE_BROWSING_ENABLE =
+      const AndroidWebViewFeature._internal("SAFE_BROWSING_ENABLE");
 
   ///
-  static const SAFE_BROWSING_HIT = const AndroidWebViewFeature._internal("SAFE_BROWSING_HIT");
+  static const SAFE_BROWSING_HIT =
+      const AndroidWebViewFeature._internal("SAFE_BROWSING_HIT");
 
   ///
-  static const SAFE_BROWSING_PRIVACY_POLICY_URL = const AndroidWebViewFeature._internal("SAFE_BROWSING_PRIVACY_POLICY_URL");
+  static const SAFE_BROWSING_PRIVACY_POLICY_URL =
+      const AndroidWebViewFeature._internal("SAFE_BROWSING_PRIVACY_POLICY_URL");
 
   ///
-  static const SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY = const AndroidWebViewFeature._internal("SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY");
+  static const SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY =
+      const AndroidWebViewFeature._internal(
+          "SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY");
 
   ///
-  static const SAFE_BROWSING_RESPONSE_PROCEED = const AndroidWebViewFeature._internal("SAFE_BROWSING_RESPONSE_PROCEED");
+  static const SAFE_BROWSING_RESPONSE_PROCEED =
+      const AndroidWebViewFeature._internal("SAFE_BROWSING_RESPONSE_PROCEED");
 
   ///
-  static const SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL = const AndroidWebViewFeature._internal("SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL");
+  static const SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL =
+      const AndroidWebViewFeature._internal(
+          "SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL");
 
   ///
-  static const SAFE_BROWSING_WHITELIST = const AndroidWebViewFeature._internal("SAFE_BROWSING_WHITELIST");
+  static const SAFE_BROWSING_WHITELIST =
+      const AndroidWebViewFeature._internal("SAFE_BROWSING_WHITELIST");
 
   ///
-  static const SERVICE_WORKER_BASIC_USAGE = const AndroidWebViewFeature._internal("SERVICE_WORKER_BASIC_USAGE");
+  static const SERVICE_WORKER_BASIC_USAGE =
+      const AndroidWebViewFeature._internal("SERVICE_WORKER_BASIC_USAGE");
 
   ///
-  static const SERVICE_WORKER_BLOCK_NETWORK_LOADS = const AndroidWebViewFeature._internal("SERVICE_WORKER_BLOCK_NETWORK_LOADS");
+  static const SERVICE_WORKER_BLOCK_NETWORK_LOADS =
+      const AndroidWebViewFeature._internal(
+          "SERVICE_WORKER_BLOCK_NETWORK_LOADS");
 
   ///
-  static const SERVICE_WORKER_CACHE_MODE = const AndroidWebViewFeature._internal("SERVICE_WORKER_CACHE_MODE");
+  static const SERVICE_WORKER_CACHE_MODE =
+      const AndroidWebViewFeature._internal("SERVICE_WORKER_CACHE_MODE");
 
   ///
-  static const SERVICE_WORKER_CONTENT_ACCESS = const AndroidWebViewFeature._internal("SERVICE_WORKER_CONTENT_ACCESS");
+  static const SERVICE_WORKER_CONTENT_ACCESS =
+      const AndroidWebViewFeature._internal("SERVICE_WORKER_CONTENT_ACCESS");
 
   ///
-  static const SERVICE_WORKER_FILE_ACCESS = const AndroidWebViewFeature._internal("SERVICE_WORKER_FILE_ACCESS");
+  static const SERVICE_WORKER_FILE_ACCESS =
+      const AndroidWebViewFeature._internal("SERVICE_WORKER_FILE_ACCESS");
 
   ///
-  static const SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST = const AndroidWebViewFeature._internal("SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
+  static const SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST =
+      const AndroidWebViewFeature._internal(
+          "SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
 
   ///
-  static const SHOULD_OVERRIDE_WITH_REDIRECTS = const AndroidWebViewFeature._internal("SHOULD_OVERRIDE_WITH_REDIRECTS");
+  static const SHOULD_OVERRIDE_WITH_REDIRECTS =
+      const AndroidWebViewFeature._internal("SHOULD_OVERRIDE_WITH_REDIRECTS");
 
   ///
-  static const START_SAFE_BROWSING = const AndroidWebViewFeature._internal("START_SAFE_BROWSING");
+  static const START_SAFE_BROWSING =
+      const AndroidWebViewFeature._internal("START_SAFE_BROWSING");
 
   ///
-  static const TRACING_CONTROLLER_BASIC_USAGE = const AndroidWebViewFeature._internal("TRACING_CONTROLLER_BASIC_USAGE");
+  static const TRACING_CONTROLLER_BASIC_USAGE =
+      const AndroidWebViewFeature._internal("TRACING_CONTROLLER_BASIC_USAGE");
 
   ///
-  static const VISUAL_STATE_CALLBACK = const AndroidWebViewFeature._internal("VISUAL_STATE_CALLBACK");
+  static const VISUAL_STATE_CALLBACK =
+      const AndroidWebViewFeature._internal("VISUAL_STATE_CALLBACK");
 
   ///
-  static const WEB_MESSAGE_CALLBACK_ON_MESSAGE = const AndroidWebViewFeature._internal("WEB_MESSAGE_CALLBACK_ON_MESSAGE");
+  static const WEB_MESSAGE_CALLBACK_ON_MESSAGE =
+      const AndroidWebViewFeature._internal("WEB_MESSAGE_CALLBACK_ON_MESSAGE");
 
   ///
-  static const WEB_MESSAGE_LISTENER = const AndroidWebViewFeature._internal("WEB_MESSAGE_LISTENER");
+  static const WEB_MESSAGE_LISTENER =
+      const AndroidWebViewFeature._internal("WEB_MESSAGE_LISTENER");
 
   ///
-  static const WEB_MESSAGE_PORT_CLOSE = const AndroidWebViewFeature._internal("WEB_MESSAGE_PORT_CLOSE");
+  static const WEB_MESSAGE_PORT_CLOSE =
+      const AndroidWebViewFeature._internal("WEB_MESSAGE_PORT_CLOSE");
 
   ///
-  static const WEB_MESSAGE_PORT_POST_MESSAGE = const AndroidWebViewFeature._internal("WEB_MESSAGE_PORT_POST_MESSAGE");
+  static const WEB_MESSAGE_PORT_POST_MESSAGE =
+      const AndroidWebViewFeature._internal("WEB_MESSAGE_PORT_POST_MESSAGE");
 
   ///
-  static const WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK = const AndroidWebViewFeature._internal("WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK");
+  static const WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK =
+      const AndroidWebViewFeature._internal(
+          "WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK");
 
   ///
-  static const WEB_RESOURCE_ERROR_GET_CODE = const AndroidWebViewFeature._internal("WEB_RESOURCE_ERROR_GET_CODE");
+  static const WEB_RESOURCE_ERROR_GET_CODE =
+      const AndroidWebViewFeature._internal("WEB_RESOURCE_ERROR_GET_CODE");
 
   ///
-  static const WEB_RESOURCE_ERROR_GET_DESCRIPTION = const AndroidWebViewFeature._internal("WEB_RESOURCE_ERROR_GET_DESCRIPTION");
+  static const WEB_RESOURCE_ERROR_GET_DESCRIPTION =
+      const AndroidWebViewFeature._internal(
+          "WEB_RESOURCE_ERROR_GET_DESCRIPTION");
 
   ///
-  static const WEB_RESOURCE_REQUEST_IS_REDIRECT = const AndroidWebViewFeature._internal("WEB_RESOURCE_REQUEST_IS_REDIRECT");
+  static const WEB_RESOURCE_REQUEST_IS_REDIRECT =
+      const AndroidWebViewFeature._internal("WEB_RESOURCE_REQUEST_IS_REDIRECT");
 
   ///
-  static const WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE = const AndroidWebViewFeature._internal("WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE");
+  static const WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE =
+      const AndroidWebViewFeature._internal(
+          "WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE");
 
   ///
-  static const WEB_VIEW_RENDERER_TERMINATE = const AndroidWebViewFeature._internal("WEB_VIEW_RENDERER_TERMINATE");
+  static const WEB_VIEW_RENDERER_TERMINATE =
+      const AndroidWebViewFeature._internal("WEB_VIEW_RENDERER_TERMINATE");
 
   bool operator ==(value) => value == _value;
 

@@ -24,9 +24,9 @@ class IOSWebStorageManager {
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
-    List<Map<dynamic, dynamic>> records = (await _staticChannel
-            .invokeMethod('fetchDataRecords', args))
-        .cast<Map<dynamic, dynamic>>();
+    List<Map<dynamic, dynamic>> records =
+        (await _staticChannel.invokeMethod('fetchDataRecords', args))
+            .cast<Map<dynamic, dynamic>>();
     for (var record in records) {
       List<String> dataTypesString = record["dataTypes"].cast<String>();
       Set<IOSWKWebsiteDataType> dataTypes = Set();
@@ -84,7 +84,6 @@ class IOSWebStorageManager {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
     args.putIfAbsent("timestamp", () => timestamp);
-    await _staticChannel
-        .invokeMethod('removeDataModifiedSince', args);
+    await _staticChannel.invokeMethod('removeDataModifiedSince', args);
   }
 }

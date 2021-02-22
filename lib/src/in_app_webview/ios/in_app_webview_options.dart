@@ -247,7 +247,8 @@ class IOSInAppWebViewOptions
       this.applePayAPIEnabled = false,
       this.allowingReadAccessTo,
       this.disableLongPressContextMenuOnLinks = false}) {
-    assert(allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
+    assert(
+        allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
   }
 
   @override
@@ -283,7 +284,8 @@ class IOSInAppWebViewOptions
       "isPagingEnabled": isPagingEnabled,
       "maximumZoomScale": maximumZoomScale,
       "minimumZoomScale": minimumZoomScale,
-      "contentInsetAdjustmentBehavior": contentInsetAdjustmentBehavior.toValue(),
+      "contentInsetAdjustmentBehavior":
+          contentInsetAdjustmentBehavior.toValue(),
       "isDirectionalLockEnabled": isDirectionalLockEnabled,
       "mediaType": mediaType,
       "pageZoom": pageZoom,
@@ -300,7 +302,8 @@ class IOSInAppWebViewOptions
     List<String> dataDetectorTypesList =
         List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorTypeValue) {
-      var dataDetectorType = IOSWKDataDetectorTypes.fromValue(dataDetectorTypeValue);
+      var dataDetectorType =
+          IOSWKDataDetectorTypes.fromValue(dataDetectorTypeValue);
       if (dataDetectorType != null) {
         dataDetectorTypes.add(dataDetectorType);
       }
@@ -344,11 +347,15 @@ class IOSInAppWebViewOptions
     options.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
     options.mediaType = map["mediaType"];
     options.pageZoom = map["pageZoom"];
-    options.limitsNavigationsToAppBoundDomains = map["limitsNavigationsToAppBoundDomains"];
+    options.limitsNavigationsToAppBoundDomains =
+        map["limitsNavigationsToAppBoundDomains"];
     options.useOnNavigationResponse = map["useOnNavigationResponse"];
     options.applePayAPIEnabled = map["applePayAPIEnabled"];
-    options.allowingReadAccessTo = map["allowingReadAccessTo"] != null ? Uri.parse(map["allowingReadAccessTo"]) : null;
-    options.disableLongPressContextMenuOnLinks = map["disableLongPressContextMenuOnLinks"];
+    options.allowingReadAccessTo = map["allowingReadAccessTo"] != null
+        ? Uri.parse(map["allowingReadAccessTo"])
+        : null;
+    options.disableLongPressContextMenuOnLinks =
+        map["disableLongPressContextMenuOnLinks"];
     return options;
   }
 

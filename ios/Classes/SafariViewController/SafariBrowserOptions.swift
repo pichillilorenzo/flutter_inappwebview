@@ -14,8 +14,8 @@ public class SafariBrowserOptions: Options<SafariViewController> {
     var entersReaderIfAvailable = false
     var barCollapsingEnabled = false
     var dismissButtonStyle = 0 //done
-    var preferredBarTintColor = ""
-    var preferredControlTintColor = ""
+    var preferredBarTintColor: String?
+    var preferredControlTintColor: String?
     var presentationStyle = 0 //fullscreen
     var transitionStyle = 0 //crossDissolve
     
@@ -30,6 +30,10 @@ public class SafariBrowserOptions: Options<SafariViewController> {
                 realOptions["entersReaderIfAvailable"] = safariViewController.configuration.entersReaderIfAvailable
                 realOptions["barCollapsingEnabled"] = safariViewController.configuration.barCollapsingEnabled
                 realOptions["dismissButtonStyle"] = safariViewController.dismissButtonStyle.rawValue
+            }
+            if #available(iOS 10.0, *) {
+                realOptions["preferredBarTintColor"] = safariViewController.preferredBarTintColor?.hexString
+                realOptions["preferredControlTintColor"] = safariViewController.preferredControlTintColor?.hexString
             }
             realOptions["presentationStyle"] = safariViewController.modalPresentationStyle.rawValue
             realOptions["transitionStyle"] = safariViewController.modalTransitionStyle.rawValue

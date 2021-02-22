@@ -5,7 +5,6 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:path_provider/path_provider.dart';
 // import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -61,6 +60,20 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     super.dispose();
   }
 
+  var options = InAppWebViewGroupOptions(
+      crossPlatform: InAppWebViewOptions(
+        useShouldOverrideUrlLoading: false,
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+      ),
+      ios: IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+        // limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
+      )
+  );
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -88,26 +101,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   child: InAppWebView(
                     key: webViewKey,
                     // contextMenu: contextMenu,
-                    initialUrl: "https://flutter.dev",
+                    initialUrlRequest: URLRequest(
+                      url: Uri.parse("https://github.com")
+                    ),
                     // initialFile: "assets/index.html",
-                    initialHeaders: {},
                     initialUserScripts: UnmodifiableListView<UserScript>([
 
                     ]),
-                    initialOptions: InAppWebViewGroupOptions(
-                      crossPlatform: InAppWebViewOptions(
-                        useShouldOverrideUrlLoading: false,
-                        mediaPlaybackRequiresUserGesture: false,
-                        clearCache: true,
-                      ),
-                      android: AndroidInAppWebViewOptions(
-                        useHybridComposition: false,
-                      ),
-                      ios: IOSInAppWebViewOptions(
-                        allowsInlineMediaPlayback: true,
-                        // limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
-                      )
-                    ),
+                    initialOptions: options,
                     onWebViewCreated: (controller) {
                       webView = controller;
                       print("onWebViewCreated");
@@ -115,15 +116,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     onLoadStart: (controller, url) {
                       print("onLoadStart $url");
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url.toString();
                       });
                     },
                     androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
                       return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
                     },
-                    shouldOverrideUrlLoading: (controller, shouldOverrideUrlLoadingRequest) async {
-                      var url = shouldOverrideUrlLoadingRequest.url;
-                      var uri = Uri.parse(url);
+                    shouldOverrideUrlLoading: (controller, navigationAction) async {
+                      var uri = navigationAction.request.url!;
 
                       if (!["http", "https", "file",
                         "chrome", "data", "javascript",
@@ -134,17 +134,21 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                             url,
                           );
                           // and cancel the request
-                          return ShouldOverrideUrlLoadingAction.CANCEL;
+                          return NavigationActionPolicy.CANCEL;
                         }
                       }
 
-                      return ShouldOverrideUrlLoadingAction.ALLOW;
+                      return NavigationActionPolicy.ALLOW;
+                    },
+                    onLoadResource: (controller, resource) {
+                      // print(resource);
                     },
                     onLoadStop: (controller, url) async {
                       print("onLoadStop $url");
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url.toString();
                       });
+                      webView = controller;
 
                       // RenderObject renderBox = webViewKey.currentContext!.findRenderObject()!;
                       // print(renderBox.paintBounds.size);
@@ -157,10 +161,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     onUpdateVisitedHistory: (controller, url, androidIsReload) {
                       print("onUpdateVisitedHistory $url");
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url.toString();
                       });
                     },
                     onConsoleMessage: (controller, consoleMessage) {
+                      print("CONSOLE MESSAGE FROM MAIN WEBVIEW!");
                       print(consoleMessage);
                     },
                   ),
@@ -169,19 +174,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.arrow_back),
                     onPressed: () {
                       webView?.goBack();
                     },
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.arrow_forward),
                     onPressed: () {
                       webView?.goForward();
                     },
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.refresh),
                     onPressed: () {
                       webView?.reload();

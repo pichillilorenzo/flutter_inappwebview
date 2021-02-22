@@ -5,11 +5,11 @@
 - Added `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options also for iOS (also thanks to [liranhao](https://github.com/liranhao))
 - Added limited cookies support on iOS below 11.0 using JavaScript
 - Added `IOSCookieManager` class and `CookieManager.instance().ios.getAllCookies` iOS-specific method
-- Added `UserScript`, `UserScriptInjectionTime`, `ContentWorld`, `AndroidWebViewFeature`, `AndroidServiceWorkerController`, `AndroidServiceWorkerClient`, `ScreenshotConfiguration`, `IOSWKPDFConfiguration` classes
+- Added `UserScript`, `UserScriptInjectionTime`, `ContentWorld`, `AndroidWebViewFeature`, `AndroidServiceWorkerController`, `AndroidServiceWorkerClient`, `ScreenshotConfiguration`, `IOSWKPDFConfiguration`, `URLRequest` classes
 - Added `initialUserScripts` WebView option
-- Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeAllUserScripts`, `callAsyncJavaScript` WebView methods
+- Added `addUserScript`, `addUserScripts`, `removeUserScript`, `removeUserScripts`, `removeUserScriptsByGroupName`, `removeAllUserScripts`, `callAsyncJavaScript`, `isSecureContext` WebView methods
 - Added `contentWorld` argument to `evaluateJavascript` WebView method
-- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse`, `applePayAPIEnabled`, `allowingReadAccessTo` iOS-specific WebView options
+- Added `isDirectionalLockEnabled`, `mediaType`, `pageZoom`, `limitsNavigationsToAppBoundDomains`, `useOnNavigationResponse`, `applePayAPIEnabled`, `allowingReadAccessTo`, `disableLongPressContextMenuOnLinks` iOS-specific WebView options
 - Added `handlesURLScheme`, `createPdf`, `createWebArchiveData` iOS-specific WebView methods
 - Added `iosOnNavigationResponse` and `iosShouldAllowDeprecatedTLS` iOS-specific WebView events
 - Added `iosAnimated` optional argument to `zoomBy` WebView method
@@ -18,6 +18,7 @@
 - Added `cssLinkHtmlTagAttributes` optional argument to `injectCSSFileFromUrl` WebView method
 - Added `iosAllowingReadAccessTo` iOS-specific optional argument to `loadUrl` WebView method
 - Added new iOS-specific attributes to `ShouldOverrideUrlLoadingRequest` and `CreateWindowRequest` classes
+- Added `toolbarTopTranslucent`, `toolbarTopTintColor`, `toolbarBottomTintColor`, `toolbarTopBarTintColor` ios-specific InAppBrowser options
 - Updated integration tests
 - Merge "Upgraded appcompat to 1.2.0-rc-02" [#465](https://github.com/pichillilorenzo/flutter_inappwebview/pull/465) (thanks to [andreidiaconu](https://github.com/andreidiaconu))
 - Merge "Added missing field 'headers' which returned by WebResourceResponse.toMap()" [#490](https://github.com/pichillilorenzo/flutter_inappwebview/pull/490) (thanks to [Doflatango](https://github.com/Doflatango))
@@ -47,14 +48,44 @@
 
 - Minimum Flutter version required is `1.22.2` and Dart SDK `>=2.12.0-0 <3.0.0`
 - iOS Xcode version `>= 12`
-- Removed `debuggingEnabled` WebView option; on Android you should use now the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method; on iOS, debugging is always enabled
 - `allowUniversalAccessFromFileURLs` and `allowFileAccessFromFileURLs` WebView options moved from Android-specific options to cross-platform options
 - Added `callAsyncJavaScript` name to the list of javaScriptHandlerForbiddenNames
-- Changed `zoomBy` WebView method signature
 - Moved `saveWebArchive` WebView method from Android-specific to cross-platform
+- Moved `progressBar` InAppBroswer from Android-specific option to cross-platform option and renamed to `hideProgressBar`
 - Renamed `HttpAuthChallenge` to `URLAuthenticationChallenge`
-- Deleted `androidOnRequestFocus` event because it is never called
 - Updated `basicConstraints`, `subjectKeyIdentifier`, `authorityKeyIdentifier`, `certificatePolicies`, `cRLDistributionPoints`, `authorityInfoAccess` attributes type of `X509Certificate`
+- Updated "WebView.storyboard" for InAppBrowser iOS representation
+- Renamed `ShouldOverrideUrlLoadingAction` class to `NavigationActionPolicy`
+- Renamed `ProtectionSpace` class to `URLProtectionSpace`
+- Renamed `ProtectionSpaceHttpAuthCredentials` to `URLProtectionSpaceHttpAuthCredentials`
+- Renamed `CreateWindowRequest` class to `CreateWindowAction`
+- Renamed `initialUrl` to `initialUrlRequest` WebView attribute and made it of type `URLRequest`
+- Renamed `toolbarTop` InAppBrowser cross-platform option to `hideToolbarTop`
+- Renamed `toolbarBottom` InAppBrowser ios-specific option to `hideToolbarBottom`
+- Removed `debuggingEnabled` WebView option; on Android you should use now the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method; on iOS, debugging is always enabled
+- Removed `androidOnRequestFocus` event because it is never called
+- Removed `initialHeaders` WebView attribute. Use `URLRequest.headers` attribute
+- Removed `headers` argument from `loadFile` WebView method
+- Removed `headers` argument from `openFile` InAppBrowser method
+- Removed `headers` argument from `loadUrl` WebView method, renamed the `url` argument to `urlRequest` and made it of type `URLRequest`
+- Removed `headers` argument from `openFile` InAppBrowser method
+- Removed `headers` argument from `openUrl` InAppBrowser method, renamed the `url` argument to `urlRequest` and made it of type `URLRequest`
+- Removed `fallback` argument from `ChromeSafariBrowser` constructor. Check for availability of `ChromeSafariBrowser` if you want show one or the other.
+- Removed `scheme` argument from `onLoadResourceCustomScheme` WebView event. Use the `Uri url` parameter now.
+- Removed `ShouldOverrideUrlLoadingRequest` class and replaced with `NavigationAction`
+- Changed `zoomBy` WebView method signature
+- Changed type of `urlFile` argument of `injectCSSFileFromUrl` WebView method to `Uri`
+- Changed type of `urlFile` argument of `injectJavascriptFileFromUrl` WebView method to `Uri`
+- Changed return type of `getOriginalUrl` Android-specific WebView method to `Uri`
+- Changed return type of `getSafeBrowsingPrivacyPolicyUrl` Android-specific WebView method to `Uri`
+- Changed type of `url` argument of `onLoadStart`, `onLoadStop`, `onLoadError`, `onLoadHttpError`, `onLoadResourceCustomScheme`, `onUpdateVisitedHistory`, `onPrint`, `onPageCommitVisible`, `androidOnSafeBrowsingHit`, `androidOnRenderProcessUnresponsive`, `androidOnRenderProcessResponsive`, `androidOnFormResubmission`, `androidOnReceivedTouchIconUrl` WebView events to `Uri`
+- Changed type of `baseUrl` and `androidHistoryUrl` arguments of `loadData` WebView method and `openData` InAppBrowser method
+- Changed `openUrl` InAppBrowser method to `openUrlRequest`
+- Changed type of `url` argument of `openWithSystemBrowser` InAppBrowser method to `Uri`
+- Changed all InAppBrowser color options type from `String` to `Color`
+- Changed all ChromeSafariBrowser color options type from `String` to `Color`
+- Updated attributes of `ShouldOverrideUrlLoadingRequest`, `ServerTrustChallenge` and `ClientCertChallenge` classes
+- Changed type of `url` attribute to `Uri` for `JsAlertRequest`, `JsAlertConfirm`, `JsPromptRequest` classes
 
 ## 4.0.0+4
 

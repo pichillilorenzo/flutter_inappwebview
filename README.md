@@ -29,8 +29,8 @@ Also, check the [example/integration_test/webview_flutter_test.dart](https://git
 
 ## Articles/Resources
 
-- [InAppWebView: The Real Power of WebViews in Flutter](https://medium.com/flutter-community/inappwebview-the-real-power-of-webviews-in-flutter-c6d52374209d?source=friends_link&sk=cb74487219bcd85e610a670ee0b447d0)
-- [Creating a Full-Featured Browser using WebViews in Flutter](https://medium.com/flutter-community/creating-a-full-featured-browser-using-webviews-in-flutter-9c8f2923c574?source=friends_link&sk=55fc8267f351082aa9e73ced546f6bcb)
+- [InAppWebView: The Real Power of WebViews in Flutter](https://medium.com/flutter-community/inappwebview-the-real-power-of-webviews-in-flutter-c6d52374209d?source=friends_link&sk=cb74487219bcd85e610a670ee0b447d0) (valid for plugin version 4.0.0)
+- [Creating a Full-Featured Browser using WebViews in Flutter](https://medium.com/flutter-community/creating-a-full-featured-browser-using-webviews-in-flutter-9c8f2923c574?source=friends_link&sk=55fc8267f351082aa9e73ced546f6bcb) (valid for plugin version 4.0.0)
 - [Flutter Browser App: A Full-Featured Mobile Browser App (such as the Google Chrome mobile browser) created using Flutter and the features offered by the flutter_inappwebview plugin](https://github.com/pichillilorenzo/flutter_browser_app)
 
 ## Requirements
@@ -323,24 +323,31 @@ class _MyAppState extends State<MyApp> {
                   decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
-                    initialUrl: "https://flutter.dev/",
-                    initialHeaders: {},
+                    initialUrlRequest: URLRequest(
+                      url: Uri.parse("https://flutter.dev/")
+                    ),
                     initialOptions: InAppWebViewGroupOptions(
-                        crossPlatform: InAppWebViewOptions(
+                      crossPlatform: InAppWebViewOptions(
 
-                        )
+                      ),
+                      ios: IOSInAppWebViewOptions(
+
+                      ),
+                      android: AndroidInAppWebViewOptions(
+                        useHybridComposition: true
+                      )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },
                     onLoadStart: (controller, url) {
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url?.toString() ?? '';
                       });
                     },
                     onLoadStop: (controller, url) async {
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url?.toString() ?? '';
                       });
                     },
                     onProgressChanged: (controller, progress) {
@@ -354,19 +361,19 @@ class _MyAppState extends State<MyApp> {
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.arrow_back),
                     onPressed: () {
                       webView?.goBack();
                     },
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.arrow_forward),
                     onPressed: () {
                       webView?.goForward();
                     },
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.refresh),
                     onPressed: () {
                       webView?.reload();
@@ -395,8 +402,8 @@ Screenshots:
 ##### `InAppWebViewController` Cross-platform methods
 
 * `addJavaScriptHandler({required String handlerName, required JavaScriptHandlerCallback callback})`: Adds a JavaScript message handler callback that listen to post messages sent from JavaScript by the handler with name `handlerName`.
-* `addUserScript(UserScript userScript)`: Injects the specified `userScript` into the webpage’s content.
-* `addUserScripts(List<UserScript> userScripts)`: Injects the `userScripts` into the webpage’s content.
+* `addUserScript({required UserScript userScript})`: Injects the specified `userScript` into the webpage’s content.
+* `addUserScripts({required List<UserScript> userScripts})`: Injects the `userScripts` into the webpage’s content.
 * `callAsyncJavaScript({required String functionBody, Map<String, dynamic> arguments = const <String, dynamic>{}, ContentWorld? contentWorld})`: Executes the specified string as an asynchronous JavaScript function.
 * `canGoBackOrForward({required int steps})`: Returns a boolean value indicating whether the WebView can go back or forward the given number of steps. Steps is negative if backward and positive if forward.
 * `canGoBack`: Returns a boolean value indicating whether the WebView can move backward.
@@ -433,26 +440,28 @@ Screenshots:
 * `injectCSSFileFromAsset({required String assetFilePath})`: Injects a CSS file into the WebView from the flutter assets directory.
 * `injectCSSFileFromUrl({required String urlFile, CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes})`: Injects an external CSS file into the WebView from a defined url.
 * `injectJavascriptFileFromAsset({required String assetFilePath})`: Injects a JavaScript file into the WebView from the flutter assets directory.
-* `injectJavascriptFileFromUrl({required String urlFile, ScriptHtmlTagAttributes? scriptHtmlTagAttributes})`: Injects an external JavaScript file into the WebView from a defined url.
+* `injectJavascriptFileFromUrl({required Uri urlFile, ScriptHtmlTagAttributes? scriptHtmlTagAttributes})`: Injects an external JavaScript file into the WebView from a defined url.
 * `isLoading`: Check if the WebView instance is in a loading state.
-* `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String androidHistoryUrl = "about:blank"})`: Loads the given data into this WebView.
-* `loadFile({required String assetFilePath, Map<String, String> headers = const {}})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
-* `loadUrl({required String url, Map<String, String> headers = const {}, String? iosAllowingReadAccessTo})`: Loads the given url with optional headers specified as a map from name to value.
+* `isSecureContext`: Indicates whether the webpage context is capable of using features that require secure contexts.
+* `loadData({required String data, String mimeType = "text/html", String encoding = "utf8", Uri? baseUrl, Uri? androidHistoryUrl})`: Loads the given data into this WebView.
+* `loadFile({required String assetFilePath})`: Loads the given `assetFilePath` with optional headers specified as a map from name to value.
+* `loadUrl({required URLRequest urlRequest, Uri? iosAllowingReadAccessTo})`: Loads the given url with optional headers specified as a map from name to value.
 * `pauseTimers`: On Android, it pauses all layout, parsing, and JavaScript timers for all WebViews. This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused. On iOS, it is restricted to just this WebView.
-* `postUrl({required String url, required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
+* `postUrl({required Uri url, required Uint8List postData})`: Loads the given url with postData using `POST` method into this WebView.
 * `printCurrentPage`: Prints the current page.
 * `reload`: Reloads the WebView.
 * `removeAllUserScripts()`: Removes all the user scripts from the webpage’s content.
 * `removeJavaScriptHandler({required String handlerName})`: Removes a JavaScript message handler previously added with the `addJavaScriptHandler()` associated to `handlerName` key.
-* `removeUserScript(UserScript userScript)`: Removes the specified `userScript` from the webpage’s content.
-* `removeUserScripts(List<UserScript> userScripts)`: Removes the `userScripts` from the webpage’s content.
+* `removeUserScript({required UserScript userScript})`: Removes the specified `userScript` from the webpage’s content.
+* `removeUserScriptsByGroupName({required String groupName})`: Removes all the `UserScript`s with `groupName` as group name from the webpage’s content.
+* `removeUserScripts({required List<UserScript> userScripts})`: Removes the `userScripts` from the webpage’s content.
 * `requestFocusNodeHref`: Requests the anchor or image element URL at the last tapped point.
 * `requestImageRef`: Requests the URL of the image last touched by the user.
 * `resumeTimers`: On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers. On iOS, it resumes all layout, parsing, and JavaScript timers to just this WebView.
 * `saveWebArchive({required String filePath, bool autoname = false})`: Saves the current view as a web archive.
 * `scrollBy({required int x, required int y, bool animated = false})`: Moves the scrolled position of the WebView.
 * `scrollTo({required int x, required int y, bool animated = false})`: Scrolls the WebView to the position.
-* `setContextMenu(ContextMenu contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
+* `setContextMenu(ContextMenu? contextMenu)`: Sets or updates the WebView context menu to be used next time it will appear.
 * `setOptions({required InAppWebViewGroupOptions options})`: Sets the WebView options with the new options and evaluates them.
 * `stopLoading`: Stops the WebView from loading.
 * `takeScreenshot({ScreenshotConfiguration? screenshotConfiguration})`: Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a `Uint8List`. Returns `null` if it wasn't be able to take it.
@@ -611,6 +620,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `minimumLogicalFontSize`: Sets the minimum logical font size. The default is `8`.
 * `mixedContentMode`: Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
 * `needInitialFocus`: Tells the WebView whether it needs to set a node. The default value is `true`.
+* `networkAvailable`: Informs WebView of the network state.
 * `offscreenPreRaster`: Sets whether this WebView should raster tiles when it is offscreen but attached to a window.
 * `overScrollMode`: Sets the WebView's over-scroll mode. The default value is `AndroidOverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS`.
 * `regexToCancelSubFramesLoading`: Regular expression used by `shouldOverrideUrlLoading` event to cancel navigation for frames that are not the main frame. If the url request of a subframe matches the regular expression, then the request of that subframe is canceled.
@@ -649,6 +659,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `contentInsetAdjustmentBehavior`: Configures how safe area insets are added to the adjusted content inset. The default value is `IOSUIScrollViewContentInsetAdjustmentBehavior.NEVER`.
 * `dataDetectorTypes`: Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
 * `decelerationRate`: A `IOSUIScrollViewDecelerationRate` value that determines the rate of deceleration after the user lifts their finger. The default value is `IOSUIScrollViewDecelerationRate.NORMAL`.
+* `disableLongPressContextMenuOnLinks`: Set to `true` to disable the context menu (copy, select, etc.) that is shown when the user emits a long press event on a HTML link.
 * `disallowOverScroll`: Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
 * `enableViewportScale`: Set to `true` to allow a viewport meta tag to either disable or restrict the range of user scaling. The default value is `false`.
 * `ignoresViewportScaleLimits`: Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
@@ -664,7 +675,7 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `selectionGranularity`: The level of granularity with which the user can interactively select content in the web view.
 * `sharedCookiesEnabled`: Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
 * `suppressesIncrementalRendering`: Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
-* `useOnNavigationResponse`: Set to `true` to be able to listen at the `iosOnNavigationResponse` event. The default value is `false`.
+* `useOnNavigationResponse`: Set to `true` to be able to listen to the `iosOnNavigationResponse` event. The default value is `false`.
 
 #### `InAppWebView` Events
 
@@ -814,25 +825,32 @@ class _MyAppState extends State<MyApp> {
                   decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
                   child: InAppWebView(
-                    initialUrl: "https://flutter.dev/",
+                    initialUrlRequest: URLRequest(
+                      url: Uri.parse("https://flutter.dev/")
+                    ),
                     contextMenu: contextMenu,
-                    initialHeaders: {},
                     initialOptions: InAppWebViewGroupOptions(
-                        crossPlatform: InAppWebViewOptions(
+                      crossPlatform: InAppWebViewOptions(
 
-                        )
+                      ),
+                      ios: IOSInAppWebViewOptions(
+
+                      ),
+                      android: AndroidInAppWebViewOptions(
+                        useHybridComposition: true
+                      )
                     ),
                     onWebViewCreated: (InAppWebViewController controller) {
                       webView = controller;
                     },
                     onLoadStart: (controller, url) {
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url?.toString() ?? '';
                       });
                     },
                     onLoadStop: (controller, url) async {
                       setState(() {
-                        this.url = url ?? '';
+                        this.url = url?.toString() ?? '';
                       });
                     },
                     onProgressChanged: (controller, progress) {
@@ -846,19 +864,19 @@ class _MyAppState extends State<MyApp> {
               ButtonBar(
                 alignment: MainAxisAlignment.center,
                 children: <Widget>[
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.arrow_back),
                     onPressed: () {
                       webView?.goBack();
                     },
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.arrow_forward),
                     onPressed: () {
                       webView?.goForward();
                     },
                   ),
-                  RaisedButton(
+                  ElevatedButton(
                     child: Icon(Icons.refresh),
                     onPressed: () {
                       webView?.reload();
@@ -922,7 +940,9 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     headlessWebView = new HeadlessInAppWebView(
-      initialUrl: "https://flutter.dev/",
+      initialUrlRequest: URLRequest(
+        url: Uri.parse("https://flutter.dev/")
+      ),
       initialOptions: InAppWebViewGroupOptions(
         crossPlatform: InAppWebViewOptions(
 
@@ -937,19 +957,19 @@ class _MyAppState extends State<MyApp> {
       onLoadStart: (controller, url) async {
         print("onLoadStart $url");
         setState(() {
-          this.url = url ?? '';
+          this.url = url?.toString() ?? '';
         });
       },
       onLoadStop: (controller, url) async {
         print("onLoadStop $url");
         setState(() {
-          this.url = url ?? '';
+          this.url = url?.toString() ?? '';
         });
       },
       onUpdateVisitedHistory: (controller, url, androidIsReload) {
         print("onUpdateVisitedHistory $url");
         setState(() {
-          this.url = url ?? '';
+          this.url = url?.toString() ?? '';
         });
       },
     );
@@ -976,7 +996,7 @@ class _MyAppState extends State<MyApp> {
                     "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
               ),
               Center(
-                child: RaisedButton(
+                child: ElevatedButton(
                     onPressed: () async {
                       await headlessWebView?.dispose();
                       await headlessWebView?.run();
@@ -984,7 +1004,7 @@ class _MyAppState extends State<MyApp> {
                     child: Text("Run HeadlessInAppWebView")),
               ),
               Center(
-                child: RaisedButton(
+                child: ElevatedButton(
                     onPressed: () async {
                       try {
                         await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
@@ -995,7 +1015,7 @@ class _MyAppState extends State<MyApp> {
                     child: Text("Send console.log message")),
               ),
               Center(
-                child: RaisedButton(
+                child: ElevatedButton(
                     onPressed: () {
                       headlessWebView?.dispose();
                     },
@@ -1054,9 +1074,9 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(ShouldOverrideUrlLoadingRequest shouldOverrideUrlLoadingRequest) async {
-    print("\n\n override ${shouldOverrideUrlLoadingRequest.url}\n\n");
-    return ShouldOverrideUrlLoadingAction.ALLOW;
+  Future<NavigationActionPolicy?>? shouldOverrideUrlLoading(NavigationAction navigationAction)  async {
+    print("\n\n override ${navigationAction.request.url}\n\n");
+    return NavigationActionPolicy.ALLOW;
   }
 
   @override
@@ -1066,7 +1086,7 @@ class MyInAppBrowser extends InAppBrowser {
         "ms ---> duration: " +
         response.duration.toString() +
         "ms " +
-        (response.url ?? ''));
+        (response.url?.toString() ?? ''));
   }
 
   @override
@@ -1074,7 +1094,7 @@ class MyInAppBrowser extends InAppBrowser {
     print("""
     console output:
       message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel?.toValue()}
+      messageLevel: ${consoleMessage.messageLevel.toValue()}
    """);
   }
 }
@@ -1106,7 +1126,7 @@ class _MyAppState extends State<MyApp> {
           title: const Text('InAppBrowser Example'),
         ),
         body: Center(
-          child: RaisedButton(
+          child: ElevatedButton(
               onPressed: () {
                 widget.browser.openFile(
                     assetFilePath: "assets/index.html",
@@ -1136,10 +1156,10 @@ Screenshots:
 
 #### `InAppBrowser` Methods
 
-* `open({String url = "about:blank", Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens an `url` in a new `InAppBrowser` instance.
-* `openFile({required String assetFilePath, Map<String, String> headers = const {}, InAppBrowserClassOptions options})`: Opens the given `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open`.
-* `openData({required String data, String mimeType = "text/html", String encoding = "utf8", String baseUrl = "about:blank", String historyUrl = "about:blank", InAppBrowserClassOptions options})`: Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
-* `openWithSystemBrowser({required String url})`: This is a static method that opens an `url` in the system browser. You wont be able to use the `InAppBrowser` methods here!
+* `openUrlRequest({required URLRequest urlRequest, InAppBrowserClassOptions? options})`: Opens an `url` in a new `InAppBrowser` instance.
+* `openFile({required String assetFilePath, InAppBrowserClassOptions? options})`: Opens the given `assetFilePath` file in a new `InAppBrowser` instance. The other arguments are the same of `InAppBrowser.open`.
+* `openData({required String data, String mimeType = "text/html", String encoding = "utf8", Uri? baseUrl, Uri? androidHistoryUrl, InAppBrowserClassOptions? options})`: Opens a new `InAppBrowser` instance with `data` as a content, using `baseUrl` as the base URL for it.
+* `openWithSystemBrowser({required Uri url})`: This is a static method that opens an `url` in the system browser. You wont be able to use the `InAppBrowser` methods here!
 * `show`: Displays an `InAppBrowser` window that was opened hidden. Calling this has no effect if the `InAppBrowser` was already visible.
 * `hide`: Hides the `InAppBrowser` window. Calling this has no effect if the `InAppBrowser` was already hidden.
 * `close`: Closes the `InAppBrowser` window.
@@ -1157,25 +1177,28 @@ Specific options of the `InAppBrowser` class are:
 
 * `hidden`: Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally. The default value is `false`.
 * `hideUrlBar`: Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
+* `hideProgressBar`: Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
+* `hideToolbarTop`: Set to `true` to hide the toolbar at the top of the WebView. The default value is `false`.
 * `toolbarTopBackgroundColor`: Set the custom background color of the toolbar at the top.
-* `toolbarTop`: Set to `false` to hide the toolbar at the top of the WebView. The default value is `true`.
 
 ##### `InAppBrowser` Android-specific options
 
 * `closeOnCannotGoBack`: Set to `false` to not close the InAppBrowser when the user click on the back button and the WebView cannot go back to the history. The default value is `true`.
 * `hideTitleBar`: Set to `true` if you want the title should be displayed. The default value is `false`.
-* `progressBar`: Set to `false` to hide the progress bar at the bottom of the toolbar at the top. The default value is `true`.
 * `toolbarTopFixedTitle`: Set the action bar's title.
 
 ##### `InAppBrowser` iOS-specific options
 
 * `closeButtonCaption`: Set the custom text for the close button.
 * `closeButtonColor`: Set the custom color for the close button.
+* `hideToolbarBottom`: Set to `true` to hide the toolbar at the bottom of the WebView. The default value is `false`.
 * `presentationStyle`: Set the custom modal presentation style when presenting the WebView. The default value is `IOSUIModalPresentationStyle.FULL_SCREEN`.
-* `spinner`: Set to `false` to hide the spinner when the WebView is loading a page. The default value is `true`.
 * `toolbarBottomBackgroundColor`: Set the custom background color of the toolbar at the bottom.
+* `toolbarBottomTintColor`: Set the tint color to apply to the bar button items.
 * `toolbarBottomTranslucent`: Set to `true` to set the toolbar at the bottom translucent. The default value is `true`.
-* `toolbarBottom`: Set to `false` to hide the toolbar at the bottom of the WebView. The default value is `true`.
+* `toolbarTopTranslucent`: Set to `true` to set the toolbar at the top translucent. The default value is `true`.
+* `toolbarTopBarTintColor`: Set the tint color to apply to the navigation bar background.
+* `toolbarTopTintColor`: Set the tint color to apply to the navigation items and bar button items.
 * `transitionStyle`: Set to the custom transition style when presenting the WebView. The default value is `IOSUIModalTransitionStyle.COVER_VERTICAL`.
 
 #### `InAppBrowser` Events
@@ -1191,8 +1214,6 @@ Specific events of the `InAppBrowser` class are:
 [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 
 If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for `android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml` (you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
-
-You can initialize the `ChromeSafariBrowser` instance with an `InAppBrowser` fallback instance.
 
 Create a Class that extends the `ChromeSafariBrowser` Class in order to override the callbacks to manage the browser events. Example:
 ```dart
@@ -1227,8 +1248,6 @@ class MyInAppBrowser extends InAppBrowser {
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
-  MyChromeSafariBrowser(browserFallback) : super(bFallback: browserFallback);
-
   @override
   void onOpened() {
     print("ChromeSafari browser opened");
@@ -1254,7 +1273,7 @@ Future main() async {
 }
 
 class MyApp extends StatefulWidget {
-  final ChromeSafariBrowser browser = new MyChromeSafariBrowser(new MyInAppBrowser());
+  final ChromeSafariBrowser browser = new MyChromeSafariBrowser();
 
   @override
   _MyAppState createState() => new _MyAppState();
@@ -1285,10 +1304,10 @@ class _MyAppState extends State<MyApp> {
           title: const Text('ChromeSafariBrowser Example'),
         ),
         body: Center(
-          child: RaisedButton(
+          child: ElevatedButton(
               onPressed: () async {
                 await widget.browser.open(
-                    url: "https://flutter.dev/",
+                    url: Uri.parse("https://flutter.dev/"),
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false),
                         ios: IOSSafariOptions(barCollapsingEnabled: true)));
@@ -1316,7 +1335,7 @@ Screenshots:
 * `addMenuItems`: Adds a list of `ChromeSafariBrowserMenuItem` to the menu.
 * `close`: Closes the `ChromeSafariBrowser` instance.
 * `isOpened`: Returns `true` if the `ChromeSafariBrowser` instance is opened, otherwise `false`.
-* `open({required String url, ChromeSafariBrowserClassOptions options, Map<String, String> headersFallback = const {}, InAppBrowserClassOptions optionsFallback})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
+* `open({required Uri url, ChromeSafariBrowserClassOptions? options})`: Opens an `url` in a new `ChromeSafariBrowser` instance.
 * `static isAvailable`: On Android, returns `true` if Chrome Custom Tabs is available. On iOS, returns `true` if SFSafariViewController is available. Otherwise returns `false`.
 
 #### `ChromeSafariBrowser` options
@@ -1376,30 +1395,31 @@ Future main() async {
           title: const Text('InAppWebView Example'),
         ),
         body: Container(
-          child: Column(children: <Widget>[
-            Expanded(
-              child: Container(
-                child: InAppWebView(
-                  initialUrl: "http://localhost:8080/assets/index.html",
-                  initialHeaders: {},
-                  initialOptions: InAppWebViewGroupOptions(
-                      crossPlatform: InAppWebViewOptions(
+            child: Column(children: <Widget>[
+              Expanded(
+                child: Container(
+                  child: InAppWebView(
+                    initialUrlRequest: URLRequest(
+                      url: Uri.parse("http://localhost:8080/assets/index.html")
+                    ),
+                    initialOptions: InAppWebViewGroupOptions(
+                        crossPlatform: InAppWebViewOptions(
 
-                      )
+                        )
+                    ),
+                    onWebViewCreated: (controller) {
+
+                    },
+                    onLoadStart: (controller, url) {
+
+                    },
+                    onLoadStop: (controller, url) {
+
+                    },
                   ),
-                  onWebViewCreated: (controller) {
-
-                  },
-                  onLoadStart: (controller, url) {
-
-                  },
-                  onLoadStop: (controller, url) {
-
-                  },
                 ),
-              ),
-            )]
-          )
+              )]
+            )
         ),
       ),
     );
@@ -1426,11 +1446,11 @@ On iOS, it is implemented using [WKHTTPCookieStore](https://developer.apple.com/
 #### `CookieManager` methods
 
 * `instance`: Gets the cookie manager shared instance.
-* `setCookie({required String url, required String name, required String value, String? domain, String path = "/", int? expiresDate, int? maxAge, bool? isSecure, bool? isHttpOnly, HTTPCookieSameSitePolicy? sameSite, InAppWebViewController? iosBelow11WebViewController})`: Sets a cookie for the given `url`. Any existing cookie with the same `host`, `path` and `name` will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
-* `getCookies({required String url, InAppWebViewController? iosBelow11WebViewController})`: Gets all the cookies for the given `url`.
-* `getCookie({required String url, required String name, InAppWebViewController? iosBelow11WebViewController})`: Gets a cookie by its `name` for the given `url`.
-* `deleteCookie({required String url, required String name, String domain = "", String path = "/", InAppWebViewController? iosBelow11WebViewController})`: Removes a cookie by its `name` for the given `url`, `domain` and `path`.
-* `deleteCookies({required String url, String domain = "", String path = "/", InAppWebViewController? iosBelow11WebViewController})`: Removes all cookies for the given `url`, `domain` and `path`.
+* `setCookie({required Uri url, required String name, required String value, String? domain, String path = "/", int? expiresDate, int? maxAge, bool? isSecure, bool? isHttpOnly, HTTPCookieSameSitePolicy? sameSite, InAppWebViewController? iosBelow11WebViewController})`: Sets a cookie for the given `url`. Any existing cookie with the same `host`, `path` and `name` will be replaced with the new cookie. The cookie being set will be ignored if it is expired.
+* `getCookies({required Uri url, InAppWebViewController? iosBelow11WebViewController})`: Gets all the cookies for the given `url`.
+* `getCookie({required Uri url, required String name, InAppWebViewController? iosBelow11WebViewController})`: Gets a cookie by its `name` for the given `url`.
+* `deleteCookie({required Uri url, required String name, String domain = "", String path = "/", InAppWebViewController? iosBelow11WebViewController})`: Removes a cookie by its `name` for the given `url`, `domain` and `path`.
+* `deleteCookies({required Uri url, String domain = "", String path = "/", InAppWebViewController? iosBelow11WebViewController})`: Removes all cookies for the given `url`, `domain` and `path`.
 * `deleteAllCookies()`: Removes all cookies.
 
 #### `CookieManager` iOS-specific methods
@@ -1449,10 +1469,10 @@ On Android, this class has a custom implementation using `android.database.sqlit
 
 * `instance`: Gets the database shared instance.
 * `getAllAuthCredentials`: Gets a map list of all HTTP auth credentials saved.
-* `getHttpAuthCredentials({required ProtectionSpace protectionSpace})`: Gets all the HTTP auth credentials saved for that `protectionSpace`.
-* `setHttpAuthCredential({required ProtectionSpace protectionSpace, required HttpAuthCredential credential})`: Saves an HTTP auth `credential` for that `protectionSpace`.
-* `removeHttpAuthCredential({required ProtectionSpace protectionSpace, required HttpAuthCredential credential})`: Removes an HTTP auth `credential` for that `protectionSpace`.
-* `removeHttpAuthCredentials({required ProtectionSpace protectionSpace})`: Removes all the HTTP auth credentials saved for that `protectionSpace`.
+* `getHttpAuthCredentials({required URLProtectionSpace protectionSpace})`: Gets all the HTTP auth credentials saved for that `protectionSpace`.
+* `setHttpAuthCredential({required URLProtectionSpace protectionSpace, required URLCredential credential})`: Saves an HTTP auth `credential` for that `protectionSpace`.
+* `removeHttpAuthCredential({required URLProtectionSpace protectionSpace, required URLCredential credential})`: Removes an HTTP auth `credential` for that `protectionSpace`.
+* `removeHttpAuthCredentials({required URLProtectionSpace protectionSpace})`: Removes all the HTTP auth credentials saved for that `protectionSpace`.
 * `clearAllAuthCredentials()`: Removes all the HTTP auth credentials saved in the database.
 
 ### `WebStorageManager` class

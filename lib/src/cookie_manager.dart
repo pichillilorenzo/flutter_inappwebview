@@ -5,8 +5,10 @@ import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
-import 'in_app_webview_controller.dart';
-import 'headless_in_app_webview.dart';
+import 'in_app_webview/in_app_webview_controller.dart';
+import 'in_app_webview/in_app_webview_options.dart';
+import 'in_app_webview/headless_in_app_webview.dart';
+
 import 'types.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the cookies used by WebView instances.
@@ -50,7 +52,7 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to set the cookie (session-only cookie won't work! In that case, you should set also [expiresDate] or [maxAge]).
   Future<void> setCookie(
-      {required String url,
+      {required Uri url,
       required String name,
       required String value,
       String? domain,
@@ -63,7 +65,7 @@ class CookieManager {
       InAppWebViewController? iosBelow11WebViewController}) async {
     if (domain == null) domain = _getDomainName(url);
 
-    assert(url.isNotEmpty);
+    assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
     assert(value.isNotEmpty);
     assert(domain.isNotEmpty);
@@ -82,7 +84,7 @@ class CookieManager {
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('value', () => value);
     args.putIfAbsent('domain', () => domain);
@@ -97,7 +99,7 @@ class CookieManager {
   }
 
   Future<void> _setCookieWithJavaScript(
-      {required String url,
+      {required Uri url,
         required String name,
         required String value,
         required String domain,
@@ -125,8 +127,8 @@ class CookieManager {
 
     if (webViewController != null) {
       InAppWebViewGroupOptions? options = await webViewController.getOptions();
-      if (options != null && options.crossPlatform != null &&
-          options.crossPlatform!.javaScriptEnabled) {
+      if (options != null &&
+          options.crossPlatform.javaScriptEnabled) {
         await webViewController.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
         return;
@@ -135,7 +137,7 @@ class CookieManager {
 
     var setCookieCompleter = Completer<void>();
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrl: url,
+      initialUrlRequest: URLRequest(url: url),
       onLoadStop: (controller, url) async {
         await controller.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
@@ -156,8 +158,8 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
   ///If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be found!).
-  Future<List<Cookie>> getCookies({required String url, InAppWebViewController? iosBelow11WebViewController}) async {
-    assert(url.isNotEmpty);
+  Future<List<Cookie>> getCookies({required Uri url, InAppWebViewController? iosBelow11WebViewController}) async {
+    assert(url.toString().isNotEmpty);
 
     if (Platform.isIOS) {
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -171,7 +173,7 @@ class CookieManager {
     List<Cookie> cookies = [];
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('url', () => url.toString());
     List<dynamic> cookieListMap =
         await _channel.invokeMethod('getCookies', args);
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
@@ -192,15 +194,15 @@ class CookieManager {
     return cookies;
   }
 
-  Future<List<Cookie>> _getCookiesWithJavaScript({required String url, InAppWebViewController? webViewController}) async {
-    assert(url.isNotEmpty);
+  Future<List<Cookie>> _getCookiesWithJavaScript({required Uri url, InAppWebViewController? webViewController}) async {
+    assert(url.toString().isNotEmpty);
 
     List<Cookie> cookies = [];
 
     if (webViewController != null) {
       InAppWebViewGroupOptions? options = await webViewController.getOptions();
-      if (options != null && options.crossPlatform != null &&
-          options.crossPlatform!.javaScriptEnabled) {
+      if (options != null &&
+          options.crossPlatform.javaScriptEnabled) {
         List<String> documentCookies = (await webViewController.evaluateJavascript(source: 'document.cookie') as String)
             .split(';').map((documentCookie) => documentCookie.trim()).toList();
         documentCookies.forEach((documentCookie) {
@@ -217,7 +219,7 @@ class CookieManager {
 
     var pageLoaded = Completer<void>();
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrl: url,
+      initialUrlRequest: URLRequest(url: url),
       onLoadStop: (controller, url) async {
         pageLoaded.complete();
       },
@@ -249,9 +251,9 @@ class CookieManager {
   ///If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be found!).
   Future<Cookie?> getCookie(
-      {required String url, required String name, InAppWebViewController? iosBelow11WebViewController}) async {
+      {required Uri url, required String name, InAppWebViewController? iosBelow11WebViewController}) async {
 
-    assert(url.isNotEmpty);
+    assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
     if (Platform.isIOS) {
@@ -265,7 +267,7 @@ class CookieManager {
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('url', () => url.toString());
     List<dynamic> cookies = await _channel.invokeMethod('getCookies', args);
     cookies = cookies.cast<Map<dynamic, dynamic>>();
     for (var i = 0; i < cookies.length; i++) {
@@ -298,14 +300,14 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be deleted!).
   Future<void> deleteCookie(
-      {required String url,
+      {required Uri url,
       required String name,
       String domain = "",
       String path = "/",
       InAppWebViewController? iosBelow11WebViewController}) async {
     if (domain.isEmpty) domain = _getDomainName(url);
 
-    assert(url.isNotEmpty);
+    assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
     if (Platform.isIOS) {
@@ -319,7 +321,7 @@ class CookieManager {
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('name', () => name);
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
@@ -338,11 +340,11 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!).
   Future<void> deleteCookies(
-      {required String url, String domain = "", String path = "/",
+      {required Uri url, String domain = "", String path = "/",
         InAppWebViewController? iosBelow11WebViewController}) async {
     if (domain.isEmpty) domain = _getDomainName(url);
 
-    assert(url.isNotEmpty);
+    assert(url.toString().isNotEmpty);
 
     if (Platform.isIOS) {
       DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
@@ -358,7 +360,7 @@ class CookieManager {
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('url', () => url);
+    args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('domain', () => domain);
     args.putIfAbsent('path', () => path);
     await _channel.invokeMethod('deleteCookies', args);
@@ -372,9 +374,8 @@ class CookieManager {
     await _channel.invokeMethod('deleteAllCookies', args);
   }
 
-  String _getDomainName(String url) {
-    Uri uri = Uri.parse(url);
-    String domain = uri.host;
+  String _getDomainName(Uri url) {
+    String domain = url.host;
     // ignore: unnecessary_null_comparison
     if (domain == null) return "";
     return domain.startsWith("www.") ? domain.substring(4) : domain;

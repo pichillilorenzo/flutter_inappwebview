@@ -19,7 +19,9 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
     super.initState();
 
     headlessWebView = new HeadlessInAppWebView(
-      initialUrl: "https://flutter.dev/",
+      initialUrlRequest: URLRequest(
+          url: Uri.parse("https://flutter.dev")
+      ),
       initialOptions: InAppWebViewGroupOptions(
         crossPlatform: InAppWebViewOptions(
 
@@ -34,19 +36,19 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
       onLoadStart: (controller, url) async {
         print("onLoadStart $url");
         setState(() {
-          this.url = url ?? '';
+          this.url = url.toString();
         });
       },
       onLoadStop: (controller, url) async {
         print("onLoadStop $url");
         setState(() {
-          this.url = url ?? '';
+          this.url = url.toString();
         });
       },
       onUpdateVisitedHistory: (controller, url, androidIsReload) {
         print("onUpdateVisitedHistory $url");
         setState(() {
-          this.url = url ?? '';
+          this.url = url.toString();
         });
       },
     );
@@ -74,7 +76,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
                 "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
           ),
           Center(
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () async {
                 await headlessWebView?.dispose();
                 await headlessWebView?.run();
@@ -82,7 +84,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
               child: Text("Run HeadlessInAppWebView")),
           ),
           Center(
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () async {
                 try {
                   await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
@@ -93,7 +95,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
               child: Text("Send console.log message")),
           ),
           Center(
-            child: RaisedButton(
+            child: ElevatedButton(
               onPressed: () {
                 headlessWebView?.dispose();
               },

@@ -2,9 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.pichillilorenzo.flutter_inappwebview">
     <application>
-        <activity android:theme="@style/AppTheme" android:name="com.pichillilorenzo.flutter_inappwebview.InAppBrowser.InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>
-        <activity android:theme="@style/ThemeTransparent" android:name="com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ChromeCustomTabsActivity" android:configChanges="orientation|screenSize"></activity>
-        <receiver android:name="com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ActionBroadcastReceiver" />
+        <activity android:theme="@style/AppTheme" android:name="com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity" android:configChanges="orientation|screenSize"></activity>
+        <activity android:theme="@style/ThemeTransparent" android:name="com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeCustomTabsActivity" android:configChanges="orientation|screenSize"></activity>
+        <receiver android:name="com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ActionBroadcastReceiver" />
         <meta-data
             android:name="io.flutter.embedded_views_preview"
             android:value="true" />

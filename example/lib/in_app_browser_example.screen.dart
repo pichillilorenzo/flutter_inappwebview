@@ -41,10 +41,10 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future<ShouldOverrideUrlLoadingAction> shouldOverrideUrlLoading(
-      shouldOverrideUrlLoadingRequest) async {
-    print("\n\nOverride ${shouldOverrideUrlLoadingRequest.url}\n\n");
-    return ShouldOverrideUrlLoadingAction.ALLOW;
+  Future<NavigationActionPolicy> shouldOverrideUrlLoading(
+      navigationAction) async {
+    print("\n\nOverride ${navigationAction.request.url}\n\n");
+    return NavigationActionPolicy.ALLOW;
   }
 
   @override
@@ -54,7 +54,7 @@ class MyInAppBrowser extends InAppBrowser {
         "ms ---> duration: " +
         response.duration.toString() +
         "ms " +
-        response.url!);
+        (response.url ?? '').toString());
   }
 
   @override
@@ -62,7 +62,7 @@ class MyInAppBrowser extends InAppBrowser {
     print("""
     console output:
       message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel!.toValue()}
+      messageLevel: ${consoleMessage.messageLevel.toValue()}
    """);
   }
 }
@@ -93,23 +93,24 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: <Widget>[
-                RaisedButton(
+                ElevatedButton(
                     onPressed: () async {
-                      await widget.browser.openFile(
-                          assetFilePath: "assets/index.html",
+                      await widget.browser.openUrlRequest(
+                          urlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
                           options: InAppBrowserClassOptions(
-                              inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-                                  crossPlatform: InAppWebViewOptions(
-                            useShouldOverrideUrlLoading: true,
-                            useOnLoadResource: true,
-                          ))));
+                            inAppWebViewGroupOptions: InAppWebViewGroupOptions(
+                                crossPlatform: InAppWebViewOptions(
+                                  useShouldOverrideUrlLoading: true,
+                                  useOnLoadResource: true,
+                                )
+                            )));
                     },
                     child: Text("Open In-App Browser")),
                 Container(height: 40),
-                RaisedButton(
+                ElevatedButton(
                     onPressed: () async {
                       await InAppBrowser.openWithSystemBrowser(
-                          url: "https://flutter.dev/");
+                          url: Uri.parse("https://flutter.dev/"));
                     },
                     child: Text("Open System Browser")),
             ])));

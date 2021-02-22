@@ -4,10 +4,13 @@ import android.app.Activity;
 import android.content.Context;
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.webkit.ValueCallback;
 
-import com.pichillilorenzo.flutter_inappwebview.InAppWebView.FlutterWebViewFactory;
+import com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeSafariBrowserManager;
+import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabaseHandler;
+import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebViewFactory;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.HeadlessInAppWebViewManager;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -15,7 +18,6 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.PluginRegistry;
 import io.flutter.embedding.engine.plugins.FlutterPlugin;
 import io.flutter.plugin.platform.PlatformViewRegistry;
-import io.flutter.view.FlutterMain;
 import io.flutter.view.FlutterView;
 
 public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {

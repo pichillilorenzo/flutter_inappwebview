@@ -4,7 +4,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'main.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-  MyChromeSafariBrowser({browserFallback}) : super(bFallback: browserFallback);
 
   @override
   void onOpened() {
@@ -24,7 +23,7 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
 class ChromeSafariBrowserExampleScreen extends StatefulWidget {
   final ChromeSafariBrowser browser =
-      MyChromeSafariBrowser(browserFallback: InAppBrowser());
+      MyChromeSafariBrowser();
 
   @override
   _ChromeSafariBrowserExampleScreenState createState() =>
@@ -57,10 +56,10 @@ class _ChromeSafariBrowserExampleScreenState
         )),
         drawer: myDrawer(context: context),
         body: Center(
-          child: RaisedButton(
+          child: ElevatedButton(
               onPressed: () async {
                 await widget.browser.open(
-                    url: "https://flutter.dev/",
+                    url: Uri.parse("https://flutter.dev/"),
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false, keepAliveEnabled: true),
                         ios: IOSSafariOptions(

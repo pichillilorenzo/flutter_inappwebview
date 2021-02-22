@@ -34,15 +34,21 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         myView = UIView(frame: frame)
         myView!.clipsToBounds = true
         
-        let initialUrl = args["initialUrl"] as? String
+        let initialUrlRequest = args["initialUrlRequest"] as? [String: Any?]
         let initialFile = args["initialFile"] as? String
         let initialData = args["initialData"] as? [String: String]
-        let initialHeaders = args["initialHeaders"] as? [String: String]
         let initialOptions = args["initialOptions"] as! [String: Any?]
         let contextMenu = args["contextMenu"] as? [String: Any]
         let windowId = args["windowId"] as? Int64
         let initialUserScripts = args["initialUserScripts"] as? [[String: Any]]
-
+        
+        var userScripts: [UserScript] = []
+        if let initialUserScripts = initialUserScripts {
+            for intialUserScript in initialUserScripts {
+                userScripts.append(UserScript.fromMap(map: intialUserScript, windowId: windowId)!)
+            }
+        }
+        
         let options = InAppWebViewOptions()
         let _ = options.parse(options: initialOptions)
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: options)
@@ -50,11 +56,15 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView!.frame = myView!.bounds
-            webView!.IABController = nil
             webView!.contextMenu = contextMenu
             webView!.channel = channel!
+            webView!.initialUserScripts = userScripts
         } else {
-            webView = InAppWebView(frame: myView!.bounds, configuration: preWebviewConfiguration, IABController: nil, contextMenu: contextMenu, channel: channel!)
+            webView = InAppWebView(frame: myView!.bounds,
+                                   configuration: preWebviewConfiguration,
+                                   contextMenu: contextMenu,
+                                   channel: channel!,
+                                   userScripts: userScripts)
         }
         
         methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
@@ -66,9 +76,6 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         myView!.addSubview(webView!)
 
         webView!.options = options
-        if let userScripts = initialUserScripts {
-            webView!.appendUserScripts(userScripts: userScripts)
-        }
         webView!.prepare()
         
         if windowId == nil {
@@ -90,7 +97,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                                 let configuration = self.webView!.configuration
                                 configuration.userContentController.add(contentRuleList!)
 
-                                self.load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+                                self.load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
                         }
                         return
                     } catch {
@@ -98,7 +105,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                     }
                 }
             }
-            load(initialUrl: initialUrl, initialFile: initialFile, initialData: initialData, initialHeaders: initialHeaders)
+            load(initialUrlRequest: initialUrlRequest, initialFile: initialFile, initialData: initialData)
         }
         else if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView!.load(webViewTransport.request)
@@ -133,33 +140,32 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         return myView!
     }
     
-    public func load(initialUrl: String?, initialFile: String?, initialData: [String: String]?, initialHeaders: [String: String]?) {
+    public func load(initialUrlRequest: [String:Any?]?, initialFile: String?, initialData: [String: String]?) {
         if let initialFile = initialFile {
             do {
-                try webView?.loadFile(url: initialFile, headers: initialHeaders)
+                try webView?.loadFile(assetFilePath: initialFile)
             }
             catch let error as NSError {
                 dump(error)
             }
-            return
         }
-        
-        if let initialData = initialData {
+        else if let initialData = initialData {
             let data = initialData["data"]!
             let mimeType = initialData["mimeType"]!
             let encoding = initialData["encoding"]!
             let baseUrl = initialData["baseUrl"]!
             webView?.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
         }
-        else if let initialUrl = initialUrl, let url = URL(string: initialUrl) {
+        else if let initialUrlRequest = initialUrlRequest {
+            let urlRequest = URLRequest.init(fromPluginMap: initialUrlRequest)
             var allowingReadAccessToURL: URL? = nil
-            if let allowingReadAccessTo = webView?.options?.allowingReadAccessTo, url.scheme == "file" {
+            if let allowingReadAccessTo = webView?.options?.allowingReadAccessTo, let url = urlRequest.url, url.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
                 if allowingReadAccessToURL?.scheme != "file" {
                     allowingReadAccessToURL = nil
                 }
             }
-            webView?.loadUrl(url: url, headers: initialHeaders, allowingReadAccessTo: allowingReadAccessToURL)
+            webView?.loadUrl(urlRequest: urlRequest, allowingReadAccessTo: allowingReadAccessToURL)
         }
     }
 }

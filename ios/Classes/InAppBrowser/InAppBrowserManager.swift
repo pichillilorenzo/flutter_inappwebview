@@ -13,12 +13,12 @@ import AVFoundation
 
 let WEBVIEW_STORYBOARD = "WebView"
 let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
+let NAV_STORYBOARD_CONTROLLER_ID = "navController"
 
 public class InAppBrowserManager: NSObject, FlutterPlugin {
     static var registrar: FlutterPluginRegistrar?
     static var channel: FlutterMethodChannel?
     
-    // var tmpWindow: UIWindow?
     private var previousStatusBarStyle = -1
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -36,34 +36,24 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         let arguments = call.arguments as? NSDictionary
 
         switch call.method {
-            case "openUrl":
+            case "openUrlRequest":
                 let uuid = arguments!["uuid"] as! String
-                let url = arguments!["url"] as! String
+                let urlRequest = arguments!["urlRequest"] as! [String:Any?]
                 let options = arguments!["options"] as! [String: Any?]
-                let headers = arguments!["headers"] as! [String: String]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
                 let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
-                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
+                openUrlRequest(uuid: uuid, urlRequest: urlRequest, options: options, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openFile":
                 let uuid = arguments!["uuid"] as! String
-                var url = arguments!["url"] as! String
-                let key = InAppBrowserManager.registrar!.lookupKey(forAsset: url)
-                let assetURL = Bundle.main.url(forResource: key, withExtension: nil)
-                if assetURL == nil {
-                    result(FlutterError(code: "InAppBrowserFlutterPlugin", message: url + " asset file cannot be found!", details: nil))
-                    return
-                } else {
-                    url = assetURL!.absoluteString
-                }
+                let assetFilePath = arguments!["assetFilePath"] as! String
                 let options = arguments!["options"] as! [String: Any?]
-                let headers = arguments!["headers"] as! [String: String]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
                 let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
-                openUrl(uuid: uuid, url: url, options: options, headers: headers, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
+                openFile(uuid: uuid, assetFilePath: assetFilePath, options: options, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openData":
@@ -91,9 +81,71 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
     }
     
     public func prepareInAppBrowserWebViewController(options: [String: Any?]) -> InAppBrowserWebViewController {
-        if self.previousStatusBarStyle == -1 {
-            self.previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
+        if previousStatusBarStyle == -1 {
+            previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         }
+        
+        let browserOptions = InAppBrowserOptions()
+        let _ = browserOptions.parse(options: options)
+        
+        let webViewOptions = InAppWebViewOptions()
+        let _ = webViewOptions.parse(options: options)
+        
+        let webViewController = InAppBrowserWebViewController()
+        webViewController.browserOptions = browserOptions
+        webViewController.webViewOptions = webViewOptions
+        webViewController.previousStatusBarStyle = previousStatusBarStyle
+        return webViewController
+    }
+    
+    public func openUrlRequest(uuid: String, urlRequest: [String:Any?], options: [String: Any?],
+                        contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
+        let webViewController = prepareInAppBrowserWebViewController(options: options)
+        
+        webViewController.uuid = uuid
+        webViewController.initialUrlRequest = URLRequest.init(fromPluginMap: urlRequest)
+        webViewController.contextMenu = contextMenu
+        webViewController.windowId = windowId
+        webViewController.initialUserScripts = initialUserScripts ?? []
+        
+        presentViewController(webViewController: webViewController)
+    }
+    
+    public func openFile(uuid: String, assetFilePath: String, options: [String: Any?],
+                        contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
+        let webViewController = prepareInAppBrowserWebViewController(options: options)
+        
+        webViewController.uuid = uuid
+        webViewController.initialFile = assetFilePath
+        webViewController.contextMenu = contextMenu
+        webViewController.windowId = windowId
+        webViewController.initialUserScripts = initialUserScripts ?? []
+        
+        presentViewController(webViewController: webViewController)
+    }
+    
+    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String,
+                         baseUrl: String, contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
+        let webViewController = prepareInAppBrowserWebViewController(options: options)
+        
+        webViewController.uuid = uuid
+        webViewController.initialData = data
+        webViewController.initialMimeType = mimeType
+        webViewController.initialEncoding = encoding
+        webViewController.initialBaseUrl = baseUrl
+        webViewController.contextMenu = contextMenu
+        webViewController.windowId = windowId
+        webViewController.initialUserScripts = initialUserScripts ?? []
+        
+        presentViewController(webViewController: webViewController)
+    }
+    
+    public func presentViewController(webViewController: InAppBrowserWebViewController) {
+        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
+        let navController = storyboard.instantiateViewController(withIdentifier: NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
+        webViewController.edgesForExtendedLayout = []
+        navController.pushViewController(webViewController, animated: false)
+        webViewController.prepareNavigationControllerBeforeViewWillAppear()
         
         let frame: CGRect = UIScreen.main.bounds
         let tmpWindow = UIWindow(frame: frame)
@@ -103,81 +155,15 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         tmpWindow.rootViewController = tmpController
         tmpWindow.windowLevel = UIWindow.Level(baseWindowLevel!.rawValue + 1.0)
         tmpWindow.makeKeyAndVisible()
+        navController.tmpWindow = tmpWindow
         
-        let browserOptions = InAppBrowserOptions()
-        let _ = browserOptions.parse(options: options)
-        
-        let webViewOptions = InAppWebViewOptions()
-        let _ = webViewOptions.parse(options: options)
-        
-        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
-        let webViewController = storyboard.instantiateViewController(withIdentifier: WEBVIEW_STORYBOARD_CONTROLLER_ID) as! InAppBrowserWebViewController
-        webViewController.tmpWindow = tmpWindow
-        webViewController.browserOptions = browserOptions
-        webViewController.webViewOptions = webViewOptions
-        webViewController.isHidden = browserOptions.hidden
-        webViewController.previousStatusBarStyle = previousStatusBarStyle
-        webViewController.prepareBeforeViewWillAppear()
-        return webViewController
-    }
-    
-    public func openUrl(uuid: String, url: String, options: [String: Any?], headers: [String: String],
-                        contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
-        let absoluteUrl = URL(string: url)!.absoluteURL
-        let webViewController = prepareInAppBrowserWebViewController(options: options)
-        
-        webViewController.uuid = uuid
-        webViewController.initURL = absoluteUrl
-        webViewController.initHeaders = headers
-        webViewController.contextMenu = contextMenu
-        webViewController.windowId = windowId
-        webViewController.initUserScripts = initialUserScripts ?? []
-        
-        if webViewController.isHidden {
-            webViewController.view.isHidden = true
-            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
-
-            })
-            webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
-                webViewController.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
-                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-            })
+        var animated = true
+        if let browserOptions = webViewController.browserOptions, browserOptions.hidden {
+            tmpWindow.isHidden = true
+            UIApplication.shared.delegate?.window??.makeKeyAndVisible()
+            animated = false
         }
-        else {
-            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
-
-            })
-        }
-    }
-    
-    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String,
-                         baseUrl: String, contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
-        let webViewController = prepareInAppBrowserWebViewController(options: options)
-        
-        webViewController.uuid = uuid
-        webViewController.initData = data
-        webViewController.initMimeType = mimeType
-        webViewController.initEncoding = encoding
-        webViewController.initBaseUrl = baseUrl
-        webViewController.contextMenu = contextMenu
-        webViewController.windowId = windowId
-        webViewController.initUserScripts = initialUserScripts ?? []
-        
-        if webViewController.isHidden {
-            webViewController.view.isHidden = true
-            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: false, completion: {() -> Void in
-                
-            })
-            webViewController.presentingViewController?.dismiss(animated: false, completion: {() -> Void in
-                webViewController.tmpWindow?.windowLevel = UIWindow.Level(rawValue: 0.0)
-                UIApplication.shared.delegate?.window??.makeKeyAndVisible()
-            })
-        }
-        else {
-            webViewController.tmpWindow!.rootViewController!.present(webViewController, animated: true, completion: {() -> Void in
-                
-            })
-        }
+        tmpWindow.rootViewController!.present(navController, animated: animated, completion: nil)
     }
     
     public func openWithSystemBrowser(url: String, result: @escaping FlutterResult) {
@@ -188,16 +174,11 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         }
         else {
             if #available(iOS 10.0, *) {
-                UIApplication.shared.open(absoluteUrl, options: convertToUIApplicationOpenExternalURLOptionsKeyDictionary([:]), completionHandler: nil)
+                UIApplication.shared.open(absoluteUrl, options: [:], completionHandler: nil)
             } else {
                 UIApplication.shared.openURL(absoluteUrl)
             }
         }
         result(true)
     }
-}
-
-// Helper function inserted by Swift 4.2 migrator.
-fileprivate func convertToUIApplicationOpenExternalURLOptionsKeyDictionary(_ input: [String: Any]) -> [UIApplication.OpenExternalURLOptionsKey: Any] {
-    return Dictionary(uniqueKeysWithValues: input.map { key, value in (UIApplication.OpenExternalURLOptionsKey(rawValue: key), value)})
 }

@@ -2,339 +2,343 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
-class Util {
-  static Color? convertColorFromStringRepresentation(String colorValue) {
+extension UtilColor on Color {
+  static Color? fromStringRepresentation(String colorValue) {
     if (colorValue.startsWith("#")) {
-      return Util.getColorFromHex(colorValue);
+      return fromHex(colorValue);
     } else if (colorValue.startsWith("rgb(")) {
-      return Util.getColorFromRgbString(colorValue);
+      return fromRgbString(colorValue);
     } else if (colorValue.startsWith("rgba(")) {
-      return Util.getColorFromRgbaString(colorValue);
+      return fromRgbaString(colorValue);
     } else if (colorValue.startsWith("hls(")) {
-      return Util.getColorFromHlsString(colorValue);
+      return fromHlsString(colorValue);
     } else if (colorValue.startsWith("hlsa(")) {
-      return Util.getColorFromHlsaString(colorValue);
+      return fromHlsaString(colorValue);
     } else {
       /**
-        This part of the code is generated using the JavaScript code below on this link: https://drafts.csswg.org/css-color/#typedef-color
+          This part of the code is generated using the JavaScript code below on this link: https://drafts.csswg.org/css-color/#typedef-color
 
 
-        let code = 'switch(colorValue) {\n';
-        const table = document.querySelector('.named-color-table');
-        const colorNameCells = table.querySelectorAll('tr > th dfn');
-        const colorHexValueCells = table.querySelectorAll('tr > td:nth-child(4)');
-        for (let i = 0; i < colorNameCells.length; i++) {
+          let code = 'switch(colorValue) {\n';
+          const table = document.querySelector('.named-color-table');
+          const colorNameCells = table.querySelectorAll('tr > th dfn');
+          const colorHexValueCells = table.querySelectorAll('tr > td:nth-child(4)');
+          for (let i = 0; i < colorNameCells.length; i++) {
           const colorName = colorNameCells[i].textContent.trim();
           const colorHexValue = colorHexValueCells[i].textContent.trim();
           code += '  case "' + colorName + '":\n';
-          code += '     return Util.getColorFromHex("' + colorHexValue + '");\n';
-        }
-        code += '}';
-      */
+          code += '     return getColorFromHex("' + colorHexValue + '");\n';
+          }
+          code += '}';
+       */
 
       switch (colorValue) {
         case "aliceblue":
-          return Util.getColorFromHex("#f0f8ff");
+          return fromHex("#f0f8ff");
         case "antiquewhite":
-          return Util.getColorFromHex("#faebd7");
+          return fromHex("#faebd7");
         case "aqua":
-          return Util.getColorFromHex("#00ffff");
+          return fromHex("#00ffff");
         case "aquamarine":
-          return Util.getColorFromHex("#7fffd4");
+          return fromHex("#7fffd4");
         case "azure":
-          return Util.getColorFromHex("#f0ffff");
+          return fromHex("#f0ffff");
         case "beige":
-          return Util.getColorFromHex("#f5f5dc");
+          return fromHex("#f5f5dc");
         case "bisque":
-          return Util.getColorFromHex("#ffe4c4");
+          return fromHex("#ffe4c4");
         case "black":
-          return Util.getColorFromHex("#000000");
+          return fromHex("#000000");
         case "blanchedalmond":
-          return Util.getColorFromHex("#ffebcd");
+          return fromHex("#ffebcd");
         case "blue":
-          return Util.getColorFromHex("#0000ff");
+          return fromHex("#0000ff");
         case "blueviolet":
-          return Util.getColorFromHex("#8a2be2");
+          return fromHex("#8a2be2");
         case "brown":
-          return Util.getColorFromHex("#a52a2a");
+          return fromHex("#a52a2a");
         case "burlywood":
-          return Util.getColorFromHex("#deb887");
+          return fromHex("#deb887");
         case "cadetblue":
-          return Util.getColorFromHex("#5f9ea0");
+          return fromHex("#5f9ea0");
         case "chartreuse":
-          return Util.getColorFromHex("#7fff00");
+          return fromHex("#7fff00");
         case "chocolate":
-          return Util.getColorFromHex("#d2691e");
+          return fromHex("#d2691e");
         case "coral":
-          return Util.getColorFromHex("#ff7f50");
+          return fromHex("#ff7f50");
         case "cornflowerblue":
-          return Util.getColorFromHex("#6495ed");
+          return fromHex("#6495ed");
         case "cornsilk":
-          return Util.getColorFromHex("#fff8dc");
+          return fromHex("#fff8dc");
         case "crimson":
-          return Util.getColorFromHex("#dc143c");
+          return fromHex("#dc143c");
         case "cyan":
-          return Util.getColorFromHex("#00ffff");
+          return fromHex("#00ffff");
         case "darkblue":
-          return Util.getColorFromHex("#00008b");
+          return fromHex("#00008b");
         case "darkcyan":
-          return Util.getColorFromHex("#008b8b");
+          return fromHex("#008b8b");
         case "darkgoldenrod":
-          return Util.getColorFromHex("#b8860b");
+          return fromHex("#b8860b");
         case "darkgray":
-          return Util.getColorFromHex("#a9a9a9");
+          return fromHex("#a9a9a9");
         case "darkgreen":
-          return Util.getColorFromHex("#006400");
+          return fromHex("#006400");
         case "darkgrey":
-          return Util.getColorFromHex("#a9a9a9");
+          return fromHex("#a9a9a9");
         case "darkkhaki":
-          return Util.getColorFromHex("#bdb76b");
+          return fromHex("#bdb76b");
         case "darkmagenta":
-          return Util.getColorFromHex("#8b008b");
+          return fromHex("#8b008b");
         case "darkolivegreen":
-          return Util.getColorFromHex("#556b2f");
+          return fromHex("#556b2f");
         case "darkorange":
-          return Util.getColorFromHex("#ff8c00");
+          return fromHex("#ff8c00");
         case "darkorchid":
-          return Util.getColorFromHex("#9932cc");
+          return fromHex("#9932cc");
         case "darkred":
-          return Util.getColorFromHex("#8b0000");
+          return fromHex("#8b0000");
         case "darksalmon":
-          return Util.getColorFromHex("#e9967a");
+          return fromHex("#e9967a");
         case "darkseagreen":
-          return Util.getColorFromHex("#8fbc8f");
+          return fromHex("#8fbc8f");
         case "darkslateblue":
-          return Util.getColorFromHex("#483d8b");
+          return fromHex("#483d8b");
         case "darkslategray":
-          return Util.getColorFromHex("#2f4f4f");
+          return fromHex("#2f4f4f");
         case "darkslategrey":
-          return Util.getColorFromHex("#2f4f4f");
+          return fromHex("#2f4f4f");
         case "darkturquoise":
-          return Util.getColorFromHex("#00ced1");
+          return fromHex("#00ced1");
         case "darkviolet":
-          return Util.getColorFromHex("#9400d3");
+          return fromHex("#9400d3");
         case "deeppink":
-          return Util.getColorFromHex("#ff1493");
+          return fromHex("#ff1493");
         case "deepskyblue":
-          return Util.getColorFromHex("#00bfff");
+          return fromHex("#00bfff");
         case "dimgray":
-          return Util.getColorFromHex("#696969");
+          return fromHex("#696969");
         case "dimgrey":
-          return Util.getColorFromHex("#696969");
+          return fromHex("#696969");
         case "dodgerblue":
-          return Util.getColorFromHex("#1e90ff");
+          return fromHex("#1e90ff");
         case "firebrick":
-          return Util.getColorFromHex("#b22222");
+          return fromHex("#b22222");
         case "floralwhite":
-          return Util.getColorFromHex("#fffaf0");
+          return fromHex("#fffaf0");
         case "forestgreen":
-          return Util.getColorFromHex("#228b22");
+          return fromHex("#228b22");
         case "fuchsia":
-          return Util.getColorFromHex("#ff00ff");
+          return fromHex("#ff00ff");
         case "gainsboro":
-          return Util.getColorFromHex("#dcdcdc");
+          return fromHex("#dcdcdc");
         case "ghostwhite":
-          return Util.getColorFromHex("#f8f8ff");
+          return fromHex("#f8f8ff");
         case "gold":
-          return Util.getColorFromHex("#ffd700");
+          return fromHex("#ffd700");
         case "goldenrod":
-          return Util.getColorFromHex("#daa520");
+          return fromHex("#daa520");
         case "gray":
-          return Util.getColorFromHex("#808080");
+          return fromHex("#808080");
         case "green":
-          return Util.getColorFromHex("#008000");
+          return fromHex("#008000");
         case "greenyellow":
-          return Util.getColorFromHex("#adff2f");
+          return fromHex("#adff2f");
         case "grey":
-          return Util.getColorFromHex("#808080");
+          return fromHex("#808080");
         case "honeydew":
-          return Util.getColorFromHex("#f0fff0");
+          return fromHex("#f0fff0");
         case "hotpink":
-          return Util.getColorFromHex("#ff69b4");
+          return fromHex("#ff69b4");
         case "indianred":
-          return Util.getColorFromHex("#cd5c5c");
+          return fromHex("#cd5c5c");
         case "indigo":
-          return Util.getColorFromHex("#4b0082");
+          return fromHex("#4b0082");
         case "ivory":
-          return Util.getColorFromHex("#fffff0");
+          return fromHex("#fffff0");
         case "khaki":
-          return Util.getColorFromHex("#f0e68c");
+          return fromHex("#f0e68c");
         case "lavender":
-          return Util.getColorFromHex("#e6e6fa");
+          return fromHex("#e6e6fa");
         case "lavenderblush":
-          return Util.getColorFromHex("#fff0f5");
+          return fromHex("#fff0f5");
         case "lawngreen":
-          return Util.getColorFromHex("#7cfc00");
+          return fromHex("#7cfc00");
         case "lemonchiffon":
-          return Util.getColorFromHex("#fffacd");
+          return fromHex("#fffacd");
         case "lightblue":
-          return Util.getColorFromHex("#add8e6");
+          return fromHex("#add8e6");
         case "lightcoral":
-          return Util.getColorFromHex("#f08080");
+          return fromHex("#f08080");
         case "lightcyan":
-          return Util.getColorFromHex("#e0ffff");
+          return fromHex("#e0ffff");
         case "lightgoldenrodyellow":
-          return Util.getColorFromHex("#fafad2");
+          return fromHex("#fafad2");
         case "lightgray":
-          return Util.getColorFromHex("#d3d3d3");
+          return fromHex("#d3d3d3");
         case "lightgreen":
-          return Util.getColorFromHex("#90ee90");
+          return fromHex("#90ee90");
         case "lightgrey":
-          return Util.getColorFromHex("#d3d3d3");
+          return fromHex("#d3d3d3");
         case "lightpink":
-          return Util.getColorFromHex("#ffb6c1");
+          return fromHex("#ffb6c1");
         case "lightsalmon":
-          return Util.getColorFromHex("#ffa07a");
+          return fromHex("#ffa07a");
         case "lightseagreen":
-          return Util.getColorFromHex("#20b2aa");
+          return fromHex("#20b2aa");
         case "lightskyblue":
-          return Util.getColorFromHex("#87cefa");
+          return fromHex("#87cefa");
         case "lightslategray":
-          return Util.getColorFromHex("#778899");
+          return fromHex("#778899");
         case "lightslategrey":
-          return Util.getColorFromHex("#778899");
+          return fromHex("#778899");
         case "lightsteelblue":
-          return Util.getColorFromHex("#b0c4de");
+          return fromHex("#b0c4de");
         case "lightyellow":
-          return Util.getColorFromHex("#ffffe0");
+          return fromHex("#ffffe0");
         case "lime":
-          return Util.getColorFromHex("#00ff00");
+          return fromHex("#00ff00");
         case "limegreen":
-          return Util.getColorFromHex("#32cd32");
+          return fromHex("#32cd32");
         case "linen":
-          return Util.getColorFromHex("#faf0e6");
+          return fromHex("#faf0e6");
         case "magenta":
-          return Util.getColorFromHex("#ff00ff");
+          return fromHex("#ff00ff");
         case "maroon":
-          return Util.getColorFromHex("#800000");
+          return fromHex("#800000");
         case "mediumaquamarine":
-          return Util.getColorFromHex("#66cdaa");
+          return fromHex("#66cdaa");
         case "mediumblue":
-          return Util.getColorFromHex("#0000cd");
+          return fromHex("#0000cd");
         case "mediumorchid":
-          return Util.getColorFromHex("#ba55d3");
+          return fromHex("#ba55d3");
         case "mediumpurple":
-          return Util.getColorFromHex("#9370db");
+          return fromHex("#9370db");
         case "mediumseagreen":
-          return Util.getColorFromHex("#3cb371");
+          return fromHex("#3cb371");
         case "mediumslateblue":
-          return Util.getColorFromHex("#7b68ee");
+          return fromHex("#7b68ee");
         case "mediumspringgreen":
-          return Util.getColorFromHex("#00fa9a");
+          return fromHex("#00fa9a");
         case "mediumturquoise":
-          return Util.getColorFromHex("#48d1cc");
+          return fromHex("#48d1cc");
         case "mediumvioletred":
-          return Util.getColorFromHex("#c71585");
+          return fromHex("#c71585");
         case "midnightblue":
-          return Util.getColorFromHex("#191970");
+          return fromHex("#191970");
         case "mintcream":
-          return Util.getColorFromHex("#f5fffa");
+          return fromHex("#f5fffa");
         case "mistyrose":
-          return Util.getColorFromHex("#ffe4e1");
+          return fromHex("#ffe4e1");
         case "moccasin":
-          return Util.getColorFromHex("#ffe4b5");
+          return fromHex("#ffe4b5");
         case "navajowhite":
-          return Util.getColorFromHex("#ffdead");
+          return fromHex("#ffdead");
         case "navy":
-          return Util.getColorFromHex("#000080");
+          return fromHex("#000080");
         case "oldlace":
-          return Util.getColorFromHex("#fdf5e6");
+          return fromHex("#fdf5e6");
         case "olive":
-          return Util.getColorFromHex("#808000");
+          return fromHex("#808000");
         case "olivedrab":
-          return Util.getColorFromHex("#6b8e23");
+          return fromHex("#6b8e23");
         case "orange":
-          return Util.getColorFromHex("#ffa500");
+          return fromHex("#ffa500");
         case "orangered":
-          return Util.getColorFromHex("#ff4500");
+          return fromHex("#ff4500");
         case "orchid":
-          return Util.getColorFromHex("#da70d6");
+          return fromHex("#da70d6");
         case "palegoldenrod":
-          return Util.getColorFromHex("#eee8aa");
+          return fromHex("#eee8aa");
         case "palegreen":
-          return Util.getColorFromHex("#98fb98");
+          return fromHex("#98fb98");
         case "paleturquoise":
-          return Util.getColorFromHex("#afeeee");
+          return fromHex("#afeeee");
         case "palevioletred":
-          return Util.getColorFromHex("#db7093");
+          return fromHex("#db7093");
         case "papayawhip":
-          return Util.getColorFromHex("#ffefd5");
+          return fromHex("#ffefd5");
         case "peachpuff":
-          return Util.getColorFromHex("#ffdab9");
+          return fromHex("#ffdab9");
         case "peru":
-          return Util.getColorFromHex("#cd853f");
+          return fromHex("#cd853f");
         case "pink":
-          return Util.getColorFromHex("#ffc0cb");
+          return fromHex("#ffc0cb");
         case "plum":
-          return Util.getColorFromHex("#dda0dd");
+          return fromHex("#dda0dd");
         case "powderblue":
-          return Util.getColorFromHex("#b0e0e6");
+          return fromHex("#b0e0e6");
         case "purple":
-          return Util.getColorFromHex("#800080");
+          return fromHex("#800080");
         case "rebeccapurple":
-          return Util.getColorFromHex("#663399");
+          return fromHex("#663399");
         case "red":
-          return Util.getColorFromHex("#ff0000");
+          return fromHex("#ff0000");
         case "rosybrown":
-          return Util.getColorFromHex("#bc8f8f");
+          return fromHex("#bc8f8f");
         case "royalblue":
-          return Util.getColorFromHex("#4169e1");
+          return fromHex("#4169e1");
         case "saddlebrown":
-          return Util.getColorFromHex("#8b4513");
+          return fromHex("#8b4513");
         case "salmon":
-          return Util.getColorFromHex("#fa8072");
+          return fromHex("#fa8072");
         case "sandybrown":
-          return Util.getColorFromHex("#f4a460");
+          return fromHex("#f4a460");
         case "seagreen":
-          return Util.getColorFromHex("#2e8b57");
+          return fromHex("#2e8b57");
         case "seashell":
-          return Util.getColorFromHex("#fff5ee");
+          return fromHex("#fff5ee");
         case "sienna":
-          return Util.getColorFromHex("#a0522d");
+          return fromHex("#a0522d");
         case "silver":
-          return Util.getColorFromHex("#c0c0c0");
+          return fromHex("#c0c0c0");
         case "skyblue":
-          return Util.getColorFromHex("#87ceeb");
+          return fromHex("#87ceeb");
         case "slateblue":
-          return Util.getColorFromHex("#6a5acd");
+          return fromHex("#6a5acd");
         case "slategray":
-          return Util.getColorFromHex("#708090");
+          return fromHex("#708090");
         case "slategrey":
-          return Util.getColorFromHex("#708090");
+          return fromHex("#708090");
         case "snow":
-          return Util.getColorFromHex("#fffafa");
+          return fromHex("#fffafa");
         case "springgreen":
-          return Util.getColorFromHex("#00ff7f");
+          return fromHex("#00ff7f");
         case "steelblue":
-          return Util.getColorFromHex("#4682b4");
+          return fromHex("#4682b4");
         case "tan":
-          return Util.getColorFromHex("#d2b48c");
+          return fromHex("#d2b48c");
         case "teal":
-          return Util.getColorFromHex("#008080");
+          return fromHex("#008080");
         case "thistle":
-          return Util.getColorFromHex("#d8bfd8");
+          return fromHex("#d8bfd8");
         case "tomato":
-          return Util.getColorFromHex("#ff6347");
+          return fromHex("#ff6347");
         case "turquoise":
-          return Util.getColorFromHex("#40e0d0");
+          return fromHex("#40e0d0");
         case "violet":
-          return Util.getColorFromHex("#ee82ee");
+          return fromHex("#ee82ee");
         case "wheat":
-          return Util.getColorFromHex("#f5deb3");
+          return fromHex("#f5deb3");
         case "white":
-          return Util.getColorFromHex("#ffffff");
+          return fromHex("#ffffff");
         case "whitesmoke":
-          return Util.getColorFromHex("#f5f5f5");
+          return fromHex("#f5f5f5");
         case "yellow":
-          return Util.getColorFromHex("#ffff00");
+          return fromHex("#ffff00");
         case "yellowgreen":
-          return Util.getColorFromHex("#9acd32");
+          return fromHex("#9acd32");
       }
     }
     return null;
   }
 
-  static Color getColorFromHex(String hexString) {
+  static Color? fromHex(String? hexString) {
+    if (hexString == null) {
+      return null;
+    }
+
     hexString = hexString.trim();
     if (hexString.length == 4) {
       // convert for example #f00 to #ff0000
@@ -347,7 +351,11 @@ class Util {
     return Color(int.parse(buffer.toString(), radix: 16));
   }
 
-  static Color getColorFromRgbString(String rgbString) {
+  static Color? fromRgbString(String? rgbString) {
+    if (rgbString == null) {
+      return null;
+    }
+
     rgbString = rgbString.trim();
     var rgbValues = rgbString
         .substring(4, rgbString.length - 1)
@@ -357,7 +365,11 @@ class Util {
     return Color.fromRGBO(rgbValues[0], rgbValues[1], rgbValues[2], 1);
   }
 
-  static Color getColorFromRgbaString(String rgbaString) {
+  static Color? fromRgbaString(String? rgbaString) {
+    if (rgbaString == null) {
+      return null;
+    }
+
     rgbaString = rgbaString.trim();
     var rgbaValues = rgbaString
         .substring(5, rgbaString.length - 1)
@@ -368,30 +380,38 @@ class Util {
         int.parse(rgbaValues[2]), double.parse(rgbaValues[3]));
   }
 
-  static Color getColorFromHlsString(String hlsString) {
+  static Color? fromHlsString(String? hlsString) {
+    if (hlsString == null) {
+      return null;
+    }
+
     hlsString = hlsString.trim();
     var hlsValues = hlsString
         .substring(4, hlsString.length - 1)
         .split(",")
         .map((rbgValue) => double.parse(rbgValue.trim()))
         .toList();
-    var rgbValues = hslToRgb(hlsValues[0], hlsValues[1], hlsValues[2]);
+    var rgbValues = _hslToRgb(hlsValues[0], hlsValues[1], hlsValues[2]);
     return Color.fromRGBO(rgbValues[0], rgbValues[1], rgbValues[2], 1);
   }
 
-  static Color getColorFromHlsaString(String hlsaString) {
+  static Color? fromHlsaString(String? hlsaString) {
+    if (hlsaString == null) {
+      return null;
+    }
+
     hlsaString = hlsaString.trim();
     var hlsaValues = hlsaString
         .substring(5, hlsaString.length - 1)
         .split(",")
         .map((rbgValue) => double.parse(rbgValue.trim()))
         .toList();
-    var rgbaValues = hslToRgb(hlsaValues[0], hlsaValues[1], hlsaValues[2]);
+    var rgbaValues = _hslToRgb(hlsaValues[0], hlsaValues[1], hlsaValues[2]);
     return Color.fromRGBO(
         rgbaValues[0], rgbaValues[1], rgbaValues[2], hlsaValues[3]);
   }
 
-  static List<int> hslToRgb(double h, double s, double l) {
+  static List<int> _hslToRgb(double h, double s, double l) {
     double r, g, b;
 
     if (s == 0) {
@@ -399,20 +419,20 @@ class Util {
     } else {
       double q = l < 0.5 ? l * (1 + s) : l + s - l * s;
       double p = 2 * l - q;
-      r = hueToRgb(p, q, h + 1 / 3);
-      g = hueToRgb(p, q, h);
-      b = hueToRgb(p, q, h - 1 / 3);
+      r = _hueToRgb(p, q, h + 1 / 3);
+      g = _hueToRgb(p, q, h);
+      b = _hueToRgb(p, q, h - 1 / 3);
     }
-    var rgb = [to255(r), to255(g), to255(b)];
+    var rgb = [_to255(r), _to255(g), _to255(b)];
     return rgb;
   }
 
-  static int to255(double v) {
+  static int _to255(double v) {
     return min(255, (256 * v).round());
   }
 
   /// Helper method that converts hue to rgb
-  static double hueToRgb(double p, double q, double t) {
+  static double _hueToRgb(double p, double q, double t) {
     if (t < 0) t += 1;
     if (t > 1) t -= 1;
     if (t < 1 / 6) return p + (q - p) * 6 * t;
@@ -420,4 +440,13 @@ class Util {
     if (t < 2 / 3) return p + (q - p) * (2 / 3 - t) * 6;
     return p;
   }
+}
+
+extension HexColor on Color {
+  /// Prefixes a hash sign if [leadingHashSign] is set to `true` (default is `true`).
+  String toHex({bool leadingHashSign = true}) => '${leadingHashSign ? '#' : ''}'
+      '${alpha.toRadixString(16).padLeft(2, '0')}'
+      '${red.toRadixString(16).padLeft(2, '0')}'
+      '${green.toRadixString(16).padLeft(2, '0')}'
+      '${blue.toRadixString(16).padLeft(2, '0')}';
 }

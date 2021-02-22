@@ -1,107 +1,49 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="14490.70" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
-    <device id="retina5_5" orientation="portrait">
-        <adaptation id="fullscreen"/>
-    </device>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="17701" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina5_5" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment version="2048" identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="14490.49"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17703"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--In App Browser Web View Controller-->
-        <scene sceneID="PeV-E5-ivI">
+        <!--In App Browser Navigation Controller-->
+        <scene sceneID="jLX-8h-9MF">
             <objects>
-                <viewController storyboardIdentifier="viewController" id="zfm-Ja-gep" customClass="InAppBrowserWebViewController" customModule="flutter_inappwebview" sceneMemberID="viewController">
+                <navigationController storyboardIdentifier="navController" id="kDN-39-Jxf" customClass="InAppBrowserNavigationController" customModule="flutter_inappwebview" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="uWm-7N-XXH">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="5mU-lN-GJR" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-1707" y="-554"/>
+        </scene>
+        <!--In App Browser Web View Controller-->
+        <scene sceneID="aus-qq-RXG">
+            <objects>
+                <viewController storyboardIdentifier="viewController" id="Myh-pL-l6f" customClass="InAppBrowserWebViewController" customModule="flutter_inappwebview" sceneMemberID="viewController">
                     <layoutGuides>
-                        <viewControllerLayoutGuide type="top" id="eCU-xC-qdo"/>
-                        <viewControllerLayoutGuide type="bottom" id="dUM-I7-PRF"/>
+                        <viewControllerLayoutGuide type="top" id="t5f-B2-Tnb"/>
+                        <viewControllerLayoutGuide type="bottom" id="Rnw-Dd-Oxb"/>
                     </layoutGuides>
-                    <view key="view" contentMode="scaleToFill" id="ISu-6l-aO1">
+                    <view key="view" contentMode="scaleToFill" id="1n8-5e-oxa">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <subviews>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="gA9-n8-qaQ" userLabel="Container WebView" customClass="InAppWebView_IBWrapper" customModule="flutter_inappwebview">
-                                <rect key="frame" x="0.0" y="66" width="414" height="626"/>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                            </view>
-                            <toolbar opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Pf-5R-cFf" userLabel="Toolbar Bottom">
-                                <rect key="frame" x="0.0" y="692" width="414" height="44"/>
-                                <items>
-                                    <barButtonItem title="&lt;" id="595-GQ-9lo"/>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="CNi-Ja-5Sm"/>
-                                    <barButtonItem title="&gt;" id="cCF-Ou-NU3"/>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="M8l-n1-EKt"/>
-                                    <barButtonItem systemItem="refresh" id="fig-ca-P2P"/>
-                                    <barButtonItem style="plain" systemItem="flexibleSpace" id="ML1-Dy-jn0"/>
-                                    <barButtonItem systemItem="action" id="skL-Lw-jYB"/>
-                                </items>
-                            </toolbar>
-                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="vlz-kT-71x" userLabel="Toolbar Top">
-                                <rect key="frame" x="0.0" y="20" width="414" height="46"/>
-                                <subviews>
-                                    <textField opaque="NO" contentMode="scaleToFill" horizontalCompressionResistancePriority="250" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" clearButtonMode="whileEditing" translatesAutoresizingMaskIntoConstraints="NO" id="sy2-Vx-Cxd">
-                                        <rect key="frame" x="8" y="8" width="351" height="30"/>
-                                        <edgeInsets key="layoutMargins" top="8" left="8" bottom="8" right="8"/>
-                                        <nil key="textColor"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
-                                    </textField>
-                                    <button opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zlr-JJ-Uuj">
-                                        <rect key="frame" x="367" y="8" width="39" height="30"/>
-                                        <state key="normal" title="Close"/>
-                                    </button>
-                                </subviews>
-                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-                                <constraints>
-                                    <constraint firstItem="sy2-Vx-Cxd" firstAttribute="centerY" secondItem="vlz-kT-71x" secondAttribute="centerY" id="29E-I6-cKG"/>
-                                    <constraint firstItem="zlr-JJ-Uuj" firstAttribute="leading" secondItem="sy2-Vx-Cxd" secondAttribute="trailing" constant="8" symbolic="YES" id="5VU-v3-7Ey"/>
-                                    <constraint firstItem="zlr-JJ-Uuj" firstAttribute="trailing" secondItem="vlz-kT-71x" secondAttribute="trailingMargin" id="Cz5-rQ-5zV"/>
-                                    <constraint firstItem="sy2-Vx-Cxd" firstAttribute="top" secondItem="vlz-kT-71x" secondAttribute="topMargin" id="DVY-hQ-ZiW"/>
-                                    <constraint firstItem="zlr-JJ-Uuj" firstAttribute="top" secondItem="sy2-Vx-Cxd" secondAttribute="top" id="c8c-p0-wa2"/>
-                                    <constraint firstItem="sy2-Vx-Cxd" firstAttribute="leading" secondItem="vlz-kT-71x" secondAttribute="leadingMargin" id="fTs-kD-AzF"/>
-                                </constraints>
-                            </view>
-                            <activityIndicatorView hidden="YES" opaque="NO" userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="gray" translatesAutoresizingMaskIntoConstraints="NO" id="HWt-17-FMf">
-                                <rect key="frame" x="197" y="369" width="20" height="20"/>
-                            </activityIndicatorView>
-                        </subviews>
-                        <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
-                        <constraints>
-                            <constraint firstItem="gA9-n8-qaQ" firstAttribute="leading" secondItem="ISu-6l-aO1" secondAttribute="leading" id="8YB-0N-UzE"/>
-                            <constraint firstItem="gA9-n8-qaQ" firstAttribute="trailing" secondItem="ISu-6l-aO1" secondAttribute="trailing" id="Dhn-ga-7dD"/>
-                            <constraint firstItem="gA9-n8-qaQ" firstAttribute="bottom" secondItem="8Pf-5R-cFf" secondAttribute="top" id="KeI-jL-Qoi"/>
-                            <constraint firstItem="gA9-n8-qaQ" firstAttribute="trailing" secondItem="8Pf-5R-cFf" secondAttribute="trailing" id="OPR-aA-bxG"/>
-                            <constraint firstItem="vlz-kT-71x" firstAttribute="leading" secondItem="gA9-n8-qaQ" secondAttribute="leading" id="OZ2-Kx-4su"/>
-                            <constraint firstItem="gA9-n8-qaQ" firstAttribute="leading" secondItem="8Pf-5R-cFf" secondAttribute="leading" id="RGD-3l-ddR"/>
-                            <constraint firstItem="gA9-n8-qaQ" firstAttribute="top" secondItem="vlz-kT-71x" secondAttribute="bottom" id="Sjd-dV-din"/>
-                            <constraint firstItem="vlz-kT-71x" firstAttribute="trailing" secondItem="gA9-n8-qaQ" secondAttribute="trailing" id="XRo-VA-krE"/>
-                            <constraint firstItem="vlz-kT-71x" firstAttribute="top" secondItem="eCU-xC-qdo" secondAttribute="bottom" id="bWR-2T-bWy"/>
-                            <constraint firstItem="HWt-17-FMf" firstAttribute="centerX" secondItem="gA9-n8-qaQ" secondAttribute="centerX" id="dV8-Dm-9mc"/>
-                            <constraint firstItem="HWt-17-FMf" firstAttribute="centerY" secondItem="gA9-n8-qaQ" secondAttribute="centerY" id="pCx-Ia-kSL"/>
-                            <constraint firstItem="8Pf-5R-cFf" firstAttribute="bottom" secondItem="dUM-I7-PRF" secondAttribute="top" id="uVo-FW-XOM"/>
-                            <constraint firstAttribute="trailing" secondItem="vlz-kT-71x" secondAttribute="trailing" id="ugv-NZ-e6F"/>
-                            <constraint firstItem="vlz-kT-71x" firstAttribute="leading" secondItem="ISu-6l-aO1" secondAttribute="leading" id="yp6-RS-pBY"/>
-                        </constraints>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <connections>
-                        <outlet property="backButton" destination="595-GQ-9lo" id="dvV-nO-BJ6"/>
-                        <outlet property="closeButton" destination="zlr-JJ-Uuj" id="vcO-DA-ByF"/>
-                        <outlet property="containerWebView" destination="gA9-n8-qaQ" id="lkF-Wk-Bm1"/>
-                        <outlet property="forwardButton" destination="cCF-Ou-NU3" id="IqB-62-XYC"/>
-                        <outlet property="reloadButton" destination="fig-ca-P2P" id="271-Gw-S2k"/>
-                        <outlet property="shareButton" destination="skL-Lw-jYB" id="8hu-WC-OM0"/>
-                        <outlet property="spinner" destination="HWt-17-FMf" id="c2Y-Tb-XfA"/>
-                        <outlet property="toolbarBottom" destination="8Pf-5R-cFf" id="Og7-Xw-2sq"/>
-                        <outlet property="toolbarBottom_TopToWebViewBottomConstraint" destination="KeI-jL-Qoi" id="jKQ-OC-jpD"/>
-                        <outlet property="toolbarTop" destination="vlz-kT-71x" id="WgC-80-Z28"/>
-                        <outlet property="toolbarTop_BottomToWebViewTopConstraint" destination="Sjd-dV-din" id="vkO-Yu-xaE"/>
-                        <outlet property="urlField" destination="sy2-Vx-Cxd" id="MCW-lJ-Ehl"/>
-                    </connections>
+                    <navigationItem key="navigationItem" id="vzz-mz-Dtz"/>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="cYA-mw-BIR" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="oKH-bS-5CO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="433.33333333333337" y="-217.66304347826087"/>
+            <point key="canvasLocation" x="-875" y="-554"/>
         </scene>
     </scenes>
+    <resources>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+    </resources>
 </document>

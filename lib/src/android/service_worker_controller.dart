@@ -32,25 +32,12 @@ class AndroidServiceWorkerController {
 
     switch (call.method) {
       case "shouldInterceptRequest":
-        String url = call.arguments["url"];
-        String method = call.arguments["method"];
-        Map<String, String>? headers =
-        call.arguments["headers"]?.cast<String, String>();
-        bool isForMainFrame = call.arguments["isForMainFrame"];
-        bool hasGesture = call.arguments["hasGesture"];
-        bool isRedirect = call.arguments["isRedirect"];
-
-        var request = new WebResourceRequest(
-            url: url,
-            method: method,
-            headers: headers,
-            isForMainFrame: isForMainFrame,
-            hasGesture: hasGesture,
-            isRedirect: isRedirect);
-
         if (serviceWorkerClient != null && serviceWorkerClient.shouldInterceptRequest != null) {
+          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          WebResourceRequest request = WebResourceRequest.fromMap(arguments)!;
+
           return (await serviceWorkerClient.shouldInterceptRequest!(request))
-              ?.toMap();
+            ?.toMap();
         }
         break;
       default:

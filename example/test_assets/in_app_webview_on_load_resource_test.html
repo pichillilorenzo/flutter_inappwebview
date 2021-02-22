@@ -5,9 +5,7 @@
         <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
         <meta http-equiv="X-UA-Compatible" content="ie=edge">
         <title>InAppWebViewOnLoadResourceTest</title>
-        <link rel="stylesheet" href="https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="css/style.css">
-        <script src="https://code.jquery.com/jquery-3.3.1.min.js"></script>
         <link rel="shortcut icon" href="favicon.ico">
     </head>
     <body class="text-center">
@@ -20,5 +18,17 @@
                 </p>
             </main>
         </div>
+        <script>
+            document.addEventListener('DOMContentLoaded', function () {
+                var script = document.createElement('script');
+                script.src = "https://code.jquery.com/jquery-3.3.1.min.js"
+                document.body.append(script);
+
+                var link = document.createElement('link');
+                link.rel = "stylesheet";
+                link.href = "https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css"
+                document.body.append(link);
+            });
+        </script>
     </body>
 </html>

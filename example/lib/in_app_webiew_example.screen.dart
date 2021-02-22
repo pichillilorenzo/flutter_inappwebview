@@ -102,7 +102,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrlRequest: URLRequest(
-                      url: Uri.parse("https://github.com")
+                      url: Uri.parse("https://flutter.dev")
                     ),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([
@@ -139,9 +139,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       }
 
                       return NavigationActionPolicy.ALLOW;
-                    },
-                    onLoadResource: (controller, resource) {
-                      // print(resource);
                     },
                     onLoadStop: (controller, url) async {
                       print("onLoadStop $url");

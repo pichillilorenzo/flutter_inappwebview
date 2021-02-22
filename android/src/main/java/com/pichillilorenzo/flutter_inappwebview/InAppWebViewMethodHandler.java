@@ -73,7 +73,7 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       break;
       case "loadFile":
         if (webView != null) {
-          String assetFilePath = (String) call.argument("url");
+          String assetFilePath = (String) call.argument("assetFilePath");
           try {
             webView.loadFile(assetFilePath);
           } catch (IOException e) {
@@ -458,7 +458,7 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           Integer index = (Integer) call.argument("index");
           Map<String, Object> userScriptMap = (Map<String, Object>) call.argument("userScript");
           UserScript userScript = UserScript.fromMap(userScriptMap);
-          result.success(webView.userContentController.removePluginScriptAt(index, userScript.getInjectionTime()));
+          result.success(webView.userContentController.removeUserOnlyScriptAt(index, userScript.getInjectionTime()));
         } else {
           result.success(false);
         }

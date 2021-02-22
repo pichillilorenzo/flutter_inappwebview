@@ -71,6 +71,7 @@ flutter:
     - test_assets/in_app_webview_on_console_message_test.html
     - test_assets/in_app_webview_on_create_window_test.html
     - test_assets/in_app_webview_on_js_dialog_test.html
+    - test_assets/js/
     - test_assets/css/
     - test_assets/images/
     - test_assets/favicon.ico

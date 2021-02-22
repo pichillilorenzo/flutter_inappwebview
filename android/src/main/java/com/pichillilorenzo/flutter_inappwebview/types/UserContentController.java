@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.types;
 
 import android.text.TextUtils;
+import android.util.Log;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -216,11 +217,6 @@ public class UserContentController {
     return this.pluginScripts.get(pluginScript.getInjectionTime()).remove(pluginScript);
   }
 
-  public boolean removePluginScriptAt(int index, UserScriptInjectionTime injectionTime) {
-    PluginScript pluginScript = new ArrayList<>(this.pluginScripts.get(injectionTime)).get(index);
-    return this.removePluginScript(pluginScript);
-  }
-
   public void removeAllPluginScripts() {
     this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START).clear();
     this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_END).clear();
@@ -356,9 +352,5 @@ public class UserContentController {
 
   private static final String DOCUMENT_READY_WRAPPER_JS_SOURCE = "if (document.readyState === 'interactive' || document.readyState === 'complete') { " +
           "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
-          "} else {" +
-          "  document.addEventListener('DOMContentLoaded', function() {" +
-          "     " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
-          "  });" +
           "}";
 }

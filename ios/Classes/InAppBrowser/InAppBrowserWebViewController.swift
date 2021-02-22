@@ -426,7 +426,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             searchBar.isHidden = newOptions.hideUrlBar
         }
 
-        if newOptionsMap["toolbarTop"] != nil, browserOptions?.hideToolbarTop != newOptions.hideToolbarTop {
+        if newOptionsMap["hideToolbarTop"] != nil, browserOptions?.hideToolbarTop != newOptions.hideToolbarTop {
             navigationController?.navigationBar.isHidden = newOptions.hideToolbarTop
         }
 

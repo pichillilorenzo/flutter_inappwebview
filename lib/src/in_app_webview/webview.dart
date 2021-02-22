@@ -618,6 +618,8 @@ abstract class WebView {
   iosShouldAllowDeprecatedTLS;
 
   ///Initial url request that will be loaded.
+  ///
+  ///**NOTE for Android**: when loading an URL Request using "POST" method, headers are ignored.
   final URLRequest? initialUrlRequest;
 
   ///Initial asset file that will be loaded. See [InAppWebViewController.loadFile] for explanation.

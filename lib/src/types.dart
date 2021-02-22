@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
@@ -144,17 +145,19 @@ class InAppWebViewInitialData {
   ///The URL to use as the page's base URL. The default value is `about:blank`.
   late Uri baseUrl;
 
-  ///The URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
-  late Uri historyUrl;
+  ///The URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL.
+  ///
+  ///This parameter is used only on Android.
+  late Uri androidHistoryUrl;
 
   InAppWebViewInitialData(
       {required this.data,
       this.mimeType = "text/html",
       this.encoding = "utf8",
       Uri? baseUrl,
-      Uri? historyUrl}) {
+      Uri? androidHistoryUrl}) {
    this.baseUrl = baseUrl == null ? Uri.parse("about:blank") : baseUrl;
-   this.historyUrl = historyUrl == null ? Uri.parse("about:blank") : historyUrl;
+   this.androidHistoryUrl = androidHistoryUrl == null ? Uri.parse("about:blank") : androidHistoryUrl;
   }
 
   Map<String, String> toMap() {
@@ -163,7 +166,7 @@ class InAppWebViewInitialData {
       "mimeType": mimeType,
       "encoding": encoding,
       "baseUrl": baseUrl.toString(),
-      "historyUrl": historyUrl.toString()
+      "historyUrl": androidHistoryUrl.toString()
     };
   }
 
@@ -396,6 +399,30 @@ class WebHistory {
   int? currentIndex;
 
   WebHistory({this.list, this.currentIndex});
+
+  static WebHistory? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+
+    List<LinkedHashMap<dynamic, dynamic>>? historyListMap = map["history"]?.cast<LinkedHashMap<dynamic, dynamic>>();
+    int currentIndex = map["currentIndex"];
+
+    List<WebHistoryItem> historyList = <WebHistoryItem>[];
+    if (historyListMap != null) {
+      for (var i = 0; i < historyListMap.length; i++) {
+        var historyItem = historyListMap[i];
+        historyList.add(WebHistoryItem(
+            originalUrl: historyItem["originalUrl"] != null ? Uri.parse(historyItem["originalUrl"]) : null,
+            title: historyItem["title"],
+            url: historyItem["url"] != null ? Uri.parse(historyItem["url"]) : null,
+            index: i,
+            offset: i - currentIndex));
+      }
+    }
+
+    return WebHistory(list: historyList, currentIndex: currentIndex);
+  }
 
   Map<String, dynamic> toMap() {
     return {"list": list, "currentIndex": currentIndex};

@@ -1323,7 +1323,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func injectCSSCode(source: String) {
-        let jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %@; d.body.appendChild(style); })(document);"
+        let jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %@; d.head.appendChild(style); })(document);"
         injectDeferredObject(source: source, withWrapper: jsWrapper, completionHandler: nil)
     }
     
@@ -1356,7 +1356,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 cssLinkAttributes += " link.title = '\(titleAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
             }
         }
-        let jsWrapper = "(function(d) { var link = d.createElement('link'); link.rel='\(alternateStylesheet)stylesheet', link.type='text/css'; \(cssLinkAttributes) link.href = %@; d.body.appendChild(link); })(document);"
+        let jsWrapper = "(function(d) { var link = d.createElement('link'); link.rel='\(alternateStylesheet)stylesheet', link.type='text/css'; \(cssLinkAttributes) link.href = %@; d.head.appendChild(link); })(document);"
         injectDeferredObject(source: urlFile, withWrapper: jsWrapper, completionHandler: nil)
     }
     

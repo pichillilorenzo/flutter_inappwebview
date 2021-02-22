@@ -77,7 +77,7 @@ class InAppWebViewController {
         MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
     this._webview = webview;
-    this._userScripts = List<UserScript>.from(webview.initialUserScripts ?? []);
+    this._userScripts = List<UserScript>.from(webview.initialUserScripts ?? <UserScript>[]);
     this._init();
   }
 
@@ -86,7 +86,7 @@ class InAppWebViewController {
     this._inAppBrowserUuid = uuid;
     this._channel = channel;
     this._inAppBrowser = inAppBrowser;
-    this._userScripts = List<UserScript>.from(initialUserScripts ?? []);
+    this._userScripts = List<UserScript>.from(initialUserScripts ?? <UserScript>[]);
     this._init();
   }
 
@@ -982,6 +982,8 @@ class InAppWebViewController {
   ///Specify the same value as the URL parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
   ///
+  ///**NOTE for Android**: when loading an URL Request using "POST" method, headers are ignored.
+  ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)
   ///
   ///**Official iOS API**:
@@ -1037,8 +1039,8 @@ class InAppWebViewController {
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
-    args.putIfAbsent('baseUrl', () => baseUrl ?? Uri.parse("about:blank"));
-    args.putIfAbsent('historyUrl', () => androidHistoryUrl ?? Uri.parse("about:blank"));
+    args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
+    args.putIfAbsent('historyUrl', () => androidHistoryUrl?.toString() ?? "about:blank");
     await _channel.invokeMethod('loadData', args);
   }
 
@@ -1376,31 +1378,8 @@ class InAppWebViewController {
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist
   Future<WebHistory?> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<dynamic, dynamic>? result =
-        await _channel.invokeMethod('getCopyBackForwardList', args);
-
-    if (result == null) {
-      return null;
-    }
-
-    result = result.cast<String, dynamic>();
-
-    List<dynamic> historyListMap = result["history"];
-    historyListMap = historyListMap.cast<LinkedHashMap<dynamic, dynamic>>();
-
-    int currentIndex = result["currentIndex"];
-
-    List<WebHistoryItem> historyList = [] as List<WebHistoryItem>;
-    for (var i = 0; i < historyListMap.length; i++) {
-      LinkedHashMap<dynamic, dynamic> historyItem = historyListMap[i];
-      historyList.add(WebHistoryItem(
-          originalUrl: historyItem["originalUrl"] != null ? Uri.parse(historyItem["originalUrl"]) : null,
-          title: historyItem["title"],
-          url: historyItem["url"] != null ? Uri.parse(historyItem["url"]) : null,
-          index: i,
-          offset: i - currentIndex));
-    }
-    return WebHistory(list: historyList, currentIndex: currentIndex);
+    Map<String, dynamic>? result = (await _channel.invokeMethod('getCopyBackForwardList', args))?.cast<String, dynamic>();
+    return WebHistory.fromMap(result);
   }
 
   ///Clears all the webview's cache.

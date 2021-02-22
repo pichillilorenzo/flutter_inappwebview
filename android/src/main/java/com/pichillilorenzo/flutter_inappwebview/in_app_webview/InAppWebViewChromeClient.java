@@ -672,8 +672,14 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public void onProgressChanged(WebView view, int progress) {
     super.onProgressChanged(view, progress);
 
+    InAppWebView webView = (InAppWebView) view;
+
     if (inAppBrowserDelegate != null) {
       inAppBrowserDelegate.didChangeProgress(progress);
+    }
+
+    if (webView.inAppWebViewClient != null) {
+      webView.inAppWebViewClient.loadCustomJavaScriptOnPageStarted(view);
     }
 
     Map<String, Object> obj = new HashMap<>();

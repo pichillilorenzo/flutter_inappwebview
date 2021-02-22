@@ -178,9 +178,10 @@ extension WKUserContentController {
         removeUserScript(scriptToRemove: userOnlyScript)
     }
 
-    public func removeUserOnlyScript(at index: Int, userOnlyScript: UserScript) {
-        userOnlyScripts[userOnlyScript.injectionTime]!.removeObject(at: index)
-        removeUserScript(scriptToRemove: userOnlyScript)
+    public func removeUserOnlyScript(at index: Int, injectionTime: WKUserScriptInjectionTime) {
+        let scriptToRemove = userOnlyScripts[injectionTime]![index]
+        userOnlyScripts[injectionTime]!.removeObject(at: index)
+        removeUserScript(scriptToRemove: scriptToRemove)
     }
 
     public func removeAllUserOnlyScripts() {

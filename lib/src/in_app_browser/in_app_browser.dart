@@ -13,6 +13,30 @@ import '../in_app_webview/in_app_webview_options.dart';
 
 import 'in_app_browser_options.dart';
 
+class InAppBrowserAlreadyOpenedException implements Exception {
+  final dynamic message;
+
+  InAppBrowserAlreadyOpenedException([this.message]);
+
+  String toString() {
+    Object? message = this.message;
+    if (message == null) return "InAppBrowserAlreadyOpenedException";
+    return "InAppBrowserAlreadyOpenedException: $message";
+  }
+}
+
+class InAppBrowserNotOpenedException implements Exception {
+  final dynamic message;
+
+  InAppBrowserNotOpenedException([this.message]);
+
+  String toString() {
+    Object? message = this.message;
+    if (message == null) return "InAppBrowserNotOpenedException";
+    return "InAppBrowserNotOpenedException: $message";
+  }
+}
+
 ///This class uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
@@ -76,7 +100,7 @@ class InAppBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
-    args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('options', () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts', () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
@@ -127,7 +151,7 @@ class InAppBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
     args.putIfAbsent('assetFilePath', () => assetFilePath);
-    args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('options', () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts', () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
@@ -154,12 +178,12 @@ class InAppBrowser {
     
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('uuid', () => uuid);
-    args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('options', () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
-    args.putIfAbsent('baseUrl', () => baseUrl ?? Uri.parse("about:blank"));
-    args.putIfAbsent('historyUrl', () => androidHistoryUrl ?? Uri.parse("about:blank"));
+    args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
+    args.putIfAbsent('historyUrl', () => androidHistoryUrl?.toString() ?? "about:blank");
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts', () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
@@ -768,7 +792,7 @@ class InAppBrowser {
 
   void throwIfAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
-      throw Exception([
+      throw InAppBrowserAlreadyOpenedException([
         'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is already opened.'
       ]);
     }
@@ -776,7 +800,7 @@ class InAppBrowser {
 
   void throwIfNotOpened({String message = ''}) {
     if (!this.isOpened()) {
-      throw Exception([
+      throw InAppBrowserNotOpenedException([
         'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is not opened.'
       ]);
     }

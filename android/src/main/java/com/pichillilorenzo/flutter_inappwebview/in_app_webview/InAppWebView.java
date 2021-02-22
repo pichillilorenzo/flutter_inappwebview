@@ -1037,7 +1037,7 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void injectCSSCode(String source) {
-    String jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %s; d.body.appendChild(style); })(document);";
+    String jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %s; d.head.appendChild(style); })(document);";
     injectDeferredObject(source, null, jsWrapper, null);
   }
 

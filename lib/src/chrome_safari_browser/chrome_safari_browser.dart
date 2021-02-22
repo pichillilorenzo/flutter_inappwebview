@@ -6,6 +6,30 @@ import 'package:flutter/services.dart';
 import '../_uuid_generator.dart';
 import 'chrome_safari_browser_options.dart';
 
+class ChromeSafariBrowserAlreadyOpenedException implements Exception {
+  final dynamic message;
+
+  ChromeSafariBrowserAlreadyOpenedException([this.message]);
+
+  String toString() {
+    Object? message = this.message;
+    if (message == null) return "ChromeSafariBrowserAlreadyOpenedException";
+    return "ChromeSafariBrowserAlreadyOpenedException: $message";
+  }
+}
+
+class ChromeSafariBrowserNotOpenedException implements Exception {
+  final dynamic message;
+
+  ChromeSafariBrowserNotOpenedException([this.message]);
+
+  String toString() {
+    Object? message = this.message;
+    if (message == null) return "ChromeSafariBrowserNotOpenedException";
+    return "ChromeSafariBrowserNotOpenedException: $message";
+  }
+}
+
 ///This class uses native [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android
 ///and [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
 ///
@@ -120,7 +144,7 @@ class ChromeSafariBrowser {
 
   void throwIsAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
-      throw Exception([
+      throw ChromeSafariBrowserAlreadyOpenedException([
         'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is already opened.'
       ]);
     }
@@ -128,7 +152,7 @@ class ChromeSafariBrowser {
 
   void throwIsNotOpened({String message = ''}) {
     if (!this.isOpened()) {
-      throw Exception([
+      throw ChromeSafariBrowserNotOpenedException([
         'Error: ${(message.isEmpty) ? '' : message + ' '}The browser is not opened.'
       ]);
     }

@@ -39,40 +39,40 @@ class BrowserOptions {
 ///Class that represents the options that can be used for an [InAppBrowser] WebView.
 class InAppBrowserClassOptions {
   ///Cross-platform options.
-  InAppBrowserOptions? crossPlatform;
+  late InAppBrowserOptions crossPlatform;
 
   ///Android-specific options.
-  AndroidInAppBrowserOptions? android;
+  late AndroidInAppBrowserOptions android;
 
   ///iOS-specific options.
-  IOSInAppBrowserOptions? ios;
+  late IOSInAppBrowserOptions ios;
 
   ///WebView options.
-  InAppWebViewGroupOptions? inAppWebViewGroupOptions;
+  late InAppWebViewGroupOptions inAppWebViewGroupOptions;
 
   InAppBrowserClassOptions(
-      {this.crossPlatform,
-        this.android,
-        this.ios,
-        this.inAppWebViewGroupOptions}) {
-    this.crossPlatform = this.crossPlatform ?? InAppBrowserOptions();
-    this.android = this.android ?? AndroidInAppBrowserOptions();
-    this.ios = this.ios ?? IOSInAppBrowserOptions();
+      {InAppBrowserOptions? crossPlatform,
+        AndroidInAppBrowserOptions? android,
+        IOSInAppBrowserOptions? ios,
+        InAppWebViewGroupOptions? inAppWebViewGroupOptions}) {
+    this.crossPlatform = crossPlatform ?? InAppBrowserOptions();
+    this.android = android ?? AndroidInAppBrowserOptions();
+    this.ios = ios ?? IOSInAppBrowserOptions();
     this.inAppWebViewGroupOptions =
-        this.inAppWebViewGroupOptions ?? InAppWebViewGroupOptions();
+        inAppWebViewGroupOptions ?? InAppWebViewGroupOptions();
   }
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> options = {};
 
-    options.addAll(this.crossPlatform?.toMap() ?? {});
-    options.addAll(this.inAppWebViewGroupOptions?.crossPlatform.toMap() ?? {});
+    options.addAll(this.crossPlatform.toMap());
+    options.addAll(this.inAppWebViewGroupOptions.crossPlatform.toMap());
     if (defaultTargetPlatform == TargetPlatform.android) {
-      options.addAll(this.android?.toMap() ?? {});
-      options.addAll(this.inAppWebViewGroupOptions?.android.toMap() ?? {});
+      options.addAll(this.android.toMap());
+      options.addAll(this.inAppWebViewGroupOptions.android.toMap());
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-      options.addAll(this.ios?.toMap() ?? {});
-      options.addAll(this.inAppWebViewGroupOptions?.ios.toMap() ?? {});
+      options.addAll(this.ios.toMap());
+      options.addAll(this.inAppWebViewGroupOptions.ios.toMap());
     }
 
     return options;
@@ -95,16 +95,16 @@ class InAppBrowserClassOptions {
         InAppBrowserOptions.fromMap(options);
     inAppBrowserClassOptions.inAppWebViewGroupOptions =
         InAppWebViewGroupOptions();
-    inAppBrowserClassOptions.inAppWebViewGroupOptions!.crossPlatform =
+    inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
     if (defaultTargetPlatform == TargetPlatform.android) {
       inAppBrowserClassOptions.android =
           AndroidInAppBrowserOptions.fromMap(options);
-      inAppBrowserClassOptions.inAppWebViewGroupOptions!.android =
+      inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
           AndroidInAppWebViewOptions.fromMap(options);
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       inAppBrowserClassOptions.ios = IOSInAppBrowserOptions.fromMap(options);
-      inAppBrowserClassOptions.inAppWebViewGroupOptions!.ios =
+      inAppBrowserClassOptions.inAppWebViewGroupOptions.ios =
           IOSInAppWebViewOptions.fromMap(options);
     }
 

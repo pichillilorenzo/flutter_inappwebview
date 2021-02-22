@@ -260,8 +260,8 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "pauseTimers":
                 webView?.pauseTimers()
-               result(true)
-               break
+                result(true)
+                break
             case "resumeTimers":
                 webView?.resumeTimers()
                 result(true)
@@ -383,16 +383,19 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 result(webView?.getCertificate()?.toMap())
                 break
             case "addUserScript":
-                let userScriptMap = arguments!["userScript"] as! [String: Any?]
-                let userScript = UserScript.fromMap(map: userScriptMap, windowId: webView?.windowId)!
-                webView?.configuration.userContentController.addUserOnlyScript(userScript)
+                if let webView = webView {
+                    let userScriptMap = arguments!["userScript"] as! [String: Any?]
+                    let userScript = UserScript.fromMap(map: userScriptMap, windowId: webView.windowId)!
+                    webView.configuration.userContentController.addUserOnlyScript(userScript)
+                    webView.configuration.userContentController.sync(scriptMessageHandler: webView)
+                }
                 result(true)
                 break
             case "removeUserScript":
                 let index = arguments!["index"] as! Int
                 let userScriptMap = arguments!["userScript"] as! [String: Any?]
                 let userScript = UserScript.fromMap(map: userScriptMap, windowId: webView?.windowId)!
-                webView?.configuration.userContentController.removeUserOnlyScript(at: index, userOnlyScript: userScript)
+                webView?.configuration.userContentController.removeUserOnlyScript(at: index, injectionTime: userScript.injectionTime)
                 result(true)
                 break
             case "removeUserScriptsByGroupName":
@@ -463,12 +466,12 @@ class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "isSecureContext":
                 if let webView = webView {
-                    result(webView.isSecureContext(completionHandler: { (isSecureContext) in
+                    webView.isSecureContext(completionHandler: { (isSecureContext) in
                         result(isSecureContext)
-                    }))
+                    })
                 }
                 else {
-                    result(nil)
+                    result(false)
                 }
                 break
             default:

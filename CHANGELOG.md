@@ -1,4 +1,4 @@
-## 5.0.0
+## 5.0.0-nullsafety.0
 
 - Added support for Dart null-safety feature
 - Added Android Hybrid Composition support "Use PlatformViewLink widget for Android WebView" [#462](https://github.com/pichillilorenzo/flutter_inappwebview/pull/462) (thanks to [plateaukao](https://github.com/plateaukao) and [tneotia](https://github.com/tneotia))

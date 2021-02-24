@@ -1646,8 +1646,8 @@ Future main() async {
 The JavaScript Service Worker API are available starting from iOS 14.0+.
 
 To enable this JavaScript API on iOS there are only 2 ways:
-- using `App-Bound Domains`
-- your App proposes itself as a possible Default Browser such as iOS Safari or Google Chrome
+- using "App-Bound Domains"
+- your App proposes itself as a possible "Default Browser" such as iOS Safari or Google Chrome
 
 ##### iOS App-Bound Domains
 

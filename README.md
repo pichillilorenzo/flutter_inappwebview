@@ -217,14 +217,33 @@ First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](ht
 
 Classes:
 - [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. Note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
+  - [methods](#inappwebviewcontroller-methods)
+  - [options](#inappwebview-options)
+  - [events](#inappwebview-events)
 - [ContextMenu](#contextmenu-class): This class represents the WebView context menu.
+  - [options](#contextmenu-options)
+  - [events](#contextmenu-events)
 - [HeadlessInAppWebView](#headlessinappwebview-class): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
+  - [methods](#inappwebviewcontroller-methods)
+  - [options](#inappwebview-options)
+  - [events](#inappwebview-events)
 - [InAppBrowser](#inappbrowser-class): In-App Browser using native WebView.
+  - [methods](#inappbrowser-methods)
+  - [options](#inappbrowser-options)
+  - [events](#inappbrowser-events)
 - [ChromeSafariBrowser](#chromesafaribrowser-class): In-App Browser using [Chrome Custom Tabs](https://developer.android.com/reference/android/support/customtabs/package-summary) on Android / [SFSafariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller) on iOS.
+  - [methods](#chromesafaribrowser-methods)
+  - [options](#chromesafaribrowser-options)
+  - [events](#chromesafaribrowser-events)
 - [InAppLocalhostServer](#inapplocalhostserver-class): This class allows you to create a simple server on `http://localhost:[port]/`. The default `port` value is `8080`.
 - [CookieManager](#cookiemanager-class): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances. **LIMITED SUPPORT for iOS below 11.0**.
+  - [methods](#cookiemanager-methods)
 - [HttpAuthCredentialDatabase](#httpauthcredentialdatabase-class): This class implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
+  - [methods](#httpauthcredentialdatabase-methods)
 - [WebStorageManager](#webstoragemanager-class): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
+  - [methods](#webstoragemanager-methods)
+- [WebRTC](#webrtc)
+- [Service Worker API](#service-worker-api)
 
 ### Load a file inside `assets` folder
 
@@ -613,6 +632,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `forceDark`: Set the force dark mode for this WebView. The default value is `AndroidInAppWebViewForceDark.FORCE_DARK_OFF`.
 * `geolocationEnabled`: Sets whether Geolocation API is enabled. The default value is `true`.
 * `hardwareAcceleration`: Boolean value to enable Hardware Acceleration in the WebView.
+* `horizontalScrollbarThumbColor`: Sets the horizontal scrollbar thumb color.
+* `horizontalScrollbarTrackColor`: Sets the horizontal scrollbar track color.
 * `initialScale`: Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of `useWideViewPort` and `loadWithOverviewMode`.
 * `layoutAlgorithm`: Sets the underlying layout algorithm. This will cause a re-layout of the WebView.
 * `loadWithOverviewMode`: Sets whether the WebView loads pages in overview mode, that is, zooms out the content to fit on screen by width.
@@ -642,6 +663,8 @@ Instead, on the `onLoadStop` WebView event, you can use `callHandler` directly:
 * `useShouldInterceptRequest`: Set to `true` to be able to listen at the `androidShouldInterceptRequest` event. The default value is `false`.
 * `useWideViewPort`: Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
 * `verticalScrollbarPosition`: Set the position of the vertical scroll bar. The default value is `AndroidVerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT`.
+* `verticalScrollbarThumbColor`: Sets the vertical scrollbar thumb color.
+* `verticalScrollbarTrackColor`: Sets the vertical scrollbar track color.
 
 ##### `InAppWebView` iOS-specific options
 
@@ -1148,7 +1171,7 @@ class _MyAppState extends State<MyApp> {
 Screenshots:
 - iOS:
 
-![ios](https://user-images.githubusercontent.com/5956938/45934084-2a935400-bf99-11e8-9d71-9e1758b5b8c6.gif)
+![ios](https://user-images.githubusercontent.com/5956938/109074100-92fd3700-76f7-11eb-8e75-34ce7377e35f.gif)
 
 - Android:
 
@@ -1509,3 +1532,148 @@ iOS-specific methods can be called using the `WebStorageManager.instance().ios` 
 * `fetchDataRecords({required Set<IOSWKWebsiteDataType> dataTypes})`: Fetches data records containing the given website data types.
 * `removeDataFor({required Set<IOSWKWebsiteDataType> dataTypes, required List<IOSWKWebsiteDataRecord> dataRecords})`: Removes website data of the given types for the given data records.
 * `removeDataModifiedSince({required Set<IOSWKWebsiteDataType> dataTypes, required DateTime date})`: Removes all website data of the given types that has been modified since the given date.
+
+### WebRTC
+
+To work with WebRTC, you need to request `camera` and `microphone` permissions, for example using the `permission_handler` flutter package:
+```dart
+import 'package:permission_handler/permission_handler.dart';
+
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  await Permission.camera.request();
+  await Permission.microphone.request();
+
+  runApp(MyApp());
+}
+```
+Also, you need to set the cross-platform option `mediaPlaybackRequiresUserGesture` to `false` in order to autoplay HTML5 audio and video.
+
+After that, follow the instructions below for each platform where you want to use it.
+
+To test WebRTC, you can try to visit https://appr.tc/.
+
+#### WebRTC on Android
+
+On Android, you need to implement the `androidOnPermissionRequest` event, that is an event fired when the WebView is requesting permission to access a specific resource.
+This event is used to grant permissions for the WebRTC API, for example:
+```dart
+androidOnPermissionRequest: (controller, origin, resources) async {
+  return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
+}
+```
+
+Also, you need to add these permissions in your `AndroidManifest.xml` file:
+```xml
+<uses-permission android:name="android.permission.INTERNET"/>
+<uses-permission android:name="android.permission.CAMERA" />
+<uses-permission android:name="android.permission.RECORD_AUDIO" />
+<uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+<uses-permission android:name="android.permission.VIDEO_CAPTURE" />
+<uses-permission android:name="android.permission.AUDIO_CAPTURE" />
+```
+
+#### WebRTC on iOS
+
+On iOS, WebRTC is supported starting from 14.3+.
+
+You need to set the iOS-specific option `allowsInlineMediaPlayback` to `true`, for example:
+```dart
+initialOptions: InAppWebViewGroupOptions(
+  crossPlatform: InAppWebViewOptions(
+    mediaPlaybackRequiresUserGesture: false,
+  ),
+  android: AndroidInAppWebViewOptions(
+    useHybridComposition: true
+  ),
+  ios: IOSInAppWebViewOptions(
+    allowsInlineMediaPlayback: true,
+  )
+),
+```
+Note that on iOS, to be able to play video inline, the `video` HTML element must have the `playsinline` attribute, for example:
+```html
+<video autoplay playsinline src="..."></video>
+```
+In your `Info.plist` file, you need to add also the following properties:
+```xml
+<key>NSMicrophoneUsageDescription</key>
+<string>Flutter requires access to microphone.</string>
+
+<key>NSCameraUsageDescription</key>
+<string>Flutter requires access to camera.</string>
+```
+If you open this file In Xcode, the `NSMicrophoneUsageDescription` property is represented by `Privacy - Microphone Usage Description` and
+`NSCameraUsageDescription` is represented by `Privacy - Camera Usage Description`.
+
+### Service Worker API
+
+Check https://caniuse.com/serviceworkers for JavaScript Service Worker API availability.
+
+#### Service Worker API on Android
+
+On Android, the `AndroidServiceWorkerController` and `AndroidServiceWorkerClient` classes can be used to intercept requests.
+Before using these classes or its methods, you should check if the service worker features you want to use are supported or not, for example:
+```dart
+Future main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  if (Platform.isAndroid) {
+    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+
+    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+
+    if (swAvailable && swInterceptAvailable) {
+      AndroidServiceWorkerController serviceWorkerController = AndroidServiceWorkerController.instance();
+
+      serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
+        shouldInterceptRequest: (request) async {
+          print(request);
+          return null;
+        },
+      );
+    }
+  }
+
+  runApp(MyApp());
+}
+```
+
+#### Service Worker API on iOS
+
+The JavaScript Service Worker API are available starting from iOS 14.0+.
+
+To enable this JavaScript API on iOS there are only 2 ways:
+- using `App-Bound Domains`
+- your App proposes itself as a possible Default Browser such as iOS Safari or Google Chrome
+
+##### iOS App-Bound Domains
+
+Read the [WebKit - App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/) article for details.
+
+You can specify up to 10 "app-bound" domains using a new Info.plist key `WKAppBoundDomains`, for example:
+```xml
+<dict>
+<key>WKAppBoundDomains</key>
+<array>
+    <string>flutter.dev</string>
+    <string>github.com</string>
+</array>
+</dict>
+```
+
+After that, you need to set to `true` the `limitsNavigationsToAppBoundDomains` iOS-specific WebView option, for example:
+```dart
+InAppWebViewGroupOptions(
+  ios: IOSInAppWebViewOptions(
+    limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
+  )
+)
+```
+
+##### iOS Default Browser
+
+Read the [Preparing Your App to be the Default Browser or Email Client](https://developer.apple.com/documentation/xcode/allowing_apps_and_websites_to_link_to_your_content/preparing_your_app_to_be_the_default_browser_or_email_client) article for details.
+

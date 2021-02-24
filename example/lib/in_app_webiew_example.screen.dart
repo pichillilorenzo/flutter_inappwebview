@@ -1,7 +1,7 @@
 import 'dart:collection';
-import 'dart:convert';
+// import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
+// import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -23,7 +23,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   late ContextMenu contextMenu;
   String url = "";
   double progress = 0;
-  CookieManager _cookieManager = CookieManager.instance();
+  // CookieManager _cookieManager = CookieManager.instance();
 
   @override
   void initState() {
@@ -70,7 +70,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       ),
       ios: IOSInAppWebViewOptions(
         allowsInlineMediaPlayback: true,
-        // limitsNavigationsToAppBoundDomains: true // adds Service Worker API on iOS 14.0+
       )
   );
 
@@ -146,9 +145,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url.toString();
                       });
                       webView = controller;
-
-                      // RenderObject renderBox = webViewKey.currentContext!.findRenderObject()!;
-                      // print(renderBox.paintBounds.size);
                     },
                     onProgressChanged: (controller, progress) {
                       setState(() {
@@ -162,7 +158,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       });
                     },
                     onConsoleMessage: (controller, consoleMessage) {
-                      print("CONSOLE MESSAGE FROM MAIN WEBVIEW!");
                       print(consoleMessage);
                     },
                   ),

@@ -1012,6 +1012,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if newOptionsMap["javaScriptEnabled"] != nil && options?.javaScriptEnabled != newOptions.javaScriptEnabled {
             configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
         }
+        
         if #available(iOS 14.0, *) {
             if options?.mediaType != newOptions.mediaType {
                 mediaType = newOptions.mediaType
@@ -1479,7 +1480,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if let useOnDownloadStart = options?.useOnDownloadStart, useOnDownloadStart {
             let mimeType = navigationResponse.response.mimeType
             if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
-                if mimeType != nil && !mimeType!.starts(with: "text/") {
+                if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
                     onDownloadStart(url: url.absoluteString)
                     if useOnNavigationResponse == nil || !useOnNavigationResponse! {
                         decisionHandler(.cancel)

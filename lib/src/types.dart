@@ -1871,7 +1871,7 @@ class Favicon {
   }
 }
 
-///Class that represents an Android-specific class used to override the way the cache is used.
+///An Android-specific class used to override the way the cache is used.
 class AndroidCacheMode {
   final int _value;
 
@@ -1932,7 +1932,7 @@ class AndroidCacheMode {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an Android-specific class used to disable the action mode menu items.
+///An Android-specific class used to disable the action mode menu items.
 ///
 ///**NOTE**: available on Android 24+.
 class AndroidActionModeMenuItem {
@@ -1996,7 +1996,7 @@ class AndroidActionModeMenuItem {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an Android-specific class used to indicate the force dark mode.
+///An Android-specific class used to indicate the force dark mode.
 ///
 ///**NOTE**: available on Android 29+.
 class AndroidForceDark {
@@ -2053,7 +2053,7 @@ class AndroidForceDark {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an Android-specific class used to set the underlying layout algorithm.
+///An Android-specific class used to set the underlying layout algorithm.
 class AndroidLayoutAlgorithm {
   final String _value;
 
@@ -2102,7 +2102,7 @@ class AndroidLayoutAlgorithm {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an Android-specific class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
+///An Android-specific class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
 ///
 ///**NOTE**: available on Android 21+.
 class AndroidMixedContentMode {
@@ -2167,7 +2167,7 @@ class AndroidMixedContentMode {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to set the level of granularity with which the user can interactively select content in the web view.
+///An iOS-specific class used to set the level of granularity with which the user can interactively select content in the web view.
 class IOSWKSelectionGranularity {
   final int _value;
 
@@ -2215,7 +2215,7 @@ class IOSWKSelectionGranularity {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
+///An iOS-specific class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
 ///
 ///**NOTE**: available on iOS 10.0+.
 class IOSWKDataDetectorTypes {
@@ -2390,7 +2390,7 @@ class UserPreferredContentMode {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to specify the modal presentation style when presenting a view controller.
+///An iOS-specific class used to specify the modal presentation style when presenting a view controller.
 class IOSUIModalPresentationStyle {
   final int _value;
 
@@ -2490,7 +2490,7 @@ class IOSUIModalPresentationStyle {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to specify the transition style when presenting a view controller.
+///An iOS-specific class used to specify the transition style when presenting a view controller.
 class IOSUIModalTransitionStyle {
   final int _value;
 
@@ -2556,7 +2556,7 @@ class IOSUIModalTransitionStyle {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to set the custom style for the dismiss button.
+///An iOS-specific class used to set the custom style for the dismiss button.
 ///
 ///**NOTE**: available on iOS 11.0+.
 class IOSSafariDismissButtonStyle {
@@ -4618,7 +4618,7 @@ class FormResubmissionAction {
   }
 }
 
-///Class that represents an Android-specific class used to configure the WebView's over-scroll mode.
+///An Android-specific class used to configure the WebView's over-scroll mode.
 ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
 class AndroidOverScrollMode {
   final int _value;
@@ -4674,7 +4674,7 @@ class AndroidOverScrollMode {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an Android-specific class used to configure the style of the scrollbars.
+///An Android-specific class used to configure the style of the scrollbars.
 ///The scrollbars can be overlaid or inset.
 ///When inset, they add to the padding of the view. And the scrollbars can be drawn inside the padding area or on the edge of the view.
 ///For example, if a view has a background drawable and you want to draw the scrollbars inside the padding specified by the drawable,
@@ -4748,7 +4748,7 @@ class AndroidScrollBarStyle {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an Android-specific class used to configure the position of the vertical scroll bar.
+///An Android-specific class used to configure the position of the vertical scroll bar.
 class AndroidVerticalScrollbarPosition {
   final int _value;
 
@@ -5181,7 +5181,7 @@ class IOSSslError {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents an iOS-specific class used to configure how safe area insets are added to the adjusted content inset.
+///An iOS-specific class used to configure how safe area insets are added to the adjusted content inset.
 ///
 ///**NOTE**: available on iOS 11.0+.
 class IOSUIScrollViewContentInsetAdjustmentBehavior {
@@ -5576,6 +5576,7 @@ class ContentWorld {
   }
 
   ///The default world for clients.
+  // ignore: non_constant_identifier_names
   static final ContentWorld DEFAULT_CLIENT =
       ContentWorld.world(name: "defaultClient");
 
@@ -5583,6 +5584,7 @@ class ContentWorld {
   ///This property contains the content world for scripts that the current webpage executes.
   ///Be careful when manipulating variables in this content world.
   ///If you modify a variable with the same name as one the webpage uses, you may unintentionally disrupt the normal operation of that page.
+  // ignore: non_constant_identifier_names
   static final ContentWorld PAGE = ContentWorld.world(name: "page");
 
   Map<String, dynamic> toMap() {

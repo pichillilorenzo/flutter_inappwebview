@@ -4,6 +4,8 @@ import android.os.Build;
 import android.view.View;
 import android.webkit.WebSettings;
 
+import androidx.annotation.Nullable;
+
 import com.pichillilorenzo.flutter_inappwebview.Options;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 
@@ -97,6 +99,14 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
   public Boolean useOnRenderProcessGone = false;
   public Boolean disableDefaultErrorPage = false;
   public Boolean useHybridComposition = false;
+  @Nullable
+  public String verticalScrollbarThumbColor;
+  @Nullable
+  public String verticalScrollbarTrackColor;
+  @Nullable
+  public String horizontalScrollbarThumbColor;
+  @Nullable
+  public String horizontalScrollbarTrackColor;
 
   @Override
   public InAppWebViewOptions parse(Map<String, Object> options) {
@@ -339,6 +349,18 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
         case "useHybridComposition":
           useHybridComposition = (Boolean) value;
           break;
+        case "verticalScrollbarThumbColor":
+          verticalScrollbarThumbColor = (String) value;
+          break;
+        case "verticalScrollbarTrackColor":
+          verticalScrollbarTrackColor = (String) value;
+          break;
+        case "horizontalScrollbarThumbColor":
+          horizontalScrollbarThumbColor = (String) value;
+          break;
+        case "horizontalScrollbarTrackColor":
+          horizontalScrollbarTrackColor = (String) value;
+          break;
       }
     }
 
@@ -425,6 +447,10 @@ public class InAppWebViewOptions implements Options<InAppWebView> {
     options.put("useOnRenderProcessGone", useOnRenderProcessGone);
     options.put("disableDefaultErrorPage", disableDefaultErrorPage);
     options.put("useHybridComposition", useHybridComposition);
+    options.put("verticalScrollbarThumbColor", verticalScrollbarThumbColor);
+    options.put("verticalScrollbarTrackColor", verticalScrollbarTrackColor);
+    options.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
+    options.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
     return options;
   }
 

@@ -98,9 +98,8 @@ class ASN1Object {
   }
 
   String? get asString {
-    var string = value as String?;
-    if (string != null) {
-      return string;
+    if (value is String) {
+      return value;
     }
 
     if (sub != null && sub!.length > 0) {

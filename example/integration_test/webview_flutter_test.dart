@@ -459,7 +459,7 @@ void main() {
         final ConsoleMessage consoleMessage = await consoleMessageCompleter.future;
         expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
         expect(consoleMessage.message, 'message');
-      });
+      }, skip: !Platform.isIOS);
 
       testWidgets('loadUrl with file:// scheme and iosAllowingReadAccessTo argument', (WidgetTester tester) async {
         final Completer<ConsoleMessage?> consoleMessageShouldNotComplete = Completer<ConsoleMessage?>();
@@ -503,7 +503,7 @@ void main() {
         final ConsoleMessage consoleMessage = await consoleMessageCompleter.future;
         expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
         expect(consoleMessage.message, 'message');
-      });
+      }, skip: !Platform.isIOS);
     }, skip: !Platform.isIOS);
 
     testWidgets('JavaScript Handler', (WidgetTester tester) async {
@@ -2971,7 +2971,7 @@ setTimeout(function() {
         await pageLoaded.future;
         final String url = await onNavigationResponseCompleter.future;
         expect(url, 'https://flutter.dev/');
-      });
+      }, skip: !Platform.isIOS);
 
       testWidgets('cancel navigation', (WidgetTester tester) async {
         final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -3008,7 +3008,7 @@ setTimeout(function() {
         final String url = await onNavigationResponseCompleter.future;
         expect(url, 'https://flutter.dev/');
         expect(pageLoaded.future, doesNotComplete);
-      });
+      }, skip: !Platform.isIOS);
     }, skip: !Platform.isIOS);
 
     testWidgets('initialUserScripts', (WidgetTester tester) async {
@@ -4292,7 +4292,7 @@ setTimeout(function() {
         final InAppWebViewController controller = await controllerCompleter.future;
         await pageLoaded.future;
         await expectLater(controller.android.clearSslPreferences(), completes);
-      });
+      }, skip: !Platform.isAndroid);
 
       testWidgets('pause/resume', (WidgetTester tester) async {
         final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -4321,7 +4321,7 @@ setTimeout(function() {
         await expectLater(controller.android.pause(), completes);
         await Future.delayed(Duration(seconds: 1));
         await expectLater(controller.android.resume(), completes);
-      });
+      }, skip: !Platform.isAndroid);
 
       testWidgets('getOriginalUrl', (WidgetTester tester) async {
         final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -4349,7 +4349,7 @@ setTimeout(function() {
         await pageLoaded.future;
         var originUrl = (await controller.android.getOriginalUrl())?.toString();
         expect(originUrl, 'https://flutter.dev/');
-      });
+      }, skip: !Platform.isAndroid);
 
       testWidgets('pageDown/pageUp', (WidgetTester tester) async {
         final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -4378,7 +4378,7 @@ setTimeout(function() {
         expect(await controller.android.pageDown(bottom: false), true);
         await Future.delayed(Duration(seconds: 1));
         expect(await controller.android.pageUp(top: false), true);
-      });
+      }, skip: !Platform.isAndroid);
 
       testWidgets('zoomIn/zoomOut', (WidgetTester tester) async {
         final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -4407,7 +4407,7 @@ setTimeout(function() {
         expect(await controller.android.zoomIn(), true);
         await Future.delayed(Duration(seconds: 1));
         expect(await controller.android.zoomOut(), true);
-      });
+      }, skip: !Platform.isAndroid);
 
       testWidgets('clearHistory', (WidgetTester tester) async {
         final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -4443,121 +4443,121 @@ setTimeout(function() {
 
         webHistory = await controller.getCopyBackForwardList();
         expect(webHistory!.list!.length, 1);
-      });
+      }, skip: !Platform.isAndroid);
 
       test('clearClientCertPreferences', () async {
         await expectLater(AndroidInAppWebViewController.clearClientCertPreferences(), completes);
-      });
+      }, skip: !Platform.isAndroid);
 
       test('getSafeBrowsingPrivacyPolicyUrl', () async {
         expect(await AndroidInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl(), isNotNull);
-      });
+      }, skip: !Platform.isAndroid);
 
       test('setSafeBrowsingWhitelist', () async {
         expect(await AndroidInAppWebViewController.setSafeBrowsingWhitelist(hosts: ["flutter.dev", "github.com"]), true);
-      });
+      }, skip: !Platform.isAndroid);
 
       test('getCurrentWebViewPackage', () async {
         expect(await AndroidInAppWebViewController.getCurrentWebViewPackage(), isNotNull);
-      });
+      }, skip: !Platform.isAndroid);
     }, skip: !Platform.isAndroid);
 
-      group('ios methods', () {
-        testWidgets('reloadFromOrigin', (WidgetTester tester) async {
-          final Completer controllerCompleter = Completer<InAppWebViewController>();
-          final Completer<void> pageLoaded = Completer<void>();
+    group('ios methods', () {
+      testWidgets('reloadFromOrigin', (WidgetTester tester) async {
+        final Completer controllerCompleter = Completer<InAppWebViewController>();
+        final Completer<void> pageLoaded = Completer<void>();
 
-          await tester.pumpWidget(
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: InAppWebView(
-                key: GlobalKey(),
-                initialUrlRequest: URLRequest(
-                    url: Uri.parse('https://flutter.dev')
-                ),
-                onWebViewCreated: (controller) {
-                  controllerCompleter.complete(controller);
-                },
-                onLoadStop: (controller, url) {
-                  pageLoaded.complete();
-                },
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: InAppWebView(
+              key: GlobalKey(),
+              initialUrlRequest: URLRequest(
+                  url: Uri.parse('https://flutter.dev')
               ),
+              onWebViewCreated: (controller) {
+                controllerCompleter.complete(controller);
+              },
+              onLoadStop: (controller, url) {
+                pageLoaded.complete();
+              },
             ),
-          );
+          ),
+        );
 
-          final InAppWebViewController controller = await controllerCompleter.future;
-          await pageLoaded.future;
-          await expectLater(controller.ios.reloadFromOrigin(), completes);
-        });
-
-        testWidgets('createPdf', (WidgetTester tester) async {
-          final Completer controllerCompleter = Completer<InAppWebViewController>();
-          final Completer<void> pageLoaded = Completer<void>();
-
-          await tester.pumpWidget(
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: InAppWebView(
-                key: GlobalKey(),
-                initialUrlRequest: URLRequest(
-                    url: Uri.parse('https://flutter.dev')
-                ),
-                onWebViewCreated: (controller) {
-                  controllerCompleter.complete(controller);
-                },
-                onLoadStop: (controller, url) {
-                  pageLoaded.complete();
-                },
-              ),
-            ),
-          );
-
-          final InAppWebViewController controller = await controllerCompleter.future;
-          await pageLoaded.future;
-
-          var iosWKPdfConfiguration = IOSWKPDFConfiguration(rect: InAppWebViewRect(
-              width: 100,
-              height: 100,
-              x: 50,
-              y: 50
-          ));
-          var pdf = await controller.ios.createPdf(iosWKPdfConfiguration: iosWKPdfConfiguration);
-          expect(pdf, isNotNull);
-        });
-
-        testWidgets('createWebArchiveData', (WidgetTester tester) async {
-          final Completer controllerCompleter = Completer<InAppWebViewController>();
-          final Completer<void> pageLoaded = Completer<void>();
-
-          await tester.pumpWidget(
-            Directionality(
-              textDirection: TextDirection.ltr,
-              child: InAppWebView(
-                key: GlobalKey(),
-                initialUrlRequest: URLRequest(
-                    url: Uri.parse('https://flutter.dev')
-                ),
-                onWebViewCreated: (controller) {
-                  controllerCompleter.complete(controller);
-                },
-                onLoadStop: (controller, url) {
-                  pageLoaded.complete();
-                },
-              ),
-            ),
-          );
-
-          final InAppWebViewController controller = await controllerCompleter.future;
-          await pageLoaded.future;
-
-          expect(await controller.ios.createWebArchiveData(), isNotNull);
-        });
-
-        test('handlesURLScheme', () async {
-          expect(await IOSInAppWebViewController.handlesURLScheme("http"), true);
-          expect(await IOSInAppWebViewController.handlesURLScheme("https"), true);
-        });
+        final InAppWebViewController controller = await controllerCompleter.future;
+        await pageLoaded.future;
+        await expectLater(controller.ios.reloadFromOrigin(), completes);
       }, skip: !Platform.isIOS);
+
+      testWidgets('createPdf', (WidgetTester tester) async {
+        final Completer controllerCompleter = Completer<InAppWebViewController>();
+        final Completer<void> pageLoaded = Completer<void>();
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: InAppWebView(
+              key: GlobalKey(),
+              initialUrlRequest: URLRequest(
+                  url: Uri.parse('https://flutter.dev')
+              ),
+              onWebViewCreated: (controller) {
+                controllerCompleter.complete(controller);
+              },
+              onLoadStop: (controller, url) {
+                pageLoaded.complete();
+              },
+            ),
+          ),
+        );
+
+        final InAppWebViewController controller = await controllerCompleter.future;
+        await pageLoaded.future;
+
+        var iosWKPdfConfiguration = IOSWKPDFConfiguration(rect: InAppWebViewRect(
+            width: 100,
+            height: 100,
+            x: 50,
+            y: 50
+        ));
+        var pdf = await controller.ios.createPdf(iosWKPdfConfiguration: iosWKPdfConfiguration);
+        expect(pdf, isNotNull);
+      }, skip: !Platform.isIOS);
+
+      testWidgets('createWebArchiveData', (WidgetTester tester) async {
+        final Completer controllerCompleter = Completer<InAppWebViewController>();
+        final Completer<void> pageLoaded = Completer<void>();
+
+        await tester.pumpWidget(
+          Directionality(
+            textDirection: TextDirection.ltr,
+            child: InAppWebView(
+              key: GlobalKey(),
+              initialUrlRequest: URLRequest(
+                  url: Uri.parse('https://flutter.dev')
+              ),
+              onWebViewCreated: (controller) {
+                controllerCompleter.complete(controller);
+              },
+              onLoadStop: (controller, url) {
+                pageLoaded.complete();
+              },
+            ),
+          ),
+        );
+
+        final InAppWebViewController controller = await controllerCompleter.future;
+        await pageLoaded.future;
+
+        expect(await controller.ios.createWebArchiveData(), isNotNull);
+      }, skip: !Platform.isIOS);
+
+      test('handlesURLScheme', () async {
+        expect(await IOSInAppWebViewController.handlesURLScheme("http"), true);
+        expect(await IOSInAppWebViewController.handlesURLScheme("https"), true);
+      }, skip: !Platform.isIOS);
+    }, skip: !Platform.isIOS);
   });
 
   group('Cookie Manager', () {

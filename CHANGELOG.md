@@ -1,3 +1,8 @@
+## 5.0.1-nullsafety.1
+
+- Added `verticalScrollbarThumbColor`, `verticalScrollbarTrackColor`, `horizontalScrollbarThumbColor`, `horizontalScrollbarTrackColor` Android-specific WebView options
+- Fixed some null types and wrong casting
+
 ## 5.0.0-nullsafety.0
 
 - Added support for Dart null-safety feature

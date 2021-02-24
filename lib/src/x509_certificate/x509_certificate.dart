@@ -114,8 +114,8 @@ class X509Certificate {
   ///Gets the version (version number) value from the certificate.
   int? get version {
     if (block1 != null) {
-      var v = firstLeafValue(block: block1!) as List<int>?;
-      if (v != null) {
+      var v = firstLeafValue(block: block1!);
+      if (v is List<int>) {
         var index = toIntValue(v);
         if (index != null) {
           return index.toInt() + 1;
@@ -126,8 +126,10 @@ class X509Certificate {
   }
 
   ///Gets the serialNumber value from the certificate.
-  List<int> get serialNumber =>
-      block1?.atIndex(X509BlockPosition.serialNumber)?.value as List<int>;
+  List<int>? get serialNumber {
+    var data = block1?.atIndex(X509BlockPosition.serialNumber)?.value;
+    return data is List<int> ? data : null;
+  }
 
   ///Returns the issuer (issuer distinguished name) value from the certificate as a String.
   String? get issuerDistinguishedName {
@@ -143,8 +145,8 @@ class X509Certificate {
     var issuerBlock = block1?.atIndex(X509BlockPosition.issuer);
     if (issuerBlock != null) {
       for (var sub in (issuerBlock.sub ?? <ASN1Object>[])) {
-        var value = firstLeafValue(block: sub) as String?;
-        if (value != null) {
+        var value = firstLeafValue(block: sub);
+        if (value is String) {
           result.add(value);
         }
       }
@@ -162,8 +164,8 @@ class X509Certificate {
         var oidBlock = issuerBlock.findOid(oidValue: oid);
         if (oidBlock != null) {
           var sub = oidBlock.parent?.sub;
-          if (sub != null && sub.length > 0) {
-            return sub.last.value as String;
+          if (sub != null && sub.length > 0 && sub.last.value is String) {
+            return sub.last.value;
           } else {
             return null;
           }
@@ -187,8 +189,8 @@ class X509Certificate {
     var subjectBlock = block1?.atIndex(X509BlockPosition.subject);
     if (subjectBlock != null) {
       for (var sub in (subjectBlock.sub ?? <ASN1Object>[])) {
-        var value = firstLeafValue(block: sub) as String?;
-        if (value != null) {
+        var value = firstLeafValue(block: sub);
+        if (value is String) {
           result.add(value);
         }
       }
@@ -206,8 +208,8 @@ class X509Certificate {
         var oidBlock = subjectBlock.findOid(oidValue: oid);
         if (oidBlock != null) {
           var sub = oidBlock.parent?.sub;
-          if (sub != null && sub.length > 0) {
-            return sub.last.value as String;
+          if (sub != null && sub.length > 0 && sub.last.value is String) {
+            return sub.last.value;
           } else {
             return null;
           }
@@ -218,28 +220,33 @@ class X509Certificate {
   }
 
   ///Gets the notBefore date from the validity period of the certificate.
-  DateTime? get notBefore =>
-      block1?.atIndex(X509BlockPosition.dateValidity)?.subAtIndex(0)?.value
-          as DateTime?;
+  DateTime? get notBefore {
+    var data =
+        block1?.atIndex(X509BlockPosition.dateValidity)?.subAtIndex(0)?.value;
+    return data is DateTime ? data : null;
+  }
 
   ///Gets the notAfter date from the validity period of the certificate.
   DateTime? get notAfter {
-    var value = block1
-        ?.atIndex(X509BlockPosition.dateValidity)
-        ?.subAtIndex(1)
-        ?.value as DateTime?;
-    return value;
+    var data =
+        block1?.atIndex(X509BlockPosition.dateValidity)?.subAtIndex(1)?.value;
+    return data is DateTime ? data : null;
   }
 
   ///Gets the signature value (the raw signature bits) from the certificate.
-  List<int>? get signature => asn1?[0].subAtIndex(2)?.value as List<int>;
+  List<int>? get signature {
+    var data = asn1?[0].subAtIndex(2)?.value;
+    return data is List<int> ? data : null;
+  }
 
   ///Gets the signature algorithm name for the certificate signature algorithm.
   String? get sigAlgName => OID.fromValue(sigAlgOID ?? '')?.name();
 
   ///Gets the signature algorithm OID string from the certificate.
-  String? get sigAlgOID =>
-      block1?.subAtIndex(2)?.subAtIndex(0)?.value as String?;
+  String? get sigAlgOID {
+    var data = block1?.subAtIndex(2)?.subAtIndex(0)?.value;
+    return data is String ? data : null;
+  }
 
   ///Gets the DER-encoded signature algorithm parameters from this certificate's signature algorithm.
   List<int>? get sigAlgParams => null;
@@ -264,8 +271,8 @@ class X509Certificate {
     if (oidBlock != null) {
       var sub = oidBlock.parent?.sub;
       if (sub != null && sub.length > 0) {
-        var data = sub.last.subAtIndex(0)?.value as List<int>?;
-        int bits = (data != null && data.length > 0) ? data.first : 0;
+        var data = sub.last.subAtIndex(0)?.value;
+        int bits = (data is List<int> && data.length > 0) ? data.first : 0;
         for (var index = 0; index < 8; index++) {
           var value = bits & (1 << index).toUnsigned(8) != 0;
           result.insert(0, value);

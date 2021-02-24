@@ -108,18 +108,18 @@ class X509Extension {
       case 1:
       case 2:
       case 6:
-        String? name = item.value as String?;
+        var name = item.value is String ? item.value : null;
         return name;
       case 4:
         return ASN1DistinguishedNames.string(block: item);
       case 7:
-        var ip = item.value as List<int>?;
+        var ip = item.value is List<int> ? item.value : null;
         if (ip != null) {
           return ip.map((e) => e.toString()).join(".");
         }
         break;
       case 8:
-        var value = item.value as String?;
+        var value = item.value is String ? item.value : null;
         if (value != null) {
           try {
             var data = utf8.encode(value);
@@ -139,12 +139,14 @@ class X509Extension {
 class BasicConstraintExtension extends X509Extension {
   BasicConstraintExtension({required block}) : super(block: block);
 
-  bool get isCA =>
-      valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value as bool? ?? false;
+  bool get isCA {
+    var data = valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value;
+    return data is bool ? data : false;
+  }
 
   int? get pathLenConstraint {
-    var data = valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value as List<int>?;
-    if (data != null) {
+    var data = valueAsBlock?.subAtIndex(0)?.subAtIndex(0)?.value;
+    if (data is List<int>) {
       return data.length;
     }
     return null;

@@ -1,3 +1,7 @@
+import 'dart:ui';
+
+import 'package:flutter_inappwebview/src/util.dart';
+
 import '../../types.dart';
 
 import '../../in_app_browser/in_app_browser_options.dart';
@@ -213,7 +217,27 @@ class AndroidInAppWebViewOptions
 
   ///Sets whether the default Android error page should be disabled.
   ///The default value is `false`.
-  bool? disableDefaultErrorPage;
+  bool disableDefaultErrorPage;
+
+  ///Sets the vertical scrollbar thumb color.
+  ///
+  ///**NOTE**: available on Android 29+.
+  Color? verticalScrollbarThumbColor;
+
+  ///Sets the vertical scrollbar track color.
+  ///
+  ///**NOTE**: available on Android 29+.
+  Color? verticalScrollbarTrackColor;
+
+  ///Sets the horizontal scrollbar thumb color.
+  ///
+  ///**NOTE**: available on Android 29+.
+  Color? horizontalScrollbarThumbColor;
+
+  ///Sets the horizontal scrollbar track color.
+  ///
+  ///**NOTE**: available on Android 29+.
+  Color? horizontalScrollbarTrackColor;
 
   AndroidInAppWebViewOptions({
     this.textZoom = 100,
@@ -267,7 +291,11 @@ class AndroidInAppWebViewOptions
     this.scrollbarFadingEnabled = true,
     this.scrollBarFadeDuration,
     this.rendererPriorityPolicy,
-    this.disableDefaultErrorPage,
+    this.disableDefaultErrorPage = false,
+    this.verticalScrollbarThumbColor,
+    this.verticalScrollbarTrackColor,
+    this.horizontalScrollbarThumbColor,
+    this.horizontalScrollbarTrackColor,
   });
 
   @override
@@ -323,7 +351,11 @@ class AndroidInAppWebViewOptions
       "scrollbarFadingEnabled": scrollbarFadingEnabled,
       "scrollBarFadeDuration": scrollBarFadeDuration,
       "rendererPriorityPolicy": rendererPriorityPolicy?.toMap(),
-      "disableDefaultErrorPage": disableDefaultErrorPage
+      "disableDefaultErrorPage": disableDefaultErrorPage,
+      "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
+      "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
+      "horizontalScrollbarThumbColor": horizontalScrollbarThumbColor?.toHex(),
+      "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
     };
   }
 
@@ -390,6 +422,14 @@ class AndroidInAppWebViewOptions
     options.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
         map["rendererPriorityPolicy"]?.cast<String, dynamic>());
     options.disableDefaultErrorPage = map["disableDefaultErrorPage"];
+    options.verticalScrollbarThumbColor =
+        UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
+    options.verticalScrollbarTrackColor =
+        UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
+    options.horizontalScrollbarThumbColor =
+        UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
+    options.horizontalScrollbarTrackColor =
+        UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
     return options;
   }
 

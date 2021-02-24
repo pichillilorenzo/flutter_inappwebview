@@ -215,7 +215,6 @@ First, add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](ht
 
 ## Usage
 
-Classes:
 - [InAppWebView](#inappwebview-class): Flutter Widget for adding an **inline native WebView** integrated into the flutter widget tree. Note that on Android it requires **Android API 20+** (see [AndroidView](https://api.flutter.dev/flutter/widgets/AndroidView-class.html)) or **Android API 19+** if you enable the `useHybridComposition` Android-specific option.
   - [methods](#inappwebviewcontroller-methods)
   - [options](#inappwebview-options)

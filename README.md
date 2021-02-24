@@ -1534,7 +1534,7 @@ iOS-specific methods can be called using the `WebStorageManager.instance().ios` 
 
 ### WebRTC
 
-To work with WebRTC, you need to request `camera` and `microphone` permissions, for example using the `permission_handler` flutter package:
+To work with WebRTC, you need to request `camera` and `microphone` permissions, for example using the [permission_handler](https://pub.dev/packages/permission_handler) plugin:
 ```dart
 import 'package:permission_handler/permission_handler.dart';
 

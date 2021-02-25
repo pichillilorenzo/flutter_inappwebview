@@ -1,3 +1,8 @@
+## 5.0.3-nullsafety.1
+
+- Fixed Android screenshot out of memory error
+- Fixed `getFavicons` WebView method
+
 ## 5.0.2-nullsafety.1
 
 - Fixed missing `verticalScrollbarThumbColor`, `verticalScrollbarTrackColor`, `horizontalScrollbarThumbColor`, `horizontalScrollbarTrackColor` Android-specific WebView options when calling native java `setOptions()` method on Android

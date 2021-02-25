@@ -15,7 +15,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channel: FlutterMethodChannel?
     var options: InAppWebViewOptions?
-    var currentURL: URL?
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
     static var credentialsProposed: [URLCredential] = []
     var lastScrollX: CGFloat = 0
@@ -722,7 +721,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func loadUrl(urlRequest: URLRequest, allowingReadAccessTo: URL?) {
         let url = urlRequest.url!
-        currentURL = url
         
         if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo, url.scheme == "file", allowingReadAccessTo.scheme == "file" {
             loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
@@ -733,7 +731,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func postUrl(url: URL, postData: Data) {
         var request = URLRequest(url: url)
-        currentURL = url
         
         request.addValue("application/x-www-form-urlencoded", forHTTPHeaderField: "Content-Type")
         request.httpMethod = "POST"
@@ -743,7 +740,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func loadData(data: String, mimeType: String, encoding: String, baseUrl: String) {
         let url = URL(string: baseUrl)!
-        currentURL = url
         if #available(iOS 9.0, *) {
             load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: url)
         } else {
@@ -1510,7 +1506,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView, didFinish navigation: WKNavigation!) {
         initializeWindowIdJS()
         
-        currentURL = url
         InAppWebView.credentialsProposed = []
         evaluateJavaScript(PLATFORM_READY_JS_SOURCE, completionHandler: nil)
 

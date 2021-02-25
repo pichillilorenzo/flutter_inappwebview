@@ -566,31 +566,10 @@ final public class InAppWebView extends InputAwareWebView {
       @Override
       public void run() {
         try {
-          int height = (int) (getContentHeight() * scale + 0.5);
-
-          Bitmap b = Bitmap.createBitmap(getWidth(),
-                  height, Bitmap.Config.ARGB_8888);
-          Canvas c = new Canvas(b);
-
+          Bitmap resized = Bitmap.createBitmap(getMeasuredWidth(), getMeasuredHeight(), Bitmap.Config.ARGB_8888);
+          Canvas c = new Canvas(resized);
+          c.translate(-getScrollX(), -getScrollY());
           draw(c);
-
-          int scrollY = getScrollY();
-          int measuredHeight = getMeasuredHeight();
-          int bitmapHeight = b.getHeight();
-
-          int scrollOffset = (scrollY + measuredHeight > bitmapHeight)
-                  ? (bitmapHeight - measuredHeight) : scrollY;
-
-          if (scrollOffset < 0) {
-            scrollOffset = 0;
-          }
-
-          int rectX = 0;
-          int rectY = scrollOffset;
-          int rectWidth = b.getWidth();
-          int rectHeight = measuredHeight;
-
-          Bitmap resized = Bitmap.createBitmap(b, rectX, rectY, rectWidth, rectHeight);
 
           ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
           Bitmap.CompressFormat compressFormat = Bitmap.CompressFormat.PNG;
@@ -599,12 +578,12 @@ final public class InAppWebView extends InputAwareWebView {
           if (screenshotConfiguration != null) {
             Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
             if (rect != null) {
-              rectX = (int) Math.floor(rect.get("x") * scale + 0.5);
-              rectY = (int) Math.floor(rect.get("y") * scale + 0.5);
-              rectWidth = Math.min(resized.getWidth(), (int) Math.floor(rect.get("width") * scale + 0.5));
-              rectHeight = Math.min(resized.getHeight(), (int) Math.floor(rect.get("height") * scale + 0.5));
+              int rectX = (int) Math.floor(rect.get("x") * scale + 0.5);
+              int rectY = (int) Math.floor(rect.get("y") * scale + 0.5);
+              int rectWidth = Math.min(resized.getWidth(), (int) Math.floor(rect.get("width") * scale + 0.5));
+              int rectHeight = Math.min(resized.getHeight(), (int) Math.floor(rect.get("height") * scale + 0.5));
               resized = Bitmap.createBitmap(
-                      b,
+                      resized,
                       rectX,
                       rectY,
                       rectWidth,

@@ -365,7 +365,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     @objc public func share() {
-        let vc = UIActivityViewController(activityItems: [webView.currentURL ?? ""], applicationActivities: [])
+        let vc = UIActivityViewController(activityItems: [webView.url?.absoluteString ?? ""], applicationActivities: [])
         present(vc, animated: true, completion: nil)
     }
     

@@ -26,6 +26,7 @@ import 'webview.dart';
 import '_static_channel.dart';
 
 ///List of forbidden names for JavaScript handlers.
+// ignore: non_constant_identifier_names
 final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
   "onLoadResource",
   "shouldInterceptAjaxRequest",
@@ -1019,8 +1020,11 @@ class InAppWebViewController {
       var faviconUrl =
           webviewUrl.scheme + "://" + webviewUrl.host + "/favicon.ico";
       var faviconUri = Uri.parse(faviconUrl);
-      await client.headUrl(faviconUri);
-      favicons.add(Favicon(url: faviconUri, rel: "shortcut icon"));
+      var headRequest = await client.headUrl(faviconUri);
+      var headResponse = await headRequest.close();
+      if (headResponse.statusCode == 200) {
+        favicons.add(Favicon(url: faviconUri, rel: "shortcut icon"));
+      }
     } catch (e) {
       print("/favicon.ico file not found: " + e.toString());
       // print(stacktrace);

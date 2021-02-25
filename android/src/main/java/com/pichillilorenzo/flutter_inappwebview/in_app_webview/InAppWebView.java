@@ -87,6 +87,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -932,6 +933,20 @@ final public class InAppWebView extends InputAwareWebView {
       setRendererPriorityPolicy(
               (int) newOptions.rendererPriorityPolicy.get("rendererRequestedPriority"),
               (boolean) newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible"));
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      if (newOptionsMap.get("verticalScrollbarThumbColor") != null && !Util.objEquals(options.verticalScrollbarThumbColor, newOptions.verticalScrollbarThumbColor))
+        setVerticalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(newOptions.verticalScrollbarThumbColor)));
+
+      if (newOptionsMap.get("verticalScrollbarTrackColor") != null && !Util.objEquals(options.verticalScrollbarTrackColor, newOptions.verticalScrollbarTrackColor))
+        setVerticalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newOptions.verticalScrollbarTrackColor)));
+
+      if (newOptionsMap.get("horizontalScrollbarThumbColor") != null && !Util.objEquals(options.horizontalScrollbarThumbColor, newOptions.horizontalScrollbarThumbColor))
+        setHorizontalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(newOptions.horizontalScrollbarThumbColor)));
+
+      if (newOptionsMap.get("horizontalScrollbarTrackColor") != null && !Util.objEquals(options.horizontalScrollbarTrackColor, newOptions.horizontalScrollbarTrackColor))
+        setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newOptions.horizontalScrollbarTrackColor)));
     }
 
     options = newOptions;

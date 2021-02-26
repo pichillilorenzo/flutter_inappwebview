@@ -31,7 +31,7 @@ class InAppLocalhostServer {
 
     var completer = Completer();
 
-    runZoned(() {
+    runZonedGuarded(() {
       HttpServer.bind('127.0.0.1', _port).then((server) {
         print('Server running on http://localhost:' + _port.toString());
 
@@ -69,7 +69,7 @@ class InAppLocalhostServer {
 
         completer.complete();
       });
-    }, onError: (e, stackTrace) => print('Error: $e $stackTrace'));
+    }, (e, stackTrace) => print('Error: $e $stackTrace'));
 
     return completer.future;
   }

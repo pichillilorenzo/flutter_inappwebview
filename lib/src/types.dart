@@ -6143,12 +6143,18 @@ class IOSURLResponse {
   ///The name of the text encoding provided by the response’s originating source.
   String? textEncodingName;
 
+  Map<String, String>? headers;
+
+  int? statusCode;
+
   IOSURLResponse(
       {this.url,
       required this.expectedContentLength,
       this.mimeType,
       this.suggestedFilename,
-      this.textEncodingName});
+      this.textEncodingName,
+      this.headers,
+      this.statusCode});
 
   static IOSURLResponse? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -6160,6 +6166,8 @@ class IOSURLResponse {
       mimeType: map["mimeType"],
       suggestedFilename: map["suggestedFilename"],
       textEncodingName: map["textEncodingName"],
+      headers: map["headers"]?.cast<String, String>(),
+      statusCode: map["statusCode"]
     );
   }
 
@@ -6169,7 +6177,9 @@ class IOSURLResponse {
       "expectedContentLength": expectedContentLength,
       "mimeType": mimeType,
       "suggestedFilename": suggestedFilename,
-      "textEncodingName": textEncodingName
+      "textEncodingName": textEncodingName,
+      "headers": headers,
+      "statusCode": statusCode
     };
   }
 

@@ -1,3 +1,7 @@
+## 5.0.4-nullsafety.1
+
+- Added `headers` and `statusCode` properties to IOSURLResponse class
+
 ## 5.0.3-nullsafety.1
 
 - Fixed Android screenshot out of memory error

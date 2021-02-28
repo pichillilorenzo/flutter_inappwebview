@@ -36,9 +36,9 @@ Also, check the [example/integration_test/webview_flutter_test.dart](https://git
 
 ## Showcase - Who use it
 
-Check the [Showcase](https://inappwebview.dev/showcase/) page to see an open list of Apps built with **Flutter** and **Flutter InAppWebView**
+Check the [Showcase](https://inappwebview.dev/showcase/) page to see an open list of Apps built with **Flutter** and **Flutter InAppWebView**.
 
-#### Are you using the **Flutter InAppWebView** plugin and do you want to add your App there?
+#### Are you using the **Flutter InAppWebView** plugin and would you like to add your App there?
 
 Send a submission request to [Submit App](https://inappwebview.dev/submit-app/)!
 

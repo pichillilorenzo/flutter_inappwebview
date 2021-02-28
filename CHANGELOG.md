@@ -1,3 +1,7 @@
+## 5.0.5-nullsafety.1
+
+- Updated Android `WebChromeClient.getDefaultVideoPoster`
+
 ## 5.0.4-nullsafety.1
 
 - Added `headers` and `statusCode` properties to IOSURLResponse class

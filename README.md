@@ -29,9 +29,18 @@ Also, check the [example/integration_test/webview_flutter_test.dart](https://git
 
 ## Articles/Resources
 
+- [Official website: inappwebview.dev](https://inappwebview.dev)
 - [InAppWebView: The Real Power of WebViews in Flutter](https://medium.com/flutter-community/inappwebview-the-real-power-of-webviews-in-flutter-c6d52374209d?source=friends_link&sk=cb74487219bcd85e610a670ee0b447d0) (valid for plugin version 4.0.0)
 - [Creating a Full-Featured Browser using WebViews in Flutter](https://medium.com/flutter-community/creating-a-full-featured-browser-using-webviews-in-flutter-9c8f2923c574?source=friends_link&sk=55fc8267f351082aa9e73ced546f6bcb) (valid for plugin version 4.0.0)
 - [Flutter Browser App: A Full-Featured Mobile Browser App (such as the Google Chrome mobile browser) created using Flutter and the features offered by the flutter_inappwebview plugin](https://github.com/pichillilorenzo/flutter_browser_app)
+
+## Showcase - Who use it
+
+Check the [Showcase](https://inappwebview.dev/showcase/) page to see an open list of Apps built with **Flutter** and **Flutter InAppWebView**
+
+#### Are you using the **Flutter InAppWebView** plugin and do you want to add your App there?
+
+Send a submission request to [Submit App](https://inappwebview.dev/submit-app/)!
 
 ## Requirements
 

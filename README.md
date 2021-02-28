@@ -40,7 +40,7 @@ Check the [Showcase](https://inappwebview.dev/showcase/) page to see an open lis
 
 #### Are you using the **Flutter InAppWebView** plugin and would you like to add your App there?
 
-Send a submission request to [Submit App](https://inappwebview.dev/submit-app/)!
+Send a submission request to the [Submit App](https://inappwebview.dev/submit-app/) page!
 
 ## Requirements
 

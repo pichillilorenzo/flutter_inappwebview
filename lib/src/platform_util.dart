@@ -23,11 +23,16 @@ class PlatformUtil {
       return _cachedSystemVersion!;
     }
     Map<String, dynamic> args = <String, dynamic>{};
-    _cachedSystemVersion = await _channel.invokeMethod('getSystemVersion', args);
+    _cachedSystemVersion =
+        await _channel.invokeMethod('getSystemVersion', args);
     return _cachedSystemVersion!;
   }
 
-  Future<String> formatDate({required DateTime date, required String format, String locale = "en_US", String timezone = "UTC"}) async {
+  Future<String> formatDate(
+      {required DateTime date,
+      required String format,
+      String locale = "en_US",
+      String timezone = "UTC"}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('date', () => date.millisecondsSinceEpoch);
     args.putIfAbsent('format', () => format);

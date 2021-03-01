@@ -6161,14 +6161,13 @@ class IOSURLResponse {
       return null;
     }
     return IOSURLResponse(
-      url: map["url"] != null ? Uri.parse(map["url"]) : null,
-      expectedContentLength: map["expectedContentLength"],
-      mimeType: map["mimeType"],
-      suggestedFilename: map["suggestedFilename"],
-      textEncodingName: map["textEncodingName"],
-      headers: map["headers"]?.cast<String, String>(),
-      statusCode: map["statusCode"]
-    );
+        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        expectedContentLength: map["expectedContentLength"],
+        mimeType: map["mimeType"],
+        suggestedFilename: map["suggestedFilename"],
+        textEncodingName: map["textEncodingName"],
+        headers: map["headers"]?.cast<String, String>(),
+        statusCode: map["statusCode"]);
   }
 
   Map<String, dynamic> toMap() {

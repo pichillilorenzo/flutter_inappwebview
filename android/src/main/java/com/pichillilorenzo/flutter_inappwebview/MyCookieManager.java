@@ -1,21 +1,12 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
-import android.annotation.TargetApi;
-import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Build;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.Message;
-import android.util.Log;
 import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 
 import androidx.annotation.Nullable;
 
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,12 +15,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.TimeZone;
-import java.util.concurrent.Executors;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.common.PluginRegistry;
 
 public class MyCookieManager implements MethodChannel.MethodCallHandler {
 
@@ -37,9 +26,6 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
 
   public static MethodChannel channel;
   public static CookieManager cookieManager;
-
-  // As CookieManager was synchronous before API 21 this class emulates the async behavior on <21.
-  private static final boolean USES_LEGACY_STORE = Build.VERSION.SDK_INT < 21;
 
   public MyCookieManager(BinaryMessenger messenger) {
     channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_cookiemanager");

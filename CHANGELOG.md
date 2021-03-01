@@ -1,4 +1,4 @@
-## 5.0.5-nullsafety.1
+## 5.0.5
 
 - Updated Android `WebChromeClient.getDefaultVideoPoster`
 - Removed all the dependencies: `uuid`, `device_info`, `intl`, and `mime`

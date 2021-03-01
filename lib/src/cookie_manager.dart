@@ -408,7 +408,11 @@ class CookieManager {
   Future<String> _getCookieExpirationDate(int expiresDate) async {
     var platformUtil = PlatformUtil();
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
-    return await platformUtil.formatDate(date: dateTime, format: 'EEE, dd MMM yyyy hh:mm:ss z', locale: 'en_US', timezone: 'GMT');
+    return await platformUtil.formatDate(
+        date: dateTime,
+        format: 'EEE, dd MMM yyyy hh:mm:ss z',
+        locale: 'en_US',
+        timezone: 'GMT');
   }
 }
 

@@ -1,5 +1,4 @@
 class MimeTypeResolver {
-
   /*
     Extension map generated from http://svn.apache.org/viewvc/httpd/httpd/trunk/docs/conf/mime.types?view=markup
     using this JavaScript code:
@@ -21,7 +20,7 @@ class MimeTypeResolver {
     }
     console.log(JSON.stringify(extensionMap, null, '\t'));
   */
-  static final Map<String, String> extensionMap = <String, String> {
+  static final Map<String, String> extensionMap = <String, String>{
     "123": "application/vnd.lotus-1-2-3",
     "ez": "application/andrew-inset",
     "aw": "application/applixware",
@@ -448,14 +447,21 @@ class MimeTypeResolver {
     "xo": "application/vnd.olpc-sugar",
     "dd2": "application/vnd.oma.dd2+xml",
     "oxt": "application/vnd.openofficeorg.extension",
-    "pptx": "application/vnd.openxmlformats-officedocument.presentationml.presentation",
-    "sldx": "application/vnd.openxmlformats-officedocument.presentationml.slide",
-    "ppsx": "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
-    "potx": "application/vnd.openxmlformats-officedocument.presentationml.template",
+    "pptx":
+        "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+    "sldx":
+        "application/vnd.openxmlformats-officedocument.presentationml.slide",
+    "ppsx":
+        "application/vnd.openxmlformats-officedocument.presentationml.slideshow",
+    "potx":
+        "application/vnd.openxmlformats-officedocument.presentationml.template",
     "xlsx": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    "xltx": "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
-    "docx": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-    "dotx": "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
+    "xltx":
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.template",
+    "docx":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+    "dotx":
+        "application/vnd.openxmlformats-officedocument.wordprocessingml.template",
     "mgp": "application/vnd.osgeo.mapguide.package",
     "dp": "application/vnd.osgi.dp",
     "esa": "application/vnd.osgi.subsystem",

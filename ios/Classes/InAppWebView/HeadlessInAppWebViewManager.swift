@@ -31,16 +31,16 @@ public class HeadlessInAppWebViewManager: NSObject, FlutterPlugin {
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
-        let uuid: String = arguments!["uuid"] as! String
+        let id: String = arguments!["id"] as! String
 
         switch call.method {
             case "createHeadlessWebView":
                 let params = arguments!["params"] as! [String: Any?]
-                createHeadlessWebView(uuid: uuid, params: params)
+                createHeadlessWebView(id: id, params: params)
                 result(true)
                 break
             case "disposeHeadlessWebView":
-                disposeHeadlessWebView(uuid: uuid)
+                disposeHeadlessWebView(id: id)
                 result(true)
                 break
             default:
@@ -49,17 +49,17 @@ public class HeadlessInAppWebViewManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func createHeadlessWebView(uuid: String, params: [String: Any?]) {
+    public func createHeadlessWebView(id: String, params: [String: Any?]) {
         let controller = FlutterWebViewController(registrar: HeadlessInAppWebViewManager.registrar!,
             withFrame: CGRect.zero,
-            viewIdentifier: uuid,
+            viewIdentifier: id,
             arguments: params as NSDictionary)
-        flutterWebViews[uuid] = controller
+        flutterWebViews[id] = controller
     }
     
-    public func disposeHeadlessWebView(uuid: String) {
-        if let _ = flutterWebViews[uuid] {
-            flutterWebViews.removeValue(forKey: uuid)
+    public func disposeHeadlessWebView(id: String) {
+        if let _ = flutterWebViews[id] {
+            flutterWebViews.removeValue(forKey: id)
         }
     }
 }

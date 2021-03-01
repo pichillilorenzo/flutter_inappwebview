@@ -121,7 +121,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
             self.myView!.alpha = 0.01
             UIApplication.shared.keyWindow!.insertSubview(self.myView!, at: 0)
 
-            let arguments: [String: Any] = ["uuid": viewId]
+            let arguments: [String: Any] = ["id": viewId]
             channel!.invokeMethod("onHeadlessWebViewCreated", arguments: arguments)
         }
     }

@@ -3,10 +3,10 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
 import '../types.dart';
-import '../_uuid_generator.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../in_app_webview/in_app_webview_options.dart';
@@ -41,7 +41,7 @@ class InAppBrowserNotOpenedException implements Exception {
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
   ///Browser's UUID.
-  late String uuid;
+  late String id;
 
   ///Context menu used by the browser. It should be set before opening the browser.
   ContextMenu? contextMenu;
@@ -62,13 +62,13 @@ class InAppBrowser {
 
   ///
   InAppBrowser({this.windowId, this.initialUserScripts}) {
-    uuid = UUID_GENERATOR.v4();
+    id = ViewIdGenerator.generateId();
     this._channel =
-        MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$uuid');
+        MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
     this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
     webViewController = new InAppWebViewController.fromInAppBrowser(
-        uuid, this._channel, this, this.initialUserScripts);
+        id, this._channel, this, this.initialUserScripts);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
@@ -98,7 +98,7 @@ class InAppBrowser {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent('options',
         () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
@@ -151,7 +151,7 @@ class InAppBrowser {
     assert(assetFilePath.isNotEmpty);
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     args.putIfAbsent('assetFilePath', () => assetFilePath);
     args.putIfAbsent('options',
         () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
@@ -181,7 +181,7 @@ class InAppBrowser {
     this.throwIfAlreadyOpened(message: 'Cannot open data!');
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     args.putIfAbsent('options',
         () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
     args.putIfAbsent('data', () => data);
@@ -209,7 +209,7 @@ class InAppBrowser {
   Future<void> show() async {
     this.throwIfNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     await _channel.invokeMethod('show', args);
   }
 

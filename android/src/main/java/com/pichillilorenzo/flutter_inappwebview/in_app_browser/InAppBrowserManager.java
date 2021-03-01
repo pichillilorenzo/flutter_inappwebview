@@ -64,31 +64,31 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     switch (call.method) {
       case "openUrlRequest":
         {
-          String uuid = (String) call.argument("uuid");
+          String id = (String) call.argument("id");
           Map<String, Object> urlRequest = (Map<String, Object>) call.argument("urlRequest");
           Map<String, Object> options = (Map<String, Object>) call.argument("options");
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
           Integer windowId = (Integer) call.argument("windowId");
           List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
-          openUrlRequest(activity, uuid, urlRequest, options, contextMenu, windowId, initialUserScripts);
+          openUrlRequest(activity, id, urlRequest, options, contextMenu, windowId, initialUserScripts);
         }
         result.success(true);
         break;
       case "openFile":
         {
-          String uuid = (String) call.argument("uuid");
+          String id = (String) call.argument("id");
           String assetFilePath = (String) call.argument("assetFilePath");
           Map<String, Object> options = (Map<String, Object>) call.argument("options");
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
           Integer windowId = (Integer) call.argument("windowId");
           List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
-          openFile(activity, uuid, assetFilePath, options, contextMenu, windowId, initialUserScripts);
+          openFile(activity, id, assetFilePath, options, contextMenu, windowId, initialUserScripts);
         }
         result.success(true);
         break;
       case "openData":
         {
-          String uuid = (String) call.argument("uuid");
+          String id = (String) call.argument("id");
           Map<String, Object> options = (Map<String, Object>) call.argument("options");
           String data = (String) call.argument("data");
           String mimeType = (String) call.argument("mimeType");
@@ -98,7 +98,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
           Integer windowId = (Integer) call.argument("windowId");
           List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
-          openData(activity, uuid, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu, windowId, initialUserScripts);
+          openData(activity, id, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu, windowId, initialUserScripts);
         }
         result.success(true);
         break;
@@ -189,12 +189,12 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     }
   }
 
-  public void openUrlRequest(Activity activity, String uuid, Map<String, Object> urlRequest, Map<String, Object> options,
+  public void openUrlRequest(Activity activity, String id, Map<String, Object> urlRequest, Map<String, Object> options,
                              Map<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putSerializable("initialUrlRequest", (Serializable) urlRequest);
-    extras.putString("uuid", uuid);
+    extras.putString("id", id);
     extras.putSerializable("options", (Serializable) options);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
@@ -202,12 +202,12 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     startInAppBrowserActivity(activity, extras);
   }
 
-  public void openFile(Activity activity, String uuid, String assetFilePath, Map<String, Object> options,
+  public void openFile(Activity activity, String id, String assetFilePath, Map<String, Object> options,
                              Map<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putString("initialFile", assetFilePath);
-    extras.putString("uuid", uuid);
+    extras.putString("id", id);
     extras.putSerializable("options", (Serializable) options);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
@@ -215,10 +215,10 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     startInAppBrowserActivity(activity, extras);
   }
 
-  public void openData(Activity activity, String uuid, Map<String, Object> options, String data, String mimeType, String encoding,
+  public void openData(Activity activity, String id, Map<String, Object> options, String data, String mimeType, String encoding,
                        String baseUrl, String historyUrl, Map<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
     Bundle extras = new Bundle();
-    extras.putString("uuid", uuid);
+    extras.putString("id", id);
     extras.putSerializable("options", (Serializable) options);
     extras.putString("initialData", data);
     extras.putString("initialMimeType", mimeType);

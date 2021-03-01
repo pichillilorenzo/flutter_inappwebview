@@ -28,7 +28,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
   @Override
   public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
     final Activity activity = Shared.activity;
-    final String uuid = (String) call.argument("uuid");
+    final String id = (String) call.argument("id");
 
     switch (call.method) {
       case "open":
@@ -36,7 +36,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
           String url = (String) call.argument("url");
           HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(activity, uuid, url, options, menuItemList, result);
+          open(activity, id, url, options, menuItemList, result);
         }
         break;
       case "isAvailable":
@@ -47,7 +47,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     }
   }
 
-  public void open(Activity activity, String uuid, String url, HashMap<String, Object> options,
+  public void open(Activity activity, String id, String url, HashMap<String, Object> options,
                    List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
 
     Intent intent = null;
@@ -55,7 +55,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putString("url", url);
     extras.putBoolean("isData", false);
-    extras.putString("uuid", uuid);
+    extras.putString("id", id);
     extras.putSerializable("options", options);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 

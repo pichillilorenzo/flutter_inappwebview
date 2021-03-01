@@ -46,7 +46,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   static final String LOG_TAG = "InAppBrowserActivity";
   public MethodChannel channel;
   public Integer windowId;
-  public String uuid;
+  public String id;
   public InAppWebView webView;
   public ActionBar actionBar;
   public Menu menu;
@@ -67,10 +67,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     }
 
     Bundle b = getIntent().getExtras();
-    uuid = b.getString("uuid");
+    id = b.getString("id");
     windowId = b.getInt("windowId");
 
-    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + uuid);
+    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + id);
 
     setContentView(R.layout.activity_web_view);
 

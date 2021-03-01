@@ -24,6 +24,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   protected static final String LOG_TAG = "InAppWebViewFlutterPL";
 
+  public static PlatformUtil platformUtil;
   public static InAppBrowserManager inAppBrowserManager;
   public static HeadlessInAppWebViewManager headlessInAppWebViewManager;
   public static ChromeSafariBrowserManager chromeSafariBrowserManager;
@@ -70,6 +71,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     platformViewRegistry.registerViewFactory(
                     "com.pichillilorenzo/flutter_inappwebview", new FlutterWebViewFactory(messenger, flutterView));
 
+    platformUtil = new PlatformUtil(messenger);
     inAppWebViewStatic = new InAppWebViewStatic(messenger);
     myCookieManager = new MyCookieManager(messenger);
     myWebStorage = new MyWebStorage(messenger);
@@ -84,6 +86,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   @Override
   public void onDetachedFromEngine(FlutterPluginBinding binding) {
+    if (platformUtil != null) {
+      platformUtil.dispose();
+      platformUtil = null;
+    }
     if (inAppBrowserManager != null) {
       inAppBrowserManager.dispose();
       inAppBrowserManager = null;

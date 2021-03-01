@@ -306,7 +306,7 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
   }
 
   public static String getCookieExpirationDate(Long timestamp) {
-    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, d MMM yyyy hh:mm:ss z", Locale.US);
+    final SimpleDateFormat sdf = new SimpleDateFormat("EEE, dd MMM yyyy hh:mm:ss z", Locale.US);
     sdf.setTimeZone(TimeZone.getTimeZone("GMT"));
     return sdf.format(new Date(timestamp));
   }

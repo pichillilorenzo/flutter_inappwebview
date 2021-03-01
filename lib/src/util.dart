@@ -1,6 +1,41 @@
 import 'dart:math';
+import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
+
+class ViewIdGenerator {
+  static int _count = 0;
+
+  /// Math.Random()-based RNG. All platforms, fast, not cryptographically strong. Optional Seed passable.
+  static Uint8List mathRNG({int seed = -1}) {
+    var b = Uint8List(16);
+
+    var rand = (seed == -1) ? Random() : Random(seed);
+
+    for (var i = 0; i < 16; i++) {
+      b[i] = rand.nextInt(256);
+    }
+
+    (seed == -1) ? b.shuffle() : b.shuffle(Random(seed));
+
+    return b;
+  }
+
+  /// Crypto-Strong RNG. All platforms, unknown speed, cryptographically strong (theoretically)
+  static Uint8List cryptoRNG() {
+    var b = Uint8List(16);
+    var rand = Random.secure();
+    for (var i = 0; i < 16; i++) {
+      b[i] = rand.nextInt(256);
+    }
+    return b;
+  }
+
+  static String generateId() {
+    _count++;
+    return _count.toString() + cryptoRNG().map((e) => e.toString()).join('');
+  }
+}
 
 extension UtilColor on Color {
   static Color? fromStringRepresentation(String colorValue) {

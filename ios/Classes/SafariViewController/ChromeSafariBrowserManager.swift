@@ -32,11 +32,11 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
 
         switch call.method {
             case "open":
-                let uuid: String = arguments!["uuid"] as! String
+                let id: String = arguments!["id"] as! String
                 let url = arguments!["url"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let menuItemList = arguments!["menuItemList"] as! [[String: Any]]
-                open(uuid: uuid, url: url, options: options,  menuItemList: menuItemList, result: result)
+                open(id: id, url: url, options: options,  menuItemList: menuItemList, result: result)
                 break
             case "isAvailable":
                 if #available(iOS 9.0, *) {
@@ -51,7 +51,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func open(uuid: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], result: @escaping FlutterResult) {
+    public func open(id: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
         if #available(iOS 9.0, *) {
@@ -75,7 +75,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                     safari = SafariViewController(url: absoluteUrl)
                 }
                 
-                safari.uuid = uuid
+                safari.id = id
                 safari.menuItemList = menuItemList
                 safari.prepareMethodChannel()
                 safari.delegate = safari

@@ -15,7 +15,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class ActionBroadcastReceiver extends BroadcastReceiver {
   protected static final String LOG_TAG = "ActionBroadcastReceiver";
   public static final String KEY_ACTION_ID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ACTION_ID";
-  public static final String KEY_ACTION_UUID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ACTION_UUID";
+  public static final String KEY_ACTION_VIEW_ID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ACTION_VIEW_ID";
   public static final String KEY_URL_TITLE = "android.intent.extra.SUBJECT";
 
   @Override
@@ -23,11 +23,11 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
     String url = intent.getDataString();
     if (url != null) {
       Bundle b = intent.getExtras();
-      String uuid = b.getString(KEY_ACTION_UUID);
+      String viewId = b.getString(KEY_ACTION_VIEW_ID);
       int id = b.getInt(KEY_ACTION_ID);
       String title = b.getString(KEY_URL_TITLE);
 
-      MethodChannel channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid);
+      MethodChannel channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId);
       Map<String, Object> obj = new HashMap<>();
       obj.put("url", url);
       obj.put("title", title);

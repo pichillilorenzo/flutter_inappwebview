@@ -37,27 +37,27 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
 
         switch call.method {
             case "openUrlRequest":
-                let uuid = arguments!["uuid"] as! String
+                let id = arguments!["id"] as! String
                 let urlRequest = arguments!["urlRequest"] as! [String:Any?]
                 let options = arguments!["options"] as! [String: Any?]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
                 let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
-                openUrlRequest(uuid: uuid, urlRequest: urlRequest, options: options, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
+                openUrlRequest(id: id, urlRequest: urlRequest, options: options, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openFile":
-                let uuid = arguments!["uuid"] as! String
+                let id = arguments!["id"] as! String
                 let assetFilePath = arguments!["assetFilePath"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
                 let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
-                openFile(uuid: uuid, assetFilePath: assetFilePath, options: options, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
+                openFile(id: id, assetFilePath: assetFilePath, options: options, contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
             case "openData":
-                let uuid = arguments!["uuid"] as! String
+                let id = arguments!["id"] as! String
                 let options = arguments!["options"] as! [String: Any?]
                 let data = arguments!["data"] as! String
                 let mimeType = arguments!["mimeType"] as! String
@@ -66,7 +66,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
                 let contextMenu = arguments!["contextMenu"] as! [String: Any]
                 let windowId = arguments!["windowId"] as? Int64
                 let initialUserScripts = arguments!["initialUserScripts"] as? [[String: Any]]
-                openData(uuid: uuid, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl,
+                openData(id: id, options: options, data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl,
                          contextMenu: contextMenu, windowId: windowId, initialUserScripts: initialUserScripts)
                 result(true)
                 break
@@ -98,11 +98,11 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         return webViewController
     }
     
-    public func openUrlRequest(uuid: String, urlRequest: [String:Any?], options: [String: Any?],
+    public func openUrlRequest(id: String, urlRequest: [String:Any?], options: [String: Any?],
                         contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
-        webViewController.uuid = uuid
+        webViewController.id = id
         webViewController.initialUrlRequest = URLRequest.init(fromPluginMap: urlRequest)
         webViewController.contextMenu = contextMenu
         webViewController.windowId = windowId
@@ -111,11 +111,11 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         presentViewController(webViewController: webViewController)
     }
     
-    public func openFile(uuid: String, assetFilePath: String, options: [String: Any?],
+    public func openFile(id: String, assetFilePath: String, options: [String: Any?],
                         contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
-        webViewController.uuid = uuid
+        webViewController.id = id
         webViewController.initialFile = assetFilePath
         webViewController.contextMenu = contextMenu
         webViewController.windowId = windowId
@@ -124,11 +124,11 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         presentViewController(webViewController: webViewController)
     }
     
-    public func openData(uuid: String, options: [String: Any?], data: String, mimeType: String, encoding: String,
+    public func openData(id: String, options: [String: Any?], data: String, mimeType: String, encoding: String,
                          baseUrl: String, contextMenu: [String: Any], windowId: Int64?, initialUserScripts: [[String: Any]]?) {
         let webViewController = prepareInAppBrowserWebViewController(options: options)
         
-        webViewController.uuid = uuid
+        webViewController.id = id
         webViewController.initialData = data
         webViewController.initialMimeType = mimeType
         webViewController.initialEncoding = encoding

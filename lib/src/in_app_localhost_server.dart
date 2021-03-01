@@ -2,7 +2,8 @@ import 'dart:io';
 import 'dart:async';
 
 import 'package:flutter/services.dart' show rootBundle;
-import 'package:mime/mime.dart';
+
+import 'mime_type_resolver.dart';
 
 ///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server. The default [port] value is `8080`.
 class InAppLocalhostServer {
@@ -54,8 +55,7 @@ class InAppLocalhostServer {
           var contentType = ['text', 'html'];
           if (!request.requestedUri.path.endsWith('/') &&
               request.requestedUri.pathSegments.isNotEmpty) {
-            var mimeType =
-                lookupMimeType(request.requestedUri.path, headerBytes: body);
+            var mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
             if (mimeType != null) {
               contentType = mimeType.split('/');
             }

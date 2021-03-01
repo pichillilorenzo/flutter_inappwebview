@@ -2,8 +2,8 @@ import 'dart:async';
 import 'dart:collection';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 
-import '../_uuid_generator.dart';
 import 'chrome_safari_browser_options.dart';
 
 class ChromeSafariBrowserAlreadyOpenedException implements Exception {
@@ -37,7 +37,7 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///`android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml`
 ///(you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
 class ChromeSafariBrowser {
-  late String uuid;
+  late String id;
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   bool _isOpened = false;
   late MethodChannel _channel;
@@ -45,9 +45,9 @@ class ChromeSafariBrowser {
       const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
   ChromeSafariBrowser() {
-    uuid = UUID_GENERATOR.v4();
+    id = ViewIdGenerator.generateId();
     this._channel =
-        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$uuid');
+        MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
     this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
   }
@@ -93,7 +93,7 @@ class ChromeSafariBrowser {
     });
 
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('options', () => options?.toMap() ?? {});
     args.putIfAbsent('menuItemList', () => menuItemList);

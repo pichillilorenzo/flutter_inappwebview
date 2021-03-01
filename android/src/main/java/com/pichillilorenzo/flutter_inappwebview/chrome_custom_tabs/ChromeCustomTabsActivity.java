@@ -26,7 +26,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
 
   protected static final String LOG_TAG = "CustomTabsActivity";
   public MethodChannel channel;
-  public String uuid;
+  public String id;
   public CustomTabsIntent.Builder builder;
   public ChromeCustomTabsOptions options;
   public CustomTabActivityHelper customTabActivityHelper;
@@ -43,9 +43,9 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
 
     Bundle b = getIntent().getExtras();
     assert b != null;
-    uuid = b.getString("uuid");
+    id = b.getString("id");
 
-    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid);
+    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + id);
     channel.setMethodCallHandler(this);
 
     final String url = b.getString("url");
@@ -201,7 +201,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
 
     Bundle extras = new Bundle();
     extras.putInt(ActionBroadcastReceiver.KEY_ACTION_ID, actionSourceId);
-    extras.putString(ActionBroadcastReceiver.KEY_ACTION_UUID, uuid);
+    extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
     actionIntent.putExtras(extras);
 
     return PendingIntent.getBroadcast(

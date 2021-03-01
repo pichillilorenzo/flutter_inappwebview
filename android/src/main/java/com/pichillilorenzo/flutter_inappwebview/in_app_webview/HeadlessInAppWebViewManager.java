@@ -50,18 +50,18 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
   @Override
   public void onMethodCall(final MethodCall call, final Result result) {
     final Activity activity = Shared.activity;
-    final String uuid = (String) call.argument("uuid");
+    final String id = (String) call.argument("id");
 
     switch (call.method) {
       case "createHeadlessWebView":
         {
           HashMap<String, Object> params = (HashMap<String, Object>) call.argument("params");
-          createHeadlessWebView(activity, uuid, params);
+          createHeadlessWebView(activity, id, params);
         }
         result.success(true);
         break;
       case "disposeHeadlessWebView":
-        disposeHeadlessWebView(uuid);
+        disposeHeadlessWebView(id);
         result.success(true);
         break;
       default:
@@ -70,15 +70,15 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
 
   }
 
-  public void createHeadlessWebView(Activity activity, String uuid, HashMap<String, Object> params) {
-    FlutterWebView flutterWebView = new FlutterWebView(Shared.messenger, activity, uuid, params, null);
-    flutterWebViews.put(uuid, flutterWebView);
+  public void createHeadlessWebView(Activity activity, String id, HashMap<String, Object> params) {
+    FlutterWebView flutterWebView = new FlutterWebView(Shared.messenger, activity, id, params, null);
+    flutterWebViews.put(id, flutterWebView);
   }
 
-  public void disposeHeadlessWebView(String uuid) {
-    if (flutterWebViews.containsKey(uuid)) {
-      flutterWebViews.get(uuid).dispose();
-      flutterWebViews.remove(uuid);
+  public void disposeHeadlessWebView(String id) {
+    if (flutterWebViews.containsKey(id)) {
+      flutterWebViews.get(id).dispose();
+      flutterWebViews.remove(id);
     }
   }
 

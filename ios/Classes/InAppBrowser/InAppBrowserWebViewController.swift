@@ -21,7 +21,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var progressBar: UIProgressView!
     
     var tmpWindow: UIWindow?
-    var uuid: String = ""
+    var id: String = ""
     var windowId: Int64?
     var webView: InAppWebView!
     var channel: FlutterMethodChannel?
@@ -39,7 +39,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var methodCallDelegate: InAppWebViewMethodHandler?
 
     public override func loadView() {
-        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_" + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
         
         var userScripts: [UserScript] = []
         for intialUserScript in initialUserScripts {

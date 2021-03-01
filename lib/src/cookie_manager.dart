@@ -1,13 +1,12 @@
 import 'dart:async';
 import 'dart:io';
 
-import 'package:device_info/device_info.dart';
 import 'package:flutter/services.dart';
-import 'package:intl/intl.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
 import 'in_app_webview/in_app_webview_options.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
+import 'platform_util.dart';
 
 import 'types.dart';
 
@@ -72,9 +71,8 @@ class CookieManager {
     assert(path.isNotEmpty);
 
     if (Platform.isIOS) {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      var version = double.tryParse(iosInfo.systemVersion);
+      var platformUtil = PlatformUtil();
+      var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
         await _setCookieWithJavaScript(
             url: url,
@@ -121,7 +119,7 @@ class CookieManager {
         name + "=" + value + "; Domain=" + domain + "; Path=" + path;
 
     if (expiresDate != null)
-      cookieValue += "; Expires=" + _getCookieExpirationDate(expiresDate);
+      cookieValue += "; Expires=" + await _getCookieExpirationDate(expiresDate);
 
     if (maxAge != null) cookieValue += "; Max-Age=" + maxAge.toString();
 
@@ -169,9 +167,8 @@ class CookieManager {
     assert(url.toString().isNotEmpty);
 
     if (Platform.isIOS) {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      var version = double.tryParse(iosInfo.systemVersion);
+      var platformUtil = PlatformUtil();
+      var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
         return await _getCookiesWithJavaScript(
             url: url, webViewController: iosBelow11WebViewController);
@@ -269,9 +266,8 @@ class CookieManager {
     assert(name.isNotEmpty);
 
     if (Platform.isIOS) {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      var version = double.tryParse(iosInfo.systemVersion);
+      var platformUtil = PlatformUtil();
+      var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
         List<Cookie> cookies = await _getCookiesWithJavaScript(
             url: url, webViewController: iosBelow11WebViewController);
@@ -326,9 +322,8 @@ class CookieManager {
     assert(name.isNotEmpty);
 
     if (Platform.isIOS) {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      var version = double.tryParse(iosInfo.systemVersion);
+      var platformUtil = PlatformUtil();
+      var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
         await _setCookieWithJavaScript(
             url: url,
@@ -371,9 +366,8 @@ class CookieManager {
     assert(url.toString().isNotEmpty);
 
     if (Platform.isIOS) {
-      DeviceInfoPlugin deviceInfo = DeviceInfoPlugin();
-      IosDeviceInfo iosInfo = await deviceInfo.iosInfo;
-      var version = double.tryParse(iosInfo.systemVersion);
+      var platformUtil = PlatformUtil();
+      var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
         List<Cookie> cookies = await _getCookiesWithJavaScript(
             url: url, webViewController: iosBelow11WebViewController);
@@ -408,15 +402,13 @@ class CookieManager {
 
   String _getDomainName(Uri url) {
     String domain = url.host;
-    // ignore: unnecessary_null_comparison
-    if (domain == null) return "";
     return domain.startsWith("www.") ? domain.substring(4) : domain;
   }
 
-  String _getCookieExpirationDate(int expiresDate) {
+  Future<String> _getCookieExpirationDate(int expiresDate) async {
+    var platformUtil = PlatformUtil();
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
-    return DateFormat('EEE, d MMM yyyy hh:mm:ss', "en_US").format(dateTime) +
-        ' GMT';
+    return await platformUtil.formatDate(date: dateTime, format: 'EEE, dd MMM yyyy hh:mm:ss z', locale: 'en_US', timezone: 'GMT');
   }
 }
 

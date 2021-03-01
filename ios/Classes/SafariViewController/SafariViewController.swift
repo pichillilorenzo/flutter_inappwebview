@@ -13,7 +13,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     
     var channel: FlutterMethodChannel?
     var safariOptions: SafariBrowserOptions?
-    var uuid: String = ""
+    var id: String = ""
     var menuItemList: [[String: Any]] = []
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -25,7 +25,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     }
     
     public func prepareMethodChannel() {
-        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
         SwiftFlutterPlugin.instance!.registrar!.addMethodCallDelegate(self, channel: channel!)
     }
     
@@ -104,7 +104,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
         var uiActivities: [UIActivity] = []
         menuItemList.forEach { (menuItem) in
-            let activity = CustomUIActivity(uuid: uuid, id: menuItem["id"] as! Int64, url: URL, title: title, label: menuItem["label"] as? String, type: nil, image: nil)
+            let activity = CustomUIActivity(viewId: id, id: menuItem["id"] as! Int64, url: URL, title: title, label: menuItem["label"] as? String, type: nil, image: nil)
             uiActivities.append(activity)
         }
         return uiActivities
@@ -141,7 +141,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
 }
 
 class CustomUIActivity : UIActivity {
-    var uuid: String
+    var viewId: String
     var id: Int64
     var url: URL
     var title: String?
@@ -149,8 +149,8 @@ class CustomUIActivity : UIActivity {
     var label: String?
     var image: UIImage?
     
-    init(uuid: String, id: Int64, url: URL, title: String?, label: String?, type: UIActivity.ActivityType?, image: UIImage?) {
-        self.uuid = uuid
+    init(viewId: String, id: Int64, url: URL, title: String?, label: String?, type: UIActivity.ActivityType?, image: UIImage?) {
+        self.viewId = viewId
         self.id = id
         self.url = url
         self.title = title
@@ -180,7 +180,7 @@ class CustomUIActivity : UIActivity {
     }
 
     override func perform() {
-        let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + uuid, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
         
         let arguments: [String: Any?] = [
             "url": url.absoluteString,

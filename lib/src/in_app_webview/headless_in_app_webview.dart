@@ -2,10 +2,10 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
 import '../types.dart';
-import '../_uuid_generator.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_options.dart';
@@ -15,7 +15,7 @@ import 'in_app_webview_options.dart';
 ///
 ///Remember to dispose it when you don't need it anymore.
 class HeadlessInAppWebView implements WebView {
-  late String uuid;
+  late String id;
   bool _isDisposed = true;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
@@ -86,8 +86,8 @@ class HeadlessInAppWebView implements WebView {
       this.initialOptions,
       this.contextMenu,
       this.initialUserScripts}) {
-    uuid = UUID_GENERATOR.v4();
-    webViewController = new InAppWebViewController(uuid, this);
+    id = ViewIdGenerator.generateId();
+    webViewController = new InAppWebViewController(id, this);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
@@ -109,7 +109,7 @@ class HeadlessInAppWebView implements WebView {
     }
     _isDisposed = false;
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     args.putIfAbsent(
         'params',
         () => <String, dynamic>{
@@ -133,7 +133,7 @@ class HeadlessInAppWebView implements WebView {
       return;
     }
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('uuid', () => uuid);
+    args.putIfAbsent('id', () => id);
     await _sharedChannel.invokeMethod('disposeHeadlessWebView', args);
     _isDisposed = true;
   }

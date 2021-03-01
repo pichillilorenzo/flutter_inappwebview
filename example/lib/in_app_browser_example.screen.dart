@@ -7,8 +7,9 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'main.dart';
 
 class MyInAppBrowser extends InAppBrowser {
-
-  MyInAppBrowser({int? windowId, UnmodifiableListView<UserScript>? initialUserScripts}) : super(windowId: windowId, initialUserScripts: initialUserScripts);
+  MyInAppBrowser(
+      {int? windowId, UnmodifiableListView<UserScript>? initialUserScripts})
+      : super(windowId: windowId, initialUserScripts: initialUserScripts);
 
   @override
   Future onBrowserCreated() async {
@@ -91,28 +92,28 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
         drawer: myDrawer(context: context),
         body: Center(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                ElevatedButton(
-                    onPressed: () async {
-                      await widget.browser.openUrlRequest(
-                          urlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
-                          options: InAppBrowserClassOptions(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: <Widget>[
+              ElevatedButton(
+                  onPressed: () async {
+                    await widget.browser.openUrlRequest(
+                        urlRequest:
+                            URLRequest(url: Uri.parse("https://flutter.dev")),
+                        options: InAppBrowserClassOptions(
                             inAppWebViewGroupOptions: InAppWebViewGroupOptions(
                                 crossPlatform: InAppWebViewOptions(
-                                  useShouldOverrideUrlLoading: true,
-                                  useOnLoadResource: true,
-                                )
-                            )));
-                    },
-                    child: Text("Open In-App Browser")),
-                Container(height: 40),
-                ElevatedButton(
-                    onPressed: () async {
-                      await InAppBrowser.openWithSystemBrowser(
-                          url: Uri.parse("https://flutter.dev/"));
-                    },
-                    child: Text("Open System Browser")),
+                          useShouldOverrideUrlLoading: true,
+                          useOnLoadResource: true,
+                        ))));
+                  },
+                  child: Text("Open In-App Browser")),
+              Container(height: 40),
+              ElevatedButton(
+                  onPressed: () async {
+                    await InAppBrowser.openWithSystemBrowser(
+                        url: Uri.parse("https://flutter.dev/"));
+                  },
+                  child: Text("Open System Browser")),
             ])));
   }
 }

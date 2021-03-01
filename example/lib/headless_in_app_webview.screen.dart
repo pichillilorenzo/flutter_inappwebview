@@ -10,7 +10,8 @@ class HeadlessInAppWebViewExampleScreen extends StatefulWidget {
       new _HeadlessInAppWebViewExampleScreenState();
 }
 
-class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebViewExampleScreen> {
+class _HeadlessInAppWebViewExampleScreenState
+    extends State<HeadlessInAppWebViewExampleScreen> {
   HeadlessInAppWebView? headlessWebView;
   String url = "";
 
@@ -19,13 +20,9 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
     super.initState();
 
     headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(
-          url: Uri.parse("https://flutter.dev")
-      ),
+      initialUrlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
       initialOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(
-
-        ),
+        crossPlatform: InAppWebViewOptions(),
       ),
       onWebViewCreated: (controller) {
         print('HeadlessInAppWebView created!');
@@ -69,40 +66,40 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
         )),
         drawer: myDrawer(context: context),
         body: SafeArea(
-          child: Column(children: <Widget>[
-            Container(
+            child: Column(children: <Widget>[
+          Container(
             padding: EdgeInsets.all(20.0),
             child: Text(
                 "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
           ),
           Center(
             child: ElevatedButton(
-              onPressed: () async {
-                await headlessWebView?.dispose();
-                await headlessWebView?.run();
-              },
-              child: Text("Run HeadlessInAppWebView")),
+                onPressed: () async {
+                  await headlessWebView?.dispose();
+                  await headlessWebView?.run();
+                },
+                child: Text("Run HeadlessInAppWebView")),
           ),
           Center(
             child: ElevatedButton(
-              onPressed: () async {
-                try {
-                  await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
-                } on MissingPluginException {
-                  print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
-                }
-              },
-              child: Text("Send console.log message")),
+                onPressed: () async {
+                  try {
+                    await headlessWebView?.webViewController.evaluateJavascript(
+                        source: """console.log('Here is the message!');""");
+                  } on MissingPluginException {
+                    print(
+                        "HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
+                  }
+                },
+                child: Text("Send console.log message")),
           ),
           Center(
             child: ElevatedButton(
-              onPressed: () {
-                headlessWebView?.dispose();
-              },
-              child: Text("Dispose HeadlessInAppWebView")),
+                onPressed: () {
+                  headlessWebView?.dispose();
+                },
+                child: Text("Dispose HeadlessInAppWebView")),
           )
-        ])
-      )
-    );
+        ])));
   }
 }

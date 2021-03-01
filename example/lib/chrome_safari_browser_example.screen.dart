@@ -4,7 +4,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'main.dart';
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-
   @override
   void onOpened() {
     print("ChromeSafari browser opened");
@@ -22,8 +21,7 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 }
 
 class ChromeSafariBrowserExampleScreen extends StatefulWidget {
-  final ChromeSafariBrowser browser =
-      MyChromeSafariBrowser();
+  final ChromeSafariBrowser browser = MyChromeSafariBrowser();
 
   @override
   _ChromeSafariBrowserExampleScreenState createState() =>
@@ -34,16 +32,22 @@ class _ChromeSafariBrowserExampleScreenState
     extends State<ChromeSafariBrowserExampleScreen> {
   @override
   void initState() {
-    widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(id: 1, label: 'Custom item menu 1', action: (url, title) {
-      print('Custom item menu 1 clicked!');
-      print(url);
-      print(title);
-    }));
-    widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(id: 2, label: 'Custom item menu 2', action: (url, title) {
-      print('Custom item menu 2 clicked!');
-      print(url);
-      print(title);
-    }));
+    widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(
+        id: 1,
+        label: 'Custom item menu 1',
+        action: (url, title) {
+          print('Custom item menu 1 clicked!');
+          print(url);
+          print(title);
+        }));
+    widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(
+        id: 2,
+        label: 'Custom item menu 2',
+        action: (url, title) {
+          print('Custom item menu 2 clicked!');
+          print(url);
+          print(title);
+        }));
     super.initState();
   }
 
@@ -61,11 +65,14 @@ class _ChromeSafariBrowserExampleScreenState
                 await widget.browser.open(
                     url: Uri.parse("https://flutter.dev/"),
                     options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(addDefaultShareMenuItem: false, keepAliveEnabled: true),
+                        android: AndroidChromeCustomTabsOptions(
+                            addDefaultShareMenuItem: false,
+                            keepAliveEnabled: true),
                         ios: IOSSafariOptions(
-                            dismissButtonStyle: IOSSafariDismissButtonStyle.CLOSE,
-                            presentationStyle: IOSUIModalPresentationStyle.OVER_FULL_SCREEN
-                        )));
+                            dismissButtonStyle:
+                                IOSSafariDismissButtonStyle.CLOSE,
+                            presentationStyle:
+                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
               },
               child: Text("Open Chrome Safari Browser")),
         ));

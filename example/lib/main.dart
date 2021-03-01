@@ -22,11 +22,14 @@ Future main() async {
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
 
-    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
 
     if (swAvailable && swInterceptAvailable) {
-      AndroidServiceWorkerController serviceWorkerController = AndroidServiceWorkerController.instance();
+      AndroidServiceWorkerController serviceWorkerController =
+          AndroidServiceWorkerController.instance();
 
       serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
         shouldInterceptRequest: (request) async {
@@ -86,7 +89,6 @@ class MyApp extends StatefulWidget {
 }
 
 class _MyAppState extends State<MyApp> {
-
   @override
   void initState() {
     super.initState();
@@ -99,14 +101,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-        initialRoute: '/',
-        routes: {
-          '/': (context) => InAppWebViewExampleScreen(),
-          '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
-          '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
-          '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
-        }
-    );
+    return MaterialApp(initialRoute: '/', routes: {
+      '/': (context) => InAppWebViewExampleScreen(),
+      '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+      '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
+      '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
+    });
   }
 }

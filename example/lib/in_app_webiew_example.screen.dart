@@ -30,29 +30,35 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     super.initState();
 
     contextMenu = ContextMenu(
-      menuItems: [
-        ContextMenuItem(androidId: 1, iosId: "1", title: "Special", action: () async {
-          print("Menu item Special clicked!");
+        menuItems: [
+          ContextMenuItem(
+              androidId: 1,
+              iosId: "1",
+              title: "Special",
+              action: () async {
+                print("Menu item Special clicked!");
+                print(await webView?.getSelectedText());
+                await webView?.clearFocus();
+              })
+        ],
+        options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
+        onCreateContextMenu: (hitTestResult) async {
+          print("onCreateContextMenu");
+          print(hitTestResult.extra);
           print(await webView?.getSelectedText());
-          await webView?.clearFocus();
-        })
-      ],
-      options: ContextMenuOptions(
-        hideDefaultSystemContextMenuItems: false
-      ),
-      onCreateContextMenu: (hitTestResult) async {
-        print("onCreateContextMenu");
-        print(hitTestResult.extra);
-        print(await webView?.getSelectedText());
-      },
-      onHideContextMenu: () {
-        print("onHideContextMenu");
-      },
-      onContextMenuActionItemClicked: (contextMenuItemClicked) async {
-        var id = (Platform.isAndroid) ? contextMenuItemClicked.androidId : contextMenuItemClicked.iosId;
-        print("onContextMenuActionItemClicked: " + id.toString() + " " + contextMenuItemClicked.title);
-      }
-    );
+        },
+        onHideContextMenu: () {
+          print("onHideContextMenu");
+        },
+        onContextMenuActionItemClicked: (contextMenuItemClicked) async {
+          var id = (Platform.isAndroid)
+              ? contextMenuItemClicked.androidId
+              : contextMenuItemClicked.iosId;
+          print("onContextMenuActionItemClicked: " +
+              id.toString() +
+              " " +
+              contextMenuItemClicked.title);
+        });
   }
 
   @override
@@ -70,123 +76,125 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       ),
       ios: IOSInAppWebViewOptions(
         allowsInlineMediaPlayback: true,
-      )
-  );
+      ));
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-            title: Text("InAppWebView")
-        ),
+        appBar: AppBar(title: Text("InAppWebView")),
         drawer: myDrawer(context: context),
         body: SafeArea(
             child: Column(children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                    "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
-              ),
-              Container(
-                  padding: EdgeInsets.all(10.0),
-                  child: progress < 1.0
-                      ? LinearProgressIndicator(value: progress)
-                      : Container()),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(10.0),
-                  decoration:
+          Container(
+            padding: EdgeInsets.all(20.0),
+            child: Text(
+                "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
+          ),
+          Container(
+              padding: EdgeInsets.all(10.0),
+              child: progress < 1.0
+                  ? LinearProgressIndicator(value: progress)
+                  : Container()),
+          Expanded(
+            child: Container(
+              margin: const EdgeInsets.all(10.0),
+              decoration:
                   BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-                  child: InAppWebView(
-                    key: webViewKey,
-                    // contextMenu: contextMenu,
-                    initialUrlRequest: URLRequest(
-                      url: Uri.parse("https://flutter.dev")
-                    ),
-                    // initialFile: "assets/index.html",
-                    initialUserScripts: UnmodifiableListView<UserScript>([
+              child: InAppWebView(
+                key: webViewKey,
+                // contextMenu: contextMenu,
+                initialUrlRequest:
+                    URLRequest(url: Uri.parse("https://flutter.dev")),
+                // initialFile: "assets/index.html",
+                initialUserScripts: UnmodifiableListView<UserScript>([]),
+                initialOptions: options,
+                onWebViewCreated: (controller) {
+                  webView = controller;
+                  print("onWebViewCreated");
+                },
+                onLoadStart: (controller, url) {
+                  print("onLoadStart $url");
+                  setState(() {
+                    this.url = url.toString();
+                  });
+                },
+                androidOnPermissionRequest: (InAppWebViewController controller,
+                    String origin, List<String> resources) async {
+                  return PermissionRequestResponse(
+                      resources: resources,
+                      action: PermissionRequestResponseAction.GRANT);
+                },
+                shouldOverrideUrlLoading: (controller, navigationAction) async {
+                  var uri = navigationAction.request.url!;
 
-                    ]),
-                    initialOptions: options,
-                    onWebViewCreated: (controller) {
-                      webView = controller;
-                      print("onWebViewCreated");
-                    },
-                    onLoadStart: (controller, url) {
-                      print("onLoadStart $url");
-                      setState(() {
-                        this.url = url.toString();
-                      });
-                    },
-                    androidOnPermissionRequest: (InAppWebViewController controller, String origin, List<String> resources) async {
-                      return PermissionRequestResponse(resources: resources, action: PermissionRequestResponseAction.GRANT);
-                    },
-                    shouldOverrideUrlLoading: (controller, navigationAction) async {
-                      var uri = navigationAction.request.url!;
+                  if (![
+                    "http",
+                    "https",
+                    "file",
+                    "chrome",
+                    "data",
+                    "javascript",
+                    "about"
+                  ].contains(uri.scheme)) {
+                    if (await canLaunch(url)) {
+                      // Launch the App
+                      await launch(
+                        url,
+                      );
+                      // and cancel the request
+                      return NavigationActionPolicy.CANCEL;
+                    }
+                  }
 
-                      if (!["http", "https", "file",
-                        "chrome", "data", "javascript",
-                        "about"].contains(uri.scheme)) {
-                        if (await canLaunch(url)) {
-                          // Launch the App
-                          await launch(
-                            url,
-                          );
-                          // and cancel the request
-                          return NavigationActionPolicy.CANCEL;
-                        }
-                      }
-
-                      return NavigationActionPolicy.ALLOW;
-                    },
-                    onLoadStop: (controller, url) async {
-                      print("onLoadStop $url");
-                      setState(() {
-                        this.url = url.toString();
-                      });
-                      webView = controller;
-                    },
-                    onProgressChanged: (controller, progress) {
-                      setState(() {
-                        this.progress = progress / 100;
-                      });
-                    },
-                    onUpdateVisitedHistory: (controller, url, androidIsReload) {
-                      print("onUpdateVisitedHistory $url");
-                      setState(() {
-                        this.url = url.toString();
-                      });
-                    },
-                    onConsoleMessage: (controller, consoleMessage) {
-                      print(consoleMessage);
-                    },
-                  ),
-                ),
+                  return NavigationActionPolicy.ALLOW;
+                },
+                onLoadStop: (controller, url) async {
+                  print("onLoadStop $url");
+                  setState(() {
+                    this.url = url.toString();
+                  });
+                  webView = controller;
+                },
+                onProgressChanged: (controller, progress) {
+                  setState(() {
+                    this.progress = progress / 100;
+                  });
+                },
+                onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                  print("onUpdateVisitedHistory $url");
+                  setState(() {
+                    this.url = url.toString();
+                  });
+                },
+                onConsoleMessage: (controller, consoleMessage) {
+                  print(consoleMessage);
+                },
               ),
-              ButtonBar(
-                alignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ElevatedButton(
-                    child: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      webView?.goBack();
-                    },
-                  ),
-                  ElevatedButton(
-                    child: Icon(Icons.arrow_forward),
-                    onPressed: () {
-                      webView?.goForward();
-                    },
-                  ),
-                  ElevatedButton(
-                    child: Icon(Icons.refresh),
-                    onPressed: () {
-                      webView?.reload();
-                    },
-                  ),
-                ],
+            ),
+          ),
+          ButtonBar(
+            alignment: MainAxisAlignment.center,
+            children: <Widget>[
+              ElevatedButton(
+                child: Icon(Icons.arrow_back),
+                onPressed: () {
+                  webView?.goBack();
+                },
               ),
-            ]))
-    );
+              ElevatedButton(
+                child: Icon(Icons.arrow_forward),
+                onPressed: () {
+                  webView?.goForward();
+                },
+              ),
+              ElevatedButton(
+                child: Icon(Icons.refresh),
+                onPressed: () {
+                  webView?.reload();
+                },
+              ),
+            ],
+          ),
+        ])));
   }
 }

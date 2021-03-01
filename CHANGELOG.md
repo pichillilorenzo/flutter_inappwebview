@@ -1,3 +1,7 @@
+## 5.0.5+2
+
+- Updated docs for iOS-specific options `alwaysBounceVertical` and `alwaysBounceHorizontal`
+
 ## 5.0.5+1
 
 - Fixed "No bounce in inappwebview iOS" [#696](https://github.com/pichillilorenzo/flutter_inappwebview/issues/696)

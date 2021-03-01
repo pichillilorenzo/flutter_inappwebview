@@ -84,10 +84,14 @@ class IOSInAppWebViewOptions
   IOSUIScrollViewDecelerationRate decelerationRate;
 
   ///A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content.
+  ///If this property is set to `true` and [IOSInAppWebViewOptions.disallowOverScroll] is `false`,
+  ///vertical dragging is allowed even if the content is smaller than the bounds of the scroll view.
   ///The default value is `false`.
   bool alwaysBounceVertical;
 
   ///A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view.
+  ///If this property is set to `true` and [IOSInAppWebViewOptions.disallowOverScroll] is `false`,
+  ///horizontal dragging is allowed even if the content is smaller than the bounds of the scroll view.
   ///The default value is `false`.
   bool alwaysBounceHorizontal;
 

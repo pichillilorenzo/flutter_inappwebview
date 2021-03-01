@@ -88,7 +88,7 @@ class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebView
               onPressed: () async {
                 try {
                   await headlessWebView?.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
-                } on MissingPluginException catch(e) {
+                } on MissingPluginException {
                   print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
                 }
               },

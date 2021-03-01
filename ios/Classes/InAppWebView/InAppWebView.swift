@@ -1977,7 +1977,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
             onScrollChanged(x: x, y: y)
         }
-        setNeedsLayout()
         lastScrollX = scrollView.contentOffset.x
         lastScrollY = scrollView.contentOffset.y
     }

@@ -1,3 +1,7 @@
+## 5.0.5+1
+
+- Fixed "No bounce in inappwebview iOS" [#696](https://github.com/pichillilorenzo/flutter_inappwebview/issues/696)
+
 ## 5.0.5
 
 - Updated Android `WebChromeClient.getDefaultVideoPoster`

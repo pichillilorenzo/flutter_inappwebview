@@ -327,6 +327,8 @@ void main() {
       await controller.loadUrl(urlRequest: URLRequest(url: Uri.parse('https://www.google.com/')));
       url = await pageLoads.stream.first;
       expect(url, 'https://www.google.com/');
+
+      pageLoads.close();
     });
 
     testWidgets('loadUrl with headers', (WidgetTester tester) async {
@@ -376,6 +378,9 @@ void main() {
       final String content = await controller
           .evaluateJavascript(source: 'document.documentElement.innerText');
       expect(content.contains('flutter_test_header'), isTrue);
+
+      pageStarts.close();
+      pageLoads.close();
     });
 
     group("iOS loadFileURL", () {
@@ -1282,6 +1287,8 @@ void main() {
         await pageLoads.stream.first; // Wait for the next page load.
         final String? currentUrl = (await controller.getUrl())?.toString();
         expect(currentUrl, 'https://www.google.com/');
+
+        pageLoads.close();
       });
 
       testWidgets('allow requests on iOS only if iosWKNavigationType == IOSWKNavigationType.LINK_ACTIVATED', (WidgetTester tester) async {
@@ -1334,6 +1341,8 @@ void main() {
         await pageLoads.stream.first; // Wait for the next page load.
         currentUrl = (await controller.getUrl())?.toString();
         expect(currentUrl, 'https://github.com/pichillilorenzo/flutter_inappwebview');
+
+        pageLoads.close();
       }, skip: !Platform.isIOS);
 
       testWidgets('can block requests', (WidgetTester tester) async {
@@ -1382,6 +1391,8 @@ void main() {
             .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
         final String? currentUrl = (await controller.getUrl())?.toString();
         expect(currentUrl, isNot(contains('youtube.com')));
+
+        pageLoads.close();
       });
 
       testWidgets('supports asynchronous decisions', (WidgetTester tester) async {
@@ -1428,6 +1439,8 @@ void main() {
         await pageLoads.stream.first; // Wait for second page to load.
         final String? currentUrl = (await controller.getUrl())?.toString();
         expect(currentUrl, 'https://www.google.com/');
+
+        pageLoads.close();
       });
     });
 
@@ -1554,6 +1567,8 @@ void main() {
           await pageLoads.stream.first;
           final String? currentUrl = (await controller.getUrl())?.toString();
           expect(currentUrl, 'about:blank');
+
+          pageLoads.close();
         });
 
     testWidgets(
@@ -1596,6 +1611,8 @@ void main() {
         await controller.goBack();
         await pageLoads.stream.first;
         expect((await controller.getUrl())?.toString(), contains('flutter.dev'));
+
+        pageLoads.close();
       },
       skip: !Platform.isAndroid,
     );
@@ -3216,6 +3233,8 @@ setTimeout(function() {
 
       final String? currentUrl = (await controller.getUrl())?.toString();
       expect(currentUrl, 'https://flutter.dev/');
+
+      pageLoads.close();
     });
 
     testWidgets('loadFile', (WidgetTester tester) async {
@@ -3250,6 +3269,8 @@ setTimeout(function() {
       expect(url, isNotNull);
       expect(url!.scheme, 'file');
       expect(url.path, endsWith("test_assets/in_app_webview_initial_file_test.html"));
+
+      pageLoads.close();
     });
 
     testWidgets('reload', (WidgetTester tester) async {
@@ -3280,6 +3301,8 @@ setTimeout(function() {
       await controller.reload();
       url = await pageLoads.stream.first;
       expect(url, 'https://flutter.dev/');
+
+      pageLoads.close();
     });
 
     testWidgets('web history - go back and forward', (WidgetTester tester) async {
@@ -3364,6 +3387,8 @@ setTimeout(function() {
       expect(webHistory.list!.length, 2);
       expect(webHistory.list![0].url.toString(), 'https://flutter.dev/');
       expect(webHistory.list![1].url.toString(), 'https://github.com/flutter');
+
+      pageLoads.close();
     });
 
     testWidgets('getProgress', (WidgetTester tester) async {
@@ -4183,6 +4208,8 @@ setTimeout(function() {
       expect(value, isNull);
       value = await controller.evaluateJavascript(source: "window.bar;");
       expect(value, isNull);
+
+      pageLoads.close();
     });
 
     testWidgets('saveWebArchive', (WidgetTester tester) async {
@@ -4260,6 +4287,8 @@ setTimeout(function() {
       await controller.loadUrl(urlRequest: URLRequest(url: Uri.parse('http://example.com/')));
       await pageLoads.stream.first;
       expect(await controller.isSecureContext(), false);
+
+      pageLoads.close();
     });
 
     test('getDefaultUserAgent', () async {
@@ -4443,6 +4472,8 @@ setTimeout(function() {
 
         webHistory = await controller.getCopyBackForwardList();
         expect(webHistory!.list!.length, 1);
+
+        pageLoads.close();
       }, skip: !Platform.isAndroid);
 
       test('clearClientCertPreferences', () async {

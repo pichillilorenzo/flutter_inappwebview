@@ -957,7 +957,7 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void injectDeferredObject(String source, @Nullable final ContentWorld contentWorld, String jsWrapper, @Nullable final ValueCallback<String> resultCallback) {
-    final String resultUuid = contentWorld != null ? UUID.randomUUID().toString() : null;
+    final String resultUuid = contentWorld != null && !contentWorld.equals(ContentWorld.PAGE) ? UUID.randomUUID().toString() : null;
     String scriptToInject = source;
     if (jsWrapper != null) {
       org.json.JSONArray jsonEsc = new org.json.JSONArray();
@@ -968,7 +968,8 @@ final public class InAppWebView extends InputAwareWebView {
     }
     if (resultUuid != null && resultCallback != null) {
       evaluateJavaScriptContentWorldCallbacks.put(resultUuid, resultCallback);
-      scriptToInject = PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE
+      scriptToInject = Util.replaceAll(PluginScriptsUtil.EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE,
+              PluginScriptsUtil.VAR_RANDOM_NAME, "_" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + Math.round(Math.random() * 1000000))
               .replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, UserContentController.escapeCode(source))
               .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
     }
@@ -987,7 +988,7 @@ final public class InAppWebView extends InputAwareWebView {
           evaluateJavascript(scriptToInject, new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String s) {
-              if (contentWorld != null || resultCallback == null)
+              if (resultUuid != null || resultCallback == null)
                 return;
               resultCallback.onReceiveValue(s);
             }

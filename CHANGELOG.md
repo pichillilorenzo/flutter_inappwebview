@@ -1,3 +1,7 @@
+## 5.0.5+3
+
+- Fixed Android `evaluateJavascript` method when using `contentWorld: ContentWorld.PAGE`
+
 ## 5.0.5+2
 
 - Updated docs for iOS-specific options `alwaysBounceVertical` and `alwaysBounceHorizontal`

@@ -15,6 +15,7 @@ public class PluginScriptsUtil {
   public static final String VAR_FUNCTION_ARGUMENTS_OBJ = "$IN_APP_WEBVIEW_FUNCTION_ARGUMENTS_OBJ";
   public static final String VAR_FUNCTION_BODY = "$IN_APP_WEBVIEW_FUNCTION_BODY";
   public static final String VAR_RESULT_UUID = "$IN_APP_WEBVIEW_RESULT_UUID";
+  public static final String VAR_RANDOM_NAME = "$IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME";
 
   public static final String CALL_ASYNC_JAVA_SCRIPT_WRAPPER_JS_SOURCE = "(function(obj) {" +
           "  (async function(" + VAR_FUNCTION_ARGUMENT_NAMES + ") {" +
@@ -27,7 +28,13 @@ public class PluginScriptsUtil {
           "  return null;" +
           "})(" + VAR_FUNCTION_ARGUMENTS_OBJ + ");";
 
-  public static final String EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE = "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('evaluateJavaScriptWithContentWorld', {'value': eval(" + VAR_PLACEHOLDER_VALUE + "), 'resultUuid': '" + VAR_RESULT_UUID + "'});";
+  public static final String EVALUATE_JAVASCRIPT_WITH_CONTENT_WORLD_WRAPPER_JS_SOURCE = "var $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME = null;" +
+          "try {" +
+          "  $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME = eval(" + VAR_PLACEHOLDER_VALUE + ");" +
+          "} catch(e) {" +
+          "  console.error(e);" +
+          "}" +
+          "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('evaluateJavaScriptWithContentWorld', {'value': $IN_APP_WEBVIEW_VARIABLE_RANDOM_NAME, 'resultUuid': '" + VAR_RESULT_UUID + "'});";
 
   public static final String IS_ACTIVE_ELEMENT_INPUT_EDITABLE_JS_SOURCE =
           "var activeEl = document.activeElement;" +

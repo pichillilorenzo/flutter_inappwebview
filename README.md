@@ -17,6 +17,13 @@
 
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
+# Announcement
+
+All the configuration and info about Getting Started with this plugin and code examples will be moved from here to the new [inappwebview.dev official website](https://inappwebview.dev/)!
+I will create a new section there for better visualization and management.
+
+Stay tuned!
+
 ## API Reference
 
 See the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the **full documentation**.
@@ -114,6 +121,9 @@ Future main() async {
   runApp(new MyApp());
 }
 ```
+
+#### Enable Material Components for Android
+To use Material Components when the user interacts with input elements in the WebView, follow the steps described in the [Enabling Material Components instructions](https://flutter.dev/docs/deployment/android#enabling-material-components).
 
 ### IMPORTANT Note for iOS
 
@@ -1622,7 +1632,7 @@ Check https://caniuse.com/serviceworkers for JavaScript Service Worker API avail
 #### Service Worker API on Android
 
 On Android, the `AndroidServiceWorkerController` and `AndroidServiceWorkerClient` classes can be used to intercept requests.
-Before using these classes or its methods, you should check if the service worker features you want to use are supported or not, for example:
+Before using these classes or their methods, you should check if the service worker features you want to use are supported or not, for example:
 ```dart
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -1651,7 +1661,7 @@ Future main() async {
 
 #### Service Worker API on iOS
 
-The JavaScript Service Worker API are available starting from iOS 14.0+.
+The JavaScript Service Worker API is available starting from iOS 14.0+.
 
 To enable this JavaScript API on iOS there are only 2 ways:
 - using "App-Bound Domains"
@@ -1661,7 +1671,7 @@ To enable this JavaScript API on iOS there are only 2 ways:
 
 Read the [WebKit - App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/) article for details.
 
-You can specify up to 10 "app-bound" domains using a new Info.plist key `WKAppBoundDomains`, for example:
+You can specify up to 10 "app-bound" domains using the new Info.plist key `WKAppBoundDomains`, for example:
 ```xml
 <dict>
 <key>WKAppBoundDomains</key>

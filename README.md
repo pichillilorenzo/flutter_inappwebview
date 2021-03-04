@@ -17,7 +17,7 @@
 
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
-## Announcement
+# Announcement
 
 All the configuration and info about Getting Started with this plugin and code examples will be moved from here to the new [inappwebview.dev official website](https://inappwebview.dev/)!
 I will create a new section there for better visualization and management.

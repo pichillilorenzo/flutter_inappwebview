@@ -6707,40 +6707,31 @@ class IOSNSUnderlineStyle {
   }
 
   ///Do not draw a line.
-  static const STYLE_NONE =
-  const IOSNSUnderlineStyle._internal(0);
+  static const STYLE_NONE = const IOSNSUnderlineStyle._internal(0);
 
   ///Draw a single line.
-  static const SINGLE =
-  const IOSNSUnderlineStyle._internal(1);
+  static const SINGLE = const IOSNSUnderlineStyle._internal(1);
 
   ///Draw a thick line.
-  static const THICK =
-  const IOSNSUnderlineStyle._internal(2);
+  static const THICK = const IOSNSUnderlineStyle._internal(2);
 
   ///Draw a double line.
-  static const DOUBLE =
-  const IOSNSUnderlineStyle._internal(9);
+  static const DOUBLE = const IOSNSUnderlineStyle._internal(9);
 
   ///Draw a line of dots.
-  static const PATTERN_DOT =
-  const IOSNSUnderlineStyle._internal(256);
+  static const PATTERN_DOT = const IOSNSUnderlineStyle._internal(256);
 
   ///Draw a line of dashes.
-  static const PATTERN_DASH =
-  const IOSNSUnderlineStyle._internal(512);
+  static const PATTERN_DASH = const IOSNSUnderlineStyle._internal(512);
 
   ///Draw a line of alternating dashes and dots.
-  static const PATTERN_DASH_DOT =
-  const IOSNSUnderlineStyle._internal(768);
+  static const PATTERN_DASH_DOT = const IOSNSUnderlineStyle._internal(768);
 
   ///Draw a line of alternating dashes and two dots.
-  static const PATTERN_DASH_DOT_DOT =
-  const IOSNSUnderlineStyle._internal(1024);
+  static const PATTERN_DASH_DOT_DOT = const IOSNSUnderlineStyle._internal(1024);
 
   ///Draw the line only beneath or through words, not whitespace.
-  static const BY_WORD =
-  const IOSNSUnderlineStyle._internal(32768);
+  static const BY_WORD = const IOSNSUnderlineStyle._internal(32768);
 
   bool operator ==(value) => value == _value;
 
@@ -6777,8 +6768,7 @@ class IOSNSAttributedStringTextEffectStyle {
 
   ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
   static const LETTERPRESS_STYLE =
-  const IOSNSAttributedStringTextEffectStyle._internal(
-      "letterpressStyle");
+      const IOSNSAttributedStringTextEffectStyle._internal("letterpressStyle");
 
   bool operator ==(value) => value == _value;
 

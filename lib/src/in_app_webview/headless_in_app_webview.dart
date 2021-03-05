@@ -129,7 +129,9 @@ class HeadlessInAppWebView implements WebView {
               'windowId': this.windowId,
               'initialUserScripts':
                   this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-              'pullToRefreshOptions': this.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
+              'pullToRefreshOptions':
+                  this.pullToRefreshController?.options.toMap() ??
+                      PullToRefreshOptions(enabled: false).toMap()
             });
     await _sharedChannel.invokeMethod('createHeadlessWebView', args);
   }

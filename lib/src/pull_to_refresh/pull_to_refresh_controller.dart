@@ -26,8 +26,7 @@ class PullToRefreshController {
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onRefresh":
-        if (onRefresh != null)
-          onRefresh!();
+        if (onRefresh != null) onRefresh!();
         break;
       default:
         throw UnimplementedError("Unimplemented ${call.method} method");
@@ -123,8 +122,8 @@ class PullToRefreshController {
   }
 
   void initMethodChannel(dynamic id) {
-    this._channel =
-        MethodChannel('com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
+    this._channel = MethodChannel(
+        'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
     this._channel?.setMethodCallHandler(handleMethod);
   }
 }

@@ -27,14 +27,13 @@ class PullToRefreshOptions {
   ///**NOTE**: Available only on iOS.
   IOSNSAttributedString? attributedTitle;
 
-  PullToRefreshOptions({
-    this.enabled = true,
-    this.color,
-    this.backgroundColor,
-    this.distanceToTriggerSync,
-    this.slingshotDistance,
-    this.attributedTitle
-  });
+  PullToRefreshOptions(
+      {this.enabled = true,
+      this.color,
+      this.backgroundColor,
+      this.distanceToTriggerSync,
+      this.slingshotDistance,
+      this.attributedTitle});
 
   Map<String, dynamic> toMap() {
     return {

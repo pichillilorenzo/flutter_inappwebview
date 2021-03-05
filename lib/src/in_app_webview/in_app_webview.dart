@@ -385,7 +385,9 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
                         [],
-                'pullToRefreshOptions': widget.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
+                'pullToRefreshOptions':
+                    widget.pullToRefreshController?.options.toMap() ??
+                        PullToRefreshOptions(enabled: false).toMap()
               },
               creationParamsCodec: const StandardMessageCodec(),
             )
@@ -412,7 +414,9 @@ class _InAppWebViewState extends State<InAppWebView> {
             'windowId': widget.windowId,
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-            'pullToRefreshOptions': widget.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
+            'pullToRefreshOptions':
+                widget.pullToRefreshController?.options.toMap() ??
+                    PullToRefreshOptions(enabled: false).toMap()
           },
           creationParamsCodec: const StandardMessageCodec(),
         );
@@ -433,7 +437,9 @@ class _InAppWebViewState extends State<InAppWebView> {
           'windowId': widget.windowId,
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-          'pullToRefreshOptions': widget.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
+          'pullToRefreshOptions':
+              widget.pullToRefreshController?.options.toMap() ??
+                  PullToRefreshOptions(enabled: false).toMap()
         },
         creationParamsCodec: const StandardMessageCodec(),
       );

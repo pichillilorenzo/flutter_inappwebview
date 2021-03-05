@@ -137,8 +137,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         urlController.text = this.url;
                       });
                     },
-                    androidOnPermissionRequest: (InAppWebViewController controller,
-                        String origin, List<String> resources) async {
+                    androidOnPermissionRequest: (controller, origin, resources) async {
                       return PermissionRequestResponse(
                           resources: resources,
                           action: PermissionRequestResponseAction.GRANT);

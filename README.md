@@ -13,7 +13,7 @@
 [![GitHub stars](https://img.shields.io/github/stars/pichillilorenzo/flutter_inappwebview?style=social)](https://github.com/pichillilorenzo/flutter_inappwebview)
 
 
-![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/86118415-0ac78300-bad1-11ea-9933-31dc65744f38.png)
+![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/110180687-8751f480-7e0a-11eb-89cc-d62f85c148cb.png)
 
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
@@ -411,8 +411,7 @@ class _MyAppState extends State<MyApp> {
                             urlController.text = this.url;
                           });
                         },
-                        androidOnPermissionRequest: (InAppWebViewController controller,
-                            String origin, List<String> resources) async {
+                        androidOnPermissionRequest: (controller, origin, resources) async {
                           return PermissionRequestResponse(
                               resources: resources,
                               action: PermissionRequestResponseAction.GRANT);
@@ -420,15 +419,8 @@ class _MyAppState extends State<MyApp> {
                         shouldOverrideUrlLoading: (controller, navigationAction) async {
                           var uri = navigationAction.request.url!;
 
-                          if (![
-                            "http",
-                            "https",
-                            "file",
-                            "chrome",
-                            "data",
-                            "javascript",
-                            "about"
-                          ].contains(uri.scheme)) {
+                          if (![ "http", "https", "file", "chrome",
+                            "data", "javascript", "about"].contains(uri.scheme)) {
                             if (await canLaunch(url)) {
                               // Launch the App
                               await launch(

@@ -8,6 +8,7 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import '../context_menu.dart';
 import '../types.dart';
@@ -15,6 +16,7 @@ import '../types.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_options.dart';
+import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
 class InAppWebView extends StatefulWidget implements WebView {
@@ -38,6 +40,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialData,
     this.initialOptions,
     this.initialUserScripts,
+    this.pullToRefreshController,
     this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
@@ -132,6 +135,9 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final UnmodifiableListView<UserScript>? initialUserScripts;
+
+  @override
+  final PullToRefreshController? pullToRefreshController;
 
   @override
   final ContextMenu? contextMenu;
@@ -379,6 +385,7 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
                         [],
+                'pullToRefreshOptions': widget.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
               },
               creationParamsCodec: const StandardMessageCodec(),
             )
@@ -405,6 +412,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             'windowId': widget.windowId,
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            'pullToRefreshOptions': widget.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
           },
           creationParamsCodec: const StandardMessageCodec(),
         );
@@ -425,6 +433,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'windowId': widget.windowId,
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+          'pullToRefreshOptions': widget.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
         },
         creationParamsCodec: const StandardMessageCodec(),
       );
@@ -445,6 +454,7 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   void _onPlatformViewCreated(int id) {
     _controller = InAppWebViewController(id, widget);
+    widget.pullToRefreshController?.initMethodChannel(id);
     if (widget.onWebViewCreated != null) {
       widget.onWebViewCreated!(_controller);
     }

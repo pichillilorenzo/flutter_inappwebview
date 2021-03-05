@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
+public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
     var webView: InAppWebView?
     
     init(webView: InAppWebView) {

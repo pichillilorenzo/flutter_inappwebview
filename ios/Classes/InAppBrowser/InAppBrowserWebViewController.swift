@@ -36,6 +36,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var initialBaseUrl: String?
     var previousStatusBarStyle = -1
     var initialUserScripts: [[String: Any]] = []
+    var pullToRefreshInitialOptions: [String: Any?] = [:]
     var methodCallDelegate: InAppWebViewMethodHandler?
 
     public override func loadView() {
@@ -63,6 +64,15 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
         channel!.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
+        
+        let pullToRefreshLayoutChannel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id,
+                                                              binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        let pullToRefreshOptions = PullToRefreshOptions()
+        let _ = pullToRefreshOptions.parse(options: pullToRefreshInitialOptions)
+        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, options: pullToRefreshOptions)
+        webView.pullToRefreshControl = pullToRefreshControl
+        pullToRefreshControl.delegate = webView
+        pullToRefreshControl.prepare()
         
         prepareWebView()
         

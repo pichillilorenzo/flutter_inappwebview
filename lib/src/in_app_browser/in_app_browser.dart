@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
@@ -40,14 +41,17 @@ class InAppBrowserNotOpenedException implements Exception {
 ///This class uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
 class InAppBrowser {
-  ///Browser's UUID.
-  late String id;
+  ///View ID.
+  late final String id;
 
   ///Context menu used by the browser. It should be set before opening the browser.
   ContextMenu? contextMenu;
 
+  ///Represents the pull-to-refresh feature controller.
+  PullToRefreshController? pullToRefreshController;
+
   ///Initial list of user scripts to be loaded at start or end of a page loading.
-  UnmodifiableListView<UserScript>? initialUserScripts;
+  final UnmodifiableListView<UserScript>? initialUserScripts;
 
   bool _isOpened = false;
   late MethodChannel _channel;
@@ -68,13 +72,14 @@ class InAppBrowser {
     this._channel.setMethodCallHandler(handleMethod);
     _isOpened = false;
     webViewController = new InAppWebViewController.fromInAppBrowser(
-        id, this._channel, this, this.initialUserScripts);
+        this._channel, this, this.initialUserScripts);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onBrowserCreated":
         this._isOpened = true;
+        this.pullToRefreshController?.initMethodChannel(id);
         onBrowserCreated();
         break;
       case "onExit":
@@ -106,7 +111,8 @@ class InAppBrowser {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    await _sharedChannel.invokeMethod('openUrlRequest', args);
+    args.putIfAbsent('pullToRefreshOptions', () => pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap());
+    await _sharedChannel.invokeMethod('open', args);
   }
 
   ///Opens the given [assetFilePath] file in a new [InAppBrowser] instance.
@@ -159,7 +165,8 @@ class InAppBrowser {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    await _sharedChannel.invokeMethod('openFile', args);
+    args.putIfAbsent('pullToRefreshOptions', () => pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap());
+    await _sharedChannel.invokeMethod('open', args);
   }
 
   ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
@@ -194,7 +201,8 @@ class InAppBrowser {
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    await _sharedChannel.invokeMethod('openData', args);
+    args.putIfAbsent('pullToRefreshOptions', () => pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap());
+    await _sharedChannel.invokeMethod('open', args);
   }
 
   ///This is a static method that opens an [url] in the system browser. You wont be able to use the [InAppBrowser] methods here!

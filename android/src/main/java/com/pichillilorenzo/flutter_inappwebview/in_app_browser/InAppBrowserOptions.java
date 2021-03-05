@@ -15,7 +15,7 @@ public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
   public Boolean hidden = false;
   public Boolean hideToolbarTop = false;
   @Nullable
-  public String toolbarTopBackgroundColor = null;
+  public String toolbarTopBackgroundColor;
   @Nullable
   public String toolbarTopFixedTitle;
   public Boolean hideUrlBar = false;

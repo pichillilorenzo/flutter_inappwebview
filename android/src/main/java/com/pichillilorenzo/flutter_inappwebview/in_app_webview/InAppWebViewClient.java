@@ -150,8 +150,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, "ERROR: " + s + " " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         allowShouldOverrideUrlLoading(webView, url, headers, isForMainFrame);
       }
 
@@ -375,8 +375,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
       }
 
       @Override
@@ -428,8 +428,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
       }
 
       @Override
@@ -493,8 +493,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
       }
 
       @Override
@@ -553,8 +553,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
       }
 
       @Override
@@ -736,7 +736,7 @@ public class InAppWebViewClient extends WebViewClient {
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.d(LOG_TAG, "ERROR: " + errorCode + " " + errorMessage);
+        Log.e(LOG_TAG, "ERROR: " + errorCode + " " + errorMessage);
       }
 
       @Override

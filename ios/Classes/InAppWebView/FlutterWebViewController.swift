@@ -23,13 +23,8 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         self.registrar = registrar
         self.viewId = viewId
         
-        var channelName = ""
-        if let id = viewId as? Int64 {
-            channelName = "com.pichillilorenzo/flutter_inappwebview_" + String(id)
-        } else if let id = viewId as? String {
-            channelName = "com.pichillilorenzo/flutter_inappwebview_" + id
-        }
-        channel = FlutterMethodChannel(name: channelName, binaryMessenger: registrar.messenger())
+        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_" + String(describing: viewId),
+                                       binaryMessenger: registrar.messenger())
         
         myView = UIView(frame: frame)
         myView!.clipsToBounds = true
@@ -41,6 +36,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         let contextMenu = args["contextMenu"] as? [String: Any]
         let windowId = args["windowId"] as? Int64
         let initialUserScripts = args["initialUserScripts"] as? [[String: Any]]
+        let pullToRefreshInitialOptions = args["pullToRefreshOptions"] as! [String: Any?]
         
         var userScripts: [UserScript] = []
         if let initialUserScripts = initialUserScripts {
@@ -69,6 +65,15 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         
         methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
         channel!.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
+        
+        let pullToRefreshLayoutChannel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + String(describing: viewId),
+                                                              binaryMessenger: registrar.messenger())
+        let pullToRefreshOptions = PullToRefreshOptions()
+        let _ = pullToRefreshOptions.parse(options: pullToRefreshInitialOptions)
+        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, options: pullToRefreshOptions)
+        webView!.pullToRefreshControl = pullToRefreshControl
+        pullToRefreshControl.delegate = webView!
+        pullToRefreshControl.prepare()
 
         webView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.autoresizesSubviews = true

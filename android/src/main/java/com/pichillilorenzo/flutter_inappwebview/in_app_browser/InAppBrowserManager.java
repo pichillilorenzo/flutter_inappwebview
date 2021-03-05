@@ -62,44 +62,8 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     final Activity activity = Shared.activity;
 
     switch (call.method) {
-      case "openUrlRequest":
-        {
-          String id = (String) call.argument("id");
-          Map<String, Object> urlRequest = (Map<String, Object>) call.argument("urlRequest");
-          Map<String, Object> options = (Map<String, Object>) call.argument("options");
-          Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
-          Integer windowId = (Integer) call.argument("windowId");
-          List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
-          openUrlRequest(activity, id, urlRequest, options, contextMenu, windowId, initialUserScripts);
-        }
-        result.success(true);
-        break;
-      case "openFile":
-        {
-          String id = (String) call.argument("id");
-          String assetFilePath = (String) call.argument("assetFilePath");
-          Map<String, Object> options = (Map<String, Object>) call.argument("options");
-          Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
-          Integer windowId = (Integer) call.argument("windowId");
-          List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
-          openFile(activity, id, assetFilePath, options, contextMenu, windowId, initialUserScripts);
-        }
-        result.success(true);
-        break;
-      case "openData":
-        {
-          String id = (String) call.argument("id");
-          Map<String, Object> options = (Map<String, Object>) call.argument("options");
-          String data = (String) call.argument("data");
-          String mimeType = (String) call.argument("mimeType");
-          String encoding = (String) call.argument("encoding");
-          String baseUrl = (String) call.argument("baseUrl");
-          String historyUrl = (String) call.argument("historyUrl");
-          Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
-          Integer windowId = (Integer) call.argument("windowId");
-          List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) call.argument("initialUserScripts");
-          openData(activity, id, options, data, mimeType, encoding, baseUrl, historyUrl, contextMenu, windowId, initialUserScripts);
-        }
+      case "open":
+        open(activity, (Map<String, Object>) call.arguments());
         result.success(true);
         break;
       case "openWithSystemBrowser":
@@ -189,45 +153,36 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     }
   }
 
-  public void openUrlRequest(Activity activity, String id, Map<String, Object> urlRequest, Map<String, Object> options,
-                             Map<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
+  public void open(Activity activity, Map<String, Object> arguments) {
+    String id = (String) arguments.get("id");
+    Map<String, Object> urlRequest = (Map<String, Object>) arguments.get("urlRequest");
+    String assetFilePath = (String) arguments.get("assetFilePath");
+    String data = (String) arguments.get("data");
+    String mimeType = (String) arguments.get("mimeType");
+    String encoding = (String) arguments.get("encoding");
+    String baseUrl = (String) arguments.get("baseUrl");
+    String historyUrl = (String) arguments.get("historyUrl");
+    Map<String, Object> options = (Map<String, Object>) arguments.get("options");
+    Map<String, Object> contextMenu = (Map<String, Object>) arguments.get("contextMenu");
+    Integer windowId = (Integer) arguments.get("windowId");
+    List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) arguments.get("initialUserScripts");
+    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) arguments.get("pullToRefreshOptions");
+
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
     extras.putSerializable("initialUrlRequest", (Serializable) urlRequest);
-    extras.putString("id", id);
-    extras.putSerializable("options", (Serializable) options);
-    extras.putSerializable("contextMenu", (Serializable) contextMenu);
-    extras.putInt("windowId", windowId != null ? windowId : -1);
-    extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
-    startInAppBrowserActivity(activity, extras);
-  }
-
-  public void openFile(Activity activity, String id, String assetFilePath, Map<String, Object> options,
-                             Map<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
-    Bundle extras = new Bundle();
-    extras.putString("fromActivity", activity.getClass().getName());
     extras.putString("initialFile", assetFilePath);
-    extras.putString("id", id);
-    extras.putSerializable("options", (Serializable) options);
-    extras.putSerializable("contextMenu", (Serializable) contextMenu);
-    extras.putInt("windowId", windowId != null ? windowId : -1);
-    extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
-    startInAppBrowserActivity(activity, extras);
-  }
-
-  public void openData(Activity activity, String id, Map<String, Object> options, String data, String mimeType, String encoding,
-                       String baseUrl, String historyUrl, Map<String, Object> contextMenu, Integer windowId, List<Map<String, Object>> initialUserScripts) {
-    Bundle extras = new Bundle();
-    extras.putString("id", id);
-    extras.putSerializable("options", (Serializable) options);
     extras.putString("initialData", data);
     extras.putString("initialMimeType", mimeType);
     extras.putString("initialEncoding", encoding);
     extras.putString("initialBaseUrl", baseUrl);
     extras.putString("initialHistoryUrl", historyUrl);
+    extras.putString("id", id);
+    extras.putSerializable("options", (Serializable) options);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
     extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
+    extras.putSerializable("pullToRefreshInitialOptions", (Serializable) pullToRefreshInitialOptions);
     startInAppBrowserActivity(activity, extras);
   }
 

@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -23,16 +24,21 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   Future onLoadStop(url) async {
+    pullToRefreshController?.endRefreshing();
     print("\n\nStopped $url\n\n");
   }
 
   @override
   void onLoadError(url, code, message) {
+    pullToRefreshController?.endRefreshing();
     print("Can't load $url.. Error: $message");
   }
 
   @override
   void onProgressChanged(progress) {
+    if (progress == 100) {
+      pullToRefreshController?.endRefreshing();
+    }
     print("Progress: $progress");
   }
 
@@ -77,9 +83,27 @@ class InAppBrowserExampleScreen extends StatefulWidget {
 }
 
 class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
+
+  late PullToRefreshController pullToRefreshController;
+
   @override
   void initState() {
     super.initState();
+
+    pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: Colors.black,
+      ),
+      onRefresh: () async {
+        if (Platform.isAndroid) {
+          widget.browser.webViewController.reload();
+        } else if (Platform.isIOS) {
+          widget.browser.webViewController.loadUrl(
+              urlRequest: URLRequest(url: await widget.browser.webViewController.getUrl()));
+        }
+      },
+    );
+    widget.browser.pullToRefreshController = pullToRefreshController;
   }
 
   @override

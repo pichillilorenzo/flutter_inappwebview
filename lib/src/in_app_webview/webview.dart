@@ -1,6 +1,8 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
+import '../pull_to_refresh/pull_to_refresh_controller.dart';
+
 import '../context_menu.dart';
 import '../types.dart';
 
@@ -642,6 +644,9 @@ abstract class WebView {
   ///This is a limitation of the native iOS WebKit APIs.
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
+  ///Represents the pull-to-refresh feature controller.
+  final PullToRefreshController? pullToRefreshController;
+
   WebView(
       {this.windowId,
       this.onWebViewCreated,
@@ -701,5 +706,6 @@ abstract class WebView {
       this.initialData,
       this.initialOptions,
       this.contextMenu,
-      this.initialUserScripts});
+      this.initialUserScripts,
+      this.pullToRefreshController});
 }

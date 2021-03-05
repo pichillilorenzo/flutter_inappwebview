@@ -2,6 +2,7 @@ import 'dart:collection';
 import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
@@ -13,6 +14,9 @@ import 'in_app_webview/in_app_webview_controller.dart';
 import 'http_auth_credentials_database.dart';
 import 'cookie_manager.dart';
 import 'web_storage/web_storage.dart';
+import 'pull_to_refresh/pull_to_refresh_controller.dart';
+import 'pull_to_refresh/pull_to_refresh_options.dart';
+import 'util.dart';
 
 ///This type represents a callback, added with [InAppWebViewController.addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
@@ -6494,4 +6498,290 @@ class IOSWKWindowFeatures {
   String toString() {
     return toMap().toString();
   }
+}
+
+///An iOS-specific class that represents a string with associated attributes
+///used by the [PullToRefreshController] and [PullToRefreshOptions] classes.
+class IOSNSAttributedString {
+  ///The characters for the new object.
+  String string;
+
+  ///The color of the background behind the text.
+  ///
+  ///The value of this attribute is a [Color] object.
+  ///Use this attribute to specify the color of the background area behind the text.
+  ///If you do not specify this attribute, no background color is drawn.
+  Color? backgroundColor;
+
+  ///The vertical offset for the position of the text.
+  ///
+  ///The value of this attribute is a number containing a floating point value indicating the character’s offset from the baseline, in points.
+  ///The default value is `0`.
+  double? baselineOffset;
+
+  ///The expansion factor of the text.
+  ///
+  ///The value of this attribute is a number containing a floating point value indicating the log of the expansion factor to be applied to glyphs.
+  ///The default value is `0`, indicating no expansion.
+  double? expansion;
+
+  ///The color of the text.
+  ///
+  ///The value of this attribute is a [Color] object.
+  ///Use this attribute to specify the color of the text during rendering.
+  ///If you do not specify this attribute, the text is rendered in black.
+  Color? foregroundColor;
+
+  ///The kerning of the text.
+  ///
+  ///The value of this attribute is a number containing a floating-point value.
+  ///This value specifies the number of points by which to adjust kern-pair characters.
+  ///Kerning prevents unwanted space from occurring between specific characters and depends on the font.
+  ///The value `0` means kerning is disabled. The default value for this attribute is `0`.
+  double? kern;
+
+  ///The ligature of the text.
+  ///
+  ///The value of this attribute is a number containing an integer.
+  ///Ligatures cause specific character combinations to be rendered using a single custom glyph that corresponds to those characters.
+  ///The value `0` indicates no ligatures. The value `1` indicates the use of the default ligatures.
+  ///The value `2` indicates the use of all ligatures.
+  ///The default value for this attribute is `1`. (Value `2` is unsupported on iOS.)
+  int? ligature;
+
+  ///The obliqueness of the text.
+  ///
+  ///The value of this attribute is a number containing a floating point value indicating skew to be applied to glyphs.
+  ///The default value is `0`, indicating no skew.
+  double? obliqueness;
+
+  ///The color of the strikethrough.
+  ///
+  ///The value of this attribute is a [Color] object. The default value is `null`, indicating same as foreground color.
+  Color? strikethroughColor;
+
+  ///The strikethrough style of the text.
+  ///
+  ///This value indicates whether the text has a line through it and corresponds to one of the constants described in [IOSNSUnderlineStyle].
+  ///The default value for this attribute is [IOSNSUnderlineStyle.STYLE_NONE].
+  IOSNSUnderlineStyle? strikethroughStyle;
+
+  ///The color of the stroke.
+  ///
+  ///The value of this parameter is a [Color] object.
+  ///If it is not defined (which is the case by default), it is assumed to be the same as the value of foregroundColor;
+  ///otherwise, it describes the outline color.
+  Color? strokeColor;
+
+  ///The width of the stroke.
+  ///
+  ///The value of this attribute is a number containing a floating-point value.
+  ///This value represents the amount to change the stroke width and is specified as a percentage of the font point size.
+  ///Specify `0` (the default) for no additional changes.
+  ///Specify positive values to change the stroke width alone.
+  ///Specify negative values to stroke and fill the text.
+  ///For example, a typical value for outlined text would be `3.0`.
+  double? strokeWidth;
+
+  ///The text effect.
+  ///
+  ///The value of this attribute is a [IOSNSAttributedStringTextEffectStyle] object.
+  ///The default value of this property is `null`, indicating no text effect.
+  IOSNSAttributedStringTextEffectStyle? textEffect;
+
+  ///The color of the underline.
+  ///
+  ///The value of this attribute is a [Color] object.
+  ///The default value is `null`, indicating same as foreground color.
+  Color? underlineColor;
+
+  ///The underline style of the text.
+  ///
+  ///This value indicates whether the text is underlined and corresponds to one of the constants described in [IOSNSUnderlineStyle].
+  ///The default value for this attribute is [IOSNSUnderlineStyle.STYLE_NONE].
+  IOSNSUnderlineStyle? underlineStyle;
+
+  IOSNSAttributedString({
+    required this.string,
+    this.backgroundColor,
+    this.baselineOffset,
+    this.expansion,
+    this.foregroundColor,
+    this.kern,
+    this.ligature,
+    this.obliqueness,
+    this.strikethroughColor,
+    this.strikethroughStyle,
+    this.strokeColor,
+    this.strokeWidth,
+    this.textEffect,
+    this.underlineColor,
+    this.underlineStyle,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "string": this.string,
+      "backgroundColor": this.backgroundColor?.toHex(),
+      "baselineOffset": this.baselineOffset,
+      "expansion": this.expansion,
+      "foregroundColor": this.foregroundColor?.toHex(),
+      "kern": this.kern,
+      "ligature": this.ligature,
+      "obliqueness": this.obliqueness,
+      "strikethroughColor": this.strikethroughColor?.toHex(),
+      "strikethroughStyle": this.strikethroughStyle?.toValue(),
+      "strokeColor": this.strokeColor?.toHex(),
+      "strokeWidth": this.strokeWidth,
+      "textEffect": this.textEffect?.toValue(),
+      "underlineColor": this.underlineColor?.toHex(),
+      "underlineStyle": this.underlineStyle?.toValue(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///An iOS-specific Class that represents the constants for the underline style and strikethrough style attribute keys.
+class IOSNSUnderlineStyle {
+  final int _value;
+
+  const IOSNSUnderlineStyle._internal(this._value);
+
+  static final Set<IOSNSUnderlineStyle> values = [
+    IOSNSUnderlineStyle.STYLE_NONE,
+    IOSNSUnderlineStyle.SINGLE,
+    IOSNSUnderlineStyle.THICK,
+    IOSNSUnderlineStyle.DOUBLE,
+    IOSNSUnderlineStyle.PATTERN_DOT,
+    IOSNSUnderlineStyle.PATTERN_DASH,
+    IOSNSUnderlineStyle.PATTERN_DASH_DOT,
+    IOSNSUnderlineStyle.PATTERN_DASH_DOT_DOT,
+    IOSNSUnderlineStyle.BY_WORD,
+  ].toSet();
+
+  static IOSNSUnderlineStyle? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return IOSNSUnderlineStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SINGLE";
+      case 2:
+        return "THICK";
+      case 9:
+        return "DOUBLE";
+      case 256:
+        return "PATTERN_DOT";
+      case 512:
+        return "PATTERN_DASH";
+      case 768:
+        return "PATTERN_DASH_DOT";
+      case 1024:
+        return "PATTERN_DASH_DOT_DOT";
+      case 32768:
+        return "BY_WORD";
+      case 0:
+      default:
+        return "STYLE_NONE";
+    }
+  }
+
+  ///Do not draw a line.
+  static const STYLE_NONE =
+  const IOSNSUnderlineStyle._internal(0);
+
+  ///Draw a single line.
+  static const SINGLE =
+  const IOSNSUnderlineStyle._internal(1);
+
+  ///Draw a thick line.
+  static const THICK =
+  const IOSNSUnderlineStyle._internal(2);
+
+  ///Draw a double line.
+  static const DOUBLE =
+  const IOSNSUnderlineStyle._internal(9);
+
+  ///Draw a line of dots.
+  static const PATTERN_DOT =
+  const IOSNSUnderlineStyle._internal(256);
+
+  ///Draw a line of dashes.
+  static const PATTERN_DASH =
+  const IOSNSUnderlineStyle._internal(512);
+
+  ///Draw a line of alternating dashes and dots.
+  static const PATTERN_DASH_DOT =
+  const IOSNSUnderlineStyle._internal(768);
+
+  ///Draw a line of alternating dashes and two dots.
+  static const PATTERN_DASH_DOT_DOT =
+  const IOSNSUnderlineStyle._internal(1024);
+
+  ///Draw the line only beneath or through words, not whitespace.
+  static const BY_WORD =
+  const IOSNSUnderlineStyle._internal(32768);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///An iOS-specific Class that represents the supported proxy types.
+class IOSNSAttributedStringTextEffectStyle {
+  final String _value;
+
+  const IOSNSAttributedStringTextEffectStyle._internal(this._value);
+
+  static final Set<IOSNSAttributedStringTextEffectStyle> values = [
+    IOSNSAttributedStringTextEffectStyle.LETTERPRESS_STYLE,
+  ].toSet();
+
+  static IOSNSAttributedStringTextEffectStyle? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return IOSNSAttributedStringTextEffectStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
+  static const LETTERPRESS_STYLE =
+  const IOSNSAttributedStringTextEffectStyle._internal(
+      "letterpressStyle");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
 }

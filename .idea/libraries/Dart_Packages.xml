@@ -133,7 +133,7 @@
         <entry key="file">
           <value>
             <list>
-              <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/file-6.0.0/lib" />
+              <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/file-6.1.0/lib" />
               <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/file-6.0.0-nullsafety.4/lib" />
             </list>
           </value>
@@ -377,7 +377,7 @@
         <entry key="process">
           <value>
             <list>
-              <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/process-4.0.0/lib" />
+              <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/process-4.1.0/lib" />
               <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/process-4.0.0-nullsafety.4/lib" />
             </list>
           </value>
@@ -441,7 +441,7 @@
         <entry key="source_span">
           <value>
             <list>
-              <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.0/lib" />
+              <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.1/lib" />
               <option value="$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.0-nullsafety.4/lib" />
             </list>
           </value>
@@ -647,7 +647,7 @@
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/fake_async-1.2.0/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/ffi-1.0.0/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/file-6.0.0-nullsafety.4/lib" />
-      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/file-6.0.0/lib" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/file-6.1.0/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/flutter_downloader-1.5.2/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/glob-1.2.0/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/http_multi_server-2.2.0/lib" />
@@ -682,7 +682,7 @@
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/plugin_platform_interface-1.1.0-nullsafety.1/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/pool-1.5.0-nullsafety.3/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/process-4.0.0-nullsafety.4/lib" />
-      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/process-4.0.0/lib" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/process-4.1.0/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/pub_semver-1.4.4/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/shelf-0.7.5/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/shelf_packages_handler-2.0.0/lib" />
@@ -691,7 +691,7 @@
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_map_stack_trace-2.1.0-nullsafety.4/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_maps-0.10.10-nullsafety.3/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.0-nullsafety.4/lib" />
-      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.0/lib" />
+      <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/source_span-1.8.1/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/stack_trace-1.10.0-nullsafety.6/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/stack_trace-1.10.0/lib" />
       <root url="file://$USER_HOME$/flutter/.pub-cache/hosted/pub.dartlang.org/stream_channel-2.1.0-nullsafety.3/lib" />

@@ -11,8 +11,8 @@ public class LeakAvoider: NSObject {
     weak var delegate : FlutterMethodCallDelegate?
     
     init(delegate: FlutterMethodCallDelegate) {
-        self.delegate = delegate
         super.init()
+        self.delegate = delegate
     }
     
     public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {

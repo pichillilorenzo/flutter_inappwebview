@@ -9,13 +9,17 @@ import '../types.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_options.dart';
+import '../pull_to_refresh/pull_to_refresh_controller.dart';
+import '../pull_to_refresh/pull_to_refresh_options.dart';
 
 ///Class that represents a WebView in headless mode.
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 ///
 ///Remember to dispose it when you don't need it anymore.
 class HeadlessInAppWebView implements WebView {
-  late String id;
+  ///View ID.
+  late final String id;
+
   bool _isDisposed = true;
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
@@ -85,7 +89,8 @@ class HeadlessInAppWebView implements WebView {
       this.initialData,
       this.initialOptions,
       this.contextMenu,
-      this.initialUserScripts}) {
+      this.initialUserScripts,
+      this.pullToRefreshController}) {
     id = ViewIdGenerator.generateId();
     webViewController = new InAppWebViewController(id, this);
   }
@@ -93,6 +98,7 @@ class HeadlessInAppWebView implements WebView {
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onHeadlessWebViewCreated":
+        pullToRefreshController?.initMethodChannel(id);
         if (onWebViewCreated != null) {
           onWebViewCreated!(webViewController);
         }
@@ -123,6 +129,7 @@ class HeadlessInAppWebView implements WebView {
               'windowId': this.windowId,
               'initialUserScripts':
                   this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+              'pullToRefreshOptions': this.pullToRefreshController?.options.toMap() ?? PullToRefreshOptions(enabled: false).toMap()
             });
     await _sharedChannel.invokeMethod('createHeadlessWebView', args);
   }
@@ -176,6 +183,9 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final UnmodifiableListView<UserScript>? initialUserScripts;
+
+  @override
+  final PullToRefreshController? pullToRefreshController;
 
   @override
   final void Function(InAppWebViewController controller, Uri? url)?

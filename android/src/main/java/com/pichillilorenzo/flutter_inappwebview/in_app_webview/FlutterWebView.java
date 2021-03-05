@@ -16,9 +16,10 @@ import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
-import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 
 import java.io.IOException;
@@ -38,6 +39,7 @@ public class FlutterWebView implements PlatformView {
   public InAppWebView webView;
   public final MethodChannel channel;
   public InAppWebViewMethodHandler methodCallDelegate;
+  public PullToRefreshLayout pullToRefreshLayout;
 
   public FlutterWebView(BinaryMessenger messenger, final Context context, Object id, HashMap<String, Object> params, View containerView) {
     channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_" + id);
@@ -53,6 +55,7 @@ public class FlutterWebView implements PlatformView {
     Map<String, Object> contextMenu = (Map<String, Object>) params.get("contextMenu");
     Integer windowId = (Integer) params.get("windowId");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) params.get("initialUserScripts");
+    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) params.get("pullToRefreshOptions");
 
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
@@ -73,6 +76,13 @@ public class FlutterWebView implements PlatformView {
 
     webView = new InAppWebView(context, channel, id, windowId, options, contextMenu, containerView, userScripts);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
+
+    MethodChannel pullToRefreshLayoutChannel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
+    PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
+    pullToRefreshOptions.parse(pullToRefreshInitialOptions);
+    pullToRefreshLayout = new PullToRefreshLayout(context, pullToRefreshLayoutChannel, pullToRefreshOptions);
+    pullToRefreshLayout.addView(webView);
+    pullToRefreshLayout.prepare();
 
     methodCallDelegate = new InAppWebViewMethodHandler(webView);
     channel.setMethodCallHandler(methodCallDelegate);
@@ -117,7 +127,7 @@ public class FlutterWebView implements PlatformView {
 
   @Override
   public View getView() {
-    return webView;
+    return pullToRefreshLayout;
   }
 
   @Override
@@ -145,6 +155,11 @@ public class FlutterWebView implements PlatformView {
           webView.dispose();
           webView.destroy();
           webView = null;
+          
+          if (pullToRefreshLayout != null) {
+            pullToRefreshLayout.dispose();
+            pullToRefreshLayout = null;
+          }
         }
       });
       WebSettings settings = webView.getSettings();

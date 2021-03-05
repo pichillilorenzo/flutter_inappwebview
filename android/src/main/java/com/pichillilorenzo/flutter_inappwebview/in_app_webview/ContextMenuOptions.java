@@ -35,7 +35,7 @@ public class ContextMenuOptions implements Options<Object> {
   }
 
   @Override
-  public Map<String, Object> getRealOptions(Object webView) {
+  public Map<String, Object> getRealOptions(Object obj) {
     Map<String, Object> realOptions = toMap();
     return realOptions;
   }

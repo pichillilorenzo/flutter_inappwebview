@@ -302,15 +302,21 @@ Use `InAppWebViewController` to control the WebView instance.
 Example:
 ```dart
 import 'dart:async';
+import 'dart:collection';
+import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   if (Platform.isAndroid) {
     await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
+
   runApp(new MyApp());
 }
 
@@ -321,13 +327,42 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
 
-  InAppWebViewController? webView;
+  final GlobalKey webViewKey = GlobalKey();
+
+  InAppWebViewController? webViewController;
+  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
+      crossPlatform: InAppWebViewOptions(
+        mediaPlaybackRequiresUserGesture: false,
+      ),
+      android: AndroidInAppWebViewOptions(
+        useHybridComposition: true,
+      ),
+      ios: IOSInAppWebViewOptions(
+        allowsInlineMediaPlayback: true,
+      ));
+
+  late PullToRefreshController pullToRefreshController;
   String url = "";
   double progress = 0;
+  final urlController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+
+    pullToRefreshController = PullToRefreshController(
+      options: PullToRefreshOptions(
+        color: Colors.blue,
+      ),
+      onRefresh: () async {
+        if (Platform.isAndroid) {
+          webViewController?.reload();
+        } else if (Platform.isIOS) {
+          webViewController?.loadUrl(
+              urlRequest: URLRequest(url: await webViewController?.getUrl()));
+        }
+      },
+    );
   }
 
   @override
@@ -339,87 +374,131 @@ class _MyAppState extends State<MyApp> {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
-        appBar: AppBar(
-          title: const Text('InAppWebView Example'),
-        ),
-        body: Container(
-            child: Column(children: <Widget>[
-              Container(
-                padding: EdgeInsets.all(20.0),
-                child: Text(
-                    "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
-              ),
-              Container(
-                  padding: EdgeInsets.all(10.0),
-                  child: progress < 1.0
-                      ? LinearProgressIndicator(value: progress)
-                      : Container()),
-              Expanded(
-                child: Container(
-                  margin: const EdgeInsets.all(10.0),
-                  decoration:
-                  BoxDecoration(border: Border.all(color: Colors.blueAccent)),
-                  child: InAppWebView(
-                    initialUrlRequest: URLRequest(
-                      url: Uri.parse("https://flutter.dev/")
-                    ),
-                    initialOptions: InAppWebViewGroupOptions(
-                      crossPlatform: InAppWebViewOptions(
+          appBar: AppBar(title: Text("Official InAppWebView website")),
+          body: SafeArea(
+              child: Column(children: <Widget>[
+                TextField(
+                  decoration: InputDecoration(
+                      prefixIcon: Icon(Icons.search)
+                  ),
+                  controller: urlController,
+                  keyboardType: TextInputType.url,
+                  onSubmitted: (value) {
+                    var url = Uri.parse(value);
+                    if (url.scheme.isEmpty) {
+                      url = Uri.parse("https://www.google.com/search?q=" + value);
+                    }
+                    webViewController?.loadUrl(
+                        urlRequest: URLRequest(url: url));
+                  },
+                ),
+                Expanded(
+                  child: Stack(
+                    children: [
+                      InAppWebView(
+                        key: webViewKey,
+                        initialUrlRequest:
+                        URLRequest(url: Uri.parse("https://inappwebview.dev/")),
+                        initialOptions: options,
+                        pullToRefreshController: pullToRefreshController,
+                        onWebViewCreated: (controller) {
+                          webViewController = controller;
+                        },
+                        onLoadStart: (controller, url) {
+                          setState(() {
+                            this.url = url.toString();
+                            urlController.text = this.url;
+                          });
+                        },
+                        androidOnPermissionRequest: (InAppWebViewController controller,
+                            String origin, List<String> resources) async {
+                          return PermissionRequestResponse(
+                              resources: resources,
+                              action: PermissionRequestResponseAction.GRANT);
+                        },
+                        shouldOverrideUrlLoading: (controller, navigationAction) async {
+                          var uri = navigationAction.request.url!;
 
-                      ),
-                      ios: IOSInAppWebViewOptions(
+                          if (![
+                            "http",
+                            "https",
+                            "file",
+                            "chrome",
+                            "data",
+                            "javascript",
+                            "about"
+                          ].contains(uri.scheme)) {
+                            if (await canLaunch(url)) {
+                              // Launch the App
+                              await launch(
+                                url,
+                              );
+                              // and cancel the request
+                              return NavigationActionPolicy.CANCEL;
+                            }
+                          }
 
+                          return NavigationActionPolicy.ALLOW;
+                        },
+                        onLoadStop: (controller, url) async {
+                          pullToRefreshController.endRefreshing();
+                          setState(() {
+                            this.url = url.toString();
+                            urlController.text = this.url;
+                          });
+                        },
+                        onLoadError: (controller, url, code, message) {
+                          pullToRefreshController.endRefreshing();
+                        },
+                        onProgressChanged: (controller, progress) {
+                          if (progress == 100) {
+                            pullToRefreshController.endRefreshing();
+                          }
+                          setState(() {
+                            this.progress = progress / 100;
+                            urlController.text = this.url;
+                          });
+                        },
+                        onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                          setState(() {
+                            this.url = url.toString();
+                            urlController.text = this.url;
+                          });
+                        },
+                        onConsoleMessage: (controller, consoleMessage) {
+                          print(consoleMessage);
+                        },
                       ),
-                      android: AndroidInAppWebViewOptions(
-                        useHybridComposition: true
-                      )
-                    ),
-                    onWebViewCreated: (InAppWebViewController controller) {
-                      webView = controller;
-                    },
-                    onLoadStart: (controller, url) {
-                      setState(() {
-                        this.url = url?.toString() ?? '';
-                      });
-                    },
-                    onLoadStop: (controller, url) async {
-                      setState(() {
-                        this.url = url?.toString() ?? '';
-                      });
-                    },
-                    onProgressChanged: (controller, progress) {
-                      setState(() {
-                        this.progress = progress / 100;
-                      });
-                    },
+                      progress < 1.0
+                          ? LinearProgressIndicator(value: progress)
+                          : Container(),
+                    ],
                   ),
                 ),
-              ),
-              ButtonBar(
-                alignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  ElevatedButton(
-                    child: Icon(Icons.arrow_back),
-                    onPressed: () {
-                      webView?.goBack();
-                    },
-                  ),
-                  ElevatedButton(
-                    child: Icon(Icons.arrow_forward),
-                    onPressed: () {
-                      webView?.goForward();
-                    },
-                  ),
-                  ElevatedButton(
-                    child: Icon(Icons.refresh),
-                    onPressed: () {
-                      webView?.reload();
-                    },
-                  ),
-                ],
-              ),
-            ])),
-      ),
+                ButtonBar(
+                  alignment: MainAxisAlignment.center,
+                  children: <Widget>[
+                    ElevatedButton(
+                      child: Icon(Icons.arrow_back),
+                      onPressed: () {
+                        webViewController?.goBack();
+                      },
+                    ),
+                    ElevatedButton(
+                      child: Icon(Icons.arrow_forward),
+                      onPressed: () {
+                        webViewController?.goForward();
+                      },
+                    ),
+                    ElevatedButton(
+                      child: Icon(Icons.refresh),
+                      onPressed: () {
+                        webViewController?.reload();
+                      },
+                    ),
+                  ],
+                ),
+              ]))),
     );
   }
 }
@@ -428,11 +507,11 @@ class _MyAppState extends State<MyApp> {
 Screenshots:
 - Android:
 
-![android](https://user-images.githubusercontent.com/5956938/47271038-7aebda80-d574-11e8-98fd-41e6bbc9fe2d.gif)
+![android](https://user-images.githubusercontent.com/5956938/110179602-a18ad300-7e08-11eb-849b-2c7f1af28155.gif)
 
 - iOS:
 
-![ios](https://user-images.githubusercontent.com/5956938/54096363-e1e72000-43ab-11e9-85c2-983a830ab7a0.gif)
+![ios](https://user-images.githubusercontent.com/5956938/110179614-a8194a80-7e08-11eb-85f9-3da10acbbcb2.gif)
 
 #### `InAppWebViewController` Methods
 

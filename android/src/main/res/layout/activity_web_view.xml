@@ -10,10 +10,15 @@
     tools:context=".in_app_browser.InAppBrowserActivity"
     android:focusable="true">
 
-    <com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView
-        android:id="@+id/webView"
+    <com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout
+        android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent">
+        <com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView
+            android:id="@+id/webView"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent" />
+    </com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout>
 
     <ProgressBar
         android:id="@+id/progressBar"

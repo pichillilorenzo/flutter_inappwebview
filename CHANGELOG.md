@@ -1,3 +1,10 @@
+## 5.1.0
+
+- Added support for pull-to-refresh feature [#395](https://github.com/pichillilorenzo/flutter_inappwebview/issues/395)
+- Fixed issue not rendering WebView content when scrolling on iOS [#703](https://github.com/pichillilorenzo/flutter_inappwebview/issues/703)
+- Fixed `InAppBrowser.openData` method
+- `InAppBrowser.initialUserScripts`, `InAppBrowser.id`, `HeadlessInAppWebView.id` properties are `final` now
+
 ## 5.0.5+3
 
 - Fixed Android `evaluateJavascript` method when using `contentWorld: ContentWorld.PAGE`

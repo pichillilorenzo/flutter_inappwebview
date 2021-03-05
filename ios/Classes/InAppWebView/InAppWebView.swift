@@ -9,16 +9,20 @@ import Flutter
 import Foundation
 import WebKit
 
-public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate {
+public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate, PullToRefreshDelegate {
 
     var windowId: Int64?
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channel: FlutterMethodChannel?
     var options: InAppWebViewOptions?
+    var pullToRefreshControl: PullToRefreshControl?
+    
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
     static var credentialsProposed: [URLCredential] = []
+    
     var lastScrollX: CGFloat = 0
     var lastScrollY: CGFloat = 0
+    
     var isPausedTimers = false
     var isPausedTimersCompletionHandler: (() -> Void)?
 
@@ -250,10 +254,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         return super.canPerformAction(action, withSender: sender)
     }
+    
+    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+        // fix for pull-to-refresh jittering when the touch drag event is held
+        if let pullToRefreshControl = pullToRefreshControl,
+           pullToRefreshControl.shouldCallOnRefresh {
+            pullToRefreshControl.onRefresh()
+        }
+    }
 
     public func prepare() {
-        self.scrollView.addGestureRecognizer(self.longPressRecognizer)
-        self.scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
+        scrollView.addGestureRecognizer(self.longPressRecognizer)
+        scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
+        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old], context: nil)
         
         addObserver(self,
                     forKeyPath: #keyPath(WKWebView.estimatedProgress),
@@ -269,13 +282,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             forKeyPath: #keyPath(WKWebView.title),
             options: [.new, .old],
             context: nil)
-
+        
         NotificationCenter.default.addObserver(
                         self,
                         selector: #selector(onCreateContextMenu),
                         name: UIMenuController.willShowMenuNotification,
                         object: nil)
-        
         
         NotificationCenter.default.addObserver(
                         self,
@@ -566,7 +578,13 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let newTitle = change?[NSKeyValueChangeKey.newKey] as? String
             onTitleChanged(title: newTitle)
             inAppBrowserDelegate?.didChangeTitle(title: newTitle)
-       }
+        } else if keyPath == #keyPath(UIScrollView.contentOffset) {
+            let newContentOffset = change?[NSKeyValueChangeKey.newKey] as? CGPoint
+            let oldContentOffset = change?[NSKeyValueChangeKey.oldKey] as? CGPoint
+            if scrollView.isDragging || scrollView.isDecelerating || newContentOffset != oldContentOffset {
+                onScrollChanged()
+            }
+        }
         replaceGestureHandlerIfNeeded()
     }
     
@@ -1956,7 +1974,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         })
     }
     
-    public func scrollViewDidScroll(_ scrollView: UIScrollView) {
+    /// UIScrollViewDelegate is somehow bugged:
+    /// if InAppWebView implements the UIScrollViewDelegate protocol and implement the scrollViewDidScroll event,
+    /// then, when the user scrolls the content, the webview content is not rendered (just white space).
+    /// Calling setNeedsLayout() resolves this problem, but, for some reason, the bounce effect is canceled.
+    ///
+    /// So, to track the same event, without implementing the scrollViewDidScroll event, we create
+    /// an observer that observes the scrollView.contentOffset property.
+    /// This way, we don't need to call setNeedsLayout() and all works fine.
+    public func onScrollChanged() {
         let disableVerticalScroll = options?.disableVerticalScroll ?? false
         let disableHorizontalScroll = options?.disableHorizontalScroll ?? false
         if disableVerticalScroll && disableHorizontalScroll {
@@ -2635,6 +2661,23 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
+    public func enablePullToRefresh() {
+        if let pullToRefreshControl = pullToRefreshControl {
+            if #available(iOS 10.0, *) {
+                scrollView.refreshControl = pullToRefreshControl
+            } else {
+                scrollView.addSubview(pullToRefreshControl)
+            }
+        }
+    }
+    
+    public func disablePullToRefresh() {
+        pullToRefreshControl?.removeFromSuperview()
+        if #available(iOS 10.0, *) {
+            scrollView.refreshControl = nil
+        }
+    }
+    
     public func dispose() {
         if isPausedTimers, let completionHandler = isPausedTimersCompletionHandler {
             isPausedTimersCompletionHandler = nil
@@ -2659,12 +2702,16 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         for imp in customIMPs {
             imp_removeBlock(imp)
         }
+        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
         longPressRecognizer.removeTarget(self, action: #selector(longPressGestureDetected))
         longPressRecognizer.delegate = nil
         scrollView.removeGestureRecognizer(longPressRecognizer)
         recognizerForDisablingContextMenuOnLinks.removeTarget(self, action: #selector(longPressGestureDetected))
         recognizerForDisablingContextMenuOnLinks.delegate = nil
         scrollView.removeGestureRecognizer(recognizerForDisablingContextMenuOnLinks)
+        disablePullToRefresh()
+        pullToRefreshControl?.dispose()
+        pullToRefreshControl = nil
         uiDelegate = nil
         navigationDelegate = nil
         scrollView.delegate = nil

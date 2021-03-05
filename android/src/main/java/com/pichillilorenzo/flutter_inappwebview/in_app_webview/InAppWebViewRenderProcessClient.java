@@ -47,7 +47,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.d(LOG_TAG, "ERROR: " + errorCode + " " + errorMessage);
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
       }
 
       @Override
@@ -79,7 +79,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.d(LOG_TAG, "ERROR: " + errorCode + " " + errorMessage);
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
       }
 
       @Override

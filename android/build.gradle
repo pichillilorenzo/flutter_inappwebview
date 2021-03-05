@@ -49,5 +49,6 @@ android {
         implementation 'androidx.browser:browser:1.2.0'
         implementation 'androidx.appcompat:appcompat:1.2.0-rc02'
         implementation 'com.squareup.okhttp3:mockwebserver:3.14.7'
+        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
     }
 }

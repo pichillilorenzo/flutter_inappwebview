@@ -29,6 +29,8 @@ import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewOptio
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -48,6 +50,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public Integer windowId;
   public String id;
   public InAppWebView webView;
+  public PullToRefreshLayout pullToRefreshLayout;
   public ActionBar actionBar;
   public Menu menu;
   public SearchView searchView;
@@ -73,6 +76,15 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + id);
 
     setContentView(R.layout.activity_web_view);
+
+    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>)  b.getSerializable("pullToRefreshInitialOptions");
+    MethodChannel pullToRefreshLayoutChannel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
+    PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
+    pullToRefreshOptions.parse(pullToRefreshInitialOptions);
+    pullToRefreshLayout = findViewById(R.id.pullToRefresh);
+    pullToRefreshLayout.channel = pullToRefreshLayoutChannel;
+    pullToRefreshLayout.options = pullToRefreshOptions;
+    pullToRefreshLayout.prepare();
 
     webView = findViewById(R.id.webView);
     webView.windowId = windowId;
@@ -128,10 +140,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         }
       }
       else if (initialData != null) {
-        String mimeType = b.getString("mimeType");
-        String encoding = b.getString("encoding");
-        String baseUrl = b.getString("baseUrl");
-        String historyUrl = b.getString("historyUrl");
+        String mimeType = b.getString("initialMimeType");
+        String encoding = b.getString("initialEncoding");
+        String baseUrl = b.getString("initialBaseUrl");
+        String historyUrl = b.getString("initialHistoryUrl");
         webView.loadDataWithBaseURL(baseUrl, initialData, mimeType, encoding, historyUrl);
       }
       else if (initialUrlRequest != null) {

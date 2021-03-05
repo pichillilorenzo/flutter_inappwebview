@@ -175,7 +175,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     channel.invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
       @Override
-      public void success(Object response) {
+      public void success(@Nullable Object response) {
         String responseMessage = null;
         String confirmButtonTitle = null;
 
@@ -203,8 +203,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         result.cancel();
       }
 
@@ -290,8 +290,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         result.cancel();
       }
 
@@ -393,8 +393,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         result.cancel();
       }
 
@@ -507,8 +507,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
-        Log.e(LOG_TAG, s + ", " + s1);
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         result.cancel();
       }
 
@@ -599,6 +599,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         if (InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
           InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
         }
@@ -638,7 +639,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
 
       @Override
-      public void error(String s, String s1, Object o) {
+      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
         callback.invoke(origin, false, false);
       }
 
@@ -1124,8 +1126,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         }
 
         @Override
-        public void error(String s, String s1, Object o) {
-          Log.e(LOG_TAG, s + ", " + s1);
+        public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+          request.deny();
         }
 
         @Override

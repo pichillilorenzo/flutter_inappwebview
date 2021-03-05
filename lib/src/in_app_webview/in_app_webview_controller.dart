@@ -53,13 +53,7 @@ class InAppWebViewController {
   List<UserScript> _userScripts = [];
 
   // ignore: unused_field
-  bool _isOpened = false;
-
-  // ignore: unused_field
   dynamic _id;
-
-  // ignore: unused_field
-  String? _inAppBrowserUuid;
 
   InAppBrowser? _inAppBrowser;
 
@@ -84,11 +78,9 @@ class InAppWebViewController {
   }
 
   InAppWebViewController.fromInAppBrowser(
-      String uuid,
       MethodChannel channel,
       InAppBrowser inAppBrowser,
       UnmodifiableListView<UserScript>? initialUserScripts) {
-    this._inAppBrowserUuid = uuid;
     this._channel = channel;
     this._inAppBrowser = inAppBrowser;
     this._userScripts =

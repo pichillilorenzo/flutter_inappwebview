@@ -1,3 +1,7 @@
+## 5.1.0+1
+
+- Added a test for the pull-to-refresh feature when used on Android. It requires the `useHybridComposition: true` Android-specific option, otherwise it will throw an exception.
+
 ## 5.1.0
 
 - Added support for pull-to-refresh feature [#395](https://github.com/pichillilorenzo/flutter_inappwebview/issues/395)

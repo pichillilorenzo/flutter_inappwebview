@@ -10,6 +10,8 @@ import 'in_app_webview_controller.dart';
 import 'in_app_webview_options.dart';
 import 'headless_in_app_webview.dart';
 
+import 'android/in_app_webview_options.dart';
+
 ///Abstract class that represents a WebView. Used by [InAppWebView] and [HeadlessInAppWebView].
 abstract class WebView {
   ///The window id of a [CreateWindowAction.windowId].
@@ -645,6 +647,8 @@ abstract class WebView {
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
   ///Represents the pull-to-refresh feature controller.
+  ///
+  ///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [AndroidInAppWebViewOptions.useHybridComposition] must be `true`.
   final PullToRefreshController? pullToRefreshController;
 
   WebView(

@@ -156,7 +156,7 @@ final public class InAppWebView extends InputAwareWebView {
                       @Nullable Integer windowId, InAppWebViewOptions options,
                       @Nullable Map<String, Object> contextMenu, View containerView,
                       List<UserScript> userScripts) {
-    super(context, containerView);
+    super(context, containerView, options.useHybridComposition);
     this.channel = channel;
     this.id = id;
     this.windowId = windowId;
@@ -1244,7 +1244,7 @@ final public class InAppWebView extends InputAwareWebView {
   @Override
   public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
     InputConnection connection = super.onCreateInputConnection(outAttrs);
-    if (connection == null && containerView != null) {
+    if (connection == null && !options.useHybridComposition && containerView != null) {
       // workaround to hide the Keyboard when the user click outside
       // on something not focusable such as input or a textarea.
       containerView

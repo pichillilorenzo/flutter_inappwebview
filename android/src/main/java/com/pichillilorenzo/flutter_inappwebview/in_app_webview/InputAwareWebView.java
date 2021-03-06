@@ -12,6 +12,8 @@ import android.view.inputmethod.InputMethodManager;
 import android.webkit.WebView;
 import android.widget.ListPopupWindow;
 
+import androidx.annotation.Nullable;
+
 /**
  * A WebView subclass that mirrors the same implementation hacks that the system WebView does in
  * order to correctly create an InputConnection.
@@ -22,13 +24,16 @@ import android.widget.ListPopupWindow;
  */
 public class InputAwareWebView extends WebView {
   private static final String LOG_TAG = "InputAwareWebView";
+  @Nullable
   public View containerView;
   private View threadedInputConnectionProxyView;
   private ThreadedInputConnectionProxyAdapterView proxyAdapterView;
+  private boolean useHybridComposition = false;
 
-  public InputAwareWebView(Context context, View containerView) {
+  public InputAwareWebView(Context context, @Nullable View containerView, Boolean useHybridComposition) {
     super(context);
     this.containerView = containerView;
+    this.useHybridComposition = useHybridComposition == null ? false : useHybridComposition;
   }
 
   public InputAwareWebView(Context context, AttributeSet attrs) {
@@ -83,6 +88,9 @@ public class InputAwareWebView extends WebView {
 
   /** Restore the original InputConnection, if needed. */
   void dispose() {
+    if (useHybridComposition) {
+      return;
+    }
     resetInputConnection();
   }
 
@@ -101,6 +109,9 @@ public class InputAwareWebView extends WebView {
    */
   @Override
   public boolean checkInputConnectionProxy(final View view) {
+    if (useHybridComposition) {
+      return super.checkInputConnectionProxy(view);
+    }
     // Check to see if the view param is WebView's ThreadedInputConnectionProxyView.
     View previousProxy = threadedInputConnectionProxyView;
     threadedInputConnectionProxyView = view;
@@ -138,6 +149,10 @@ public class InputAwareWebView extends WebView {
   @Override
   public void clearFocus() {
     super.clearFocus();
+
+    if (useHybridComposition) {
+      return;
+    }
     resetInputConnection();
   }
 
@@ -206,6 +221,10 @@ public class InputAwareWebView extends WebView {
 
   @Override
   protected void onFocusChanged(boolean focused, int direction, Rect previouslyFocusedRect) {
+    if (useHybridComposition) {
+      super.onFocusChanged(focused, direction, previouslyFocusedRect);
+      return;
+    }
     // This works around a crash when old (<67.0.3367.0) Chromium versions are used.
 
     // Prior to Chromium 67.0.3367 the following sequence happens when a select drop down is shown

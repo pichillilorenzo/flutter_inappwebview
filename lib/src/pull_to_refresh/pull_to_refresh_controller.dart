@@ -5,6 +5,7 @@ import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../util.dart';
 import '../types.dart';
+import '../in_app_webview/android/in_app_webview_options.dart';
 import 'pull_to_refresh_options.dart';
 
 ///A standard controller that can initiate the refreshing of a scroll view’s contents.
@@ -12,6 +13,8 @@ import 'pull_to_refresh_options.dart';
 ///
 ///All the methods should be called only when the WebView has been created or is already running
 ///(for example [WebView.onWebViewCreated] or [InAppBrowser.onBrowserCreated]).
+///
+///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [AndroidInAppWebViewOptions.useHybridComposition] must be `true`.
 class PullToRefreshController {
   late PullToRefreshOptions options;
   MethodChannel? _channel;

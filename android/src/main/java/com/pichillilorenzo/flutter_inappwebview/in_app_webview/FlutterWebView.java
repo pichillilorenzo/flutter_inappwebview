@@ -11,6 +11,7 @@ import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.NonNull;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -74,15 +75,17 @@ public class FlutterWebView implements PlatformView {
       }
     }
 
-    webView = new InAppWebView(context, channel, id, windowId, options, contextMenu, containerView, userScripts);
+    webView = new InAppWebView(context, channel, id, windowId, options, contextMenu, options.useHybridComposition ? null : containerView, userScripts);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
-    MethodChannel pullToRefreshLayoutChannel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
-    PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
-    pullToRefreshOptions.parse(pullToRefreshInitialOptions);
-    pullToRefreshLayout = new PullToRefreshLayout(context, pullToRefreshLayoutChannel, pullToRefreshOptions);
-    pullToRefreshLayout.addView(webView);
-    pullToRefreshLayout.prepare();
+    if (options.useHybridComposition) {
+      MethodChannel pullToRefreshLayoutChannel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
+      PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
+      pullToRefreshOptions.parse(pullToRefreshInitialOptions);
+      pullToRefreshLayout = new PullToRefreshLayout(context, pullToRefreshLayoutChannel, pullToRefreshOptions);
+      pullToRefreshLayout.addView(webView);
+      pullToRefreshLayout.prepare();
+    }
 
     methodCallDelegate = new InAppWebViewMethodHandler(webView);
     channel.setMethodCallHandler(methodCallDelegate);
@@ -127,7 +130,7 @@ public class FlutterWebView implements PlatformView {
 
   @Override
   public View getView() {
-    return pullToRefreshLayout;
+    return pullToRefreshLayout != null ? pullToRefreshLayout : webView;
   }
 
   @Override
@@ -170,26 +173,26 @@ public class FlutterWebView implements PlatformView {
 
   @Override
   public void onInputConnectionLocked() {
-    if (webView != null && webView.inAppBrowserDelegate == null)
+    if (webView != null && webView.inAppBrowserDelegate == null && !webView.options.useHybridComposition)
       webView.lockInputConnection();
   }
 
   @Override
   public void onInputConnectionUnlocked() {
-    if (webView != null && webView.inAppBrowserDelegate == null)
+    if (webView != null && webView.inAppBrowserDelegate == null && !webView.options.useHybridComposition)
       webView.unlockInputConnection();
   }
 
   @Override
-  public void onFlutterViewAttached(View flutterView) {
-    if (webView != null) {
+  public void onFlutterViewAttached(@NonNull View flutterView) {
+    if (webView != null && !webView.options.useHybridComposition) {
       webView.setContainerView(flutterView);
     }
   }
 
   @Override
   public void onFlutterViewDetached() {
-    if (webView != null) {
+    if (webView != null && !webView.options.useHybridComposition) {
       webView.setContainerView(null);
     }
   }

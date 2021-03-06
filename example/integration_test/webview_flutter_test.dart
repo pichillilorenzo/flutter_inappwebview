@@ -4412,6 +4412,11 @@ setTimeout(function() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(url: Uri.parse('https://github.com/flutter')),
+            initialOptions: InAppWebViewGroupOptions(
+              android: AndroidInAppWebViewOptions(
+                useHybridComposition: true
+              )
+            ),
             pullToRefreshController: pullToRefreshController,
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);

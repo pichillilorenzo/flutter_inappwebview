@@ -229,7 +229,6 @@ class InAppBrowser {
   Future<void> show() async {
     this.throwIfNotOpened();
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('id', () => id);
     await _channel.invokeMethod('show', args);
   }
 

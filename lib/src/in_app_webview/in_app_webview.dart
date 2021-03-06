@@ -354,10 +354,12 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   Widget build(BuildContext context) {
     if (defaultTargetPlatform == TargetPlatform.android) {
-      var useHybridComposition = widget.initialOptions?.android.useHybridComposition ?? false;
+      var useHybridComposition =
+          widget.initialOptions?.android.useHybridComposition ?? false;
 
       if (!useHybridComposition && widget.pullToRefreshController != null) {
-        throw new Exception("To use the pull-to-refresh feature, useHybridComposition Android-specific option MUST be true!");
+        throw new Exception(
+            "To use the pull-to-refresh feature, useHybridComposition Android-specific option MUST be true!");
       }
 
       if (useHybridComposition) {

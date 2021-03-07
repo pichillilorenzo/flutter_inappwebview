@@ -1,3 +1,7 @@
+## 5.1.0+2
+
+- Fixed missing MATCH_PARENT layout params to the WebView on Android when it is wrapped by PullToRefreshLayout
+
 ## 5.1.0+1
 
 - Added a test for the pull-to-refresh feature when used on Android. It requires the `useHybridComposition: true` Android-specific option, otherwise it will throw an exception.

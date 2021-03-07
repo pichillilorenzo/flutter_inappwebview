@@ -6,10 +6,12 @@ import android.os.Build;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
+import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
 import androidx.webkit.WebViewCompat;
@@ -17,11 +19,11 @@ import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
 import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
-import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -79,6 +81,8 @@ public class FlutterWebView implements PlatformView {
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
     if (options.useHybridComposition) {
+      // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
+      webView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       MethodChannel pullToRefreshLayoutChannel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
       PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
       pullToRefreshOptions.parse(pullToRefreshInitialOptions);

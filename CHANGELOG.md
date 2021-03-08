@@ -1,3 +1,7 @@
+## 5.1.0+4
+
+- Fixed "IOS scrolling crash the application" [#707](https://github.com/pichillilorenzo/flutter_inappwebview/issues/707)
+
 ## 5.1.0+3
 
 - Fixed "Unsupported operation: Platform._operatingSystem" when compiling for Web again [#507](https://github.com/pichillilorenzo/flutter_inappwebview/issues/507)

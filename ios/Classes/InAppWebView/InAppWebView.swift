@@ -581,8 +581,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         } else if keyPath == #keyPath(UIScrollView.contentOffset) {
             let newContentOffset = change?[NSKeyValueChangeKey.newKey] as? CGPoint
             let oldContentOffset = change?[NSKeyValueChangeKey.oldKey] as? CGPoint
-            if scrollView.isDragging || scrollView.isDecelerating || newContentOffset != oldContentOffset {
-                onScrollChanged()
+            let startedByUser = scrollView.isDragging || scrollView.isDecelerating
+            if newContentOffset != oldContentOffset {
+                DispatchQueue.main.async {
+                    self.onScrollChanged(startedByUser: startedByUser, oldContentOffset: oldContentOffset)
+                }
             }
         }
         replaceGestureHandlerIfNeeded()
@@ -1982,23 +1985,27 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     /// So, to track the same event, without implementing the scrollViewDidScroll event, we create
     /// an observer that observes the scrollView.contentOffset property.
     /// This way, we don't need to call setNeedsLayout() and all works fine.
-    public func onScrollChanged() {
+    public func onScrollChanged(startedByUser: Bool, oldContentOffset: CGPoint?) {
         let disableVerticalScroll = options?.disableVerticalScroll ?? false
         let disableHorizontalScroll = options?.disableHorizontalScroll ?? false
-        if disableVerticalScroll && disableHorizontalScroll {
-            scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY);
-        }
-        else if disableVerticalScroll {
-            if (scrollView.contentOffset.y >= 0 || scrollView.contentOffset.y < 0) {
-                scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: lastScrollY);
+        if startedByUser {
+            if disableVerticalScroll && disableHorizontalScroll {
+                scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY);
+            }
+            else if disableVerticalScroll {
+                if (scrollView.contentOffset.y >= 0 || scrollView.contentOffset.y < 0) {
+                    scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: lastScrollY);
+                }
+            }
+            else if disableHorizontalScroll {
+                if (scrollView.contentOffset.x >= 0 || scrollView.contentOffset.x < 0) {
+                    scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y);
+                }
             }
         }
-        else if disableHorizontalScroll {
-            if (scrollView.contentOffset.x >= 0 || scrollView.contentOffset.x < 0) {
-                scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y);
-            }
-        }
-        if navigationDelegate != nil && !(disableVerticalScroll && disableHorizontalScroll) {
+        if (!disableVerticalScroll && !disableHorizontalScroll) ||
+            (disableVerticalScroll && scrollView.contentOffset.x != oldContentOffset?.x) ||
+            (disableHorizontalScroll && scrollView.contentOffset.y != oldContentOffset?.y) {
             let x = Int(scrollView.contentOffset.x / scrollView.contentScaleFactor)
             let y = Int(scrollView.contentOffset.y / scrollView.contentScaleFactor)
             onScrollChanged(x: x, y: y)

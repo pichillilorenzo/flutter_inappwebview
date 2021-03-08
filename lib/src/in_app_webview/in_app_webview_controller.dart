@@ -1908,7 +1908,7 @@ class InAppWebViewController {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript
   Future<void> addUserScript({required UserScript userScript}) async {
-    assert(_webview?.windowId == null || !Platform.isIOS);
+    assert(_webview?.windowId == null || defaultTargetPlatform != TargetPlatform.iOS);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('userScript', () => userScript.toMap());
@@ -1924,7 +1924,7 @@ class InAppWebViewController {
   ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
   ///This is a limitation of the native iOS WebKit APIs.
   Future<void> addUserScripts({required List<UserScript> userScripts}) async {
-    assert(_webview?.windowId == null || !Platform.isIOS);
+    assert(_webview?.windowId == null || defaultTargetPlatform != TargetPlatform.iOS);
 
     for (var i = 0; i < userScripts.length; i++) {
       await addUserScript(userScript: userScripts[i]);
@@ -1939,7 +1939,7 @@ class InAppWebViewController {
   ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
   ///This is a limitation of the native iOS WebKit APIs.
   Future<bool> removeUserScript({required UserScript userScript}) async {
-    assert(_webview?.windowId == null || !Platform.isIOS);
+    assert(_webview?.windowId == null || defaultTargetPlatform != TargetPlatform.iOS);
 
     var index = _userScripts.indexOf(userScript);
     if (index == -1) {
@@ -1962,7 +1962,7 @@ class InAppWebViewController {
   ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
   ///This is a limitation of the native iOS WebKit APIs.
   Future<void> removeUserScriptsByGroupName({required String groupName}) async {
-    assert(_webview?.windowId == null || !Platform.isIOS);
+    assert(_webview?.windowId == null || defaultTargetPlatform != TargetPlatform.iOS);
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('groupName', () => groupName);
@@ -1977,7 +1977,7 @@ class InAppWebViewController {
   ///This is a limitation of the native iOS WebKit APIs.
   Future<void> removeUserScripts(
       {required List<UserScript> userScripts}) async {
-    assert(_webview?.windowId == null || !Platform.isIOS);
+    assert(_webview?.windowId == null || defaultTargetPlatform != TargetPlatform.iOS);
 
     for (var i = 0; i < userScripts.length; i++) {
       await removeUserScript(userScript: userScripts[i]);
@@ -1992,7 +1992,7 @@ class InAppWebViewController {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts
   Future<void> removeAllUserScripts() async {
-    assert(_webview?.windowId == null || !Platform.isIOS);
+    assert(_webview?.windowId == null || defaultTargetPlatform != TargetPlatform.iOS);
 
     _userScripts.clear();
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2059,9 +2059,9 @@ class InAppWebViewController {
   Future<String?> saveWebArchive(
       {required String filePath, bool autoname = false}) async {
     if (!autoname) {
-      if (Platform.isAndroid) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
         assert(filePath.endsWith("." + WebArchiveFormat.MHT.toValue()));
-      } else if (Platform.isIOS) {
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toValue()));
       }
     }

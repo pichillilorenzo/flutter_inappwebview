@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
@@ -70,7 +71,7 @@ class CookieManager {
     assert(domain.isNotEmpty);
     assert(path.isNotEmpty);
 
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       var platformUtil = PlatformUtil();
       var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
@@ -166,7 +167,7 @@ class CookieManager {
       InAppWebViewController? iosBelow11WebViewController}) async {
     assert(url.toString().isNotEmpty);
 
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       var platformUtil = PlatformUtil();
       var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
@@ -265,7 +266,7 @@ class CookieManager {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       var platformUtil = PlatformUtil();
       var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
@@ -321,7 +322,7 @@ class CookieManager {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       var platformUtil = PlatformUtil();
       var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {
@@ -365,7 +366,7 @@ class CookieManager {
 
     assert(url.toString().isNotEmpty);
 
-    if (Platform.isIOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
       var platformUtil = PlatformUtil();
       var version = double.tryParse(await platformUtil.getSystemVersion());
       if (version != null && version < 11.0) {

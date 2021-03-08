@@ -1,3 +1,7 @@
+## 5.1.0+3
+
+- Fixed "Unsupported operation: Platform._operatingSystem" when compiling for Web again [#507](https://github.com/pichillilorenzo/flutter_inappwebview/issues/507)
+
 ## 5.1.0+2
 
 - Fixed missing MATCH_PARENT layout params to the WebView on Android when it is wrapped by PullToRefreshLayout

@@ -474,6 +474,57 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(false)
                 }
                 break
+            case "createWebMessageChannel":
+                if let webView = webView {
+                    let _ = webView.createWebMessageChannel { (webMessageChannel) in
+                        result(webMessageChannel.toMap())
+                    }
+                } else {
+                    result(nil)
+                }
+                break
+            case "postWebMessage":
+                if let webView = webView {
+                    let message = arguments!["message"] as! [String: Any?]
+                    let targetOrigin = arguments!["targetOrigin"] as! String
+                    
+                    var ports: [WebMessagePort] = []
+                    let portsMap = message["ports"] as? [[String: Any?]]
+                    if let portsMap = portsMap {
+                        for portMap in portsMap {
+                            let webMessageChannelId = portMap["webMessageChannelId"] as! String
+                            let index = portMap["index"] as! Int
+                            if let webMessageChannel = webView.webMessageChannels[webMessageChannelId] {
+                                ports.append(webMessageChannel.ports[index])
+                            }
+                        }
+                    }
+                    let webMessage = WebMessage(data: message["data"] as? String, ports: ports)
+                    do {
+                        try webView.postWebMessage(message: webMessage, targetOrigin: targetOrigin) { (_) in
+                            result(true)
+                        }
+                    } catch let error as NSError {
+                        result(FlutterError(code: "InAppWebViewMethodHandler", message: error.domain, details: nil))
+                    }
+                } else {
+                    result(false)
+                }
+                break
+            case "addWebMessageListener":
+                if let webView = webView {
+                    let webMessageListenerMap = arguments!["webMessageListener"] as! [String: Any?]
+                    let webMessageListener = WebMessageListener.fromMap(map: webMessageListenerMap)!
+                    do {
+                        try webView.addWebMessageListener(webMessageListener: webMessageListener)
+                        result(false)
+                    } catch let error as NSError {
+                        result(FlutterError(code: "InAppWebViewMethodHandler", message: error.domain, details: nil))
+                    }
+                } else {
+                    result(false)
+                }
+            break
             default:
                 result(FlutterMethodNotImplemented)
                 break

@@ -18,6 +18,8 @@ import '../types.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../web_storage/web_storage.dart';
 import '../util.dart';
+import '../web_message/web_message_channel.dart';
+import '../web_message/web_message_listener.dart';
 
 import 'headless_in_app_webview.dart';
 import 'in_app_webview.dart';
@@ -51,6 +53,7 @@ class InAppWebViewController {
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
   List<UserScript> _userScripts = [];
+  Set<String> _webMessageListenerObjNames = Set();
 
   // ignore: unused_field
   dynamic _id;
@@ -1455,7 +1458,7 @@ class InAppWebViewController {
   void addJavaScriptHandler(
       {required String handlerName,
       required JavaScriptHandlerCallback callback}) {
-    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName));
+    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName), '"$handlerName" is a forbidden name!');
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
 
@@ -1467,7 +1470,7 @@ class InAppWebViewController {
     return this.javaScriptHandlersMap.remove(handlerName);
   }
 
-  ///Takes a screenshot (in PNG format) of the WebView's visible viewport and returns a [Uint8List]. Returns `null` if it wasn't be able to take it.
+  ///Takes a screenshot of the WebView's visible viewport and returns a [Uint8List]. Returns `null` if it wasn't be able to take it.
   ///
   ///[screenshotConfiguration] represents the configuration data to use when generating an image from a web view’s contents.
   ///
@@ -2085,6 +2088,32 @@ class InAppWebViewController {
   Future<bool> isSecureContext() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('isSecureContext', args);
+  }
+
+  Future<WebMessageChannel?> createWebMessageChannel() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    Map<String, dynamic>? result = (await _channel.invokeMethod('createWebMessageChannel', args))
+        ?.cast<String, dynamic>();
+    return WebMessageChannel.fromMap(result);
+  }
+
+  Future<void> postWebMessage({required WebMessage message, Uri? targetOrigin}) async {
+    if (targetOrigin == null) {
+      targetOrigin = Uri.parse("");
+    }
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('message', () => message.toMap());
+    args.putIfAbsent('targetOrigin', () => targetOrigin.toString());
+    await _channel.invokeMethod('postWebMessage', args);
+  }
+
+  Future<void> addWebMessageListener(WebMessageListener webMessageListener) async {
+    assert(!_webMessageListenerObjNames.contains(webMessageListener.jsObjectName), "jsObjectName ${webMessageListener.jsObjectName} was already added.");
+    _webMessageListenerObjNames.add(webMessageListener.jsObjectName);
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('webMessageListener', () => webMessageListener.toMap());
+    await _channel.invokeMethod('addWebMessageListener', args);
   }
 
   ///Gets the default user agent.

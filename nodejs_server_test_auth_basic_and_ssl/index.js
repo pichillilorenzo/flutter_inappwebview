@@ -10,10 +10,10 @@ const appAuthBasic = express()
 const fs = require('fs')
 const path = require('path')
 
-var options = { 
-  key: fs.readFileSync('server-key.pem'), 
-  cert: fs.readFileSync('server-crt.pem'), 
-  ca: fs.readFileSync('ca-crt.pem'), 
+var options = {
+  key: fs.readFileSync('server-key.pem'),
+  cert: fs.readFileSync('server-crt.pem'),
+  ca: fs.readFileSync('ca-crt.pem'),
   requestCert: true,
   rejectUnauthorized: false
 };

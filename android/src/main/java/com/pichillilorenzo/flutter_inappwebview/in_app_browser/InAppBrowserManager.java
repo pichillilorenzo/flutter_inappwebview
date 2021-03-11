@@ -32,6 +32,8 @@ import android.os.Bundle;
 import android.webkit.MimeTypeMap;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
+
 import com.pichillilorenzo.flutter_inappwebview.Shared;
 
 import java.io.Serializable;
@@ -58,7 +60,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
   }
 
   @Override
-  public void onMethodCall(final MethodCall call, final Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     final Activity activity = Shared.activity;
 
     switch (call.method) {

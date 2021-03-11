@@ -45,7 +45,7 @@ class ChromeSafariBrowser {
       const MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser');
 
   ChromeSafariBrowser() {
-    id = ViewIdGenerator.generateId();
+    id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
     this._channel.setMethodCallHandler(handleMethod);

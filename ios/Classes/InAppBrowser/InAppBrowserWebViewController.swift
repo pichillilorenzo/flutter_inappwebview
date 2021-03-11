@@ -75,6 +75,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         pullToRefreshControl.prepare()
         
         prepareWebView()
+        webView.windowCreated = true
         
         progressBar = UIProgressView(progressViewStyle: .bar)
         

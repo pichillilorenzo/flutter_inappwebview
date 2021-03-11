@@ -91,7 +91,7 @@ class HeadlessInAppWebView implements WebView {
       this.contextMenu,
       this.initialUserScripts,
       this.pullToRefreshController}) {
-    id = ViewIdGenerator.generateId();
+    id = IdGenerator.generate();
     webViewController = new InAppWebViewController(id, this);
   }
 

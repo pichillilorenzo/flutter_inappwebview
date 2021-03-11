@@ -1,10 +1,14 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
+import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
+import androidx.webkit.WebMessageCompat;
+import androidx.webkit.WebMessagePortCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -16,9 +20,13 @@ import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.types.SslCertificateExt;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageChannel;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageListener;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -503,6 +511,56 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           });
         } else {
           result.success(false);
+        }
+        break;
+      case "createWebMessageChannel":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
+          result.success(webView.createCompatWebMessageChannel().toMap());
+        } else {
+          result.success(null);
+        }
+        break;
+      case "postWebMessage":
+        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
+                WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
+          Map<String, Object> message = (Map<String, Object>) call.argument("message");
+          String targetOrigin = (String) call.argument("targetOrigin");
+          List<WebMessagePortCompat> ports = new ArrayList<>();
+          List<Map<String, Object>> portsMap = (List<Map<String, Object>>) message.get("ports");
+          if (portsMap != null) {
+            for (Map<String, Object> portMap : portsMap) {
+              String webMessageChannelId = (String) portMap.get("webMessageChannelId");
+              Integer index = (Integer) portMap.get("index");
+              WebMessageChannel webMessageChannel = webView.webMessageChannels.get(webMessageChannelId);
+              if (webMessageChannel != null) {
+                ports.add(webMessageChannel.ports.get(index));
+              }
+            }
+          }
+          WebMessageCompat webMessage = new WebMessageCompat((String) message.get("data"), ports.toArray(new WebMessagePortCompat[0]));
+          try {
+            WebViewCompat.postWebMessage(webView, webMessage, Uri.parse(targetOrigin));
+            result.success(true);
+          } catch (Exception e) {
+            result.error(LOG_TAG, e.getMessage(), null);
+          }
+        } else {
+          result.success(true);
+        }
+        break;
+      case "addWebMessageListener":
+        if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+          Map<String, Object> webMessageListenerMap = (Map<String, Object>) call.argument("webMessageListener");
+          WebMessageListener webMessageListener = WebMessageListener.fromMap(webMessageListenerMap);
+          try {
+            webView.addWebMessageListener(webMessageListener);
+            result.success(true);
+          } catch (Exception e) {
+            result.error(LOG_TAG, e.getMessage(), null);
+          }
+        } else {
+          result.success(true);
         }
         break;
       default:

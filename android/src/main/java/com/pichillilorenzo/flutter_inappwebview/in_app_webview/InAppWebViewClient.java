@@ -190,7 +190,7 @@ public class InAppWebViewClient extends WebViewClient {
   public void onPageStarted(WebView view, String url, Bitmap favicon) {
     final InAppWebView webView = (InAppWebView) view;
     webView.isLoading = true;
-
+    webView.disposeWebMessageChannels();
     webView.userContentController.resetContentWorlds();
     loadCustomJavaScriptOnPageStarted(webView);
 

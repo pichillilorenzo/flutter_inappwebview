@@ -176,7 +176,7 @@ class AndroidInAppWebViewController {
   ///has loaded WebView will be killed.
   ///The next time the app starts and loads WebView it will use the new WebView package instead.
   ///
-  ///**NOTE**: available only on Android 26+.
+  ///**NOTE**: available only on Android 21+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getCurrentWebViewPackage(android.content.Context)
   static Future<AndroidWebViewPackageInfo?> getCurrentWebViewPackage() async {

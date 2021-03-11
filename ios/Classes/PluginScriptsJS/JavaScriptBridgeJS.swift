@@ -20,6 +20,7 @@ let JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT = PluginScript(
 
 let JAVASCRIPT_BRIDGE_JS_SOURCE = """
 window.\(JAVASCRIPT_BRIDGE_NAME) = {};
+\(WEB_MESSAGE_CHANNELS_VARIABLE_NAME) = {};
 window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
     var _windowId = \(WINDOW_ID_VARIABLE_JS_SOURCE);
     var _callHandlerID = setTimeout(function(){});
@@ -28,6 +29,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME).callHandler = function() {
         window.\(JAVASCRIPT_BRIDGE_NAME)[_callHandlerID] = resolve;
     });
 };
+\(WEB_MESSAGE_LISTENER_JS_SOURCE)
 """
 
 let PLATFORM_READY_JS_SOURCE = "window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));";

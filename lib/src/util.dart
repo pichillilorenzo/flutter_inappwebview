@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 
-class ViewIdGenerator {
+class IdGenerator {
   static int _count = 0;
 
   /// Math.Random()-based RNG. All platforms, fast, not cryptographically strong. Optional Seed passable.
@@ -31,7 +31,7 @@ class ViewIdGenerator {
     return b;
   }
 
-  static String generateId() {
+  static String generate() {
     _count++;
     return _count.toString() + cryptoRNG().map((e) => e.toString()).join('');
   }

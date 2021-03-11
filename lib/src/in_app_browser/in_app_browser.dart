@@ -66,7 +66,7 @@ class InAppBrowser {
 
   ///
   InAppBrowser({this.windowId, this.initialUserScripts}) {
-    id = ViewIdGenerator.generateId();
+    id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
     this._channel.setMethodCallHandler(handleMethod);

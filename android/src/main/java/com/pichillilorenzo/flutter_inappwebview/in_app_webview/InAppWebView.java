@@ -9,7 +9,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.graphics.drawable.Drawable;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,30 +41,28 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
+import android.webkit.WebView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
-import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
-import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
-import com.pichillilorenzo.flutter_inappwebview.types.UserContentController;
+import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
+import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerAction;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerHandler;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerTrigger;
-import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
-import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
-import com.pichillilorenzo.flutter_inappwebview.R;
-import com.pichillilorenzo.flutter_inappwebview.Shared;
-import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
-import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
-import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.ConsoleLogJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.InterceptAjaxRequestJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.InterceptFetchRequestJS;
@@ -75,19 +73,25 @@ import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.OnWindowFocusE
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PluginScriptsUtil;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PrintJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PromisePolyfillJS;
+import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
+import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
+import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
+import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
+import com.pichillilorenzo.flutter_inappwebview.types.UserContentController;
+import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageChannel;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessageListener;
 
 import org.json.JSONObject;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -139,6 +143,8 @@ final public class InAppWebView extends InputAwareWebView {
 
   public Map<String, ValueCallback<String>> callAsyncJavaScriptCallbacks = new HashMap<>();
   public Map<String, ValueCallback<String>> evaluateJavaScriptContentWorldCallbacks = new HashMap<>();
+
+  public Map<String, WebMessageChannel> webMessageChannels = new HashMap<>();
 
   public InAppWebView(Context context) {
     super(context);
@@ -1587,6 +1593,30 @@ final public class InAppWebView extends InputAwareWebView {
     });
   }
 
+  @TargetApi(Build.VERSION_CODES.M)
+  public WebMessageChannel createCompatWebMessageChannel() {
+    String id = UUID.randomUUID().toString();
+    WebMessageChannel webMessageChannel = new WebMessageChannel(id, this);
+    webMessageChannels.put(id, webMessageChannel);
+    return webMessageChannel;
+  }
+
+  public void addWebMessageListener(@NonNull WebMessageListener webMessageListener) {
+    WebViewCompat.addWebMessageListener(this, webMessageListener.jsObjectName, webMessageListener.allowedOriginRules, webMessageListener.listener);
+  }
+
+  public void disposeWebMessageChannels() {
+    for (WebMessageChannel webMessageChannel : webMessageChannels.values()) {
+      webMessageChannel.dispose();
+    }
+    webMessageChannels.clear();
+  }
+
+//  @Override
+//  protected void onWindowVisibilityChanged(int visibility) {
+//    if (visibility != View.GONE) super.onWindowVisibilityChanged(View.VISIBLE);
+//  }
+
   @Override
   public void dispose() {
     if (windowId != null) {
@@ -1594,6 +1624,7 @@ final public class InAppWebView extends InputAwareWebView {
     }
     headlessHandler.removeCallbacksAndMessages(null);
     mHandler.removeCallbacksAndMessages(null);
+    disposeWebMessageChannels();
     removeAllViews();
     if (checkContextMenuShouldBeClosedTask != null)
       removeCallbacks(checkContextMenuShouldBeClosedTask);

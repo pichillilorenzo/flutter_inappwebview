@@ -15,3 +15,4 @@ export 'content_blocker.dart';
 export 'http_auth_credentials_database.dart';
 export 'context_menu.dart';
 export 'pull_to_refresh/main.dart';
+export 'web_message/main.dart';

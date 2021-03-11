@@ -12,10 +12,13 @@ import WebKit
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate, PullToRefreshDelegate {
 
     var windowId: Int64?
+    var windowCreated = false
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channel: FlutterMethodChannel?
     var options: InAppWebViewOptions?
     var pullToRefreshControl: PullToRefreshControl?
+    var webMessageChannels: [String:WebMessageChannel] = [:]
+    var webMessageListeners: [WebMessageListener] = []
     
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
     static var credentialsProposed: [URLCredential] = []
@@ -450,6 +453,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
         configuration.userContentController.add(self, name: "onCallAsyncJavaScriptResultBelowIOS14Received")
+        configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessagePortMessageReceived")
+        configuration.userContentController.add(self, name: "onWebMessagePortMessageReceived")
+        configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessageListenerPostMessageReceived")
+        configuration.userContentController.add(self, name: "onWebMessageListenerPostMessageReceived")
         configuration.userContentController.addUserOnlyScripts(initialUserScripts)
         configuration.userContentController.sync(scriptMessageHandler: self)
     }
@@ -1418,6 +1425,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                  decidePolicyFor navigationAction: WKNavigationAction,
                  decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
         
+        if windowId != nil, !windowCreated {
+            decisionHandler(.cancel)
+            return
+        }
+        
         if navigationAction.request.url != nil {
             
             if let useShouldOverrideUrlLoading = options?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading {
@@ -1513,6 +1525,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        disposeWebMessageChannels()
         initializeWindowIdJS()
         
         if #available(iOS 14.0, *) {
@@ -1561,6 +1574,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func webView(_ webView: WKWebView, didReceive challenge: URLAuthenticationChallenge, completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void) {
         
+        if windowId != nil, !windowCreated {
+            completionHandler(.cancelAuthenticationChallenge, nil)
+            return
+        }
+        
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
@@ -1573,6 +1591,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             onReceivedHttpAuthRequest(challenge: challenge, result: {(result) -> Void in
                 if result is FlutterError {
                     print((result as! FlutterError).message ?? "")
+                    completionHandler(.performDefaultHandling, nil)
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {
                     completionHandler(.performDefaultHandling, nil)
@@ -1642,6 +1661,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             onReceivedServerTrustAuthRequest(challenge: challenge, result: {(result) -> Void in
                 if result is FlutterError {
                     print((result as! FlutterError).message ?? "")
+                    completionHandler(.performDefaultHandling, nil)
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {
                     completionHandler(.performDefaultHandling, nil)
@@ -1677,6 +1697,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             onReceivedClientCertRequest(challenge: challenge, result: {(result) -> Void in
                 if result is FlutterError {
                     print((result as! FlutterError).message ?? "")
+                    completionHandler(.performDefaultHandling, nil)
                 }
                 else if (result as? NSObject) == FlutterMethodNotImplemented {
                     completionHandler(.performDefaultHandling, nil)
@@ -1801,6 +1822,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         onJsAlert(frame: frame, message: message, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message ?? "")
+                completionHandler()
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createAlertDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, completionHandler: completionHandler)
@@ -1862,6 +1884,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         onJsConfirm(frame: frame, message: message, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message ?? "")
+                completionHandler(false)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createConfirmDialog(message: message, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, completionHandler: completionHandler)
@@ -1937,6 +1960,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         onJsPrompt(frame: frame, message: message, defaultValue: defaultValue, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message ?? "")
+                completionHandler(nil)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: nil, confirmButtonTitle: nil, cancelButtonTitle: nil, value: nil, completionHandler: completionHandler)
@@ -2068,9 +2092,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func webView(_ webView: WKWebView,
                         authenticationChallenge challenge: URLAuthenticationChallenge,
                         shouldAllowDeprecatedTLS decisionHandler: @escaping (Bool) -> Void) {
+        if windowId != nil, !windowCreated {
+            decisionHandler(false)
+            return
+        }
+        
         shouldAllowDeprecatedTLS(challenge: challenge, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message ?? "")
+                decisionHandler(false)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
                 decisionHandler(false)
@@ -2511,6 +2541,45 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 ])
                 callAsyncJavaScriptBelowIOS14Results.removeValue(forKey: resultUuid)
             }
+        } else if message.name == "onWebMessagePortMessageReceived" {
+            let body = message.body as! [String: Any?]
+            let webMessageChannelId = body["webMessageChannelId"] as! String
+            let index = body["index"] as! Int64
+            let webMessage = body["message"] as? String
+            if let webMessageChannel = webMessageChannels[webMessageChannelId] {
+                webMessageChannel.onMessage(index: index, message: webMessage)
+            }
+        } else if message.name == "onWebMessageListenerPostMessageReceived" {
+            let body = message.body as! [String: Any?]
+            let jsObjectName = body["jsObjectName"] as! String
+            let messageData = body["message"] as? String
+            if let webMessageListener = webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
+                let isMainFrame = message.frameInfo.isMainFrame
+                
+                var scheme: String? = nil
+                var host: String? = nil
+                var port: Int? = nil
+                if #available(iOS 9.0, *) {
+                    let sourceOrigin = message.frameInfo.securityOrigin
+                    scheme = sourceOrigin.protocol
+                    host = sourceOrigin.host
+                    port = sourceOrigin.port
+                } else if let url = message.frameInfo.request.url {
+                    scheme = url.scheme
+                    host = url.host
+                    port = url.port
+                }
+                
+                if !webMessageListener.isOriginAllowed(scheme: scheme, host: host, port: port) {
+                    return
+                }
+                
+                var sourceOrigin: URL? = nil
+                if let scheme = scheme, !scheme.isEmpty, let host = host, !host.isEmpty {
+                    sourceOrigin = URL(string: "\(scheme)://\(host)\(port != nil && port != 0 ? ":" + String(port!) : "")")
+                }
+                webMessageListener.onPostMessage(message: messageData, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
+            }
         }
     }
     
@@ -2685,15 +2754,74 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
+    public func createWebMessageChannel(completionHandler: ((WebMessageChannel) -> Void)? = nil) -> WebMessageChannel {
+        let id = NSUUID().uuidString
+        let webMessageChannel = WebMessageChannel(id: id)
+        webMessageChannel.initJsInstance(webView: self, completionHandler: completionHandler)
+        webMessageChannels[id] = webMessageChannel
+        
+        return webMessageChannel
+    }
+    
+    public func postWebMessage(message: WebMessage, targetOrigin: String, completionHandler: ((Any?) -> Void)? = nil) throws {
+        var portsString = "null"
+        if let ports = message.ports {
+            var portArrayString: [String] = []
+            for port in ports {
+                if port.isStarted {
+                    throw NSError(domain: "Port is already started", code: 0)
+                }
+                if port.isClosed || port.isTransferred {
+                    throw NSError(domain: "Port is already closed or transferred", code: 0)
+                }
+                port.isTransferred = true
+                portArrayString.append("\(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)['\(port.webMessageChannel!.id)'].\(port.name)")
+            }
+            portsString = "[" + portArrayString.joined(separator: ", ") + "]"
+        }
+        let data = message.data?.replacingOccurrences(of: "\'", with: "\\'") ?? "null"
+        let url = URL(string: targetOrigin)?.absoluteString ?? "*"
+        let source = """
+        (function() {
+            window.postMessage('\(data)', '\(url)', \(portsString));
+        })();
+        """
+        evaluateJavascript(source: source, completionHandler: completionHandler)
+        message.dispose()
+    }
+    
+    public func addWebMessageListener(webMessageListener: WebMessageListener) throws {
+        if webMessageListeners.map({ ($0.jsObjectName) }).contains(webMessageListener.jsObjectName) {
+            throw NSError(domain: "jsObjectName \(webMessageListener.jsObjectName) was already added.", code: 0)
+        }
+        try webMessageListener.assertOriginRulesValid()
+        webMessageListener.initJsInstance(webView: self)
+        webMessageListeners.append(webMessageListener)
+    }
+    
+    public func disposeWebMessageChannels() {
+        for webMessageChannel in webMessageChannels.values {
+            webMessageChannel.dispose()
+        }
+        webMessageChannels.removeAll()
+    }
+    
     public func dispose() {
         if isPausedTimers, let completionHandler = isPausedTimersCompletionHandler {
             isPausedTimersCompletionHandler = nil
             completionHandler()
         }
         stopLoading()
+        disposeWebMessageChannels()
+        for webMessageListener in webMessageListeners {
+            webMessageListener.dispose()
+        }
+        webMessageListeners.removeAll()
         if windowId == nil {
             configuration.userContentController.removeAllPluginScriptMessageHandlers()
             configuration.userContentController.removeScriptMessageHandler(forName: "onCallAsyncJavaScriptResultBelowIOS14Received")
+            configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessagePortMessageReceived")
+            configuration.userContentController.removeScriptMessageHandler(forName: "onWebMessageListenerPostMessageReceived")
             configuration.userContentController.removeAllUserScripts()
             if #available(iOS 11.0, *) {
                 configuration.userContentController.removeAllContentRuleLists()

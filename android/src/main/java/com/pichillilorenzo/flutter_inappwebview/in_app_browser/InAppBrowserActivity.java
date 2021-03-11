@@ -65,11 +65,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
-    if (savedInstanceState != null) {
-      return;
-    }
-
     Bundle b = getIntent().getExtras();
+    assert b != null;
     id = b.getString("id");
     windowId = b.getInt("windowId");
 
@@ -77,7 +74,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     setContentView(R.layout.activity_web_view);
 
-    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>)  b.getSerializable("pullToRefreshInitialOptions");
+    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) b.getSerializable("pullToRefreshInitialOptions");
     MethodChannel pullToRefreshLayoutChannel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
     PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
     pullToRefreshOptions.parse(pullToRefreshInitialOptions);

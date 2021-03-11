@@ -1,6 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
@@ -9,6 +10,7 @@ import android.webkit.WebView;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -66,8 +68,20 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
         break;
       case "getCurrentWebViewPackage":
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          result.success(
-                  convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(Shared.activity)));
+          result.success(convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(Shared.activity)));
+        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          //with Android Lollipop (API 21) they started to update the WebView
+          //as a separate APK with the PlayStore and they added the
+          //getLoadedPackageInfo() method to the WebViewFactory class and this
+          //should handle the Android 7.0 behaviour changes too
+          try {
+            Class webViewFactory = Class.forName("android.webkit.WebViewFactory");
+            Method method = webViewFactory.getMethod("getLoadedPackageInfo");
+            PackageInfo pInfo = (PackageInfo) method.invoke(null);
+            result.success(convertWebViewPackageToMap(pInfo));
+          } catch (Exception e) {
+            result.success(null);
+          }
         } else {
           result.success(null);
         }

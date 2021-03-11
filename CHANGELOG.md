@@ -1,3 +1,12 @@
+## 5.2.0
+
+- Added `WebMessageChannel` and `WebMessageListener` features
+- `AndroidInAppWebViewController.getCurrentWebViewPackage` is available now starting from Android API 21+.
+- Updated Android Gradle distributionUrl version to `5.6.4`
+- Attempt to fix "InAppBrowserActivity.onCreate NullPointerException - Attempt to invoke virtual method 'java.lang.String android.os.Bundle.getString(java.lang.String)' on a null object reference" [#665](https://github.com/pichillilorenzo/flutter_inappwebview/issues/665)
+- Fixed "[iOS] Application crashes when processing onCreateWindow" [#579](https://github.com/pichillilorenzo/flutter_inappwebview/issues/579)
+- Fixed wrong mapping of `NavigationAction` class on Android for `androidHasGesture` and `androidIsRedirect` properties
+
 ## 5.1.0+4
 
 - Fixed "IOS scrolling crash the application" [#707](https://github.com/pichillilorenzo/flutter_inappwebview/issues/707)

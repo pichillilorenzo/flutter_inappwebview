@@ -6147,8 +6147,10 @@ class IOSURLResponse {
   ///The name of the text encoding provided by the response’s originating source.
   String? textEncodingName;
 
+  ///All HTTP header fields of the response.
   Map<String, String>? headers;
 
+  ///The response’s HTTP status code.
   int? statusCode;
 
   IOSURLResponse(

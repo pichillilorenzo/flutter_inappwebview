@@ -2116,6 +2116,16 @@ class InAppWebViewController {
     await _channel.invokeMethod('addWebMessageListener', args);
   }
 
+  Future<bool> canScrollVertically() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('canScrollVertically', args);
+  }
+
+  Future<bool> canScrollHorizontally() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('canScrollHorizontally', args);
+  }
+
   ///Gets the default user agent.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)

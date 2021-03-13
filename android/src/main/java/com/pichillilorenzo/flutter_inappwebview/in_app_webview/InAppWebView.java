@@ -9,7 +9,6 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Point;
 import android.graphics.drawable.ColorDrawable;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
@@ -30,6 +29,7 @@ import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.ViewParent;
 import android.view.ViewTreeObserver;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputConnection;
@@ -41,7 +41,6 @@ import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
-import android.webkit.WebView;
 import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -49,8 +48,6 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
-import androidx.webkit.JavaScriptReplyProxy;
-import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -73,6 +70,7 @@ import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.OnWindowFocusE
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PluginScriptsUtil;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PrintJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PromisePolyfillJS;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
@@ -87,7 +85,6 @@ import org.json.JSONObject;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -476,6 +473,22 @@ final public class InAppWebView extends InputAwareWebView {
         obj.put("extra", hitTestResult.getExtra());
         channel.invokeMethod("onLongPressHitTestResult", obj);
         return false;
+      }
+    });
+
+    getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
+      @Override
+      public void onGlobalLayout() {
+        final boolean canScrollVertical = canScrollVertically();
+        ViewParent parent = getParent();
+        if (parent instanceof PullToRefreshLayout) {
+          PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) parent;
+          if (!canScrollVertical) {
+            pullToRefreshLayout.setEnabled(false);
+          } else {
+            pullToRefreshLayout.setEnabled(pullToRefreshLayout.options.enabled);
+          }
+        }
       }
     });
   }
@@ -1242,6 +1255,11 @@ final public class InAppWebView extends InputAwareWebView {
     return super.onTouchEvent(ev);
   }
 
+//  @Override
+//  protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+//    super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+//  }
+
   @Override
   public boolean dispatchTouchEvent(MotionEvent event) {
     return super.dispatchTouchEvent(event);
@@ -1591,6 +1609,14 @@ final public class InAppWebView extends InputAwareWebView {
         resultCallback.onReceiveValue(true);
       }
     });
+  }
+  
+  public boolean canScrollVertically() {
+    return computeVerticalScrollRange() > computeVerticalScrollExtent();
+  }
+
+  public boolean canScrollHorizontally() {
+    return computeHorizontalScrollRange() > computeHorizontalScrollExtent();
   }
 
   @TargetApi(Build.VERSION_CODES.M)

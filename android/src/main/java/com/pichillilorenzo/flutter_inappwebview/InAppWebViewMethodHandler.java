@@ -563,6 +563,20 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           result.success(true);
         }
         break;
+      case "canScrollVertically":
+        if (webView != null) {
+          result.success(webView.canScrollVertically());
+        } else {
+          result.success(false);
+        }
+        break;
+      case "canScrollHorizontally":
+        if (webView != null) {
+          result.success(webView.canScrollHorizontally());
+        } else {
+          result.success(false);
+        }
+        break;
       default:
         result.notImplemented();
     }

@@ -1542,6 +1542,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         InAppWebView.credentialsProposed = []
         evaluateJavaScript(PLATFORM_READY_JS_SOURCE, completionHandler: nil)
+        
+        // sometimes scrollView.contentSize doesn't fit all the frame.size available
+        // so, we call setNeedsLayout to redraw the layout
+        let webViewFrameSize = frame.size
+        let scrollViewSize = scrollView.contentSize
+        if (scrollViewSize.width < webViewFrameSize.width || scrollViewSize.height < webViewFrameSize.height) {
+            setNeedsLayout()
+        }
 
         onLoadStop(url: url?.absoluteString)
         
@@ -2735,6 +2743,14 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             }
             completionHandler(false)
         }
+    }
+    
+    public func canScrollVertically() -> Bool {
+        return scrollView.contentSize.height > self.frame.height
+    }
+    
+    public func canScrollHorizontally() -> Bool {
+        return scrollView.contentSize.width > self.frame.width
     }
     
     public func enablePullToRefresh() {

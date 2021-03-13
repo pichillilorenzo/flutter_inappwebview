@@ -101,12 +101,12 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._isOriginAllowed = function(allowedOriginRules,
             (rule.host[0] === "*" && host != null && host.indexOf(rule.host.split("*")[1]) >= 0) ||
             (hostIPv6 != null && IPv6 != null && hostIPv6 === IPv6);
 
-        var portAllowed = rulePort === currentPort
+        var portAllowed = rulePort === currentPort;
 
         if (schemeAllowed && hostAllowed && portAllowed) {
             return true;
         }
     }
-    return false
+    return false;
 }
 """

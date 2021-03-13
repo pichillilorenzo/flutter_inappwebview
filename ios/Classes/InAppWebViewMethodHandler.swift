@@ -524,7 +524,21 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 } else {
                     result(false)
                 }
-            break
+                break
+            case "canScrollVertically":
+                if let webView = webView {
+                    result(webView.canScrollVertically())
+                } else {
+                    result(false)
+                }
+                break
+            case "canScrollHorizontally":
+                if let webView = webView {
+                    result(webView.canScrollHorizontally())
+                } else {
+                    result(false)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

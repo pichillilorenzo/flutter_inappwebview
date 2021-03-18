@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/services.dart' show rootBundle;
 
@@ -39,7 +40,8 @@ class InAppLocalhostServer {
         this._server = server;
 
         server.listen((HttpRequest request) async {
-          var body = [] as List<int>;
+          Uint8List body = Uint8List(0);
+
           var path = request.requestedUri.path;
           path = (path.startsWith('/')) ? path.substring(1) : path;
           path += (path.endsWith('/')) ? 'index.html' : '';

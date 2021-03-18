@@ -2873,7 +2873,7 @@ class AjaxRequestHeaders {
 ///Class that represents a JavaScript [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 class AjaxRequest {
   ///Data passed as a parameter to the `XMLHttpRequest.send()` method.
-  dynamic data;
+  dynamic? data;
 
   ///The HTTP request method of the `XMLHttpRequest` request.
   String? method;
@@ -3225,7 +3225,7 @@ class FetchRequest {
   Map<String, dynamic>? headers;
 
   ///Body of the request.
-  Uint8List? body;
+  dynamic? body;
 
   ///The mode used by the request.
   String? mode;
@@ -3291,9 +3291,7 @@ class FetchRequest {
         url: map["url"] != null ? Uri.parse(map["url"]) : null,
         method: map["method"],
         headers: map["headers"]?.cast<String, dynamic>(),
-        body: map["body"] != null
-            ? Uint8List.fromList(map["body"].cast<int>())
-            : null,
+        body: map["body"],
         mode: map["mode"],
         credentials: credentials,
         cache: map["cache"],

@@ -9,6 +9,8 @@ const appHttps = express()
 const appAuthBasic = express()
 const fs = require('fs')
 const path = require('path')
+const bodyParser = require('body-parser');
+const multiparty = require('multiparty');
 
 var options = {
   key: fs.readFileSync('server-key.pem'),
@@ -117,14 +119,11 @@ appAuthBasic.get('/test-index', (req, res) => {
 appAuthBasic.listen(8081);
 
 
-
-// Parse URL-encoded bodies (as sent by HTML forms)
-app.use(express.urlencoded());
-
 app.use(cors());
 
+app.use(bodyParser.urlencoded({extended: false}));
 // Parse JSON bodies (as sent by API clients)
-app.use(express.json());
+app.use(bodyParser.json());
 
 app.use(express.static(__dirname + '/public'));
 
@@ -162,14 +161,27 @@ app.post("/test-post", (req, res) => {
 })
 
 app.post("/test-ajax-post", (req, res) => {
-  console.log(JSON.stringify(req.headers))
-  console.log(JSON.stringify(req.body))
-  res.set("Content-Type", "application/json")
-  res.send(JSON.stringify({
-    "firstname": req.body.firstname,
-    "lastname": req.body.lastname,
-  }))
-  res.end()
+  console.log(JSON.stringify(req.headers));
+  if (req.headers["content-type"].indexOf("multipart/form-data;") === 0) {
+    const form = new multiparty.Form();
+    form.parse(req, function(err, fields, files) {
+      console.log(fields);
+      res.set("Content-Type", "application/json")
+      res.send(JSON.stringify({
+        "firstname": fields.firstname[0],
+        "lastname": fields.lastname[0],
+      }));
+      res.end();
+    });
+  } else {
+    console.log(req.body);
+    res.set("Content-Type", "application/json")
+    res.send(JSON.stringify({
+      "firstname": req.body.firstname,
+      "lastname": req.body.lastname,
+    }));
+    res.end();
+  }
 })
 
 app.get("/test-download-file", (req, res) => {

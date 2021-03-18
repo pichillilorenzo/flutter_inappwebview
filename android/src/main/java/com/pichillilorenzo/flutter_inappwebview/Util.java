@@ -274,4 +274,17 @@ public class Util {
   public static String replaceAll(String s, String oldString, String newString) {
     return TextUtils.join(newString, s.split(Pattern.quote(oldString)));
   }
+
+  public static void log(String tag, String message) {
+    // Split by line, then ensure each line can fit into Log's maximum length.
+    for (int i = 0, length = message.length(); i < length; i++) {
+      int newline = message.indexOf('\n', i);
+      newline = newline != -1 ? newline : length;
+      do {
+        int end = Math.min(newline, i + 4000);
+        Log.d(tag, message.substring(i, end));
+        i = end;
+      } while (i < newline);
+    }
+  }
 }

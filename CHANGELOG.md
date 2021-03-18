@@ -9,6 +9,12 @@
 - Fixed wrong mapping of `NavigationAction` class on Android for `androidHasGesture` and `androidIsRedirect` properties
 - Fixed "Pull to refresh creating problem in some webpages on Android" [#719](https://github.com/pichillilorenzo/flutter_inappwebview/issues/719)
 - Fixed iOS sometimes `scrollView.contentSize` doesn't fit all the `frame.size` available
+- Fixed ajax and fetch interceptor when the data/body sent is not a string
+- Fixed "InAppLocalhostServer - Error: type 'List<dynamic>' is not a subtype of type 'List<int>' in type cast" [#724](https://github.com/pichillilorenzo/flutter_inappwebview/issues/724)
+
+### BREAKING CHANGES
+
+- `FetchRequest.body` is a dynamic type now
 
 ## 5.1.0+4
 

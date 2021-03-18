@@ -24,68 +24,6 @@ let INTERCEPT_FETCH_REQUEST_JS_SOURCE = """
   if (fetch == null) {
     return;
   }
-  function convertHeadersToJson(headers) {
-    var headersObj = {};
-    for (var header of headers.keys()) {
-      var value = headers.get(header);
-      headersObj[header] = value;
-    }
-    return headersObj;
-  }
-  function convertJsonToHeaders(headersJson) {
-    return new Headers(headersJson);
-  }
-  function convertBodyToArray(body) {
-    return new Response(body).arrayBuffer().then(function(arrayBuffer) {
-      var arr = Array.from(new Uint8Array(arrayBuffer));
-      return arr;
-    })
-  }
-  function convertArrayIntBodyToUint8Array(arrayIntBody) {
-    return new Uint8Array(arrayIntBody);
-  }
-  function convertCredentialsToJson(credentials) {
-    var credentialsObj = {};
-    if (window.FederatedCredential != null && credentials instanceof FederatedCredential) {
-      credentialsObj.type = credentials.type;
-      credentialsObj.id = credentials.id;
-      credentialsObj.name = credentials.name;
-      credentialsObj.protocol = credentials.protocol;
-      credentialsObj.provider = credentials.provider;
-      credentialsObj.iconURL = credentials.iconURL;
-    } else if (window.PasswordCredential != null && credentials instanceof PasswordCredential) {
-      credentialsObj.type = credentials.type;
-      credentialsObj.id = credentials.id;
-      credentialsObj.name = credentials.name;
-      credentialsObj.password = credentials.password;
-      credentialsObj.iconURL = credentials.iconURL;
-    } else {
-      credentialsObj.type = 'default';
-      credentialsObj.value = credentials;
-    }
-  }
-  function convertJsonToCredential(credentialsJson) {
-    var credentials;
-    if (window.FederatedCredential != null && credentialsJson.type === 'federated') {
-      credentials = new FederatedCredential({
-        id: credentialsJson.id,
-        name: credentialsJson.name,
-        protocol: credentialsJson.protocol,
-        provider: credentialsJson.provider,
-        iconURL: credentialsJson.iconURL
-      });
-    } else if (window.PasswordCredential != null && credentialsJson.type === 'password') {
-      credentials = new PasswordCredential({
-        id: credentialsJson.id,
-        name: credentialsJson.name,
-        password: credentialsJson.password,
-        iconURL: credentialsJson.iconURL
-      });
-    } else {
-      credentials = credentialsJson;
-    }
-    return credentials;
-  }
   window.fetch = async function(resource, init) {
     if (\(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE) == null || \(FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE) == true) {
       var fetchRequest = {
@@ -116,7 +54,7 @@ let INTERCEPT_FETCH_REQUEST_JS_SOURCE = """
         fetchRequest.integrity = resource.integrity;
         fetchRequest.keepalive = resource.keepalive;
       } else {
-        fetchRequest.url = resource;
+        fetchRequest.url = resource != null ? resource.toString() : null;
         if (init != null) {
           fetchRequest.method = init.method;
           fetchRequest.headers = init.headers;
@@ -132,10 +70,10 @@ let INTERCEPT_FETCH_REQUEST_JS_SOURCE = """
         }
       }
       if (fetchRequest.headers instanceof Headers) {
-        fetchRequest.headers = convertHeadersToJson(fetchRequest.headers);
+        fetchRequest.headers = \(JAVASCRIPT_UTIL_VAR_NAME).convertHeadersToJson(fetchRequest.headers);
       }
-      fetchRequest.credentials = convertCredentialsToJson(fetchRequest.credentials);
-      return convertBodyToArray(fetchRequest.body).then(function(body) {
+      fetchRequest.credentials = \(JAVASCRIPT_UTIL_VAR_NAME).convertCredentialsToJson(fetchRequest.credentials);
+      return \(JAVASCRIPT_UTIL_VAR_NAME).convertBodyRequest(fetchRequest.body).then(function(body) {
         fetchRequest.body = body;
         return window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('shouldInterceptFetchRequest', fetchRequest).then(function(result) {
           if (result != null) {
@@ -152,7 +90,18 @@ let INTERCEPT_FETCH_REQUEST_JS_SOURCE = """
                 controller.abort();
                 break;
             }
-            resource = (result.url != null) ? result.url : resource;
+            if (result.body != null && !\(JAVASCRIPT_UTIL_VAR_NAME).isString(result.body) && result.body.length > 0) {
+              var bodyString = \(JAVASCRIPT_UTIL_VAR_NAME).arrayBufferToString(result.body);
+              if (\(JAVASCRIPT_UTIL_VAR_NAME).isBodyFormData(bodyString)) {
+                var formDataContentType = \(JAVASCRIPT_UTIL_VAR_NAME).getFormDataContentType(bodyString);
+                if (result.headers != null) {
+                  result.headers['Content-Type'] = result.headers['Content-Type'] == null ? formDataContentType : result.headers['Content-Type'];
+                } else {
+                  result.headers = { 'Content-Type': formDataContentType };
+                }
+              }
+            }
+            resource = result.url;
             if (init == null) {
               init = {};
             }
@@ -160,16 +109,18 @@ let INTERCEPT_FETCH_REQUEST_JS_SOURCE = """
               init.method = result.method;
             }
             if (result.headers != null && Object.keys(result.headers).length > 0) {
-              init.headers = convertJsonToHeaders(result.headers);
+              init.headers = \(JAVASCRIPT_UTIL_VAR_NAME).convertJsonToHeaders(result.headers);
             }
-            if (result.body != null && result.body.length > 0)   {
-              init.body = convertArrayIntBodyToUint8Array(result.body);
+            if (\(JAVASCRIPT_UTIL_VAR_NAME).isString(result.body) || result.body == null) {
+              init.body = result.body;
+            } else if (result.body.length > 0) {
+              init.body = new Uint8Array(result.body);
             }
             if (result.mode != null && result.mode.length > 0) {
               init.mode = result.mode;
             }
             if (result.credentials != null) {
-              init.credentials = convertJsonToCredential(result.credentials);
+              init.credentials = \(JAVASCRIPT_UTIL_VAR_NAME).convertJsonToCredential(result.credentials);
             }
             if (result.cache != null && result.cache.length > 0) {
               init.cache = result.cache;

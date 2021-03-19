@@ -2,8 +2,10 @@
 
 - Added `WebMessageChannel` and `WebMessageListener` features
 - Added `canScrollVertically` and `canScrollHorizontally` webview methods
+- Added Android pull-to-refresh `setSize` method and `size` option
 - `AndroidInAppWebViewController.getCurrentWebViewPackage` is available now starting from Android API 21+
 - Updated Android Gradle distributionUrl version to `5.6.4`
+- Updated Android `androidx.webkit:webkit` to `1.4.0`, `androidx.browser:browser` to `1.3.0`, `androidx.appcompat:appcompat` to `1.2.0`
 - Attempt to fix "InAppBrowserActivity.onCreate NullPointerException - Attempt to invoke virtual method 'java.lang.String android.os.Bundle.getString(java.lang.String)' on a null object reference" [#665](https://github.com/pichillilorenzo/flutter_inappwebview/issues/665)
 - Fixed "[iOS] Application crashes when processing onCreateWindow" [#579](https://github.com/pichillilorenzo/flutter_inappwebview/issues/579)
 - Fixed wrong mapping of `NavigationAction` class on Android for `androidHasGesture` and `androidIsRedirect` properties

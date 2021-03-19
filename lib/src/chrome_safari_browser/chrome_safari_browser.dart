@@ -37,7 +37,9 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///`android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml`
 ///(you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
 class ChromeSafariBrowser {
-  late String id;
+  ///View ID used internally.
+  late final String id;
+
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
   bool _isOpened = false;
   late MethodChannel _channel;

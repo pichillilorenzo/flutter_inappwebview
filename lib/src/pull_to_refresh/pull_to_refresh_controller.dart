@@ -115,6 +115,15 @@ class PullToRefreshController {
     return await _channel?.invokeMethod('getDefaultSlingshotDistance', args);
   }
 
+  ///Sets the size of the refresh indicator. One of [AndroidPullToRefreshSize.DEFAULT], or [AndroidPullToRefreshSize.LARGE].
+  ///
+  ///**NOTE**: Available only on Android.
+  Future<void> setSize(AndroidPullToRefreshSize size) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('size', () => size.toValue());
+    await _channel?.invokeMethod('setSize', args);
+  }
+
   ///Sets the styled title text to display in the refresh control.
   ///
   ///**NOTE**: Available only on iOS.

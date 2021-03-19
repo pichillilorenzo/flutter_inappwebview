@@ -19,6 +19,8 @@ public class PullToRefreshOptions implements Options<PullToRefreshLayout> {
   public Integer distanceToTriggerSync;
   @Nullable
   public Integer slingshotDistance;
+  @Nullable
+  public Integer size;
 
   public PullToRefreshOptions parse(Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
@@ -44,6 +46,9 @@ public class PullToRefreshOptions implements Options<PullToRefreshLayout> {
         case "slingshotDistance":
           slingshotDistance = (Integer) value;
           break;
+        case "size":
+          size = (Integer) value;
+          break;
       }
     }
 
@@ -57,6 +62,7 @@ public class PullToRefreshOptions implements Options<PullToRefreshLayout> {
     options.put("backgroundColor", backgroundColor);
     options.put("distanceToTriggerSync", distanceToTriggerSync);
     options.put("slingshotDistance", slingshotDistance);
+    options.put("size", size);
     return options;
   }
 

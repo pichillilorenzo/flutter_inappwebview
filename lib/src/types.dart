@@ -17,6 +17,8 @@ import 'web_storage/web_storage.dart';
 import 'pull_to_refresh/pull_to_refresh_controller.dart';
 import 'pull_to_refresh/pull_to_refresh_options.dart';
 import 'util.dart';
+import 'web_message/web_message_listener.dart';
+import 'web_message/web_message_channel.dart';
 
 ///This type represents a callback, added with [InAppWebViewController.addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
@@ -29,6 +31,13 @@ import 'util.dart';
 ///Also, a [JavaScriptHandlerCallback] can return json data to the JavaScript side.
 ///In this case, simply return data that you want to send and it will be automatically json encoded using [jsonEncode] from the `dart:convert` library.
 typedef dynamic JavaScriptHandlerCallback(List<dynamic> arguments);
+
+///The listener for handling [WebMessageListener] events sent by a `postMessage()` on the injected JavaScript object.
+typedef void OnPostMessageCallback(String? message, Uri? sourceOrigin, bool isMainFrame, JavaScriptReplyProxy replyProxy);
+
+///The listener for handling [WebMessagePort] events.
+///The message callback methods are called on the main thread.
+typedef void WebMessageCallback(String? message);
 
 ///Class representing the level of a console message.
 class ConsoleMessageLevel {
@@ -6769,6 +6778,54 @@ class IOSNSAttributedStringTextEffectStyle {
   ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
   static const LETTERPRESS_STYLE =
       const IOSNSAttributedStringTextEffectStyle._internal("letterpressStyle");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Android-specific class representing the size of the refresh indicator.
+class AndroidPullToRefreshSize {
+  final int _value;
+
+  const AndroidPullToRefreshSize._internal(this._value);
+
+  static final Set<AndroidPullToRefreshSize> values = [
+    AndroidPullToRefreshSize.DEFAULT,
+    AndroidPullToRefreshSize.LARGE,
+  ].toSet();
+
+  static AndroidPullToRefreshSize? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return AndroidPullToRefreshSize.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 0:
+        return "LARGE";
+      case 1:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  ///Default size.
+  static const DEFAULT = const AndroidPullToRefreshSize._internal(1);
+
+  ///Large size.
+  static const LARGE = const AndroidPullToRefreshSize._internal(0);
 
   bool operator ==(value) => value == _value;
 

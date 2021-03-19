@@ -1619,7 +1619,6 @@ final public class InAppWebView extends InputAwareWebView {
     return computeHorizontalScrollRange() > computeHorizontalScrollExtent();
   }
 
-  @TargetApi(Build.VERSION_CODES.M)
   public WebMessageChannel createCompatWebMessageChannel() {
     String id = UUID.randomUUID().toString();
     WebMessageChannel webMessageChannel = new WebMessageChannel(id, this);

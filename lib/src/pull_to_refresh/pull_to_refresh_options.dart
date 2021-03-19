@@ -22,6 +22,11 @@ class PullToRefreshOptions {
   ///**NOTE**: Available only on Android.
   int? slingshotDistance;
 
+  ///The size of the refresh indicator.
+  ///
+  ///**NOTE**: Available only on Android.
+  AndroidPullToRefreshSize? size;
+
   ///The title text to display in the refresh control.
   ///
   ///**NOTE**: Available only on iOS.
@@ -33,6 +38,7 @@ class PullToRefreshOptions {
       this.backgroundColor,
       this.distanceToTriggerSync,
       this.slingshotDistance,
+      this.size,
       this.attributedTitle});
 
   Map<String, dynamic> toMap() {
@@ -42,6 +48,7 @@ class PullToRefreshOptions {
       "backgroundColor": backgroundColor?.toHex(),
       "distanceToTriggerSync": distanceToTriggerSync,
       "slingshotDistance": slingshotDistance,
+      "size": size?.toValue(),
       "attributedTitle": attributedTitle?.toMap() ?? {}
     };
   }

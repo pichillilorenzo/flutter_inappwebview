@@ -71,6 +71,8 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements MethodCha
       setDistanceToTriggerSync(options.distanceToTriggerSync);
     if (options.slingshotDistance != null)
       setSlingshotDistance(options.slingshotDistance);
+    if (options.size != null)
+      setSize(options.size);
   }
 
   @Override
@@ -123,6 +125,13 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements MethodCha
         break;
       case "getDefaultSlingshotDistance":
         result.success(SwipeRefreshLayout.DEFAULT_SLINGSHOT_DISTANCE);
+        break;
+      case "setSize":
+        {
+          Integer size = (Integer) call.argument("size");
+          setSize(size);
+        }
+        result.success(true);
         break;
       default:
         result.notImplemented();

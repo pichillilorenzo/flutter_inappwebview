@@ -12,8 +12,10 @@ import androidx.webkit.WebViewFeature;
 
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
@@ -48,13 +50,22 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
         }
         break;
       case "getSafeBrowsingPrivacyPolicyUrl":
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_PRIVACY_POLICY_URL)) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_PRIVACY_POLICY_URL)) {
           result.success(WebViewCompat.getSafeBrowsingPrivacyPolicyUrl().toString());
         } else
           result.success(null);
         break;
       case "setSafeBrowsingWhitelist":
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 && WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_WHITELIST)) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ALLOWLIST)) {
+          Set<String> hosts = new HashSet<>((List<String>) call.argument("hosts"));
+          WebViewCompat.setSafeBrowsingAllowlist(hosts, new ValueCallback<Boolean>() {
+            @Override
+            public void onReceiveValue(Boolean value) {
+              result.success(value);
+            }
+          });
+        }
+        else if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_WHITELIST)) {
           List<String> hosts = (List<String>) call.argument("hosts");
           WebViewCompat.setSafeBrowsingWhitelist(hosts, new ValueCallback<Boolean>() {
             @Override
@@ -62,8 +73,7 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
               result.success(value);
             }
           });
-        }
-        else
+        } else
           result.success(false);
         break;
       case "getCurrentWebViewPackage":

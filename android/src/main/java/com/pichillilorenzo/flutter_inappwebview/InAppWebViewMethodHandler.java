@@ -229,8 +229,7 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         result.success((webView != null) ? webView.getCopyBackForwardList() : null);
         break;
       case "startSafeBrowsing":
-        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O_MR1 &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.START_SAFE_BROWSING)) {
+        if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.START_SAFE_BROWSING)) {
           WebViewCompat.startSafeBrowsing(webView.getContext(), new ValueCallback<Boolean>() {
             @Override
             public void onReceiveValue(Boolean success) {
@@ -514,16 +513,14 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         }
         break;
       case "createWebMessageChannel":
-        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
+        if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
           result.success(webView.createCompatWebMessageChannel().toMap());
         } else {
           result.success(null);
         }
         break;
       case "postWebMessage":
-        if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M &&
-                WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
+        if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
           Map<String, Object> message = (Map<String, Object>) call.argument("message");
           String targetOrigin = (String) call.argument("targetOrigin");
           List<WebMessagePortCompat> ports = new ArrayList<>();

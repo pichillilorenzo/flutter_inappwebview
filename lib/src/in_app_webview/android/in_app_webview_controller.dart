@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../_static_channel.dart';
 
 import '../../types.dart';
+import '../../android/webview_feature.dart';
 
 ///Class represents the Android controller that contains only android-specific methods for the WebView.
 class AndroidInAppWebViewController {
@@ -21,10 +22,10 @@ class AndroidInAppWebViewController {
   ///URL loads are not guaranteed to be protected by Safe Browsing until after the this method returns true.
   ///Safe Browsing is not fully supported on all devices. For those devices this method will returns false.
   ///
-  ///This should not be called if Safe Browsing has been disabled by manifest tag
-  ///or [AndroidInAppWebViewOptions.safeBrowsingEnabled]. This prepares resources used for Safe Browsing.
+  ///This should not be called if Safe Browsing has been disabled by manifest tag or [AndroidInAppWebViewOptions.safeBrowsingEnabled].
+  ///This prepares resources used for Safe Browsing.
   ///
-  ///**NOTE**: available only on Android 27+.
+  ///This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.START_SAFE_BROWSING].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#startSafeBrowsing(android.content.Context,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)
   Future<bool> startSafeBrowsing() async {
@@ -134,7 +135,7 @@ class AndroidInAppWebViewController {
 
   ///Returns a URL pointing to the privacy policy for Safe Browsing reporting.
   ///
-  ///**NOTE**: available only on Android 27+.
+  ///This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.SAFE_BROWSING_PRIVACY_POLICY_URL].
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()
   static Future<Uri?> getSafeBrowsingPrivacyPolicyUrl() async {
@@ -156,11 +157,11 @@ class AndroidInAppWebViewController {
   ///
   ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
   ///
+  ///This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.SAFE_BROWSING_ALLOWLIST].
+  ///
   ///[hosts] represents the list of hosts. This value must never be `null`.
   ///
-  ///**NOTE**: available only on Android 27+.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#setSafeBrowsingAllowlist(java.util.Set%3Cjava.lang.String%3E,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)
   static Future<bool> setSafeBrowsingWhitelist(
       {required List<String> hosts}) async {
     Map<String, dynamic> args = <String, dynamic>{};

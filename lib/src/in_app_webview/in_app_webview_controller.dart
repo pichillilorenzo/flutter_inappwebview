@@ -20,6 +20,7 @@ import '../web_storage/web_storage.dart';
 import '../util.dart';
 import '../web_message/web_message_channel.dart';
 import '../web_message/web_message_listener.dart';
+import '../android/webview_feature.dart';
 
 import 'headless_in_app_webview.dart';
 import 'in_app_webview.dart';
@@ -2090,6 +2091,18 @@ class InAppWebViewController {
     return await _channel.invokeMethod('isSecureContext', args);
   }
 
+  ///Creates a message channel to communicate with JavaScript and returns the message channel with ports that represent the endpoints of this message channel.
+  ///The HTML5 message channel functionality is described [here](https://html.spec.whatwg.org/multipage/comms.html#messagechannel).
+  ///
+  ///The returned message channels are entangled and already in started state.
+  ///
+  ///This method should be called when the page is loaded, for example, when the [WebView.onLoadStop] is fired, otherwise the [WebMessageChannel] won't work.
+  ///
+  ///**NOTE for Android**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL].
+  ///
+  ///**NOTE for iOS**: This is implemented using Javascript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#createWebMessageChannel(android.webkit.WebView)
   Future<WebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result = (await _channel.invokeMethod('createWebMessageChannel', args))
@@ -2097,6 +2110,16 @@ class InAppWebViewController {
     return WebMessageChannel.fromMap(result);
   }
 
+  ///Post a message to main frame. The embedded application can restrict the messages to a certain target origin.
+  ///See [HTML5 spec](https://html.spec.whatwg.org/multipage/comms.html#posting-messages) for how target origin can be used.
+  ///
+  ///A target origin can be set as a wildcard ("*"). However this is not recommended.
+  ///
+  ///**NOTE for Android**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.POST_WEB_MESSAGE].
+  ///
+  ///**NOTE for iOS**: This is implemented using Javascript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#postWebMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri)
   Future<void> postWebMessage({required WebMessage message, Uri? targetOrigin}) async {
     if (targetOrigin == null) {
       targetOrigin = Uri.parse("");
@@ -2107,6 +2130,165 @@ class InAppWebViewController {
     await _channel.invokeMethod('postWebMessage', args);
   }
 
+  ///Adds a [WebMessageListener] to the WebView and injects a JavaScript object into each frame that the [WebMessageListener] will listen on.
+  ///
+  ///The injected JavaScript object will be named [WebMessageListener.jsObjectName] in the global scope.
+  ///This will inject the JavaScript object in any frame whose origin matches [WebMessageListener.allowedOriginRules]
+  ///for every navigation after this call, and the JavaScript object will be available immediately when the page begins to load.
+  ///
+  ///Each [WebMessageListener.allowedOriginRules] entry must follow the format `SCHEME "://" [ HOSTNAME_PATTERN [ ":" PORT ] ]`, each part is explained in the below table:
+  ///
+  ///<table>
+  ///   <colgroup>
+  ///      <col width="25%">
+  ///   </colgroup>
+  ///   <tbody>
+  ///      <tr>
+  ///         <th>Rule</th>
+  ///         <th>Description</th>
+  ///         <th>Example</th>
+  ///      </tr>
+  ///      <tr>
+  ///         <td>http/https with hostname</td>
+  ///         <td><code translate="no" dir="ltr">SCHEME</code> is http or https; <code translate="no" dir="ltr">HOSTNAME_<wbr>PATTERN</code> is a regular hostname; <code translate="no" dir="ltr">PORT</code> is optional, when not present, the rule will match port <code translate="no" dir="ltr">80</code> for http and port
+  ///            <code translate="no" dir="ltr">443</code> for https.
+  ///         </td>
+  ///         <td>
+  ///            <ul>
+  ///               <li><code translate="no" dir="ltr">https://foobar.com:8080</code> - Matches https:// URL on port 8080, whose normalized
+  ///                  host is foobar.com.
+  ///               </li>
+  ///               <li><code translate="no" dir="ltr">https://www.example.com</code> - Matches https:// URL on port 443, whose normalized host
+  ///                  is www.example.com.
+  ///               </li>
+  ///            </ul>
+  ///         </td>
+  ///      </tr>
+  ///      <tr>
+  ///         <td>http/https with pattern matching</td>
+  ///         <td><code translate="no" dir="ltr">SCHEME</code> is http or https; <code translate="no" dir="ltr">HOSTNAME_<wbr>PATTERN</code> is a sub-domain matching
+  ///            pattern with a leading <code translate="no" dir="ltr">*.<wbr></code>; <code translate="no" dir="ltr">PORT</code> is optional, when not present, the rule will
+  ///            match port <code translate="no" dir="ltr">80</code> for http and port <code translate="no" dir="ltr">443</code> for https.
+  ///         </td>
+  ///         <td>
+  ///            <ul>
+  ///               <li><code translate="no" dir="ltr">https://*.example.com</code> - Matches https://calendar.example.com and
+  ///                  https://foo.bar.example.com but not https://example.com.
+  ///               </li>
+  ///               <li><code translate="no" dir="ltr">https://*.example.com:8080</code> - Matches https://calendar.example.com:8080</li>
+  ///            </ul>
+  ///         </td>
+  ///      </tr>
+  ///      <tr>
+  ///         <td>http/https with IP literal</td>
+  ///         <td><code translate="no" dir="ltr">SCHEME</code> is https or https; <code translate="no" dir="ltr">HOSTNAME_<wbr>PATTERN</code> is IP literal; <code translate="no" dir="ltr">PORT</code> is
+  ///            optional, when not present, the rule will match port <code translate="no" dir="ltr">80</code> for http and port <code translate="no" dir="ltr">443</code>
+  ///            for https.
+  ///         </td>
+  ///         <td>
+  ///            <ul>
+  ///               <li><code translate="no" dir="ltr">https://127.0.0.1</code> - Matches https:// URL on port 443, whose IPv4 address is
+  ///                  127.0.0.1
+  ///               </li>
+  ///               <li><code translate="no" dir="ltr">https://[::1]</code> or <code translate="no" dir="ltr">https://[0:0::1]</code>- Matches any URL to the IPv6 loopback
+  ///                  address with port 443.
+  ///               </li>
+  ///               <li><code translate="no" dir="ltr">https://[::1]:99</code> - Matches any https:// URL to the IPv6 loopback on port 99.</li>
+  ///            </ul>
+  ///         </td>
+  ///      </tr>
+  ///      <tr>
+  ///         <td>Custom scheme</td>
+  ///         <td><code translate="no" dir="ltr">SCHEME</code> is a custom scheme; <code translate="no" dir="ltr">HOSTNAME_<wbr>PATTERN</code> and <code translate="no" dir="ltr">PORT</code> must not be
+  ///            present.
+  ///         </td>
+  ///         <td>
+  ///            <ul>
+  ///               <li><code translate="no" dir="ltr">my-app-scheme://</code> - Matches any my-app-scheme:// URL.</li>
+  ///            </ul>
+  ///         </td>
+  ///      </tr>
+  ///      <tr>
+  ///         <td><code translate="no" dir="ltr">*</code></td>
+  ///         <td>Wildcard rule, matches any origin.</td>
+  ///         <td>
+  ///            <ul>
+  ///               <li><code translate="no" dir="ltr">*</code></li>
+  ///            </ul>
+  ///         </td>
+  ///      </tr>
+  ///   </tbody>
+  ///</table>
+  ///
+  ///Note that this is a powerful API, as the JavaScript object will be injected when the frame's origin matches any one of the allowed origins.
+  ///The HTTPS scheme is strongly recommended for security; allowing HTTP origins exposes the injected object to any potential network-based attackers.
+  ///If a wildcard "*" is provided, it will inject the JavaScript object to all frames.
+  ///A wildcard should only be used if the app wants **any** third party web page to be able to use the injected object.
+  ///When using a wildcard, the app must treat received messages as untrustworthy and validate any data carefully.
+  ///
+  ///This method can be called multiple times to inject multiple JavaScript objects.
+  ///
+  ///Let's say the injected JavaScript object is named `myObject`. We will have following methods on that object once it is available to use:
+  ///
+  ///```javascript
+  /// // Web page (in JavaScript)
+  /// // message needs to be a JavaScript String, MessagePorts is an optional parameter.
+  /// myObject.postMessage(message[, MessagePorts]) // on Android
+  /// myObject.postMessage(message) // on iOS
+  ///
+  /// // To receive messages posted from the app side, assign a function to the "onmessage"
+  /// // property. This function should accept a single "event" argument. "event" has a "data"
+  /// // property, which is the message string from the app side.
+  /// myObject.onmessage = function(event) { ... }
+  ///
+  /// // To be compatible with DOM EventTarget's addEventListener, it accepts type and listener
+  /// // parameters, where type can be only "message" type and listener can only be a JavaScript
+  /// // function for myObject. An event object will be passed to listener with a "data" property,
+  /// // which is the message string from the app side.
+  /// myObject.addEventListener(type, listener)
+  ///
+  /// // To be compatible with DOM EventTarget's removeEventListener, it accepts type and listener
+  /// // parameters, where type can be only "message" type and listener can only be a JavaScript
+  /// // function for myObject.
+  /// myObject.removeEventListener(type, listener)
+  ///```
+  ///
+  ///We start the communication between JavaScript and the app from the JavaScript side.
+  ///In order to send message from the app to JavaScript, it needs to post a message from JavaScript first,
+  ///so the app will have a [JavaScriptReplyProxy] object to respond. Example:
+  ///
+  ///```javascript
+  /// // Web page (in JavaScript)
+  /// myObject.onmessage = function(event) {
+  ///   // prints "Got it!" when we receive the app's response.
+  ///   console.log(event.data);
+  /// }
+  /// myObject.postMessage("I'm ready!");
+  ///```
+  ///
+  ///```dart
+  /// // Flutter App
+  /// child: InAppWebView(
+  ///   onWebViewCreated: (controller) async {
+  ///     if (!Platform.isAndroid || await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.WEB_MESSAGE_LISTENER)) {
+  ///       await controller.addWebMessageListener(WebMessageListener(
+  ///         jsObjectName: "myObject",
+  ///         onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) {
+  ///           // do something about message, sourceOrigin and isMainFrame.
+  ///           replyProxy.postMessage("Got it!");
+  ///         },
+  ///       ));
+  ///     }
+  ///     await controller.loadUrl(urlRequest: URLRequest(url: Uri.parse("https://www.example.com")));
+  ///   },
+  /// ),
+  ///```
+  ///
+  ///**NOTE for Android**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.WEB_MESSAGE_LISTENER].
+  ///
+  ///**NOTE for iOS**: This is implemented using Javascript.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#addWebMessageListener(android.webkit.WebView,%20java.lang.String,%20java.util.Set%3Cjava.lang.String%3E,%20androidx.webkit.WebViewCompat.WebMessageListener)
   Future<void> addWebMessageListener(WebMessageListener webMessageListener) async {
     assert(!_webMessageListenerObjNames.contains(webMessageListener.jsObjectName), "jsObjectName ${webMessageListener.jsObjectName} was already added.");
     _webMessageListenerObjNames.add(webMessageListener.jsObjectName);
@@ -2116,11 +2298,13 @@ class InAppWebViewController {
     await _channel.invokeMethod('addWebMessageListener', args);
   }
 
+  ///Returns `true` if the webpage can scroll vertically, otherwise `false`.
   Future<bool> canScrollVertically() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canScrollVertically', args);
   }
 
+  ///Returns `true` if the webpage can scroll horizontally, otherwise `false`.
   Future<bool> canScrollHorizontally() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canScrollHorizontally', args);

@@ -741,6 +741,20 @@ class InAppWebViewController {
           _webview!.onExitFullscreen!(this);
         else if (_inAppBrowser != null) _inAppBrowser!.onExitFullscreen();
         break;
+      case "onOverScrolled":
+        if ((_webview != null && _webview!.onOverScrolled != null) ||
+            _inAppBrowser != null) {
+          int x = call.arguments["x"];
+          int y = call.arguments["y"];
+          bool clampedX = call.arguments["clampedX"];
+          bool clampedY = call.arguments["clampedY"];
+
+          if (_webview != null && _webview!.onOverScrolled != null)
+            _webview!.onOverScrolled!(this, x, y, clampedX, clampedY);
+          else
+            _inAppBrowser!.onOverScrolled(x, y, clampedX, clampedY);
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json

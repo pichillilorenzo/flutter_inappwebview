@@ -607,6 +607,19 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)
   void onTitleChanged(String? title) {}
 
+  ///Event fired to respond to the results of an over-scroll operation.
+  ///
+  ///[x] represents the new X scroll value in pixels.
+  ///
+  ///[y] represents the new Y scroll value in pixels.
+  ///
+  ///[clampedX] is `true` if [x] was clamped to an over-scroll boundary.
+  ///
+  ///[clampedY] is `true` if [y] was clamped to an over-scroll boundary.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onOverScrolled(int,%20int,%20boolean,%20boolean)
+  void onOverScrolled(int x, int y, bool clampedX, bool clampedY) {}
+
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///

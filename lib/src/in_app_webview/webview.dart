@@ -387,6 +387,19 @@ abstract class WebView {
   final void Function(InAppWebViewController controller, String? title)?
       onTitleChanged;
 
+  ///Event fired to respond to the results of an over-scroll operation.
+  ///
+  ///[x] represents the new X scroll value in pixels.
+  ///
+  ///[y] represents the new Y scroll value in pixels.
+  ///
+  ///[clampedX] is `true` if [x] was clamped to an over-scroll boundary.
+  ///
+  ///[clampedY] is `true` if [y] was clamped to an over-scroll boundary.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onOverScrolled(int,%20int,%20boolean,%20boolean)
+  final void Function(InAppWebViewController controller, int x, int y, bool clampedX, bool clampedY)? onOverScrolled;
+
   ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
@@ -687,6 +700,7 @@ abstract class WebView {
       this.onTitleChanged,
       this.onWindowFocus,
       this.onWindowBlur,
+      this.onOverScrolled,
       this.androidOnSafeBrowsingHit,
       this.androidOnPermissionRequest,
       this.androidOnGeolocationPermissionsShowPrompt,

@@ -66,6 +66,7 @@ class HeadlessInAppWebView implements WebView {
       this.onTitleChanged,
       this.onWindowFocus,
       this.onWindowBlur,
+      this.onOverScrolled,
       this.androidOnSafeBrowsingHit,
       this.androidOnPermissionRequest,
       this.androidOnGeolocationPermissionsShowPrompt,
@@ -345,6 +346,9 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final void Function(InAppWebViewController controller)? onExitFullscreen;
+
+  @override
+  final void Function(InAppWebViewController controller, int x, int y, bool clampedX, bool clampedY)? onOverScrolled;
 
   @override
   final Future<WebResourceResponse?> Function(

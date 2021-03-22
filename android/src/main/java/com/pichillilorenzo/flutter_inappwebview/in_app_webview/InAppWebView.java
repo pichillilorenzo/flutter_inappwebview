@@ -1255,10 +1255,21 @@ final public class InAppWebView extends InputAwareWebView {
     return super.onTouchEvent(ev);
   }
 
-//  @Override
-//  protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
-//    super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
-//  }
+  @Override
+  protected void onOverScrolled(int scrollX, int scrollY, boolean clampedX, boolean clampedY) {
+    super.onOverScrolled(scrollX, scrollY, clampedX, clampedY);
+
+    boolean overScrolledHorizontally = canScrollHorizontally() && clampedX;
+    boolean overScrolledVertically = canScrollVertically() && clampedY;
+    if (overScrolledHorizontally || overScrolledVertically) {
+      Map<String, Object> obj = new HashMap<>();
+      obj.put("x", scrollX);
+      obj.put("y", scrollY);
+      obj.put("clampedX", overScrolledHorizontally);
+      obj.put("clampedY", overScrolledVertically);
+      channel.invokeMethod("onOverScrolled", obj);
+    }
+  }
 
   @Override
   public boolean dispatchTouchEvent(MotionEvent event) {

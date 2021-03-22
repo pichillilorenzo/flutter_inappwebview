@@ -3,6 +3,7 @@
 - Added `WebMessageChannel` and `WebMessageListener` features
 - Added `canScrollVertically` and `canScrollHorizontally` webview methods
 - Added Android pull-to-refresh `setSize` method and `size` option
+- Added `onOverScrolled` WebView event
 - `AndroidInAppWebViewController.getCurrentWebViewPackage` is available now starting from Android API 21+
 - Updated Android Gradle distributionUrl version to `5.6.4`
 - Updated Android `androidx.webkit:webkit` to `1.4.0`, `androidx.browser:browser` to `1.3.0`, `androidx.appcompat:appcompat` to `1.2.0`

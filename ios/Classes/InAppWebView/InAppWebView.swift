@@ -2025,12 +2025,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY);
             }
             else if disableVerticalScroll {
-                if (scrollView.contentOffset.y >= 0 || scrollView.contentOffset.y < 0) {
+                if scrollView.contentOffset.y >= 0 || scrollView.contentOffset.y < 0 {
                     scrollView.contentOffset = CGPoint(x: scrollView.contentOffset.x, y: lastScrollY);
                 }
             }
             else if disableHorizontalScroll {
-                if (scrollView.contentOffset.x >= 0 || scrollView.contentOffset.x < 0) {
+                if scrollView.contentOffset.x >= 0 || scrollView.contentOffset.x < 0 {
                     scrollView.contentOffset = CGPoint(x: lastScrollX, y: scrollView.contentOffset.y);
                 }
             }
@@ -2044,6 +2044,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         lastScrollX = scrollView.contentOffset.x
         lastScrollY = scrollView.contentOffset.y
+        
+        let overScrolledHorizontally = lastScrollX < 0 || lastScrollX > (scrollView.contentSize.width - scrollView.frame.size.width)
+        let overScrolledVertically = lastScrollY < 0 || lastScrollY > (scrollView.contentSize.height - scrollView.frame.size.height)
+        if overScrolledHorizontally || overScrolledVertically {
+            let x = Int(lastScrollX / scrollView.contentScaleFactor)
+            let y = Int(lastScrollY / scrollView.contentScaleFactor)
+            self.onOverScrolled(x: x, y: y,
+                           clampedX: overScrolledHorizontally,
+                           clampedY: overScrolledVertically)
+        }
     }
     
     public func webView(_ webView: WKWebView,
@@ -2294,6 +2304,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func onScrollChanged(x: Int, y: Int) {
         let arguments: [String: Any] = ["x": x, "y": y]
         channel?.invokeMethod("onScrollChanged", arguments: arguments)
+    }
+    
+    public func onOverScrolled(x: Int, y: Int, clampedX: Bool, clampedY: Bool) {
+        let arguments: [String: Any] = ["x": x, "y": y, "clampedX": clampedX, "clampedY": clampedY]
+        channel?.invokeMethod("onOverScrolled", arguments: arguments)
     }
     
     public func onDownloadStart(url: String) {

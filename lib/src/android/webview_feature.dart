@@ -31,7 +31,6 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY,
     AndroidWebViewFeature.SAFE_BROWSING_RESPONSE_PROCEED,
     AndroidWebViewFeature.SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL,
-    AndroidWebViewFeature.SAFE_BROWSING_WHITELIST,
     AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE,
     AndroidWebViewFeature.SERVICE_WORKER_BLOCK_NETWORK_LOADS,
     AndroidWebViewFeature.SERVICE_WORKER_CACHE_MODE,

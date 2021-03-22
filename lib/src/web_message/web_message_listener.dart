@@ -26,9 +26,14 @@ class WebMessageListener {
 
   late MethodChannel _channel;
 
-  WebMessageListener({required this.jsObjectName, Set<String>? allowedOriginRules, this.onPostMessage}) {
-    this.allowedOriginRules = allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
-    assert(!this.allowedOriginRules.contains(""), "allowedOriginRules cannot contain empty strings");
+  WebMessageListener(
+      {required this.jsObjectName,
+      Set<String>? allowedOriginRules,
+      this.onPostMessage}) {
+    this.allowedOriginRules =
+        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
+    assert(!this.allowedOriginRules.contains(""),
+        "allowedOriginRules cannot contain empty strings");
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_listener_$jsObjectName');
     this._channel.setMethodCallHandler(handleMethod);
@@ -42,7 +47,9 @@ class WebMessageListener {
         }
         if (onPostMessage != null) {
           String? message = call.arguments["message"];
-          Uri? sourceOrigin = call.arguments["sourceOrigin"] != null ? Uri.parse(call.arguments["sourceOrigin"]) : null;
+          Uri? sourceOrigin = call.arguments["sourceOrigin"] != null
+              ? Uri.parse(call.arguments["sourceOrigin"])
+              : null;
           bool isMainFrame = call.arguments["isMainFrame"];
           onPostMessage!(message, sourceOrigin, isMainFrame, _replyProxy!);
         }

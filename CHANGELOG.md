@@ -14,6 +14,7 @@
 - Fixed iOS sometimes `scrollView.contentSize` doesn't fit all the `frame.size` available
 - Fixed ajax and fetch interceptor when the data/body sent is not a string
 - Fixed "InAppLocalhostServer - Error: type 'List<dynamic>' is not a subtype of type 'List<int>' in type cast" [#724](https://github.com/pichillilorenzo/flutter_inappwebview/issues/724)
+- Merge "fix proguard" [#737](https://github.com/pichillilorenzo/flutter_inappwebview/pull/737) (thanks to [myroid](https://github.com/myroid))
 
 ### BREAKING CHANGES
 

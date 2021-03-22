@@ -15,7 +15,8 @@ class WebMessageChannel {
 
   late MethodChannel _channel;
 
-  WebMessageChannel({required this.id, required this.port1, required this.port2}) {
+  WebMessageChannel(
+      {required this.id, required this.port1, required this.port2}) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_channel_$id');
     this._channel.setMethodCallHandler(handleMethod);
@@ -28,8 +29,7 @@ class WebMessageChannel {
     var webMessageChannel = WebMessageChannel(
         id: map["id"],
         port1: WebMessagePort(index: 0),
-        port2: WebMessagePort(index: 1)
-    );
+        port2: WebMessagePort(index: 1));
     webMessageChannel.port1._webMessageChannel = webMessageChannel;
     webMessageChannel.port2._webMessageChannel = webMessageChannel;
     return webMessageChannel;
@@ -84,7 +84,8 @@ class WebMessagePort {
   Future<void> setWebMessageCallback(WebMessageCallback? onMessage) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('index', () => this._index);
-    await _webMessageChannel._channel.invokeMethod('setWebMessageCallback', args);
+    await _webMessageChannel._channel
+        .invokeMethod('setWebMessageCallback', args);
     this._onMessage = onMessage;
   }
 

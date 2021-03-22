@@ -1473,7 +1473,8 @@ class InAppWebViewController {
   void addJavaScriptHandler(
       {required String handlerName,
       required JavaScriptHandlerCallback callback}) {
-    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName), '"$handlerName" is a forbidden name!');
+    assert(!_JAVASCRIPT_HANDLER_FORBIDDEN_NAMES.contains(handlerName),
+        '"$handlerName" is a forbidden name!');
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
 
@@ -2119,8 +2120,9 @@ class InAppWebViewController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#createWebMessageChannel(android.webkit.WebView)
   Future<WebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic>? result = (await _channel.invokeMethod('createWebMessageChannel', args))
-        ?.cast<String, dynamic>();
+    Map<String, dynamic>? result =
+        (await _channel.invokeMethod('createWebMessageChannel', args))
+            ?.cast<String, dynamic>();
     return WebMessageChannel.fromMap(result);
   }
 
@@ -2134,7 +2136,8 @@ class InAppWebViewController {
   ///**NOTE for iOS**: This is implemented using Javascript.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#postWebMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri)
-  Future<void> postWebMessage({required WebMessage message, Uri? targetOrigin}) async {
+  Future<void> postWebMessage(
+      {required WebMessage message, Uri? targetOrigin}) async {
     if (targetOrigin == null) {
       targetOrigin = Uri.parse("");
     }
@@ -2303,8 +2306,11 @@ class InAppWebViewController {
   ///**NOTE for iOS**: This is implemented using Javascript.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewCompat#addWebMessageListener(android.webkit.WebView,%20java.lang.String,%20java.util.Set%3Cjava.lang.String%3E,%20androidx.webkit.WebViewCompat.WebMessageListener)
-  Future<void> addWebMessageListener(WebMessageListener webMessageListener) async {
-    assert(!_webMessageListenerObjNames.contains(webMessageListener.jsObjectName), "jsObjectName ${webMessageListener.jsObjectName} was already added.");
+  Future<void> addWebMessageListener(
+      WebMessageListener webMessageListener) async {
+    assert(
+        !_webMessageListenerObjNames.contains(webMessageListener.jsObjectName),
+        "jsObjectName ${webMessageListener.jsObjectName} was already added.");
     _webMessageListenerObjNames.add(webMessageListener.jsObjectName);
 
     Map<String, dynamic> args = <String, dynamic>{};

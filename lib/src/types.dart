@@ -33,7 +33,8 @@ import 'web_message/web_message_channel.dart';
 typedef dynamic JavaScriptHandlerCallback(List<dynamic> arguments);
 
 ///The listener for handling [WebMessageListener] events sent by a `postMessage()` on the injected JavaScript object.
-typedef void OnPostMessageCallback(String? message, Uri? sourceOrigin, bool isMainFrame, JavaScriptReplyProxy replyProxy);
+typedef void OnPostMessageCallback(String? message, Uri? sourceOrigin,
+    bool isMainFrame, JavaScriptReplyProxy replyProxy);
 
 ///The listener for handling [WebMessagePort] events.
 ///The message callback methods are called on the main thread.

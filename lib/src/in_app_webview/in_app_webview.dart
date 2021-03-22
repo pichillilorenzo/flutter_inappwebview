@@ -310,7 +310,8 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller)? onExitFullscreen;
 
   @override
-  final void Function(InAppWebViewController controller, int x, int y, bool clampedX, bool clampedY)? onOverScrolled;
+  final void Function(InAppWebViewController controller, int x, int y,
+      bool clampedX, bool clampedY)? onOverScrolled;
 
   @override
   final Future<WebResourceResponse?> Function(

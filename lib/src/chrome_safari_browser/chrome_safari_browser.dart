@@ -79,7 +79,7 @@ class ChromeSafariBrowser {
     }
   }
 
-  ///Opens an [url] in a new [ChromeSafariBrowser] instance.
+  ///Opens the [ChromeSafariBrowser] instance with an [url].
   ///
   ///[url]: The [url] to load.
   ///

@@ -23,6 +23,8 @@ public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
 
   public Boolean hideTitleBar = false;
   public Boolean closeOnCannotGoBack = true;
+  public Boolean allowGoBackWithBackButton = true;
+  public Boolean shouldCloseOnBackButtonPressed = false;
 
   @Override
   public InAppBrowserOptions parse(Map<String, Object> options) {
@@ -58,6 +60,12 @@ public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
         case "hideProgressBar":
           hideProgressBar = (Boolean) value;
           break;
+        case "allowGoBackWithBackButton":
+          allowGoBackWithBackButton = (Boolean) value;
+          break;
+        case "shouldCloseOnBackButtonPressed":
+          shouldCloseOnBackButtonPressed = (Boolean) value;
+          break;
       }
     }
 
@@ -75,6 +83,8 @@ public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
     options.put("hideTitleBar", hideTitleBar);
     options.put("closeOnCannotGoBack", closeOnCannotGoBack);
     options.put("hideProgressBar", hideProgressBar);
+    options.put("allowGoBackWithBackButton", allowGoBackWithBackButton);
+    options.put("shouldCloseOnBackButtonPressed", shouldCloseOnBackButtonPressed);
     return options;
   }
 

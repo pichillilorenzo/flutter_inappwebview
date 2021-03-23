@@ -247,12 +247,21 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   }
 
   public boolean onKeyDown(int keyCode, KeyEvent event) {
-    if ((keyCode == KeyEvent.KEYCODE_BACK)) {
-      if (canGoBack())
-        goBack();
-      else if (options.closeOnCannotGoBack)
+    if (keyCode == KeyEvent.KEYCODE_BACK) {
+      if (options.shouldCloseOnBackButtonPressed) {
         close(null);
-      return true;
+        return true;
+      }
+      if (options.allowGoBackWithBackButton) {
+        if (canGoBack())
+          goBack();
+        else if (options.closeOnCannotGoBack)
+          close(null);
+        return true;
+      }
+      if (!options.shouldCloseOnBackButtonPressed) {
+        return true;
+      }
     }
     return super.onKeyDown(keyCode, event);
   }

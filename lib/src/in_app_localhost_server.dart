@@ -15,7 +15,7 @@ class InAppLocalhostServer {
     this._port = port;
   }
 
-  ///Starts a server on http://localhost:[port]/.
+  ///Starts the server on `http://localhost:[port]/`.
   ///
   ///**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file (See [ATS Configuration Basics](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35)):
   ///```xml

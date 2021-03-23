@@ -91,7 +91,7 @@ class InAppBrowser {
     }
   }
 
-  ///Opens an [urlRequest] in a new [InAppBrowser] instance.
+  ///Opens the [InAppBrowser] instance with an [urlRequest].
   ///
   ///[urlRequest]: The [urlRequest] to load.
   ///
@@ -119,7 +119,7 @@ class InAppBrowser {
     await _sharedChannel.invokeMethod('open', args);
   }
 
-  ///Opens the given [assetFilePath] file in a new [InAppBrowser] instance.
+  ///Opens the [InAppBrowser] instance with the given [assetFilePath] file.
   ///
   ///[options]: Options for the [InAppBrowser].
   ///
@@ -177,7 +177,7 @@ class InAppBrowser {
     await _sharedChannel.invokeMethod('open', args);
   }
 
-  ///Opens a new [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
+  ///Opens the [InAppBrowser] instance with [data] as a content, using [baseUrl] as the base URL for it.
   ///
   ///The [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
   ///

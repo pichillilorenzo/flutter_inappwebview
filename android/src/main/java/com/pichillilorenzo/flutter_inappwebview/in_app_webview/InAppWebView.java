@@ -232,11 +232,11 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (options.userAgent != null && !options.userAgent.isEmpty())
       settings.setUserAgentString(options.userAgent);
-    else if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
+    else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
       settings.setUserAgentString(WebSettings.getDefaultUserAgent(getContext()));
 
     if (options.applicationNameForUserAgent != null && !options.applicationNameForUserAgent.isEmpty()) {
-      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
         String userAgent = (options.userAgent != null && !options.userAgent.isEmpty()) ? options.userAgent : WebSettings.getDefaultUserAgent(getContext());
         String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
         settings.setUserAgentString(userAgentWithApplicationName);
@@ -390,7 +390,7 @@ final public class InAppWebView extends InputAwareWebView {
       @Override
       public void run() {
         int newPosition = getScrollY();
-        if(initialPositionScrollStoppedTask - newPosition == 0){
+        if (initialPositionScrollStoppedTask - newPosition == 0) {
           // has stopped
           onScrollStopped();
         } else {
@@ -436,8 +436,7 @@ final public class InAppWebView extends InputAwareWebView {
 
         if (options.disableHorizontalScroll && options.disableVerticalScroll) {
           return (event.getAction() == MotionEvent.ACTION_MOVE);
-        }
-        else if (options.disableHorizontalScroll || options.disableVerticalScroll) {
+        } else if (options.disableHorizontalScroll || options.disableVerticalScroll) {
           switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
               // save the x
@@ -512,8 +511,7 @@ final public class InAppWebView extends InputAwareWebView {
       clearFormData();
       settings.setSavePassword(false);
       settings.setSaveFormData(false);
-    }
-    else {
+    } else {
       settings.setCacheMode(WebSettings.LOAD_DEFAULT);
       settings.setAppCacheEnabled(true);
       settings.setSavePassword(true);
@@ -703,7 +701,7 @@ final public class InAppWebView extends InputAwareWebView {
       settings.setUserAgentString(newOptions.userAgent);
 
     if (newOptionsMap.get("applicationNameForUserAgent") != null && !options.applicationNameForUserAgent.equals(newOptions.applicationNameForUserAgent) && !newOptions.applicationNameForUserAgent.isEmpty()) {
-      if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
         String userAgent = (newOptions.userAgent != null && !newOptions.userAgent.isEmpty()) ? newOptions.userAgent : WebSettings.getDefaultUserAgent(getContext());
         String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
         settings.setUserAgentString(userAgentWithApplicationName);
@@ -797,7 +795,7 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
       if (newOptionsMap.get("disabledActionModeMenuItems") != null && (options.disabledActionModeMenuItems == null ||
-            !options.disabledActionModeMenuItems.equals(newOptions.disabledActionModeMenuItems)))
+              !options.disabledActionModeMenuItems.equals(newOptions.disabledActionModeMenuItems)))
         settings.setDisabledActionModeMenuItems(newOptions.disabledActionModeMenuItems);
 
     if (newOptionsMap.get("fantasyFontFamily") != null && !options.fantasyFontFamily.equals(newOptions.fantasyFontFamily))
@@ -834,7 +832,7 @@ final public class InAppWebView extends InputAwareWebView {
       settings.setMinimumLogicalFontSize(newOptions.minimumLogicalFontSize);
 
     if (newOptionsMap.get("initialScale") != null && !options.initialScale.equals(newOptions.initialScale))
-        setInitialScale(newOptions.initialScale);
+      setInitialScale(newOptions.initialScale);
 
     if (newOptionsMap.get("needInitialFocus") != null && options.needInitialFocus != newOptions.needInitialFocus)
       settings.setNeedInitialFocus(newOptions.needInitialFocus);
@@ -926,7 +924,7 @@ final public class InAppWebView extends InputAwareWebView {
 
     if (newOptionsMap.get("rendererPriorityPolicy") != null &&
             (options.rendererPriorityPolicy.get("rendererRequestedPriority") != newOptions.rendererPriorityPolicy.get("rendererRequestedPriority") ||
-            options.rendererPriorityPolicy.get("waivedWhenNotVisible") != newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible")) &&
+                    options.rendererPriorityPolicy.get("waivedWhenNotVisible") != newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible")) &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       setRendererPriorityPolicy(
               (int) newOptions.rendererPriorityPolicy.get("rendererRequestedPriority"),
@@ -1120,7 +1118,7 @@ final public class InAppWebView extends InputAwareWebView {
 
     List<HashMap<String, String>> history = new ArrayList<HashMap<String, String>>();
 
-    for(int i = 0; i < currentSize; i++) {
+    for (int i = 0; i < currentSize; i++) {
       WebHistoryItem historyItem = currentList.getItemAtIndex(i);
       HashMap<String, String> historyItemMap = new HashMap<>();
 
@@ -1140,10 +1138,10 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   @Override
-  protected void onScrollChanged (int x,
-                                  int y,
-                                  int oldX,
-                                  int oldY) {
+  protected void onScrollChanged(int x,
+                                 int y,
+                                 int oldX,
+                                 int oldY) {
     super.onScrollChanged(x, y, oldX, oldY);
 
     if (floatingContextMenu != null) {
@@ -1194,8 +1192,7 @@ final public class InAppWebView extends InputAwareWebView {
     final String newUserAgent;
     if (enabled) {
       newUserAgent = webSettings.getUserAgentString().replace("Mobile", "eliboM").replace("Android", "diordnA");
-    }
-    else {
+    } else {
       newUserAgent = webSettings.getUserAgentString().replace("eliboM", "Mobile").replace("diordnA", "Android");
     }
 
@@ -1237,12 +1234,9 @@ final public class InAppWebView extends InputAwareWebView {
 
   private void sendOnCreateContextMenuEvent() {
     HitTestResult hitTestResult = getHitTestResult();
-    Map<String, Object> hitTestResultMap = new HashMap<>();
-    hitTestResultMap.put("type", hitTestResult.getType());
-    hitTestResultMap.put("extra", hitTestResult.getExtra());
-
     Map<String, Object> obj = new HashMap<>();
-    obj.put("hitTestResult", hitTestResultMap);
+    obj.put("type", hitTestResult.getType());
+    obj.put("extra", hitTestResult.getExtra());
     channel.invokeMethod("onCreateContextMenu", obj);
   }
 
@@ -1283,21 +1277,21 @@ final public class InAppWebView extends InputAwareWebView {
       // workaround to hide the Keyboard when the user click outside
       // on something not focusable such as input or a textarea.
       containerView
-        .getHandler()
-        .postDelayed(
-          new Runnable() {
-            @Override
-            public void run() {
-              InputMethodManager imm =
-                      (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
-              if (imm != null && !imm.isAcceptingText()) {
+              .getHandler()
+              .postDelayed(
+                      new Runnable() {
+                        @Override
+                        public void run() {
+                          InputMethodManager imm =
+                                  (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
+                          if (imm != null && !imm.isAcceptingText()) {
 
-                imm.hideSoftInputFromWindow(
-                        containerView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
-              }
-            }
-          },
-          128);
+                            imm.hideSoftInputFromWindow(
+                                    containerView.getWindowToken(), InputMethodManager.HIDE_NOT_ALWAYS);
+                          }
+                        }
+                      },
+                      128);
     }
     return connection;
   }
@@ -1353,9 +1347,9 @@ final public class InAppWebView extends InputAwareWebView {
     if (contextMenu != null) {
       customMenuItems = (List<Map<String, Object>>) contextMenu.get("menuItems");
       Map<String, Object> contextMenuOptionsMap = (Map<String, Object>) contextMenu.get("options");
-     if (contextMenuOptionsMap != null) {
-       contextMenuOptions.parse(contextMenuOptionsMap);
-     }
+      if (contextMenuOptionsMap != null) {
+        contextMenuOptions.parse(contextMenuOptionsMap);
+      }
     }
     customMenuItems = customMenuItems == null ? new ArrayList<Map<String, Object>>() : customMenuItems;
 
@@ -1604,7 +1598,7 @@ final public class InAppWebView extends InputAwareWebView {
             .replace(PluginScriptsUtil.VAR_RESULT_UUID, resultUuid);
 
     sourceToInject = userContentController.generateCodeForScriptEvaluation(sourceToInject, contentWorld);
-    evaluateJavascript(sourceToInject,  null);
+    evaluateJavascript(sourceToInject, null);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -1621,7 +1615,7 @@ final public class InAppWebView extends InputAwareWebView {
       }
     });
   }
-  
+
   public boolean canScrollVertically() {
     return computeVerticalScrollRange() > computeVerticalScrollExtent();
   }

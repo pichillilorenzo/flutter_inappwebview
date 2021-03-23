@@ -20,7 +20,9 @@ class HeadlessInAppWebView implements WebView {
   ///View ID.
   late final String id;
 
-  bool _isDisposed = true;
+  bool _started = false;
+  bool _running = false;
+
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
 
@@ -111,10 +113,10 @@ class HeadlessInAppWebView implements WebView {
 
   ///Runs the headless WebView.
   Future<void> run() async {
-    if (!_isDisposed) {
+    if (_started) {
       return;
     }
-    _isDisposed = false;
+    _started = true;
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent(
@@ -135,17 +137,24 @@ class HeadlessInAppWebView implements WebView {
                       PullToRefreshOptions(enabled: false).toMap()
             });
     await _sharedChannel.invokeMethod('createHeadlessWebView', args);
+    _running = true;
   }
 
   ///Disposes the headless WebView.
   Future<void> dispose() async {
-    if (_isDisposed) {
+    if (!_running) {
       return;
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     await _sharedChannel.invokeMethod('disposeHeadlessWebView', args);
-    _isDisposed = true;
+    _started = false;
+    _running = false;
+  }
+
+  ///Indicates if the headless WebView is running or not.
+  bool isRunning() {
+    return _running;
   }
 
   @override

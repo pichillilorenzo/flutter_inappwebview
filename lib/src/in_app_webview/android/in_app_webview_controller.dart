@@ -7,6 +7,7 @@ import '../_static_channel.dart';
 
 import '../../types.dart';
 import '../../android/webview_feature.dart';
+import '../in_app_webview_controller.dart';
 
 ///Class represents the Android controller that contains only android-specific methods for the WebView.
 class AndroidInAppWebViewController {
@@ -42,7 +43,7 @@ class AndroidInAppWebViewController {
   }
 
   ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
-  ///To pause JavaScript globally, use [pauseTimers()]. To resume WebView, call [resume()].
+  ///To pause JavaScript globally, use [InAppWebViewController.pauseTimers]. To resume WebView, call [resume].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onPause()
   Future<void> pause() async {
@@ -50,7 +51,7 @@ class AndroidInAppWebViewController {
     await _channel.invokeMethod('pause', args);
   }
 
-  ///Resumes a WebView after a previous call to [pause()].
+  ///Resumes a WebView after a previous call to [pause].
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onResume()
   Future<void> resume() async {

@@ -136,10 +136,9 @@ public class WebMessageListener : FlutterMethodCallDelegate {
                         var event = {data: '\(messageEscaped)'};
                         if (webMessageListener.onmessage != null) {
                             webMessageListener.onmessage(event);
-                        } else {
-                            for (var listener of webMessageListener.listeners) {
-                                listener(event);
-                            }
+                        }
+                        for (var listener of webMessageListener.listeners) {
+                            listener(event);
                         }
                     }
                 })();

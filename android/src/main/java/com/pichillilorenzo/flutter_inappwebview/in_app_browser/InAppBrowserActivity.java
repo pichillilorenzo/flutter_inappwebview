@@ -401,43 +401,57 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   @Override
   public void didChangeTitle(String title) {
-    if (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty()) {
+    if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty())) {
       actionBar.setTitle(title);
     }
   }
 
   @Override
   public void didStartNavigation(String url) {
-    progressBar.setProgress(0);
-    searchView.setQuery(url, false);
+    if (progressBar != null) {
+      progressBar.setProgress(0);
+    }
+    if (searchView != null) {
+      searchView.setQuery(url, false);
+    }
   }
 
   @Override
   public void didUpdateVisitedHistory(String url) {
-    searchView.setQuery(url, false);
+    if (searchView != null) {
+      searchView.setQuery(url, false);
+    }
   }
 
   @Override
   public void didFinishNavigation(String url) {
-    searchView.setQuery(url, false);
-    progressBar.setProgress(0);
+    if (searchView != null) {
+      searchView.setQuery(url, false);
+    }
+    if (progressBar != null) {
+      progressBar.setProgress(0);
+    }
   }
 
   @Override
   public void didFailNavigation(String url, int errorCode, String description) {
-    progressBar.setProgress(0);
+    if (progressBar != null) {
+      progressBar.setProgress(0);
+    }
   }
 
   @Override
   public void didChangeProgress(int progress) {
-    progressBar.setVisibility(View.VISIBLE);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-      progressBar.setProgress(progress, true);
-    } else {
-      progressBar.setProgress(progress);
-    }
-    if (progress == 100) {
-      progressBar.setVisibility(View.GONE);
+    if (progressBar != null) {
+      progressBar.setVisibility(View.VISIBLE);
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        progressBar.setProgress(progress, true);
+      } else {
+        progressBar.setProgress(progress);
+      }
+      if (progress == 100) {
+        progressBar.setVisibility(View.GONE);
+      }
     }
   }
 

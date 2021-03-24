@@ -18,11 +18,10 @@ labels: bug
     ❗️❗️❗️ IMPORTANT ❗️❗️❗️
 -->
 
-- [x] I have read the [README](https://github.com/pichillilorenzo/flutter_inappwebview/blob/master/README.md)
+- [x] I have read the [Get Started - Installation](https://inappwebview.dev/docs/get-started/installation/) section
+- [x] I have read and done the [Get Started - Setup Android](https://inappwebview.dev/docs/get-started/setup-android/) section
+- [x] I have read and done the [Get Started - Setup iOS](https://inappwebview.dev/docs/get-started/setup-ios/) section
 - [x] I have already searched for the same problem
-- [x] I have read and done the setup for Android: [IMPORTANT Note for Android and iOS](https://github.com/pichillilorenzo/flutter_inappwebview#important-note-for-android-and-ios) and [IMPORTANT Note for Android](https://github.com/pichillilorenzo/flutter_inappwebview#important-note-for-android)
-- [x] I have read and done the setup for iOS: [IMPORTANT Note for Android and iOS](https://github.com/pichillilorenzo/flutter_inappwebview#important-note-for-android-and-ios) and [IMPORTANT Note for iOS](https://github.com/pichillilorenzo/flutter_inappwebview#important-note-for-ios)
-- [x] I have ran the sample app and it does not work there
 
 ## Environment
 

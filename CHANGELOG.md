@@ -1,10 +1,12 @@
 ## 5.2.1
 
 - Added `isRunning` method to the `HeadlessInAppWebView` class
+- Added `isRunning` method to the `InAppLocalhostServer` class
 - Added `allowGoBackWithBackButton` and `shouldCloseOnBackButtonPressed` Android-specific InAppBrowser options
 - Fixed iOS `WebMessageListener` javascript implementation not calling event listeners when `onmessage` is set
 - Fixed `onCreateContextMenu` event on Android where `hitTestResult` has always `null` values
 - Fixed "java.lang.NullPointerException: Attempt to invoke virtual method 'void android.widget.SearchView.setQuery(java.lang.CharSequence, boolean)' on a null object reference" [#742](https://github.com/pichillilorenzo/flutter_inappwebview/issues/742)
+- Fixed Android js error in some very rare case where `window.flutter_inappwebview` is `undefined` when loading plugin scripts
 
 ## 5.2.0
 

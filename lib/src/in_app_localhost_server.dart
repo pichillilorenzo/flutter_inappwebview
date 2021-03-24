@@ -8,6 +8,7 @@ import 'mime_type_resolver.dart';
 
 ///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server. The default [port] value is `8080`.
 class InAppLocalhostServer {
+  bool _started = false;
   HttpServer? _server;
   int _port = 8080;
 
@@ -27,9 +28,10 @@ class InAppLocalhostServer {
   ///```
   ///The `NSAllowsLocalNetworking` key is available since **iOS 10**.
   Future<void> start() async {
-    if (this._server != null) {
+    if (this._started) {
       throw Exception('Server already started on http://localhost:$_port');
     }
+    this._started = true;
 
     var completer = Completer();
 
@@ -78,10 +80,17 @@ class InAppLocalhostServer {
 
   ///Closes the server.
   Future<void> close() async {
-    if (this._server != null) {
-      await this._server!.close(force: true);
-      print('Server running on http://localhost:$_port closed');
-      this._server = null;
+    if (this._server == null) {
+      return;
     }
+    await this._server!.close(force: true);
+    print('Server running on http://localhost:$_port closed');
+    this._started = false;
+    this._server = null;
+  }
+
+  ///Indicates if the server is running or not.
+  bool isRunning() {
+    return this._server != null;
   }
 }

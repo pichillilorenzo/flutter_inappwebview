@@ -212,13 +212,15 @@ public class JavaScriptBridgeJS {
           "};";
 
   public static final String JAVASCRIPT_BRIDGE_JS_SOURCE = "if (window.top == null || window.top === window) {" +
-          "  window." + JAVASCRIPT_BRIDGE_NAME + ".callHandler = function() {" +
-          "    var _callHandlerID = setTimeout(function(){});" +
-          "    window." + JAVASCRIPT_BRIDGE_NAME + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
-          "    return new Promise(function(resolve, reject) {" +
-          "      window." + JAVASCRIPT_BRIDGE_NAME + "[_callHandlerID] = resolve;" +
-          "    });" +
-          "  };"+
+          "  if (window." + JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+          "    window." + JAVASCRIPT_BRIDGE_NAME + ".callHandler = function() {" +
+          "      var _callHandlerID = setTimeout(function(){});" +
+          "      window." + JAVASCRIPT_BRIDGE_NAME + "._callHandler(arguments[0], _callHandlerID, JSON.stringify(Array.prototype.slice.call(arguments, 1)));" +
+          "      return new Promise(function(resolve, reject) {" +
+          "        window." + JAVASCRIPT_BRIDGE_NAME + "[_callHandlerID] = resolve;" +
+          "      });" +
+          "    };" +
+          "  }"+
           "} else {" +
           "  window." + JAVASCRIPT_BRIDGE_NAME + " = {};" +
           "  window." + JAVASCRIPT_BRIDGE_NAME + ".callHandler = function() {" +
@@ -229,10 +231,12 @@ public class JavaScriptBridgeJS {
           "    });" +
           "  };" +
           "}" +
-          UTIL_JS_SOURCE;
+          "if (window." + JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+          "  " + UTIL_JS_SOURCE +
+          "}";
 
   public static final String PLATFORM_READY_JS_SOURCE = "(function() {" +
-          "  if ((window.top == null || window.top === window) && window." + JAVASCRIPT_BRIDGE_NAME + "._platformReady == null) {" +
+          "  if ((window.top == null || window.top === window) && window." + JAVASCRIPT_BRIDGE_NAME + " != null && window." + JAVASCRIPT_BRIDGE_NAME + "._platformReady == null) {" +
           "    window.dispatchEvent(new Event('flutterInAppWebViewPlatformReady'));" +
           "    window." + JAVASCRIPT_BRIDGE_NAME + "._platformReady = true;" +
           "  }" +

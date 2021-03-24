@@ -44,7 +44,8 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
     options.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
     options.closeOnCannotGoBack = map["closeOnCannotGoBack"];
     options.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
-    options.shouldCloseOnBackButtonPressed = map["shouldCloseOnBackButtonPressed"];
+    options.shouldCloseOnBackButtonPressed =
+        map["shouldCloseOnBackButtonPressed"];
     return options;
   }
 

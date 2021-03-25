@@ -4,6 +4,7 @@ import '../../in_app_browser/in_app_browser_options.dart';
 
 import '../in_app_webview_options.dart';
 import '../webview.dart';
+import '../in_app_webview_controller.dart';
 
 class IosOptions {}
 
@@ -181,6 +182,9 @@ class IOSInAppWebViewOptions
   ///- [InAppWebViewController.getHitTestResult]
   ///- [InAppWebViewController.requestFocusNodeHref]
   ///- [InAppWebViewController.requestImageRef]
+  ///- [InAppWebViewController.postWebMessage]
+  ///- [InAppWebViewController.createWebMessageChannel]
+  ///- [InAppWebViewController.addWebMessageListener]
   ///
   ///Options affected:
   ///- [WebView.initialUserScripts]

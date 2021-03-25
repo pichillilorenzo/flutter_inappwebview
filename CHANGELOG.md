@@ -1,3 +1,7 @@
+## 5.2.1+1
+
+- Fixed iOS "Unexpectedly found nil while unwrapping an Optional value: file flutter_inappwebview/WKUserContentController.swift, line 36" error when `applePayAPIEnabled` iOS-specific WebView option is enabled
+
 ## 5.2.1
 
 - Added `isRunning` method to the `HeadlessInAppWebView` class

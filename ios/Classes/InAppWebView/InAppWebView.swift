@@ -412,19 +412,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func prepareAndAddUserScripts() -> Void {
-        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
-            return
-        }
-        
         if windowId != nil {
             // The new created window webview has the same WKWebViewConfiguration variable reference.
             // So, we cannot set another WKWebViewConfiguration for it unfortunately!
             // This is a limitation of the official WebKit API.
             return
         }
-        
         configuration.userContentController = WKUserContentController()
         configuration.userContentController.initialize()
+        
+        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+            return
+        }
+        
         configuration.userContentController.addPluginScript(PROMISE_POLYFILL_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(CONSOLE_LOG_JS_PLUGIN_SCRIPT)

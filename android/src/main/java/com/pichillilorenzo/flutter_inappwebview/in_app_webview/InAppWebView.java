@@ -116,7 +116,7 @@ final public class InAppWebView extends InputAwareWebView {
   public InAppWebViewOptions options;
   public boolean isLoading = false;
   public OkHttpClient httpClient;
-  public float scale = getResources().getDisplayMetrics().density;
+  public float zoomScale = 1.0f;
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
   public Pattern regexToCancelSubFramesLoadingCompiled;
@@ -579,6 +579,8 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void takeScreenshot(final @Nullable Map<String, Object> screenshotConfiguration, final MethodChannel.Result result) {
+    final float pixelDensity = Util.getPixelDensity(getContext());
+    
     headlessHandler.post(new Runnable() {
       @Override
       public void run() {
@@ -595,10 +597,10 @@ final public class InAppWebView extends InputAwareWebView {
           if (screenshotConfiguration != null) {
             Map<String, Double> rect = (Map<String, Double>) screenshotConfiguration.get("rect");
             if (rect != null) {
-              int rectX = (int) Math.floor(rect.get("x") * scale + 0.5);
-              int rectY = (int) Math.floor(rect.get("y") * scale + 0.5);
-              int rectWidth = Math.min(resized.getWidth(), (int) Math.floor(rect.get("width") * scale + 0.5));
-              int rectHeight = Math.min(resized.getHeight(), (int) Math.floor(rect.get("height") * scale + 0.5));
+              int rectX = (int) Math.floor(rect.get("x") * pixelDensity + 0.5);
+              int rectY = (int) Math.floor(rect.get("y") * pixelDensity + 0.5);
+              int rectWidth = Math.min(resized.getWidth(), (int) Math.floor(rect.get("width") * pixelDensity + 0.5));
+              int rectHeight = Math.min(resized.getHeight(), (int) Math.floor(rect.get("height") * pixelDensity + 0.5));
               resized = Bitmap.createBitmap(
                       resized,
                       rectX,
@@ -609,7 +611,7 @@ final public class InAppWebView extends InputAwareWebView {
 
             Double snapshotWidth = (Double) screenshotConfiguration.get("snapshotWidth");
             if (snapshotWidth != null) {
-              int dstWidth = (int) Math.floor(snapshotWidth * scale + 0.5);
+              int dstWidth = (int) Math.floor(snapshotWidth * pixelDensity + 0.5);
               float ratioBitmap = (float) resized.getWidth() / (float) resized.getHeight();
               int dstHeight = (int) ((float) dstWidth / ratioBitmap);
               resized = Bitmap.createScaledBitmap(resized, dstWidth, dstHeight, true);
@@ -1222,10 +1224,6 @@ final public class InAppWebView extends InputAwareWebView {
     }
   }
 
-  public Float getUpdatedScale() {
-    return scale;
-  }
-
   @Override
   public void onCreateContextMenu(ContextMenu menu) {
     super.onCreateContextMenu(menu);
@@ -1509,7 +1507,7 @@ final public class InAppWebView extends InputAwareWebView {
         if (floatingContextMenu != null) {
           if (value != null && !value.equalsIgnoreCase("null")) {
             int x = contextMenuPoint.x;
-            int y = (int) ((Float.parseFloat(value) * scale) + (floatingContextMenu.getHeight() / 3.5));
+            int y = (int) ((Float.parseFloat(value) * Util.getPixelDensity(getContext())) + (floatingContextMenu.getHeight() / 3.5));
             contextMenuPoint.y = y;
             onFloatingActionGlobalLayout(x, y);
           } else {

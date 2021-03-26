@@ -101,12 +101,6 @@ class InAppWebViewController {
 
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
-      case "onHeadlessWebViewCreated":
-        if (_webview != null &&
-            _webview is HeadlessInAppWebView &&
-            _webview!.onWebViewCreated != null)
-          _webview!.onWebViewCreated!(this);
-        break;
       case "onLoadStart":
         if ((_webview != null && _webview!.onLoadStart != null) ||
             _inAppBrowser != null) {
@@ -361,13 +355,17 @@ class InAppWebViewController {
                 ?.toMap();
         }
         break;
-      case "onScaleChanged":
-        if ((_webview != null && _webview!.androidOnScaleChanged != null) ||
+      case "onZoomScaleChanged":
+        if ((_webview != null && (_webview!.androidOnScaleChanged != null || _webview!.onZoomScaleChanged != null)) ||
             _inAppBrowser != null) {
           double oldScale = call.arguments["oldScale"];
           double newScale = call.arguments["newScale"];
-          if (_webview != null && _webview!.androidOnScaleChanged != null)
-            _webview!.androidOnScaleChanged!(this, oldScale, newScale);
+          if (_webview != null) {
+            if (_webview!.onZoomScaleChanged != null)
+              _webview!.onZoomScaleChanged!(this, oldScale, newScale);
+            else
+              _webview!.androidOnScaleChanged!(this, oldScale, newScale);
+          }
           else
             _inAppBrowser!.androidOnScaleChanged(oldScale, newScale);
         }
@@ -1703,16 +1701,18 @@ class InAppWebViewController {
     return await _channel.invokeMethod('zoomBy', args);
   }
 
-  ///Gets the current scale of this WebView.
-  ///
-  ///**Official Android API**:
-  ///- https://developer.android.com/reference/android/util/DisplayMetrics#density
-  ///- https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)
+  ///Gets the current zoom scale of the WebView.
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale
-  Future<double?> getScale() async {
+  Future<double?> getZoomScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('getScale', args);
+    return await _channel.invokeMethod('getZoomScale', args);
+  }
+
+  ///Use [getZoomScale] instead.
+  @Deprecated('Use `getZoomScale` instead')
+  Future<double?> getScale() async {
+    return await getZoomScale();
   }
 
   ///Gets the selected text.

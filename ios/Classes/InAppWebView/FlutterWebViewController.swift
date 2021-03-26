@@ -17,7 +17,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
     var myView: UIView?
     var methodCallDelegate: InAppWebViewMethodHandler?
 
-    init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Any, arguments args: NSDictionary) {
+    init(registrar: FlutterPluginRegistrar, withFrame frame: CGRect, viewIdentifier viewId: Any, params: NSDictionary) {
         super.init()
         
         self.registrar = registrar
@@ -29,14 +29,11 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         myView = UIView(frame: frame)
         myView!.clipsToBounds = true
         
-        let initialUrlRequest = args["initialUrlRequest"] as? [String: Any?]
-        let initialFile = args["initialFile"] as? String
-        let initialData = args["initialData"] as? [String: String]
-        let initialOptions = args["initialOptions"] as! [String: Any?]
-        let contextMenu = args["contextMenu"] as? [String: Any]
-        let windowId = args["windowId"] as? Int64
-        let initialUserScripts = args["initialUserScripts"] as? [[String: Any]]
-        let pullToRefreshInitialOptions = args["pullToRefreshOptions"] as! [String: Any?]
+        let initialOptions = params["initialOptions"] as! [String: Any?]
+        let contextMenu = params["contextMenu"] as? [String: Any]
+        let windowId = params["windowId"] as? Int64
+        let initialUserScripts = params["initialUserScripts"] as? [[String: Any]]
+        let pullToRefreshInitialOptions = params["pullToRefreshOptions"] as! [String: Any?]
         
         var userScripts: [UserScript] = []
         if let initialUserScripts = initialUserScripts {
@@ -83,6 +80,17 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         webView!.options = options
         webView!.prepare()
         webView!.windowCreated = true
+    }
+    
+    public func view() -> UIView {
+        return myView!
+    }
+    
+    public func makeInitialLoad(params: NSDictionary) {
+        let windowId = params["windowId"] as? Int64
+        let initialUrlRequest = params["initialUrlRequest"] as? [String: Any?]
+        let initialFile = params["initialFile"] as? String
+        let initialData = params["initialData"] as? [String: String]
         
         if windowId == nil {
             if #available(iOS 11.0, *) {
@@ -116,37 +124,9 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         else if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView!.load(webViewTransport.request)
         }
-        
-        if (frame.isEmpty && viewId is String) {
-            /// Note: The WKWebView behaves very unreliable when rendering offscreen
-            /// on a device. This is especially true with JavaScript, which simply
-            /// won't be executed sometimes.
-            /// Therefore, I decided to add this very ugly hack where the rendering
-            /// webview will be added to the view hierarchy (between the
-            /// rootViewController's view and the key window).
-            self.myView!.alpha = 0.01
-            UIApplication.shared.keyWindow!.insertSubview(self.myView!, at: 0)
-
-            let arguments: [String: Any] = ["id": viewId]
-            channel!.invokeMethod("onHeadlessWebViewCreated", arguments: arguments)
-        }
     }
     
-    deinit {
-        print("FlutterWebViewController - dealloc")
-        channel?.setMethodCallHandler(nil)
-        methodCallDelegate?.webView = nil
-        methodCallDelegate = nil
-        webView?.dispose()
-        webView = nil
-        myView = nil
-    }
-    
-    public func view() -> UIView {
-        return myView!
-    }
-    
-    public func load(initialUrlRequest: [String:Any?]?, initialFile: String?, initialData: [String: String]?) {
+    func load(initialUrlRequest: [String:Any?]?, initialFile: String?, initialData: [String: String]?) {
         if let initialFile = initialFile {
             do {
                 try webView?.loadFile(assetFilePath: initialFile)
@@ -173,5 +153,19 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
             }
             webView?.loadUrl(urlRequest: urlRequest, allowingReadAccessTo: allowingReadAccessToURL)
         }
+    }
+    
+    func dispose() {
+        channel?.setMethodCallHandler(nil)
+        methodCallDelegate?.webView = nil
+        methodCallDelegate = nil
+        webView?.dispose()
+        webView = nil
+        myView = nil
+    }
+    
+    deinit {
+        print("FlutterWebViewController - dealloc")
+        dispose()
     }
 }

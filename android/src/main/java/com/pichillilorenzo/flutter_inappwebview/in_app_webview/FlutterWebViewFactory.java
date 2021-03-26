@@ -23,7 +23,9 @@ public class FlutterWebViewFactory extends PlatformViewFactory {
   @Override
   public PlatformView create(Context context, int id, Object args) {
     HashMap<String, Object> params = (HashMap<String, Object>) args;
-    return new FlutterWebView(messenger, context, id, params, containerView);
+    FlutterWebView flutterWebView = new FlutterWebView(messenger, context, id, params, containerView);
+    flutterWebView.makeInitialLoad(params);
+    return flutterWebView;
   }
 }
 

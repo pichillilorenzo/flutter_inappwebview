@@ -23,6 +23,7 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
@@ -508,12 +509,12 @@ public class InAppWebViewClient extends WebViewClient {
   public void onScaleChanged(WebView view, float oldScale, float newScale) {
     super.onScaleChanged(view, oldScale, newScale);
     final InAppWebView webView = (InAppWebView) view;
-    webView.scale = newScale;
+    webView.zoomScale = newScale / Util.getPixelDensity(webView.getContext());
 
     Map<String, Object> obj = new HashMap<>();
     obj.put("oldScale", oldScale);
     obj.put("newScale", newScale);
-    channel.invokeMethod("onScaleChanged", obj);
+    channel.invokeMethod("onZoomScaleChanged", obj);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.O_MR1)

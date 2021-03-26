@@ -3247,6 +3247,45 @@ setTimeout(function() {
       await expectLater(onTitleChangedCompleter.future, completes);
     });
 
+    testWidgets('onZoomScaleChanged', (WidgetTester tester) async {
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<void> pageLoaded = Completer<void>();
+      final Completer<void> onZoomScaleChangedCompleter = Completer<void>();
+
+      var listenForScaleChange = false;
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrlRequest:
+            URLRequest(url: Uri.parse('https://github.com/flutter')),
+            onWebViewCreated: (controller) {
+              controllerCompleter.complete(controller);
+            },
+            onLoadStop: (controller, url) {
+              pageLoaded.complete();
+            },
+            onZoomScaleChanged: (controller, oldScale, newScale) {
+              if (listenForScaleChange) {
+                onZoomScaleChangedCompleter.complete();
+              }
+            },
+          ),
+        ),
+      );
+
+      final InAppWebViewController controller =
+      await controllerCompleter.future;
+      await pageLoaded.future;
+      listenForScaleChange = true;
+
+      await controller.zoomBy(zoomFactor: 2);
+
+      await expectLater(onZoomScaleChangedCompleter.future, completes);
+    });
+
     testWidgets('androidOnPermissionRequest', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
@@ -3339,50 +3378,6 @@ setTimeout(function() {
       await pageLoaded.future;
       await loadedResourceCompleter.future;
       expect(resourceLoaded, containsAll(resourceList));
-    }, skip: !Platform.isAndroid);
-
-    testWidgets('androidOnScaleChanged', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
-      final Completer<void> pageLoaded = Completer<void>();
-      final Completer<void> onScaleChangedCompleter = Completer<void>();
-
-      var listenForScaleChange = false;
-
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: Uri.parse('https://flutter.dev/')),
-            onWebViewCreated: (controller) {
-              controllerCompleter.complete(controller);
-            },
-            onLoadStop: (controller, url) {
-              pageLoaded.complete();
-            },
-            androidOnScaleChanged: (controller, oldScale, newScale) {
-              if (listenForScaleChange) {
-                onScaleChangedCompleter.complete();
-              }
-            },
-          ),
-        ),
-      );
-
-      final InAppWebViewController controller =
-          await controllerCompleter.future;
-      await pageLoaded.future;
-      listenForScaleChange = true;
-
-      await controller.evaluateJavascript(source: """
-    var meta = document.createElement('meta');
-    meta.setAttribute('name', 'viewport');
-    meta.setAttribute('content', 'width=device-width, initial-scale=2.0, maximum-scale=2.0, minimum-scale=2.0, user-scalable=no');
-    document.getElementsByTagName('head')[0].appendChild(meta);
-    """);
-
-      await expectLater(onScaleChangedCompleter.future, completes);
     }, skip: !Platform.isAndroid);
 
     testWidgets('androidOnReceivedIcon', (WidgetTester tester) async {
@@ -4540,7 +4535,7 @@ setTimeout(function() {
           controller.zoomBy(zoomFactor: 3.0, iosAnimated: true), completes);
     });
 
-    testWidgets('getScale', (WidgetTester tester) async {
+    testWidgets('getZoomScale', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
@@ -4565,7 +4560,7 @@ setTimeout(function() {
           await controllerCompleter.future;
       await pageLoaded.future;
 
-      final scale = await controller.getScale();
+      final scale = await controller.getZoomScale();
       expect(scale, isNonZero);
       expect(scale, isPositive);
     });

@@ -293,8 +293,8 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 webView?.reloadFromOrigin()
                 result(true)
                 break
-            case "getScale":
-                result(webView?.getScale())
+            case "getZoomScale":
+                result(webView?.getZoomScale())
                 break
             case "hasOnlySecureContent":
                 result(webView?.hasOnlySecureContent ?? false)

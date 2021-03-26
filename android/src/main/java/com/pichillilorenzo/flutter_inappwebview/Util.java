@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
+import android.content.Context;
 import android.content.res.AssetManager;
 import android.net.http.SslCertificate;
 import android.os.Build;
@@ -286,5 +287,9 @@ public class Util {
         i = end;
       } while (i < newline);
     }
+  }
+
+  public static float getPixelDensity(Context context) {
+    return context.getResources().getDisplayMetrics().density;
   }
 }

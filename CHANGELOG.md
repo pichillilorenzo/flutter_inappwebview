@@ -1,3 +1,12 @@
+## 5.3.0
+
+- Added `initialSize` property to the `HeadlessInAppWebView` class
+- Added `setSize` and `getSize` methods to the `HeadlessInAppWebView` class
+- `androidOnScaleChanged` WebView event is now deprecated. Use the new `onZoomScaleChanged` WebView event, that is available for both Android and iOS
+- `getScale` WebView method is now deprecated. Use the new `getZoomScale` WebView method
+- Removed `final` keyword for all `HeadlessInAppWebView` events
+- Fixed wrong usage of Android WebView scale property
+
 ## 5.2.1+1
 
 - Fixed iOS "Unexpectedly found nil while unwrapping an Optional value: file flutter_inappwebview/WKUserContentController.swift, line 36" error when `applePayAPIEnabled` iOS-specific WebView option is enabled

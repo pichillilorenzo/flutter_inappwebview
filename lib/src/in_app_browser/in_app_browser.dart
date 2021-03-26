@@ -59,7 +59,7 @@ class InAppBrowser {
       const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
   /// WebView Controller that can be used to access the [InAppWebViewController] API.
-  late InAppWebViewController webViewController;
+  late final InAppWebViewController webViewController;
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
@@ -620,6 +620,19 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#onOverScrolled(int,%20int,%20boolean,%20boolean)
   void onOverScrolled(int x, int y, bool clampedX, bool clampedY) {}
 
+  ///Event fired when the zoom scale of the WebView has changed.
+  ///
+  ///[oldScale] The old zoom scale factor.
+  ///
+  ///[newScale] The new zoom scale factor.
+  ///
+  ///**NOTE**: available only on Android.
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)
+  ///
+  ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom
+  void onZoomScaleChanged(double oldScale, double newScale) {}
+
   ///Event fired when the WebView notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
   ///
@@ -738,15 +751,8 @@ class InAppBrowser {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)
   Future<FormResubmissionAction?>? androidOnFormResubmission(Uri? url) {}
 
-  ///Event fired when the scale applied to the WebView has changed.
-  ///
-  ///[oldScale] The old scale factor.
-  ///
-  ///[newScale] The new scale factor.
-  ///
-  ///**NOTE**: available only on Android.
-  ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)
+  ///Use [onZoomScaleChanged] instead.
+  @Deprecated('Use `onZoomScaleChanged` instead')
   void androidOnScaleChanged(double oldScale, double newScale) {}
 
   ///Event fired when there is new favicon for the current page.

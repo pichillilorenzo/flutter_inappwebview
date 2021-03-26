@@ -19,11 +19,10 @@
  *
  */
 
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
-
-import android.app.Activity;
+package com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview;
 
 import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -33,14 +32,11 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-/**
- * InAppBrowserManager
- */
 public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHandler {
 
-  public MethodChannel channel;
   protected static final String LOG_TAG = "HeadlessInAppWebViewManager";
-  Map<String, FlutterWebView> flutterWebViews = new HashMap<>();
+  public MethodChannel channel;
+  public static final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
 
   public HeadlessInAppWebViewManager(BinaryMessenger messenger) {
     channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_headless_inappwebview");
@@ -49,19 +45,14 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
 
   @Override
   public void onMethodCall(final MethodCall call, final Result result) {
-    final Activity activity = Shared.activity;
     final String id = (String) call.argument("id");
 
     switch (call.method) {
-      case "createHeadlessWebView":
+      case "run":
         {
           HashMap<String, Object> params = (HashMap<String, Object>) call.argument("params");
-          createHeadlessWebView(activity, id, params);
+          HeadlessInAppWebViewManager.run(id, params);
         }
-        result.success(true);
-        break;
-      case "disposeHeadlessWebView":
-        disposeHeadlessWebView(id);
         result.success(true);
         break;
       default:
@@ -70,19 +61,18 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
 
   }
 
-  public void createHeadlessWebView(Activity activity, String id, HashMap<String, Object> params) {
-    FlutterWebView flutterWebView = new FlutterWebView(Shared.messenger, activity, id, params, null);
-    flutterWebViews.put(id, flutterWebView);
-  }
-
-  public void disposeHeadlessWebView(String id) {
-    if (flutterWebViews.containsKey(id)) {
-      flutterWebViews.get(id).dispose();
-      flutterWebViews.remove(id);
-    }
+  public static void run(String id, HashMap<String, Object> params) {
+    FlutterWebView flutterWebView = new FlutterWebView(Shared.messenger, Shared.activity, id, params, null);
+    HeadlessInAppWebView headlessInAppWebView = new HeadlessInAppWebView(Shared.messenger, id, flutterWebView);
+    HeadlessInAppWebViewManager.webViews.put(id, headlessInAppWebView);
+    
+    headlessInAppWebView.prepare(params);
+    headlessInAppWebView.onWebViewCreated();
+    flutterWebView.makeInitialLoad(params);
   }
 
   public void dispose() {
+    HeadlessInAppWebViewManager.webViews.clear();
     channel.setMethodCallHandler(null);
   }
 }

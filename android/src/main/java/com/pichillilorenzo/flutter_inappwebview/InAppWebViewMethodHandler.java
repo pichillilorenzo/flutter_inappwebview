@@ -2,7 +2,6 @@ package com.pichillilorenzo.flutter_inappwebview;
 
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
@@ -332,8 +331,8 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "getOriginalUrl":
         result.success((webView != null) ? webView.getOriginalUrl() : null);
         break;
-      case "getScale":
-        result.success((webView != null) ? webView.getUpdatedScale() : null);
+      case "getZoomScale":
+        result.success((webView != null) ? webView.zoomScale : null);
         break;
       case "getSelectedText":
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {

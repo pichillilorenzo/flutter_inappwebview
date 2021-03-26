@@ -485,3 +485,23 @@ extension HexColor on Color {
       '${green.toRadixString(16).padLeft(2, '0')}'
       '${blue.toRadixString(16).padLeft(2, '0')}';
 }
+
+extension MapSize on Size {
+  static Size? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return Size(map["width"] ?? -1.0, map["height"] ?? -1.0);
+  }
+
+  Map<String, double> toJson() {
+    return toMap();
+  }
+
+  Map<String, double> toMap() {
+    return {
+      'width': width,
+      'height': height
+    };
+  }
+}

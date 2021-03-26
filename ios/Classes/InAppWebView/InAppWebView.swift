@@ -53,6 +53,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     var callAsyncJavaScriptBelowIOS14Results: [String:((Any?) -> Void)] = [:]
     
+    var oldZoomScale = Float(1.0)
+    
     init(frame: CGRect, configuration: WKWebViewConfiguration, contextMenu: [String: Any]?, channel: FlutterMethodChannel?, userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
         self.channel = channel
@@ -270,6 +272,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         scrollView.addGestureRecognizer(self.longPressRecognizer)
         scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old], context: nil)
+        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale), options: [.new, .old], context: nil)
         
         addObserver(self,
                     forKeyPath: #keyPath(WKWebView.estimatedProgress),
@@ -2056,6 +2059,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
+    public func scrollViewDidZoom(_ scrollView: UIScrollView) {
+        let newScale = Float(scrollView.zoomScale)
+        if newScale != oldZoomScale {
+            self.onZoomScaleChanged(newScale: newScale, oldScale: oldZoomScale)
+            oldZoomScale = newScale
+        }
+    }
+    
     public func webView(_ webView: WKWebView,
                         createWebViewWith configuration: WKWebViewConfiguration,
                   for navigationAction: WKNavigationAction,
@@ -2304,6 +2315,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     public func onScrollChanged(x: Int, y: Int) {
         let arguments: [String: Any] = ["x": x, "y": y]
         channel?.invokeMethod("onScrollChanged", arguments: arguments)
+    }
+    
+    public func onZoomScaleChanged(newScale: Float, oldScale: Float) {
+        let arguments: [String: Any] = ["newScale": newScale, "oldScale": oldScale]
+        channel?.invokeMethod("onZoomScaleChanged", arguments: arguments)
     }
     
     public func onOverScrolled(x: Int, y: Int, clampedX: Bool, clampedY: Bool) {
@@ -2678,7 +2694,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         scrollView.setZoomScale(currentZoomScale * CGFloat(zoomFactor), animated: animated)
     }
     
-    public func getScale() -> Float {
+    public func getZoomScale() -> Float {
         return Float(scrollView.zoomScale)
     }
     
@@ -2869,6 +2885,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             imp_removeBlock(imp)
         }
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
+        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
         longPressRecognizer.removeTarget(self, action: #selector(longPressGestureDetected))
         longPressRecognizer.delegate = nil
         scrollView.removeGestureRecognizer(longPressRecognizer)

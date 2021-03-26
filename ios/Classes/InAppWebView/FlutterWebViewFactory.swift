@@ -25,7 +25,8 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
         let webviewController = FlutterWebViewController(registrar: registrar!,
                                                          withFrame: frame,
                                                          viewIdentifier: viewId,
-                                                         arguments: arguments!)
+                                                         params: arguments!)
+        webviewController.makeInitialLoad(params: arguments!)
         return webviewController
     }
 }

@@ -44,16 +44,14 @@ public class FlutterWebView implements PlatformView {
   public InAppWebViewMethodHandler methodCallDelegate;
   public PullToRefreshLayout pullToRefreshLayout;
 
-  public FlutterWebView(BinaryMessenger messenger, final Context context, Object id, HashMap<String, Object> params, View containerView) {
+  public FlutterWebView(BinaryMessenger messenger, final Context context, Object id, 
+                        HashMap<String, Object> params, View containerView) {
     channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_" + id);
 
     DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
     DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
     displayListenerProxy.onPreWebViewInitialization(displayManager);
-
-    Map<String, Object> initialUrlRequest = (Map<String, Object>) params.get("initialUrlRequest");
-    final String initialFile = (String) params.get("initialFile");
-    final Map<String, String> initialData = (Map<String, String>) params.get("initialData");
+    
     Map<String, Object> initialOptions = (Map<String, Object>) params.get("initialOptions");
     Map<String, Object> contextMenu = (Map<String, Object>) params.get("contextMenu");
     Integer windowId = (Integer) params.get("windowId");
@@ -95,6 +93,18 @@ public class FlutterWebView implements PlatformView {
     channel.setMethodCallHandler(methodCallDelegate);
 
     webView.prepare();
+  }
+
+  @Override
+  public View getView() {
+    return pullToRefreshLayout != null ? pullToRefreshLayout : webView;
+  }
+
+  public void makeInitialLoad(HashMap<String, Object> params) {
+    Integer windowId = (Integer) params.get("windowId");
+    Map<String, Object> initialUrlRequest = (Map<String, Object>) params.get("initialUrlRequest");
+    final String initialFile = (String) params.get("initialFile");
+    final Map<String, String> initialData = (Map<String, String>) params.get("initialData");
 
     if (windowId != null) {
       Message resultMsg = InAppWebViewChromeClient.windowWebViewMessages.get(windowId);
@@ -109,7 +119,6 @@ public class FlutterWebView implements PlatformView {
         } catch (IOException e) {
           e.printStackTrace();
           Log.e(LOG_TAG, initialFile + " asset file cannot be found!", e);
-          return;
         }
       }
       else if (initialData != null) {
@@ -125,16 +134,6 @@ public class FlutterWebView implements PlatformView {
         webView.loadUrl(urlRequest);
       }
     }
-
-    if (containerView == null && id instanceof String) {
-      Map<String, Object> obj = new HashMap<>();
-      channel.invokeMethod("onHeadlessWebViewCreated", obj);
-    }
-  }
-
-  @Override
-  public View getView() {
-    return pullToRefreshLayout != null ? pullToRefreshLayout : webView;
   }
 
   @Override

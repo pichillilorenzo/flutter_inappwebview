@@ -6,6 +6,7 @@
 - `getScale` WebView method is now deprecated. Use the new `getZoomScale` WebView method
 - Removed `final` keyword for all `HeadlessInAppWebView` events
 - Fixed wrong usage of Android WebView scale property
+- Fixed "java.lang.NullPointerException: com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewRenderProcessClient$1.success(InAppWebViewRenderProcessClient.java:37)" [#757](https://github.com/pichillilorenzo/flutter_inappwebview/issues/757)
 
 ## 5.2.1+1
 

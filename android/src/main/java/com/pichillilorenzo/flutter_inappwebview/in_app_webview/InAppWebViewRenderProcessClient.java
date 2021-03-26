@@ -33,14 +33,16 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
 
       @Override
       public void success(@Nullable Object response) {
-        Map<String, Object> responseMap = (Map<String, Object>) response;
-        Integer action = (Integer) responseMap.get("action");
-        if (action != null && renderer != null) {
-          switch (action) {
-            case 0:
-              if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
-                renderer.terminate();
-              break;
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          Integer action = (Integer) responseMap.get("action");
+          if (action != null && renderer != null) {
+            switch (action) {
+              case 0:
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
+                  renderer.terminate();
+                break;
+            }
           }
         }
       }
@@ -65,14 +67,16 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
 
       @Override
       public void success(@Nullable Object response) {
-        Map<String, Object> responseMap = (Map<String, Object>) response;
-        Integer action = (Integer) responseMap.get("action");
-        if (action != null && renderer != null) {
-          switch (action) {
-            case 0:
-              if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
-                renderer.terminate();
-              break;
+        if (response != null) {
+          Map<String, Object> responseMap = (Map<String, Object>) response;
+          Integer action = (Integer) responseMap.get("action");
+          if (action != null && renderer != null) {
+            switch (action) {
+              case 0:
+                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
+                  renderer.terminate();
+                break;
+            }
           }
         }
       }

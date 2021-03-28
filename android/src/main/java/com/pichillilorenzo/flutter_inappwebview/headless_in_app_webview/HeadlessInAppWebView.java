@@ -7,7 +7,7 @@ import android.widget.FrameLayout;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.Size2D;
@@ -15,7 +15,6 @@ import com.pichillilorenzo.flutter_inappwebview.types.Size2D;
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -27,11 +26,14 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
   public final MethodChannel channel;
   @Nullable
   public FlutterWebView flutterWebView;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public HeadlessInAppWebView(BinaryMessenger messenger, @NonNull String id, @NonNull FlutterWebView flutterWebView) {
+  public HeadlessInAppWebView(@NonNull final InAppWebViewFlutterPlugin plugin, @NonNull String id, @NonNull FlutterWebView flutterWebView) {
     this.id = id;
+    this.plugin = plugin;
     this.flutterWebView = flutterWebView;
-    this.channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_headless_inappwebview_" + id);
+    this.channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_headless_inappwebview_" + id);
     channel.setMethodCallHandler(this);
   }
 
@@ -70,7 +72,7 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
   public void prepare(Map<String, Object> params) {
     // Add the headless WebView to the view hierarchy.
     // This way is also possible to take screenshots.
-    ViewGroup contentView = (ViewGroup) Shared.activity.findViewById(android.R.id.content);
+    ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
     ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
     if (mainView != null) {
       View view = flutterWebView.getView();
@@ -108,12 +110,13 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
   public void dispose() {
     channel.setMethodCallHandler(null);
     HeadlessInAppWebViewManager.webViews.remove(id);
-    ViewGroup contentView = (ViewGroup) Shared.activity.findViewById(android.R.id.content);
+    ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
     ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
     if (mainView != null) {
       mainView.removeView(flutterWebView.getView());
     }
     flutterWebView.dispose();
     flutterWebView = null;
+    plugin = null;
   }
 }

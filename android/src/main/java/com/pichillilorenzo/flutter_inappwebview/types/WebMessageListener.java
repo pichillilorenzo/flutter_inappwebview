@@ -10,14 +10,13 @@ import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
-
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -30,10 +29,10 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
   public JavaScriptReplyProxy replyProxy;
   public MethodChannel channel;
 
-  public WebMessageListener(@NonNull String jsObjectName, @NonNull Set<String> allowedOriginRules) {
+  public WebMessageListener(@NonNull BinaryMessenger messenger, @NonNull String jsObjectName, @NonNull Set<String> allowedOriginRules) {
     this.jsObjectName = jsObjectName;
     this.allowedOriginRules = allowedOriginRules;
-    this.channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappwebview_web_message_listener_" + this.jsObjectName);
+    this.channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_web_message_listener_" + this.jsObjectName);
     this.channel.setMethodCallHandler(this);
     this.listener = new WebViewCompat.WebMessageListener() {
       @Override
@@ -49,7 +48,7 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
   }
 
   @Nullable
-  public static WebMessageListener fromMap(@Nullable Map<String, Object> map) {
+  public static WebMessageListener fromMap(@NonNull BinaryMessenger messenger, @Nullable Map<String, Object> map) {
     if (map == null) {
       return null;
     }
@@ -58,7 +57,7 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
     List<String> allowedOriginRuleList = (List<String>) map.get("allowedOriginRules");
     assert allowedOriginRuleList != null;
     Set<String> allowedOriginRules = new HashSet<>(allowedOriginRuleList);
-    return new WebMessageListener(jsObjectName, allowedOriginRules);
+    return new WebMessageListener(messenger, jsObjectName, allowedOriginRules);
   }
 
   @Override

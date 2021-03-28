@@ -25,7 +25,8 @@ class HeadlessInAppWebView implements WebView {
   bool _started = false;
   bool _running = false;
 
-  static const MethodChannel _sharedChannel = const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
+  static const MethodChannel _sharedChannel =
+      const MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview');
   late MethodChannel _channel;
 
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
@@ -97,7 +98,7 @@ class HeadlessInAppWebView implements WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       @Deprecated('Use `onZoomScaleChanged` instead')
-      this.androidOnScaleChanged,
+          this.androidOnScaleChanged,
       this.androidOnReceivedIcon,
       this.androidOnReceivedTouchIconUrl,
       this.androidOnJsBeforeUnload,
@@ -108,8 +109,8 @@ class HeadlessInAppWebView implements WebView {
       this.iosShouldAllowDeprecatedTLS}) {
     id = IdGenerator.generate();
     webViewController = new InAppWebViewController(id, this);
-    this._channel = MethodChannel(
-        'com.pichillilorenzo/flutter_headless_inappwebview_$id');
+    this._channel =
+        MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
   }
 
@@ -188,7 +189,8 @@ class HeadlessInAppWebView implements WebView {
   ///Gets the current size in pixels of the WebView.
   Future<Size?> getSize() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    Map<String, dynamic> sizeMap = (await _channel.invokeMethod('getSize', args))?.cast<String, dynamic>();
+    Map<String, dynamic> sizeMap =
+        (await _channel.invokeMethod('getSize', args))?.cast<String, dynamic>();
     return MapSize.fromMap(sizeMap);
   }
 
@@ -223,16 +225,12 @@ class HeadlessInAppWebView implements WebView {
       androidOnGeolocationPermissionsShowPrompt;
 
   @override
-  Future<PermissionRequestResponse?> Function(
-      InAppWebViewController controller,
-      String origin,
-      List<String> resources)? androidOnPermissionRequest;
+  Future<PermissionRequestResponse?> Function(InAppWebViewController controller,
+      String origin, List<String> resources)? androidOnPermissionRequest;
 
   @override
-  Future<SafeBrowsingResponse?> Function(
-      InAppWebViewController controller,
-      Uri url,
-      SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
+  Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
+      Uri url, SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
   @override
   void Function(InAppWebViewController controller, Uri? url)?
@@ -289,8 +287,7 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller)? onWindowBlur;
 
   @override
-  void Function(InAppWebViewController controller, Uri url)?
-      onDownloadStart;
+  void Function(InAppWebViewController controller, Uri url)? onDownloadStart;
 
   @override
   void Function(InAppWebViewController controller, int activeMatchOrdinal,
@@ -316,12 +313,11 @@ class HeadlessInAppWebView implements WebView {
       String message)? onLoadError;
 
   @override
-  void Function(InAppWebViewController controller, Uri? url,
-      int statusCode, String description)? onLoadHttpError;
+  void Function(InAppWebViewController controller, Uri? url, int statusCode,
+      String description)? onLoadHttpError;
 
   @override
-  void Function(
-          InAppWebViewController controller, LoadedResource resource)?
+  void Function(InAppWebViewController controller, LoadedResource resource)?
       onLoadResource;
 
   @override
@@ -354,8 +350,7 @@ class HeadlessInAppWebView implements WebView {
       URLAuthenticationChallenge challenge)? onReceivedHttpAuthRequest;
 
   @override
-  Future<ServerTrustAuthResponse?> Function(
-      InAppWebViewController controller,
+  Future<ServerTrustAuthResponse?> Function(InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? onReceivedServerTrustAuthRequest;
 
   @override
@@ -392,13 +387,13 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller)? onExitFullscreen;
 
   @override
-  void Function(InAppWebViewController controller, int x, int y,
-      bool clampedX, bool clampedY)? onOverScrolled;
+  void Function(InAppWebViewController controller, int x, int y, bool clampedX,
+      bool clampedY)? onOverScrolled;
 
   @override
   void Function(
-      InAppWebViewController controller, double oldScale, double newScale)?
-  onZoomScaleChanged;
+          InAppWebViewController controller, double oldScale, double newScale)?
+      onZoomScaleChanged;
 
   @override
   Future<WebResourceResponse?> Function(
@@ -436,17 +431,14 @@ class HeadlessInAppWebView implements WebView {
       androidOnReceivedIcon;
 
   @override
-  void Function(
-          InAppWebViewController controller, Uri url, bool precomposed)?
+  void Function(InAppWebViewController controller, Uri url, bool precomposed)?
       androidOnReceivedTouchIconUrl;
 
   @override
-  Future<JsBeforeUnloadResponse?> Function(
-      InAppWebViewController controller,
+  Future<JsBeforeUnloadResponse?> Function(InAppWebViewController controller,
       JsBeforeUnloadRequest jsBeforeUnloadRequest)? androidOnJsBeforeUnload;
 
   @override
-  void Function(
-          InAppWebViewController controller, LoginRequest loginRequest)?
+  void Function(InAppWebViewController controller, LoginRequest loginRequest)?
       androidOnReceivedLoginRequest;
 }

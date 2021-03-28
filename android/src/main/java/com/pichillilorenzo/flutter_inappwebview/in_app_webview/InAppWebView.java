@@ -51,9 +51,9 @@ import androidx.annotation.RequiresApi;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
-import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerAction;
@@ -102,6 +102,8 @@ final public class InAppWebView extends InputAwareWebView {
 
   static final String LOG_TAG = "InAppWebView";
 
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
   @Nullable
   public InAppBrowserDelegate inAppBrowserDelegate;
   public MethodChannel channel;
@@ -155,18 +157,20 @@ final public class InAppWebView extends InputAwareWebView {
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(Context context, MethodChannel channel, Object id,
+  public InAppWebView(Context context, InAppWebViewFlutterPlugin plugin,
+                      MethodChannel channel, Object id,
                       @Nullable Integer windowId, InAppWebViewOptions options,
                       @Nullable Map<String, Object> contextMenu, View containerView,
                       List<UserScript> userScripts) {
     super(context, containerView, options.useHybridComposition);
+    this.plugin = plugin;
     this.channel = channel;
     this.id = id;
     this.windowId = windowId;
     this.options = options;
     this.contextMenu = contextMenu;
     this.userContentController.addUserOnlyScripts(userScripts);
-    Shared.activity.registerForContextMenu(this);
+    plugin.activity.registerForContextMenu(this);
   }
 
   @Override
@@ -181,7 +185,7 @@ final public class InAppWebView extends InputAwareWebView {
     javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
     addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
 
-    inAppWebViewChromeClient = new InAppWebViewChromeClient(channel, inAppBrowserDelegate);
+    inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, channel, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
 
     inAppWebViewClient = new InAppWebViewClient(channel, inAppBrowserDelegate);
@@ -551,7 +555,7 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void loadFile(String assetFilePath) throws IOException {
-    loadUrl(Util.getUrlAsset(assetFilePath));
+    loadUrl(Util.getUrlAsset(plugin, assetFilePath));
   }
 
   public boolean isLoading() {
@@ -1208,7 +1212,7 @@ final public class InAppWebView extends InputAwareWebView {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void printCurrentPage() {
     // Get a PrintManager instance
-    PrintManager printManager = (PrintManager) Shared.activity.getSystemService(Context.PRINT_SERVICE);
+    PrintManager printManager = (PrintManager) plugin.activity.getSystemService(Context.PRINT_SERVICE);
 
     if (printManager != null) {
       String jobName = getTitle() + " Document";
@@ -1665,6 +1669,7 @@ final public class InAppWebView extends InputAwareWebView {
     inAppWebViewClient = null;
     javaScriptBridgeInterface = null;
     inAppWebViewRenderProcessClient = null;
+    plugin = null;
     super.dispose();
   }
 

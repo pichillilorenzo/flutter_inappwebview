@@ -1,12 +1,12 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
 import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
 import android.webkit.ValueCallback;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 
+import androidx.annotation.Nullable;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
@@ -17,17 +17,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
-  public MethodChannel channel;
-
+  
   protected static final String LOG_TAG = "InAppWebViewStatic";
+  public MethodChannel channel;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public InAppWebViewStatic(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_static");
+  public InAppWebViewStatic(final InAppWebViewFlutterPlugin plugin) {
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_static");
     channel.setMethodCallHandler(this);
   }
 
@@ -35,7 +37,7 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
   public void onMethodCall(MethodCall call, final MethodChannel.Result result) {
     switch (call.method) {
       case "getDefaultUserAgent":
-        result.success(WebSettings.getDefaultUserAgent(Shared.applicationContext));
+        result.success(WebSettings.getDefaultUserAgent(plugin.applicationContext));
         break;
       case "clearClientCertPreferences":
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -78,7 +80,7 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
         break;
       case "getCurrentWebViewPackage":
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          result.success(convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(Shared.activity)));
+          result.success(convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(plugin.activity)));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           //with Android Lollipop (API 21) they started to update the WebView
           //as a separate APK with the PlayStore and they added the
@@ -122,5 +124,6 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    plugin = null;
   }
 }

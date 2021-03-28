@@ -14,12 +14,15 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class PlatformUtil implements MethodChannel.MethodCallHandler {
-  public MethodChannel channel;
 
   protected static final String LOG_TAG = "PlatformUtil";
+  public MethodChannel channel;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public PlatformUtil(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_platformutil");
+  public PlatformUtil(final InAppWebViewFlutterPlugin plugin) {
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_platformutil");
     channel.setMethodCallHandler(this);
   }
 
@@ -63,5 +66,6 @@ public class PlatformUtil implements MethodChannel.MethodCallHandler {
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    plugin = null;
   }
 }

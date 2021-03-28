@@ -25,23 +25,25 @@ import android.app.Activity;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.pm.ResolveInfo;
-import android.os.Parcelable;
-import android.provider.Browser;
 import android.net.Uri;
 import android.os.Bundle;
-import android.webkit.MimeTypeMap;
+import android.os.Parcelable;
+import android.provider.Browser;
 import android.util.Log;
+import android.webkit.MimeTypeMap;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -51,33 +53,37 @@ import io.flutter.plugin.common.MethodChannel.Result;
  */
 public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
 
-  public MethodChannel channel;
   protected static final String LOG_TAG = "InAppBrowserManager";
+  public MethodChannel channel;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
+  public String id;
+  public static final Map<String, InAppBrowserManager> shared = new HashMap<>();
 
-  public InAppBrowserManager(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappbrowser");
+  public InAppBrowserManager(final InAppWebViewFlutterPlugin plugin) {
+    this.id = UUID.randomUUID().toString();
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappbrowser");
     channel.setMethodCallHandler(this);
+    shared.put(this.id, this);
   }
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
-    final Activity activity = Shared.activity;
-
     switch (call.method) {
       case "open":
-        open(activity, (Map<String, Object>) call.arguments());
+        open(plugin.activity, (Map<String, Object>) call.arguments());
         result.success(true);
         break;
       case "openWithSystemBrowser":
         {
           String url = (String) call.argument("url");
-          openWithSystemBrowser(activity, url, result);
+          openWithSystemBrowser(plugin.activity, url, result);
         }
         break;
       default:
         result.notImplemented();
     }
-
   }
 
   public static String getMimeType(String url) {
@@ -180,6 +186,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putString("initialBaseUrl", baseUrl);
     extras.putString("initialHistoryUrl", historyUrl);
     extras.putString("id", id);
+    extras.putString("managerId", this.id);
     extras.putSerializable("options", (Serializable) options);
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
@@ -197,5 +204,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    shared.remove(this.id);
+    plugin = null;
   }
 }

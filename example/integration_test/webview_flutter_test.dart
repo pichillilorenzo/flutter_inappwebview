@@ -5455,10 +5455,10 @@ setTimeout(function() {
         onWebViewCreated: (controller) {
           controllerCompleter.complete(controller);
         },
-        onLoadStop: (controller, url) async {
-          pageLoaded.complete();
-        },
       );
+      headlessWebView.onLoadStop = (controller, url) async {
+        pageLoaded.complete();
+      };
 
       await headlessWebView.run();
       expect(headlessWebView.isRunning(), true);
@@ -5472,8 +5472,70 @@ setTimeout(function() {
 
       await headlessWebView.dispose();
 
-      expect(() async => await headlessWebView.webViewController.getUrl(),
-          throwsA(isInstanceOf<MissingPluginException>()));
+      expect(headlessWebView.isRunning(), false);
+    });
+
+    test('take screenshot', () async {
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<void> pageLoaded = Completer<void>();
+
+      var headlessWebView = new HeadlessInAppWebView(
+        initialUrlRequest: URLRequest(url: Uri.parse("https://github.com/flutter")),
+        onWebViewCreated: (controller) {
+          controllerCompleter.complete(controller);
+        },
+        onLoadStop: (controller, url) async {
+          pageLoaded.complete();
+        }
+      );
+
+      await headlessWebView.run();
+      expect(headlessWebView.isRunning(), true);
+
+      final InAppWebViewController controller =
+      await controllerCompleter.future;
+      await pageLoaded.future;
+
+      final String? url = (await controller.getUrl())?.toString();
+      expect(url, 'https://github.com/flutter');
+
+      final Size? size = await headlessWebView.getSize();
+      expect(size, isNotNull);
+
+      final Uint8List? screenshot = await controller.takeScreenshot();
+      expect(screenshot, isNotNull);
+
+      await headlessWebView.dispose();
+
+      expect(headlessWebView.isRunning(), false);
+    });
+
+    test('set and get custom size', () async {
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
+
+      var headlessWebView = new HeadlessInAppWebView(
+          initialUrlRequest: URLRequest(url: Uri.parse("https://github.com/flutter")),
+          initialSize: Size(600, 800),
+          onWebViewCreated: (controller) {
+            controllerCompleter.complete(controller);
+          },
+      );
+
+      await headlessWebView.run();
+      expect(headlessWebView.isRunning(), true);
+
+      final Size? size = await headlessWebView.getSize();
+      expect(size, isNotNull);
+      expect(size, Size(600, 800));
+
+      await headlessWebView.setSize(Size(1080, 1920));
+      final Size? newSize = await headlessWebView.getSize();
+      expect(newSize, isNotNull);
+      expect(newSize, Size(1080, 1920));
+
+      await headlessWebView.dispose();
+
+      expect(headlessWebView.isRunning(), false);
     });
 
     test('set/get options', () async {
@@ -5569,7 +5631,7 @@ setTimeout(function() {
           throwsA(isInstanceOf<MissingPluginException>()));
     });
 
-    test('openFile and close', () async {
+    test('openData and close', () async {
       var inAppBrowser = new MyInAppBrowser();
       expect(inAppBrowser.isOpened(), false);
       expect(() async {

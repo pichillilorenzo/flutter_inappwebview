@@ -23,7 +23,6 @@ import android.webkit.WebViewClient;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabase;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
@@ -444,6 +443,8 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onReceivedClientCertRequest(final WebView view, final ClientCertRequest request) {
 
+    InAppWebView webView = (InAppWebView) view;
+
     URI uri;
     try {
       uri = new URI(view.getUrl());
@@ -475,7 +476,7 @@ public class InAppWebViewClient extends WebViewClient {
                   String certificatePath = (String) responseMap.get("certificatePath");
                   String certificatePassword = (String) responseMap.get("certificatePassword");
                   String androidKeyStoreType = (String) responseMap.get("androidKeyStoreType");
-                  Util.PrivateKeyAndCertificates privateKeyAndCertificates = Util.loadPrivateKeyAndCertificate(certificatePath, certificatePassword, androidKeyStoreType);
+                  Util.PrivateKeyAndCertificates privateKeyAndCertificates = Util.loadPrivateKeyAndCertificate(webView.plugin, certificatePath, certificatePassword, androidKeyStoreType);
                   request.proceed(privateKeyAndCertificates.privateKey, privateKeyAndCertificates.certificates);
                 }
                 return;

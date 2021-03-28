@@ -548,7 +548,7 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "addWebMessageListener":
         if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
           Map<String, Object> webMessageListenerMap = (Map<String, Object>) call.argument("webMessageListener");
-          WebMessageListener webMessageListener = WebMessageListener.fromMap(webMessageListenerMap);
+          WebMessageListener webMessageListener = WebMessageListener.fromMap(webView.plugin.messenger, webMessageListenerMap);
           try {
             webView.addWebMessageListener(webMessageListener);
             result.success(true);

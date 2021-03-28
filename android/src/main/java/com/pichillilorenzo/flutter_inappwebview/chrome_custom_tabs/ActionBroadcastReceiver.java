@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -16,6 +14,7 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
   protected static final String LOG_TAG = "ActionBroadcastReceiver";
   public static final String KEY_ACTION_ID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ACTION_ID";
   public static final String KEY_ACTION_VIEW_ID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ACTION_VIEW_ID";
+  public static final String CHROME_MANAGER_ID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.CHROME_MANAGER_ID";
   public static final String KEY_URL_TITLE = "android.intent.extra.SUBJECT";
 
   @Override
@@ -27,7 +26,10 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
       int id = b.getInt(KEY_ACTION_ID);
       String title = b.getString(KEY_URL_TITLE);
 
-      MethodChannel channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId);
+      String managerId = b.getString(CHROME_MANAGER_ID);
+      ChromeSafariBrowserManager manager = (ChromeSafariBrowserManager) ChromeSafariBrowserManager.shared.get(managerId);
+
+      MethodChannel channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId);
       Map<String, Object> obj = new HashMap<>();
       obj.put("url", url);
       obj.put("title", title);

@@ -21,13 +21,14 @@
 
 package com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
+import androidx.annotation.Nullable;
+
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebView;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.Result;
@@ -37,9 +38,12 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
   protected static final String LOG_TAG = "HeadlessInAppWebViewManager";
   public MethodChannel channel;
   public static final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public HeadlessInAppWebViewManager(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_headless_inappwebview");
+  public HeadlessInAppWebViewManager(final InAppWebViewFlutterPlugin plugin) {
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_headless_inappwebview");
     channel.setMethodCallHandler(this);
   }
 
@@ -51,7 +55,7 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
       case "run":
         {
           HashMap<String, Object> params = (HashMap<String, Object>) call.argument("params");
-          HeadlessInAppWebViewManager.run(id, params);
+          run(id, params);
         }
         result.success(true);
         break;
@@ -61,9 +65,9 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
 
   }
 
-  public static void run(String id, HashMap<String, Object> params) {
-    FlutterWebView flutterWebView = new FlutterWebView(Shared.messenger, Shared.activity, id, params, null);
-    HeadlessInAppWebView headlessInAppWebView = new HeadlessInAppWebView(Shared.messenger, id, flutterWebView);
+  public void run(String id, HashMap<String, Object> params) {
+    FlutterWebView flutterWebView = new FlutterWebView(plugin, plugin.activity, id, params);
+    HeadlessInAppWebView headlessInAppWebView = new HeadlessInAppWebView(plugin, id, flutterWebView);
     HeadlessInAppWebViewManager.webViews.put(id, headlessInAppWebView);
     
     headlessInAppWebView.prepare(params);
@@ -72,7 +76,7 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
   }
 
   public void dispose() {
-    HeadlessInAppWebViewManager.webViews.clear();
     channel.setMethodCallHandler(null);
+    webViews.clear();
   }
 }

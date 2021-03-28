@@ -26,12 +26,15 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
 
   static final String LOG_TAG = "ServiceWorkerManager";
 
-  public static MethodChannel channel;
+  public MethodChannel channel;
   @Nullable
   public static ServiceWorkerControllerCompat serviceWorkerController;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public ServiceWorkerManager(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_android_serviceworkercontroller");
+  public ServiceWorkerManager(final InAppWebViewFlutterPlugin plugin) {
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_android_serviceworkercontroller");
     channel.setMethodCallHandler(this);
     if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
       serviceWorkerController = ServiceWorkerControllerCompat.getInstance();
@@ -152,5 +155,6 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    plugin = null;
   }
 }

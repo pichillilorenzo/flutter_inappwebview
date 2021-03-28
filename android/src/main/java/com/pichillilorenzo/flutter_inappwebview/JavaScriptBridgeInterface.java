@@ -23,8 +23,7 @@ public class JavaScriptBridgeInterface {
   private static final String LOG_TAG = "JSBridgeInterface";
   private InAppWebView inAppWebView;
   private final MethodChannel channel;
-
-
+  
   public JavaScriptBridgeInterface(InAppWebView inAppWebView) {
     this.inAppWebView = inAppWebView;
     this.channel = this.inAppWebView.channel;

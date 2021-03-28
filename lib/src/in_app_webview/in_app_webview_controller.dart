@@ -356,7 +356,9 @@ class InAppWebViewController {
         }
         break;
       case "onZoomScaleChanged":
-        if ((_webview != null && (_webview!.androidOnScaleChanged != null || _webview!.onZoomScaleChanged != null)) ||
+        if ((_webview != null &&
+                (_webview!.androidOnScaleChanged != null ||
+                    _webview!.onZoomScaleChanged != null)) ||
             _inAppBrowser != null) {
           double oldScale = call.arguments["oldScale"];
           double newScale = call.arguments["newScale"];
@@ -365,8 +367,7 @@ class InAppWebViewController {
               _webview!.onZoomScaleChanged!(this, oldScale, newScale);
             else
               _webview!.androidOnScaleChanged!(this, oldScale, newScale);
-          }
-          else
+          } else
             _inAppBrowser!.androidOnScaleChanged(oldScale, newScale);
         }
         break;

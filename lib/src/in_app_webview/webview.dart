@@ -413,8 +413,8 @@ abstract class WebView {
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom
   final void Function(
-      InAppWebViewController controller, double oldScale, double newScale)?
-  onZoomScaleChanged;
+          InAppWebViewController controller, double oldScale, double newScale)?
+      onZoomScaleChanged;
 
   ///Event fired when the webview notifies that a loading URL has been flagged by Safe Browsing.
   ///The default behavior is to show an interstitial to the user, with the reporting checkbox visible.
@@ -721,7 +721,7 @@ abstract class WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       @Deprecated('Use `onZoomScaleChanged` instead')
-      this.androidOnScaleChanged,
+          this.androidOnScaleChanged,
       this.androidOnReceivedIcon,
       this.androidOnReceivedTouchIconUrl,
       this.androidOnJsBeforeUnload,

@@ -1,15 +1,15 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
-import android.util.Log;
 import android.webkit.ValueCallback;
 import android.webkit.WebStorage;
+
+import androidx.annotation.Nullable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -17,11 +17,14 @@ public class MyWebStorage implements MethodChannel.MethodCallHandler {
 
   static final String LOG_TAG = "MyWebStorage";
 
-  public static MethodChannel channel;
+  public MethodChannel channel;
   public static WebStorage webStorageManager;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public MyWebStorage(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_webstoragemanager");
+  public MyWebStorage(final InAppWebViewFlutterPlugin plugin) {
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_webstoragemanager");
     channel.setMethodCallHandler(this);
     webStorageManager = WebStorage.getInstance();
   }
@@ -100,5 +103,6 @@ public class MyWebStorage implements MethodChannel.MethodCallHandler {
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    plugin = null;
   }
 }

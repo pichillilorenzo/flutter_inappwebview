@@ -6,9 +6,7 @@ import android.net.http.SslCertificate;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.IBinder;
 import android.os.Looper;
-import android.os.Parcelable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -16,13 +14,11 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.Serializable;
 import java.security.Key;
 import java.security.KeyStore;
 import java.security.PrivateKey;
@@ -30,7 +26,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -57,13 +52,13 @@ public class Util {
 
   private Util() {}
 
-  public static String getUrlAsset(String assetFilePath) throws IOException {
-    String key = (Shared.registrar != null) ? Shared.registrar.lookupKeyForAsset(assetFilePath) : Shared.flutterAssets.getAssetFilePathByName(assetFilePath);
+  public static String getUrlAsset(InAppWebViewFlutterPlugin plugin, String assetFilePath) throws IOException {
+    String key = (plugin.registrar != null) ? plugin.registrar.lookupKeyForAsset(assetFilePath) : plugin.flutterAssets.getAssetFilePathByName(assetFilePath);
     InputStream is = null;
     IOException e = null;
 
     try {
-      is = getFileAsset(assetFilePath);
+      is = getFileAsset(plugin, assetFilePath);
     } catch (IOException ex) {
       e = ex;
     } finally {
@@ -82,9 +77,9 @@ public class Util {
     return ANDROID_ASSET_URL + key;
   }
 
-  public static InputStream getFileAsset(String assetFilePath) throws IOException {
-    String key = (Shared.registrar != null) ? Shared.registrar.lookupKeyForAsset(assetFilePath) : Shared.flutterAssets.getAssetFilePathByName(assetFilePath);
-    AssetManager mg = Shared.applicationContext.getResources().getAssets();
+  public static InputStream getFileAsset(InAppWebViewFlutterPlugin plugin,String assetFilePath) throws IOException {
+    String key = (plugin.registrar != null) ? plugin.registrar.lookupKeyForAsset(assetFilePath) : plugin.flutterAssets.getAssetFilePathByName(assetFilePath);
+    AssetManager mg = plugin.applicationContext.getResources().getAssets();
     return mg.open(key);
   }
 
@@ -136,12 +131,12 @@ public class Util {
     }
   }
 
-  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(String certificatePath, String certificatePassword, String keyStoreType) {
+  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(InAppWebViewFlutterPlugin plugin, String certificatePath, String certificatePassword, String keyStoreType) {
 
     PrivateKeyAndCertificates privateKeyAndCertificates = null;
 
     try {
-      InputStream certificateFileStream = getFileAsset(certificatePath);
+      InputStream certificateFileStream = getFileAsset(plugin, certificatePath);
 
       KeyStore keyStore = KeyStore.getInstance(keyStoreType);
       keyStore.load(certificateFileStream, certificatePassword != null ? certificatePassword.toCharArray() : null);

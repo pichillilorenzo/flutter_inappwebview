@@ -499,9 +499,6 @@ extension MapSize on Size {
   }
 
   Map<String, double> toMap() {
-    return {
-      'width': width,
-      'height': height
-    };
+    return {'width': width, 'height': height};
   }
 }

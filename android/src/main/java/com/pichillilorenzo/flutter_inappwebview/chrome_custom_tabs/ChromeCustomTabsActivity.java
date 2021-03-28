@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
+import android.util.Log;
 
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -13,7 +14,6 @@ import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
-import com.pichillilorenzo.flutter_inappwebview.Shared;
 
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +34,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
   protected boolean onChromeSafariBrowserOpened = false;
   protected boolean onChromeSafariBrowserCompletedInitialLoad = false;
+  public ChromeSafariBrowserManager manager;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +46,10 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     assert b != null;
     id = b.getString("id");
 
-    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + id);
+    String managerId = b.getString("managerId");
+    manager = (ChromeSafariBrowserManager) ChromeSafariBrowserManager.shared.get(managerId);
+
+    channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + id);
     channel.setMethodCallHandler(this);
 
     final String url = b.getString("url");
@@ -77,6 +81,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
       @Override
       public void onCustomTabsDisconnected() {
         chromeCustomTabsActivity.close();
+        dispose();
       }
     });
 
@@ -128,10 +133,13 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
         this.close();
 
         // https://stackoverflow.com/a/41596629/4637638
-        Intent myIntent = new Intent(Shared.activity, Shared.activity.getClass());
+        Intent myIntent = new Intent(manager.plugin.activity, manager.plugin.activity.getClass());
         myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        Shared.activity.startActivity(myIntent);
+        manager.plugin.activity.startActivity(myIntent);
+
+        dispose();
+        
         result.success(true);
         break;
       default:
@@ -186,14 +194,8 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
       close();
+      dispose();
     }
-  }
-
-  public void close() {
-    customTabsSession = null;
-    finish();
-    Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onChromeSafariBrowserClosed", obj);
   }
 
   private PendingIntent createPendingIntent(int actionSourceId) {
@@ -202,9 +204,22 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     Bundle extras = new Bundle();
     extras.putInt(ActionBroadcastReceiver.KEY_ACTION_ID, actionSourceId);
     extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
+    extras.putString(ActionBroadcastReceiver.CHROME_MANAGER_ID, manager.id);
     actionIntent.putExtras(extras);
 
     return PendingIntent.getBroadcast(
-            this, actionSourceId, actionIntent, 0);
+            this, actionSourceId, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+  }
+
+  public void dispose() {
+    channel.setMethodCallHandler(null);
+    manager = null;
+  }
+
+  public void close() {
+    customTabsSession = null;
+    finish();
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onChromeSafariBrowserClosed", obj);
   }
 }

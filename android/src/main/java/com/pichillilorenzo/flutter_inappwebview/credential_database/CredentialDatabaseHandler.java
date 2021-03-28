@@ -4,9 +4,10 @@ import android.os.Build;
 import android.webkit.WebViewDatabase;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
-import com.pichillilorenzo.flutter_inappwebview.Shared;
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.URLCredential;
 import com.pichillilorenzo.flutter_inappwebview.types.URLProtectionSpace;
 
@@ -15,7 +16,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -24,13 +24,16 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
 
   static final String LOG_TAG = "CredentialDatabaseHandler";
 
-  public static MethodChannel channel;
+  public MethodChannel channel;
   public static CredentialDatabase credentialDatabase;
+  @Nullable
+  public InAppWebViewFlutterPlugin plugin;
 
-  public CredentialDatabaseHandler(BinaryMessenger messenger) {
-    channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_credential_database");
+  public CredentialDatabaseHandler(final InAppWebViewFlutterPlugin plugin) {
+    this.plugin = plugin;
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_credential_database");
     channel.setMethodCallHandler(this);
-    credentialDatabase = CredentialDatabase.getInstance(Shared.applicationContext);
+    credentialDatabase = CredentialDatabase.getInstance(plugin.applicationContext);
   }
 
   @Override
@@ -109,7 +112,7 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
         break;
       case "clearAllAuthCredentials":
         credentialDatabase.clearAllAuthCredentials();
-        WebViewDatabase.getInstance(Shared.applicationContext).clearHttpAuthUsernamePassword();
+        WebViewDatabase.getInstance(plugin.applicationContext).clearHttpAuthUsernamePassword();
         result.success(true);
         break;
       default:
@@ -119,6 +122,7 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    plugin = null;
   }
 
 }

@@ -23,17 +23,16 @@ import android.widget.SearchView;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
+import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewChromeClient;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewOptions;
-import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
-import com.pichillilorenzo.flutter_inappwebview.R;
-import com.pichillilorenzo.flutter_inappwebview.Shared;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
-import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -60,7 +59,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public String fromActivity;
   private List<ActivityResultListener> activityResultListeners = new ArrayList<>();
   public InAppWebViewMethodHandler methodCallDelegate;
-
+  public InAppBrowserManager manager;
+  
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -68,14 +68,18 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     Bundle b = getIntent().getExtras();
     assert b != null;
     id = b.getString("id");
+
+    String managerId = b.getString("managerId");
+    manager = (InAppBrowserManager) InAppBrowserManager.shared.get(managerId);
+    
     windowId = b.getInt("windowId");
 
-    channel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + id);
+    channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_inappbrowser_" + id);
 
     setContentView(R.layout.activity_web_view);
 
     Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) b.getSerializable("pullToRefreshInitialOptions");
-    MethodChannel pullToRefreshLayoutChannel = new MethodChannel(Shared.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
+    MethodChannel pullToRefreshLayoutChannel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
     PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
     pullToRefreshOptions.parse(pullToRefreshInitialOptions);
     pullToRefreshLayout = findViewById(R.id.pullToRefresh);
@@ -87,6 +91,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     webView.windowId = windowId;
     webView.inAppBrowserDelegate = this;
     webView.channel = channel;
+    webView.plugin = manager.plugin;
 
     methodCallDelegate = new InAppWebViewMethodHandler(webView);
     channel.setMethodCallHandler(methodCallDelegate);
@@ -488,8 +493,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       methodCallDelegate = null;
     }
     if (webView != null) {
-      if (Shared.activityPluginBinding != null) {
-        Shared.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
+      if (manager.plugin.activityPluginBinding != null) {
+        manager.plugin.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
       }
       ViewGroup vg = (ViewGroup) (webView.getParent());
       if (vg != null) {
@@ -501,6 +506,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
           webView.dispose();
           webView.destroy();
           webView = null;
+          manager = null;
         }
       });
       webView.loadUrl("about:blank");

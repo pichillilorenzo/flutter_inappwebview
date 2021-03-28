@@ -87,8 +87,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.androidOnRenderProcessResponsive,
     this.androidOnRenderProcessUnresponsive,
     this.androidOnFormResubmission,
-    @Deprecated('Use `onZoomScaleChanged` instead')
-    this.androidOnScaleChanged,
+    @Deprecated('Use `onZoomScaleChanged` instead') this.androidOnScaleChanged,
     this.androidOnReceivedIcon,
     this.androidOnReceivedTouchIconUrl,
     this.androidOnJsBeforeUnload,
@@ -317,8 +316,8 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final void Function(
-      InAppWebViewController controller, double oldScale, double newScale)?
-  onZoomScaleChanged;
+          InAppWebViewController controller, double oldScale, double newScale)?
+      onZoomScaleChanged;
 
   @override
   final Future<WebResourceResponse?> Function(

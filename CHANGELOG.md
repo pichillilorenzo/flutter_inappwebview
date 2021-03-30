@@ -1,3 +1,8 @@
+## 5.3.0+1
+
+- Fixed "Android - Pull to refresh triggered when scrolling container inside a website" [#765](https://github.com/pichillilorenzo/flutter_inappwebview/issues/765)
+- Fixed "InAppWebViewController.getHitTestResult" wrong type mapping
+
 ## 5.3.0
 
 - Added `initialSize` property to the `HeadlessInAppWebView` class

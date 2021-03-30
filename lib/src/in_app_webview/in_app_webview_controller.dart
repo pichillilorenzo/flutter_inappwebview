@@ -1744,8 +1744,8 @@ class InAppWebViewController {
 
     InAppWebViewHitTestResultType? type =
         InAppWebViewHitTestResultType.fromValue(
-            hitTestResultMap["type"].toInt());
-    String extra = hitTestResultMap["extra"];
+            hitTestResultMap["type"]?.toInt());
+    String? extra = hitTestResultMap["extra"];
     return InAppWebViewHitTestResult(type: type, extra: extra);
   }
 

@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.view.DragEvent;
 import android.view.MotionEvent;
 import android.view.View;
 import android.webkit.WebView;
@@ -13,6 +14,7 @@ import androidx.annotation.Nullable;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -50,8 +52,19 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements MethodCha
     if (channel != null) {
       this.channel.setMethodCallHandler(this);
     }
-    
+
     setEnabled(options.enabled);
+    setOnChildScrollUpCallback(new OnChildScrollUpCallback() {
+      @Override
+      public boolean canChildScrollUp(@NonNull SwipeRefreshLayout parent, @Nullable View child) {
+        if (child instanceof InAppWebView) {
+          InAppWebView inAppWebView = (InAppWebView) child;
+          return (inAppWebView.canScrollVertically() && inAppWebView.getScrollY() > 0) ||
+                 (!inAppWebView.canScrollVertically() && inAppWebView.getScrollY() == 0);
+        }
+        return true;
+      }
+    });
     setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
       @Override
       public void onRefresh() {

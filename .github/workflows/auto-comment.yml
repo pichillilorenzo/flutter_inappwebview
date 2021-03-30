@@ -11,7 +11,7 @@ jobs:
             👋 @{{ author }}
 
             **NOTE**: This comment is auto-generated.
-
+            <br />
             Are you sure you have already searched for the same problem?
 
             Some people open new issues but they didn't search for something similar or for the same issue.

@@ -357,6 +357,7 @@ class InAppWebViewController {
         break;
       case "onZoomScaleChanged":
         if ((_webview != null &&
+                // ignore: deprecated_member_use_from_same_package
                 (_webview!.androidOnScaleChanged != null ||
                     _webview!.onZoomScaleChanged != null)) ||
             _inAppBrowser != null) {
@@ -365,10 +366,14 @@ class InAppWebViewController {
           if (_webview != null) {
             if (_webview!.onZoomScaleChanged != null)
               _webview!.onZoomScaleChanged!(this, oldScale, newScale);
-            else
+            else {
+              // ignore: deprecated_member_use_from_same_package
               _webview!.androidOnScaleChanged!(this, oldScale, newScale);
-          } else
+            }
+          } else {
+            // ignore: deprecated_member_use_from_same_package
             _inAppBrowser!.androidOnScaleChanged(oldScale, newScale);
+          }
         }
         break;
       case "onReceivedIcon":

@@ -179,15 +179,27 @@ class HeadlessInAppWebView implements WebView {
   ///Set `-1` to match the corresponding width or height of the current device screen size.
   ///`Size(-1, -1)` will match both width and height of the current device screen size.
   ///
+  ///Note that if the [HeadlessInAppWebView] is not running, this method won't have effect.
+  ///
   ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
   Future<void> setSize(Size size) async {
+    if (!_running) {
+      return;
+    }
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toMap());
     await _channel.invokeMethod('setSize', args);
   }
 
   ///Gets the current size in pixels of the WebView.
+  ///
+  ///Note that if the [HeadlessInAppWebView] is not running, this method will return `null`.
   Future<Size?> getSize() async {
+    if (!_running) {
+      return null;
+    }
+
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic> sizeMap =
         (await _channel.invokeMethod('getSize', args))?.cast<String, dynamic>();

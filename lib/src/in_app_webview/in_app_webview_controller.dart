@@ -1142,7 +1142,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent(
-        'allowingReadAccessTo', () => iosAllowingReadAccessTo.toString());
+        'allowingReadAccessTo', () => iosAllowingReadAccessTo?.toString());
     await _channel.invokeMethod('loadUrl', args);
   }
 
@@ -1165,11 +1165,14 @@ class InAppWebViewController {
 
   ///Loads the given [data] into this WebView, using [baseUrl] as the base URL for the content.
   ///
-  ///The [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
-  ///
-  ///The [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
-  ///
-  ///The [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
+  ///- [mimeType] parameter specifies the format of the data. The default value is `"text/html"`.
+  ///- [encoding] parameter specifies the encoding of the data. The default value is `"utf8"`.
+  ///- [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
+  ///- [iosAllowingReadAccessTo], used in combination with [baseUrl] (using the `file://` scheme),
+  ///is an iOS-specific argument that represents the URL from which to read the web content.
+  ///This [baseUrl] must be a file-based URL (using the `file://` scheme).
+  ///Specify the same value as the [baseUrl] parameter to prevent WebView from reading any other content.
+  ///Specify a directory to give WebView permission to read additional files in the specified directory.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)
   ///
@@ -1181,7 +1184,11 @@ class InAppWebViewController {
       String mimeType = "text/html",
       String encoding = "utf8",
       Uri? baseUrl,
-      Uri? androidHistoryUrl}) async {
+      Uri? androidHistoryUrl,
+      Uri? iosAllowingReadAccessTo}) async {
+    assert(iosAllowingReadAccessTo == null ||
+        iosAllowingReadAccessTo.isScheme("file"));
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('data', () => data);
     args.putIfAbsent('mimeType', () => mimeType);
@@ -1189,6 +1196,8 @@ class InAppWebViewController {
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
         'historyUrl', () => androidHistoryUrl?.toString() ?? "about:blank");
+    args.putIfAbsent(
+        'allowingReadAccessTo', () => iosAllowingReadAccessTo?.toString());
     await _channel.invokeMethod('loadData', args);
   }
 

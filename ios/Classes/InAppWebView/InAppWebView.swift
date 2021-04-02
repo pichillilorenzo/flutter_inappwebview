@@ -769,12 +769,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         load(request)
     }
     
-    public func loadData(data: String, mimeType: String, encoding: String, baseUrl: String) {
-        let url = URL(string: baseUrl)!
+    public func loadData(data: String, mimeType: String, encoding: String, baseUrl: URL, allowingReadAccessTo: URL?) {
+        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo, baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file" {
+            loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
+        }
+        
         if #available(iOS 9.0, *) {
-            load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: url)
+            load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: baseUrl)
         } else {
-            loadHTMLString(data, baseURL: url)
+            loadHTMLString(data, baseURL: baseUrl)
         }
     }
     

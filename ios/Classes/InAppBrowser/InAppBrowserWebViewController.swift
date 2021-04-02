@@ -157,7 +157,15 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
         else if let initialData = initialData {
-            webView.loadData(data: initialData, mimeType: initialMimeType!, encoding: initialEncoding!, baseUrl: initialBaseUrl!)
+            let baseUrl = URL(string: initialBaseUrl!)!
+            var allowingReadAccessToURL: URL? = nil
+            if let allowingReadAccessTo = webView?.options?.allowingReadAccessTo, baseUrl.scheme == "file" {
+                allowingReadAccessToURL = URL(string: allowingReadAccessTo)
+                if allowingReadAccessToURL?.scheme != "file" {
+                    allowingReadAccessToURL = nil
+                }
+            }
+            webView.loadData(data: initialData, mimeType: initialMimeType!, encoding: initialEncoding!, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
         }
         else if let initialUrlRequest = initialUrlRequest {
             var allowingReadAccessToURL: URL? = nil

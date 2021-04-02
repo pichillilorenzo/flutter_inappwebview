@@ -139,8 +139,15 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
             let data = initialData["data"]!
             let mimeType = initialData["mimeType"]!
             let encoding = initialData["encoding"]!
-            let baseUrl = initialData["baseUrl"]!
-            webView?.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl)
+            let baseUrl = URL(string: initialData["baseUrl"]!)!
+            var allowingReadAccessToURL: URL? = nil
+            if let allowingReadAccessTo = webView?.options?.allowingReadAccessTo, baseUrl.scheme == "file" {
+                allowingReadAccessToURL = URL(string: allowingReadAccessTo)
+                if allowingReadAccessToURL?.scheme != "file" {
+                    allowingReadAccessToURL = nil
+                }
+            }
+            webView?.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
         }
         else if let initialUrlRequest = initialUrlRequest {
             let urlRequest = URLRequest.init(fromPluginMap: initialUrlRequest)

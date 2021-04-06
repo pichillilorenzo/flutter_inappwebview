@@ -1,3 +1,8 @@
+## 5.3.1+1
+
+- Removed duplicate lib exports
+- Fixed some rare cases when iOS WKWebView `scrollViewDidEndDragging` event blocks the scroll gesture
+
 ## 5.3.1
 
 - Added support of `allowingReadAccessTo` iOS-specific WebView option for the WebView `initialData` parameter

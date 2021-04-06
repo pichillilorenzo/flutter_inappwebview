@@ -39,6 +39,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var recognizerForDisablingContextMenuOnLinks: UILongPressGestureRecognizer!
     var lastLongPressTouchPoint: CGPoint?
     
+    var panGestureRecognizer: UIPanGestureRecognizer!
+    
     var lastTouchPoint: CGPoint?
     var lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
     
@@ -70,6 +72,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         recognizerForDisablingContextMenuOnLinks.delegate = self
         recognizerForDisablingContextMenuOnLinks.addTarget(self, action: #selector(longPressGestureDetected))
         recognizerForDisablingContextMenuOnLinks?.minimumPressDuration = 0.45
+        panGestureRecognizer = UIPanGestureRecognizer()
+        panGestureRecognizer.delegate = self
+        panGestureRecognizer.addTarget(self, action: #selector(endDraggingDetected))
     }
     
     override public var frame: CGRect {
@@ -260,17 +265,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return super.canPerformAction(action, withSender: sender)
     }
     
-    public func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-        // fix for pull-to-refresh jittering when the touch drag event is held
-        if let pullToRefreshControl = pullToRefreshControl,
-           pullToRefreshControl.shouldCallOnRefresh {
-            pullToRefreshControl.onRefresh()
+    // For some reasons, using the scrollViewDidEndDragging event, in some rare cases, could block
+    // the scroll gesture
+    @objc func endDraggingDetected() {
+        // detect end dragging
+        if panGestureRecognizer.state == .ended {
+            // fix for pull-to-refresh jittering when the touch drag event is held
+            if let pullToRefreshControl = pullToRefreshControl,
+               pullToRefreshControl.shouldCallOnRefresh {
+                pullToRefreshControl.onRefresh()
+            }
         }
     }
 
     public func prepare() {
         scrollView.addGestureRecognizer(self.longPressRecognizer)
         scrollView.addGestureRecognizer(self.recognizerForDisablingContextMenuOnLinks)
+        scrollView.addGestureRecognizer(self.panGestureRecognizer)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old], context: nil)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale), options: [.new, .old], context: nil)
         
@@ -2895,6 +2906,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         recognizerForDisablingContextMenuOnLinks.removeTarget(self, action: #selector(longPressGestureDetected))
         recognizerForDisablingContextMenuOnLinks.delegate = nil
         scrollView.removeGestureRecognizer(recognizerForDisablingContextMenuOnLinks)
+        panGestureRecognizer.removeTarget(self, action: #selector(endDraggingDetected))
+        panGestureRecognizer.delegate = nil
+        scrollView.removeGestureRecognizer(panGestureRecognizer)
         disablePullToRefresh()
         pullToRefreshControl?.dispose()
         pullToRefreshControl = nil

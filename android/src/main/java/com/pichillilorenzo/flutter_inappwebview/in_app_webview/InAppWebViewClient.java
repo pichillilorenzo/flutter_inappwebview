@@ -15,11 +15,13 @@ import android.webkit.RenderProcessGoneDetail;
 import android.webkit.SafeBrowsingResponse;
 import android.webkit.SslErrorHandler;
 import android.webkit.ValueCallback;
+import android.webkit.WebResourceError;
 import android.webkit.WebResourceRequest;
 import android.webkit.WebResourceResponse;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
@@ -254,6 +256,35 @@ public class InAppWebViewClient extends WebViewClient {
     obj.put("url", url);
     obj.put("androidIsReload", isReload);
     channel.invokeMethod("onUpdateVisitedHistory", obj);
+  }
+  
+  @RequiresApi(api = Build.VERSION_CODES.M)
+  @Override
+  public void onReceivedError(WebView view, @NonNull WebResourceRequest request, @NonNull WebResourceError error) {
+//    final InAppWebView webView = (InAppWebView) view;
+//
+//    if (request.isForMainFrame()) {
+//      if (webView.options.disableDefaultErrorPage) {
+//        webView.stopLoading();
+//        webView.loadUrl("about:blank");
+//      }
+//
+//      webView.isLoading = false;
+//      previousAuthRequestFailureCount = 0;
+//      credentialsProposed = null;
+//
+//      if (inAppBrowserDelegate != null) {
+//        inAppBrowserDelegate.didFailNavigation(request.getUrl().toString(), error.getErrorCode(), error.getDescription().toString());
+//      }
+//    }
+//
+//    Map<String, Object> obj = new HashMap<>();
+//    obj.put("url", request.getUrl().toString());
+//    obj.put("code", error.getErrorCode());
+//    obj.put("message", error.getDescription());
+//    channel.invokeMethod("onLoadError", obj);
+
+    super.onReceivedError(view, request, error);
   }
 
   @Override

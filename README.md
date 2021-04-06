@@ -17,10 +17,6 @@
 
 A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
 
-# Announcement
-
-All the configuration and info about get started with this plugin and code examples has been moved from here to the new [inappwebview.dev official website Documentation page](https://inappwebview.dev/docs/)!
-
 ## Articles/Resources
 
 - [Official documentation: inappwebview.dev/docs](https://inappwebview.dev/docs/)
@@ -60,3 +56,7 @@ Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://f
 * [CookieManager](https://inappwebview.dev/docs/cookie-manager/basic-usage/): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances.
 * [HttpAuthCredentialDatabase](https://inappwebview.dev/docs/http-auth-credential-database/basic-usage/): This class implements a singleton object (shared instance) that manages the shared HTTP auth credentials cache.
 * [WebStorageManager](https://inappwebview.dev/docs/web-storage-manager/basic-usage/): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
+
+## Support
+
+Did you find this plugin useful? Please consider to [make a donation](https://inappwebview.dev/donate/) to help improve it!

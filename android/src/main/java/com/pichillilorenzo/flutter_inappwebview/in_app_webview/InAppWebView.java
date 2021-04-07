@@ -1019,7 +1019,18 @@ final public class InAppWebView extends InputAwareWebView {
       }
       String idAttr = (String) scriptHtmlTagAttributes.get("id");
       if (idAttr != null) {
-        scriptAttributes += " script.id = '" + idAttr.replaceAll("'", "\\\\'") + "'; ";
+        String scriptIdEscaped = idAttr.replaceAll("'", "\\\\'");
+        scriptAttributes += " script.id = '" + scriptIdEscaped + "'; ";
+        scriptAttributes += " script.onload = function() {" +
+        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptLoaded', '" + scriptIdEscaped + "');" +
+        "  }" +
+        "};";
+        scriptAttributes += " script.onerror = function() {" +
+        "  if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + " != null) {" +
+        "    window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + ".callHandler('onInjectedScriptError', '" + scriptIdEscaped + "');" +
+        "  }" +
+        "};";
       }
       Boolean asyncAttr = (Boolean) scriptHtmlTagAttributes.get("async");
       if (asyncAttr != null && asyncAttr) {

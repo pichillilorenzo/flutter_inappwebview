@@ -1336,7 +1336,22 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 scriptAttributes += " script.type = '\(typeAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
             }
             if let idAttr = scriptHtmlTagAttributes["id"] as? String {
-                scriptAttributes += " script.id = '\(idAttr.replacingOccurrences(of: "\'", with: "\\'"))'; "
+                let scriptIdEscaped = idAttr.replacingOccurrences(of: "\'", with: "\\'")
+                scriptAttributes += " script.id = '\(scriptIdEscaped)'; "
+                scriptAttributes += """
+                script.onload = function() {
+                    if (window.\(JAVASCRIPT_BRIDGE_NAME) != null) {
+                        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onInjectedScriptLoaded', '\(scriptIdEscaped)');
+                    }
+                };
+                """
+                scriptAttributes += """
+                script.onerror = function() {
+                    if (window.\(JAVASCRIPT_BRIDGE_NAME) != null) {
+                        window.\(JAVASCRIPT_BRIDGE_NAME).callHandler('onInjectedScriptError', '\(scriptIdEscaped)');
+                    }
+                };
+                """
             }
             if let asyncAttr = scriptHtmlTagAttributes["async"] as? Bool, asyncAttr {
                 scriptAttributes += " script.async = true; "

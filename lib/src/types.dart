@@ -6037,6 +6037,16 @@ class ScriptHtmlTagAttributes {
   ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
   ReferrerPolicy? referrerPolicy;
 
+  ///Represents a callback function that will be called as soon as the script has been loaded successfully.
+  ///
+  ///**NOTE**: This callback requires the [id] property to be set.
+  Function()? onLoad;
+
+  ///Represents a callback function that will be called if an error occurred while trying to load the script.
+  ///
+  ///**NOTE**: This callback requires the [id] property to be set.
+  Function()? onError;
+
   ScriptHtmlTagAttributes(
       {this.type = "text/javascript",
       this.id,
@@ -6046,7 +6056,14 @@ class ScriptHtmlTagAttributes {
       this.integrity,
       this.noModule,
       this.nonce,
-      this.referrerPolicy});
+      this.referrerPolicy,
+      this.onLoad,
+      this.onError}) {
+    if (this.onLoad != null || this.onError != null) {
+      assert(this.id != null,
+          'onLoad and onError callbacks require the id property to be set.');
+    }
+  }
 
   Map<String, dynamic> toMap() {
     return {

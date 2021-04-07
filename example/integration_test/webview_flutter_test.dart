@@ -4142,6 +4142,8 @@ setTimeout(function() {
     testWidgets('injectJavascriptFileFromUrl', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
+      final Completer<void> jQueryLoaded = Completer<void>();
+      final Completer<void> jQueryLoadError = Completer<void>();
 
       await tester.pumpWidget(
         Directionality(
@@ -4164,9 +4166,25 @@ setTimeout(function() {
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromUrl(
+          urlFile: Uri.parse('https://www.notawebsite..com/jquery-3.3.1.min.js'),
+          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(id: 'jquery-error', onError: () {
+            jQueryLoadError.complete();
+          },));
+      await jQueryLoadError.future;
+      expect(
+          await controller.evaluateJavascript(
+              source: "document.body.querySelector('#jquery-error') == null;"),
+          false);
+      expect(
+          await controller.evaluateJavascript(source: "window.jQuery == null;"),
+          true);
+
+      await controller.injectJavascriptFileFromUrl(
           urlFile: Uri.parse('https://code.jquery.com/jquery-3.3.1.min.js'),
-          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(id: 'jquery'));
-      await Future.delayed(Duration(seconds: 4));
+          scriptHtmlTagAttributes: ScriptHtmlTagAttributes(id: 'jquery', onLoad: () {
+            jQueryLoaded.complete();
+          },));
+      await jQueryLoaded.future;
       expect(
           await controller.evaluateJavascript(
               source: "document.body.querySelector('#jquery') == null;"),

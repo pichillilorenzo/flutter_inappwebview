@@ -1,3 +1,8 @@
+## 5.3.2
+
+- Added `onLoad` and `onError` callbacks in `ScriptHtmlTagAttributes` class used by `InAppWebViewController.injectJavascriptFileFromUrl`
+- `InAppWebViewController.injectJavascriptFileFromAsset` returns a `Future<dynamic>` type now
+
 ## 5.3.1+1
 
 - Removed duplicate lib exports

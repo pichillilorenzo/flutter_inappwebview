@@ -35,6 +35,9 @@ class AndroidChromeCustomTabsOptions
   ///Set to `true` to enable Keep Alive. The default value is `false`.
   bool keepAliveEnabled;
 
+  //Set to `true` to launch the intent with the flag FLAG_ACTIVITY_NO_HISTORY
+  bool noHistory;
+
   AndroidChromeCustomTabsOptions(
       {this.addDefaultShareMenuItem = true,
       this.showTitle = true,
@@ -42,7 +45,9 @@ class AndroidChromeCustomTabsOptions
       this.enableUrlBarHiding = false,
       this.instantAppsEnabled = false,
       this.packageName,
-      this.keepAliveEnabled = false});
+      this.keepAliveEnabled = false,
+      this.noHistory = false
+      });
 
   @override
   Map<String, dynamic> toMap() {
@@ -53,7 +58,8 @@ class AndroidChromeCustomTabsOptions
       "enableUrlBarHiding": enableUrlBarHiding,
       "instantAppsEnabled": instantAppsEnabled,
       "packageName": packageName,
-      "keepAliveEnabled": keepAliveEnabled
+      "keepAliveEnabled": keepAliveEnabled,
+      "noHistory": noHistory
     };
   }
 
@@ -68,6 +74,7 @@ class AndroidChromeCustomTabsOptions
     options.instantAppsEnabled = map["instantAppsEnabled"];
     options.packageName = map["packageName"];
     options.keepAliveEnabled = map["keepAliveEnabled"];
+    options.noHistory = map["noHistory"];
     return options;
   }
 

@@ -499,6 +499,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 } else if options.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
                 }
+
+                if !options.applicationNameForUserAgent.isEmpty {
+                    configuration.applicationNameForUserAgent = options.applicationNameForUserAgent
+                }
             }
             
             if #available(iOS 10.0, *) {

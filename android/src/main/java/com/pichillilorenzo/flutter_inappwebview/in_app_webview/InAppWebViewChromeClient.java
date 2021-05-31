@@ -1004,7 +1004,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   private Boolean arrayContainsString(String[] array, String pattern) {
     for (String content : array) {
-      if (content.contains(pattern)) {
+      if (content != null && content.contains(pattern)) {
         return true;
       }
     }

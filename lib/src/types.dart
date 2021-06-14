@@ -4052,7 +4052,7 @@ class NavigationAction {
 
   Map<String, dynamic> toMap() {
     return {
-      "request": request.toString(),
+      "request": request.toMap(),
       "isForMainFrame": isForMainFrame,
       "androidHasGesture": androidHasGesture,
       "androidIsRedirect": androidIsRedirect,

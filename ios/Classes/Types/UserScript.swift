@@ -22,10 +22,11 @@ public class UserScript : WKUserScript {
         self.groupName = groupName
     }
     
-    @available(iOS 14.0, *)
     public override init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool, in contentWorld: WKContentWorld) {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly, in: contentWorld)
-        self.contentWorld = contentWorld
+        if #available(iOS 14.0, *) {
+            self.contentWorld = contentWorld
+        }
     }
 
     @available(iOS 14.0, *)

@@ -21,6 +21,10 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
         self.channel?.setMethodCallHandler(self.handle)
     }
     
+    deinit {
+        dispose()
+    }
+    
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         

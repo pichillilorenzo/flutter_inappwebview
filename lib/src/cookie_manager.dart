@@ -141,7 +141,7 @@ class CookieManager {
 
     var setCookieCompleter = Completer<void>();
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: url),
+      initialUrlRequest: URLRequest(url: url.toString()),
       onLoadStop: (controller, url) async {
         await controller.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
@@ -226,7 +226,7 @@ class CookieManager {
 
     var pageLoaded = Completer<void>();
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: url),
+      initialUrlRequest: URLRequest(url: url.toString()),
       onLoadStop: (controller, url) async {
         pageLoaded.complete();
       },

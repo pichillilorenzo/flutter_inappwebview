@@ -395,9 +395,9 @@ class _InAppWebViewState extends State<InAppWebView> {
               viewType: 'com.pichillilorenzo/flutter_inappwebview',
               layoutDirection: TextDirection.rtl,
               creationParams: <String, dynamic>{
-                'initialUrlRequest': (widget.initialUrlRequest ??
-                        URLRequest(url: Uri.parse("about:blank")))
-                    .toMap(),
+                'initialUrlRequest':
+                    (widget.initialUrlRequest ?? URLRequest(url: "about:blank"))
+                        .toMap(),
                 'initialFile': widget.initialFile,
                 'initialData': widget.initialData?.toMap(),
                 'initialOptions': widget.initialOptions?.toMap() ?? {},
@@ -425,9 +425,9 @@ class _InAppWebViewState extends State<InAppWebView> {
           gestureRecognizers: widget.gestureRecognizers,
           layoutDirection: TextDirection.rtl,
           creationParams: <String, dynamic>{
-            'initialUrlRequest': (widget.initialUrlRequest ??
-                    URLRequest(url: Uri.parse("about:blank")))
-                .toMap(),
+            'initialUrlRequest':
+                (widget.initialUrlRequest ?? URLRequest(url: "about:blank"))
+                    .toMap(),
             'initialFile': widget.initialFile,
             'initialData': widget.initialData?.toMap(),
             'initialOptions': widget.initialOptions?.toMap() ?? {},
@@ -448,9 +448,9 @@ class _InAppWebViewState extends State<InAppWebView> {
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: widget.gestureRecognizers,
         creationParams: <String, dynamic>{
-          'initialUrlRequest': (widget.initialUrlRequest ??
-                  URLRequest(url: Uri.parse("about:blank")))
-              .toMap(),
+          'initialUrlRequest':
+              (widget.initialUrlRequest ?? URLRequest(url: "about:blank"))
+                  .toMap(),
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialOptions': widget.initialOptions?.toMap() ?? {},

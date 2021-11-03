@@ -6326,7 +6326,7 @@ class IOSShouldAllowDeprecatedTLSAction {
 ///A URL load request that is independent of protocol or URL scheme.
 class URLRequest {
   ///The URL of the request.
-  Uri? url;
+  String? url;
 
   ///The HTTP request method.
   ///
@@ -6405,7 +6405,7 @@ class URLRequest {
       return null;
     }
     return URLRequest(
-      url: map["url"] != null ? Uri.parse(map["url"]) : null,
+      url: map["url"],
       headers: map["headers"]?.cast<String, String>(),
       method: map["method"],
       body: map["body"],
@@ -6427,7 +6427,7 @@ class URLRequest {
 
   Map<String, dynamic> toMap() {
     return {
-      "url": url?.toString(),
+      "url": url,
       "headers": headers,
       "method": method,
       "body": body,

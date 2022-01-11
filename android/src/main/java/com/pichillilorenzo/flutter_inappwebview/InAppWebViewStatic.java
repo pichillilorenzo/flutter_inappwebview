@@ -11,6 +11,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -58,9 +59,9 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
           result.success(null);
         break;
       case "setSafeBrowsingWhitelist":
-        if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ALLOWLIST)) {
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_WHITELIST)) {
           Set<String> hosts = new HashSet<>((List<String>) call.argument("hosts"));
-          WebViewCompat.setSafeBrowsingAllowlist(hosts, new ValueCallback<Boolean>() {
+          WebViewCompat.setSafeBrowsingWhitelist(new ArrayList<>(hosts), new ValueCallback<Boolean>() {
             @Override
             public void onReceiveValue(Boolean value) {
               result.success(value);

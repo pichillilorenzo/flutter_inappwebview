@@ -7,7 +7,7 @@ import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
+// import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -397,7 +397,7 @@ void main() {
       late File fileJs;
 
       setUpAll(() async {
-        appSupportDir = (await getApplicationSupportDirectory())!;
+        appSupportDir = (await getApplicationSupportDirectory());
 
         final Directory htmlFolder = Directory('${appSupportDir.path}/html/');
         if (!await htmlFolder.exists()) {
@@ -4853,7 +4853,7 @@ setTimeout(function() {
         fileName = fileName + WebArchiveFormat.WEBARCHIVE.toValue();
       }
 
-      var fullPath = supportDir!.path + Platform.pathSeparator + fileName;
+      var fullPath = supportDir.path + Platform.pathSeparator + fileName;
       var path = await controller.saveWebArchive(filePath: fullPath);
       expect(path, isNotNull);
       expect(path, endsWith(fileName));

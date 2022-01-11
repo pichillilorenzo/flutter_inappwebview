@@ -1650,7 +1650,7 @@ final public class InAppWebView extends InputAwareWebView {
   }
 
   public void addWebMessageListener(@NonNull WebMessageListener webMessageListener) {
-    WebViewCompat.addWebMessageListener(this, webMessageListener.jsObjectName, webMessageListener.allowedOriginRules, webMessageListener.listener);
+    WebViewCompat.addWebMessageListener(this, webMessageListener.jsObjectName, new ArrayList<>(webMessageListener.allowedOriginRules), webMessageListener.listener);
   }
 
   public void disposeWebMessageChannels() {

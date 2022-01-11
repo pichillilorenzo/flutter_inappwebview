@@ -5,7 +5,7 @@ import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.webkit.JavaScriptReplyProxy;
+import androidx.webkit.JsReplyProxy;
 import androidx.webkit.WebMessageCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
@@ -26,7 +26,7 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
   public String jsObjectName;
   public Set<String> allowedOriginRules;
   public WebViewCompat.WebMessageListener listener;
-  public JavaScriptReplyProxy replyProxy;
+  public JsReplyProxy replyProxy;
   public MethodChannel channel;
 
   public WebMessageListener(@NonNull BinaryMessenger messenger, @NonNull String jsObjectName, @NonNull Set<String> allowedOriginRules) {
@@ -36,7 +36,7 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
     this.channel.setMethodCallHandler(this);
     this.listener = new WebViewCompat.WebMessageListener() {
       @Override
-      public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy javaScriptReplyProxy) {
+      public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JsReplyProxy javaScriptReplyProxy) {
         replyProxy = javaScriptReplyProxy;
         Map<String, Object> obj = new HashMap<>();
         obj.put("message", message.getData());

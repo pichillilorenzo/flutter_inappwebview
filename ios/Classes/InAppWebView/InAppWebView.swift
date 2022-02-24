@@ -528,7 +528,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     // See also https://forums.developer.apple.com/thread/97194
                     // check if websiteDataStore has not been initialized before
                     if(!options.incognito && options.cacheEnabled) {
-                        configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
+                        configuration.websiteDataStore = WKWebsiteDataStore.default()
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
                         configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)

@@ -136,6 +136,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         return result as? UILongPressGestureRecognizer
     }
     
+    @objc private func keyboardDidAppear(_ notification: Notification) {
+        guard let keyboardFrame = (notification.userInfo?["UIKeyboardFrameEndUserInfoKey"] as? NSValue)?.cgRectValue else { return }
+        scrollView.contentInset.bottom = keyboardFrame.height
+    }
+    
+    
     @objc func longPressGestureDetected(_ sender: UIGestureRecognizer) {
         if sender.state == .cancelled {
             return
@@ -299,6 +305,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             forKeyPath: #keyPath(WKWebView.title),
             options: [.new, .old],
             context: nil)
+        
+        NotificationCenter.default.addObserver(
+                        self,
+                        selector: #selector(keyboardDidAppear(_:)),
+                        name: UIResponder.keyboardDidShowNotification,
+                        object: nil)
         
         NotificationCenter.default.addObserver(
                         self,

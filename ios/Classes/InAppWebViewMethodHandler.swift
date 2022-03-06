@@ -289,7 +289,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 result(webView?.getContentHeight())
                 break
             case "zoomBy":
-                let zoomFactor = arguments!["zoomFactor"] as! Float
+                let zoomFactor = (arguments!["zoomFactor"] as! NSNumber).floatValue
                 let animated = arguments!["iosAnimated"] as! Bool
                 webView?.zoomBy(zoomFactor: zoomFactor, animated: animated)
                 result(true)

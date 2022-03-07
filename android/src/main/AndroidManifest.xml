@@ -4,10 +4,12 @@
     <application>
         <activity
             android:theme="@style/AppTheme"
+            android:exported="true"
             android:name="com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity"
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density" />
         <activity
             android:theme="@style/ThemeTransparent"
+            android:exported="false"
             android:name="com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeCustomTabsActivity" />
         <receiver android:name="com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ActionBroadcastReceiver" />
         <meta-data

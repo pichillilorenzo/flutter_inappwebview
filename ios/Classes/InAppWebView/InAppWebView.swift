@@ -2942,10 +2942,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     }
     
 //    var accessoryView: UIView?
-//
-//    // https://stackoverflow.com/a/58001395/4637638
-//    public override var inputAccessoryView: UIView? {
-//        // remove/replace the default accessory view
-//        return accessoryView
-//    }
+    var disableInputAccessoryView = false
+    // https://stackoverflow.com/a/58001395/4637638
+    public override var inputAccessoryView: UIView? {
+        return disableInputAccessoryView ? nil : super.inputAccessoryView
+    }
 }

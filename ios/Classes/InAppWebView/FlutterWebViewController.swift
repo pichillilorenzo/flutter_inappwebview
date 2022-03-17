@@ -58,6 +58,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
                                    contextMenu: contextMenu,
                                    channel: channel!,
                                    userScripts: userScripts)
+            webView?.disableInputAccessoryView = options.disableInputAccessoryView
         }
         
         methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)

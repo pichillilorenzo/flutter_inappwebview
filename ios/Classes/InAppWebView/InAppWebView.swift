@@ -1442,6 +1442,43 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         return result;
     }
+
+    @available(iOS 15.0, *)
+    @available(macOS 12.0, *)
+    @available(macCatalyst 15.0, *)
+    public func webView(_ webView: WKWebView,
+                 requestMediaCapturePermissionFor origin: WKSecurityOrigin,
+                 initiatedByFrame frame: WKFrameInfo,
+                 type: WKMediaCaptureType,
+                 decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+         onPermissionRequest(origin: origin, type: type, result: {(result) -> Void in
+             if result is FlutterError {
+                 print((result as! FlutterError).message ?? "")
+                 decisionHandler(.deny)
+             }
+             else if (result as? NSObject) == FlutterMethodNotImplemented {
+                 decisionHandler(.deny)
+             }
+             else {
+                 var response: [String: Any]
+                 if let r = result {
+                     response = r as! [String: Any]
+                     var action = response["action"] as? Int
+                     action = action != nil ? action : 0;
+//                     var resources = response["resources"] as? [String]
+                     switch action {
+                         case 1:
+                            decisionHandler(.grant)
+                             break
+                         default:
+                            decisionHandler(.deny)
+                     }
+                     return;
+                 }
+                 decisionHandler(.deny)
+             }
+         })
+     }
     
     @available(iOS 13.0, *)
     public func webView(_ webView: WKWebView,
@@ -2372,6 +2409,25 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func onNavigationResponse(navigationResponse: WKNavigationResponse, result: FlutterResult?) {
         channel?.invokeMethod("onNavigationResponse", arguments: navigationResponse.toMap(), result: result)
+    }
+    
+    @available(iOS 15.0, *)
+    @available(macOS 12.0, *)
+    @available(macCatalyst 15.0, *)
+    public func onPermissionRequest(origin: WKSecurityOrigin, type: WKMediaCaptureType, result: FlutterResult?) {
+        let resources: [String];
+        switch type {
+            case .camera:
+                resources = ["camera"]
+                break;
+            case .microphone:
+                resources = ["microphone"]
+                break;
+            default:
+                resources = ["cameraAndMicrophone"]
+        }
+        let arguments: [String: Any] = ["origin": origin.protocol + "://" + origin.host, "resources": resources]
+        channel?.invokeMethod("onPermissionRequest", arguments: arguments, result: result)
     }
     
     public func onReceivedHttpAuthRequest(challenge: URLAuthenticationChallenge, result: FlutterResult?) {

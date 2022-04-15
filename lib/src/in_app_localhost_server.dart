@@ -56,17 +56,16 @@ class InAppLocalhostServer {
             return;
           }
 
-          var contentType = ['text', 'html'];
+          var contentType = ContentType('text', 'html', charset: 'utf-8');
           if (!request.requestedUri.path.endsWith('/') &&
               request.requestedUri.pathSegments.isNotEmpty) {
             var mimeType = MimeTypeResolver.lookup(request.requestedUri.path);
             if (mimeType != null) {
-              contentType = mimeType.split('/');
+              contentType = _getContentTypeFromMimeType(mimeType);
             }
           }
 
-          request.response.headers.contentType =
-              ContentType(contentType[0], contentType[1], charset: 'utf-8');
+          request.response.headers.contentType = contentType;
           request.response.add(body);
           request.response.close();
         });
@@ -92,5 +91,21 @@ class InAppLocalhostServer {
   ///Indicates if the server is running or not.
   bool isRunning() {
     return this._server != null;
+  }
+
+  ContentType _getContentTypeFromMimeType(String mimeType) {
+    final contentType = mimeType.split('/');
+    String? charset;
+
+    if (_isTextFile(mimeType)) {
+      charset = 'utf-8';
+    }
+
+    return ContentType(contentType[0], contentType[1], charset: charset);
+  }
+
+  bool _isTextFile(String mimeType) {
+    final textFile = RegExp(r'^text\/|^application\/(javascript|json)');
+    return textFile.hasMatch(mimeType);
   }
 }

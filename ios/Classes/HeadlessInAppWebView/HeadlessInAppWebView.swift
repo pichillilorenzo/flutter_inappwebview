@@ -21,10 +21,6 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
         self.channel?.setMethodCallHandler(self.handle)
     }
     
-    deinit {
-        dispose()
-    }
-    
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         
@@ -95,5 +91,10 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
         channel = nil
         HeadlessInAppWebViewManager.webViews.removeValue(forKey: id)
         flutterWebView = nil
+    }
+    
+    deinit {
+        print("HeadlessInAppWebView - dealloc")
+        dispose()
     }
 }

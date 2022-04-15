@@ -99,9 +99,11 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
         }
         break;
       case "setWebContentsDebuggingEnabled":
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        {
           boolean debuggingEnabled = (boolean) call.argument("debuggingEnabled");
-          WebView.setWebContentsDebuggingEnabled(debuggingEnabled);
+          if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+            WebView.setWebContentsDebuggingEnabled(debuggingEnabled);
+          }
         }
         result.success(true);
         break;

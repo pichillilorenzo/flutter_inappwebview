@@ -19,6 +19,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var pullToRefreshControl: PullToRefreshControl?
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
+    var currentOriginalUrl: URL?
     
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
     static var credentialsProposed: [URLCredential] = []
@@ -26,6 +27,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var lastScrollX: CGFloat = 0
     var lastScrollY: CGFloat = 0
     
+    // Used to manage pauseTimers() and resumeTimers()
     var isPausedTimers = false
     var isPausedTimersCompletionHandler: (() -> Void)?
 
@@ -405,9 +407,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if #available(iOS 9.0, *) {
                 configuration.allowsAirPlayForMediaPlayback = options.allowsAirPlayForMediaPlayback
                 configuration.allowsPictureInPictureMediaPlayback = options.allowsPictureInPictureMediaPlayback
-                if !options.applicationNameForUserAgent.isEmpty {
-                    configuration.applicationNameForUserAgent = options.applicationNameForUserAgent
-                }
             }
             
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
@@ -498,6 +497,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                 } else if options.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
+                }
+                if !options.applicationNameForUserAgent.isEmpty {
+                    if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
+                        configuration.applicationNameForUserAgent = applicationNameForUserAgent + " " + options.applicationNameForUserAgent
+                    }
                 }
             }
             
@@ -1557,6 +1561,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        currentOriginalUrl = url
+        lastTouchPoint = nil
+        
         disposeWebMessageChannels()
         initializeWindowIdJS()
         
@@ -2723,6 +2730,10 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         scrollView.setZoomScale(currentZoomScale * CGFloat(zoomFactor), animated: animated)
     }
     
+    public func getOriginalUrl() -> URL? {
+        return currentOriginalUrl
+    }
+    
     public func getZoomScale() -> Float {
         return Float(scrollView.zoomScale)
     }
@@ -2883,10 +2894,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     }
     
     public func dispose() {
-        if isPausedTimers, let completionHandler = isPausedTimersCompletionHandler {
-            isPausedTimersCompletionHandler = nil
-            completionHandler()
-        }
+        resumeTimers()
         stopLoading()
         disposeWebMessageChannels()
         for webMessageListener in webMessageListeners {

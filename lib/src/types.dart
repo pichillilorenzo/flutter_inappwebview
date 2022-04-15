@@ -4052,7 +4052,7 @@ class NavigationAction {
 
   Map<String, dynamic> toMap() {
     return {
-      "request": request.toString(),
+      "request": request.toMap(),
       "isForMainFrame": isForMainFrame,
       "androidHasGesture": androidHasGesture,
       "androidIsRedirect": androidIsRedirect,
@@ -6844,6 +6844,48 @@ class AndroidPullToRefreshSize {
 
   ///Large size.
   static const LARGE = const AndroidPullToRefreshSize._internal(0);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents the [WebView] native implementation to be used.
+class WebViewImplementation {
+  final int _value;
+
+  const WebViewImplementation._internal(this._value);
+
+  static final Set<WebViewImplementation> values = [
+    WebViewImplementation.NATIVE
+  ].toSet();
+
+  static WebViewImplementation? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return WebViewImplementation.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 0:
+      default:
+        return "NATIVE";
+    }
+  }
+
+  ///Default native implementation, such as `WKWebView` for iOS and `android.webkit.WebView` for Android.
+  static const NATIVE = const WebViewImplementation._internal(0);
 
   bool operator ==(value) => value == _value;
 

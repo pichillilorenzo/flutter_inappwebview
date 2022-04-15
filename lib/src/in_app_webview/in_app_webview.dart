@@ -41,6 +41,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialOptions,
     this.initialUserScripts,
     this.pullToRefreshController,
+    this.implementation = WebViewImplementation.NATIVE,
     this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
@@ -134,6 +135,9 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final URLRequest? initialUrlRequest;
+
+  @override
+  final WebViewImplementation implementation;
 
   @override
   final UnmodifiableListView<UserScript>? initialUserScripts;
@@ -403,6 +407,7 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialOptions': widget.initialOptions?.toMap() ?? {},
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
                 'windowId': widget.windowId,
+                'implementation': widget.implementation.toValue(),
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
                         [],
@@ -423,7 +428,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
           onPlatformViewCreated: _onPlatformViewCreated,
           gestureRecognizers: widget.gestureRecognizers,
-          layoutDirection: TextDirection.rtl,
+          layoutDirection: Directionality.maybeOf(context) ?? TextDirection.rtl,
           creationParams: <String, dynamic>{
             'initialUrlRequest': (widget.initialUrlRequest ??
                     URLRequest(url: Uri.parse("about:blank")))
@@ -433,6 +438,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialOptions': widget.initialOptions?.toMap() ?? {},
             'contextMenu': widget.contextMenu?.toMap() ?? {},
             'windowId': widget.windowId,
+            'implementation': widget.implementation.toValue(),
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
             'pullToRefreshOptions':
@@ -456,6 +462,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialOptions': widget.initialOptions?.toMap() ?? {},
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
+          'implementation': widget.implementation.toValue(),
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
           'pullToRefreshOptions':

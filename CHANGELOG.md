@@ -1,3 +1,18 @@
+## 5.3.3
+
+- `getOriginalUrl` method is cross-platform now
+- Updated Android `compileSdkVersion` to 31
+- Added `singleInstance` option for Android `ChromeSafariBrowser` implementation
+- Fixed `requestImageRef` method always `null` on iOS
+- Fixed "applicationNameForUserAgent is not work in ios" [#525](https://github.com/pichillilorenzo/flutter_inappwebview/issues/525)
+- Fixed "Crash when try select file from webview input on Android" [#867](https://github.com/pichillilorenzo/flutter_inappwebview/issues/867)
+- Fixed "NavigationAction.request should use toMap method" [#878](https://github.com/pichillilorenzo/flutter_inappwebview/issues/878)
+- Merge "Fix parsing crash on null value." [#828](https://github.com/pichillilorenzo/flutter_inappwebview/pull/828) (thanks to [ItsCalebJones](https://github.com/ItsCalebJones))
+- Merge "fix: ApplicationNameForUserAgent is not working in iOS" [#1095](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1095) (thanks to [sunalwaysknows](https://github.com/sunalwaysknows))
+- Merge "Make sure we open a new instance of a custom chrome chrome tab" [#812](https://github.com/pichillilorenzo/flutter_inappwebview/pull/812) (thanks to [savy-91](https://github.com/savy-91))
+- Merge "fix bug when in String[] array come null" [#868](https://github.com/pichillilorenzo/flutter_inappwebview/pull/868) (thanks to [Ser1ous](https://github.com/Ser1ous))
+- Merge "fix: use in NavigationAction request toMap method" [#879](https://github.com/pichillilorenzo/flutter_inappwebview/pull/879) (thanks to [chreck](https://github.com/chreck))
+
 ## 5.3.2
 
 - Added `onLoad` and `onError` callbacks in `ScriptHtmlTagAttributes` class used by `InAppWebViewController.injectJavascriptFileFromUrl`

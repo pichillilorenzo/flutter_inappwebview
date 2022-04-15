@@ -27,7 +27,6 @@
          additional functionality it is fine to subclass or reimplement
          FlutterApplication and put your custom class here. -->
     <application
-        android:name="io.flutter.app.FlutterApplication"
         android:label="flutter_inappwebview_example"
         android:usesCleartextTraffic="true"
         android:icon="@mipmap/ic_launcher">
@@ -36,22 +35,22 @@
         <meta-data
             android:name="flutterEmbedding"
             android:value="2" />
-        <activity
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
-            android:exported="true"
-            android:hardwareAccelerated="true"
-            android:launchMode="singleTop"
-            android:name=".EmbedderV1Activity"
-            android:theme="@style/LaunchTheme"
-            android:windowSoftInputMode="adjustResize">
-            <!-- This keeps the window background of the activity showing
-                 until Flutter renders its first frame. It can be removed if
-                 there is no splash screen (such as the default splash screen
-                 defined in @style/LaunchTheme). -->
-            <meta-data
-                android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"
-                android:value="true"/>
-        </activity>
+<!--        <activity-->
+<!--            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"-->
+<!--            android:exported="true"-->
+<!--            android:hardwareAccelerated="true"-->
+<!--            android:launchMode="singleTop"-->
+<!--            android:name=".EmbedderV1Activity"-->
+<!--            android:theme="@style/LaunchTheme"-->
+<!--            android:windowSoftInputMode="adjustResize">-->
+<!--            &lt;!&ndash; This keeps the window background of the activity showing-->
+<!--                 until Flutter renders its first frame. It can be removed if-->
+<!--                 there is no splash screen (such as the default splash screen-->
+<!--                 defined in @style/LaunchTheme). &ndash;&gt;-->
+<!--            <meta-data-->
+<!--                android:name="io.flutter.app.android.SplashScreenUntilFirstFrame"-->
+<!--                android:value="true"/>-->
+<!--        </activity>-->
         <activity
             android:configChanges="orientation|keyboardHidden|keyboard|screenSize|locale|layoutDirection|fontScale|screenLayout|density"
             android:hardwareAccelerated="true"

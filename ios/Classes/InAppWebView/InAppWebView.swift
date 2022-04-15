@@ -407,9 +407,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if #available(iOS 9.0, *) {
                 configuration.allowsAirPlayForMediaPlayback = options.allowsAirPlayForMediaPlayback
                 configuration.allowsPictureInPictureMediaPlayback = options.allowsPictureInPictureMediaPlayback
-                if !options.applicationNameForUserAgent.isEmpty {
-                    configuration.applicationNameForUserAgent = options.applicationNameForUserAgent
-                }
             }
             
             configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
@@ -500,6 +497,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                 } else if options.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
+                }
+                if !options.applicationNameForUserAgent.isEmpty {
+                    if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
+                        configuration.applicationNameForUserAgent = applicationNameForUserAgent + " " + options.applicationNameForUserAgent
+                    }
                 }
             }
             

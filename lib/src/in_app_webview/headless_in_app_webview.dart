@@ -53,6 +53,7 @@ class HeadlessInAppWebView implements WebView {
       this.contextMenu,
       this.initialUserScripts,
       this.pullToRefreshController,
+      this.implementation = WebViewImplementation.NATIVE,
       this.onWebViewCreated,
       this.onLoadStart,
       this.onLoadStop,
@@ -147,6 +148,7 @@ class HeadlessInAppWebView implements WebView {
               'initialOptions': this.initialOptions?.toMap() ?? {},
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
+              'implementation': this.implementation,
               'initialUserScripts':
                   this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
               'pullToRefreshOptions':
@@ -226,6 +228,9 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   final PullToRefreshController? pullToRefreshController;
+
+  @override
+  final WebViewImplementation implementation;
 
   @override
   void Function(InAppWebViewController controller)?

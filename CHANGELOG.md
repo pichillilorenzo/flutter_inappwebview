@@ -1,3 +1,8 @@
+## 5.3.3
+
+- `getOriginalUrl` method is cross-platform now
+- Fixed `requestImageRef` method always `null` on iOS
+
 ## 5.3.2
 
 - Added `onLoad` and `onError` callbacks in `ScriptHtmlTagAttributes` class used by `InAppWebViewController.injectJavascriptFileFromUrl`

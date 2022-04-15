@@ -6850,3 +6850,51 @@ class AndroidPullToRefreshSize {
   @override
   int get hashCode => _value.hashCode;
 }
+
+///Class that represents the [WebView] native implementation to be used.
+class WebViewImplementation {
+  final int _value;
+
+  const WebViewImplementation._internal(this._value);
+
+  static final Set<WebViewImplementation> values = [
+    WebViewImplementation.NATIVE,
+    WebViewImplementation.GECKO,
+  ].toSet();
+
+  static WebViewImplementation? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return WebViewImplementation.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "GECKO";
+      case 0:
+      default:
+        return "NATIVE";
+    }
+  }
+
+  ///Default native implementation, such as `WKWebView` for iOS and `android.webkit.WebView` for Android.
+  static const NATIVE = const WebViewImplementation._internal(0);
+
+  ///Android-only WebView implementation using the Mozilla's Gecko browser engine.
+  static const GECKO = const WebViewImplementation._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}

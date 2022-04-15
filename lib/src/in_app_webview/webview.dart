@@ -22,16 +22,16 @@ abstract class WebView {
 
   ///Event fired when the [WebView] starts to load an [url].
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)
-  ///
-  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
+  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
   ///Event fired when the [WebView] finishes loading an [url].
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)
-  ///
-  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
+  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
 
   ///Event fired when the [WebView] encounters an error loading an [url].
@@ -60,7 +60,9 @@ abstract class WebView {
 
   ///Event fired when the current [progress] of loading a page is changed.
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
+  ///- iOS
   final void Function(InAppWebViewController controller, int progress)?
       onProgressChanged;
 
@@ -254,7 +256,7 @@ abstract class WebView {
       onReceivedClientCertRequest;
 
   ///Event fired as find-on-page operations progress.
-  ///The listener may be notified multiple times while the operation is underway, and the numberOfMatches value should not be considered final unless [isDoneCounting] is true.
+  ///The listener may be notified multiple times while the operation is underway, and the [numberOfMatches] value should not be considered final unless [isDoneCounting] is true.
   ///
   ///[activeMatchOrdinal] represents the zero-based ordinal of the currently selected match.
   ///
@@ -262,7 +264,9 @@ abstract class WebView {
   ///
   ///[isDoneCounting] whether the find operation has actually completed.
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setFindListener(android.webkit.WebView.FindListener)
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.FindListener.onFindResultReceived](https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)))
+  ///- iOS
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,
       int numberOfMatches, bool isDoneCounting)? onFindResultReceived;
 
@@ -340,7 +344,9 @@ abstract class WebView {
   ///
   ///[url] represents the url on which is called.
   ///
-  ///**NOTE**: available on Android 21+.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   final void Function(InAppWebViewController controller, Uri? url)? onPrint;
 
   ///Event fired when an HTML element of the webview has been clicked and held.
@@ -674,6 +680,10 @@ abstract class WebView {
   ///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [AndroidInAppWebViewOptions.useHybridComposition] must be `true`.
   final PullToRefreshController? pullToRefreshController;
 
+  ///Represents the WebView native implementation to be used.
+  ///The default value is [WebViewImplementation.NATIVE].
+  final WebViewImplementation implementation;
+
   WebView(
       {this.windowId,
       this.onWebViewCreated,
@@ -722,7 +732,7 @@ abstract class WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       @Deprecated('Use `onZoomScaleChanged` instead')
-          this.androidOnScaleChanged,
+      this.androidOnScaleChanged,
       this.androidOnReceivedIcon,
       this.androidOnReceivedTouchIconUrl,
       this.androidOnJsBeforeUnload,
@@ -737,5 +747,6 @@ abstract class WebView {
       this.initialOptions,
       this.contextMenu,
       this.initialUserScripts,
-      this.pullToRefreshController});
+      this.pullToRefreshController,
+      this.implementation = WebViewImplementation.NATIVE});
 }

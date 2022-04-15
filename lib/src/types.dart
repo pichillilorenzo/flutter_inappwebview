@@ -6858,8 +6858,7 @@ class WebViewImplementation {
   const WebViewImplementation._internal(this._value);
 
   static final Set<WebViewImplementation> values = [
-    WebViewImplementation.NATIVE,
-    WebViewImplementation.GECKO,
+    WebViewImplementation.NATIVE
   ].toSet();
 
   static WebViewImplementation? fromValue(int? value) {
@@ -6879,8 +6878,6 @@ class WebViewImplementation {
   @override
   String toString() {
     switch (_value) {
-      case 1:
-        return "GECKO";
       case 0:
       default:
         return "NATIVE";
@@ -6889,9 +6886,6 @@ class WebViewImplementation {
 
   ///Default native implementation, such as `WKWebView` for iOS and `android.webkit.WebView` for Android.
   static const NATIVE = const WebViewImplementation._internal(0);
-
-  ///Android-only WebView implementation using the Mozilla's Gecko browser engine.
-  static const GECKO = const WebViewImplementation._internal(1);
 
   bool operator ==(value) => value == _value;
 

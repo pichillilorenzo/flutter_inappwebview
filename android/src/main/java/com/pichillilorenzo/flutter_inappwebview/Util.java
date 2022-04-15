@@ -317,4 +317,8 @@ public class Util {
     }
     return InetAddress.getByName(address).getCanonicalHostName();
   }
+
+  public static Object getOrDefault(Map map, String key, Object defaultValue) {
+    return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
 }

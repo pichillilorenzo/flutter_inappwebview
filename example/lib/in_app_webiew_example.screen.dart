@@ -24,7 +24,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
         useShouldOverrideUrlLoading: true,
-        mediaPlaybackRequiresUserGesture: false,
+        mediaPlaybackRequiresUserGesture: false
       ),
       android: AndroidInAppWebViewOptions(
         useHybridComposition: true,

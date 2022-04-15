@@ -35,6 +35,9 @@ class AndroidChromeCustomTabsOptions
   ///Set to `true` to enable Keep Alive. The default value is `false`.
   bool keepAliveEnabled;
 
+  ///Set to `true` to launch the Android activity in `singleInstance` mode. The default value is `false`.
+  bool singleInstance;
+
   AndroidChromeCustomTabsOptions(
       {this.addDefaultShareMenuItem = true,
       this.showTitle = true,
@@ -42,7 +45,8 @@ class AndroidChromeCustomTabsOptions
       this.enableUrlBarHiding = false,
       this.instantAppsEnabled = false,
       this.packageName,
-      this.keepAliveEnabled = false});
+      this.keepAliveEnabled = false,
+      this.singleInstance = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -53,7 +57,8 @@ class AndroidChromeCustomTabsOptions
       "enableUrlBarHiding": enableUrlBarHiding,
       "instantAppsEnabled": instantAppsEnabled,
       "packageName": packageName,
-      "keepAliveEnabled": keepAliveEnabled
+      "keepAliveEnabled": keepAliveEnabled,
+      "singleInstance": singleInstance
     };
   }
 
@@ -68,6 +73,7 @@ class AndroidChromeCustomTabsOptions
     options.instantAppsEnabled = map["instantAppsEnabled"];
     options.packageName = map["packageName"];
     options.keepAliveEnabled = map["keepAliveEnabled"];
+    options.singleInstance = map["singleInstance"];
     return options;
   }
 

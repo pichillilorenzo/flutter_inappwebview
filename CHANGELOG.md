@@ -1,7 +1,12 @@
 ## 5.3.3
 
 - `getOriginalUrl` method is cross-platform now
+- Updated Android `compileSdkVersion` to 31
+- Added `singleInstance` option for Android `ChromeSafariBrowser` implementation
 - Fixed `requestImageRef` method always `null` on iOS
+- Fixed "applicationNameForUserAgent is not work in ios" [#525](https://github.com/pichillilorenzo/flutter_inappwebview/issues/525)
+- Merge "Fix parsing crash on null value." [#828](https://github.com/pichillilorenzo/flutter_inappwebview/pull/828) (thanks to [ItsCalebJones](https://github.com/ItsCalebJones))
+- Merge "fix: ApplicationNameForUserAgent is not working in iOS" [#1095](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1095) (thanks to [sunalwaysknows](https://github.com/sunalwaysknows))
 
 ## 5.3.2
 

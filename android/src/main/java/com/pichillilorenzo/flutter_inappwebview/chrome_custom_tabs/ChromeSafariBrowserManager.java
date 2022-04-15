@@ -7,6 +7,7 @@ import android.os.Bundle;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -67,8 +68,9 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putSerializable("options", options);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 
+    Boolean isSingleInstance = (Boolean) options.get("singleInstance");
     if (CustomTabActivityHelper.isAvailable(activity)) {
-      intent = new Intent(activity, ChromeCustomTabsActivity.class);
+      intent = new Intent(activity, !isSingleInstance ? ChromeCustomTabsActivity.class : ChromeCustomTabsActivitySingleInstance.class);
       intent.putExtras(extras);
       activity.startActivity(intent);
       result.success(true);

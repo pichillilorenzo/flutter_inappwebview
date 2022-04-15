@@ -148,7 +148,7 @@ class HeadlessInAppWebView implements WebView {
               'initialOptions': this.initialOptions?.toMap() ?? {},
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
-              'implementation': this.implementation,
+              'implementation': this.implementation.toValue(),
               'initialUserScripts':
                   this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
               'pullToRefreshOptions':

@@ -1,8 +1,6 @@
 ## 5.4.0
 
 - Added Android Mozilla's Gecko browser engine
-- `getOriginalUrl` method is cross-platform now
-- Fixed `requestImageRef` method always `null` on iOS
 
 ## 5.3.2
 

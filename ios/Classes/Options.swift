@@ -16,10 +16,8 @@ public class Options<T>: NSObject {
     
     func parse(options: [String: Any?]) -> Options {
         for (key, value) in options {
-            if value != nil, !(value is NSNull) {
-                if self.responds(to: Selector(key)) {
-                    self.setValue(value, forKey: key)
-                }
+            if !(value is NSNull), value != nil, self.responds(to: Selector(key)) {
+                self.setValue(value, forKey: key)
             }
         }
         return self

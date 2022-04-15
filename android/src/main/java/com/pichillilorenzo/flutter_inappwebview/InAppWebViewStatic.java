@@ -104,6 +104,9 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
           if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
             WebView.setWebContentsDebuggingEnabled(debuggingEnabled);
           }
+          if (InAppWebViewFlutterPlugin.geckoRuntime != null) {
+            InAppWebViewFlutterPlugin.geckoRuntime.getSettings().setRemoteDebuggingEnabled(true);
+          }
         }
         result.success(true);
         break;

@@ -1,0 +1,20 @@
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "background@inappwebview.dev"
+    }
+  },
+  "manifest_version": 2,
+  "name": "background",
+  "version": "1.0",
+  "description": "Background implementation.",
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "permissions": [
+    "<all_urls>",
+    "nativeMessaging",
+    "nativeMessagingFromContent",
+    "geckoViewAddons"
+  ]
+}

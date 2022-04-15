@@ -3,10 +3,12 @@ package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
 import android.os.Build;
 import android.view.View;
 import android.webkit.WebSettings;
+import android.webkit.WebView;
 
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.Options;
+import com.pichillilorenzo.flutter_inappwebview.in_app_geckoview.InAppGeckoView;
 import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 
@@ -524,6 +526,9 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
         rendererPriorityPolicy.put("waivedWhenNotVisible", webView.getRendererPriorityWaivedWhenNotVisible());
         realOptions.put("rendererPriorityPolicy", rendererPriorityPolicy);
       }
+    } else if (inAppWebView instanceof InAppGeckoView) {
+      // TODO: implement
+      InAppGeckoView webView = (InAppGeckoView) inAppWebView;
     }
     return realOptions;
   }

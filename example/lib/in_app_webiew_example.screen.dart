@@ -43,6 +43,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   void initState() {
     super.initState();
 
+
+
     contextMenu = ContextMenu(
         menuItems: [
           ContextMenuItem(
@@ -87,6 +89,19 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
         }
       },
     );
+
+    Future.delayed(Duration(seconds: 5), () async {
+      await webViewController?.loadUrl(urlRequest: URLRequest(url: Uri.parse("https://www.example.com/")));
+
+      Future.delayed(Duration(seconds: 3), () async {
+        await webViewController?.evaluateJavascript(source: """
+            myTestObj.addEventListener('message', function(event) {
+              console.log(event.data);
+            });
+            myTestObj.postMessage('JavaScript To Native');
+          """);
+      });
+    });
   }
 
   @override
@@ -122,14 +137,24 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   InAppWebView(
                     key: webViewKey,
                     // contextMenu: contextMenu,
-                    initialUrlRequest:
-                    URLRequest(url: Uri.parse("https://github.com/flutter")),
+                    // initialUrlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialOptions: options,
                     pullToRefreshController: pullToRefreshController,
-                    onWebViewCreated: (controller) {
+                    implementation: WebViewImplementation.GECKO,
+                    onWebViewCreated: (controller) async {
                       webViewController = controller;
+                      await controller.addWebMessageListener(WebMessageListener(
+                        jsObjectName: "myTestObj",
+                        allowedOriginRules: Set.from(["https://*.example.com"]),
+                        onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) {
+                          print(sourceOrigin.toString() == "https://www.example.com");
+                          print(isMainFrame);
+
+                          replyProxy.postMessage(message! + " and back");
+                        },
+                      ));
                     },
                     onLoadStart: (controller, url) {
                       setState(() {

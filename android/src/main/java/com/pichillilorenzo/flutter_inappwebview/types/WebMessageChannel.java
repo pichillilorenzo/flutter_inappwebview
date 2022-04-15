@@ -9,6 +9,7 @@ import androidx.webkit.WebMessagePortCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
+import com.pichillilorenzo.flutter_inappwebview.in_app_geckoview.InAppGeckoView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 
@@ -67,6 +68,9 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
         if (webView instanceof InAppWebView) {
           final Integer index = (Integer) call.argument("index");
           setWebMessageCallbackForInAppWebView(index, result);
+        } else if (webView instanceof InAppGeckoView) {
+          final Integer index = (Integer) call.argument("index");
+          setWebMessageCallbackForInAppGeckoView(index, result);
         } else {
           result.success(true);
         }
@@ -76,6 +80,10 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
           final Integer index = (Integer) call.argument("index");
           Map<String, Object> message = (Map<String, Object>) call.argument("message");
           postMessageForInAppWebView(index, message, result);
+        } else if (webView instanceof InAppGeckoView) {
+          final Integer index = (Integer) call.argument("index");
+          Map<String, Object> message = (Map<String, Object>) call.argument("message");
+          postMessageForInAppGeckoView(index, message, result);
         } else {
           result.success(true);
         }
@@ -84,6 +92,9 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
         if (webView instanceof InAppWebView) {
           Integer index = (Integer) call.argument("index");
           closeForInAppWebView(index, result);
+        } else if (webView instanceof InAppGeckoView) {
+          Integer index = (Integer) call.argument("index");
+          closeForInAppGeckoView(index, result);
         } else {
           result.success(true);
         }
@@ -110,6 +121,24 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
           }
         });
         result.success(true);
+      } catch (Exception e) {
+        result.error(LOG_TAG, e.getMessage(), null);
+      }
+    } else {
+      result.success(true);
+    }
+  }
+
+  private void setWebMessageCallbackForInAppGeckoView(final Integer index, final @NonNull MethodChannel.Result result) {
+    if (webView != null && ports.size() > 0) {
+      final WebMessagePort webMessagePort = ports.get(index);
+      try {
+        webMessagePort.setWebMessageCallback(new ValueCallback<Void>() {
+          @Override
+          public void onReceiveValue(Void value) {
+            result.success(true);
+          }
+        });
       } catch (Exception e) {
         result.error(LOG_TAG, e.getMessage(), null);
       }
@@ -146,6 +175,37 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
     }
   }
 
+  private void postMessageForInAppGeckoView(final Integer index, Map<String, Object> message, final @NonNull MethodChannel.Result result) {
+    if (webView != null && ports.size() > 0) {
+      WebMessagePort port = ports.get(index);
+      List<WebMessagePort> webMessagePorts = new ArrayList<>();
+      List<Map<String, Object>> portsMap = (List<Map<String, Object>>) message.get("ports");
+      if (portsMap != null) {
+        for (Map<String, Object> portMap : portsMap) {
+          String webMessageChannelId = (String) portMap.get("webMessageChannelId");
+          Integer portIndex = (Integer) portMap.get("index");
+          WebMessageChannel webMessageChannel = webView.getWebMessageChannels().get(webMessageChannelId);
+          if (webMessageChannel != null) {
+            webMessagePorts.add(webMessageChannel.ports.get(portIndex));
+          }
+        }
+      }
+      WebMessage webMessage = new WebMessage((String) message.get("data"), webMessagePorts);
+      try {
+        port.postMessage(webMessage, new ValueCallback<Void>() {
+          @Override
+          public void onReceiveValue(Void value) {
+            result.success(true);
+          }
+        });
+      } catch (Exception e) {
+        result.error(LOG_TAG, e.getMessage(), null);
+      }
+    } else {
+      result.success(true);
+    }
+  }
+
   private void closeForInAppWebView(Integer index, @NonNull MethodChannel.Result result) {
     if (webView != null && compatPorts.size() > 0 &&
             WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_PORT_CLOSE)) {
@@ -153,6 +213,24 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
       try {
         port.close();
         result.success(true);
+      } catch (Exception e) {
+        result.error(LOG_TAG, e.getMessage(), null);
+      }
+    } else {
+      result.success(true);
+    }
+  }
+
+  private void closeForInAppGeckoView(Integer index, final @NonNull MethodChannel.Result result) {
+    if (webView != null && ports.size() > 0) {
+      WebMessagePort port = ports.get(index);
+      try {
+        port.close(new ValueCallback<Void>() {
+          @Override
+          public void onReceiveValue(Void value) {
+            result.success(true);
+          }
+        });
       } catch (Exception e) {
         result.error(LOG_TAG, e.getMessage(), null);
       }

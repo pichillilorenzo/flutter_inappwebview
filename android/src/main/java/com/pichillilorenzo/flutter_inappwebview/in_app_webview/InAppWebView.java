@@ -540,7 +540,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       return;
     }
     
-    loadUrl(Util.getUrlAsset(plugin, assetFilePath));
+    loadUrl(Util.getUrlAsset(plugin, assetFilePath, false));
   }
 
   public boolean isLoading() {

@@ -113,6 +113,7 @@ class AndroidInAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.clearHistory](https://developer.android.com/reference/android/webkit/WebView#clearHistory())).
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.purgeHistory](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#purgeHistory())).
   Future<void> clearHistory() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('clearHistory', args);

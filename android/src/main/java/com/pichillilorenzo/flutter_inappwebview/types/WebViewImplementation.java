@@ -1,7 +1,8 @@
 package com.pichillilorenzo.flutter_inappwebview.types;
 
 public enum WebViewImplementation {
-  NATIVE(0);
+  NATIVE(0),
+  GECKO(1);
 
   private final int value;
 

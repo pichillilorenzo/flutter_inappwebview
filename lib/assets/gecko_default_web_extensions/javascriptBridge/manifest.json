@@ -1,0 +1,29 @@
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "javascriptBridge@inappwebview.dev"
+    }
+  },
+  "manifest_version": 2,
+  "name": "javascriptBridge",
+  "version": "1.0",
+  "description": "JavaScript Bridge implementation.",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "javascriptBridge.js"
+      ],
+      "run_at": "document_start",
+      "match_about_blank": true,
+      "all_frames": true
+    }
+  ],
+  "permissions": [
+    "nativeMessaging",
+    "nativeMessagingFromContent",
+    "geckoViewAddons"
+  ]
+}

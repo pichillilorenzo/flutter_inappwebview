@@ -906,6 +906,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getUrl](https://developer.android.com/reference/android/webkit/WebView#getUrl()))
+  ///- Android Mozilla's GeckoView
   ///- iOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   Future<Uri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -917,6 +918,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getTitle](https://developer.android.com/reference/android/webkit/WebView#getTitle()))
+  ///- Android Mozilla's GeckoView
   ///- iOS ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
   Future<String?> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -927,6 +929,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getProgress](https://developer.android.com/reference/android/webkit/WebView#getProgress()))
+  ///- Android Mozilla's GeckoView
   ///- iOS ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
   Future<int?> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1149,6 +1152,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String))). If method is "POST", [Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[]))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.load](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#load-org.mozilla.geckoview.GeckoSession.Loader-)). If method is "POST", the same implementation of [postUrl] is used
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
   Future<void> loadUrl(
       {required URLRequest urlRequest, @Deprecated('Use `allowingReadAccessTo` instead') Uri? iosAllowingReadAccessTo, Uri? allowingReadAccessTo}) async {
@@ -1173,6 +1177,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[])))
+  ///- Android Mozilla's GeckoView: it's implemented using JavaScript, creating a fake HTML form using method="POST" and action="[url]" and automatically submitting it
   ///- iOS
   Future<void> postUrl({required Uri url, required Uint8List postData}) async {
     assert(url.toString().isNotEmpty);
@@ -1196,6 +1201,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadDataWithBaseURL](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.load](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#load-org.mozilla.geckoview.GeckoSession.Loader-))
   ///- iOS ([Official API - WKWebView.loadHTMLString](https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring) or [Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1415011-load))
   Future<void> loadData(
       {required String data,
@@ -1255,6 +1261,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.load](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#load-org.mozilla.geckoview.GeckoSession.Loader-))
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load))
   Future<void> loadFile({required String assetFilePath}) async {
     assert(assetFilePath.isNotEmpty);
@@ -1267,6 +1274,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.reload](https://developer.android.com/reference/android/webkit/WebView#reload()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.reload](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#reload--))
   ///- iOS ([Official API - WKWebView.reload](https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload))
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1277,6 +1285,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBack](https://developer.android.com/reference/android/webkit/WebView#goBack()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.goBack](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#goBack--))
   ///- iOS ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1287,6 +1296,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.canGoBack](https://developer.android.com/reference/android/webkit/WebView#canGoBack()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.NavigationDelegate.onCanGoBack](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.NavigationDelegate.html#onCanGoBack-org.mozilla.geckoview.GeckoSession-boolean-))
   ///- iOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1297,6 +1307,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goForward](https://developer.android.com/reference/android/webkit/WebView#goForward()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.goForward](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#goForward--))
   ///- iOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1307,6 +1318,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.canGoForward](https://developer.android.com/reference/android/webkit/WebView#canGoForward()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.NavigationDelegate.onCanGoForward](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.NavigationDelegate.html#onCanGoForward-org.mozilla.geckoview.GeckoSession-boolean-))
   ///- iOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1317,6 +1329,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBackOrForward](https://developer.android.com/reference/android/webkit/WebView#goBackOrForward(int)))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.gotoHistoryIndex](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#gotoHistoryIndex-int-))
   ///- iOS ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
   Future<void> goBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1328,6 +1341,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.canGoBackOrForward](https://developer.android.com/reference/android/webkit/WebView#canGoBackOrForward(int)))
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<bool> canGoBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1339,6 +1353,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> goTo({required WebHistoryItem historyItem}) async {
     var steps = historyItem.offset;
@@ -1351,6 +1366,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1361,6 +1377,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.stopLoading](https://developer.android.com/reference/android/webkit/WebView#stopLoading()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.stop](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.html#stop--))
   ///- iOS ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1383,6 +1400,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.evaluateJavascript](https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
+  ///- Android Mozilla's GeckoView: it's implemented using JavaScript `eval()` method through a GeckoView WebExtension
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   Future<dynamic> evaluateJavascript(
       {required String source, ContentWorld? contentWorld}) async {
@@ -1411,6 +1429,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> injectJavascriptFileFromUrl(
       {required Uri urlFile,
@@ -1436,6 +1455,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<dynamic> injectJavascriptFileFromAsset(
       {required String assetFilePath}) async {
@@ -1452,6 +1472,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> injectCSSCode({required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1470,6 +1491,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> injectCSSFileFromUrl(
       {required Uri urlFile,
@@ -1491,6 +1513,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> injectCSSFileFromAsset({required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
@@ -1550,6 +1573,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   void addJavaScriptHandler(
       {required String handlerName,
@@ -1565,6 +1589,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   JavaScriptHandlerCallback? removeJavaScriptHandler(
       {required String handlerName}) {
@@ -1579,6 +1604,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView ([Official API - GeckoView.capturePixels](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoView.html#capturePixels--))
   ///- iOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   Future<Uint8List?> takeScreenshot(
       {ScreenshotConfiguration? screenshotConfiguration}) async {
@@ -1592,6 +1618,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> setOptions({required InAppWebViewGroupOptions options}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1604,6 +1631,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<InAppWebViewGroupOptions?> getOptions() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1625,6 +1653,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.copyBackForwardList](https://developer.android.com/reference/android/webkit/WebView#copyBackForwardList()))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.HistoryDelegate.HistoryList](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.HistoryDelegate.HistoryList.html))
   ///- iOS ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
   Future<WebHistory?> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1638,6 +1667,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView ([Official API - StorageController.clearData](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/StorageController.html#clearData-long-))
   ///- iOS
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1654,6 +1684,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findAllAsync](https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)))
+  ///- Android Mozilla's GeckoView ([Official API - SessionFinder.find](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/SessionFinder.html#find-java.lang.String-int-))
   ///- iOS
   Future<void> findAllAsync({required String find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1669,6 +1700,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findNext](https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)))
+  ///- Android Mozilla's GeckoView ([Official API - SessionFinder.find](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/SessionFinder.html#find-java.lang.String-int-))
   ///- iOS
   Future<void> findNext({required bool forward}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1682,6 +1714,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.clearMatches](https://developer.android.com/reference/android/webkit/WebView#clearMatches()))
+  ///- Android Mozilla's GeckoView ([Official API - SessionFinder.clear](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/SessionFinder.html#clear--))
   ///- iOS
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1692,6 +1725,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<String> getTRexRunnerHtml() async {
     return await rootBundle
@@ -1702,6 +1736,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<String> getTRexRunnerCss() async {
     return await rootBundle
@@ -1718,6 +1753,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.scrollTo](https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)))
+  ///- Android Mozilla's GeckoView ([Official API - View.scrollTo](https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)))
   ///- iOS ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
   Future<void> scrollTo(
       {required int x, required int y, bool animated = false}) async {
@@ -1738,6 +1774,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.scrollBy](https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)))
+  ///- Android Mozilla's GeckoView ([Official API - View.scrollBy](https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)))
   ///- iOS ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
   Future<void> scrollBy(
       {required int x, required int y, bool animated = false}) async {
@@ -1751,10 +1788,11 @@ class InAppWebViewController {
   ///On Android native WebView, it pauses all layout, parsing, and JavaScript timers for all WebViews.
   ///This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
   ///
-  ///On iOS, it is implemented using JavaScript and it is restricted to just this WebView.
+  ///On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript and it is restricted to just this WebView.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.pauseTimers](https://developer.android.com/reference/android/webkit/WebView#pauseTimers()))
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> pauseTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1763,10 +1801,11 @@ class InAppWebViewController {
 
   ///On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
   ///
-  ///On iOS, it is implemented using JavaScript and it resumes all layout, parsing, and JavaScript timers to just this WebView.
+  ///On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript and it resumes all layout, parsing, and JavaScript timers to just this WebView.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.resumeTimers](https://developer.android.com/reference/android/webkit/WebView#resumeTimers()))
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<void> resumeTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1787,8 +1826,11 @@ class InAppWebViewController {
 
   ///Gets the height of the HTML content.
   ///
+  ///**NOTE**: on Android Mozilla's GeckoView, this is implemented using Javascript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getContentHeight](https://developer.android.com/reference/android/webkit/WebView#getContentHeight()))
+  ///- Android Mozilla's GeckoView
   ///- iOS ([Official API - UIScrollView.contentSize](https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize))
   Future<int?> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1826,6 +1868,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getOriginalUrl](https://developer.android.com/reference/android/webkit/WebView#getOriginalUrl()))
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1835,8 +1878,11 @@ class InAppWebViewController {
 
   ///Gets the current zoom scale of the WebView.
   ///
+  ///**NOTE**: On Android Mozilla's GeckoView, it is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS ([Official API - UIScrollView.zoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619419-zoomscale))
   Future<double?> getZoomScale() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1857,6 +1903,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<String?> getSelectedText() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1865,10 +1912,11 @@ class InAppWebViewController {
 
   ///Gets the hit result for hitting an HTML elements.
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE**: On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getHitTestResult](https://developer.android.com/reference/android/webkit/WebView#getHitTestResult()))
+  ///- Android Mozilla's GeckoView
   ///- iOS
   Future<InAppWebViewHitTestResult?> getHitTestResult() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1892,6 +1940,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - ViewGroup.clearFocus](https://developer.android.com/reference/android/view/ViewGroup#clearFocus()))
+  ///- Android Mozilla's GeckoView ([Official API - ViewGroup.clearFocus](https://developer.android.com/reference/android/view/ViewGroup#clearFocus()))
   ///- iOS ([Official API - UIResponder.resignFirstResponder](https://developer.apple.com/documentation/uikit/uiresponder/1621097-resignfirstresponder))
   Future<void> clearFocus() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1908,10 +1957,11 @@ class InAppWebViewController {
 
   ///Requests the anchor or image element URL at the last tapped point.
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE**: On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.requestFocusNodeHref](https://developer.android.com/reference/android/webkit/WebView#requestFocusNodeHref(android.os.Message))).
+  ///- Android Mozilla's GeckoView.
   ///- iOS.
   Future<RequestFocusNodeHrefResult?> requestFocusNodeHref() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1928,10 +1978,11 @@ class InAppWebViewController {
 
   ///Requests the URL of the image last touched by the user.
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE**: On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.requestImageRef](https://developer.android.com/reference/android/webkit/WebView#requestImageRef(android.os.Message))).
+  ///- Android Mozilla's GeckoView.
   ///- iOS.
   Future<RequestImageRefResult?> requestImageRef() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2056,6 +2107,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getCertificate](https://developer.android.com/reference/android/webkit/WebView#getCertificate())).
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.ProgressDelegate.SecurityInformation.certificate](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.ProgressDelegate.SecurityInformation.html#certificate)).
   ///- iOS.
   Future<SslCertificate?> getCertificate() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2266,10 +2318,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for Android native WebView**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL].
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE**: On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.createWebMessageChannel](https://developer.android.com/reference/androidx/webkit/WebViewCompat#createWebMessageChannel(android.webkit.WebView))).
+  ///- Android Mozilla's GeckoView.
   ///- iOS.
   Future<WebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2286,10 +2339,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for Android native WebView**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.POST_WEB_MESSAGE].
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE**: On iOS and Android Mozilla's GeckoView, it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.postWebMessage](https://developer.android.com/reference/androidx/webkit/WebViewCompat#postWebMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri))).
+  ///- Android Mozilla's GeckoView.
   ///- iOS.
   Future<void> postWebMessage(
       {required WebMessage message, Uri? targetOrigin}) async {

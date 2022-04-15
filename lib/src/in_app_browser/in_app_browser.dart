@@ -299,6 +299,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.ProgressDelegate..onPageStart](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.ProgressDelegate.html#onPageStart-org.mozilla.geckoview.GeckoSession-java.lang.String-))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   void onLoadStart(Uri? url) {}
 
@@ -306,6 +307,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.ProgressDelegate.onPageStop](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.ProgressDelegate.html#onPageStop-org.mozilla.geckoview.GeckoSession-boolean-))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   void onLoadStop(Uri? url) {}
 
@@ -335,6 +337,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
+  ///- Android Mozilla's GeckoView ([Official API - GeckoSession.ProgressDelegate.onProgressChange](https://mozilla.github.io/geckoview/javadoc/mozilla-central/org/mozilla/geckoview/GeckoSession.ProgressDelegate.html#onProgressChange-org.mozilla.geckoview.GeckoSession-int-))
   ///- iOS
   void onProgressChanged(int progress) {}
 
@@ -520,6 +523,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.FindListener.onFindResultReceived](https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)))
+  ///- Android Mozilla's GeckoView
   ///- iOS
   void onFindResultReceived(
       int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {}
@@ -575,6 +579,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- Android Mozilla's GeckoView
   ///- iOS
   void onPrint(Uri? url) {}
 

@@ -1,0 +1,28 @@
+{
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "evaluateJavascript@inappwebview.dev"
+    }
+  },
+  "manifest_version": 2,
+  "name": "evaluateJavascript",
+  "version": "1.0",
+  "description": "Evaluate JavaScript implementation.",
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "evaluateJavascript.js"
+      ],
+      "run_at": "document_start",
+      "match_about_blank": true
+    }
+  ],
+  "permissions": [
+    "nativeMessaging",
+    "nativeMessagingFromContent",
+    "geckoViewAddons"
+  ]
+}

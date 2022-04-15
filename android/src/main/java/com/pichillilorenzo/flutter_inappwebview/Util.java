@@ -54,10 +54,11 @@ public class Util {
 
   static final String LOG_TAG = "Util";
   public static final String ANDROID_ASSET_URL = "file:///android_asset/";
+  public static final String GECKOVIEW_ASSET_URL = "resource://android/assets/";
 
   private Util() {}
 
-  public static String getUrlAsset(InAppWebViewFlutterPlugin plugin, String assetFilePath) throws IOException {
+  public static String getUrlAsset(InAppWebViewFlutterPlugin plugin, String assetFilePath, boolean isGeckoView) throws IOException {
     String key = (plugin.registrar != null) ? plugin.registrar.lookupKeyForAsset(assetFilePath) : plugin.flutterAssets.getAssetFilePathByName(assetFilePath);
     InputStream is = null;
     IOException e = null;
@@ -79,7 +80,7 @@ public class Util {
       throw e;
     }
 
-    return ANDROID_ASSET_URL + key;
+    return (!isGeckoView ? ANDROID_ASSET_URL : GECKOVIEW_ASSET_URL) + key;
   }
 
   public static InputStream getFileAsset(InAppWebViewFlutterPlugin plugin, String assetFilePath) throws IOException {

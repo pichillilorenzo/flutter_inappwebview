@@ -16,7 +16,19 @@ rootProject.allprojects {
     repositories {
         google()
         jcenter()
+        mavenCentral()
+        maven {
+            url "https://nightly.maven.mozilla.org/maven2"
+        }
+        maven {
+            url "https://maven.mozilla.org/maven2"
+        }
     }
+}
+
+ext {
+    geckoview_channel = "nightly"
+    geckoview_version = "98.0.20220111093827"
 }
 
 apply plugin: 'com.android.library'
@@ -50,5 +62,6 @@ android {
         implementation 'androidx.appcompat:appcompat:1.2.0'
         implementation 'com.squareup.okhttp3:mockwebserver:3.14.7'
         implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+        compileOnly "org.mozilla.geckoview:geckoview-${geckoview_channel}:${geckoview_version}"
     }
 }

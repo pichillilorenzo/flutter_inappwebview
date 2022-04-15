@@ -13,6 +13,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
+import com.pichillilorenzo.flutter_inappwebview.in_app_geckoview.InAppGeckoView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 
@@ -110,6 +111,9 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
         if (webView instanceof InAppWebView) {
           String message = (String) call.argument("message");
           postMessageForInAppWebView(message, result);
+        } else if (webView instanceof InAppGeckoView) {
+          String message = (String) call.argument("message");
+          postMessageForInAppGeckoView(message, result);
         } else {
           result.success(true);
         }
@@ -175,6 +179,33 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
       replyProxy.postMessage(message);
     }
     result.success(true);
+  }
+
+  private void postMessageForInAppGeckoView(String message, final @NonNull MethodChannel.Result result) {
+    if (webView != null) {
+      String jsObjectNameEscaped = Util.replaceAll(jsObjectName, "\'", "\\'");
+      String messageEscaped = Util.replaceAll(message, "\'", "\\'");
+      String source = "(function() {" +
+              "  var webMessageListener = window['" + jsObjectNameEscaped + "'];" +
+              "  if (webMessageListener != null) {" +
+              "      var event = {data: '" + messageEscaped + "'};" +
+              "      if (webMessageListener.onmessage != null) {" +
+              "          webMessageListener.onmessage(event);" +
+              "      }" +
+              "      for (var listener of webMessageListener.listeners) {" +
+              "          listener(event);" +
+              "      }" +
+              "  }" +
+              "})();";
+      webView.evaluateJavascript(source, null, new ValueCallback<String>() {
+        @Override
+        public void onReceiveValue(String value) {
+          result.success(true);
+        }
+      });
+    } else {
+      result.success(true);
+    }
   }
 
   public boolean isOriginAllowed(String scheme, String host, int port) {

@@ -10,6 +10,9 @@ import com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeSafariB
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabaseHandler;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
+import com.pichillilorenzo.flutter_inappwebview.in_app_geckoview.GeckoRuntimeManager;
+
+import org.mozilla.geckoview.GeckoRuntime;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -36,6 +39,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public FlutterWebViewFactory flutterWebViewFactory;
   public static ValueCallback<Uri> filePathCallbackLegacy;
   public static ValueCallback<Uri[]> filePathCallback;
+  public static GeckoRuntime geckoRuntime;
 
   public Context applicationContext;
   public PluginRegistry.Registrar registrar;
@@ -74,6 +78,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     this.activity = activity;
     this.messenger = messenger;
     this.flutterView = flutterView;
+
+    GeckoRuntimeManager.create(this.applicationContext);
 
     inAppBrowserManager = new InAppBrowserManager(this);
     headlessInAppWebViewManager = new HeadlessInAppWebViewManager(this);

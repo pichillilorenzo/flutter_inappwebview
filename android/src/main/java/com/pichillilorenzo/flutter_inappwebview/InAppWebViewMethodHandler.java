@@ -13,6 +13,7 @@ import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserOptions;
+import com.pichillilorenzo.flutter_inappwebview.in_app_geckoview.InAppGeckoView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewOptions;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
@@ -325,6 +326,13 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "getContentHeight":
         if (webView instanceof InAppWebView) {
           result.success(webView.getContentHeight());
+        } else if (webView instanceof InAppGeckoView) {
+          webView.getContentHeight(new ValueCallback<Integer>() {
+            @Override
+            public void onReceiveValue(Integer value) {
+              result.success(value);
+            }
+          });
         } else {
           result.success(null);
         }
@@ -342,12 +350,19 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "getZoomScale":
         if (webView instanceof InAppWebView) {
           result.success(webView.getZoomScale());
+        } else if (webView instanceof InAppGeckoView) {
+          webView.getZoomScale(new ValueCallback<Float>() {
+            @Override
+            public void onReceiveValue(Float value) {
+              result.success(value);
+            }
+          });
         } else {
           result.success(null);
         }
         break;
       case "getSelectedText":
-        if ((webView instanceof InAppWebView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)) {
+        if ((webView instanceof InAppWebView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) || webView instanceof InAppGeckoView) {
           webView.getSelectedText(new ValueCallback<String>() {
             @Override
             public void onReceiveValue(String value) {
@@ -361,6 +376,13 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
       case "getHitTestResult":
         if (webView instanceof InAppWebView) {
           result.success(HitTestResult.fromWebViewHitTestResult(webView.getHitTestResult()).toMap());
+        } else if (webView instanceof InAppGeckoView) {
+          webView.getHitTestResult(new ValueCallback<HitTestResult>() {
+            @Override
+            public void onReceiveValue(HitTestResult value) {
+              result.success(value.toMap());
+            }
+          });
         } else {
           result.success(null);
         }
@@ -528,6 +550,13 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         if (webView != null) {
           if (webView instanceof InAppWebView && WebViewFeature.isFeatureSupported(WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
             result.success(webView.createCompatWebMessageChannel().toMap());
+          } else if (webView instanceof InAppGeckoView) {
+            webView.createWebMessageChannel(new ValueCallback<WebMessageChannel>() {
+              @Override
+              public void onReceiveValue(WebMessageChannel webMessageChannel) {
+                result.success(webMessageChannel.toMap());
+              }
+            });
           } else {
             result.success(null);
           }
@@ -550,6 +579,8 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
               if (webMessageChannel != null) {
                 if (webView instanceof InAppWebView) {
                   compatPorts.add(webMessageChannel.compatPorts.get(index));
+                } else if (webView instanceof InAppGeckoView) {
+                  ports.add(webMessageChannel.ports.get(index));
                 }
               }
             }
@@ -559,6 +590,18 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
             try {
               WebViewCompat.postWebMessage((WebView) webView, webMessage, Uri.parse(targetOrigin));
               result.success(true);
+            } catch (Exception e) {
+              result.error(LOG_TAG, e.getMessage(), null);
+            }
+          } else if (webView instanceof InAppGeckoView) {
+            WebMessage webMessage = new WebMessage((String) message.get("data"), ports);
+            try {
+              webView.postWebMessage(webMessage, Uri.parse(targetOrigin), new ValueCallback<String>() {
+                @Override
+                public void onReceiveValue(String value) {
+                  result.success(true);
+                }
+              });
             } catch (Exception e) {
               result.error(LOG_TAG, e.getMessage(), null);
             }
@@ -572,6 +615,13 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           Map<String, Object> webMessageListenerMap = (Map<String, Object>) call.argument("webMessageListener");
           WebMessageListener webMessageListener = WebMessageListener.fromMap(webView, webView.getPlugin().messenger, webMessageListenerMap);
           if (webView instanceof InAppWebView && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+            try {
+              webView.addWebMessageListener(webMessageListener);
+              result.success(true);
+            } catch (Exception e) {
+              result.error(LOG_TAG, e.getMessage(), null);
+            }
+          } else if (webView instanceof InAppGeckoView) {
             try {
               webView.addWebMessageListener(webMessageListener);
               result.success(true);

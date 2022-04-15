@@ -72,6 +72,9 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     if (CustomTabActivityHelper.isAvailable(activity)) {
       intent = new Intent(activity, !isSingleInstance ? ChromeCustomTabsActivity.class : ChromeCustomTabsActivitySingleInstance.class);
       intent.putExtras(extras);
+      if ((Boolean) options.get("noHistory")) {
+        intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
+      }
       activity.startActivity(intent);
       result.success(true);
       return;

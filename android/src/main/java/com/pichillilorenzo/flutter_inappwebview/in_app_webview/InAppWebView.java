@@ -1184,6 +1184,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
       Map<String, Object> obj = new HashMap<>();
       obj.put("url", url);
+      obj.put("userAgent", userAgent);
+      obj.put("contentDisposition", contentDisposition);
+      obj.put("mimetype", mimetype);
+      obj.put("contentLength", contentLength);
       channel.invokeMethod("onDownloadStart", obj);
     }
   }

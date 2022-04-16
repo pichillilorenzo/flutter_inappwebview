@@ -2739,7 +2739,7 @@ void main() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            onDownloadStart: (controller, url) {
+            onDownloadStart:(controller, url, userAgent, contentDisposition, mimeType, contentLength) {
               onDownloadStartCompleter.complete(url.toString());
             },
           ),

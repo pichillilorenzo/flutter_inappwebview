@@ -24,8 +24,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
       crossPlatform: InAppWebViewOptions(
         useShouldOverrideUrlLoading: true,
-        mediaPlaybackRequiresUserGesture: false,
-        useOnDownloadStart: true
+        mediaPlaybackRequiresUserGesture: false
       ),
       android: AndroidInAppWebViewOptions(
         useHybridComposition: true,
@@ -124,16 +123,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrlRequest:
-                    URLRequest(url: Uri.parse("https://testfiledownload.com/")),
+                    URLRequest(url: Uri.parse("https://github.com/flutter")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialOptions: options,
                     pullToRefreshController: pullToRefreshController,
                     onWebViewCreated: (controller) {
                       webViewController = controller;
-                    },
-                    onDownloadStartRequest: (controller, request) {
-                      print(request);
                     },
                     onLoadStart: (controller, url) {
                       setState(() {

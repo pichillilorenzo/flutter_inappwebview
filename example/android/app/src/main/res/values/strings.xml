@@ -1,0 +1,11 @@
+<resources>
+    <string name="app_name">Flutter Trusted Web Activity</string>
+    <string name="asset_statements">
+        [{
+            \"relation\": [\"delegate_permission/common.handle_all_urls\"],
+            \"target\": {
+                \"namespace\": \"web\",
+                \"site\": \"https://flutter.dev\"}
+        }]
+    </string>
+</resources>

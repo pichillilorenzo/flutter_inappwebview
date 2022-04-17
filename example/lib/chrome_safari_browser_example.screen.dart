@@ -67,7 +67,8 @@ class _ChromeSafariBrowserExampleScreenState
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(
                             shareState: CustomTabsShareState.SHARE_STATE_OFF,
-                            singleInstance: false,
+                            isSingleInstance: false,
+                            isTrustedWebActivity: false,
                             keepAliveEnabled: true),
                         ios: IOSSafariOptions(
                             dismissButtonStyle:

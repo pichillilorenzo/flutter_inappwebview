@@ -67,17 +67,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     customTabActivityHelper.setConnectionCallback(new CustomTabActivityHelper.ConnectionCallback() {
       @Override
       public void onCustomTabsConnected() {
-        customTabsSession = customTabActivityHelper.getSession();
-        Uri uri = Uri.parse(url);
-        customTabActivityHelper.mayLaunchUrl(uri, null, null);
-
-        builder = new CustomTabsIntent.Builder(customTabsSession);
-        prepareCustomTabs(menuItemList);
-
-        CustomTabsIntent customTabsIntent = builder.build();
-        prepareCustomTabsIntent(customTabsIntent);
-
-        CustomTabActivityHelper.openCustomTab(chromeCustomTabsActivity, customTabsIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
+        customTabsConnected(url, menuItemList);
       }
 
       @Override
@@ -147,6 +137,20 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
       default:
         result.notImplemented();
     }
+  }
+
+  public void customTabsConnected (String url, List<HashMap<String, Object>> menuItemList) {
+    customTabsSession = customTabActivityHelper.getSession();
+    Uri uri = Uri.parse(url);
+    customTabActivityHelper.mayLaunchUrl(uri, null, null);
+
+    builder = new CustomTabsIntent.Builder(customTabsSession);
+    prepareCustomTabs(menuItemList);
+
+    CustomTabsIntent customTabsIntent = builder.build();
+    prepareCustomTabsIntent(customTabsIntent);
+
+    CustomTabActivityHelper.openCustomTab(this, customTabsIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
   private void prepareCustomTabs(List<HashMap<String, Object>> menuItemList) {

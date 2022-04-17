@@ -7015,3 +7015,261 @@ class CustomTabsShareState {
   @override
   int get hashCode => _value.hashCode;
 }
+
+///Android-class that represents display mode of a Trusted Web Activity.
+abstract class TrustedWebActivityDisplayMode {
+  Map<String, dynamic> toMap() {
+    return {};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Android-class that represents the default display mode of a Trusted Web Activity.
+///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
+class TrustedWebActivityDefaultDisplayMode implements TrustedWebActivityDisplayMode {
+
+  String _type = "DEFAULT_MODE";
+
+  Map<String, dynamic> toMap() {
+    return {
+      "type": _type
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Android-class that represents the default display mode of a Trusted Web Activity.
+///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
+class TrustedWebActivityImmersiveDisplayMode implements TrustedWebActivityDisplayMode {
+  ///Whether the Trusted Web Activity should be in sticky immersive mode.
+  bool isSticky;
+
+  ///The constant defining how to deal with display cutouts.
+  AndroidLayoutInDisplayCutoutMode layoutInDisplayCutoutMode;
+
+  String _type = "IMMERSIVE_MODE";
+
+  TrustedWebActivityImmersiveDisplayMode(
+      {required this.isSticky,
+        required this.layoutInDisplayCutoutMode});
+
+  static TrustedWebActivityImmersiveDisplayMode? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+
+    return TrustedWebActivityImmersiveDisplayMode(
+        isSticky: map["isSticky"],
+        layoutInDisplayCutoutMode: map["layoutInDisplayCutoutMode"]);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "isSticky": isSticky,
+      "layoutInDisplayCutoutMode": layoutInDisplayCutoutMode.toValue(),
+      "type": _type
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Android-specific class representing the share state that should be applied to the custom tab.
+///
+///**NOTE**: available on Android 28+.
+class AndroidLayoutInDisplayCutoutMode {
+  final int _value;
+
+  const AndroidLayoutInDisplayCutoutMode._internal(this._value);
+
+  static final Set<AndroidLayoutInDisplayCutoutMode> values = [
+    AndroidLayoutInDisplayCutoutMode.DEFAULT,
+    AndroidLayoutInDisplayCutoutMode.SHORT_EDGES,
+    AndroidLayoutInDisplayCutoutMode.NEVER,
+    AndroidLayoutInDisplayCutoutMode.ALWAYS
+  ].toSet();
+
+  static AndroidLayoutInDisplayCutoutMode? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return AndroidLayoutInDisplayCutoutMode.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SHORT_EDGES";
+      case 2:
+        return "NEVER";
+      case 3:
+        return "ALWAYS";
+      case 0:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  ///With this default setting, content renders into the cutout area when displayed in portrait mode, but content is letterboxed when displayed in landscape mode.
+  ///
+  ///**NOTE**: available on Android 28+.
+  static const DEFAULT = const AndroidLayoutInDisplayCutoutMode._internal(0);
+
+  ///Content renders into the cutout area in both portrait and landscape modes.
+  ///
+  ///**NOTE**: available on Android 28+.
+  static const SHORT_EDGES = const AndroidLayoutInDisplayCutoutMode._internal(1);
+
+  ///Content never renders into the cutout area.
+  ///
+  ///**NOTE**: available on Android 28+.
+  static const NEVER = const AndroidLayoutInDisplayCutoutMode._internal(2);
+
+  ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
+  ///
+  ///**NOTE**: available on Android 30+.
+  static const ALWAYS = const AndroidLayoutInDisplayCutoutMode._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+/// Android-specific class representing Screen Orientation Lock type value of a Trusted Web Activity:
+/// https://www.w3.org/TR/screen-orientation/#screenorientation-interface
+class TrustedWebActivityScreenOrientation {
+  final int _value;
+
+  const TrustedWebActivityScreenOrientation._internal(this._value);
+
+  static final Set<TrustedWebActivityScreenOrientation> values = [
+    TrustedWebActivityScreenOrientation.DEFAULT,
+    TrustedWebActivityScreenOrientation.PORTRAIT_PRIMARY,
+    TrustedWebActivityScreenOrientation.PORTRAIT_SECONDARY,
+    TrustedWebActivityScreenOrientation.LANDSCAPE_PRIMARY,
+    TrustedWebActivityScreenOrientation.LANDSCAPE_SECONDARY,
+    TrustedWebActivityScreenOrientation.ANY,
+    TrustedWebActivityScreenOrientation.LANDSCAPE,
+    TrustedWebActivityScreenOrientation.PORTRAIT,
+    TrustedWebActivityScreenOrientation.NATURAL,
+  ].toSet();
+
+  static TrustedWebActivityScreenOrientation? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return TrustedWebActivityScreenOrientation.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "PORTRAIT_PRIMARY";
+      case 2:
+        return "PORTRAIT_SECONDARY";
+      case 3:
+        return "LANDSCAPE_PRIMARY";
+      case 4:
+        return "LANDSCAPE_SECONDARY";
+      case 5:
+        return "ANY";
+      case 6:
+        return "LANDSCAPE";
+      case 7:
+        return "PORTRAIT";
+      case 8:
+        return "NATURAL";
+      case 0:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  /// The default screen orientation is the set of orientations to which the screen is locked when
+  /// there is no current orientation lock.
+  static const DEFAULT = const TrustedWebActivityScreenOrientation._internal(0);
+
+  ///  Portrait-primary is an orientation where the screen width is less than or equal to the
+  ///  screen height. If the device's natural orientation is portrait, then it is in
+  ///  portrait-primary when held in that position.
+  static const PORTRAIT_PRIMARY = const TrustedWebActivityScreenOrientation._internal(1);
+
+  /// Portrait-secondary is an orientation where the screen width is less than or equal to the
+  /// screen height. If the device's natural orientation is portrait, then it is in
+  /// portrait-secondary when rotated 180° from its natural position.
+  static const PORTRAIT_SECONDARY = const TrustedWebActivityScreenOrientation._internal(2);
+
+  /// Landscape-primary is an orientation where the screen width is greater than the screen height.
+  /// If the device's natural orientation is landscape, then it is in landscape-primary when held
+  /// in that position.
+  static const LANDSCAPE_PRIMARY = const TrustedWebActivityScreenOrientation._internal(3);
+
+  /// Landscape-secondary is an orientation where the screen width is greater than the
+  /// screen height. If the device's natural orientation is landscape, it is in
+  /// landscape-secondary when rotated 180° from its natural orientation.
+  static const LANDSCAPE_SECONDARY = const TrustedWebActivityScreenOrientation._internal(4);
+
+  /// Any is an orientation that means the screen can be locked to any one of portrait-primary,
+  /// portrait-secondary, landscape-primary and landscape-secondary.
+  static const ANY = const TrustedWebActivityScreenOrientation._internal(5);
+
+  /// Landscape is an orientation where the screen width is greater than the screen height and
+  /// depending on platform convention locking the screen to landscape can represent
+  /// landscape-primary, landscape-secondary or both.
+  static const LANDSCAPE = const TrustedWebActivityScreenOrientation._internal(6);
+
+  /// Portrait is an orientation where the screen width is less than or equal to the screen height
+  /// and depending on platform convention locking the screen to portrait can represent
+  /// portrait-primary, portrait-secondary or both.
+  static const PORTRAIT = const TrustedWebActivityScreenOrientation._internal(7);
+
+  /// Natural is an orientation that refers to either portrait-primary or landscape-primary
+  /// depending on the device's usual orientation. This orientation is usually provided by
+  /// the underlying operating system.
+  static const NATURAL = const TrustedWebActivityScreenOrientation._internal(8);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}

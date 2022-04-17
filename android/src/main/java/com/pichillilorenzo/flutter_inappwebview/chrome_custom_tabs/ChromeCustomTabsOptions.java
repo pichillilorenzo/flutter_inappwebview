@@ -4,10 +4,14 @@ import android.content.Intent;
 
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.trusted.ScreenOrientation;
+import androidx.browser.trusted.TrustedWebActivityDisplayMode;
 
 import com.pichillilorenzo.flutter_inappwebview.Options;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity> {
@@ -24,8 +28,12 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
   public Boolean instantAppsEnabled = false;
   public String packageName;
   public Boolean keepAliveEnabled = false;
-  public Boolean singleInstance = false;
+  public Boolean isSingleInstance = false;
   public Boolean noHistory = false;
+  public Boolean isTrustedWebActivity = false;
+  public List<String> additionalTrustedOrigins = new ArrayList<>();
+  public TrustedWebActivityDisplayMode displayMode = null;
+  public Integer screenOrientation = ScreenOrientation.DEFAULT;
 
   @Override
   public ChromeCustomTabsOptions parse(Map<String, Object> options) {
@@ -61,11 +69,34 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
         case "keepAliveEnabled":
           keepAliveEnabled = (Boolean) value;
           break;
-        case "singleInstance":
-          singleInstance = (Boolean) value;
+        case "isSingleInstance":
+          isSingleInstance = (Boolean) value;
           break;
         case "noHistory":
           noHistory = (Boolean) value;
+          break;
+        case "isTrustedWebActivity":
+          isTrustedWebActivity = (Boolean) value;
+          break;
+        case "additionalTrustedOrigins":
+          additionalTrustedOrigins = (List<String>) value;
+          break;
+        case "displayMode":
+          Map<String, Object> displayModeMap = (Map<String, Object>) value;
+          String displayModeType = (String) displayModeMap.get("type");
+          if (displayModeType != null) {
+            switch (displayModeType) {
+              case "IMMERSIVE_MODE":
+                boolean isSticky = (boolean) displayModeMap.get("isSticky");
+                int layoutInDisplayCutoutMode = (int) displayModeMap.get("layoutInDisplayCutoutMode");
+                displayMode = new TrustedWebActivityDisplayMode.ImmersiveMode(isSticky, layoutInDisplayCutoutMode);
+              case "DEFAULT_MODE":
+                displayMode = new TrustedWebActivityDisplayMode.DefaultMode();
+            }
+          }
+          break;
+        case "screenOrientation":
+          screenOrientation = (Integer) value;
           break;
       }
     }
@@ -83,8 +114,11 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
     options.put("instantAppsEnabled", instantAppsEnabled);
     options.put("packageName", packageName);
     options.put("keepAliveEnabled", keepAliveEnabled);
-    options.put("singleInstance", singleInstance);
+    options.put("isSingleInstance", isSingleInstance);
     options.put("noHistory", noHistory);
+    options.put("isTrustedWebActivity", isTrustedWebActivity);
+    options.put("additionalTrustedOrigins", additionalTrustedOrigins);
+    options.put("screenOrientation", screenOrientation);
     return options;
   }
 

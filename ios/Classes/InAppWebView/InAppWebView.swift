@@ -1546,7 +1546,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             let mimeType = navigationResponse.response.mimeType
             if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
                 if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
-                    onDownloadStart(url: url.absoluteString)
+                    let downloadStartRequest = DownloadStartRequest(url: url.absoluteString,
+                                                                    userAgent: nil,
+                                                                    contentDisposition: nil,
+                                                                    mimeType: mimeType,
+                                                                    contentLength: navigationResponse.response.expectedContentLength,
+                                                                    suggestedFilename: navigationResponse.response.suggestedFilename,
+                                                                    textEncodingName: navigationResponse.response.textEncodingName)
+                    onDownloadStartRequest(request: downloadStartRequest)
                     if useOnNavigationResponse == nil || !useOnNavigationResponse! {
                         decisionHandler(.cancel)
                     }
@@ -2363,9 +2370,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         channel?.invokeMethod("onOverScrolled", arguments: arguments)
     }
     
-    public func onDownloadStart(url: String) {
-        let arguments: [String: Any] = ["url": url]
-        channel?.invokeMethod("onDownloadStart", arguments: arguments)
+    public func onDownloadStartRequest(request: DownloadStartRequest) {
+        channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
     }
     
     public func onLoadResourceCustomScheme(url: String, result: FlutterResult?) {

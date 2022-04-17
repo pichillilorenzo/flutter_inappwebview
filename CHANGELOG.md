@@ -3,6 +3,8 @@
 - `getOriginalUrl` method is cross-platform now
 - Updated Android `compileSdkVersion` to 31
 - Added `singleInstance` option for Android `ChromeSafariBrowser` implementation
+- Added `onDownloadStartRequest` event and deprecated old `onDownloadStart` event
+- Fixed missing `onZoomScaleChanged` call for `InAppBrowser` class
 - Fixed `requestImageRef` method always `null` on iOS
 - Fixed "applicationNameForUserAgent is not work in ios" [#525](https://github.com/pichillilorenzo/flutter_inappwebview/issues/525)
 - Fixed "Crash when try select file from webview input on Android" [#867](https://github.com/pichillilorenzo/flutter_inappwebview/issues/867)

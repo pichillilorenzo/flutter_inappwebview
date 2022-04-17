@@ -53,7 +53,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.shouldOverrideUrlLoading,
     this.onLoadResource,
     this.onScrollChanged,
-    this.onDownloadStart,
+    @Deprecated('Use `onDownloadStartRequest` instead') this.onDownloadStart,
+    this.onDownloadStartRequest,
     this.onLoadResourceCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
@@ -211,9 +212,15 @@ class InAppWebView extends StatefulWidget implements WebView {
           InAppWebViewController controller, Uri url, bool precomposed)?
       androidOnReceivedTouchIconUrl;
 
+  ///Use [onDownloadStartRequest] instead
+  @Deprecated('Use `onDownloadStartRequest` instead')
   @override
   final void Function(InAppWebViewController controller, Uri url)?
       onDownloadStart;
+
+  @override
+  final void Function(InAppWebViewController controller, DownloadStartRequest downloadStartRequest)?
+    onDownloadStartRequest;
 
   @override
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,

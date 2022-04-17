@@ -37,6 +37,7 @@ import android.view.inputmethod.InputConnection;
 import android.view.inputmethod.InputMethodManager;
 import android.webkit.CookieManager;
 import android.webkit.DownloadListener;
+import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
@@ -54,6 +55,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.types.DownloadStartRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
@@ -1181,10 +1183,17 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   class DownloadStartListener implements DownloadListener {
     @Override
-    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimetype, long contentLength) {
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("url", url);
-      channel.invokeMethod("onDownloadStart", obj);
+    public void onDownloadStart(String url, String userAgent, String contentDisposition, String mimeType, long contentLength) {
+      DownloadStartRequest downloadStartRequest = new DownloadStartRequest(
+        url,
+        userAgent,
+        contentDisposition,
+        mimeType,
+        contentLength,
+        URLUtil.guessFileName(url, contentDisposition, mimeType),
+        null
+      );
+      channel.invokeMethod("onDownloadStartRequest", downloadStartRequest.toMap());
     }
   }
 

@@ -112,18 +112,23 @@ abstract class WebView {
   final void Function(InAppWebViewController controller, int x, int y)?
       onScrollChanged;
 
+  ///Use [onDownloadStartRequest] instead
+  @Deprecated('Use `onDownloadStartRequest` instead')
+  final void Function(InAppWebViewController controller, Uri url)?
+      onDownloadStart;
+
   ///Event fired when [WebView] recognizes a downloadable file.
   ///To download the file, you can use the [flutter_downloader](https://pub.dev/packages/flutter_downloader) plugin.
   ///
-  ///[url] represents the url of the file.
+  ///[downloadStartRequest] represents the request of the file to download.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnDownloadStart] option to `true`.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
-  final void Function(InAppWebViewController controller, Uri url)?
-      onDownloadStart;
+  final void Function(InAppWebViewController controller, DownloadStartRequest downloadStartRequest)?
+    onDownloadStartRequest;
 
   ///Event fired when the [WebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
@@ -696,7 +701,8 @@ abstract class WebView {
       this.shouldOverrideUrlLoading,
       this.onLoadResource,
       this.onScrollChanged,
-      this.onDownloadStart,
+      @Deprecated('Use `onDownloadStartRequest` instead') this.onDownloadStart,
+      this.onDownloadStartRequest,
       this.onLoadResourceCustomScheme,
       this.onCreateWindow,
       this.onCloseWindow,

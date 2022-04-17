@@ -223,6 +223,10 @@ class IOSInAppWebViewOptions
   ///The default value is `false`.
   bool disableLongPressContextMenuOnLinks;
 
+  ///Set to `true` to disable the [inputAccessoryView](https://developer.apple.com/documentation/uikit/uiresponder/1621119-inputaccessoryview) above system keyboard.
+  ///The default value is `false`.
+  bool disableInputAccessoryView;
+
   IOSInAppWebViewOptions(
       {this.disallowOverScroll = false,
       this.enableViewportScale = false,
@@ -255,7 +259,8 @@ class IOSInAppWebViewOptions
       this.useOnNavigationResponse = false,
       this.applePayAPIEnabled = false,
       this.allowingReadAccessTo,
-      this.disableLongPressContextMenuOnLinks = false}) {
+      this.disableLongPressContextMenuOnLinks = false,
+      this.disableInputAccessoryView = false}) {
     assert(
         allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
   }
@@ -303,6 +308,7 @@ class IOSInAppWebViewOptions
       "applePayAPIEnabled": applePayAPIEnabled,
       "allowingReadAccessTo": allowingReadAccessTo.toString(),
       "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
+      "disableInputAccessoryView": disableInputAccessoryView,
     };
   }
 
@@ -365,6 +371,7 @@ class IOSInAppWebViewOptions
         : null;
     options.disableLongPressContextMenuOnLinks =
         map["disableLongPressContextMenuOnLinks"];
+    options.disableInputAccessoryView = map["disableInputAccessoryView"];
     return options;
   }
 

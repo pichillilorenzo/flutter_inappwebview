@@ -201,20 +201,26 @@ class InAppWebViewController {
             _inAppBrowser!.onScrollChanged(x, y);
         }
         break;
-      case "onDownloadStart":
-        if ((_webview != null && _webview!.onDownloadStart != null) ||
+      case "onDownloadStartRequest":
+        if ((_webview != null &&
+            // ignore: deprecated_member_use_from_same_package
+            (_webview!.onDownloadStart != null || _webview!.onDownloadStartRequest != null)) ||
             _inAppBrowser != null) {
-          String url = call.arguments["url"];
-          String userAgent = call.arguments["userAgent"];
-          String contentDisposition = call.arguments["contentDisposition"];
-          String mimeType = call.arguments["mimetype"];
-          int contentLength = call.arguments["contentLength"] as int;
-          Uri uri = Uri.parse(url);
+          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
+          DownloadStartRequest downloadStartRequest = DownloadStartRequest.fromMap(arguments)!;
 
-          if (_webview != null && _webview!.onDownloadStart != null)
-            _webview!.onDownloadStart!(this, uri, userAgent, contentDisposition, mimeType, contentLength);
-          else
-            _inAppBrowser!.onDownloadStart(uri, userAgent, contentDisposition, mimeType, contentLength);
+          if (_webview != null) {
+            if (_webview!.onDownloadStartRequest != null)
+              _webview!.onDownloadStartRequest!(this, downloadStartRequest);
+            else {
+              // ignore: deprecated_member_use_from_same_package
+              _webview!.onDownloadStart!(this, downloadStartRequest.url);
+            }
+          } else {
+            // ignore: deprecated_member_use_from_same_package
+            _inAppBrowser!.onDownloadStart(downloadStartRequest.url);
+            _inAppBrowser!.onDownloadStartRequest(downloadStartRequest);
+          }
         }
         break;
       case "onLoadResourceCustomScheme":
@@ -380,6 +386,7 @@ class InAppWebViewController {
           } else {
             // ignore: deprecated_member_use_from_same_package
             _inAppBrowser!.androidOnScaleChanged(oldScale, newScale);
+            _inAppBrowser!.onZoomScaleChanged(oldScale, newScale);
           }
         }
         break;

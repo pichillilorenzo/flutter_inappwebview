@@ -64,7 +64,8 @@ class HeadlessInAppWebView implements WebView {
       this.shouldOverrideUrlLoading,
       this.onLoadResource,
       this.onScrollChanged,
-      this.onDownloadStart,
+      @Deprecated('Use `onDownloadStartRequest` instead') this.onDownloadStart,
+      this.onDownloadStartRequest,
       this.onLoadResourceCustomScheme,
       this.onCreateWindow,
       this.onCloseWindow,
@@ -301,14 +302,15 @@ class HeadlessInAppWebView implements WebView {
   @override
   void Function(InAppWebViewController controller)? onWindowBlur;
 
+  ///Use [onDownloadStartRequest] instead
+  @Deprecated('Use `onDownloadStartRequest` instead')
   @override
-  void Function(
-      InAppWebViewController controller,
-      Uri url,
-      String userAgent,
-      String contentDisposition,
-      String mimeType,
-      int contentLength)? onDownloadStart;
+  final void Function(InAppWebViewController controller, Uri url)?
+  onDownloadStart;
+
+  @override
+  final void Function(InAppWebViewController controller, DownloadStartRequest downloadStartRequest)?
+  onDownloadStartRequest;
 
   @override
   void Function(InAppWebViewController controller, int activeMatchOrdinal,

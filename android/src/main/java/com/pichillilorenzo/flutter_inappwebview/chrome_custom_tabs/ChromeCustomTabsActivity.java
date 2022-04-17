@@ -43,7 +43,8 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     setContentView(R.layout.chrome_custom_tabs_layout);
 
     Bundle b = getIntent().getExtras();
-    assert b != null;
+    if (b == null) return;
+    
     id = b.getString("id");
 
     String managerId = b.getString("managerId");

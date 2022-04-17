@@ -66,7 +66,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     super.onCreate(savedInstanceState);
 
     Bundle b = getIntent().getExtras();
-    assert b != null;
+    if (b == null) return;
+    
     id = b.getString("id");
 
     String managerId = b.getString("managerId");

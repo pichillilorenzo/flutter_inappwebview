@@ -110,11 +110,15 @@ class ChromeSafariBrowser {
   }
 
   ///Adds a [ChromeSafariBrowserMenuItem] to the menu.
+  ///
+  ///**NOTE**: Not available in an Android Trusted Web Activity.
   void addMenuItem(ChromeSafariBrowserMenuItem menuItem) {
     this._menuItems[menuItem.id] = menuItem;
   }
 
   ///Adds a list of [ChromeSafariBrowserMenuItem] to the menu.
+  ///
+  ///**NOTE**: Not available in an Android Trusted Web Activity.
   void addMenuItems(List<ChromeSafariBrowserMenuItem> menuItems) {
     menuItems.forEach((menuItem) {
       this._menuItems[menuItem.id] = menuItem;
@@ -161,6 +165,8 @@ class ChromeSafariBrowser {
 }
 
 ///Class that represents a custom menu item for a [ChromeSafariBrowser] instance.
+///
+///**NOTE**: Not available in an Android Trusted Web Activity.
 class ChromeSafariBrowserMenuItem {
   ///The menu item id
   int id;

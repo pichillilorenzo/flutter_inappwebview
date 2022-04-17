@@ -2,6 +2,7 @@
 
 - `getOriginalUrl` method is cross-platform now
 - Updated Android `compileSdkVersion` to 31
+- Updated Flutter environment: sdk to `>=2.14.0 <3.0.0` and flutter version to `>=2.5.0`
 - Added `singleInstance` option for Android `ChromeSafariBrowser` implementation
 - Added `onDownloadStartRequest` event and deprecated old `onDownloadStart` event
 - Fixed missing `onZoomScaleChanged` call for `InAppBrowser` class

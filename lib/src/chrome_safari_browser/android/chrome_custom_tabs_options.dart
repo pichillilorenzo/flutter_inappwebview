@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import '../../util.dart';
+import '../../types.dart';
 
 import '../chrome_safari_browser_options.dart';
 import '../chrome_safari_browser.dart';
@@ -11,7 +12,11 @@ import '../../in_app_webview/android/in_app_webview_options.dart';
 class AndroidChromeCustomTabsOptions
     implements ChromeSafariBrowserOptions, AndroidOptions {
   ///Set to `false` if you don't want the default share item to the menu. The default value is `true`.
-  bool addDefaultShareMenuItem;
+  @Deprecated('Use `shareState` instead')
+  bool? addDefaultShareMenuItem;
+
+  ///The share state that should be applied to the custom tab. The default value is [CustomTabsShareState.SHARE_STATE_DEFAULT].
+  CustomTabsShareState shareState;
 
   ///Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
   bool showTitle;
@@ -42,7 +47,8 @@ class AndroidChromeCustomTabsOptions
   bool noHistory;
 
   AndroidChromeCustomTabsOptions(
-      {this.addDefaultShareMenuItem = true,
+      {@Deprecated('Use `shareState` instead') this.addDefaultShareMenuItem,
+      this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
       this.showTitle = true,
       this.toolbarBackgroundColor,
       this.enableUrlBarHiding = false,
@@ -55,7 +61,9 @@ class AndroidChromeCustomTabsOptions
   @override
   Map<String, dynamic> toMap() {
     return {
+      // ignore: deprecated_member_use_from_same_package
       "addDefaultShareMenuItem": addDefaultShareMenuItem,
+      "shareState": shareState.toValue(),
       "showTitle": showTitle,
       "toolbarBackgroundColor": toolbarBackgroundColor?.toHex(),
       "enableUrlBarHiding": enableUrlBarHiding,
@@ -70,7 +78,9 @@ class AndroidChromeCustomTabsOptions
   static AndroidChromeCustomTabsOptions fromMap(Map<String, dynamic> map) {
     AndroidChromeCustomTabsOptions options =
         new AndroidChromeCustomTabsOptions();
+    // ignore: deprecated_member_use_from_same_package
     options.addDefaultShareMenuItem = map["addDefaultShareMenuItem"];
+    options.shareState = map["shareState"];
     options.showTitle = map["showTitle"];
     options.toolbarBackgroundColor =
         UtilColor.fromHex(map["toolbarBackgroundColor"]);

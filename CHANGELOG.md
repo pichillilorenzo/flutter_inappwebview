@@ -5,6 +5,7 @@
 - Updated Flutter environment: sdk to `>=2.14.0 <3.0.0` and flutter version to `>=2.5.0`
 - Added `singleInstance` option for Android `ChromeSafariBrowser` implementation
 - Added `onDownloadStartRequest` event and deprecated old `onDownloadStart` event
+- Added `shareState` Android option for `ChromeSafariBrowser` class
 - Fixed missing `onZoomScaleChanged` call for `InAppBrowser` class
 - Fixed `requestImageRef` method always `null` on iOS
 - Fixed "applicationNameForUserAgent is not work in ios" [#525](https://github.com/pichillilorenzo/flutter_inappwebview/issues/525)

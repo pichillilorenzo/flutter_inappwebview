@@ -5140,9 +5140,9 @@ setTimeout(function() {
         final InAppWebViewController controller =
             await controllerCompleter.future;
         await pageLoaded.future;
-        var originUrl = (await controller.android.getOriginalUrl())?.toString();
+        var originUrl = (await controller.getOriginalUrl())?.toString();
         expect(originUrl, 'https://github.com/flutter');
-      }, skip: !Platform.isAndroid);
+      });
 
       testWidgets('pageDown/pageUp', (WidgetTester tester) async {
         final Completer controllerCompleter =

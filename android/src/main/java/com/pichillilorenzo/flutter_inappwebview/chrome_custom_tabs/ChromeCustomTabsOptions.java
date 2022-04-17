@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 import android.content.Intent;
 
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.pichillilorenzo.flutter_inappwebview.Options;
 
@@ -13,7 +14,9 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
 
   final static String LOG_TAG = "ChromeCustomTabsOptions";
 
-  public Boolean addDefaultShareMenuItem = true;
+  @Deprecated
+  public Boolean addDefaultShareMenuItem;
+  public Integer shareState = CustomTabsIntent.SHARE_STATE_DEFAULT;
   public Boolean showTitle = true;
   @Nullable
   public String toolbarBackgroundColor;
@@ -21,6 +24,8 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
   public Boolean instantAppsEnabled = false;
   public String packageName;
   public Boolean keepAliveEnabled = false;
+  public Boolean singleInstance = false;
+  public Boolean noHistory = false;
 
   @Override
   public ChromeCustomTabsOptions parse(Map<String, Object> options) {
@@ -33,25 +38,34 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
 
       switch (key) {
         case "addDefaultShareMenuItem":
-          addDefaultShareMenuItem = (boolean) value;
+          addDefaultShareMenuItem = (Boolean) value;
+          break;
+        case "shareState":
+          shareState = (Integer) value;
           break;
         case "showTitle":
-          showTitle = (boolean) value;
+          showTitle = (Boolean) value;
           break;
         case "toolbarBackgroundColor":
           toolbarBackgroundColor = (String) value;
           break;
         case "enableUrlBarHiding":
-          enableUrlBarHiding = (boolean) value;
+          enableUrlBarHiding = (Boolean) value;
           break;
         case "instantAppsEnabled":
-          instantAppsEnabled = (boolean) value;
+          instantAppsEnabled = (Boolean) value;
           break;
         case "packageName":
           packageName = (String) value;
           break;
         case "keepAliveEnabled":
-          keepAliveEnabled = (boolean) value;
+          keepAliveEnabled = (Boolean) value;
+          break;
+        case "singleInstance":
+          singleInstance = (Boolean) value;
+          break;
+        case "noHistory":
+          noHistory = (Boolean) value;
           break;
       }
     }
@@ -69,6 +83,8 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
     options.put("instantAppsEnabled", instantAppsEnabled);
     options.put("packageName", packageName);
     options.put("keepAliveEnabled", keepAliveEnabled);
+    options.put("singleInstance", singleInstance);
+    options.put("noHistory", noHistory);
     return options;
   }
 

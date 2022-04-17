@@ -8,6 +8,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
+import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.customtabs.CustomTabsService;
@@ -149,17 +150,22 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   private void prepareCustomTabs(List<HashMap<String, Object>> menuItemList) {
-    if (options.addDefaultShareMenuItem)
-      builder.addDefaultShareMenuItem();
+    if (options.addDefaultShareMenuItem != null) {
+      builder.setShareState(options.addDefaultShareMenuItem ?
+              CustomTabsIntent.SHARE_STATE_ON : CustomTabsIntent.SHARE_STATE_OFF);
+    } else {
+      builder.setShareState(options.shareState);
+    }
 
-    if (options.toolbarBackgroundColor != null && !options.toolbarBackgroundColor.isEmpty())
-      builder.setToolbarColor(Color.parseColor(options.toolbarBackgroundColor));
+    if (options.toolbarBackgroundColor != null && !options.toolbarBackgroundColor.isEmpty()) {
+      CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
+      builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder
+              .setToolbarColor(Color.parseColor(options.toolbarBackgroundColor))
+              .build());
+    }
 
     builder.setShowTitle(options.showTitle);
-
-    if (options.enableUrlBarHiding)
-      builder.enableUrlBarHiding();
-
+    builder.setUrlBarHidingEnabled(options.enableUrlBarHiding);
     builder.setInstantAppsEnabled(options.instantAppsEnabled);
 
     for (HashMap<String, Object> menuItem : menuItemList) {

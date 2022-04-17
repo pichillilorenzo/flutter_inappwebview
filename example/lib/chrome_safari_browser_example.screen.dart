@@ -66,7 +66,7 @@ class _ChromeSafariBrowserExampleScreenState
                     url: Uri.parse("https://flutter.dev/"),
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(
-                            addDefaultShareMenuItem: false,
+                            shareState: CustomTabsShareState.SHARE_STATE_OFF,
                             singleInstance: false,
                             keepAliveEnabled: true),
                         ios: IOSSafariOptions(

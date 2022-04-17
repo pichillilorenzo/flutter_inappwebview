@@ -2955,10 +2955,8 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         print("InAppWebView - dealloc")
     }
     
-//    var accessoryView: UIView?
-    var disableInputAccessoryView = false
     // https://stackoverflow.com/a/58001395/4637638
     public override var inputAccessoryView: UIView? {
-        return disableInputAccessoryView ? nil : super.inputAccessoryView
+        return options?.disableInputAccessoryView ?? false ? nil : super.inputAccessoryView
     }
 }

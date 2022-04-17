@@ -223,8 +223,8 @@ class IOSInAppWebViewOptions
   ///The default value is `false`.
   bool disableLongPressContextMenuOnLinks;
 
-  ///Set to `true` to disable inputAccessoryView above system keyboard
-  ///https://developer.apple.com/documentation/uikit/uiresponder/1621119-inputaccessoryview
+  ///Set to `true` to disable the [inputAccessoryView](https://developer.apple.com/documentation/uikit/uiresponder/1621119-inputaccessoryview) above system keyboard.
+  ///The default value is `false`.
   bool disableInputAccessoryView;
 
   IOSInAppWebViewOptions(

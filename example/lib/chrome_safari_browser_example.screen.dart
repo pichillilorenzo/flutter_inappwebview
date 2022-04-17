@@ -67,6 +67,7 @@ class _ChromeSafariBrowserExampleScreenState
                     options: ChromeSafariBrowserClassOptions(
                         android: AndroidChromeCustomTabsOptions(
                             addDefaultShareMenuItem: false,
+                            singleInstance: false,
                             keepAliveEnabled: true),
                         ios: IOSSafariOptions(
                             dismissButtonStyle:

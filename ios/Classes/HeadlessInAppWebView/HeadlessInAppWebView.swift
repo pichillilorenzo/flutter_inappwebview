@@ -92,4 +92,9 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
         HeadlessInAppWebViewManager.webViews.removeValue(forKey: id)
         flutterWebView = nil
     }
+    
+    deinit {
+        print("HeadlessInAppWebView - dealloc")
+        dispose()
+    }
 }

@@ -36,7 +36,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._normalizeIPv6 = function(ip_string) {
     // replace ipv4 address if any
     var ipv4 = ip_string.match(/(.*:)([0-9]+\\.[0-9]+\\.[0-9]+\\.[0-9]+$)/);
     if (ipv4) {
-        var ip_string = ipv4[1];
+        ip_string = ipv4[1];
         ipv4 = ipv4[2].match(/[0-9]+/g);
         for (var i = 0;i < 4;i ++) {
             var byte = parseInt(ipv4[i],10);
@@ -85,12 +85,12 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._isOriginAllowed = function(allowedOriginRules,
         var IPv6 = null;
         if (rule.host != null && rule.host[0] === "[") {
             try {
-                IPv6 = normalizeIPv6(rule.host.substring(1, rule.host.length - 1));
+                IPv6 = window.\(JAVASCRIPT_BRIDGE_NAME)._normalizeIPv6(rule.host.substring(1, rule.host.length - 1));
             } catch {}
         }
         var hostIPv6 = null;
         try {
-            hostIPv6 = normalizeIPv6(host);
+            hostIPv6 = window.\(JAVASCRIPT_BRIDGE_NAME)._normalizeIPv6(host);
         } catch {}
 
         var schemeAllowed = scheme == rule.scheme;

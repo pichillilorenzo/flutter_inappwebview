@@ -83,8 +83,9 @@ public class WebMessageListener : FlutterMethodCallDelegate {
                     return "'*'"
                 }
                 let rule = URL(string: allowedOriginRule)!
+                let host = rule.host != nil ? "'" + rule.host!.replacingOccurrences(of: "\'", with: "\\'") + "'" : "null"
                 return """
-                {scheme: '\(rule.scheme!)', host: '\(rule.host?.replacingOccurrences(of: "\'", with: "\\'") ?? "null")', port: \(rule.port != nil ? String(rule.port!) : "null")}
+                {scheme: '\(rule.scheme!)', host: \(host), port: \(rule.port != nil ? String(rule.port!) : "null")}
                 """
             }.joined(separator: ", ")
             let source = """

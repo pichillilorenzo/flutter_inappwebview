@@ -298,6 +298,9 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 webView?.reloadFromOrigin()
                 result(true)
                 break
+            case "getOriginalUrl":
+                result(webView?.getOriginalUrl()?.absoluteString)
+                break
             case "getZoomScale":
                 result(webView?.getZoomScale())
                 break

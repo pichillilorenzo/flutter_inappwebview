@@ -27,7 +27,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = null;
             if (target.tagName === 'IMG') {
                 var img = target;
                 window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = {
-                    src: img.src
+                    url: img.src
                 };
                 var parent = img.parentNode;
                 while (parent) {
@@ -47,7 +47,7 @@ window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = null;
                 var images = link.getElementsByTagName('img');
                 var img = (images.length > 0) ? images[0] : null;
                 var imgSrc = (img != null) ? img.src : null;
-                window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = (img != null) ? {src: img.src} : window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched;
+                window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched = (img != null) ? {url: imgSrc} : window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched;
                 window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched = {
                     title: link.textContent,
                     url: link.href,

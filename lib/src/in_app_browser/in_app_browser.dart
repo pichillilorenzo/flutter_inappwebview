@@ -64,8 +64,12 @@ class InAppBrowser {
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
 
+  ///Represents the WebView native implementation to be used.
+  ///The default value is [WebViewImplementation.NATIVE].
+  final WebViewImplementation implementation;
+
   ///
-  InAppBrowser({this.windowId, this.initialUserScripts}) {
+  InAppBrowser({this.windowId, this.initialUserScripts, this.implementation = WebViewImplementation.NATIVE}) {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
@@ -109,6 +113,7 @@ class InAppBrowser {
         () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
+    args.putIfAbsent('implementation', () => implementation.toValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent(
@@ -167,6 +172,7 @@ class InAppBrowser {
         () => options?.toMap() ?? InAppBrowserClassOptions().toMap());
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
+    args.putIfAbsent('implementation', () => implementation.toValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent(
@@ -207,6 +213,7 @@ class InAppBrowser {
         'historyUrl', () => androidHistoryUrl?.toString() ?? "about:blank");
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
+    args.putIfAbsent('implementation', () => implementation.toValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent(
@@ -290,16 +297,16 @@ class InAppBrowser {
 
   ///Event fired when the [InAppBrowser] starts to load an [url].
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)
-  ///
-  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
+  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   void onLoadStart(Uri? url) {}
 
   ///Event fired when the [InAppBrowser] finishes loading an [url].
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)
-  ///
-  ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
+  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   void onLoadStop(Uri? url) {}
 
   ///Event fired when the [InAppBrowser] encounters an error loading an [url].
@@ -326,7 +333,9 @@ class InAppBrowser {
 
   ///Event fired when the current [progress] (range 0-100) of loading a page is changed.
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
+  ///- iOS
   void onProgressChanged(int progress) {}
 
   ///Event fired when the [InAppBrowser] webview receives a [ConsoleMessage].
@@ -368,16 +377,21 @@ class InAppBrowser {
   ///**Official iOS API**: https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll
   void onScrollChanged(int x, int y) {}
 
-  ///Event fired when [InAppBrowser] recognizes and starts a downloadable file.
+  ///Use [onDownloadStartRequest] instead
+  @Deprecated('Use `onDownloadStartRequest` instead')
+  void onDownloadStart(Uri url) {}
+
+  ///Event fired when [WebView] recognizes a downloadable file.
+  ///To download the file, you can use the [flutter_downloader](https://pub.dev/packages/flutter_downloader) plugin.
   ///
-  ///[url] represents the url of the file.
+  ///[downloadStartRequest] represents the request of the file to download.
   ///
   ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewOptions.useOnDownloadStart] option to `true`.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
-  void onDownloadStart(Uri url) {}
+  void onDownloadStartRequest(DownloadStartRequest downloadStartRequest) {}
 
   ///Event fired when the [InAppBrowser] webview finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
@@ -501,7 +515,7 @@ class InAppBrowser {
       URLAuthenticationChallenge challenge) {}
 
   ///Event fired as find-on-page operations progress.
-  ///The listener may be notified multiple times while the operation is underway, and the numberOfMatches value should not be considered final unless [isDoneCounting] is true.
+  ///The listener may be notified multiple times while the operation is underway, and the [numberOfMatches] value should not be considered final unless [isDoneCounting] is true.
   ///
   ///[activeMatchOrdinal] represents the zero-based ordinal of the currently selected match.
   ///
@@ -509,7 +523,9 @@ class InAppBrowser {
   ///
   ///[isDoneCounting] whether the find operation has actually completed.
   ///
-  ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setFindListener(android.webkit.WebView.FindListener)
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.FindListener.onFindResultReceived](https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)))
+  ///- iOS
   void onFindResultReceived(
       int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {}
 
@@ -562,7 +578,9 @@ class InAppBrowser {
   ///
   ///[url] represents the url on which is called.
   ///
-  ///**NOTE**: available on Android 21+.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   void onPrint(Uri? url) {}
 
   ///Event fired when an HTML element of the webview has been clicked and held.

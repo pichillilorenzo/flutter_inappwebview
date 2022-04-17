@@ -41,6 +41,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialOptions,
     this.initialUserScripts,
     this.pullToRefreshController,
+    this.implementation = WebViewImplementation.NATIVE,
     this.contextMenu,
     this.onWebViewCreated,
     this.onLoadStart,
@@ -52,7 +53,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.shouldOverrideUrlLoading,
     this.onLoadResource,
     this.onScrollChanged,
-    this.onDownloadStart,
+    @Deprecated('Use `onDownloadStartRequest` instead') this.onDownloadStart,
+    this.onDownloadStartRequest,
     this.onLoadResourceCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
@@ -136,6 +138,9 @@ class InAppWebView extends StatefulWidget implements WebView {
   final URLRequest? initialUrlRequest;
 
   @override
+  final WebViewImplementation implementation;
+
+  @override
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
   @override
@@ -207,9 +212,15 @@ class InAppWebView extends StatefulWidget implements WebView {
           InAppWebViewController controller, Uri url, bool precomposed)?
       androidOnReceivedTouchIconUrl;
 
+  ///Use [onDownloadStartRequest] instead
+  @Deprecated('Use `onDownloadStartRequest` instead')
   @override
   final void Function(InAppWebViewController controller, Uri url)?
       onDownloadStart;
+
+  @override
+  final void Function(InAppWebViewController controller, DownloadStartRequest downloadStartRequest)?
+    onDownloadStartRequest;
 
   @override
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,
@@ -395,14 +406,13 @@ class _InAppWebViewState extends State<InAppWebView> {
               viewType: 'com.pichillilorenzo/flutter_inappwebview',
               layoutDirection: TextDirection.rtl,
               creationParams: <String, dynamic>{
-                'initialUrlRequest': (widget.initialUrlRequest ??
-                        URLRequest(url: Uri.parse("about:blank")))
-                    .toMap(),
+                'initialUrlRequest': widget.initialUrlRequest?.toMap(),
                 'initialFile': widget.initialFile,
                 'initialData': widget.initialData?.toMap(),
                 'initialOptions': widget.initialOptions?.toMap() ?? {},
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
                 'windowId': widget.windowId,
+                'implementation': widget.implementation.toValue(),
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
                         [],
@@ -423,16 +433,15 @@ class _InAppWebViewState extends State<InAppWebView> {
           viewType: 'com.pichillilorenzo/flutter_inappwebview',
           onPlatformViewCreated: _onPlatformViewCreated,
           gestureRecognizers: widget.gestureRecognizers,
-          layoutDirection: TextDirection.rtl,
+          layoutDirection: Directionality.maybeOf(context) ?? TextDirection.rtl,
           creationParams: <String, dynamic>{
-            'initialUrlRequest': (widget.initialUrlRequest ??
-                    URLRequest(url: Uri.parse("about:blank")))
-                .toMap(),
+            'initialUrlRequest': widget.initialUrlRequest?.toMap(),
             'initialFile': widget.initialFile,
             'initialData': widget.initialData?.toMap(),
             'initialOptions': widget.initialOptions?.toMap() ?? {},
             'contextMenu': widget.contextMenu?.toMap() ?? {},
             'windowId': widget.windowId,
+            'implementation': widget.implementation.toValue(),
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
             'pullToRefreshOptions':
@@ -448,14 +457,13 @@ class _InAppWebViewState extends State<InAppWebView> {
         onPlatformViewCreated: _onPlatformViewCreated,
         gestureRecognizers: widget.gestureRecognizers,
         creationParams: <String, dynamic>{
-          'initialUrlRequest': (widget.initialUrlRequest ??
-                  URLRequest(url: Uri.parse("about:blank")))
-              .toMap(),
+          'initialUrlRequest': widget.initialUrlRequest?.toMap(),
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
           'initialOptions': widget.initialOptions?.toMap() ?? {},
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
+          'implementation': widget.implementation.toValue(),
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
           'pullToRefreshOptions':

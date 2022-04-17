@@ -2705,7 +2705,7 @@ void main() {
       expect(numberOfMatches, 2);
     });
 
-    testWidgets('onDownloadStart', (WidgetTester tester) async {
+    testWidgets('onDownloadStartRequest', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<String> onDownloadStartCompleter = Completer<String>();
       await tester.pumpWidget(
@@ -2739,8 +2739,8 @@ void main() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            onDownloadStart: (controller, url) {
-              onDownloadStartCompleter.complete(url.toString());
+            onDownloadStartRequest: (controller, request) {
+              onDownloadStartCompleter.complete(request.url.toString());
             },
           ),
         ),

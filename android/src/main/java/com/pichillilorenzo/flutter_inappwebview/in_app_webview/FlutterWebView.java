@@ -22,6 +22,7 @@ import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
+import com.pichillilorenzo.flutter_inappwebview.types.PlatformWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
 
@@ -32,9 +33,8 @@ import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
-import io.flutter.plugin.platform.PlatformView;
 
-public class FlutterWebView implements PlatformView {
+public class FlutterWebView implements PlatformWebView {
 
   static final String LOG_TAG = "IAWFlutterWebView";
 

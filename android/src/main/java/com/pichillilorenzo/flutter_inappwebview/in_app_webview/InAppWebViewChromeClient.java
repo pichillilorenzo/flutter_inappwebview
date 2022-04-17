@@ -11,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
+import android.os.Bundle;
 import android.os.Environment;
 import android.os.Message;
 import android.os.Parcelable;
@@ -573,6 +574,19 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     WebView.HitTestResult result = view.getHitTestResult();
     String url = result.getExtra();
 
+    // Ensure that images with hyperlink return the correct URL, not the image source
+    if(result.getType() == WebView.HitTestResult.SRC_IMAGE_ANCHOR_TYPE) {
+      Message href = view.getHandler().obtainMessage();
+      view.requestFocusNodeHref(href);
+      Bundle data = href.getData();
+      if (data != null) {
+        String imageUrl = data.getString("url");
+        if(imageUrl != null && !imageUrl.isEmpty()) {
+          url = imageUrl;
+        }
+      }
+    }
+
     URLRequest request = new URLRequest(url, "GET", null, null);
     CreateWindowAction createWindowAction = new CreateWindowAction(
             request,
@@ -1004,7 +1018,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   private Boolean arrayContainsString(String[] array, String pattern) {
     for (String content : array) {
-      if (content.contains(pattern)) {
+      if (content != null && content.contains(pattern)) {
         return true;
       }
     }

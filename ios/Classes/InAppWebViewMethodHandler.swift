@@ -289,14 +289,17 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 result(webView?.getContentHeight())
                 break
             case "zoomBy":
-                let zoomFactor = arguments!["zoomFactor"] as! Float
-                let animated = arguments!["iosAnimated"] as! Bool
+                let zoomFactor = (arguments!["zoomFactor"] as! NSNumber).floatValue
+                let animated = arguments!["animated"] as! Bool
                 webView?.zoomBy(zoomFactor: zoomFactor, animated: animated)
                 result(true)
                 break
             case "reloadFromOrigin":
                 webView?.reloadFromOrigin()
                 result(true)
+                break
+            case "getOriginalUrl":
+                result(webView?.getOriginalUrl()?.absoluteString)
                 break
             case "getZoomScale":
                 result(webView?.getZoomScale())

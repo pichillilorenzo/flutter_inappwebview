@@ -9,6 +9,8 @@ description: Demonstrates how to use the flutter_inappwebview plugin.
 # Read more about versioning at semver.org.
 version: 1.0.0+1
 
+publish_to: none
+
 environment:
   sdk: ">=2.14.0 <3.0.0"
   flutter: ">=2.5.0"

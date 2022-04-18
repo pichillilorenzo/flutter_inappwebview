@@ -126,9 +126,10 @@ class AndroidChromeCustomTabsOptions
     options.noHistory = map["noHistory"];
     options.isTrustedWebActivity = map["isTrustedWebActivity"];
     options.additionalTrustedOrigins = map["additionalTrustedOrigins"];
-    switch(map["displayMode"]["type"]) {
+    switch (map["displayMode"]["type"]) {
       case "IMMERSIVE_MODE":
-        options.displayMode = TrustedWebActivityImmersiveDisplayMode.fromMap(map["displayMode"]);
+        options.displayMode =
+            TrustedWebActivityImmersiveDisplayMode.fromMap(map["displayMode"]);
         break;
       case "DEFAULT_MODE":
       default:

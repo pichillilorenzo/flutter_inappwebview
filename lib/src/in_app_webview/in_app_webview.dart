@@ -219,8 +219,8 @@ class InAppWebView extends StatefulWidget implements WebView {
       onDownloadStart;
 
   @override
-  final void Function(InAppWebViewController controller, DownloadStartRequest downloadStartRequest)?
-    onDownloadStartRequest;
+  final void Function(InAppWebViewController controller,
+      DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
   @override
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,

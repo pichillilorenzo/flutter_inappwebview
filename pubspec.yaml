@@ -62,3 +62,7 @@ flutter:
   #
   # For details regarding fonts in packages, see
   # https://flutter.io/custom-fonts/#from-packages
+
+false_secrets:
+  - /nodejs_server_test_auth_basic_and_ssl/*.pem
+  - /nodejs_server_test_auth_basic_and_ssl/*.pfx

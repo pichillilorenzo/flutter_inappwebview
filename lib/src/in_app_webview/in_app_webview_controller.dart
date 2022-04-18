@@ -203,11 +203,14 @@ class InAppWebViewController {
         break;
       case "onDownloadStartRequest":
         if ((_webview != null &&
-            // ignore: deprecated_member_use_from_same_package
-            (_webview!.onDownloadStart != null || _webview!.onDownloadStartRequest != null)) ||
+                // ignore: deprecated_member_use_from_same_package
+                (_webview!.onDownloadStart != null ||
+                    _webview!.onDownloadStartRequest != null)) ||
             _inAppBrowser != null) {
-          Map<String, dynamic> arguments = call.arguments.cast<String, dynamic>();
-          DownloadStartRequest downloadStartRequest = DownloadStartRequest.fromMap(arguments)!;
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          DownloadStartRequest downloadStartRequest =
+              DownloadStartRequest.fromMap(arguments)!;
 
           if (_webview != null) {
             if (_webview!.onDownloadStartRequest != null)
@@ -1163,7 +1166,10 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String))). If method is "POST", [Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[]))
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
   Future<void> loadUrl(
-      {required URLRequest urlRequest, @Deprecated('Use `allowingReadAccessTo` instead') Uri? iosAllowingReadAccessTo, Uri? allowingReadAccessTo}) async {
+      {required URLRequest urlRequest,
+      @Deprecated('Use `allowingReadAccessTo` instead')
+          Uri? iosAllowingReadAccessTo,
+      Uri? allowingReadAccessTo}) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
     assert(iosAllowingReadAccessTo == null ||
         iosAllowingReadAccessTo.isScheme("file"));
@@ -1171,7 +1177,10 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent(
-        'allowingReadAccessTo', () => allowingReadAccessTo?.toString() ?? iosAllowingReadAccessTo?.toString());
+        'allowingReadAccessTo',
+        () =>
+            allowingReadAccessTo?.toString() ??
+            iosAllowingReadAccessTo?.toString());
     await _channel.invokeMethod('loadUrl', args);
   }
 
@@ -1215,10 +1224,10 @@ class InAppWebViewController {
       String encoding = "utf8",
       Uri? baseUrl,
       @Deprecated('Use `historyUrl` instead')
-      Uri? androidHistoryUrl,
+          Uri? androidHistoryUrl,
       Uri? historyUrl,
       @Deprecated('Use `allowingReadAccessTo` instead')
-      Uri? iosAllowingReadAccessTo,
+          Uri? iosAllowingReadAccessTo,
       Uri? allowingReadAccessTo}) async {
     assert(iosAllowingReadAccessTo == null ||
         iosAllowingReadAccessTo.isScheme("file"));
@@ -1229,9 +1238,16 @@ class InAppWebViewController {
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
-        'historyUrl', () => historyUrl?.toString() ?? androidHistoryUrl?.toString() ?? "about:blank");
+        'historyUrl',
+        () =>
+            historyUrl?.toString() ??
+            androidHistoryUrl?.toString() ??
+            "about:blank");
     args.putIfAbsent(
-        'allowingReadAccessTo', () => allowingReadAccessTo?.toString() ?? iosAllowingReadAccessTo?.toString());
+        'allowingReadAccessTo',
+        () =>
+            allowingReadAccessTo?.toString() ??
+            iosAllowingReadAccessTo?.toString());
     await _channel.invokeMethod('loadData', args);
   }
 
@@ -1706,8 +1722,8 @@ class InAppWebViewController {
   ///- Android native WebView
   ///- iOS
   Future<String> getTRexRunnerHtml() async {
-    return await rootBundle
-        .loadString("packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html");
+    return await rootBundle.loadString(
+        "packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html");
   }
 
   ///Gets the css of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerHtml].
@@ -1716,8 +1732,8 @@ class InAppWebViewController {
   ///- Android native WebView
   ///- iOS
   Future<String> getTRexRunnerCss() async {
-    return await rootBundle
-        .loadString("packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css");
+    return await rootBundle.loadString(
+        "packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css");
   }
 
   ///Scrolls the WebView to the position.
@@ -1820,7 +1836,9 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - WebView.zoomBy](https://developer.android.com/reference/android/webkit/WebView#zoomBy(float)))
   ///- iOS ([Official API - UIScrollView.setZoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619412-setzoomscale))
   Future<void> zoomBy(
-      {required double zoomFactor, @Deprecated('Use `animated` instead') bool? iosAnimated, bool animated = false}) async {
+      {required double zoomFactor,
+      @Deprecated('Use `animated` instead') bool? iosAnimated,
+      bool animated = false}) async {
     assert(defaultTargetPlatform != TargetPlatform.android ||
         (defaultTargetPlatform == TargetPlatform.android &&
             zoomFactor > 0.01 &&

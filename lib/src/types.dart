@@ -6857,9 +6857,8 @@ class WebViewImplementation {
 
   const WebViewImplementation._internal(this._value);
 
-  static final Set<WebViewImplementation> values = [
-    WebViewImplementation.NATIVE
-  ].toSet();
+  static final Set<WebViewImplementation> values =
+      [WebViewImplementation.NATIVE].toSet();
 
   static WebViewImplementation? fromValue(int? value) {
     if (value != null) {
@@ -6918,12 +6917,12 @@ class DownloadStartRequest {
 
   DownloadStartRequest(
       {required this.url,
-        this.userAgent,
-        this.contentDisposition,
-        this.mimeType,
-        required this.contentLength,
-        this.suggestedFilename,
-        this.textEncodingName});
+      this.userAgent,
+      this.contentDisposition,
+      this.mimeType,
+      required this.contentLength,
+      this.suggestedFilename,
+      this.textEncodingName});
 
   static DownloadStartRequest? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -7034,14 +7033,12 @@ abstract class TrustedWebActivityDisplayMode {
 
 ///Android-class that represents the default display mode of a Trusted Web Activity.
 ///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
-class TrustedWebActivityDefaultDisplayMode implements TrustedWebActivityDisplayMode {
-
+class TrustedWebActivityDefaultDisplayMode
+    implements TrustedWebActivityDisplayMode {
   String _type = "DEFAULT_MODE";
 
   Map<String, dynamic> toMap() {
-    return {
-      "type": _type
-    };
+    return {"type": _type};
   }
 
   Map<String, dynamic> toJson() {
@@ -7056,7 +7053,8 @@ class TrustedWebActivityDefaultDisplayMode implements TrustedWebActivityDisplayM
 
 ///Android-class that represents the default display mode of a Trusted Web Activity.
 ///The system UI (status bar, navigation bar) is shown, and the browser toolbar is hidden while the user is on a verified origin.
-class TrustedWebActivityImmersiveDisplayMode implements TrustedWebActivityDisplayMode {
+class TrustedWebActivityImmersiveDisplayMode
+    implements TrustedWebActivityDisplayMode {
   ///Whether the Trusted Web Activity should be in sticky immersive mode.
   bool isSticky;
 
@@ -7066,10 +7064,10 @@ class TrustedWebActivityImmersiveDisplayMode implements TrustedWebActivityDispla
   String _type = "IMMERSIVE_MODE";
 
   TrustedWebActivityImmersiveDisplayMode(
-      {required this.isSticky,
-        required this.layoutInDisplayCutoutMode});
+      {required this.isSticky, required this.layoutInDisplayCutoutMode});
 
-  static TrustedWebActivityImmersiveDisplayMode? fromMap(Map<String, dynamic>? map) {
+  static TrustedWebActivityImmersiveDisplayMode? fromMap(
+      Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
@@ -7149,7 +7147,8 @@ class AndroidLayoutInDisplayCutoutMode {
   ///Content renders into the cutout area in both portrait and landscape modes.
   ///
   ///**NOTE**: available on Android 28+.
-  static const SHORT_EDGES = const AndroidLayoutInDisplayCutoutMode._internal(1);
+  static const SHORT_EDGES =
+      const AndroidLayoutInDisplayCutoutMode._internal(1);
 
   ///Content never renders into the cutout area.
   ///
@@ -7232,22 +7231,26 @@ class TrustedWebActivityScreenOrientation {
   ///  Portrait-primary is an orientation where the screen width is less than or equal to the
   ///  screen height. If the device's natural orientation is portrait, then it is in
   ///  portrait-primary when held in that position.
-  static const PORTRAIT_PRIMARY = const TrustedWebActivityScreenOrientation._internal(1);
+  static const PORTRAIT_PRIMARY =
+      const TrustedWebActivityScreenOrientation._internal(1);
 
   /// Portrait-secondary is an orientation where the screen width is less than or equal to the
   /// screen height. If the device's natural orientation is portrait, then it is in
   /// portrait-secondary when rotated 180° from its natural position.
-  static const PORTRAIT_SECONDARY = const TrustedWebActivityScreenOrientation._internal(2);
+  static const PORTRAIT_SECONDARY =
+      const TrustedWebActivityScreenOrientation._internal(2);
 
   /// Landscape-primary is an orientation where the screen width is greater than the screen height.
   /// If the device's natural orientation is landscape, then it is in landscape-primary when held
   /// in that position.
-  static const LANDSCAPE_PRIMARY = const TrustedWebActivityScreenOrientation._internal(3);
+  static const LANDSCAPE_PRIMARY =
+      const TrustedWebActivityScreenOrientation._internal(3);
 
   /// Landscape-secondary is an orientation where the screen width is greater than the
   /// screen height. If the device's natural orientation is landscape, it is in
   /// landscape-secondary when rotated 180° from its natural orientation.
-  static const LANDSCAPE_SECONDARY = const TrustedWebActivityScreenOrientation._internal(4);
+  static const LANDSCAPE_SECONDARY =
+      const TrustedWebActivityScreenOrientation._internal(4);
 
   /// Any is an orientation that means the screen can be locked to any one of portrait-primary,
   /// portrait-secondary, landscape-primary and landscape-secondary.
@@ -7256,12 +7259,14 @@ class TrustedWebActivityScreenOrientation {
   /// Landscape is an orientation where the screen width is greater than the screen height and
   /// depending on platform convention locking the screen to landscape can represent
   /// landscape-primary, landscape-secondary or both.
-  static const LANDSCAPE = const TrustedWebActivityScreenOrientation._internal(6);
+  static const LANDSCAPE =
+      const TrustedWebActivityScreenOrientation._internal(6);
 
   /// Portrait is an orientation where the screen width is less than or equal to the screen height
   /// and depending on platform convention locking the screen to portrait can represent
   /// portrait-primary, portrait-secondary or both.
-  static const PORTRAIT = const TrustedWebActivityScreenOrientation._internal(7);
+  static const PORTRAIT =
+      const TrustedWebActivityScreenOrientation._internal(7);
 
   /// Natural is an orientation that refers to either portrait-primary or landscape-primary
   /// depending on the device's usual orientation. This orientation is usually provided by

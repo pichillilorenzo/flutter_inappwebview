@@ -27,3 +27,6 @@
 .dart_tool/
 .packages
 build/
+.fvm/
+
+flutter_driver_tests.log

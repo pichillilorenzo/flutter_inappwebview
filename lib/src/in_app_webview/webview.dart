@@ -127,8 +127,8 @@ abstract class WebView {
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)
   ///
   ///**Official iOS API**: https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview
-  final void Function(InAppWebViewController controller, DownloadStartRequest downloadStartRequest)?
-    onDownloadStartRequest;
+  final void Function(InAppWebViewController controller,
+      DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
   ///Event fired when the [WebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
@@ -701,7 +701,8 @@ abstract class WebView {
       this.shouldOverrideUrlLoading,
       this.onLoadResource,
       this.onScrollChanged,
-      @Deprecated('Use `onDownloadStartRequest` instead') this.onDownloadStart,
+      @Deprecated('Use `onDownloadStartRequest` instead')
+          this.onDownloadStart,
       this.onDownloadStartRequest,
       this.onLoadResourceCustomScheme,
       this.onCreateWindow,
@@ -738,7 +739,7 @@ abstract class WebView {
       this.androidOnRenderProcessUnresponsive,
       this.androidOnFormResubmission,
       @Deprecated('Use `onZoomScaleChanged` instead')
-      this.androidOnScaleChanged,
+          this.androidOnScaleChanged,
       this.androidOnReceivedIcon,
       this.androidOnReceivedTouchIconUrl,
       this.androidOnJsBeforeUnload,

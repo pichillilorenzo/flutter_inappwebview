@@ -69,7 +69,10 @@ class InAppBrowser {
   final WebViewImplementation implementation;
 
   ///
-  InAppBrowser({this.windowId, this.initialUserScripts, this.implementation = WebViewImplementation.NATIVE}) {
+  InAppBrowser(
+      {this.windowId,
+      this.initialUserScripts,
+      this.implementation = WebViewImplementation.NATIVE}) {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');

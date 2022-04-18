@@ -133,7 +133,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public LinearLayout floatingContextMenu = null;
   @Nullable
   public Map<String, Object> contextMenu = null;
-  public Handler mainLooperHandler = new Handler(Looper.getMainLooper());
+  public Handler mainLooperHandler = new Handler(getWebViewLooper());
   static Handler mHandler = new Handler();
 
   public Runnable checkScrollStoppedTask;
@@ -1670,6 +1670,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       webMessageListener.dispose();
     }
     webMessageListeners.clear();
+  }
+
+  @Override
+  public Looper getWebViewLooper() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+      return super.getWebViewLooper();
+    }
+    return Looper.getMainLooper();
   }
 
   @Override

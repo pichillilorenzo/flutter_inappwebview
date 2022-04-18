@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 import android.content.Context;
 import android.net.Uri;
 import android.net.http.SslCertificate;
+import android.os.Looper;
 import android.webkit.ValueCallback;
 import android.webkit.WebMessage;
 import android.webkit.WebView;
@@ -98,4 +99,5 @@ public interface InAppWebViewInterface {
   void setWebMessageChannels(Map<String, WebMessageChannel> webMessageChannels);
   void disposeWebMessageChannels();
   void disposeWebMessageListeners();
+  Looper getWebViewLooper();
 }

@@ -5271,6 +5271,10 @@ setTimeout(function() {
         expect(await AndroidInAppWebViewController.getCurrentWebViewPackage(),
             isNotNull);
       }, skip: !Platform.isAndroid);
+
+      test('setWebContentsDebuggingEnabled', () async {
+        expect(AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true), completes);
+      }, skip: !Platform.isAndroid);
     }, skip: !Platform.isAndroid);
 
     group('ios methods', () {

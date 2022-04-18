@@ -97,7 +97,7 @@ public class ContentBlockerHandler {
                 final String[] webViewUrl = new String[1];
                 if (!trigger.getLoadType().isEmpty() || !trigger.getIfTopUrl().isEmpty() || !trigger.getUnlessTopUrl().isEmpty()) {
                     final CountDownLatch latch = new CountDownLatch(1);
-                    Handler handler = new Handler(Looper.getMainLooper());
+                    Handler handler = new Handler(webView.getWebViewLooper());
                     handler.post(new Runnable() {
                         @Override
                         public void run() {
@@ -160,7 +160,7 @@ public class ContentBlockerHandler {
                                 "   d.addEventListener('DOMContentLoaded', function(event) { hide(); }); " +
                                 "})(document);";
 
-                        final Handler handler = new Handler(Looper.getMainLooper());
+                        final Handler handler = new Handler(webView.getWebViewLooper());
                         handler.post(new Runnable() {
                             @Override
                             public void run() {

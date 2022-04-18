@@ -7,8 +7,8 @@ function error() {
   echo "$@" 1>&2
 }
 
-# on macOS local IP can be found using $(ipconfig getifaddr en0)
-# on linux local IP can be found using $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') or $(ip route get 1 | awk '{print $NF;exit}')
+# on macOS local IP can be found using something like $(ipconfig getifaddr en0)
+# on linux local IP can be found using something like $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') or $(ip route get 1 | awk '{print $NF;exit}')
 export NODE_SERVER_IP=$1
 FAILED=0
 
@@ -17,6 +17,7 @@ dart $PROJECT_DIR/tool/env.dart
 cd $PROJECT_DIR/nodejs_server_test_auth_basic_and_ssl
 node index.js &
 
+flutter --version
 flutter clean
 cd $PROJECT_DIR/example
 flutter clean

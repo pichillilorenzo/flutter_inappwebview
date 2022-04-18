@@ -397,7 +397,7 @@ void main() {
       late File fileJs;
 
       setUpAll(() async {
-        appSupportDir = (await getApplicationSupportDirectory())!;
+        appSupportDir = (await getApplicationSupportDirectory());
 
         final Directory htmlFolder = Directory('${appSupportDir.path}/html/');
         if (!await htmlFolder.exists()) {
@@ -476,7 +476,7 @@ void main() {
       }, skip: !Platform.isIOS);
 
       testWidgets(
-          'loadUrl with file:// scheme and iosAllowingReadAccessTo argument',
+          'loadUrl with file:// scheme and allowingReadAccessTo argument',
           (WidgetTester tester) async {
         final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
             Completer<ConsoleMessage?>();
@@ -511,7 +511,7 @@ void main() {
                 controller.loadUrl(
                     urlRequest:
                         URLRequest(url: Uri.parse('file://${fileHtml.path}')),
-                    iosAllowingReadAccessTo:
+                    allowingReadAccessTo:
                         Uri.parse('file://${appSupportDir.path}/'));
               },
               onConsoleMessage: (controller, consoleMessage) {
@@ -1558,6 +1558,7 @@ void main() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
+            initialUrlRequest: URLRequest(url: Uri.parse("about:blank")),
             initialOptions: InAppWebViewGroupOptions(
               crossPlatform: InAppWebViewOptions(
                   javaScriptEnabled: true,
@@ -3804,7 +3805,7 @@ setTimeout(function() {
 """,
           encoding: 'utf-8',
           mimeType: 'text/html',
-          androidHistoryUrl: Uri.parse("https://flutter.dev"),
+          historyUrl: Uri.parse("https://flutter.dev"),
           baseUrl: Uri.parse("https://flutter.dev"));
       await pageLoads.stream.first;
 
@@ -4550,7 +4551,7 @@ setTimeout(function() {
       await pageLoaded.future;
 
       await expectLater(
-          controller.zoomBy(zoomFactor: 3.0, iosAnimated: true), completes);
+          controller.zoomBy(zoomFactor: 3.0, animated: true), completes);
     });
 
     testWidgets('getZoomScale', (WidgetTester tester) async {
@@ -4853,7 +4854,7 @@ setTimeout(function() {
         fileName = fileName + WebArchiveFormat.WEBARCHIVE.toValue();
       }
 
-      var fullPath = supportDir!.path + Platform.pathSeparator + fileName;
+      var fullPath = supportDir.path + Platform.pathSeparator + fileName;
       var path = await controller.saveWebArchive(filePath: fullPath);
       expect(path, isNotNull);
       expect(path, endsWith(fileName));

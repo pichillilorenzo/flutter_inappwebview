@@ -5737,6 +5737,84 @@ setTimeout(function() {
       await chromeSafariBrowser.browserClosed.future;
       expect(chromeSafariBrowser.isOpened(), false);
     });
+
+    group('Android Custom Tabs', () {
+      test('Custom Tabs single instance', () async {
+        var chromeSafariBrowser = new MyChromeSafariBrowser();
+        expect(chromeSafariBrowser.isOpened(), false);
+
+        await chromeSafariBrowser.open(
+          url: Uri.parse("https://github.com/flutter"),
+          options: ChromeSafariBrowserClassOptions(
+            android: AndroidChromeCustomTabsOptions(
+              isSingleInstance: true
+            )
+          )
+        );
+        await chromeSafariBrowser.browserCreated.future;
+        expect(chromeSafariBrowser.isOpened(), true);
+        expect(() async {
+          await chromeSafariBrowser.open(
+              url: Uri.parse("https://flutter.dev"));
+        }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+        await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+        await chromeSafariBrowser.close();
+        await chromeSafariBrowser.browserClosed.future;
+        expect(chromeSafariBrowser.isOpened(), false);
+      });
+
+      test('Trusted Web Activity', () async {
+        var chromeSafariBrowser = new MyChromeSafariBrowser();
+        expect(chromeSafariBrowser.isOpened(), false);
+
+        await chromeSafariBrowser.open(
+            url: Uri.parse("https://github.com/flutter"),
+            options: ChromeSafariBrowserClassOptions(
+                android: AndroidChromeCustomTabsOptions(
+                    isTrustedWebActivity: true
+                )
+            )
+        );
+        await chromeSafariBrowser.browserCreated.future;
+        expect(chromeSafariBrowser.isOpened(), true);
+        expect(() async {
+          await chromeSafariBrowser.open(
+              url: Uri.parse("https://flutter.dev"));
+        }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+        await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+        await chromeSafariBrowser.close();
+        await chromeSafariBrowser.browserClosed.future;
+        expect(chromeSafariBrowser.isOpened(), false);
+      });
+
+      test('Trusted Web Activity single instance', () async {
+        var chromeSafariBrowser = new MyChromeSafariBrowser();
+        expect(chromeSafariBrowser.isOpened(), false);
+
+        await chromeSafariBrowser.open(
+            url: Uri.parse("https://github.com/flutter"),
+            options: ChromeSafariBrowserClassOptions(
+                android: AndroidChromeCustomTabsOptions(
+                  isTrustedWebActivity: true,
+                  isSingleInstance: true
+                )
+            )
+        );
+        await chromeSafariBrowser.browserCreated.future;
+        expect(chromeSafariBrowser.isOpened(), true);
+        expect(() async {
+          await chromeSafariBrowser.open(
+              url: Uri.parse("https://flutter.dev"));
+        }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+        await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+        await chromeSafariBrowser.close();
+        await chromeSafariBrowser.browserClosed.future;
+        expect(chromeSafariBrowser.isOpened(), false);
+      });
+    }, skip: !Platform.isAndroid);
   });
 
   group('InAppLocalhostServer', () {

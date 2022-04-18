@@ -21,6 +21,8 @@
 - Fixed "Unexpected behavior when using a null initialUrlRequest" [#1063](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1063)
 - Fixed "Local storage & cookie didn't persist when sharedCookie and cache both enabled" [#1092](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1092)
 - Fixed "ios zoomBy crash: Foundation/NSNumber.swift:467: Fatal error: Unable to bridge NSNumber to Float" [#873](https://github.com/pichillilorenzo/flutter_inappwebview/issues/873)
+- Fixed "In App Browser Crashing in Android - Action Bar is null" [#1137](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1137)
+- Fixed "Cannot load Javascript on some Android devices - Uncaught TypeError: Cannot read property 'appendChild' of null" [#888](https://github.com/pichillilorenzo/flutter_inappwebview/issues/888)
 - Merged "Update Options.swift" [#889](https://github.com/pichillilorenzo/flutter_inappwebview/pull/889) (thanks to [cloudygeek](https://github.com/cloudygeek))
 - Merged "fix: Applicatio nNameForUserAgent is not working in iOS" [#1095](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1095) (thanks to [sunalwaysknows](https://github.com/sunalwaysknows))
 - Merged "Make sure we open a new instance of a custom chrome chrome tab" [#812](https://github.com/pichillilorenzo/flutter_inappwebview/pull/812) (thanks to [savy-91](https://github.com/savy-91))

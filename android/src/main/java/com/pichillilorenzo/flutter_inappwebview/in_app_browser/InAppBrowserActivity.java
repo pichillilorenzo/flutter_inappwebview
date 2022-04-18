@@ -20,6 +20,7 @@ import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 import android.widget.SearchView;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -50,6 +51,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public String id;
   public InAppWebView webView;
   public PullToRefreshLayout pullToRefreshLayout;
+  @Nullable
   public ActionBar actionBar;
   public Menu menu;
   public SearchView searchView;
@@ -179,17 +181,18 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     else
       progressBar.setMax(100);
 
-    actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
+    if (actionBar != null) {
+      actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
 
-    if (options.hideToolbarTop)
-      actionBar.hide();
+      if (options.hideToolbarTop)
+        actionBar.hide();
 
-    if (options.toolbarTopBackgroundColor != null && !options.toolbarTopBackgroundColor.isEmpty())
-      actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(options.toolbarTopBackgroundColor)));
+      if (options.toolbarTopBackgroundColor != null && !options.toolbarTopBackgroundColor.isEmpty())
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(options.toolbarTopBackgroundColor)));
 
-    if (options.toolbarTopFixedTitle != null && !options.toolbarTopFixedTitle.isEmpty())
-      actionBar.setTitle(options.toolbarTopFixedTitle);
-
+      if (options.toolbarTopFixedTitle != null && !options.toolbarTopFixedTitle.isEmpty())
+        actionBar.setTitle(options.toolbarTopFixedTitle);
+    }
   }
 
   @Override
@@ -208,7 +211,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     searchView.setQuery(webView.getUrl(), false);
 
-    if (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty())
+    if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty()))
       actionBar.setTitle(webView.getTitle());
 
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -372,21 +375,24 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
         progressBar.setMax(100);
     }
 
-    if (newOptionsMap.get("hideTitleBar") != null && options.hideTitleBar != newOptions.hideTitleBar)
+    if (actionBar != null && newOptionsMap.get("hideTitleBar") != null && options.hideTitleBar != newOptions.hideTitleBar)
       actionBar.setDisplayShowTitleEnabled(!newOptions.hideTitleBar);
 
-    if (newOptionsMap.get("hideToolbarTop") != null && options.hideToolbarTop != newOptions.hideToolbarTop) {
+    if (actionBar != null && newOptionsMap.get("hideToolbarTop") != null && options.hideToolbarTop != newOptions.hideToolbarTop) {
       if (newOptions.hideToolbarTop)
         actionBar.hide();
       else
         actionBar.show();
     }
 
-    if (newOptionsMap.get("toolbarTopBackgroundColor") != null && !Util.objEquals(options.toolbarTopBackgroundColor, newOptions.toolbarTopBackgroundColor) &&
+    if (actionBar != null && newOptionsMap.get("toolbarTopBackgroundColor") != null &&
+            !Util.objEquals(options.toolbarTopBackgroundColor, newOptions.toolbarTopBackgroundColor) &&
             !newOptions.toolbarTopBackgroundColor.isEmpty())
       actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(newOptions.toolbarTopBackgroundColor)));
 
-    if (newOptionsMap.get("toolbarTopFixedTitle") != null && !Util.objEquals(options.toolbarTopFixedTitle, newOptions.toolbarTopFixedTitle) && !newOptions.toolbarTopFixedTitle.isEmpty())
+    if (actionBar != null && newOptionsMap.get("toolbarTopFixedTitle") != null &&
+            !Util.objEquals(options.toolbarTopFixedTitle, newOptions.toolbarTopFixedTitle) &&
+            !newOptions.toolbarTopFixedTitle.isEmpty())
       actionBar.setTitle(newOptions.toolbarTopFixedTitle);
 
     if (newOptionsMap.get("hideUrlBar") != null && options.hideUrlBar != newOptions.hideUrlBar) {

@@ -1064,12 +1064,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       }
     }
     String jsWrapper = "(function(d) { var script = d.createElement('script'); " + scriptAttributes +
-            " script.src = %s; d.body.appendChild(script); })(document);";
+            " script.src = %s; if (d.body != null) { d.body.appendChild(script); } })(document);";
     injectDeferredObject(urlFile, null, jsWrapper, null);
   }
 
   public void injectCSSCode(String source) {
-    String jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %s; d.head.appendChild(style); })(document);";
+    String jsWrapper = "(function(d) { var style = d.createElement('style'); style.innerHTML = %s;" +
+            " if (d.head != null) { d.head.appendChild(style); } })(document);";
     injectDeferredObject(source, null, jsWrapper, null);
   }
 
@@ -1111,7 +1112,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       }
     }
     String jsWrapper = "(function(d) { var link = d.createElement('link'); link.rel='" + alternateStylesheet + "stylesheet'; link.type='text/css'; " +
-            cssLinkAttributes + " link.href = %s; d.head.appendChild(link); })(document);";
+            cssLinkAttributes + " link.href = %s; if (d.head != null) { d.head.appendChild(link); } })(document);";
     injectDeferredObject(urlFile, null, jsWrapper, null);
   }
 

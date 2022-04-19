@@ -9,6 +9,9 @@ import '../_static_channel.dart';
 ///This includes cookies, disk and memory caches, and persistent data such as WebSQL, IndexedDB databases, and local storage.
 ///
 ///**NOTE**: available on iOS 9.0+.
+///
+///Use [WebStorageManager] instead.
+@Deprecated("Use WebStorageManager instead")
 class IOSWebStorageManager {
   static MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;
 

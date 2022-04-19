@@ -10,7 +10,7 @@ import android.webkit.WebView;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewOptions;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewSettings;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -42,8 +42,8 @@ public interface InAppWebViewInterface {
   void stopLoading();
   boolean isLoading();
   void takeScreenshot(Map<String, Object> screenshotConfiguration, MethodChannel.Result result);
-  void setOptions(InAppWebViewOptions newOptions, HashMap<String, Object> newOptionsMap);
-  Map<String, Object> getOptions();
+  void setSettings(InAppWebViewSettings newSettings, HashMap<String, Object> newSettingsMap);
+  Map<String, Object> getCustomSettings();
   HashMap<String, Object> getCopyBackForwardList();
   void clearAllCache();
   void clearSslPreferences();

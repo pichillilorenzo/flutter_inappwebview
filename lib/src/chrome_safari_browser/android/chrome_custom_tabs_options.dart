@@ -12,7 +12,7 @@ import '../../in_app_webview/android/in_app_webview_options.dart';
 class AndroidChromeCustomTabsOptions
     implements ChromeSafariBrowserOptions, AndroidOptions {
   ///Use [shareState] instead.
-  @Deprecated('Use `shareState` instead')
+  @Deprecated('Use shareState instead')
   bool? addDefaultShareMenuItem;
 
   ///The share state that should be applied to the custom tab. The default value is [CustomTabsShareState.SHARE_STATE_DEFAULT].
@@ -73,7 +73,7 @@ class AndroidChromeCustomTabsOptions
   TrustedWebActivityScreenOrientation screenOrientation;
 
   AndroidChromeCustomTabsOptions(
-      {@Deprecated('Use `shareState` instead') this.addDefaultShareMenuItem,
+      {@Deprecated('Use shareState instead') this.addDefaultShareMenuItem,
       this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
       this.showTitle = true,
       this.toolbarBackgroundColor,

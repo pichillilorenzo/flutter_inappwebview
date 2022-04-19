@@ -7,6 +7,9 @@ import '../_static_channel.dart';
 
 ///Class that is used to manage the JavaScript storage APIs provided by the WebView.
 ///It manages the Application Cache API, the Web SQL Database API and the HTML5 Web Storage API.
+///
+///Use [WebStorageManager] instead.
+@Deprecated("Use WebStorageManager instead")
 class AndroidWebStorageManager {
   static MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;
 

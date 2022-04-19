@@ -11,11 +11,11 @@ import Flutter
 public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
     
     var channel: FlutterMethodChannel?
-    var options: PullToRefreshOptions?
+    var options: PullToRefreshSettings?
     var shouldCallOnRefresh = false
     var delegate: PullToRefreshDelegate?
     
-    public init(channel: FlutterMethodChannel?, options: PullToRefreshOptions?) {
+    public init(channel: FlutterMethodChannel?, options: PullToRefreshSettings?) {
         super.init()
         self.channel = channel
         self.options = options

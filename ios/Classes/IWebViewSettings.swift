@@ -14,8 +14,8 @@ public class IWebViewSettings<T>: NSObject {
         super.init()
     }
     
-    func parse(options: [String: Any?]) -> IWebViewSettings {
-        for (key, value) in options {
+    func parse(settings: [String: Any?]) -> IWebViewSettings {
+        for (key, value) in settings {
             if !(value is NSNull), value != nil, self.responds(to: Selector(key)) {
                 self.setValue(value, forKey: key)
             }
@@ -24,7 +24,7 @@ public class IWebViewSettings<T>: NSObject {
     }
     
     func toMap() -> [String: Any?] {
-        var options: [String: Any?] = [:]
+        var settings: [String: Any?] = [:]
         var counts = UInt32();
         let properties = class_copyPropertyList(object_getClass(self), &counts);
         for i in 0..<counts {
@@ -33,14 +33,14 @@ public class IWebViewSettings<T>: NSObject {
             let cName = property_getName(property!);
             let name = String(cString: cName)
             
-            options[name] = self.value(forKey: name)
+            settings[name] = self.value(forKey: name)
         }
         free(properties)
-        return options
+        return settings
     }
     
-    func getRealOptions(obj: T?) -> [String: Any?] {
-        let realOptions: [String: Any?] = toMap()
-        return realOptions
+    func getRealSettings(obj: T?) -> [String: Any?] {
+        let realSettings: [String: Any?] = toMap()
+        return realSettings
     }
 }

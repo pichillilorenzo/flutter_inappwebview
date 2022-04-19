@@ -8,7 +8,7 @@
 import Foundation
 
 @objcMembers
-public class InAppBrowserSettings: Options<InAppBrowserWebViewController> {
+public class InAppBrowserSettings: IWebViewSettings<InAppBrowserWebViewController> {
     
     var hidden = false
     var hideToolbarTop = true
@@ -32,7 +32,7 @@ public class InAppBrowserSettings: Options<InAppBrowserWebViewController> {
         super.init()
     }
     
-    override func getRealOptions(obj: InAppBrowserWebViewController?) -> [String: Any?] {
+    override func getRealSettings(obj: InAppBrowserWebViewController?) -> [String: Any?] {
         var realOptions: [String: Any?] = toMap()
         if let inAppBrowserWebViewController = obj {
             realOptions["hideUrlBar"] = inAppBrowserWebViewController.searchBar.isHidden

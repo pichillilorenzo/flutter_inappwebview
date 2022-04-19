@@ -26,8 +26,8 @@ class HttpAuthenticationChallenge: NSObject {
         return [
             "protectionSpace": protectionSpace.toMap(),
             "previousFailureCount": previousFailureCount,
-            "iosFailureResponse": failureResponse?.toMap(),
-            "iosError": error?.localizedDescription,
+            "failureResponse": failureResponse?.toMap(),
+            "error": error?.localizedDescription,
             "proposedCredential": proposedCredential?.toMap()
         ]
     }

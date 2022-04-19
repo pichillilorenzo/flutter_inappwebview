@@ -41,7 +41,17 @@ public class URLRequest {
     Map<String, Object> urlRequestMap = new HashMap<>();
     urlRequestMap.put("url", url);
     urlRequestMap.put("method", method);
+    urlRequestMap.put("headers", headers);
     urlRequestMap.put("body", body);
+    urlRequestMap.put("allowsCellularAccess", null);
+    urlRequestMap.put("allowsConstrainedNetworkAccess", null);
+    urlRequestMap.put("allowsExpensiveNetworkAccess", null);
+    urlRequestMap.put("cachePolicy", null);
+    urlRequestMap.put("httpShouldHandleCookies", null);
+    urlRequestMap.put("httpShouldUsePipelining", null);
+    urlRequestMap.put("networkServiceType", null);
+    urlRequestMap.put("timeoutInterval", null);
+    urlRequestMap.put("mainDocumentURL", null);
     return urlRequestMap;
   }
 

@@ -8,9 +8,9 @@ import com.pichillilorenzo.flutter_inappwebview.R;
 import java.util.HashMap;
 import java.util.Map;
 
-public class InAppBrowserOptions implements IWebViewSettings<InAppBrowserActivity> {
+public class InAppBrowserSettings implements IWebViewSettings<InAppBrowserActivity> {
 
-  public static final String LOG_TAG = "InAppBrowserOptions";
+  public static final String LOG_TAG = "InAppBrowserSettings";
 
   public Boolean hidden = false;
   public Boolean hideToolbarTop = false;
@@ -27,8 +27,8 @@ public class InAppBrowserOptions implements IWebViewSettings<InAppBrowserActivit
   public Boolean shouldCloseOnBackButtonPressed = false;
 
   @Override
-  public InAppBrowserOptions parse(Map<String, Object> options) {
-    for (Map.Entry<String, Object> pair : options.entrySet()) {
+  public InAppBrowserSettings parse(Map<String, Object> settings) {
+    for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
       if (value == null) {
@@ -74,26 +74,26 @@ public class InAppBrowserOptions implements IWebViewSettings<InAppBrowserActivit
 
   @Override
   public Map<String, Object> toMap() {
-    Map<String, Object> options = new HashMap<>();
-    options.put("hidden", hidden);
-    options.put("hideToolbarTop", hideToolbarTop);
-    options.put("toolbarTopBackgroundColor", toolbarTopBackgroundColor);
-    options.put("toolbarTopFixedTitle", toolbarTopFixedTitle);
-    options.put("hideUrlBar", hideUrlBar);
-    options.put("hideTitleBar", hideTitleBar);
-    options.put("closeOnCannotGoBack", closeOnCannotGoBack);
-    options.put("hideProgressBar", hideProgressBar);
-    options.put("allowGoBackWithBackButton", allowGoBackWithBackButton);
-    options.put("shouldCloseOnBackButtonPressed", shouldCloseOnBackButtonPressed);
-    return options;
+    Map<String, Object> settings = new HashMap<>();
+    settings.put("hidden", hidden);
+    settings.put("hideToolbarTop", hideToolbarTop);
+    settings.put("toolbarTopBackgroundColor", toolbarTopBackgroundColor);
+    settings.put("toolbarTopFixedTitle", toolbarTopFixedTitle);
+    settings.put("hideUrlBar", hideUrlBar);
+    settings.put("hideTitleBar", hideTitleBar);
+    settings.put("closeOnCannotGoBack", closeOnCannotGoBack);
+    settings.put("hideProgressBar", hideProgressBar);
+    settings.put("allowGoBackWithBackButton", allowGoBackWithBackButton);
+    settings.put("shouldCloseOnBackButtonPressed", shouldCloseOnBackButtonPressed);
+    return settings;
   }
 
   @Override
-  public Map<String, Object> getRealOptions(InAppBrowserActivity inAppBrowserActivity) {
-    Map<String, Object> realOptions = toMap();
-    realOptions.put("hideToolbarTop", !inAppBrowserActivity.actionBar.isShowing());
-    realOptions.put("hideUrlBar", !inAppBrowserActivity.menu.findItem(R.id.menu_search).isVisible());
-    realOptions.put("hideProgressBar", inAppBrowserActivity.progressBar.getMax() == 0);
-    return realOptions;
+  public Map<String, Object> getRealSettings(InAppBrowserActivity inAppBrowserActivity) {
+    Map<String, Object> realSettings = toMap();
+    realSettings.put("hideToolbarTop", !inAppBrowserActivity.actionBar.isShowing());
+    realSettings.put("hideUrlBar", !inAppBrowserActivity.menu.findItem(R.id.menu_search).isVisible());
+    realSettings.put("hideProgressBar", inAppBrowserActivity.progressBar.getMax() == 0);
+    return realSettings;
   }
 }

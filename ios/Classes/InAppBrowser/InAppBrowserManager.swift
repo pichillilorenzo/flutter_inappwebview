@@ -50,20 +50,20 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func prepareInAppBrowserWebViewController(options: [String: Any?]) -> InAppBrowserWebViewController {
+    public func prepareInAppBrowserWebViewController(settings: [String: Any?]) -> InAppBrowserWebViewController {
         if previousStatusBarStyle == -1 {
             previousStatusBarStyle = UIApplication.shared.statusBarStyle.rawValue
         }
         
-        let browserOptions = InAppBrowserOptions()
-        let _ = browserOptions.parse(options: options)
+        let browserSettings = InAppBrowserSettings()
+        let _ = browserSettings.parse(settings: settings)
         
-        let webViewOptions = InAppWebViewOptions()
-        let _ = webViewOptions.parse(options: options)
+        let webViewSettings = InAppWebViewSettings()
+        let _ = webViewSettings.parse(settings: settings)
         
         let webViewController = InAppBrowserWebViewController()
-        webViewController.browserOptions = browserOptions
-        webViewController.webViewOptions = webViewOptions
+        webViewController.browserSettings = browserSettings
+        webViewController.webViewSettings = webViewSettings
         webViewController.previousStatusBarStyle = previousStatusBarStyle
         return webViewController
     }
@@ -76,13 +76,13 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         let mimeType = arguments["mimeType"] as? String
         let encoding = arguments["encoding"] as? String
         let baseUrl = arguments["baseUrl"] as? String
-        let options = arguments["options"] as! [String: Any?]
+        let settings = arguments["settings"] as! [String: Any?]
         let contextMenu = arguments["contextMenu"] as! [String: Any]
         let windowId = arguments["windowId"] as? Int64
         let initialUserScripts = arguments["initialUserScripts"] as? [[String: Any]]
         let pullToRefreshInitialOptions = arguments["pullToRefreshOptions"] as! [String: Any?]
         
-        let webViewController = prepareInAppBrowserWebViewController(options: options)
+        let webViewController = prepareInAppBrowserWebViewController(settings: settings)
         
         webViewController.id = id
         webViewController.initialUrlRequest = urlRequest != nil ? URLRequest.init(fromPluginMap: urlRequest!) : nil
@@ -117,7 +117,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         navController.tmpWindow = tmpWindow
         
         var animated = true
-        if let browserOptions = webViewController.browserOptions, browserOptions.hidden {
+        if let browserOptions = webViewController.browserSettings, browserOptions.hidden {
             tmpWindow.isHidden = true
             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             animated = false

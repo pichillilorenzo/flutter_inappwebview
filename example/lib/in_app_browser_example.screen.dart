@@ -123,12 +123,13 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                     await widget.browser.openUrlRequest(
                         urlRequest:
                             URLRequest(url: Uri.parse("https://flutter.dev")),
-                        options: InAppBrowserClassOptions(
-                            inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-                                crossPlatform: InAppWebViewOptions(
-                          useShouldOverrideUrlLoading: true,
-                          useOnLoadResource: true,
-                        ))));
+                        settings: InAppBrowserClassSettings(
+                          webViewSettings: InAppWebViewSettings(
+                            useShouldOverrideUrlLoading: true,
+                            useOnLoadResource: true,
+                          ),
+                        ),
+                    );
                   },
                   child: Text("Open In-App Browser")),
               Container(height: 40),

@@ -6,7 +6,7 @@ import android.webkit.WebSettings;
 
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.Options;
+import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
 import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 
@@ -18,9 +18,9 @@ import java.util.Map;
 import static android.webkit.WebSettings.LayoutAlgorithm.NARROW_COLUMNS;
 import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
-public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
+public class InAppWebViewSettings implements IWebViewSettings<InAppWebViewInterface> {
 
-  public static final String LOG_TAG = "InAppWebViewOptions";
+  public static final String LOG_TAG = "InAppWebViewSettings";
 
   public Boolean useShouldOverrideUrlLoading = false;
   public Boolean useOnLoadResource = false;
@@ -110,8 +110,8 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
   public String horizontalScrollbarTrackColor;
 
   @Override
-  public InAppWebViewOptions parse(Map<String, Object> options) {
-    for (Map.Entry<String, Object> pair : options.entrySet()) {
+  public InAppWebViewSettings parse(Map<String, Object> settings) {
+    for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
       if (value == null) {
@@ -370,162 +370,162 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
 
   @Override
   public Map<String, Object> toMap() {
-    Map<String, Object> options = new HashMap<>();
-    options.put("useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
-    options.put("useOnLoadResource", useOnLoadResource);
-    options.put("useOnDownloadStart", useOnDownloadStart);
-    options.put("clearCache", clearCache);
-    options.put("userAgent", userAgent);
-    options.put("applicationNameForUserAgent", applicationNameForUserAgent);
-    options.put("javaScriptEnabled", javaScriptEnabled);
-    options.put("javaScriptCanOpenWindowsAutomatically", javaScriptCanOpenWindowsAutomatically);
-    options.put("mediaPlaybackRequiresUserGesture", mediaPlaybackRequiresUserGesture);
-    options.put("minimumFontSize", minimumFontSize);
-    options.put("verticalScrollBarEnabled", verticalScrollBarEnabled);
-    options.put("horizontalScrollBarEnabled", horizontalScrollBarEnabled);
-    options.put("resourceCustomSchemes", resourceCustomSchemes);
-    options.put("contentBlockers", contentBlockers);
-    options.put("preferredContentMode", preferredContentMode);
-    options.put("useShouldInterceptAjaxRequest", useShouldInterceptAjaxRequest);
-    options.put("useShouldInterceptFetchRequest", useShouldInterceptFetchRequest);
-    options.put("incognito", incognito);
-    options.put("cacheEnabled", cacheEnabled);
-    options.put("transparentBackground", transparentBackground);
-    options.put("disableVerticalScroll", disableVerticalScroll);
-    options.put("disableHorizontalScroll", disableHorizontalScroll);
-    options.put("disableContextMenu", disableContextMenu);
-    options.put("textZoom", textZoom);
-    options.put("clearSessionCache", clearSessionCache);
-    options.put("builtInZoomControls", builtInZoomControls);
-    options.put("displayZoomControls", displayZoomControls);
-    options.put("supportZoom", supportZoom);
-    options.put("databaseEnabled", databaseEnabled);
-    options.put("domStorageEnabled", domStorageEnabled);
-    options.put("useWideViewPort", useWideViewPort);
-    options.put("safeBrowsingEnabled", safeBrowsingEnabled);
-    options.put("mixedContentMode", mixedContentMode);
-    options.put("allowContentAccess", allowContentAccess);
-    options.put("allowFileAccess", allowFileAccess);
-    options.put("allowFileAccessFromFileURLs", allowFileAccessFromFileURLs);
-    options.put("allowUniversalAccessFromFileURLs", allowUniversalAccessFromFileURLs);
-    options.put("appCachePath", appCachePath);
-    options.put("blockNetworkImage", blockNetworkImage);
-    options.put("blockNetworkLoads", blockNetworkLoads);
-    options.put("cacheMode", cacheMode);
-    options.put("cursiveFontFamily", cursiveFontFamily);
-    options.put("defaultFixedFontSize", defaultFixedFontSize);
-    options.put("defaultFontSize", defaultFontSize);
-    options.put("defaultTextEncodingName", defaultTextEncodingName);
-    options.put("disabledActionModeMenuItems", disabledActionModeMenuItems);
-    options.put("fantasyFontFamily", fantasyFontFamily);
-    options.put("fixedFontFamily", fixedFontFamily);
-    options.put("forceDark", forceDark);
-    options.put("geolocationEnabled", geolocationEnabled);
-    options.put("layoutAlgorithm", getLayoutAlgorithm());
-    options.put("loadWithOverviewMode", loadWithOverviewMode);
-    options.put("loadsImagesAutomatically", loadsImagesAutomatically);
-    options.put("minimumLogicalFontSize", minimumLogicalFontSize);
-    options.put("initialScale", initialScale);
-    options.put("needInitialFocus", needInitialFocus);
-    options.put("offscreenPreRaster", offscreenPreRaster);
-    options.put("sansSerifFontFamily", sansSerifFontFamily);
-    options.put("serifFontFamily", serifFontFamily);
-    options.put("standardFontFamily", standardFontFamily);
-    options.put("saveFormData", saveFormData);
-    options.put("thirdPartyCookiesEnabled", thirdPartyCookiesEnabled);
-    options.put("hardwareAcceleration", hardwareAcceleration);
-    options.put("supportMultipleWindows", supportMultipleWindows);
-    options.put("regexToCancelSubFramesLoading", regexToCancelSubFramesLoading);
-    options.put("overScrollMode", overScrollMode);
-    options.put("networkAvailable", networkAvailable);
-    options.put("scrollBarStyle", scrollBarStyle);
-    options.put("verticalScrollbarPosition", verticalScrollbarPosition);
-    options.put("scrollBarDefaultDelayBeforeFade", scrollBarDefaultDelayBeforeFade);
-    options.put("scrollbarFadingEnabled", scrollbarFadingEnabled);
-    options.put("scrollBarFadeDuration", scrollBarFadeDuration);
-    options.put("rendererPriorityPolicy", rendererPriorityPolicy);
-    options.put("useShouldInterceptRequest", useShouldInterceptRequest);
-    options.put("useOnRenderProcessGone", useOnRenderProcessGone);
-    options.put("disableDefaultErrorPage", disableDefaultErrorPage);
-    options.put("useHybridComposition", useHybridComposition);
-    options.put("verticalScrollbarThumbColor", verticalScrollbarThumbColor);
-    options.put("verticalScrollbarTrackColor", verticalScrollbarTrackColor);
-    options.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
-    options.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
-    return options;
+    Map<String, Object> settings = new HashMap<>();
+    settings.put("useShouldOverrideUrlLoading", useShouldOverrideUrlLoading);
+    settings.put("useOnLoadResource", useOnLoadResource);
+    settings.put("useOnDownloadStart", useOnDownloadStart);
+    settings.put("clearCache", clearCache);
+    settings.put("userAgent", userAgent);
+    settings.put("applicationNameForUserAgent", applicationNameForUserAgent);
+    settings.put("javaScriptEnabled", javaScriptEnabled);
+    settings.put("javaScriptCanOpenWindowsAutomatically", javaScriptCanOpenWindowsAutomatically);
+    settings.put("mediaPlaybackRequiresUserGesture", mediaPlaybackRequiresUserGesture);
+    settings.put("minimumFontSize", minimumFontSize);
+    settings.put("verticalScrollBarEnabled", verticalScrollBarEnabled);
+    settings.put("horizontalScrollBarEnabled", horizontalScrollBarEnabled);
+    settings.put("resourceCustomSchemes", resourceCustomSchemes);
+    settings.put("contentBlockers", contentBlockers);
+    settings.put("preferredContentMode", preferredContentMode);
+    settings.put("useShouldInterceptAjaxRequest", useShouldInterceptAjaxRequest);
+    settings.put("useShouldInterceptFetchRequest", useShouldInterceptFetchRequest);
+    settings.put("incognito", incognito);
+    settings.put("cacheEnabled", cacheEnabled);
+    settings.put("transparentBackground", transparentBackground);
+    settings.put("disableVerticalScroll", disableVerticalScroll);
+    settings.put("disableHorizontalScroll", disableHorizontalScroll);
+    settings.put("disableContextMenu", disableContextMenu);
+    settings.put("textZoom", textZoom);
+    settings.put("clearSessionCache", clearSessionCache);
+    settings.put("builtInZoomControls", builtInZoomControls);
+    settings.put("displayZoomControls", displayZoomControls);
+    settings.put("supportZoom", supportZoom);
+    settings.put("databaseEnabled", databaseEnabled);
+    settings.put("domStorageEnabled", domStorageEnabled);
+    settings.put("useWideViewPort", useWideViewPort);
+    settings.put("safeBrowsingEnabled", safeBrowsingEnabled);
+    settings.put("mixedContentMode", mixedContentMode);
+    settings.put("allowContentAccess", allowContentAccess);
+    settings.put("allowFileAccess", allowFileAccess);
+    settings.put("allowFileAccessFromFileURLs", allowFileAccessFromFileURLs);
+    settings.put("allowUniversalAccessFromFileURLs", allowUniversalAccessFromFileURLs);
+    settings.put("appCachePath", appCachePath);
+    settings.put("blockNetworkImage", blockNetworkImage);
+    settings.put("blockNetworkLoads", blockNetworkLoads);
+    settings.put("cacheMode", cacheMode);
+    settings.put("cursiveFontFamily", cursiveFontFamily);
+    settings.put("defaultFixedFontSize", defaultFixedFontSize);
+    settings.put("defaultFontSize", defaultFontSize);
+    settings.put("defaultTextEncodingName", defaultTextEncodingName);
+    settings.put("disabledActionModeMenuItems", disabledActionModeMenuItems);
+    settings.put("fantasyFontFamily", fantasyFontFamily);
+    settings.put("fixedFontFamily", fixedFontFamily);
+    settings.put("forceDark", forceDark);
+    settings.put("geolocationEnabled", geolocationEnabled);
+    settings.put("layoutAlgorithm", getLayoutAlgorithm());
+    settings.put("loadWithOverviewMode", loadWithOverviewMode);
+    settings.put("loadsImagesAutomatically", loadsImagesAutomatically);
+    settings.put("minimumLogicalFontSize", minimumLogicalFontSize);
+    settings.put("initialScale", initialScale);
+    settings.put("needInitialFocus", needInitialFocus);
+    settings.put("offscreenPreRaster", offscreenPreRaster);
+    settings.put("sansSerifFontFamily", sansSerifFontFamily);
+    settings.put("serifFontFamily", serifFontFamily);
+    settings.put("standardFontFamily", standardFontFamily);
+    settings.put("saveFormData", saveFormData);
+    settings.put("thirdPartyCookiesEnabled", thirdPartyCookiesEnabled);
+    settings.put("hardwareAcceleration", hardwareAcceleration);
+    settings.put("supportMultipleWindows", supportMultipleWindows);
+    settings.put("regexToCancelSubFramesLoading", regexToCancelSubFramesLoading);
+    settings.put("overScrollMode", overScrollMode);
+    settings.put("networkAvailable", networkAvailable);
+    settings.put("scrollBarStyle", scrollBarStyle);
+    settings.put("verticalScrollbarPosition", verticalScrollbarPosition);
+    settings.put("scrollBarDefaultDelayBeforeFade", scrollBarDefaultDelayBeforeFade);
+    settings.put("scrollbarFadingEnabled", scrollbarFadingEnabled);
+    settings.put("scrollBarFadeDuration", scrollBarFadeDuration);
+    settings.put("rendererPriorityPolicy", rendererPriorityPolicy);
+    settings.put("useShouldInterceptRequest", useShouldInterceptRequest);
+    settings.put("useOnRenderProcessGone", useOnRenderProcessGone);
+    settings.put("disableDefaultErrorPage", disableDefaultErrorPage);
+    settings.put("useHybridComposition", useHybridComposition);
+    settings.put("verticalScrollbarThumbColor", verticalScrollbarThumbColor);
+    settings.put("verticalScrollbarTrackColor", verticalScrollbarTrackColor);
+    settings.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
+    settings.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
+    return settings;
   }
 
   @Override
-  public Map<String, Object> getRealOptions(InAppWebViewInterface inAppWebView) {
-    Map<String, Object> realOptions = toMap();
+  public Map<String, Object> getRealSettings(InAppWebViewInterface inAppWebView) {
+    Map<String, Object> realSettings = toMap();
     if (inAppWebView instanceof InAppWebView) {
       InAppWebView webView = (InAppWebView) inAppWebView;
       WebSettings settings = webView.getSettings();
-      realOptions.put("userAgent", settings.getUserAgentString());
-      realOptions.put("javaScriptEnabled", settings.getJavaScriptEnabled());
-      realOptions.put("javaScriptCanOpenWindowsAutomatically", settings.getJavaScriptCanOpenWindowsAutomatically());
-      realOptions.put("mediaPlaybackRequiresUserGesture", settings.getMediaPlaybackRequiresUserGesture());
-      realOptions.put("minimumFontSize", settings.getMinimumFontSize());
-      realOptions.put("verticalScrollBarEnabled", webView.isVerticalScrollBarEnabled());
-      realOptions.put("horizontalScrollBarEnabled", webView.isHorizontalScrollBarEnabled());
-      realOptions.put("textZoom", settings.getTextZoom());
-      realOptions.put("builtInZoomControls", settings.getBuiltInZoomControls());
-      realOptions.put("supportZoom", settings.supportZoom());
-      realOptions.put("displayZoomControls", settings.getDisplayZoomControls());
-      realOptions.put("databaseEnabled", settings.getDatabaseEnabled());
-      realOptions.put("domStorageEnabled", settings.getDomStorageEnabled());
-      realOptions.put("useWideViewPort", settings.getUseWideViewPort());
+      realSettings.put("userAgent", settings.getUserAgentString());
+      realSettings.put("javaScriptEnabled", settings.getJavaScriptEnabled());
+      realSettings.put("javaScriptCanOpenWindowsAutomatically", settings.getJavaScriptCanOpenWindowsAutomatically());
+      realSettings.put("mediaPlaybackRequiresUserGesture", settings.getMediaPlaybackRequiresUserGesture());
+      realSettings.put("minimumFontSize", settings.getMinimumFontSize());
+      realSettings.put("verticalScrollBarEnabled", webView.isVerticalScrollBarEnabled());
+      realSettings.put("horizontalScrollBarEnabled", webView.isHorizontalScrollBarEnabled());
+      realSettings.put("textZoom", settings.getTextZoom());
+      realSettings.put("builtInZoomControls", settings.getBuiltInZoomControls());
+      realSettings.put("supportZoom", settings.supportZoom());
+      realSettings.put("displayZoomControls", settings.getDisplayZoomControls());
+      realSettings.put("databaseEnabled", settings.getDatabaseEnabled());
+      realSettings.put("domStorageEnabled", settings.getDomStorageEnabled());
+      realSettings.put("useWideViewPort", settings.getUseWideViewPort());
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-        realOptions.put("safeBrowsingEnabled", settings.getSafeBrowsingEnabled());
+        realSettings.put("safeBrowsingEnabled", settings.getSafeBrowsingEnabled());
       }
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-        realOptions.put("mixedContentMode", settings.getMixedContentMode());
+        realSettings.put("mixedContentMode", settings.getMixedContentMode());
       }
-      realOptions.put("allowContentAccess", settings.getAllowContentAccess());
-      realOptions.put("allowFileAccess", settings.getAllowFileAccess());
-      realOptions.put("allowFileAccessFromFileURLs", settings.getAllowFileAccessFromFileURLs());
-      realOptions.put("allowUniversalAccessFromFileURLs", settings.getAllowUniversalAccessFromFileURLs());
-      realOptions.put("blockNetworkImage", settings.getBlockNetworkImage());
-      realOptions.put("blockNetworkLoads", settings.getBlockNetworkLoads());
-      realOptions.put("cacheMode", settings.getCacheMode());
-      realOptions.put("cursiveFontFamily", settings.getCursiveFontFamily());
-      realOptions.put("defaultFixedFontSize", settings.getDefaultFixedFontSize());
-      realOptions.put("defaultFontSize", settings.getDefaultFontSize());
-      realOptions.put("defaultTextEncodingName", settings.getDefaultTextEncodingName());
+      realSettings.put("allowContentAccess", settings.getAllowContentAccess());
+      realSettings.put("allowFileAccess", settings.getAllowFileAccess());
+      realSettings.put("allowFileAccessFromFileURLs", settings.getAllowFileAccessFromFileURLs());
+      realSettings.put("allowUniversalAccessFromFileURLs", settings.getAllowUniversalAccessFromFileURLs());
+      realSettings.put("blockNetworkImage", settings.getBlockNetworkImage());
+      realSettings.put("blockNetworkLoads", settings.getBlockNetworkLoads());
+      realSettings.put("cacheMode", settings.getCacheMode());
+      realSettings.put("cursiveFontFamily", settings.getCursiveFontFamily());
+      realSettings.put("defaultFixedFontSize", settings.getDefaultFixedFontSize());
+      realSettings.put("defaultFontSize", settings.getDefaultFontSize());
+      realSettings.put("defaultTextEncodingName", settings.getDefaultTextEncodingName());
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-        realOptions.put("disabledActionModeMenuItems", settings.getDisabledActionModeMenuItems());
+        realSettings.put("disabledActionModeMenuItems", settings.getDisabledActionModeMenuItems());
       }
-      realOptions.put("fantasyFontFamily", settings.getFantasyFontFamily());
-      realOptions.put("fixedFontFamily", settings.getFixedFontFamily());
+      realSettings.put("fantasyFontFamily", settings.getFantasyFontFamily());
+      realSettings.put("fixedFontFamily", settings.getFixedFontFamily());
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-        realOptions.put("forceDark", settings.getForceDark());
+        realSettings.put("forceDark", settings.getForceDark());
       }
-      realOptions.put("layoutAlgorithm", settings.getLayoutAlgorithm().name());
-      realOptions.put("loadWithOverviewMode", settings.getLoadWithOverviewMode());
-      realOptions.put("loadsImagesAutomatically", settings.getLoadsImagesAutomatically());
-      realOptions.put("minimumLogicalFontSize", settings.getMinimumLogicalFontSize());
+      realSettings.put("layoutAlgorithm", settings.getLayoutAlgorithm().name());
+      realSettings.put("loadWithOverviewMode", settings.getLoadWithOverviewMode());
+      realSettings.put("loadsImagesAutomatically", settings.getLoadsImagesAutomatically());
+      realSettings.put("minimumLogicalFontSize", settings.getMinimumLogicalFontSize());
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-        realOptions.put("offscreenPreRaster", settings.getOffscreenPreRaster());
+        realSettings.put("offscreenPreRaster", settings.getOffscreenPreRaster());
       }
-      realOptions.put("sansSerifFontFamily", settings.getSansSerifFontFamily());
-      realOptions.put("serifFontFamily", settings.getSerifFontFamily());
-      realOptions.put("standardFontFamily", settings.getStandardFontFamily());
-      realOptions.put("saveFormData", settings.getSaveFormData());
-      realOptions.put("supportMultipleWindows", settings.supportMultipleWindows());
-      realOptions.put("overScrollMode", webView.getOverScrollMode());
-      realOptions.put("scrollBarStyle", webView.getScrollBarStyle());
-      realOptions.put("verticalScrollbarPosition", webView.getVerticalScrollbarPosition());
-      realOptions.put("scrollBarDefaultDelayBeforeFade", webView.getScrollBarDefaultDelayBeforeFade());
-      realOptions.put("scrollbarFadingEnabled", webView.isScrollbarFadingEnabled());
-      realOptions.put("scrollBarFadeDuration", webView.getScrollBarFadeDuration());
+      realSettings.put("sansSerifFontFamily", settings.getSansSerifFontFamily());
+      realSettings.put("serifFontFamily", settings.getSerifFontFamily());
+      realSettings.put("standardFontFamily", settings.getStandardFontFamily());
+      realSettings.put("saveFormData", settings.getSaveFormData());
+      realSettings.put("supportMultipleWindows", settings.supportMultipleWindows());
+      realSettings.put("overScrollMode", webView.getOverScrollMode());
+      realSettings.put("scrollBarStyle", webView.getScrollBarStyle());
+      realSettings.put("verticalScrollbarPosition", webView.getVerticalScrollbarPosition());
+      realSettings.put("scrollBarDefaultDelayBeforeFade", webView.getScrollBarDefaultDelayBeforeFade());
+      realSettings.put("scrollbarFadingEnabled", webView.isScrollbarFadingEnabled());
+      realSettings.put("scrollBarFadeDuration", webView.getScrollBarFadeDuration());
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         Map<String, Object> rendererPriorityPolicy = new HashMap<>();
         rendererPriorityPolicy.put("rendererRequestedPriority", webView.getRendererRequestedPriority());
         rendererPriorityPolicy.put("waivedWhenNotVisible", webView.getRendererPriorityWaivedWhenNotVisible());
-        realOptions.put("rendererPriorityPolicy", rendererPriorityPolicy);
+        realSettings.put("rendererPriorityPolicy", rendererPriorityPolicy);
       }
     }
-    return realOptions;
+    return realSettings;
   }
 
   private void setLayoutAlgorithm(String value) {

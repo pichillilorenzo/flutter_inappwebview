@@ -19,6 +19,7 @@ import 'pull_to_refresh/pull_to_refresh_options.dart';
 import 'util.dart';
 import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_channel.dart';
+import 'web_storage/android/web_storage_manager.dart';
 
 ///This type represents a callback, added with [InAppWebViewController.addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
@@ -158,21 +159,29 @@ class InAppWebViewInitialData {
   ///The URL to use as the page's base URL. The default value is `about:blank`.
   late Uri baseUrl;
 
+  ///Use [historyUrl] instead.
+  @Deprecated('Use historyUrl instead')
+  late Uri androidHistoryUrl;
+
   ///The URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL.
   ///
   ///This parameter is used only on Android.
-  late Uri androidHistoryUrl;
+  late Uri historyUrl;
 
   InAppWebViewInitialData(
       {required this.data,
       this.mimeType = "text/html",
       this.encoding = "utf8",
       Uri? baseUrl,
-      Uri? androidHistoryUrl}) {
+      @Deprecated('Use historyUrl instead')
+      Uri? androidHistoryUrl,
+      Uri? historyUrl}) {
     this.baseUrl = baseUrl == null ? Uri.parse("about:blank") : baseUrl;
-    this.androidHistoryUrl = androidHistoryUrl == null
-        ? Uri.parse("about:blank")
-        : androidHistoryUrl;
+    this.historyUrl = historyUrl == null
+        ? (androidHistoryUrl == null ? Uri.parse("about:blank") : androidHistoryUrl)
+        : historyUrl;
+    // ignore: deprecated_member_use_from_same_package
+    this.androidHistoryUrl = this.historyUrl;
   }
 
   Map<String, String> toMap() {
@@ -181,7 +190,7 @@ class InAppWebViewInitialData {
       "mimeType": mimeType,
       "encoding": encoding,
       "baseUrl": baseUrl.toString(),
-      "historyUrl": androidHistoryUrl.toString()
+      "historyUrl": historyUrl.toString()
     };
   }
 
@@ -195,7 +204,7 @@ class InAppWebViewInitialData {
   }
 }
 
-///Class representing a resource request of the WebView used by the event [WebView.androidShouldInterceptRequest].
+///Class representing a resource request of the WebView used by the event [WebView.shouldInterceptRequest].
 ///**NOTE**: available only on Android.
 ///
 ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebResourceRequest
@@ -274,7 +283,7 @@ class WebResourceRequest {
   }
 }
 
-///Class representing a resource response of the WebView used by the event [WebView.androidShouldInterceptRequest].
+///Class representing a resource response of the WebView used by the event [WebView.shouldInterceptRequest].
 ///**NOTE**: available only on Android.
 ///
 ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebResourceResponse
@@ -498,7 +507,7 @@ class WebHistoryItem {
   }
 }
 
-///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.androidOnGeolocationPermissionsShowPrompt] event.
+///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.onGeolocationPermissionsShowPrompt] event.
 class GeolocationPermissionShowPromptResponse {
   ///The origin for which permissions are set.
   String? origin;
@@ -534,18 +543,29 @@ class JsAlertRequest {
   ///Message to be displayed in the window.
   String? message;
 
+  ///Use [isMainFrame] instead.
+  @Deprecated("Use isMainFrame instead")
+  bool? iosIsMainFrame;
+
   ///Indicates whether the request was made for the main frame.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosIsMainFrame;
+  bool? isMainFrame;
 
-  JsAlertRequest({this.url, this.message, this.iosIsMainFrame});
+  JsAlertRequest({this.url, this.message,
+    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame, this.isMainFrame}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
+  }
 
   Map<String, dynamic> toMap() {
     return {
       "url": url?.toString(),
       "message": message,
-      "iosIsMainFrame": iosIsMainFrame
+      // ignore: deprecated_member_use_from_same_package
+      "iosIsMainFrame": isMainFrame ?? iosIsMainFrame,
+      // ignore: deprecated_member_use_from_same_package
+      "isMainFrame": isMainFrame ?? iosIsMainFrame
     };
   }
 
@@ -556,7 +576,10 @@ class JsAlertRequest {
     return JsAlertRequest(
         url: map["url"] != null ? Uri.parse(map["url"]) : null,
         message: map["message"],
-        iosIsMainFrame: map["iosIsMainFrame"]);
+        // ignore: deprecated_member_use_from_same_package
+        iosIsMainFrame: map["isMainFrame"],
+        isMainFrame: map["isMainFrame"],
+    );
   }
 
   Map<String, dynamic> toJson() {
@@ -632,18 +655,29 @@ class JsConfirmRequest {
   ///Message to be displayed in the window.
   String? message;
 
+  ///Use [isMainFrame] instead.
+  @Deprecated("Use isMainFrame instead")
+  bool? iosIsMainFrame;
+
   ///Indicates whether the request was made for the main frame.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosIsMainFrame;
+  bool? isMainFrame;
 
-  JsConfirmRequest({this.url, this.message, this.iosIsMainFrame});
+  JsConfirmRequest({this.url, this.message,
+    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame, this.isMainFrame}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
+  }
 
   Map<String, dynamic> toMap() {
     return {
       "url": url?.toString(),
       "message": message,
-      "iosIsMainFrame": iosIsMainFrame
+      // ignore: deprecated_member_use_from_same_package
+      "iosIsMainFrame": isMainFrame ?? iosIsMainFrame,
+      // ignore: deprecated_member_use_from_same_package
+      "isMainFrame": isMainFrame ?? iosIsMainFrame
     };
   }
 
@@ -654,7 +688,9 @@ class JsConfirmRequest {
     return JsConfirmRequest(
         url: map["url"] != null ? Uri.parse(map["url"]) : null,
         message: map["message"],
-        iosIsMainFrame: map["iosIsMainFrame"]);
+        // ignore: deprecated_member_use_from_same_package
+        iosIsMainFrame: map["isMainFrame"],
+        isMainFrame: map["isMainFrame"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -739,20 +775,31 @@ class JsPromptRequest {
   ///The default value displayed in the prompt dialog.
   String? defaultValue;
 
+  ///Use [isMainFrame] instead.
+  @Deprecated("Use isMainFrame instead")
+  bool? iosIsMainFrame;
+
   ///Indicates whether the request was made for the main frame.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosIsMainFrame;
+  bool? isMainFrame;
 
   JsPromptRequest(
-      {this.url, this.message, this.defaultValue, this.iosIsMainFrame});
+      {this.url, this.message, this.defaultValue,
+        @Deprecated("Use isMainFrame instead") this.iosIsMainFrame, this.isMainFrame}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
+  }
 
   Map<String, dynamic> toMap() {
     return {
       "url": url?.toString(),
       "message": message,
       "defaultValue": defaultValue,
-      "iosIsMainFrame": iosIsMainFrame
+      // ignore: deprecated_member_use_from_same_package
+      "iosIsMainFrame": isMainFrame ?? iosIsMainFrame,
+      // ignore: deprecated_member_use_from_same_package
+      "isMainFrame": isMainFrame ?? iosIsMainFrame
     };
   }
 
@@ -764,7 +811,9 @@ class JsPromptRequest {
         url: map["url"] != null ? Uri.parse(map["url"]) : null,
         message: map["message"],
         defaultValue: map["defaultValue"],
-        iosIsMainFrame: map["iosIsMainFrame"]);
+        // ignore: deprecated_member_use_from_same_package
+        iosIsMainFrame: map["isMainFrame"],
+        isMainFrame: map["isMainFrame"]);
   }
 
   Map<String, dynamic> toJson() {
@@ -848,7 +897,7 @@ class JsPromptResponse {
   }
 }
 
-///Class that represents the request of the [WebView.androidOnJsBeforeUnload] event.
+///Class that represents the request of the [WebView.onJsBeforeUnload] event.
 class JsBeforeUnloadRequest {
   ///The url of the page requesting the dialog.
   Uri? url;
@@ -899,7 +948,7 @@ class JsBeforeUnloadResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [WebView.androidOnJsBeforeUnload] event to control a JavaScript alert dialog.
+///Class that represents the response used by the [WebView.onJsBeforeUnload] event to control a JavaScript alert dialog.
 class JsBeforeUnloadResponse {
   ///Message to be displayed in the window.
   String message;
@@ -1029,7 +1078,7 @@ class SafeBrowsingResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [WebView.androidOnSafeBrowsingHit] event.
+///Class that represents the response used by the [WebView.onSafeBrowsingHit] event.
 ///It is used to indicate an action to take when hitting a malicious URL.
 class SafeBrowsingResponse {
   ///If reporting is enabled, all reports will be sent according to the privacy policy referenced by [AndroidInAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
@@ -1119,7 +1168,70 @@ class HttpAuthResponse {
   }
 }
 
+///Class that represents the constants that specify how long the credential will be kept.
+class URLCredentialPersistence {
+  final int _value;
+
+  const URLCredentialPersistence._internal(this._value);
+
+  static final Set<URLCredentialPersistence> values = [
+    URLCredentialPersistence.NONE,
+    URLCredentialPersistence.FOR_SESSION,
+    URLCredentialPersistence.PERMANENT,
+    URLCredentialPersistence.SYNCHRONIZABLE,
+  ].toSet();
+
+  static URLCredentialPersistence? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return URLCredentialPersistence.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+
+    return null;
+  }
+
+  int toValue() => _value;
+
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "FOR_SESSION";
+      case 2:
+        return "PERMANENT";
+      case 3:
+        return "SYNCHRONIZABLE";
+      case 0:
+      default:
+        return "NONE";
+    }
+  }
+
+  ///The credential should not be stored.
+  static const NONE = const URLCredentialPersistence._internal(0);
+
+  ///The credential should be stored only for this session
+  static const FOR_SESSION = const URLCredentialPersistence._internal(1);
+
+  ///The credential should be stored in the keychain.
+  static const PERMANENT = const URLCredentialPersistence._internal(2);
+
+  ///The credential should be stored permanently in the keychain,
+  ///and in addition should be distributed to other devices based on the owning Apple ID.
+  static const SYNCHRONIZABLE = const URLCredentialPersistence._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class that represents the constants that specify how long the credential will be kept.
+///Use [URLCredentialPersistence] instead.
+@Deprecated("Use URLCredentialPersistence instead")
 class IOSURLCredentialPersistence {
   final int _value;
 
@@ -1189,28 +1301,49 @@ class URLCredential {
   ///The credential’s password.
   String? password;
 
+  ///Use [certificates] instead.
+  @Deprecated("Use certificates instead")
+  List<X509Certificate>? iosCertificates;
+
   ///The intermediate certificates of the credential, if it is a client certificate credential.
   ///
   ///**NOTE**: available only on iOS.
-  List<X509Certificate>? iosCertificates;
+  List<X509Certificate>? certificates;
+
+  ///Use [persistence] instead.
+  @Deprecated("Use persistence instead")
+  IOSURLCredentialPersistence? iosPersistence;
 
   ///The credential’s persistence setting.
   ///
   ///**NOTE**: available only on iOS.
-  IOSURLCredentialPersistence? iosPersistence;
+  URLCredentialPersistence? persistence;
 
   URLCredential(
       {this.username,
       this.password,
-      this.iosPersistence,
-      this.iosCertificates});
+      @Deprecated("Use certificates instead") this.iosPersistence,
+      this.persistence,
+      @Deprecated("Use persistence instead") this.iosCertificates,
+      this.certificates}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.persistence = this.persistence ?? URLCredentialPersistence.fromValue(this.iosPersistence?.toValue());
+    // ignore: deprecated_member_use_from_same_package
+    this.certificates = this.certificates ?? this.iosCertificates;
+  }
 
   Map<String, dynamic> toMap() {
     return {
       "username": username,
       "password": password,
-      "iosCertificates": iosCertificates?.map((e) => e.toMap()).toList(),
-      "iosPersistence": iosPersistence?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosCertificates": (certificates ?? iosCertificates)?.map((e) => e.toMap()).toList(),
+      // ignore: deprecated_member_use_from_same_package
+      "certificates": (certificates ?? iosCertificates)?.map((e) => e.toMap()).toList(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosPersistence": persistence?.toValue() ?? iosPersistence?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "persistence": persistence?.toValue() ?? iosPersistence?.toValue(),
     };
   }
 
@@ -1219,13 +1352,13 @@ class URLCredential {
       return null;
     }
 
-    List<X509Certificate>? iosCertificates;
-    if (map["iosCertificates"] != null) {
-      iosCertificates = <X509Certificate>[];
-      (map["iosCertificates"].cast<Uint8List>() as List<Uint8List>)
+    List<X509Certificate>? certificates;
+    if (map["certificates"] != null) {
+      certificates = <X509Certificate>[];
+      (map["certificates"].cast<Uint8List>() as List<Uint8List>)
           .forEach((data) {
         try {
-          iosCertificates!.add(X509Certificate.fromData(data: data));
+          certificates!.add(X509Certificate.fromData(data: data));
         } catch (e, stacktrace) {
           print(e);
           print(stacktrace);
@@ -1236,9 +1369,12 @@ class URLCredential {
     return URLCredential(
       username: map["user"],
       password: map["password"],
-      iosCertificates: iosCertificates,
-      iosPersistence:
-          IOSURLCredentialPersistence.fromValue(map["iosPersistence"]),
+      // ignore: deprecated_member_use_from_same_package
+      iosCertificates: certificates,
+      certificates: certificates,
+      persistence: URLCredentialPersistence.fromValue(map["persistence"]),
+      // ignore: deprecated_member_use_from_same_package
+      iosPersistence: IOSURLCredentialPersistence.fromValue(map["persistence"])
     );
   }
 
@@ -1302,25 +1438,40 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///and the client must prompt the user for a corresponding password.
   URLCredential? proposedCredential;
 
+  ///Use [failureResponse] instead.
+  @Deprecated("Use failureResponse instead")
+  IOSURLResponse? iosFailureResponse;
+
   ///The URL response object representing the last authentication failure.
   ///This value is `null` if the protocol doesn’t use responses to indicate an authentication failure.
   ///
   ///**NOTE**: available only on iOS.
-  IOSURLResponse? iosFailureResponse;
+  URLResponse? failureResponse;
+
+  ///Use [error] instead.
+  @Deprecated("Use error instead")
+  String? iosError;
 
   ///The error object representing the last authentication failure.
   ///This value is `null` if the protocol doesn’t use errors to indicate an authentication failure.
   ///
   ///**NOTE**: available only on iOS.
-  String? iosError;
+  String? error;
 
   HttpAuthenticationChallenge({
     required this.previousFailureCount,
     required URLProtectionSpace protectionSpace,
-    this.iosFailureResponse,
+    @Deprecated("Use failureResponse instead") this.iosFailureResponse,
+    this.failureResponse,
     this.proposedCredential,
-    this.iosError,
-  }) : super(protectionSpace: protectionSpace);
+    @Deprecated("Use error instead") this.iosError,
+    this.error
+  }) : super(protectionSpace: protectionSpace) {
+    // ignore: deprecated_member_use_from_same_package
+    this.failureResponse = this.failureResponse ?? URLResponse.fromMap(this.iosFailureResponse?.toMap());
+    // ignore: deprecated_member_use_from_same_package
+    this.error = this.error ?? this.iosError;
+  }
 
   Map<String, dynamic> toMap() {
     var map = super.toMap();
@@ -1328,8 +1479,14 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
       "previousFailureCount": previousFailureCount,
       "protectionSpace": protectionSpace.toMap(),
       "proposedCredential": proposedCredential?.toMap(),
-      "iosFailureResponse": iosFailureResponse?.toMap(),
-      "iosError": iosError,
+      // ignore: deprecated_member_use_from_same_package
+      "iosFailureResponse": failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "failureResponse": failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosError": error ?? iosError,
+      // ignore: deprecated_member_use_from_same_package
+      "error": error ?? iosError,
     });
     return map;
   }
@@ -1344,9 +1501,14 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
           map["protectionSpace"].cast<String, dynamic>())!,
       proposedCredential: URLCredential.fromMap(
           map["proposedCredential"]?.cast<String, dynamic>()),
+      // ignore: deprecated_member_use_from_same_package
       iosFailureResponse: IOSURLResponse.fromMap(
-          map["iosFailureResponse"]?.cast<String, dynamic>()),
-      iosError: map["iosError"],
+          map["failureResponse"]?.cast<String, dynamic>()),
+      failureResponse: URLResponse.fromMap(
+          map["failureResponse"]?.cast<String, dynamic>()),
+      // ignore: deprecated_member_use_from_same_package
+      iosError: map["error"],
+      error: map["error"],
     );
   }
 }
@@ -1371,21 +1533,36 @@ class ServerTrustChallenge extends URLAuthenticationChallenge {
 ///Class that represents the challenge of the [WebView.onReceivedClientCertRequest] event.
 ///It provides all the information about the challenge.
 class ClientCertChallenge extends URLAuthenticationChallenge {
+  ///Use [principals] instead.
+  @Deprecated('Use principals instead')
+  List<String>? androidPrincipals;
+
   ///The acceptable certificate issuers for the certificate matching the private key.
   ///
   ///**NOTE**: available only on Android.
-  List<String>? androidPrincipals;
+  List<String>? principals;
+
+  ///Use [keyTypes] instead.
+  @Deprecated('Use keyTypes instead')
+  List<String>? androidKeyTypes;
 
   ///Returns the acceptable types of asymmetric keys.
   ///
   ///**NOTE**: available only on Android.
-  List<String>? androidKeyTypes;
+  List<String>? keyTypes;
 
   ClientCertChallenge(
       {required URLProtectionSpace protectionSpace,
-      this.androidPrincipals,
-      this.androidKeyTypes})
-      : super(protectionSpace: protectionSpace);
+      @Deprecated('Use principals instead') this.androidPrincipals,
+      this.principals,
+      @Deprecated('Use keyTypes instead') this.androidKeyTypes,
+      this.keyTypes})
+      : super(protectionSpace: protectionSpace) {
+    // ignore: deprecated_member_use_from_same_package
+    this.principals = this.principals ?? this.androidPrincipals;
+    // ignore: deprecated_member_use_from_same_package
+    this.keyTypes = this.keyTypes ?? this.androidKeyTypes;
+  }
 
   static ClientCertChallenge? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -1394,12 +1571,74 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
     return ClientCertChallenge(
         protectionSpace: URLProtectionSpace.fromMap(
             map["protectionSpace"].cast<String, dynamic>())!,
-        androidPrincipals: map["androidPrincipals"]?.cast<String>(),
-        androidKeyTypes: map["androidKeyTypes"]?.cast<String>());
+        // ignore: deprecated_member_use_from_same_package
+        androidPrincipals: map["principals"]?.cast<String>(),
+        principals: map["principals"]?.cast<String>(),
+        // ignore: deprecated_member_use_from_same_package
+        androidKeyTypes: map["keyTypes"]?.cast<String>(),
+        keyTypes: map["keyTypes"]?.cast<String>());
   }
 }
 
 ///An iOS-specific Class that represents the supported proxy types.
+class URLProtectionSpaceProxyType {
+  final String _value;
+
+  const URLProtectionSpaceProxyType._internal(this._value);
+
+  static final Set<URLProtectionSpaceProxyType> values = [
+    URLProtectionSpaceProxyType.NSUR_PROTECTION_SPACE_HTTP_PROXY,
+    URLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_HTTPS_PROXY,
+    URLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_FTP_PROXY,
+    URLProtectionSpaceProxyType.NSURL_PROTECTION_SPACE_SOCKS_PROXY,
+  ].toSet();
+
+  static URLProtectionSpaceProxyType? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return URLProtectionSpaceProxyType.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///The proxy type for HTTP proxies.
+  static const NSUR_PROTECTION_SPACE_HTTP_PROXY =
+  const URLProtectionSpaceProxyType._internal(
+      "NSURLProtectionSpaceHTTPProxy");
+
+  ///The proxy type for HTTPS proxies.
+  static const NSURL_PROTECTION_SPACE_HTTPS_PROXY =
+  const URLProtectionSpaceProxyType._internal(
+      "NSURLProtectionSpaceHTTPSProxy");
+
+  ///The proxy type for FTP proxies.
+  static const NSURL_PROTECTION_SPACE_FTP_PROXY =
+  const URLProtectionSpaceProxyType._internal(
+      "NSURLProtectionSpaceFTPProxy");
+
+  ///The proxy type for SOCKS proxies.
+  static const NSURL_PROTECTION_SPACE_SOCKS_PROXY =
+  const URLProtectionSpaceProxyType._internal(
+      "NSURLProtectionSpaceSOCKSProxy");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///An iOS-specific Class that represents the supported proxy types.
+///Use [URLProtectionSpaceProxyType] instead.
+@Deprecated("Use URLProtectionSpaceProxyType instead")
 class IOSNSURLProtectionSpaceProxyType {
   final String _value;
 
@@ -1455,7 +1694,69 @@ class IOSNSURLProtectionSpaceProxyType {
   int get hashCode => _value.hashCode;
 }
 
-///An iOS-specific Class that represents the constants describing known values of the [URLProtectionSpace.iosAuthenticationMethod] property.
+///An iOS-specific Class that represents the constants describing known values of the [URLProtectionSpace.authenticationMethod] property.
+class URLProtectionSpaceAuthenticationMethod {
+  final String _value;
+
+  const URLProtectionSpaceAuthenticationMethod._internal(this._value);
+
+  static final Set<URLProtectionSpaceAuthenticationMethod> values = [
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_NEGOTIATE,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_NTLM,
+    URLProtectionSpaceAuthenticationMethod
+        .NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
+  ].toSet();
+
+  static URLProtectionSpaceAuthenticationMethod? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return URLProtectionSpaceAuthenticationMethod.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///Use client certificate authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
+  const URLProtectionSpaceAuthenticationMethod._internal(
+      "NSURLAuthenticationMethodClientCertificate");
+
+  ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
+  const URLProtectionSpaceAuthenticationMethod._internal(
+      "NSURLAuthenticationMethodNegotiate");
+
+  ///Use NTLM authentication for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_NTLM =
+  const URLProtectionSpaceAuthenticationMethod._internal(
+      "NSURLAuthenticationMethodNTLM");
+
+  ///Perform server trust authentication (certificate validation) for this protection space.
+  static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
+  const URLProtectionSpaceAuthenticationMethod._internal(
+      "NSURLAuthenticationMethodServerTrust");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///An iOS-specific Class that represents the constants describing known values of the [URLProtectionSpace.authenticationMethod] property.
+///Use [URLProtectionSpaceAuthenticationMethod] instead.
+@Deprecated("Use URLProtectionSpaceAuthenticationMethod instead")
 class IOSNSURLProtectionSpaceAuthenticationMethod {
   final String _value;
 
@@ -1517,31 +1818,51 @@ class IOSNSURLProtectionSpaceAuthenticationMethod {
 
 ///Class that represents an SSL Error.
 class SslError {
-  ///Android-specific primary error associated to the server SSL certificate.
+  ///Use [code] instead.
+  @Deprecated('Use code instead')
   AndroidSslError? androidError;
 
-  ///iOS-specific primary error associated to the server SSL certificate.
+  ///Use [code] instead.
+  @Deprecated('Use code instead')
   IOSSslError? iosError;
 
-  ///The message associated to the [androidError]/[iosError].
+  ///Primary code error associated to the server SSL certificate.
+  ///It represents the most severe SSL error.
+  SslErrorType? code;
+
+  ///The message associated to the [code].
   String? message;
 
-  SslError({this.androidError, this.iosError, this.message});
+  SslError({@Deprecated('Use code instead') this.androidError,
+    @Deprecated('Use code instead') this.iosError,
+    this.code, this.message}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.code = this.code ?? SslErrorType.fromValue(this.androidError?.toValue() ??
+        // ignore: deprecated_member_use_from_same_package
+        this.iosError?.toValue());
+  }
 
   static SslError? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
     return SslError(
-        androidError: AndroidSslError.fromValue(map["androidError"]),
-        iosError: IOSSslError.fromValue(map["iosError"]),
+      // ignore: deprecated_member_use_from_same_package
+        androidError: AndroidSslError.fromValue(map["code"]),
+        // ignore: deprecated_member_use_from_same_package
+        iosError: IOSSslError.fromValue(map["code"]),
+        code: SslErrorType.fromValue(map["code"]),
         message: map["message"]);
   }
 
   Map<String, dynamic> toMap() {
     return {
-      "androidError": androidError?.toValue(),
-      "iosError": iosError?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "androidError": code?.toValue() ?? androidError?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosError": code?.toValue() ?? iosError?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "code": code?.toValue() ?? androidError?.toValue() ?? iosError?.toValue(),
       "message": message,
     };
   }
@@ -1578,35 +1899,55 @@ class URLProtectionSpace {
   ///The SSL Error associated.
   SslError? sslError;
 
+  ///Use [authenticationMethod] instead.
+  @Deprecated("Use authenticationMethod instead")
+  IOSNSURLProtectionSpaceAuthenticationMethod? iosAuthenticationMethod;
+
   ///The authentication method used by the receiver.
   ///
   ///**NOTE**: available only on iOS.
-  IOSNSURLProtectionSpaceAuthenticationMethod? iosAuthenticationMethod;
+  URLProtectionSpaceAuthenticationMethod? authenticationMethod;
+
+  ///Use [distinguishedNames] instead.
+  @Deprecated("Use distinguishedNames instead")
+  List<X509Certificate>? iosDistinguishedNames;
 
   ///The acceptable certificate-issuing authorities for client certificate authentication.
   ///This value is `null` if the authentication method of the protection space is not client certificate.
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
   ///
   ///**NOTE**: available only on iOS.
-  List<X509Certificate>? iosDistinguishedNames;
+  List<X509Certificate>? distinguishedNames;
+
+  ///Use [receivesCredentialSecurely] instead.
+  @Deprecated("Use receivesCredentialSecurely instead")
+  bool? iosReceivesCredentialSecurely;
 
   ///A Boolean value that indicates whether the credentials for the protection space can be sent securely.
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosReceivesCredentialSecurely;
+  bool? receivesCredentialSecurely;
+
+  ///Use [isProxy] instead.
+  @Deprecated("Use isProxy instead")
+  bool? iosIsProxy;
 
   ///Returns a Boolean value that indicates whether the receiver does not descend from `NSObject`.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosIsProxy;
+  bool? isProxy;
+
+  ///Use [proxyType] instead.
+  @Deprecated("Use proxyType instead")
+  IOSNSURLProtectionSpaceProxyType? iosProxyType;
 
   ///The receiver's proxy type.
   ///This value is `null` if the receiver does not represent a proxy protection space.
-  ///The supported proxy types are listed in [IOSNSURLProtectionSpaceProxyType.values].
+  ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
   ///
   ///**NOTE**: available only on iOS.
-  IOSNSURLProtectionSpaceProxyType? iosProxyType;
+  URLProtectionSpaceProxyType? proxyType;
 
   URLProtectionSpace(
       {required this.host,
@@ -1615,23 +1956,39 @@ class URLProtectionSpace {
       this.port,
       this.sslCertificate,
       this.sslError,
-      this.iosAuthenticationMethod,
-      this.iosDistinguishedNames,
-      this.iosReceivesCredentialSecurely,
-      this.iosIsProxy,
-      this.iosProxyType});
+      @Deprecated("Use authenticationMethod instead") this.iosAuthenticationMethod,
+      this.authenticationMethod,
+      @Deprecated("Use distinguishedNames instead") this.iosDistinguishedNames,
+      this.distinguishedNames,
+      @Deprecated("Use receivesCredentialSecurely instead") this.iosReceivesCredentialSecurely,
+      this.receivesCredentialSecurely,
+      @Deprecated("Use isProxy instead") this.iosIsProxy,
+      this.isProxy,
+      @Deprecated("Use proxyType instead") this.iosProxyType,
+      this.proxyType}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.authenticationMethod = this.authenticationMethod ?? URLProtectionSpaceAuthenticationMethod.fromValue(this.iosAuthenticationMethod?.toValue());
+    // ignore: deprecated_member_use_from_same_package
+    this.distinguishedNames = this.distinguishedNames ?? this.iosDistinguishedNames;
+    // ignore: deprecated_member_use_from_same_package
+    this.receivesCredentialSecurely = this.receivesCredentialSecurely ?? this.iosReceivesCredentialSecurely;
+    // ignore: deprecated_member_use_from_same_package
+    this.isProxy = this.isProxy ?? this.iosIsProxy;
+    // ignore: deprecated_member_use_from_same_package
+    this.proxyType = this.proxyType ?? URLProtectionSpaceProxyType.fromValue(this.iosProxyType?.toValue());
+  }
 
   static URLProtectionSpace? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
-    List<X509Certificate>? iosDistinguishedNames;
-    if (map["iosDistinguishedNames"] != null) {
-      iosDistinguishedNames = <X509Certificate>[];
-      (map["iosDistinguishedNames"].cast<Uint8List>() as List<Uint8List>)
+    List<X509Certificate>? distinguishedNames;
+    if (map["distinguishedNames"] != null) {
+      distinguishedNames = <X509Certificate>[];
+      (map["distinguishedNames"].cast<Uint8List>() as List<Uint8List>)
           .forEach((data) {
         try {
-          iosDistinguishedNames!.add(X509Certificate.fromData(data: data));
+          distinguishedNames!.add(X509Certificate.fromData(data: data));
         } catch (e, stacktrace) {
           print(e);
           print(stacktrace);
@@ -1647,14 +2004,27 @@ class URLProtectionSpace {
       sslCertificate: SslCertificate.fromMap(
           map["sslCertificate"]?.cast<String, dynamic>()),
       sslError: SslError.fromMap(map["sslError"]?.cast<String, dynamic>()),
+      // ignore: deprecated_member_use_from_same_package
       iosAuthenticationMethod:
+      // ignore: deprecated_member_use_from_same_package
           IOSNSURLProtectionSpaceAuthenticationMethod.fromValue(
-              map["iosAuthenticationMethod"]),
-      iosDistinguishedNames: iosDistinguishedNames,
-      iosReceivesCredentialSecurely: map["iosReceivesCredentialSecurely"],
-      iosIsProxy: map["iosIsProxy"],
+              map["authenticationMethod"]),
+      authenticationMethod: URLProtectionSpaceAuthenticationMethod.fromValue(
+          map["authenticationMethod"]),
+      // ignore: deprecated_member_use_from_same_package
+      iosDistinguishedNames: distinguishedNames,
+      distinguishedNames: distinguishedNames,
+      // ignore: deprecated_member_use_from_same_package
+      iosReceivesCredentialSecurely: map["receivesCredentialSecurely"],
+      receivesCredentialSecurely: map["receivesCredentialSecurely"],
+      // ignore: deprecated_member_use_from_same_package
+      iosIsProxy: map["isProxy"],
+      isProxy: map["isProxy"],
+      // ignore: deprecated_member_use_from_same_package
       iosProxyType:
-          IOSNSURLProtectionSpaceProxyType.fromValue(map["iosProxyType"]),
+      // ignore: deprecated_member_use_from_same_package
+          IOSNSURLProtectionSpaceProxyType.fromValue(map["proxyType"]),
+      proxyType: URLProtectionSpaceProxyType.fromValue(map["proxyType"]),
     );
   }
 
@@ -1666,12 +2036,26 @@ class URLProtectionSpace {
       "port": port,
       "sslCertificate": sslCertificate?.toMap(),
       "sslError": sslError?.toMap(),
-      "iosAuthenticationMethod": iosAuthenticationMethod,
-      "iosDistinguishedNames":
-          iosDistinguishedNames?.map((e) => e.toMap()).toList(),
-      "iosReceivesCredentialSecurely": iosReceivesCredentialSecurely,
-      "iosIsProxy": iosIsProxy,
-      "iosProxyType": iosProxyType?.toValue()
+      // ignore: deprecated_member_use_from_same_package
+      "iosAuthenticationMethod": authenticationMethod ?? iosAuthenticationMethod,
+      // ignore: deprecated_member_use_from_same_package
+      "authenticationMethod": authenticationMethod ?? iosAuthenticationMethod,
+      // ignore: deprecated_member_use_from_same_package
+      "iosDistinguishedNames": (distinguishedNames ?? iosDistinguishedNames)?.map((e) => e.toMap()).toList(),
+      // ignore: deprecated_member_use_from_same_package
+      "distinguishedNames": (distinguishedNames ?? iosDistinguishedNames)?.map((e) => e.toMap()).toList(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosReceivesCredentialSecurely": receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
+      // ignore: deprecated_member_use_from_same_package
+      "receivesCredentialSecurely": receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
+      // ignore: deprecated_member_use_from_same_package
+      "iosIsProxy": isProxy ?? iosIsProxy,
+      // ignore: deprecated_member_use_from_same_package
+      "isProxy": isProxy ?? iosIsProxy,
+      // ignore: deprecated_member_use_from_same_package
+      "iosProxyType": proxyType?.toValue() ?? iosProxyType?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "proxyType": proxyType?.toValue() ?? iosProxyType?.toValue(),
     };
   }
 
@@ -1816,8 +2200,12 @@ class ClientCertResponse {
   ///The certificate password.
   String? certificatePassword;
 
-  ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
+  ///Use [keyStoreType] instead.
+  @Deprecated('Use keyStoreType instead')
   String? androidKeyStoreType;
+
+  ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
+  String? keyStoreType;
 
   ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
   ClientCertResponseAction? action;
@@ -1825,17 +2213,23 @@ class ClientCertResponse {
   ClientCertResponse(
       {required this.certificatePath,
       this.certificatePassword = "",
-      this.androidKeyStoreType = "PKCS12",
+      @Deprecated('Use keyStoreType instead') this.androidKeyStoreType = "PKCS12",
+      this.keyStoreType = "PKCS12",
       this.action = ClientCertResponseAction.CANCEL}) {
     if (this.action == ClientCertResponseAction.PROCEED)
       assert(certificatePath.isNotEmpty);
+    // ignore: deprecated_member_use_from_same_package
+    this.keyStoreType = this.keyStoreType ?? this.androidKeyStoreType;
   }
 
   Map<String, dynamic> toMap() {
     return {
       "certificatePath": certificatePath,
       "certificatePassword": certificatePassword,
-      "androidKeyStoreType": androidKeyStoreType,
+      // ignore: deprecated_member_use_from_same_package
+      "androidKeyStoreType": keyStoreType ?? androidKeyStoreType,
+      // ignore: deprecated_member_use_from_same_package
+      "keyStoreType": keyStoreType ?? androidKeyStoreType,
       "action": action?.toValue()
     };
   }
@@ -1885,7 +2279,70 @@ class Favicon {
   }
 }
 
+///Class used to override the way the cache is used.
+class CacheMode {
+  final int _value;
+
+  const CacheMode._internal(this._value);
+
+  static final Set<CacheMode> values = [
+    CacheMode.LOAD_DEFAULT,
+    CacheMode.LOAD_CACHE_ELSE_NETWORK,
+    CacheMode.LOAD_NO_CACHE,
+    CacheMode.LOAD_CACHE_ONLY,
+  ].toSet();
+
+  static CacheMode? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return CacheMode.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "LOAD_CACHE_ELSE_NETWORK";
+      case 2:
+        return "LOAD_NO_CACHE";
+      case 3:
+        return "LOAD_CACHE_ONLY";
+      case -1:
+      default:
+        return "LOAD_DEFAULT";
+    }
+  }
+
+  ///Default cache usage mode. If the navigation type doesn't impose any specific behavior,
+  ///use cached resources when they are available and not expired, otherwise load resources from the network.
+  static const LOAD_DEFAULT = const CacheMode._internal(-1);
+
+  ///Use cached resources when they are available, even if they have expired. Otherwise load resources from the network.
+  static const LOAD_CACHE_ELSE_NETWORK = const CacheMode._internal(1);
+
+  ///Don't use the cache, load from the network.
+  static const LOAD_NO_CACHE = const CacheMode._internal(2);
+
+  ///Don't use the network, load from the cache.
+  static const LOAD_CACHE_ONLY = const CacheMode._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to override the way the cache is used.
+///Use [CacheMode] instead.
+@Deprecated("Use CacheMode instead")
 class AndroidCacheMode {
   final int _value;
 
@@ -1946,9 +2403,76 @@ class AndroidCacheMode {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to disable the action mode menu items.
+///
+///**NOTE**: available on Android 24+.
+class ActionModeMenuItem {
+  final int _value;
+
+  const ActionModeMenuItem._internal(this._value);
+
+  static final Set<ActionModeMenuItem> values = [
+    ActionModeMenuItem.MENU_ITEM_NONE,
+    ActionModeMenuItem.MENU_ITEM_SHARE,
+    ActionModeMenuItem.MENU_ITEM_WEB_SEARCH,
+    ActionModeMenuItem.MENU_ITEM_PROCESS_TEXT,
+  ].toSet();
+
+  static ActionModeMenuItem? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ActionModeMenuItem.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "MENU_ITEM_SHARE";
+      case 2:
+        return "MENU_ITEM_WEB_SEARCH";
+      case 4:
+        return "MENU_ITEM_PROCESS_TEXT";
+      case 0:
+      default:
+        return "MENU_ITEM_NONE";
+    }
+  }
+
+  ///No menu items should be disabled.
+  static const MENU_ITEM_NONE = const ActionModeMenuItem._internal(0);
+
+  ///Disable menu item "Share".
+  static const MENU_ITEM_SHARE = const ActionModeMenuItem._internal(1);
+
+  ///Disable menu item "Web Search".
+  static const MENU_ITEM_WEB_SEARCH =
+  const ActionModeMenuItem._internal(2);
+
+  ///Disable all the action mode menu items for text processing.
+  static const MENU_ITEM_PROCESS_TEXT =
+  const ActionModeMenuItem._internal(4);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to disable the action mode menu items.
 ///
 ///**NOTE**: available on Android 24+.
+///
+///Use [ActionModeMenuItem] instead.
+@Deprecated("Use ActionModeMenuItem instead")
 class AndroidActionModeMenuItem {
   final int _value;
 
@@ -2010,9 +2534,69 @@ class AndroidActionModeMenuItem {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to indicate the force dark mode.
+///
+///**NOTE**: available on Android 29+.
+class ForceDark {
+  final int _value;
+
+  const ForceDark._internal(this._value);
+
+  static final Set<ForceDark> values = [
+    ForceDark.FORCE_DARK_OFF,
+    ForceDark.FORCE_DARK_AUTO,
+    ForceDark.FORCE_DARK_ON,
+  ].toSet();
+
+  static ForceDark? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ForceDark.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "FORCE_DARK_AUTO";
+      case 2:
+        return "FORCE_DARK_ON";
+      case 0:
+      default:
+        return "FORCE_DARK_OFF";
+    }
+  }
+
+  ///Disable force dark, irrespective of the force dark mode of the WebView parent.
+  ///In this mode, WebView content will always be rendered as-is, regardless of whether native views are being automatically darkened.
+  static const FORCE_DARK_OFF = const ForceDark._internal(0);
+
+  ///Enable force dark dependent on the state of the WebView parent view.
+  static const FORCE_DARK_AUTO = const ForceDark._internal(1);
+
+  ///Unconditionally enable force dark. In this mode WebView content will always be rendered so as to emulate a dark theme.
+  static const FORCE_DARK_ON = const ForceDark._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to indicate the force dark mode.
 ///
 ///**NOTE**: available on Android 29+.
+///
+///Use [ForceDark] instead.
+@Deprecated("Use ForceDark instead")
 class AndroidForceDark {
   final int _value;
 
@@ -2067,7 +2651,58 @@ class AndroidForceDark {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to set the underlying layout algorithm.
+class LayoutAlgorithm {
+  final String _value;
+
+  const LayoutAlgorithm._internal(this._value);
+
+  static final Set<LayoutAlgorithm> values = [
+    LayoutAlgorithm.NORMAL,
+    LayoutAlgorithm.TEXT_AUTOSIZING,
+    LayoutAlgorithm.NARROW_COLUMNS,
+  ].toSet();
+
+  static LayoutAlgorithm? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return LayoutAlgorithm.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///NORMAL means no rendering changes. This is the recommended choice for maximum compatibility across different platforms and Android versions.
+  static const NORMAL = const LayoutAlgorithm._internal("NORMAL");
+
+  ///TEXT_AUTOSIZING boosts font size of paragraphs based on heuristics to make the text readable when viewing a wide-viewport layout in the overview mode.
+  ///It is recommended to enable zoom support [AndroidInAppWebViewOptions.supportZoom] when using this mode.
+  ///
+  ///**NOTE**: available on Android 19+.
+  static const TEXT_AUTOSIZING =
+  const LayoutAlgorithm._internal("TEXT_AUTOSIZING");
+
+  ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
+  static const NARROW_COLUMNS =
+  const LayoutAlgorithm._internal("NARROW_COLUMNS");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to set the underlying layout algorithm.
+///Use [LayoutAlgorithm] instead.
+@Deprecated("Use LayoutAlgorithm instead")
 class AndroidLayoutAlgorithm {
   final String _value;
 
@@ -2116,9 +2751,77 @@ class AndroidLayoutAlgorithm {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
+///
+///**NOTE**: available on Android 21+.
+class MixedContentMode {
+  final int _value;
+
+  const MixedContentMode._internal(this._value);
+
+  static final Set<MixedContentMode> values = [
+    MixedContentMode.MIXED_CONTENT_ALWAYS_ALLOW,
+    MixedContentMode.MIXED_CONTENT_NEVER_ALLOW,
+    MixedContentMode.MIXED_CONTENT_COMPATIBILITY_MODE,
+  ].toSet();
+
+  static MixedContentMode? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return MixedContentMode.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "MIXED_CONTENT_NEVER_ALLOW";
+      case 2:
+        return "MIXED_CONTENT_COMPATIBILITY_MODE";
+      case 0:
+      default:
+        return "MIXED_CONTENT_ALWAYS_ALLOW";
+    }
+  }
+
+  ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
+  ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
+  static const MIXED_CONTENT_ALWAYS_ALLOW =
+  const MixedContentMode._internal(0);
+
+  ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
+  ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
+  static const MIXED_CONTENT_NEVER_ALLOW =
+  const MixedContentMode._internal(1);
+
+  ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
+  ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
+  ///The types of content are allowed or blocked may change release to release and are not explicitly defined.
+  ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
+  ///For highest security, apps are recommended to use [MixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
+  static const MIXED_CONTENT_COMPATIBILITY_MODE =
+  const MixedContentMode._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to configure the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
 ///
 ///**NOTE**: available on Android 21+.
+///
+///Use [MixedContentMode] instead.
+@Deprecated("Use MixedContentMode instead")
 class AndroidMixedContentMode {
   final int _value;
 
@@ -2181,7 +2884,57 @@ class AndroidMixedContentMode {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to set the level of granularity with which the user can interactively select content in the web view.
+class SelectionGranularity {
+  final int _value;
+
+  const SelectionGranularity._internal(this._value);
+
+  static final Set<SelectionGranularity> values = [
+    SelectionGranularity.DYNAMIC,
+    SelectionGranularity.CHARACTER,
+  ].toSet();
+
+  static SelectionGranularity? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return SelectionGranularity.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "CHARACTER";
+      case 0:
+      default:
+        return "DYNAMIC";
+    }
+  }
+
+  ///Selection granularity varies automatically based on the selection.
+  static const DYNAMIC = const SelectionGranularity._internal(0);
+
+  ///Selection endpoints can be placed at any character boundary.
+  static const CHARACTER = const SelectionGranularity._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to set the level of granularity with which the user can interactively select content in the web view.
+///Use [SelectionGranularity] instead.
+@Deprecated("Use SelectionGranularity instead")
 class IOSWKSelectionGranularity {
   final int _value;
 
@@ -2229,9 +2982,92 @@ class IOSWKSelectionGranularity {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
+///
+///**NOTE**: available on iOS 10.0+.
+class DataDetectorTypes {
+  final String _value;
+
+  const DataDetectorTypes._internal(this._value);
+
+  static final Set<DataDetectorTypes> values = [
+    DataDetectorTypes.NONE,
+    DataDetectorTypes.PHONE_NUMBER,
+    DataDetectorTypes.LINK,
+    DataDetectorTypes.ADDRESS,
+    DataDetectorTypes.CALENDAR_EVENT,
+    DataDetectorTypes.TRACKING_NUMBER,
+    DataDetectorTypes.FLIGHT_NUMBER,
+    DataDetectorTypes.LOOKUP_SUGGESTION,
+    DataDetectorTypes.SPOTLIGHT_SUGGESTION,
+    DataDetectorTypes.ALL,
+  ].toSet();
+
+  static DataDetectorTypes? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return DataDetectorTypes.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///No detection is performed.
+  static const NONE = const DataDetectorTypes._internal("NONE");
+
+  ///Phone numbers are detected and turned into links.
+  static const PHONE_NUMBER =
+  const DataDetectorTypes._internal("PHONE_NUMBER");
+
+  ///URLs in text are detected and turned into links.
+  static const LINK = const DataDetectorTypes._internal("LINK");
+
+  ///Addresses are detected and turned into links.
+  static const ADDRESS = const DataDetectorTypes._internal("ADDRESS");
+
+  ///Dates and times that are in the future are detected and turned into links.
+  static const CALENDAR_EVENT =
+  const DataDetectorTypes._internal("CALENDAR_EVENT");
+
+  ///Tracking numbers are detected and turned into links.
+  static const TRACKING_NUMBER =
+  const DataDetectorTypes._internal("TRACKING_NUMBER");
+
+  ///Flight numbers are detected and turned into links.
+  static const FLIGHT_NUMBER =
+  const DataDetectorTypes._internal("FLIGHT_NUMBER");
+
+  ///Lookup suggestions are detected and turned into links.
+  static const LOOKUP_SUGGESTION =
+  const DataDetectorTypes._internal("LOOKUP_SUGGESTION");
+
+  ///Spotlight suggestions are detected and turned into links.
+  static const SPOTLIGHT_SUGGESTION =
+  const DataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+
+  ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
+  static const ALL = const DataDetectorTypes._internal("ALL");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
 ///
 ///**NOTE**: available on iOS 10.0+.
+///
+///Use [DataDetectorTypes] instead.
+@Deprecated("Use DataDetectorTypes instead")
 class IOSWKDataDetectorTypes {
   final String _value;
 
@@ -2310,6 +3146,49 @@ class IOSWKDataDetectorTypes {
 }
 
 ///Class that represents a floating-point value that determines the rate of deceleration after the user lifts their finger.
+class ScrollViewDecelerationRate {
+  final String _value;
+
+  const ScrollViewDecelerationRate._internal(this._value);
+
+  static final Set<ScrollViewDecelerationRate> values = [
+    ScrollViewDecelerationRate.NORMAL,
+    ScrollViewDecelerationRate.FAST,
+  ].toSet();
+
+  static ScrollViewDecelerationRate? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return ScrollViewDecelerationRate.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///The default deceleration rate for a scroll view: `0.998`.
+  static const NORMAL =
+  const ScrollViewDecelerationRate._internal("NORMAL");
+
+  ///A fast deceleration rate for a scroll view: `0.99`.
+  static const FAST = const ScrollViewDecelerationRate._internal("FAST");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents a floating-point value that determines the rate of deceleration after the user lifts their finger.
+///Use [ScrollViewDecelerationRate] instead.
+@Deprecated("Use ScrollViewDecelerationRate instead")
 class IOSUIScrollViewDecelerationRate {
   final String _value;
 
@@ -2404,7 +3283,109 @@ class UserPreferredContentMode {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to specify the modal presentation style when presenting a view controller.
+class ModalPresentationStyle {
+  final int _value;
+
+  const ModalPresentationStyle._internal(this._value);
+
+  static final Set<ModalPresentationStyle> values = [
+    ModalPresentationStyle.FULL_SCREEN,
+    ModalPresentationStyle.PAGE_SHEET,
+    ModalPresentationStyle.FORM_SHEET,
+    ModalPresentationStyle.CURRENT_CONTEXT,
+    ModalPresentationStyle.CUSTOM,
+    ModalPresentationStyle.OVER_FULL_SCREEN,
+    ModalPresentationStyle.OVER_CURRENT_CONTEXT,
+    ModalPresentationStyle.POPOVER,
+    ModalPresentationStyle.NONE,
+    ModalPresentationStyle.AUTOMATIC,
+  ].toSet();
+
+  static ModalPresentationStyle? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ModalPresentationStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "PAGE_SHEET";
+      case 2:
+        return "FORM_SHEET";
+      case 3:
+        return "CURRENT_CONTEXT";
+      case 4:
+        return "CUSTOM";
+      case 5:
+        return "OVER_FULL_SCREEN";
+      case 6:
+        return "OVER_CURRENT_CONTEXT";
+      case 7:
+        return "POPOVER";
+      case 8:
+        return "NONE";
+      case 9:
+        return "AUTOMATIC";
+      case 0:
+      default:
+        return "FULL_SCREEN";
+    }
+  }
+
+  ///A presentation style in which the presented view covers the screen.
+  static const FULL_SCREEN = const ModalPresentationStyle._internal(0);
+
+  ///A presentation style that partially covers the underlying content.
+  static const PAGE_SHEET = const ModalPresentationStyle._internal(1);
+
+  ///A presentation style that displays the content centered in the screen.
+  static const FORM_SHEET = const ModalPresentationStyle._internal(2);
+
+  ///A presentation style where the content is displayed over another view controller’s content.
+  static const CURRENT_CONTEXT = const ModalPresentationStyle._internal(3);
+
+  ///A custom view presentation style that is managed by a custom presentation controller and one or more custom animator objects.
+  static const CUSTOM = const ModalPresentationStyle._internal(4);
+
+  ///A view presentation style in which the presented view covers the screen.
+  static const OVER_FULL_SCREEN =
+  const ModalPresentationStyle._internal(5);
+
+  ///A presentation style where the content is displayed over another view controller’s content.
+  static const OVER_CURRENT_CONTEXT =
+  const ModalPresentationStyle._internal(6);
+
+  ///A presentation style where the content is displayed in a popover view.
+  static const POPOVER = const ModalPresentationStyle._internal(7);
+
+  ///A presentation style that indicates no adaptations should be made.
+  static const NONE = const ModalPresentationStyle._internal(8);
+
+  ///The default presentation style chosen by the system.
+  ///
+  ///**NOTE**: available on iOS 13.0+.
+  static const AUTOMATIC = const ModalPresentationStyle._internal(9);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to specify the modal presentation style when presenting a view controller.
+///Use [ModalPresentationStyle] instead.
+@Deprecated("Use ModalPresentationStyle instead")
 class IOSUIModalPresentationStyle {
   final int _value;
 
@@ -2504,7 +3485,75 @@ class IOSUIModalPresentationStyle {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to specify the transition style when presenting a view controller.
+class ModalTransitionStyle {
+  final int _value;
+
+  const ModalTransitionStyle._internal(this._value);
+
+  static final Set<ModalTransitionStyle> values = [
+    ModalTransitionStyle.COVER_VERTICAL,
+    ModalTransitionStyle.FLIP_HORIZONTAL,
+    ModalTransitionStyle.CROSS_DISSOLVE,
+    ModalTransitionStyle.PARTIAL_CURL,
+  ].toSet();
+
+  static ModalTransitionStyle? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ModalTransitionStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "FLIP_HORIZONTAL";
+      case 2:
+        return "CROSS_DISSOLVE";
+      case 3:
+        return "PARTIAL_CURL";
+      case 0:
+      default:
+        return "COVER_VERTICAL";
+    }
+  }
+
+  ///When the view controller is presented, its view slides up from the bottom of the screen.
+  ///On dismissal, the view slides back down. This is the default transition style.
+  static const COVER_VERTICAL = const ModalTransitionStyle._internal(0);
+
+  ///When the view controller is presented, the current view initiates a horizontal 3D flip from right-to-left,
+  ///resulting in the revealing of the new view as if it were on the back of the previous view.
+  ///On dismissal, the flip occurs from left-to-right, returning to the original view.
+  static const FLIP_HORIZONTAL = const ModalTransitionStyle._internal(1);
+
+  ///When the view controller is presented, the current view fades out while the new view fades in at the same time.
+  ///On dismissal, a similar type of cross-fade is used to return to the original view.
+  static const CROSS_DISSOLVE = const ModalTransitionStyle._internal(2);
+
+  ///When the view controller is presented, one corner of the current view curls up to reveal the presented view underneath.
+  ///On dismissal, the curled up page unfurls itself back on top of the presented view.
+  ///A view controller presented using this transition is itself prevented from presenting any additional view controllers.
+  static const PARTIAL_CURL = const ModalTransitionStyle._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to specify the transition style when presenting a view controller.
+///Use [ModalTransitionStyle] instead.
+@Deprecated("Use ModalTransitionStyle instead")
 class IOSUIModalTransitionStyle {
   final int _value;
 
@@ -2570,9 +3619,68 @@ class IOSUIModalTransitionStyle {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to set the custom style for the dismiss button.
+///
+///**NOTE**: available on iOS 11.0+.
+class DismissButtonStyle {
+  final int _value;
+
+  const DismissButtonStyle._internal(this._value);
+
+  static final Set<DismissButtonStyle> values = [
+    DismissButtonStyle.DONE,
+    DismissButtonStyle.CLOSE,
+    DismissButtonStyle.CANCEL,
+  ].toSet();
+
+  static DismissButtonStyle? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return DismissButtonStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "CLOSE";
+      case 2:
+        return "CANCEL";
+      case 0:
+      default:
+        return "DONE";
+    }
+  }
+
+  ///Makes the button title the localized string "Done".
+  static const DONE = const DismissButtonStyle._internal(0);
+
+  ///Makes the button title the localized string "Close".
+  static const CLOSE = const DismissButtonStyle._internal(1);
+
+  ///Makes the button title the localized string "Cancel".
+  static const CANCEL = const DismissButtonStyle._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to set the custom style for the dismiss button.
 ///
 ///**NOTE**: available on iOS 11.0+.
+///
+///Use [DismissButtonStyle] instead.
+@Deprecated("Use DismissButtonStyle instead")
 class IOSSafariDismissButtonStyle {
   final int _value;
 
@@ -2883,7 +3991,7 @@ class AjaxRequestHeaders {
 ///Class that represents a JavaScript [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
 class AjaxRequest {
   ///Data passed as a parameter to the `XMLHttpRequest.send()` method.
-  dynamic? data;
+  dynamic data;
 
   ///The HTTP request method of the `XMLHttpRequest` request.
   String? method;
@@ -3235,7 +4343,7 @@ class FetchRequest {
   Map<String, dynamic>? headers;
 
   ///Body of the request.
-  dynamic? body;
+  dynamic body;
 
   ///The mode used by the request.
   String? mode;
@@ -3585,7 +4693,7 @@ class PermissionRequestResponseAction {
   int get hashCode => _value.hashCode;
 }
 
-///Class that represents the response used by the [WebView.androidOnPermissionRequest] event.
+///Class that represents the response used by the [WebView.onPermissionRequest] event.
 class PermissionRequestResponse {
   ///Resources granted to be accessed by origin.
   List<String> resources;
@@ -3638,7 +4746,81 @@ class NavigationActionPolicy {
   }
 }
 
+///Class that represents the type of action triggering a navigation for the [WebView.shouldOverrideUrlLoading] event.
+class NavigationType {
+  final int _value;
+
+  const NavigationType._internal(this._value);
+
+  static final Set<NavigationType> values = [
+    NavigationType.LINK_ACTIVATED,
+    NavigationType.FORM_SUBMITTED,
+    NavigationType.BACK_FORWARD,
+    NavigationType.RELOAD,
+    NavigationType.FORM_RESUBMITTED,
+    NavigationType.OTHER,
+  ].toSet();
+
+  static NavigationType? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return NavigationType.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  ///A link with an href attribute was activated by the user.
+  static const LINK_ACTIVATED = const NavigationType._internal(0);
+
+  ///A form was submitted.
+  static const FORM_SUBMITTED = const NavigationType._internal(1);
+
+  ///An item from the back-forward list was requested.
+  static const BACK_FORWARD = const NavigationType._internal(2);
+
+  ///The webpage was reloaded.
+  static const RELOAD = const NavigationType._internal(3);
+
+  ///A form was resubmitted (for example by going back, going forward, or reloading).
+  static const FORM_RESUBMITTED = const NavigationType._internal(4);
+
+  ///Navigation is taking place for some other reason.
+  static const OTHER = const NavigationType._internal(-1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 0:
+        return "LINK_ACTIVATED";
+      case 1:
+        return "FORM_SUBMITTED";
+      case 2:
+        return "BACK_FORWARD";
+      case 3:
+        return "RELOAD";
+      case 4:
+        return "FORM_RESUBMITTED";
+      case -1:
+      default:
+        return "OTHER";
+    }
+  }
+}
+
 ///Class that represents the type of action triggering a navigation on iOS for the [WebView.shouldOverrideUrlLoading] event.
+///Use [NavigationType] instead.
+@Deprecated("Use NavigationType instead")
 class IOSWKNavigationType {
   final int _value;
 
@@ -3710,7 +4892,99 @@ class IOSWKNavigationType {
   }
 }
 
+///Class that represents the constants used to specify interaction with the cached responses.
+class URLRequestCachePolicy {
+  final int _value;
+
+  const URLRequestCachePolicy._internal(this._value);
+
+  static final Set<URLRequestCachePolicy> values = [
+    URLRequestCachePolicy.USE_PROTOCOL_CACHE_POLICY,
+    URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_CACHE_DATA,
+    URLRequestCachePolicy.RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA,
+    URLRequestCachePolicy.RETURN_CACHE_DATA_ELSE_LOAD,
+    URLRequestCachePolicy.RETURN_CACHE_DATA_DONT_LOAD,
+    URLRequestCachePolicy.RELOAD_REVALIDATING_CACHE_DATA,
+  ].toSet();
+
+  static URLRequestCachePolicy? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return URLRequestCachePolicy.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "RELOAD_IGNORING_LOCAL_CACHE_DATA";
+      case 2:
+        return "RETURN_CACHE_DATA_ELSE_LOAD";
+      case 3:
+        return "RETURN_CACHE_DATA_DONT_LOAD";
+      case 4:
+        return "RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA";
+      case 5:
+        return "RELOAD_REVALIDATING_CACHE_DATA";
+      case 0:
+      default:
+        return "USE_PROTOCOL_CACHE_POLICY";
+    }
+  }
+
+  ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
+  ///This is the default policy for URL load requests.
+  static const USE_PROTOCOL_CACHE_POLICY =
+  const URLRequestCachePolicy._internal(0);
+
+  ///The URL load should be loaded only from the originating source.
+  ///This policy specifies that no existing cache data should be used to satisfy a URL load request.
+  ///
+  ///**NOTE**: Always use this policy if you are making HTTP or HTTPS byte-range requests.
+  static const RELOAD_IGNORING_LOCAL_CACHE_DATA =
+  const URLRequestCachePolicy._internal(1);
+
+  ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
+  static const RETURN_CACHE_DATA_ELSE_LOAD =
+  const URLRequestCachePolicy._internal(2);
+
+  ///Use existing cache data, regardless or age or expiration date, and fail if no cached data is available.
+  ///
+  ///If there is no existing data in the cache corresponding to a URL load request,
+  ///no attempt is made to load the data from the originating source, and the load is considered to have failed.
+  ///This constant specifies a behavior that is similar to an “offline” mode.
+  static const RETURN_CACHE_DATA_DONT_LOAD =
+  const URLRequestCachePolicy._internal(3);
+
+  ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA =
+  const URLRequestCachePolicy._internal(4);
+
+  ///Use cache data if the origin source can validate it; otherwise, load from the origin.
+  ///
+  ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
+  static const RELOAD_REVALIDATING_CACHE_DATA =
+  const URLRequestCachePolicy._internal(5);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific Class that represents the constants used to specify interaction with the cached responses.
+///Use [URLRequestCachePolicy] instead.
+@Deprecated("Use URLRequestCachePolicy instead")
 class IOSURLRequestCachePolicy {
   final int _value;
 
@@ -3800,7 +5074,104 @@ class IOSURLRequestCachePolicy {
   int get hashCode => _value.hashCode;
 }
 
+///Class that represents the constants that specify how a request uses network resources.
+class URLRequestNetworkServiceType {
+  final int _value;
+
+  const URLRequestNetworkServiceType._internal(this._value);
+
+  static final Set<URLRequestNetworkServiceType> values = [
+    URLRequestNetworkServiceType.DEFAULT,
+    URLRequestNetworkServiceType.VIDEO,
+    URLRequestNetworkServiceType.BACKGROUND,
+    URLRequestNetworkServiceType.VOICE,
+    URLRequestNetworkServiceType.RESPONSIVE_DATA,
+    URLRequestNetworkServiceType.AV_STREAMING,
+    URLRequestNetworkServiceType.RESPONSIVE_AV,
+    URLRequestNetworkServiceType.CALL_SIGNALING,
+  ].toSet();
+
+  static URLRequestNetworkServiceType? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return URLRequestNetworkServiceType.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 2:
+        return "VIDEO";
+      case 3:
+        return "BACKGROUND";
+      case 4:
+        return "VOICE";
+      case 6:
+        return "RESPONSIVE_DATA";
+      case 8:
+        return "AV_STREAMING";
+      case 9:
+        return "RESPONSIVE_AV";
+      case 11:
+        return "CALL_SIGNALING";
+      case 0:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  ///A service type for standard network traffic.
+  static const DEFAULT = const URLRequestNetworkServiceType._internal(0);
+
+  ///A service type for video traffic.
+  static const VIDEO = const URLRequestNetworkServiceType._internal(2);
+
+  ///A service type for background traffic.
+  ///
+  ///You should specify this type if your app is performing a download that was not requested by the user—for example,
+  ///prefetching content so that it will be available when the user chooses to view it.
+  static const BACKGROUND = const URLRequestNetworkServiceType._internal(3);
+
+  ///A service type for voice traffic.
+  static const VOICE = const URLRequestNetworkServiceType._internal(4);
+
+  ///A service type for data that the user is actively waiting for.
+  ///
+  ///Use this service type for interactive situations where the user is anticipating a quick response, like instant messaging or completing a purchase.
+  static const RESPONSIVE_DATA =
+  const URLRequestNetworkServiceType._internal(6);
+
+  ///A service type for streaming audio/video data.
+  static const AV_STREAMING =
+  const URLRequestNetworkServiceType._internal(8);
+
+  ///A service type for responsive (time-sensitive) audio/video data.
+  static const RESPONSIVE_AV =
+  const URLRequestNetworkServiceType._internal(9);
+
+  ///A service type for call signaling.
+  ///
+  ///Use this service type with network traffic that establishes, maintains, or tears down a VoIP call.
+  static const CALL_SIGNALING =
+  const URLRequestNetworkServiceType._internal(11);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific Class that represents the constants that specify how a request uses network resources.
+///Use [URLRequestNetworkServiceType] instead.
+@Deprecated("Use URLRequestNetworkServiceType instead")
 class IOSURLRequestNetworkServiceType {
   final int _value;
 
@@ -3898,6 +5269,47 @@ class IOSURLRequestNetworkServiceType {
 ///An object that identifies the origin of a particular resource.
 ///
 ///**NOTE**: available only on iOS 9.0+.
+class SecurityOrigin {
+  ///The security origin’s host.
+  String host;
+
+  ///The security origin's port.
+  int port;
+
+  ///The security origin's protocol.
+  String protocol;
+
+  SecurityOrigin(
+      {required this.host, required this.port, required this.protocol});
+
+  static SecurityOrigin? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return SecurityOrigin(
+        host: map["host"], port: map["port"], protocol: map["protocol"]);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {"host": host, "port": port, "protocol": protocol};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///An object that identifies the origin of a particular resource.
+///
+///**NOTE**: available only on iOS 9.0+.
+///
+///Use [SecurityOrigin] instead.
+@Deprecated("Use SecurityOrigin instead")
 class IOSWKSecurityOrigin {
   ///The security origin’s host.
   String host;
@@ -3936,6 +5348,54 @@ class IOSWKSecurityOrigin {
 ///An object that contains information about a frame on a webpage.
 ///
 ///**NOTE**: available only on iOS.
+class FrameInfo {
+  ///A Boolean value indicating whether the frame is the web site's main frame or a subframe.
+  bool isMainFrame;
+
+  ///The frame’s current request.
+  URLRequest? request;
+
+  ///The frame’s security origin.
+  SecurityOrigin? securityOrigin;
+
+  FrameInfo(
+      {required this.isMainFrame, required this.request, this.securityOrigin});
+
+  static FrameInfo? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return FrameInfo(
+        isMainFrame: map["isMainFrame"],
+        request: URLRequest.fromMap(map["request"]?.cast<String, dynamic>()),
+        securityOrigin: SecurityOrigin.fromMap(
+            map["securityOrigin"]?.cast<String, dynamic>()));
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "isMainFrame": isMainFrame,
+      "request": request?.toMap(),
+      "securityOrigin": securityOrigin?.toMap()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///An object that contains information about a frame on a webpage.
+///
+///**NOTE**: available only on iOS.
+///
+///Use [FrameInfo] instead.
+@Deprecated("Use FrameInfo instead")
 class IOSWKFrameInfo {
   ///A Boolean value indicating whether the frame is the web site's main frame or a subframe.
   bool isMainFrame;
@@ -3994,44 +5454,80 @@ class NavigationAction {
   ///Also, on Android < 21, this is always `true`.
   bool isForMainFrame;
 
+  ///Use [hasGesture] instead.
+  @Deprecated('Use hasGesture instead')
+  bool? androidHasGesture;
+
   ///Gets whether a gesture (such as a click) was associated with the request.
   ///For security reasons in certain situations this method may return `false` even though
   ///the sequence of events which caused the request to be created was initiated by a user
   ///gesture.
   ///
   ///**NOTE**: available only on Android. On Android < 24, this is always `false`.
-  bool? androidHasGesture;
+  bool? hasGesture;
+
+  ///Use [isRedirect] instead.
+  @Deprecated('Use isRedirect instead')
+  bool? androidIsRedirect;
 
   ///Gets whether the request was a result of a server-side redirect.
   ///
   ///**NOTE**: available only on Android.
   ///If the request is associated to the [WebView.onCreateWindow] event, this is always `false`.
   ///Also, on Android < 21, this is always `false`.
-  bool? androidIsRedirect;
+  bool? isRedirect;
+
+  ///Use [navigationType] instead.
+  @Deprecated("Use navigationType instead")
+  IOSWKNavigationType? iosWKNavigationType;
 
   ///The type of action triggering the navigation.
   ///
   ///**NOTE**: available only on iOS.
-  IOSWKNavigationType? iosWKNavigationType;
+  NavigationType? navigationType;
+
+  ///Use [sourceFrame] instead.
+  @Deprecated("Use sourceFrame instead")
+  IOSWKFrameInfo? iosSourceFrame;
 
   ///The frame that requested the navigation.
   ///
   ///**NOTE**: available only on iOS.
-  IOSWKFrameInfo? iosSourceFrame;
+  FrameInfo? sourceFrame;
+
+  ///Use [targetFrame] instead.
+  @Deprecated("Use targetFrame instead")
+  IOSWKFrameInfo? iosTargetFrame;
 
   ///The frame in which to display the new content.
   ///
   ///**NOTE**: available only on iOS.
-  IOSWKFrameInfo? iosTargetFrame;
+  FrameInfo? targetFrame;
 
   NavigationAction(
       {required this.request,
       required this.isForMainFrame,
-      this.androidHasGesture,
-      this.androidIsRedirect,
-      this.iosWKNavigationType,
-      this.iosSourceFrame,
-      this.iosTargetFrame});
+      @Deprecated('Use hasGesture instead') this.androidHasGesture,
+      this.hasGesture,
+      @Deprecated('Use isRedirect instead') this.androidIsRedirect,
+      this.isRedirect,
+      @Deprecated("Use navigationType instead") this.iosWKNavigationType,
+      this.navigationType,
+      @Deprecated("Use sourceFrame instead") this.iosSourceFrame,
+      this.sourceFrame,
+      @Deprecated("Use targetFrame instead") this.iosTargetFrame,
+      this.targetFrame}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.hasGesture = this.hasGesture ?? this.androidHasGesture;
+    // ignore: deprecated_member_use_from_same_package
+    this.isRedirect = this.isRedirect ?? this.androidIsRedirect;
+    // ignore: deprecated_member_use_from_same_package
+    this.navigationType = this.navigationType ?? NavigationType.fromValue(this.iosWKNavigationType?.toValue());
+    // ignore: deprecated_member_use_from_same_package
+    this.sourceFrame = this.sourceFrame ?? FrameInfo.fromMap(this.iosSourceFrame?.toMap());
+    // ignore: deprecated_member_use_from_same_package
+    this.targetFrame = this.targetFrame ?? FrameInfo.fromMap(this.iosTargetFrame?.toMap());
+  }
 
   static NavigationAction? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -4040,25 +5536,47 @@ class NavigationAction {
     return NavigationAction(
         request: URLRequest.fromMap(map["request"].cast<String, dynamic>())!,
         isForMainFrame: map["isForMainFrame"],
-        androidHasGesture: map["androidHasGesture"],
-        androidIsRedirect: map["androidIsRedirect"],
-        iosWKNavigationType:
-            IOSWKNavigationType.fromValue(map["iosWKNavigationType"]),
-        iosSourceFrame: IOSWKFrameInfo.fromMap(
-            map["iosSourceFrame"]?.cast<String, dynamic>()),
-        iosTargetFrame: IOSWKFrameInfo.fromMap(
-            map["iosTargetFrame"]?.cast<String, dynamic>()));
+        // ignore: deprecated_member_use_from_same_package
+        androidHasGesture: map["hasGesture"] ?? map["androidHasGesture"],
+        hasGesture: map["hasGesture"],
+        // ignore: deprecated_member_use_from_same_package
+        androidIsRedirect: map["isRedirect"] ?? map["androidIsRedirect"],
+        isRedirect: map["isRedirect"],
+        // ignore: deprecated_member_use_from_same_package
+        iosWKNavigationType: IOSWKNavigationType.fromValue(map["navigationType"]),
+        navigationType: NavigationType.fromValue(map["navigationType"]),
+        // ignore: deprecated_member_use_from_same_package
+        iosSourceFrame: IOSWKFrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
+        sourceFrame: FrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
+        // ignore: deprecated_member_use_from_same_package
+        iosTargetFrame: IOSWKFrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
+        targetFrame: FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()));
   }
 
   Map<String, dynamic> toMap() {
     return {
       "request": request.toMap(),
       "isForMainFrame": isForMainFrame,
-      "androidHasGesture": androidHasGesture,
-      "androidIsRedirect": androidIsRedirect,
-      "iosWKNavigationType": iosWKNavigationType?.toValue(),
-      "iosSourceFrame": iosSourceFrame?.toMap(),
-      "iosTargetFrame": iosTargetFrame?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "androidHasGesture": hasGesture ?? androidHasGesture,
+      // ignore: deprecated_member_use_from_same_package
+      "hasGesture": hasGesture ?? androidHasGesture,
+      // ignore: deprecated_member_use_from_same_package
+      "isRedirect": isRedirect ?? androidIsRedirect,
+      // ignore: deprecated_member_use_from_same_package
+      "androidIsRedirect": isRedirect ?? androidIsRedirect,
+      // ignore: deprecated_member_use_from_same_package
+      "iosWKNavigationType": navigationType?.toValue() ?? iosWKNavigationType?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "navigationType": navigationType?.toValue() ?? iosWKNavigationType?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosSourceFrame": sourceFrame?.toMap() ?? iosSourceFrame?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "sourceFrame": sourceFrame?.toMap() ?? iosSourceFrame?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosTargetFrame": targetFrame?.toMap() ?? iosTargetFrame?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "targetFrame": targetFrame?.toMap() ?? iosTargetFrame?.toMap(),
     };
   }
 
@@ -4077,35 +5595,68 @@ class CreateWindowAction extends NavigationAction {
   ///The window id. Used by [WebView] to create a new WebView.
   int windowId;
 
+  ///Use [isDialog] instead.
+  @Deprecated("Use isDialog instead")
+  bool? androidIsDialog;
+
   ///Indicates if the new window should be a dialog, rather than a full-size window.
   ///
   ///**NOTE**: available only on Android.
-  bool? androidIsDialog;
+  bool? isDialog;
+
+  ///Use [windowFeatures] instead.
+  @Deprecated("Use windowFeatures instead")
+  IOSWKWindowFeatures? iosWindowFeatures;
 
   ///Window features requested by the webpage.
   ///
   ///**NOTE**: available only on iOS.
-  IOSWKWindowFeatures? iosWindowFeatures;
+  WindowFeatures? windowFeatures;
 
   CreateWindowAction(
       {required this.windowId,
-      this.androidIsDialog,
-      this.iosWindowFeatures,
+      @Deprecated('Use isDialog instead') this.androidIsDialog,
+      this.isDialog,
+      @Deprecated('Use windowFeatures instead') this.iosWindowFeatures,
+      this.windowFeatures,
       required URLRequest request,
       required bool isForMainFrame,
-      bool? androidHasGesture,
-      bool? androidIsRedirect,
-      IOSWKNavigationType? iosWKNavigationType,
-      IOSWKFrameInfo? iosSourceFrame,
-      IOSWKFrameInfo? iosTargetFrame})
+      @Deprecated('Use hasGesture instead') bool? androidHasGesture,
+      @Deprecated('Use isRedirect instead') bool? androidIsRedirect,
+      bool? hasGesture,
+      bool? isRedirect,
+      // ignore: deprecated_member_use_from_same_package
+      @Deprecated('Use navigationType instead') IOSWKNavigationType? iosWKNavigationType,
+      NavigationType? navigationType,
+        // ignore: deprecated_member_use_from_same_package
+      @Deprecated('Use sourceFrame instead') IOSWKFrameInfo? iosSourceFrame,
+      FrameInfo? sourceFrame,
+        // ignore: deprecated_member_use_from_same_package
+      @Deprecated('Use targetFrame instead') IOSWKFrameInfo? iosTargetFrame,
+      FrameInfo? targetFrame})
       : super(
             request: request,
             isForMainFrame: isForMainFrame,
-            androidHasGesture: androidHasGesture,
-            androidIsRedirect: androidIsRedirect,
-            iosWKNavigationType: iosWKNavigationType,
-            iosSourceFrame: iosSourceFrame,
-            iosTargetFrame: iosTargetFrame);
+            // ignore: deprecated_member_use_from_same_package
+            androidHasGesture: hasGesture ?? androidHasGesture,
+            hasGesture: hasGesture ?? androidHasGesture,
+            // ignore: deprecated_member_use_from_same_package
+            androidIsRedirect: isRedirect ?? androidIsRedirect,
+            isRedirect: isRedirect ?? androidIsRedirect,
+            // ignore: deprecated_member_use_from_same_package
+            iosWKNavigationType: IOSWKNavigationType.fromValue(navigationType?.toValue()) ?? iosWKNavigationType,
+            navigationType: navigationType ?? NavigationType.fromValue(iosWKNavigationType?.toValue()),
+            // ignore: deprecated_member_use_from_same_package
+            iosSourceFrame: IOSWKFrameInfo.fromMap(sourceFrame?.toMap()) ?? iosSourceFrame,
+            sourceFrame: sourceFrame ?? FrameInfo.fromMap(iosSourceFrame?.toMap()),
+            // ignore: deprecated_member_use_from_same_package
+            iosTargetFrame: IOSWKFrameInfo.fromMap(targetFrame?.toMap()) ?? iosTargetFrame,
+            targetFrame: targetFrame ?? FrameInfo.fromMap(iosTargetFrame?.toMap())) {
+    // ignore: deprecated_member_use_from_same_package
+    this.isDialog = this.isDialog ?? this.androidIsDialog;
+    // ignore: deprecated_member_use_from_same_package
+    this.windowFeatures = this.windowFeatures ?? WindowFeatures.fromMap(this.iosWindowFeatures?.toMap());
+  }
 
   static CreateWindowAction? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -4113,19 +5664,38 @@ class CreateWindowAction extends NavigationAction {
     }
     return CreateWindowAction(
         windowId: map["windowId"],
-        androidIsDialog: map["androidIsDialog"],
+        // ignore: deprecated_member_use_from_same_package
+        androidIsDialog: map["isDialog"] ?? map["androidIsDialog"],
+        isDialog: map["isDialog"] ?? map["androidIsDialog"],
+        // ignore: deprecated_member_use_from_same_package
         iosWindowFeatures: IOSWKWindowFeatures.fromMap(
-            map["iosWindowFeatures"]?.cast<String, dynamic>()),
+            map["windowFeatures"]?.cast<String, dynamic>()),
+        windowFeatures: WindowFeatures.fromMap(
+            map["windowFeatures"]?.cast<String, dynamic>()),
         request: URLRequest.fromMap(map["request"].cast<String, dynamic>())!,
         isForMainFrame: map["isForMainFrame"],
-        androidHasGesture: map["androidHasGesture"],
-        androidIsRedirect: map["androidIsRedirect"],
+        // ignore: deprecated_member_use_from_same_package
+        androidHasGesture: map["hasGesture"],
+        hasGesture: map["hasGesture"],
+        // ignore: deprecated_member_use_from_same_package
+        androidIsRedirect: map["isRedirect"],
+        isRedirect: map["isRedirect"],
+        // ignore: deprecated_member_use_from_same_package
         iosWKNavigationType:
-            IOSWKNavigationType.fromValue(map["iosWKNavigationType"]),
+        // ignore: deprecated_member_use_from_same_package
+            IOSWKNavigationType.fromValue(map["navigationType"]),
+        navigationType:
+          NavigationType.fromValue(map["navigationType"]),
+        // ignore: deprecated_member_use_from_same_package
         iosSourceFrame: IOSWKFrameInfo.fromMap(
-            map["iosSourceFrame"]?.cast<String, dynamic>()),
+            map["sourceFrame"]?.cast<String, dynamic>()),
+        sourceFrame: FrameInfo.fromMap(
+            map["sourceFrame"]?.cast<String, dynamic>()),
+        // ignore: deprecated_member_use_from_same_package
         iosTargetFrame: IOSWKFrameInfo.fromMap(
-            map["iosTargetFrame"]?.cast<String, dynamic>()));
+            map["targetFrame"]?.cast<String, dynamic>()),
+        targetFrame: FrameInfo.fromMap(
+            map["targetFrame"]?.cast<String, dynamic>()));
   }
 
   @override
@@ -4133,8 +5703,14 @@ class CreateWindowAction extends NavigationAction {
     var createWindowActionMap = super.toMap();
     createWindowActionMap.addAll({
       "windowId": windowId,
-      "androidIsDialog": androidIsDialog,
-      "iosWindowFeatures": iosWindowFeatures?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "androidIsDialog": isDialog ?? androidIsDialog,
+      // ignore: deprecated_member_use_from_same_package
+      "isDialog": isDialog ?? androidIsDialog,
+      // ignore: deprecated_member_use_from_same_package
+      "iosWindowFeatures": windowFeatures?.toMap() ?? iosWindowFeatures?.toMap(),
+      // ignore: deprecated_member_use_from_same_package
+      "windowFeatures": windowFeatures?.toMap() ?? iosWindowFeatures?.toMap(),
     });
     return createWindowActionMap;
   }
@@ -4146,7 +5722,37 @@ class CreateWindowAction extends NavigationAction {
 }
 
 ///Class that encapsulates information about the amount of storage currently used by an origin for the JavaScript storage APIs.
+///An origin comprises the host, scheme and port of a URI. See [WebStorageManager] for details.
+class WebStorageOrigin {
+  ///The string representation of this origin.
+  String? origin;
+
+  ///The quota for this origin, for the Web SQL Database API, in bytes.
+  int? quota;
+
+  ///The total amount of storage currently being used by this origin, for all JavaScript storage APIs, in bytes.
+  int? usage;
+
+  WebStorageOrigin({this.origin, this.quota, this.usage});
+
+  Map<String, dynamic> toMap() {
+    return {"origin": origin, "quota": quota, "usage": usage};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that encapsulates information about the amount of storage currently used by an origin for the JavaScript storage APIs.
 ///An origin comprises the host, scheme and port of a URI. See [AndroidWebStorageManager] for details.
+///Use [WebStorageOrigin] instead.
+@Deprecated("Use WebStorageOrigin instead")
 class AndroidWebStorageOrigin {
   ///The string representation of this origin.
   String? origin;
@@ -4176,6 +5782,115 @@ class AndroidWebStorageOrigin {
 ///Class that represents a website data type.
 ///
 ///**NOTE**: available on iOS 9.0+.
+class WebsiteDataType {
+  final String _value;
+
+  const WebsiteDataType._internal(this._value);
+
+  static final Set<WebsiteDataType> values = [
+    WebsiteDataType.WKWebsiteDataTypeFetchCache,
+    WebsiteDataType.WKWebsiteDataTypeDiskCache,
+    WebsiteDataType.WKWebsiteDataTypeMemoryCache,
+    WebsiteDataType.WKWebsiteDataTypeOfflineWebApplicationCache,
+    WebsiteDataType.WKWebsiteDataTypeCookies,
+    WebsiteDataType.WKWebsiteDataTypeSessionStorage,
+    WebsiteDataType.WKWebsiteDataTypeLocalStorage,
+    WebsiteDataType.WKWebsiteDataTypeWebSQLDatabases,
+    WebsiteDataType.WKWebsiteDataTypeIndexedDBDatabases,
+    WebsiteDataType.WKWebsiteDataTypeServiceWorkerRegistrations,
+  ].toSet();
+
+  static WebsiteDataType? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return WebsiteDataType.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///On-disk Fetch caches.
+  ///
+  ///**NOTE**: available on iOS 11.3+.
+  static const WKWebsiteDataTypeFetchCache =
+  const WebsiteDataType._internal("WKWebsiteDataTypeFetchCache");
+
+  ///On-disk caches.
+  static const WKWebsiteDataTypeDiskCache =
+  const WebsiteDataType._internal("WKWebsiteDataTypeDiskCache");
+
+  ///In-memory caches.
+  static const WKWebsiteDataTypeMemoryCache =
+  const WebsiteDataType._internal("WKWebsiteDataTypeMemoryCache");
+
+  ///HTML offline web application caches.
+  static const WKWebsiteDataTypeOfflineWebApplicationCache =
+  const WebsiteDataType._internal(
+      "WKWebsiteDataTypeOfflineWebApplicationCache");
+
+  ///Cookies.
+  static const WKWebsiteDataTypeCookies =
+  const WebsiteDataType._internal("WKWebsiteDataTypeCookies");
+
+  ///HTML session storage.
+  static const WKWebsiteDataTypeSessionStorage =
+  const WebsiteDataType._internal("WKWebsiteDataTypeSessionStorage");
+
+  ///HTML local storage.
+  static const WKWebsiteDataTypeLocalStorage =
+  const WebsiteDataType._internal("WKWebsiteDataTypeLocalStorage");
+
+  ///WebSQL databases.
+  static const WKWebsiteDataTypeWebSQLDatabases =
+  const WebsiteDataType._internal("WKWebsiteDataTypeWebSQLDatabases");
+
+  ///IndexedDB databases.
+  static const WKWebsiteDataTypeIndexedDBDatabases =
+  const WebsiteDataType._internal(
+      "WKWebsiteDataTypeIndexedDBDatabases");
+
+  ///Service worker registrations.
+  ///
+  ///**NOTE**: available on iOS 11.3+.
+  static const WKWebsiteDataTypeServiceWorkerRegistrations =
+  const WebsiteDataType._internal(
+      "WKWebsiteDataTypeServiceWorkerRegistrations");
+
+  ///Returns a set of all available website data types.
+  // ignore: non_constant_identifier_names
+  static final Set<WebsiteDataType> ALL = [
+    WebsiteDataType.WKWebsiteDataTypeFetchCache,
+    WebsiteDataType.WKWebsiteDataTypeDiskCache,
+    WebsiteDataType.WKWebsiteDataTypeMemoryCache,
+    WebsiteDataType.WKWebsiteDataTypeOfflineWebApplicationCache,
+    WebsiteDataType.WKWebsiteDataTypeCookies,
+    WebsiteDataType.WKWebsiteDataTypeSessionStorage,
+    WebsiteDataType.WKWebsiteDataTypeLocalStorage,
+    WebsiteDataType.WKWebsiteDataTypeWebSQLDatabases,
+    WebsiteDataType.WKWebsiteDataTypeIndexedDBDatabases,
+    WebsiteDataType.WKWebsiteDataTypeServiceWorkerRegistrations
+  ].toSet();
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
+///Class that represents a website data type.
+///
+///**NOTE**: available on iOS 9.0+.
+///
+///Use [WebsiteDataType] instead.
+@Deprecated("Use WebsiteDataType instead")
 class IOSWKWebsiteDataType {
   final String _value;
 
@@ -4282,6 +5997,42 @@ class IOSWKWebsiteDataType {
 ///Class that represents website data, grouped by domain name using the public suffix list.
 ///
 ///**NOTE**: available on iOS 9.0+.
+class WebsiteDataRecord {
+  ///The display name for the data record. This is usually the domain name.
+  String? displayName;
+
+  ///The various types of website data that exist for this data record.
+  Set<WebsiteDataType>? dataTypes;
+
+  WebsiteDataRecord({this.displayName, this.dataTypes});
+
+  Map<String, dynamic> toMap() {
+    List<String> dataTypesString = [];
+    if (dataTypes != null) {
+      for (var dataType in dataTypes!) {
+        dataTypesString.add(dataType.toValue());
+      }
+    }
+
+    return {"displayName": displayName, "dataTypes": dataTypesString};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents website data, grouped by domain name using the public suffix list.
+///
+///**NOTE**: available on iOS 9.0+.
+///
+///Use [WebsiteDataRecord] instead.
+@Deprecated("Use WebsiteDataRecord instead")
 class IOSWKWebsiteDataRecord {
   ///The display name for the data record. This is usually the domain name.
   String? displayName;
@@ -4433,7 +6184,7 @@ class InAppWebViewHitTestResult {
   }
 }
 
-///Class that represents the action to take used by the [WebView.androidOnRenderProcessUnresponsive] and [WebView.androidOnRenderProcessResponsive] event
+///Class that represents the action to take used by the [WebView.onRenderProcessUnresponsive] and [WebView.onRenderProcessResponsive] event
 ///to terminate the Android [WebViewRenderProcess](https://developer.android.com/reference/android/webkit/WebViewRenderProcess).
 class WebViewRenderProcessAction {
   final int _value;
@@ -4456,7 +6207,7 @@ class WebViewRenderProcessAction {
 }
 
 ///Class that provides more specific information about why the render process exited.
-///It is used by the [WebView.androidOnRenderProcessGone] event.
+///It is used by the [WebView.onRenderProcessGone] event.
 class RenderProcessGoneDetail {
   ///Indicates whether the render process was observed to crash, or whether it was killed by the system.
   ///
@@ -4558,7 +6309,7 @@ class RendererPriority {
 ///When a WebView is destroyed it will cease to be considerered when calculating the renderer priority.
 ///Once no WebViews remain associated with the renderer, the priority of the renderer will be reduced to [RendererPriority.RENDERER_PRIORITY_WAIVED].
 ///The default policy is to set the priority to [RendererPriority.RENDERER_PRIORITY_IMPORTANT] regardless of visibility,
-///and this should not be changed unless the caller also handles renderer crashes with [WebView.androidOnRenderProcessGone].
+///and this should not be changed unless the caller also handles renderer crashes with [WebView.onRenderProcessGone].
 ///Any other setting will result in WebView renderers being killed by the system more aggressively than the application.
 class RendererPriorityPolicy {
   ///The minimum priority at which this WebView desires the renderer process to be bound.
@@ -4597,7 +6348,7 @@ class RendererPriorityPolicy {
   }
 }
 
-///Class that represents the action to take used by the [WebView.androidOnFormResubmission] event.
+///Class that represents the action to take used by the [WebView.onFormResubmission] event.
 class FormResubmissionAction {
   final int _value;
 
@@ -4630,8 +6381,66 @@ class FormResubmissionAction {
   }
 }
 
+///Class used to configure the WebView's over-scroll mode.
+///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
+class OverScrollMode {
+  final int _value;
+
+  const OverScrollMode._internal(this._value);
+
+  static final Set<OverScrollMode> values = [
+    OverScrollMode.OVER_SCROLL_ALWAYS,
+    OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,
+    OverScrollMode.OVER_SCROLL_NEVER,
+  ].toSet();
+
+  static OverScrollMode? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return OverScrollMode.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "OVER_SCROLL_IF_CONTENT_SCROLLS";
+      case 2:
+        return "OVER_SCROLL_NEVER";
+      case 0:
+      default:
+        return "OVER_SCROLL_ALWAYS";
+    }
+  }
+
+  ///Always allow a user to over-scroll this view, provided it is a view that can scroll.
+  static const OVER_SCROLL_ALWAYS = const OverScrollMode._internal(0);
+
+  ///Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
+  static const OVER_SCROLL_IF_CONTENT_SCROLLS =
+  const OverScrollMode._internal(1);
+
+  ///Never allow a user to over-scroll this view.
+  static const OVER_SCROLL_NEVER = const OverScrollMode._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to configure the WebView's over-scroll mode.
 ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
+///Use [OverScrollMode] instead.
+@Deprecated("Use OverScrollMode instead")
 class AndroidOverScrollMode {
   final int _value;
 
@@ -4686,6 +6495,80 @@ class AndroidOverScrollMode {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to configure the style of the scrollbars.
+///The scrollbars can be overlaid or inset.
+///When inset, they add to the padding of the view. And the scrollbars can be drawn inside the padding area or on the edge of the view.
+///For example, if a view has a background drawable and you want to draw the scrollbars inside the padding specified by the drawable,
+///you can use [ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY] or [ScrollBarStyle.SCROLLBARS_INSIDE_INSET].
+///If you want them to appear at the edge of the view, ignoring the padding,
+///then you can use [ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY] or [ScrollBarStyle.SCROLLBARS_OUTSIDE_INSET].
+class ScrollBarStyle {
+  final int _value;
+
+  const ScrollBarStyle._internal(this._value);
+
+  static final Set<ScrollBarStyle> values = [
+    ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+    ScrollBarStyle.SCROLLBARS_INSIDE_INSET,
+    ScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY,
+    ScrollBarStyle.SCROLLBARS_OUTSIDE_INSET,
+  ].toSet();
+
+  static ScrollBarStyle? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ScrollBarStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 16777216:
+        return "SCROLLBARS_INSIDE_INSET";
+      case 33554432:
+        return "SCROLLBARS_OUTSIDE_OVERLAY";
+      case 50331648:
+        return "SCROLLBARS_OUTSIDE_INSET";
+      case 0:
+      default:
+        return "SCROLLBARS_INSIDE_OVERLAY";
+    }
+  }
+
+  ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
+  ///The scrollbars will be overlaid with translucency on the view's content.
+  static const SCROLLBARS_INSIDE_OVERLAY =
+  const ScrollBarStyle._internal(0);
+
+  ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
+  ///The scrollbars will not overlap the content area of the view.
+  static const SCROLLBARS_INSIDE_INSET =
+  const ScrollBarStyle._internal(16777216);
+
+  ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
+  ///The scrollbars will be overlaid with translucency.
+  static const SCROLLBARS_OUTSIDE_OVERLAY =
+  const ScrollBarStyle._internal(33554432);
+
+  ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
+  ///The scrollbars will only overlap the background, if any.
+  static const SCROLLBARS_OUTSIDE_INSET =
+  const ScrollBarStyle._internal(50331648);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to configure the style of the scrollbars.
 ///The scrollbars can be overlaid or inset.
 ///When inset, they add to the padding of the view. And the scrollbars can be drawn inside the padding area or on the edge of the view.
@@ -4693,6 +6576,9 @@ class AndroidOverScrollMode {
 ///you can use [AndroidScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY] or [AndroidScrollBarStyle.SCROLLBARS_INSIDE_INSET].
 ///If you want them to appear at the edge of the view, ignoring the padding,
 ///then you can use [AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_OVERLAY] or [AndroidScrollBarStyle.SCROLLBARS_OUTSIDE_INSET].
+///
+///Use [ScrollBarStyle] instead.
+@Deprecated("Use ScrollBarStyle instead")
 class AndroidScrollBarStyle {
   final int _value;
 
@@ -4760,7 +6646,66 @@ class AndroidScrollBarStyle {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to configure the position of the vertical scroll bar.
+class VerticalScrollbarPosition {
+  final int _value;
+
+  const VerticalScrollbarPosition._internal(this._value);
+
+  static final Set<VerticalScrollbarPosition> values = [
+    VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+    VerticalScrollbarPosition.SCROLLBAR_POSITION_LEFT,
+    VerticalScrollbarPosition.SCROLLBAR_POSITION_RIGHT,
+  ].toSet();
+
+  static VerticalScrollbarPosition? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return VerticalScrollbarPosition.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SCROLLBAR_POSITION_LEFT";
+      case 2:
+        return "SCROLLBAR_POSITION_RIGHT";
+      case 0:
+      default:
+        return "SCROLLBAR_POSITION_DEFAULT";
+    }
+  }
+
+  ///Position the scroll bar at the default position as determined by the system.
+  static const SCROLLBAR_POSITION_DEFAULT =
+  const VerticalScrollbarPosition._internal(0);
+
+  ///Position the scroll bar along the left edge.
+  static const SCROLLBAR_POSITION_LEFT =
+  const VerticalScrollbarPosition._internal(1);
+
+  ///Position the scroll bar along the right edge.
+  static const SCROLLBAR_POSITION_RIGHT =
+  const VerticalScrollbarPosition._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An Android-specific class used to configure the position of the vertical scroll bar.
+///Use [VerticalScrollbarPosition] instead.
+@Deprecated("Use VerticalScrollbarPosition instead")
 class AndroidVerticalScrollbarPosition {
   final int _value;
 
@@ -4817,7 +6762,40 @@ class AndroidVerticalScrollbarPosition {
   int get hashCode => _value.hashCode;
 }
 
+///Class that represents a WebView package info.
+class WebViewPackageInfo {
+  ///The version name of this WebView package.
+  String? versionName;
+
+  ///The name of this WebView package.
+  String? packageName;
+
+  WebViewPackageInfo({this.versionName, this.packageName});
+
+  static WebViewPackageInfo? fromMap(Map<String, dynamic>? map) {
+    return map != null
+        ? WebViewPackageInfo(
+        versionName: map["versionName"], packageName: map["packageName"])
+        : null;
+  }
+
+  Map<String, dynamic> toMap() {
+    return {"versionName": versionName, "packageName": packageName};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
 ///Class that represents an Android WebView package info.
+///Use [WebViewPackageInfo] instead.
+@Deprecated("Use WebViewPackageInfo instead")
 class AndroidWebViewPackageInfo {
   ///The version name of this WebView package.
   String? versionName;
@@ -5047,8 +7025,149 @@ class HTTPCookieSameSitePolicy {
   int get hashCode => _value.hashCode;
 }
 
+///Class that represents the SSL Primary error associated to the server SSL certificate.
+///Used by the [ServerTrustChallenge] class.
+class SslErrorType {
+  final int _value;
+
+  const SslErrorType._internal(this._value);
+
+  static final Set<SslErrorType> values = [
+    SslErrorType.SSL_NOTYETVALID,
+    SslErrorType.SSL_EXPIRED,
+    SslErrorType.SSL_IDMISMATCH,
+    SslErrorType.SSL_UNTRUSTED,
+    SslErrorType.SSL_DATE_INVALID,
+    SslErrorType.SSL_INVALID,
+    SslErrorType.INVALID,
+    SslErrorType.DENY,
+    SslErrorType.UNSPECIFIED,
+    SslErrorType.RECOVERABLE_TRUST_FAILURE,
+    SslErrorType.FATAL_TRUST_FAILURE,
+    SslErrorType.OTHER_ERROR,
+  ].toSet();
+
+  static final Set<SslErrorType> _androidValues = [
+    SslErrorType.SSL_NOTYETVALID,
+    SslErrorType.SSL_EXPIRED,
+    SslErrorType.SSL_IDMISMATCH,
+    SslErrorType.SSL_UNTRUSTED,
+    SslErrorType.SSL_DATE_INVALID,
+    SslErrorType.SSL_INVALID,
+  ].toSet();
+
+  static final Set<SslErrorType> _appleValues = [
+    SslErrorType.INVALID,
+    SslErrorType.DENY,
+    SslErrorType.UNSPECIFIED,
+    SslErrorType.RECOVERABLE_TRUST_FAILURE,
+    SslErrorType.FATAL_TRUST_FAILURE,
+    SslErrorType.OTHER_ERROR,
+  ].toSet();
+
+  static SslErrorType? fromValue(int? value) {
+    if (value != null) {
+      try {
+        Set<SslErrorType> valueList = <SslErrorType>[].toSet();
+        if (Platform.isAndroid) {
+          valueList = SslErrorType._androidValues;
+        } else if (Platform.isIOS || Platform.isMacOS) {
+          valueList = SslErrorType._appleValues;
+        }
+        return valueList.firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    if (Platform.isAndroid) {
+      switch (_value) {
+        case 1:
+          return "SSL_EXPIRED";
+        case 2:
+          return "SSL_IDMISMATCH";
+        case 3:
+          return "SSL_UNTRUSTED";
+        case 4:
+          return "SSL_DATE_INVALID";
+        case 5:
+          return "SSL_INVALID";
+        case 0:
+        default:
+          return "SSL_NOTYETVALID";
+      }
+    } else if (Platform.isIOS || Platform.isMacOS) {
+      switch (_value) {
+        case 3:
+          return "DENY";
+        case 4:
+          return "UNSPECIFIED";
+        case 5:
+          return "RECOVERABLE_TRUST_FAILURE";
+        case 6:
+          return "FATAL_TRUST_FAILURE";
+        case 7:
+          return "OTHER_ERROR";
+        case 0:
+        default:
+          return "INVALID";
+      }
+    }
+    return "";
+  }
+
+  ///The certificate is not yet valid
+  static const SSL_NOTYETVALID = const SslErrorType._internal(0);
+
+  ///The certificate has expired
+  static const SSL_EXPIRED = const SslErrorType._internal(1);
+
+  ///Hostname mismatch
+  static const SSL_IDMISMATCH = const SslErrorType._internal(2);
+
+  ///The certificate authority is not trusted
+  static const SSL_UNTRUSTED = const SslErrorType._internal(3);
+
+  ///The date of the certificate is invalid
+  static const SSL_DATE_INVALID = const SslErrorType._internal(4);
+
+  ///A generic error occurred
+  static const SSL_INVALID = const SslErrorType._internal(5);
+
+  ///Indicates an invalid setting or result.
+  static const INVALID = const SslErrorType._internal(0);
+
+  ///Indicates a user-configured deny; do not proceed.
+  static const DENY = const SslErrorType._internal(3);
+
+  ///Indicates the evaluation succeeded and the certificate is implicitly trusted, but user intent was not explicitly specified.
+  static const UNSPECIFIED = const SslErrorType._internal(4);
+
+  ///Indicates a trust policy failure which can be overridden by the user.
+  static const RECOVERABLE_TRUST_FAILURE = const SslErrorType._internal(5);
+
+  ///Indicates a trust failure which cannot be overridden by the user.
+  static const FATAL_TRUST_FAILURE = const SslErrorType._internal(6);
+
+  ///Indicates a failure other than that of trust evaluation.
+  static const OTHER_ERROR = const SslErrorType._internal(7);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///Class that represents the Android-specific primary error associated to the server SSL certificate.
 ///Used by the [ServerTrustChallenge] class.
+///Use [SslErrorType] instead.
+@Deprecated("Use SslErrorType instead")
 class AndroidSslError {
   final int _value;
 
@@ -5122,6 +7241,8 @@ class AndroidSslError {
 
 ///Class that represents the iOS-specific primary error associated to the server SSL certificate.
 ///Used by the [ServerTrustChallenge] class.
+///Use [SslErrorType] instead.
+@Deprecated("Use SslErrorType instead")
 class IOSSslError {
   final int _value;
 
@@ -5193,9 +7314,78 @@ class IOSSslError {
   int get hashCode => _value.hashCode;
 }
 
+///Class used to configure how safe area insets are added to the adjusted content inset.
+///
+///**NOTE**: available on iOS 11.0+.
+class ScrollViewContentInsetAdjustmentBehavior {
+  final int _value;
+
+  const ScrollViewContentInsetAdjustmentBehavior._internal(this._value);
+
+  static final Set<ScrollViewContentInsetAdjustmentBehavior> values = [
+    ScrollViewContentInsetAdjustmentBehavior.AUTOMATIC,
+    ScrollViewContentInsetAdjustmentBehavior.SCROLLABLE_AXES,
+    ScrollViewContentInsetAdjustmentBehavior.NEVER,
+    ScrollViewContentInsetAdjustmentBehavior.ALWAYS,
+  ].toSet();
+
+  static ScrollViewContentInsetAdjustmentBehavior? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return ScrollViewContentInsetAdjustmentBehavior.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SCROLLABLE_AXES";
+      case 2:
+        return "NEVER";
+      case 3:
+        return "ALWAYS";
+      case 0:
+      default:
+        return "AUTOMATIC";
+    }
+  }
+
+  ///Automatically adjust the scroll view insets.
+  static const AUTOMATIC =
+  const ScrollViewContentInsetAdjustmentBehavior._internal(0);
+
+  ///Adjust the insets only in the scrollable directions.
+  static const SCROLLABLE_AXES =
+  const ScrollViewContentInsetAdjustmentBehavior._internal(1);
+
+  ///Do not adjust the scroll view insets.
+  static const NEVER =
+  const ScrollViewContentInsetAdjustmentBehavior._internal(2);
+
+  ///Always include the safe area insets in the content adjustment.
+  static const ALWAYS =
+  const ScrollViewContentInsetAdjustmentBehavior._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to configure how safe area insets are added to the adjusted content inset.
 ///
 ///**NOTE**: available on iOS 11.0+.
+///
+///Use [ScrollViewContentInsetAdjustmentBehavior] instead.
+@Deprecated("Use ScrollViewContentInsetAdjustmentBehavior instead")
 class IOSUIScrollViewContentInsetAdjustmentBehavior {
   final int _value;
 
@@ -5420,7 +7610,7 @@ class SslCertificateDName {
   }
 }
 
-///Class used by [WebView.androidOnReceivedLoginRequest] event.
+///Class used by [WebView.onReceivedLoginRequest] event.
 class LoginRequest {
   ///The account realm used to look up accounts.
   String realm;
@@ -5522,12 +7712,16 @@ class UserScript {
   ///The time at which to inject the script into the [WebView].
   UserScriptInjectionTime injectionTime;
 
+  ///Use [forMainFrameOnly] instead.
+  @Deprecated("Use forMainFrameOnly instead")
+  bool? iosForMainFrameOnly;
+
   ///A Boolean value that indicates whether to inject the script into the main frame.
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
   ///The default value is `true`.
   ///
   ///**NOTE**: available only on iOS.
-  bool iosForMainFrameOnly;
+  bool forMainFrameOnly;
 
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.
   ///For more information about content worlds, see [ContentWorld].
@@ -5537,9 +7731,12 @@ class UserScript {
       {this.groupName,
       required this.source,
       required this.injectionTime,
-      this.iosForMainFrameOnly = true,
+      @Deprecated("Use forMainFrameOnly instead") this.iosForMainFrameOnly,
+      this.forMainFrameOnly = true,
       ContentWorld? contentWorld}) {
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
+    // ignore: deprecated_member_use_from_same_package
+    this.forMainFrameOnly = this.iosForMainFrameOnly != null ? this.iosForMainFrameOnly! : this.forMainFrameOnly;
   }
 
   Map<String, dynamic> toMap() {
@@ -5547,7 +7744,8 @@ class UserScript {
       "groupName": groupName,
       "source": source,
       "injectionTime": injectionTime.toValue(),
-      "iosForMainFrameOnly": iosForMainFrameOnly,
+      "iosForMainFrameOnly": forMainFrameOnly,
+      "forMainFrameOnly": forMainFrameOnly,
       "contentWorld": contentWorld.toMap()
     };
   }
@@ -5769,22 +7967,29 @@ class ScreenshotConfiguration {
   ///[CompressFormat.PNG] is lossless, so this value is ignored.
   int quality;
 
+  ///Use [afterScreenUpdates] instead.
+  @Deprecated("Use afterScreenUpdates instead")
+  bool? iosAfterScreenUpdates;
+
   ///A Boolean value that indicates whether to take the snapshot after incorporating any pending screen updates.
   ///The default value of this property is `true`, which causes the web view to incorporate any recent changes to the view’s content and then generate the snapshot.
   ///If you change the value to `false`, the [WebView] takes the snapshot immediately, and before incorporating any new changes.
   ///
   ///**NOTE**: available only on iOS.
   ///
-  ///**NOTE for iOS**: available only on iOS. Available from iOS 13.0+.
-  bool iosAfterScreenUpdates;
+  ///**NOTE for iOS**: Available from iOS 13.0+.
+  bool afterScreenUpdates;
 
   ScreenshotConfiguration(
       {this.rect,
       this.snapshotWidth,
       this.compressFormat = CompressFormat.PNG,
       this.quality = 100,
-      this.iosAfterScreenUpdates = true}) {
+      @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
+      this.afterScreenUpdates = true}) {
     assert(this.quality >= 0);
+    // ignore: deprecated_member_use_from_same_package
+    this.afterScreenUpdates = this.iosAfterScreenUpdates != null ? this.iosAfterScreenUpdates! : this.afterScreenUpdates;
   }
 
   Map<String, dynamic> toMap() {
@@ -5793,8 +7998,34 @@ class ScreenshotConfiguration {
       "snapshotWidth": snapshotWidth,
       "compressFormat": compressFormat.toValue(),
       "quality": quality,
-      "iosAfterScreenUpdates": iosAfterScreenUpdates
+      "iosAfterScreenUpdates": afterScreenUpdates,
+      "afterScreenUpdates": afterScreenUpdates
     };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the configuration data to use when generating a PDF representation of a web view’s contents.
+///
+///**NOTE**: available on iOS 14.0+.
+class PDFConfiguration {
+  ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
+  ///The default value of this property is `null`, which captures everything in the view’s bounds rectangle.
+  ///If you specify a custom rectangle, it must lie within the bounds rectangle of the [WebView] object.
+  InAppWebViewRect? rect;
+
+  PDFConfiguration({this.rect});
+
+  Map<String, dynamic> toMap() {
+    return {"rect": rect?.toMap()};
   }
 
   Map<String, dynamic> toJson() {
@@ -5810,6 +8041,9 @@ class ScreenshotConfiguration {
 ///An iOS-specific class that represents the configuration data to use when generating a PDF representation of a web view’s contents.
 ///
 ///**NOTE**: available on iOS 14.0+.
+///
+///Use [PDFConfiguration] instead.
+@Deprecated("Use PDFConfiguration instead")
 class IOSWKPDFConfiguration {
   ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
   ///The default value of this property is `null`, which captures everything in the view’s bounds rectangle.
@@ -6156,6 +8390,76 @@ class CSSLinkHtmlTagAttributes {
   }
 }
 
+///
+class URLResponse {
+  ///The URL for the response.
+  Uri? url;
+
+  ///The expected length of the response’s content.
+  int expectedContentLength;
+
+  ///The MIME type of the response.
+  String? mimeType;
+
+  ///A suggested filename for the response data.
+  String? suggestedFilename;
+
+  ///The name of the text encoding provided by the response’s originating source.
+  String? textEncodingName;
+
+  ///All HTTP header fields of the response.
+  Map<String, String>? headers;
+
+  ///The response’s HTTP status code.
+  int? statusCode;
+
+  URLResponse(
+      {this.url,
+        required this.expectedContentLength,
+        this.mimeType,
+        this.suggestedFilename,
+        this.textEncodingName,
+        this.headers,
+        this.statusCode});
+
+  static URLResponse? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return URLResponse(
+        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        expectedContentLength: map["expectedContentLength"],
+        mimeType: map["mimeType"],
+        suggestedFilename: map["suggestedFilename"],
+        textEncodingName: map["textEncodingName"],
+        headers: map["headers"]?.cast<String, String>(),
+        statusCode: map["statusCode"]);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "url": url?.toString(),
+      "expectedContentLength": expectedContentLength,
+      "mimeType": mimeType,
+      "suggestedFilename": suggestedFilename,
+      "textEncodingName": textEncodingName,
+      "headers": headers,
+      "statusCode": statusCode
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Use [URLResponse] instead.
+@Deprecated("Use URLResponse instead")
 class IOSURLResponse {
   ///The URL for the response.
   Uri? url;
@@ -6223,7 +8527,55 @@ class IOSURLResponse {
   }
 }
 
-///An iOS-specific Class that represents the navigation response used by the [WebView.iosOnNavigationResponse] event.
+///Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
+class NavigationResponse {
+  ///The URL for the response.
+  URLResponse? response;
+
+  ///A Boolean value that indicates whether the response targets the web view’s main frame.
+  bool isForMainFrame;
+
+  ///A Boolean value that indicates whether WebKit is capable of displaying the response’s MIME type natively.
+  bool canShowMIMEType;
+
+  NavigationResponse(
+      {this.response,
+        required this.isForMainFrame,
+        required this.canShowMIMEType});
+
+  static NavigationResponse? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return NavigationResponse(
+      response:
+      URLResponse.fromMap(map["response"]?.cast<String, dynamic>()),
+      isForMainFrame: map["isForMainFrame"],
+      canShowMIMEType: map["canShowMIMEType"],
+    );
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "response": response?.toMap(),
+      "isForMainFrame": isForMainFrame,
+      "canShowMIMEType": canShowMIMEType,
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///An iOS-specific Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
+///Use [NavigationResponse] instead.
+@Deprecated("Use NavigationResponse instead")
 class IOSWKNavigationResponse {
   ///The URL for the response.
   IOSURLResponse? response;
@@ -6269,8 +8621,37 @@ class IOSWKNavigationResponse {
   }
 }
 
-///Class that is used by [WebView.iosOnNavigationResponse] event.
+///Class that is used by [WebView.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
+class NavigationResponseAction {
+  final int _value;
+
+  const NavigationResponseAction._internal(this._value);
+
+  int toValue() => _value;
+
+  ///Cancel the navigation.
+  static const CANCEL = const NavigationResponseAction._internal(0);
+
+  ///Allow the navigation to continue.
+  static const ALLOW = const NavigationResponseAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": _value,
+    };
+  }
+}
+
+///Class that is used by [WebView.onNavigationResponse] event.
+///It represents the policy to pass back to the decision handler.
+///Use [NavigationResponseAction] instead.
+@Deprecated("Use NavigationResponseAction instead")
 class IOSNavigationResponseAction {
   final int _value;
 
@@ -6296,8 +8677,37 @@ class IOSNavigationResponseAction {
   }
 }
 
-///Class that is used by [WebView.iosShouldAllowDeprecatedTLS] event.
+///Class that is used by [WebView.shouldAllowDeprecatedTLS] event.
 ///It represents the policy to pass back to the decision handler.
+class ShouldAllowDeprecatedTLSAction {
+  final int _value;
+
+  const ShouldAllowDeprecatedTLSAction._internal(this._value);
+
+  int toValue() => _value;
+
+  ///Cancel the navigation.
+  static const CANCEL = const ShouldAllowDeprecatedTLSAction._internal(0);
+
+  ///Allow the navigation to continue.
+  static const ALLOW = const ShouldAllowDeprecatedTLSAction._internal(1);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+
+  Map<String, dynamic> toMap() {
+    return {
+      "action": _value,
+    };
+  }
+}
+
+///Class that is used by [WebView.shouldAllowDeprecatedTLS] event.
+///It represents the policy to pass back to the decision handler.
+///Use [ShouldAllowDeprecatedTLSAction] instead.
+@Deprecated("Use ShouldAllowDeprecatedTLSAction instead")
 class IOSShouldAllowDeprecatedTLSAction {
   final int _value;
 
@@ -6339,66 +8749,130 @@ class URLRequest {
   ///A dictionary containing all of the HTTP header fields for a request.
   Map<String, String>? headers;
 
+  ///Use [allowsCellularAccess] instead.
+  @Deprecated("Use allowsCellularAccess instead")
+  bool? iosAllowsCellularAccess;
+
   ///A Boolean value indicating whether the request is allowed to use the built-in cellular radios to satisfy the request.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosAllowsCellularAccess;
+  bool? allowsCellularAccess;
+
+  ///Use [allowsConstrainedNetworkAccess] instead.
+  @Deprecated("Use allowsConstrainedNetworkAccess instead")
+  bool? iosAllowsConstrainedNetworkAccess;
 
   ///A Boolean value that indicates whether the request may use the network when the user has specified Low Data Mode.
   ///
   ///**NOTE**: available only on iOS 13.0+.
-  bool? iosAllowsConstrainedNetworkAccess;
+  bool? allowsConstrainedNetworkAccess;
+
+  ///Use [allowsExpensiveNetworkAccess] instead.
+  @Deprecated("Use allowsExpensiveNetworkAccess instead")
+  bool? iosAllowsExpensiveNetworkAccess;
 
   ///A Boolean value that indicates whether connections may use a network interface that the system considers expensive.
   ///
   ///**NOTE**: available only on iOS 13.0+.
-  bool? iosAllowsExpensiveNetworkAccess;
+  bool? allowsExpensiveNetworkAccess;
+
+  ///Use [cachePolicy] instead.
+  @Deprecated("Use cachePolicy instead")
+  IOSURLRequestCachePolicy? iosCachePolicy;
 
   ///The request’s cache policy.
   ///
   ///**NOTE**: available only on iOS.
-  IOSURLRequestCachePolicy? iosCachePolicy;
+  URLRequestCachePolicy? cachePolicy;
+
+  ///Use [httpShouldHandleCookies] instead.
+  @Deprecated("Use httpShouldHandleCookies instead")
+  bool? iosHttpShouldHandleCookies;
 
   ///A Boolean value indicating whether cookies will be sent with and set for this request.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosHttpShouldHandleCookies;
+  bool? httpShouldHandleCookies;
+
+  ///Use [httpShouldUsePipelining] instead.
+  @Deprecated("Use httpShouldUsePipelining instead")
+  bool? iosHttpShouldUsePipelining;
 
   ///A Boolean value indicating whether the request should transmit before the previous response is received.
   ///
   ///**NOTE**: available only on iOS.
-  bool? iosHttpShouldUsePipelining;
+  bool? httpShouldUsePipelining;
+
+  ///Use [networkServiceType] instead.
+  @Deprecated("Use networkServiceType instead")
+  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
 
   ///The service type associated with this request.
   ///
   ///**NOTE**: available only on iOS.
-  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
+  URLRequestNetworkServiceType? networkServiceType;
+
+  ///Use [timeoutInterval] instead.
+  @Deprecated("Use timeoutInterval instead")
+  double? iosTimeoutInterval;
 
   ///The timeout interval of the request.
   ///
   ///**NOTE**: available only on iOS.
-  double? iosTimeoutInterval;
+  double? timeoutInterval;
+
+  ///Use [mainDocumentURL] instead.
+  @Deprecated("Use mainDocumentURL instead")
+  Uri? iosMainDocumentURL;
 
   ///The main document URL associated with this request.
   ///This URL is used for the cookie “same domain as main document” policy.
   ///
   ///**NOTE**: available only on iOS.
-  Uri? iosMainDocumentURL;
+  Uri? mainDocumentURL;
 
   URLRequest(
       {required this.url,
       this.method,
       this.headers,
       this.body,
-      this.iosAllowsCellularAccess,
-      this.iosAllowsConstrainedNetworkAccess,
-      this.iosAllowsExpensiveNetworkAccess,
-      this.iosCachePolicy,
-      this.iosHttpShouldHandleCookies,
-      this.iosHttpShouldUsePipelining,
-      this.iosNetworkServiceType,
-      this.iosTimeoutInterval,
-      this.iosMainDocumentURL});
+      @Deprecated("Use allowsCellularAccess instead") this.iosAllowsCellularAccess,
+      this.allowsCellularAccess,
+      @Deprecated("Use allowsConstrainedNetworkAccess instead") this.iosAllowsConstrainedNetworkAccess,
+      this.allowsConstrainedNetworkAccess,
+      @Deprecated("Use allowsExpensiveNetworkAccess instead") this.iosAllowsExpensiveNetworkAccess,
+      this.allowsExpensiveNetworkAccess,
+      @Deprecated("Use cachePolicy instead") this.iosCachePolicy,
+      this.cachePolicy,
+      @Deprecated("Use httpShouldHandleCookies instead") this.iosHttpShouldHandleCookies,
+      this.httpShouldHandleCookies,
+      @Deprecated("Use httpShouldUsePipelining instead") this.iosHttpShouldUsePipelining,
+      this.httpShouldUsePipelining,
+      @Deprecated("Use networkServiceType instead") this.iosNetworkServiceType,
+      this.networkServiceType,
+      @Deprecated("Use timeoutInterval instead") this.iosTimeoutInterval,
+      this.timeoutInterval,
+      @Deprecated("Use mainDocumentURL instead") this.iosMainDocumentURL,
+      this.mainDocumentURL,}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.allowsCellularAccess = this.allowsCellularAccess ?? this.iosAllowsCellularAccess;
+    // ignore: deprecated_member_use_from_same_package
+    this.allowsConstrainedNetworkAccess = this.allowsConstrainedNetworkAccess ?? this.iosAllowsConstrainedNetworkAccess;
+    // ignore: deprecated_member_use_from_same_package
+    this.allowsExpensiveNetworkAccess = this.allowsExpensiveNetworkAccess ?? this.iosAllowsExpensiveNetworkAccess;
+    // ignore: deprecated_member_use_from_same_package
+    this.cachePolicy = this.cachePolicy ?? URLRequestCachePolicy.fromValue(this.iosCachePolicy?.toValue());
+    // ignore: deprecated_member_use_from_same_package
+    this.httpShouldHandleCookies = this.httpShouldHandleCookies ?? this.iosHttpShouldHandleCookies;
+    // ignore: deprecated_member_use_from_same_package
+    this.httpShouldUsePipelining = this.httpShouldUsePipelining ?? this.iosHttpShouldUsePipelining;
+    // ignore: deprecated_member_use_from_same_package
+    this.networkServiceType = this.networkServiceType ?? URLRequestNetworkServiceType.fromValue(this.iosNetworkServiceType?.toValue());
+    // ignore: deprecated_member_use_from_same_package
+    this.timeoutInterval = this.timeoutInterval ?? this.iosTimeoutInterval;
+    // ignore: deprecated_member_use_from_same_package
+    this.mainDocumentURL = this.mainDocumentURL ?? this.iosMainDocumentURL;
+  }
 
   static URLRequest? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -6409,18 +8883,36 @@ class URLRequest {
       headers: map["headers"]?.cast<String, String>(),
       method: map["method"],
       body: map["body"],
-      iosAllowsCellularAccess: map["iosAllowsCellularAccess"],
-      iosAllowsConstrainedNetworkAccess:
-          map["iosAllowsConstrainedNetworkAccess"],
-      iosAllowsExpensiveNetworkAccess: map["iosAllowsExpensiveNetworkAccess"],
-      iosCachePolicy: IOSURLRequestCachePolicy.fromValue(map["iosCachePolicy"]),
-      iosHttpShouldHandleCookies: map["iosHttpShouldHandleCookies"],
-      iosHttpShouldUsePipelining: map["iosHttpShouldUsePipelining"],
-      iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromValue(
-          map["iosNetworkServiceType"]),
-      iosTimeoutInterval: map["iosTimeoutInterval"],
-      iosMainDocumentURL: map["iosMainDocumentURL"] != null
-          ? Uri.parse(map["iosMainDocumentURL"])
+      // ignore: deprecated_member_use_from_same_package
+      iosAllowsCellularAccess: map["allowsCellularAccess"],
+      allowsCellularAccess: map["allowsCellularAccess"],
+      // ignore: deprecated_member_use_from_same_package
+      iosAllowsConstrainedNetworkAccess: map["allowsConstrainedNetworkAccess"],
+      allowsConstrainedNetworkAccess: map["allowsConstrainedNetworkAccess"],
+      // ignore: deprecated_member_use_from_same_package
+      iosAllowsExpensiveNetworkAccess: map["allowsExpensiveNetworkAccess"],
+      allowsExpensiveNetworkAccess: map["allowsExpensiveNetworkAccess"],
+      // ignore: deprecated_member_use_from_same_package
+      iosCachePolicy: IOSURLRequestCachePolicy.fromValue(map["cachePolicy"]),
+      cachePolicy: URLRequestCachePolicy.fromValue(map["cachePolicy"]),
+      // ignore: deprecated_member_use_from_same_package
+      iosHttpShouldHandleCookies: map["httpShouldHandleCookies"],
+      httpShouldHandleCookies: map["httpShouldHandleCookies"],
+      // ignore: deprecated_member_use_from_same_package
+      iosHttpShouldUsePipelining: map["httpShouldUsePipelining"],
+      httpShouldUsePipelining: map["httpShouldUsePipelining"],
+      // ignore: deprecated_member_use_from_same_package
+      iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
+      networkServiceType: URLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
+      // ignore: deprecated_member_use_from_same_package
+      iosTimeoutInterval: map["timeoutInterval"],
+      timeoutInterval: map["timeoutInterval"],
+      // ignore: deprecated_member_use_from_same_package
+      iosMainDocumentURL: map["mainDocumentURL"] != null
+          ? Uri.parse(map["mainDocumentURL"])
+          : null,
+      mainDocumentURL: map["mainDocumentURL"] != null
+          ? Uri.parse(map["mainDocumentURL"])
           : null,
     );
   }
@@ -6431,15 +8923,116 @@ class URLRequest {
       "headers": headers,
       "method": method,
       "body": body,
-      "iosAllowsCellularAccess": iosAllowsCellularAccess,
-      "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
-      "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
-      "iosCachePolicy": iosCachePolicy?.toValue(),
-      "iosHttpShouldHandleCookies": iosHttpShouldHandleCookies,
-      "iosHttpShouldUsePipelining": iosHttpShouldUsePipelining,
-      "iosNetworkServiceType": iosNetworkServiceType?.toValue(),
-      "iosTimeoutInterval": iosTimeoutInterval,
-      "iosMainDocumentURL": iosMainDocumentURL?.toString(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosAllowsCellularAccess": allowsCellularAccess ?? iosAllowsCellularAccess,
+      // ignore: deprecated_member_use_from_same_package
+      "allowsCellularAccess": allowsCellularAccess ?? iosAllowsCellularAccess,
+      // ignore: deprecated_member_use_from_same_package
+      "iosAllowsConstrainedNetworkAccess": allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
+      // ignore: deprecated_member_use_from_same_package
+      "allowsConstrainedNetworkAccess": allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
+      // ignore: deprecated_member_use_from_same_package
+      "iosAllowsExpensiveNetworkAccess": allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
+      // ignore: deprecated_member_use_from_same_package
+      "allowsExpensiveNetworkAccess": allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
+      // ignore: deprecated_member_use_from_same_package
+      "iosCachePolicy": cachePolicy?.toValue() ?? iosCachePolicy?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "cachePolicy": cachePolicy?.toValue() ?? iosCachePolicy?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosHttpShouldHandleCookies": httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
+      // ignore: deprecated_member_use_from_same_package
+      "httpShouldHandleCookies": httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
+      // ignore: deprecated_member_use_from_same_package
+      "iosHttpShouldUsePipelining": httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
+      // ignore: deprecated_member_use_from_same_package
+      "httpShouldUsePipelining": httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
+      // ignore: deprecated_member_use_from_same_package
+      "iosNetworkServiceType": networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "networkServiceType": networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
+      // ignore: deprecated_member_use_from_same_package
+      "iosTimeoutInterval": timeoutInterval ?? iosTimeoutInterval,
+      // ignore: deprecated_member_use_from_same_package
+      "timeoutInterval": timeoutInterval ?? iosTimeoutInterval,
+      // ignore: deprecated_member_use_from_same_package
+      "iosMainDocumentURL": (mainDocumentURL ?? iosMainDocumentURL)?.toString(),
+      // ignore: deprecated_member_use_from_same_package
+      "mainDocumentURL": (mainDocumentURL ?? iosMainDocumentURL)?.toString(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that specifies optional attributes for the containing window when a new web view is requested.
+class WindowFeatures {
+  ///A Boolean value indicating whether the containing window should be resizable, or `null` if resizability is not specified.
+  bool? allowsResizing;
+
+  ///A Double value specifying the height of the containing window, or `null` if the height is not specified.
+  double? height;
+
+  ///A Boolean value indicating whether the menu bar should be visible, or `null` if menu bar visibility is not specified.
+  bool? menuBarVisibility;
+
+  ///A Boolean value indicating whether the status bar should be visible, or `null` if status bar visibility is not specified.
+  bool? statusBarVisibility;
+
+  ///A Boolean value indicating whether toolbars should be visible, or `null` if toolbars visibility is not specified.
+  bool? toolbarsVisibility;
+
+  ///A Double value specifying the width of the containing window, or `null` if the width is not specified.
+  double? width;
+
+  ///A Double value specifying the x-coordinate of the containing window, or `null` if the x-coordinate is not specified.
+  double? x;
+
+  ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
+  double? y;
+
+  WindowFeatures(
+      {this.allowsResizing,
+        this.height,
+        this.menuBarVisibility,
+        this.statusBarVisibility,
+        this.toolbarsVisibility,
+        this.width,
+        this.x,
+        this.y});
+
+  static WindowFeatures? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return WindowFeatures(
+        allowsResizing: map["allowsResizing"],
+        height: map["height"],
+        menuBarVisibility: map["menuBarVisibility"],
+        statusBarVisibility: map["statusBarVisibility"],
+        toolbarsVisibility: map["toolbarsVisibility"],
+        width: map["width"],
+        x: map["x"],
+        y: map["y"]);
+  }
+
+  Map<String, dynamic> toMap() {
+    return {
+      "allowsResizing": allowsResizing,
+      "height": height,
+      "menuBarVisibility": menuBarVisibility,
+      "statusBarVisibility": statusBarVisibility,
+      "toolbarsVisibility": toolbarsVisibility,
+      "width": width,
+      "x": x,
+      "y": y,
     };
   }
 
@@ -6454,6 +9047,8 @@ class URLRequest {
 }
 
 ///An iOS-specific class that specifies optional attributes for the containing window when a new web view is requested.
+///Use [WindowFeatures] instead.
+@Deprecated("Use WindowFeatures instead")
 class IOSWKWindowFeatures {
   ///A Boolean value indicating whether the containing window should be resizable, or `null` if resizability is not specified.
   bool? allowsResizing;
@@ -6527,8 +9122,159 @@ class IOSWKWindowFeatures {
   }
 }
 
+///Class that represents a string with associated attributes
+///used by the [PullToRefreshController] and [PullToRefreshOptions] classes.
+class AttributedString {
+  ///The characters for the new object.
+  String string;
+
+  ///The color of the background behind the text.
+  ///
+  ///The value of this attribute is a [Color] object.
+  ///Use this attribute to specify the color of the background area behind the text.
+  ///If you do not specify this attribute, no background color is drawn.
+  Color? backgroundColor;
+
+  ///The vertical offset for the position of the text.
+  ///
+  ///The value of this attribute is a number containing a floating point value indicating the character’s offset from the baseline, in points.
+  ///The default value is `0`.
+  double? baselineOffset;
+
+  ///The expansion factor of the text.
+  ///
+  ///The value of this attribute is a number containing a floating point value indicating the log of the expansion factor to be applied to glyphs.
+  ///The default value is `0`, indicating no expansion.
+  double? expansion;
+
+  ///The color of the text.
+  ///
+  ///The value of this attribute is a [Color] object.
+  ///Use this attribute to specify the color of the text during rendering.
+  ///If you do not specify this attribute, the text is rendered in black.
+  Color? foregroundColor;
+
+  ///The kerning of the text.
+  ///
+  ///The value of this attribute is a number containing a floating-point value.
+  ///This value specifies the number of points by which to adjust kern-pair characters.
+  ///Kerning prevents unwanted space from occurring between specific characters and depends on the font.
+  ///The value `0` means kerning is disabled. The default value for this attribute is `0`.
+  double? kern;
+
+  ///The ligature of the text.
+  ///
+  ///The value of this attribute is a number containing an integer.
+  ///Ligatures cause specific character combinations to be rendered using a single custom glyph that corresponds to those characters.
+  ///The value `0` indicates no ligatures. The value `1` indicates the use of the default ligatures.
+  ///The value `2` indicates the use of all ligatures.
+  ///The default value for this attribute is `1`. (Value `2` is unsupported on iOS.)
+  int? ligature;
+
+  ///The obliqueness of the text.
+  ///
+  ///The value of this attribute is a number containing a floating point value indicating skew to be applied to glyphs.
+  ///The default value is `0`, indicating no skew.
+  double? obliqueness;
+
+  ///The color of the strikethrough.
+  ///
+  ///The value of this attribute is a [Color] object. The default value is `null`, indicating same as foreground color.
+  Color? strikethroughColor;
+
+  ///The strikethrough style of the text.
+  ///
+  ///This value indicates whether the text has a line through it and corresponds to one of the constants described in [UnderlineStyle].
+  ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
+  UnderlineStyle? strikethroughStyle;
+
+  ///The color of the stroke.
+  ///
+  ///The value of this parameter is a [Color] object.
+  ///If it is not defined (which is the case by default), it is assumed to be the same as the value of foregroundColor;
+  ///otherwise, it describes the outline color.
+  Color? strokeColor;
+
+  ///The width of the stroke.
+  ///
+  ///The value of this attribute is a number containing a floating-point value.
+  ///This value represents the amount to change the stroke width and is specified as a percentage of the font point size.
+  ///Specify `0` (the default) for no additional changes.
+  ///Specify positive values to change the stroke width alone.
+  ///Specify negative values to stroke and fill the text.
+  ///For example, a typical value for outlined text would be `3.0`.
+  double? strokeWidth;
+
+  ///The text effect.
+  ///
+  ///The value of this attribute is a [AttributedStringTextEffectStyle] object.
+  ///The default value of this property is `null`, indicating no text effect.
+  AttributedStringTextEffectStyle? textEffect;
+
+  ///The color of the underline.
+  ///
+  ///The value of this attribute is a [Color] object.
+  ///The default value is `null`, indicating same as foreground color.
+  Color? underlineColor;
+
+  ///The underline style of the text.
+  ///
+  ///This value indicates whether the text is underlined and corresponds to one of the constants described in [UnderlineStyle].
+  ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
+  UnderlineStyle? underlineStyle;
+
+  AttributedString({
+    required this.string,
+    this.backgroundColor,
+    this.baselineOffset,
+    this.expansion,
+    this.foregroundColor,
+    this.kern,
+    this.ligature,
+    this.obliqueness,
+    this.strikethroughColor,
+    this.strikethroughStyle,
+    this.strokeColor,
+    this.strokeWidth,
+    this.textEffect,
+    this.underlineColor,
+    this.underlineStyle,
+  });
+
+  Map<String, dynamic> toMap() {
+    return {
+      "string": this.string,
+      "backgroundColor": this.backgroundColor?.toHex(),
+      "baselineOffset": this.baselineOffset,
+      "expansion": this.expansion,
+      "foregroundColor": this.foregroundColor?.toHex(),
+      "kern": this.kern,
+      "ligature": this.ligature,
+      "obliqueness": this.obliqueness,
+      "strikethroughColor": this.strikethroughColor?.toHex(),
+      "strikethroughStyle": this.strikethroughStyle?.toValue(),
+      "strokeColor": this.strokeColor?.toHex(),
+      "strokeWidth": this.strokeWidth,
+      "textEffect": this.textEffect?.toValue(),
+      "underlineColor": this.underlineColor?.toHex(),
+      "underlineStyle": this.underlineStyle?.toValue(),
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
 ///An iOS-specific class that represents a string with associated attributes
 ///used by the [PullToRefreshController] and [PullToRefreshOptions] classes.
+///Use [AttributedString] instead.
+@Deprecated("Use AttributedString instead")
 class IOSNSAttributedString {
   ///The characters for the new object.
   String string;
@@ -6676,7 +9422,99 @@ class IOSNSAttributedString {
   }
 }
 
+///Class that represents the constants for the underline style and strikethrough style attribute keys.
+class UnderlineStyle {
+  final int _value;
+
+  const UnderlineStyle._internal(this._value);
+
+  static final Set<UnderlineStyle> values = [
+    UnderlineStyle.STYLE_NONE,
+    UnderlineStyle.SINGLE,
+    UnderlineStyle.THICK,
+    UnderlineStyle.DOUBLE,
+    UnderlineStyle.PATTERN_DOT,
+    UnderlineStyle.PATTERN_DASH,
+    UnderlineStyle.PATTERN_DASH_DOT,
+    UnderlineStyle.PATTERN_DASH_DOT_DOT,
+    UnderlineStyle.BY_WORD,
+  ].toSet();
+
+  static UnderlineStyle? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return UnderlineStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SINGLE";
+      case 2:
+        return "THICK";
+      case 9:
+        return "DOUBLE";
+      case 256:
+        return "PATTERN_DOT";
+      case 512:
+        return "PATTERN_DASH";
+      case 768:
+        return "PATTERN_DASH_DOT";
+      case 1024:
+        return "PATTERN_DASH_DOT_DOT";
+      case 32768:
+        return "BY_WORD";
+      case 0:
+      default:
+        return "STYLE_NONE";
+    }
+  }
+
+  ///Do not draw a line.
+  static const STYLE_NONE = const UnderlineStyle._internal(0);
+
+  ///Draw a single line.
+  static const SINGLE = const UnderlineStyle._internal(1);
+
+  ///Draw a thick line.
+  static const THICK = const UnderlineStyle._internal(2);
+
+  ///Draw a double line.
+  static const DOUBLE = const UnderlineStyle._internal(9);
+
+  ///Draw a line of dots.
+  static const PATTERN_DOT = const UnderlineStyle._internal(256);
+
+  ///Draw a line of dashes.
+  static const PATTERN_DASH = const UnderlineStyle._internal(512);
+
+  ///Draw a line of alternating dashes and dots.
+  static const PATTERN_DASH_DOT = const UnderlineStyle._internal(768);
+
+  ///Draw a line of alternating dashes and two dots.
+  static const PATTERN_DASH_DOT_DOT = const UnderlineStyle._internal(1024);
+
+  ///Draw the line only beneath or through words, not whitespace.
+  static const BY_WORD = const UnderlineStyle._internal(32768);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific Class that represents the constants for the underline style and strikethrough style attribute keys.
+///Use [UnderlineStyle] instead.
+@Deprecated("Use UnderlineStyle instead")
 class IOSNSUnderlineStyle {
   final int _value;
 
@@ -6766,7 +9604,46 @@ class IOSNSUnderlineStyle {
   int get hashCode => _value.hashCode;
 }
 
+///Class that represents the supported proxy types.
+class AttributedStringTextEffectStyle {
+  final String _value;
+
+  const AttributedStringTextEffectStyle._internal(this._value);
+
+  static final Set<AttributedStringTextEffectStyle> values = [
+    AttributedStringTextEffectStyle.LETTERPRESS_STYLE,
+  ].toSet();
+
+  static AttributedStringTextEffectStyle? fromValue(String? value) {
+    if (value != null) {
+      try {
+        return AttributedStringTextEffectStyle.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  String toValue() => _value;
+
+  @override
+  String toString() => _value;
+
+  ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
+  static const LETTERPRESS_STYLE =
+  const AttributedStringTextEffectStyle._internal("letterpressStyle");
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific Class that represents the supported proxy types.
+///Use [AttributedStringTextEffectStyle] instead.
+@Deprecated("Use AttributedStringTextEffectStyle instead")
 class IOSNSAttributedStringTextEffectStyle {
   final String _value;
 
@@ -6803,7 +9680,57 @@ class IOSNSAttributedStringTextEffectStyle {
   int get hashCode => _value.hashCode;
 }
 
+///Class representing the size of the refresh indicator.
+class PullToRefreshSize {
+  final int _value;
+
+  const PullToRefreshSize._internal(this._value);
+
+  static final Set<PullToRefreshSize> values = [
+    PullToRefreshSize.DEFAULT,
+    PullToRefreshSize.LARGE,
+  ].toSet();
+
+  static PullToRefreshSize? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return PullToRefreshSize.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 0:
+        return "LARGE";
+      case 1:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  ///Default size.
+  static const DEFAULT = const PullToRefreshSize._internal(1);
+
+  ///Large size.
+  static const LARGE = const PullToRefreshSize._internal(0);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///Android-specific class representing the size of the refresh indicator.
+///Use [PullToRefreshSize] instead.
+@Deprecated("Use PullToRefreshSize instead")
 class AndroidPullToRefreshSize {
   final int _value;
 
@@ -7058,13 +9985,25 @@ class TrustedWebActivityImmersiveDisplayMode
   ///Whether the Trusted Web Activity should be in sticky immersive mode.
   bool isSticky;
 
+  ///Use [displayCutoutMode] instead.
+  @Deprecated("Use displayCutoutMode instead")
+  AndroidLayoutInDisplayCutoutMode? layoutInDisplayCutoutMode;
+
   ///The constant defining how to deal with display cutouts.
-  AndroidLayoutInDisplayCutoutMode layoutInDisplayCutoutMode;
+  LayoutInDisplayCutoutMode displayCutoutMode;
 
   String _type = "IMMERSIVE_MODE";
 
   TrustedWebActivityImmersiveDisplayMode(
-      {required this.isSticky, required this.layoutInDisplayCutoutMode});
+      {required this.isSticky,
+        this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
+        this.layoutInDisplayCutoutMode}) {
+    // ignore: deprecated_member_use_from_same_package
+    this.displayCutoutMode = this.layoutInDisplayCutoutMode != null ?
+      // ignore: deprecated_member_use_from_same_package
+      LayoutInDisplayCutoutMode.fromValue(this.layoutInDisplayCutoutMode!.toValue())! :
+      this.displayCutoutMode;
+  }
 
   static TrustedWebActivityImmersiveDisplayMode? fromMap(
       Map<String, dynamic>? map) {
@@ -7074,13 +10013,15 @@ class TrustedWebActivityImmersiveDisplayMode
 
     return TrustedWebActivityImmersiveDisplayMode(
         isSticky: map["isSticky"],
+        displayCutoutMode: map["layoutInDisplayCutoutMode"],
         layoutInDisplayCutoutMode: map["layoutInDisplayCutoutMode"]);
   }
 
   Map<String, dynamic> toMap() {
     return {
       "isSticky": isSticky,
-      "layoutInDisplayCutoutMode": layoutInDisplayCutoutMode.toValue(),
+      "layoutInDisplayCutoutMode": displayCutoutMode.toValue(),
+      "displayCutoutMode": displayCutoutMode.toValue(),
       "type": _type
     };
   }
@@ -7095,9 +10036,83 @@ class TrustedWebActivityImmersiveDisplayMode
   }
 }
 
+///Class representing the share state that should be applied to the custom tab.
+///
+///**NOTE**: available on Android 28+.
+class LayoutInDisplayCutoutMode {
+  final int _value;
+
+  const LayoutInDisplayCutoutMode._internal(this._value);
+
+  static final Set<LayoutInDisplayCutoutMode> values = [
+    LayoutInDisplayCutoutMode.DEFAULT,
+    LayoutInDisplayCutoutMode.SHORT_EDGES,
+    LayoutInDisplayCutoutMode.NEVER,
+    LayoutInDisplayCutoutMode.ALWAYS
+  ].toSet();
+
+  static LayoutInDisplayCutoutMode? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return LayoutInDisplayCutoutMode.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "SHORT_EDGES";
+      case 2:
+        return "NEVER";
+      case 3:
+        return "ALWAYS";
+      case 0:
+      default:
+        return "DEFAULT";
+    }
+  }
+
+  ///With this default setting, content renders into the cutout area when displayed in portrait mode, but content is letterboxed when displayed in landscape mode.
+  ///
+  ///**NOTE**: available on Android 28+.
+  static const DEFAULT = const LayoutInDisplayCutoutMode._internal(0);
+
+  ///Content renders into the cutout area in both portrait and landscape modes.
+  ///
+  ///**NOTE**: available on Android 28+.
+  static const SHORT_EDGES =
+  const LayoutInDisplayCutoutMode._internal(1);
+
+  ///Content never renders into the cutout area.
+  ///
+  ///**NOTE**: available on Android 28+.
+  static const NEVER = const LayoutInDisplayCutoutMode._internal(2);
+
+  ///The window is always allowed to extend into the DisplayCutout areas on the all edges of the screen.
+  ///
+  ///**NOTE**: available on Android 30+.
+  static const ALWAYS = const LayoutInDisplayCutoutMode._internal(3);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///Android-specific class representing the share state that should be applied to the custom tab.
 ///
 ///**NOTE**: available on Android 28+.
+///
+///Use [LayoutInDisplayCutoutMode] instead.
+@Deprecated("Use LayoutInDisplayCutoutMode instead")
 class AndroidLayoutInDisplayCutoutMode {
   final int _value;
 

@@ -12,16 +12,15 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity;
-import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserOptions;
+import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserSettings;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewOptions;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewSettings;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.SslCertificateExt;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
-import com.pichillilorenzo.flutter_inappwebview.types.WebMessage;
 import com.pichillilorenzo.flutter_inappwebview.types.WebMessageChannel;
 import com.pichillilorenzo.flutter_inappwebview.types.WebMessageListener;
 import com.pichillilorenzo.flutter_inappwebview.types.WebMessagePort;
@@ -179,27 +178,27 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
         else
           result.success(null);
         break;
-      case "setOptions":
+      case "setSettings":
         if (webView != null && webView.getInAppBrowserDelegate() != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
-          InAppBrowserOptions inAppBrowserOptions = new InAppBrowserOptions();
-          HashMap<String, Object> inAppBrowserOptionsMap = (HashMap<String, Object>) call.argument("options");
-          inAppBrowserOptions.parse(inAppBrowserOptionsMap);
-          inAppBrowserActivity.setOptions(inAppBrowserOptions, inAppBrowserOptionsMap);
+          InAppBrowserSettings inAppBrowserSettings = new InAppBrowserSettings();
+          HashMap<String, Object> inAppBrowserSettingsMap = (HashMap<String, Object>) call.argument("settings");
+          inAppBrowserSettings.parse(inAppBrowserSettingsMap);
+          inAppBrowserActivity.setSettings(inAppBrowserSettings, inAppBrowserSettingsMap);
         } else if (webView != null) {
-          InAppWebViewOptions inAppWebViewOptions = new InAppWebViewOptions();
-          HashMap<String, Object> inAppWebViewOptionsMap = (HashMap<String, Object>) call.argument("options");
-          inAppWebViewOptions.parse(inAppWebViewOptionsMap);
-          webView.setOptions(inAppWebViewOptions, inAppWebViewOptionsMap);
+          InAppWebViewSettings inAppWebViewSettings = new InAppWebViewSettings();
+          HashMap<String, Object> inAppWebViewSettingsMap = (HashMap<String, Object>) call.argument("settings");
+          inAppWebViewSettings.parse(inAppWebViewSettingsMap);
+          webView.setSettings(inAppWebViewSettings, inAppWebViewSettingsMap);
         }
         result.success(true);
         break;
-      case "getOptions":
+      case "getSettings":
         if (webView != null && webView.getInAppBrowserDelegate() != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
-          result.success(inAppBrowserActivity.getOptions());
+          result.success(inAppBrowserActivity.getCustomSettings());
         } else {
-          result.success((webView != null) ? webView.getOptions() : null);
+          result.success((webView != null) ? webView.getCustomSettings() : null);
         }
         break;
       case "close":

@@ -9,7 +9,7 @@ import Foundation
 
 @available(iOS 9.0, *)
 @objcMembers
-public class SafariBrowserOptions: Options<SafariViewController> {
+public class SafariBrowserOptions: IWebViewSettings<SafariViewController> {
     
     var entersReaderIfAvailable = false
     var barCollapsingEnabled = false
@@ -23,7 +23,7 @@ public class SafariBrowserOptions: Options<SafariViewController> {
         super.init()
     }
     
-    override func getRealOptions(obj: SafariViewController?) -> [String: Any?] {
+    override func getRealSettings(obj: SafariViewController?) -> [String: Any?] {
         var realOptions: [String: Any?] = toMap()
         if let safariViewController = obj {
             if #available(iOS 11.0, *) {

@@ -2,7 +2,6 @@ package com.pichillilorenzo.flutter_inappwebview.content_blocker;
 
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.webkit.WebResourceResponse;
 
@@ -44,7 +43,7 @@ public class ContentBlockerHandler {
     }
 
     public WebResourceResponse checkUrl(final InAppWebView webView, String url, ContentBlockerTriggerResourceType responseResourceType) throws URISyntaxException, InterruptedException, MalformedURLException {
-        if (webView.options.contentBlockers == null)
+        if (webView.customSettings.contentBlockers == null)
             return null;
 
         URI u;

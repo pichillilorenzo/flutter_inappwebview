@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ContextMenuOptions: Options<NSObject> {
+class ContextMenuOptions: IWebViewSettings<NSObject> {
     
     var hideDefaultSystemContextMenuItems = false;
 

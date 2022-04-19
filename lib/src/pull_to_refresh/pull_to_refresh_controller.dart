@@ -5,7 +5,7 @@ import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../util.dart';
 import '../types.dart';
-import '../in_app_webview/android/in_app_webview_options.dart';
+import '../in_app_webview/in_app_webview_settings.dart';
 import 'pull_to_refresh_options.dart';
 
 ///A standard controller that can initiate the refreshing of a scroll view’s contents.
@@ -14,7 +14,7 @@ import 'pull_to_refresh_options.dart';
 ///All the methods should be called only when the WebView has been created or is already running
 ///(for example [WebView.onWebViewCreated] or [InAppBrowser.onBrowserCreated]).
 ///
-///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [AndroidInAppWebViewOptions.useHybridComposition] must be `true`.
+///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.
 class PullToRefreshController {
   late PullToRefreshOptions options;
   MethodChannel? _channel;
@@ -115,10 +115,18 @@ class PullToRefreshController {
     return await _channel?.invokeMethod('getDefaultSlingshotDistance', args);
   }
 
-  ///Sets the size of the refresh indicator. One of [AndroidPullToRefreshSize.DEFAULT], or [AndroidPullToRefreshSize.LARGE].
+  ///Use [setIndicatorSize] instead.
+  @Deprecated("Use setIndicatorSize instead")
+  Future<void> setSize(AndroidPullToRefreshSize size) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('size', () => size.toValue());
+    await _channel?.invokeMethod('setSize', args);
+  }
+
+  ///Sets the size of the refresh indicator. One of [PullToRefreshSize.DEFAULT], or [PullToRefreshSize.LARGE].
   ///
   ///**NOTE**: Available only on Android.
-  Future<void> setSize(AndroidPullToRefreshSize size) async {
+  Future<void> setIndicatorSize(PullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toValue());
     await _channel?.invokeMethod('setSize', args);

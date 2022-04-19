@@ -153,25 +153,25 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(nil)
                 }
                 break
-            case "setOptions":
+            case "setSettings":
                 if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
-                    let inAppBrowserOptions = InAppBrowserOptions()
-                    let inAppBrowserOptionsMap = arguments!["options"] as! [String: Any]
-                    let _ = inAppBrowserOptions.parse(options: inAppBrowserOptionsMap)
-                    iabController.setOptions(newOptions: inAppBrowserOptions, newOptionsMap: inAppBrowserOptionsMap)
+                    let inAppBrowserSettings = InAppBrowserSettings()
+                    let inAppBrowserSettingsMap = arguments!["settings"] as! [String: Any]
+                    let _ = inAppBrowserSettings.parse(settings: inAppBrowserSettingsMap)
+                    iabController.setSettings(newSettings: inAppBrowserSettings, newSettingsMap: inAppBrowserSettingsMap)
                 } else {
-                    let inAppWebViewOptions = InAppWebViewOptions()
-                    let inAppWebViewOptionsMap = arguments!["options"] as! [String: Any]
-                    let _ = inAppWebViewOptions.parse(options: inAppWebViewOptionsMap)
-                    webView?.setOptions(newOptions: inAppWebViewOptions, newOptionsMap: inAppWebViewOptionsMap)
+                    let inAppWebViewSettings = InAppWebViewSettings()
+                    let inAppWebViewSettingsMap = arguments!["settings"] as! [String: Any]
+                    let _ = inAppWebViewSettings.parse(settings: inAppWebViewSettingsMap)
+                    webView?.setSettings(newSettings: inAppWebViewSettings, newSettingsMap: inAppWebViewSettingsMap)
                 }
                 result(true)
                 break
-            case "getOptions":
+            case "getSettings":
                 if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
-                    result(iabController.getOptions())
+                    result(iabController.getSettings())
                 } else {
-                    result(webView?.getOptions())
+                    result(webView?.getSettings())
                 }
                 break
             case "close":
@@ -441,7 +441,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "createPdf":
                 if let webView = webView, #available(iOS 14.0, *) {
-                    let configuration = arguments!["iosWKPdfConfiguration"] as? [String: Any?]
+                    let configuration = arguments!["pdfConfiguration"] as? [String: Any?]
                     webView.createPdf(configuration: configuration, completionHandler: { (pdf) -> Void in
                         result(pdf)
                     })

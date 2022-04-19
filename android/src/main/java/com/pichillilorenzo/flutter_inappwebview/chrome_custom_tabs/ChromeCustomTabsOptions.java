@@ -7,14 +7,14 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.trusted.ScreenOrientation;
 import androidx.browser.trusted.TrustedWebActivityDisplayMode;
 
-import com.pichillilorenzo.flutter_inappwebview.Options;
+import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity> {
+public class ChromeCustomTabsOptions implements IWebViewSettings<ChromeCustomTabsActivity> {
 
   final static String LOG_TAG = "ChromeCustomTabsOptions";
 
@@ -88,7 +88,7 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
             switch (displayModeType) {
               case "IMMERSIVE_MODE":
                 boolean isSticky = (boolean) displayModeMap.get("isSticky");
-                int layoutInDisplayCutoutMode = (int) displayModeMap.get("layoutInDisplayCutoutMode");
+                int layoutInDisplayCutoutMode = (int) displayModeMap.get("displayCutoutMode");
                 displayMode = new TrustedWebActivityDisplayMode.ImmersiveMode(isSticky, layoutInDisplayCutoutMode);
               case "DEFAULT_MODE":
                 displayMode = new TrustedWebActivityDisplayMode.DefaultMode();
@@ -123,7 +123,7 @@ public class ChromeCustomTabsOptions implements Options<ChromeCustomTabsActivity
   }
 
   @Override
-  public Map<String, Object> getRealOptions(ChromeCustomTabsActivity chromeCustomTabsActivity) {
+  public Map<String, Object> getRealSettings(ChromeCustomTabsActivity chromeCustomTabsActivity) {
     Map<String, Object> realOptions = toMap();
     if (chromeCustomTabsActivity != null) {
       Intent intent = chromeCustomTabsActivity.getIntent();

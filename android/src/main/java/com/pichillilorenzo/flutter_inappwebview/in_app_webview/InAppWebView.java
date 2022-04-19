@@ -41,7 +41,6 @@ import android.webkit.URLUtil;
 import android.webkit.ValueCallback;
 import android.webkit.WebBackForwardList;
 import android.webkit.WebHistoryItem;
-import android.webkit.WebMessage;
 import android.webkit.WebSettings;
 import android.webkit.WebStorage;
 import android.widget.HorizontalScrollView;
@@ -120,7 +119,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Nullable
   public InAppWebViewRenderProcessClient inAppWebViewRenderProcessClient;
   public JavaScriptBridgeInterface javaScriptBridgeInterface;
-  public InAppWebViewOptions options;
+  public InAppWebViewSettings customSettings;
   public boolean isLoading = false;
   public OkHttpClient httpClient;
   public float zoomScale = 1.0f;
@@ -165,15 +164,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public InAppWebView(Context context, InAppWebViewFlutterPlugin plugin,
                       MethodChannel channel, Object id,
-                      @Nullable Integer windowId, InAppWebViewOptions options,
+                      @Nullable Integer windowId, InAppWebViewSettings customSettings,
                       @Nullable Map<String, Object> contextMenu, View containerView,
                       List<UserScript> userScripts) {
-    super(context, containerView, options.useHybridComposition);
+    super(context, containerView, customSettings.useHybridComposition);
     this.plugin = plugin;
     this.channel = channel;
     this.id = id;
     this.windowId = windowId;
-    this.options = options;
+    this.customSettings = customSettings;
     this.contextMenu = contextMenu;
     this.userContentController.addUserOnlyScripts(userScripts);
     plugin.activity.registerForContextMenu(this);
@@ -203,167 +202,167 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
     userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
-    if (options.useShouldInterceptAjaxRequest) {
+    if (customSettings.useShouldInterceptAjaxRequest) {
       userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT);
     }
-    if (options.useShouldInterceptFetchRequest) {
+    if (customSettings.useShouldInterceptFetchRequest) {
       userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT);
     }
-    if (options.useOnLoadResource) {
+    if (customSettings.useOnLoadResource) {
       userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT);
     }
-    if (!options.useHybridComposition) {
+    if (!customSettings.useHybridComposition) {
       userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
     }
 
-    if (options.useOnDownloadStart)
+    if (customSettings.useOnDownloadStart)
       setDownloadListener(new DownloadStartListener());
 
     WebSettings settings = getSettings();
 
-    settings.setJavaScriptEnabled(options.javaScriptEnabled);
-    settings.setJavaScriptCanOpenWindowsAutomatically(options.javaScriptCanOpenWindowsAutomatically);
-    settings.setBuiltInZoomControls(options.builtInZoomControls);
-    settings.setDisplayZoomControls(options.displayZoomControls);
-    settings.setSupportMultipleWindows(options.supportMultipleWindows);
+    settings.setJavaScriptEnabled(customSettings.javaScriptEnabled);
+    settings.setJavaScriptCanOpenWindowsAutomatically(customSettings.javaScriptCanOpenWindowsAutomatically);
+    settings.setBuiltInZoomControls(customSettings.builtInZoomControls);
+    settings.setDisplayZoomControls(customSettings.displayZoomControls);
+    settings.setSupportMultipleWindows(customSettings.supportMultipleWindows);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-      settings.setSafeBrowsingEnabled(options.safeBrowsingEnabled);
+      settings.setSafeBrowsingEnabled(customSettings.safeBrowsingEnabled);
 
-    settings.setMediaPlaybackRequiresUserGesture(options.mediaPlaybackRequiresUserGesture);
+    settings.setMediaPlaybackRequiresUserGesture(customSettings.mediaPlaybackRequiresUserGesture);
 
-    settings.setDatabaseEnabled(options.databaseEnabled);
-    settings.setDomStorageEnabled(options.domStorageEnabled);
+    settings.setDatabaseEnabled(customSettings.databaseEnabled);
+    settings.setDomStorageEnabled(customSettings.domStorageEnabled);
 
-    if (options.userAgent != null && !options.userAgent.isEmpty())
-      settings.setUserAgentString(options.userAgent);
+    if (customSettings.userAgent != null && !customSettings.userAgent.isEmpty())
+      settings.setUserAgentString(customSettings.userAgent);
     else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1)
       settings.setUserAgentString(WebSettings.getDefaultUserAgent(getContext()));
 
-    if (options.applicationNameForUserAgent != null && !options.applicationNameForUserAgent.isEmpty()) {
+    if (customSettings.applicationNameForUserAgent != null && !customSettings.applicationNameForUserAgent.isEmpty()) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-        String userAgent = (options.userAgent != null && !options.userAgent.isEmpty()) ? options.userAgent : WebSettings.getDefaultUserAgent(getContext());
-        String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
+        String userAgent = (customSettings.userAgent != null && !customSettings.userAgent.isEmpty()) ? customSettings.userAgent : WebSettings.getDefaultUserAgent(getContext());
+        String userAgentWithApplicationName = userAgent + " " + customSettings.applicationNameForUserAgent;
         settings.setUserAgentString(userAgentWithApplicationName);
       }
     }
 
-    if (options.clearCache)
+    if (customSettings.clearCache)
       clearAllCache();
-    else if (options.clearSessionCache)
+    else if (customSettings.clearSessionCache)
       CookieManager.getInstance().removeSessionCookie();
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-      CookieManager.getInstance().setAcceptThirdPartyCookies(this, options.thirdPartyCookiesEnabled);
+      CookieManager.getInstance().setAcceptThirdPartyCookies(this, customSettings.thirdPartyCookiesEnabled);
 
-    settings.setLoadWithOverviewMode(options.loadWithOverviewMode);
-    settings.setUseWideViewPort(options.useWideViewPort);
-    settings.setSupportZoom(options.supportZoom);
-    settings.setTextZoom(options.textZoom);
+    settings.setLoadWithOverviewMode(customSettings.loadWithOverviewMode);
+    settings.setUseWideViewPort(customSettings.useWideViewPort);
+    settings.setSupportZoom(customSettings.supportZoom);
+    settings.setTextZoom(customSettings.textZoom);
 
-    setVerticalScrollBarEnabled(!options.disableVerticalScroll && options.verticalScrollBarEnabled);
-    setHorizontalScrollBarEnabled(!options.disableHorizontalScroll && options.horizontalScrollBarEnabled);
+    setVerticalScrollBarEnabled(!customSettings.disableVerticalScroll && customSettings.verticalScrollBarEnabled);
+    setHorizontalScrollBarEnabled(!customSettings.disableHorizontalScroll && customSettings.horizontalScrollBarEnabled);
 
-    if (options.transparentBackground)
+    if (customSettings.transparentBackground)
       setBackgroundColor(Color.TRANSPARENT);
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && options.mixedContentMode != null)
-      settings.setMixedContentMode(options.mixedContentMode);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && customSettings.mixedContentMode != null)
+      settings.setMixedContentMode(customSettings.mixedContentMode);
 
-    settings.setAllowContentAccess(options.allowContentAccess);
-    settings.setAllowFileAccess(options.allowFileAccess);
-    settings.setAllowFileAccessFromFileURLs(options.allowFileAccessFromFileURLs);
-    settings.setAllowUniversalAccessFromFileURLs(options.allowUniversalAccessFromFileURLs);
-    setCacheEnabled(options.cacheEnabled);
-    if (options.appCachePath != null && !options.appCachePath.isEmpty() && options.cacheEnabled)
-      settings.setAppCachePath(options.appCachePath);
-    settings.setBlockNetworkImage(options.blockNetworkImage);
-    settings.setBlockNetworkLoads(options.blockNetworkLoads);
-    if (options.cacheMode != null)
-      settings.setCacheMode(options.cacheMode);
-    settings.setCursiveFontFamily(options.cursiveFontFamily);
-    settings.setDefaultFixedFontSize(options.defaultFixedFontSize);
-    settings.setDefaultFontSize(options.defaultFontSize);
-    settings.setDefaultTextEncodingName(options.defaultTextEncodingName);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && options.disabledActionModeMenuItems != null)
-      settings.setDisabledActionModeMenuItems(options.disabledActionModeMenuItems);
-    settings.setFantasyFontFamily(options.fantasyFontFamily);
-    settings.setFixedFontFamily(options.fixedFontFamily);
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && options.forceDark != null)
-      settings.setForceDark(options.forceDark);
-    settings.setGeolocationEnabled(options.geolocationEnabled);
-    if (options.layoutAlgorithm != null) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && options.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
-        settings.setLayoutAlgorithm(options.layoutAlgorithm);
+    settings.setAllowContentAccess(customSettings.allowContentAccess);
+    settings.setAllowFileAccess(customSettings.allowFileAccess);
+    settings.setAllowFileAccessFromFileURLs(customSettings.allowFileAccessFromFileURLs);
+    settings.setAllowUniversalAccessFromFileURLs(customSettings.allowUniversalAccessFromFileURLs);
+    setCacheEnabled(customSettings.cacheEnabled);
+    if (customSettings.appCachePath != null && !customSettings.appCachePath.isEmpty() && customSettings.cacheEnabled)
+      settings.setAppCachePath(customSettings.appCachePath);
+    settings.setBlockNetworkImage(customSettings.blockNetworkImage);
+    settings.setBlockNetworkLoads(customSettings.blockNetworkLoads);
+    if (customSettings.cacheMode != null)
+      settings.setCacheMode(customSettings.cacheMode);
+    settings.setCursiveFontFamily(customSettings.cursiveFontFamily);
+    settings.setDefaultFixedFontSize(customSettings.defaultFixedFontSize);
+    settings.setDefaultFontSize(customSettings.defaultFontSize);
+    settings.setDefaultTextEncodingName(customSettings.defaultTextEncodingName);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && customSettings.disabledActionModeMenuItems != null)
+      settings.setDisabledActionModeMenuItems(customSettings.disabledActionModeMenuItems);
+    settings.setFantasyFontFamily(customSettings.fantasyFontFamily);
+    settings.setFixedFontFamily(customSettings.fixedFontFamily);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && customSettings.forceDark != null)
+      settings.setForceDark(customSettings.forceDark);
+    settings.setGeolocationEnabled(customSettings.geolocationEnabled);
+    if (customSettings.layoutAlgorithm != null) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && customSettings.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+        settings.setLayoutAlgorithm(customSettings.layoutAlgorithm);
       } else {
-        settings.setLayoutAlgorithm(options.layoutAlgorithm);
+        settings.setLayoutAlgorithm(customSettings.layoutAlgorithm);
       }
     }
-    settings.setLoadsImagesAutomatically(options.loadsImagesAutomatically);
-    settings.setMinimumFontSize(options.minimumFontSize);
-    settings.setMinimumLogicalFontSize(options.minimumLogicalFontSize);
-    setInitialScale(options.initialScale);
-    settings.setNeedInitialFocus(options.needInitialFocus);
+    settings.setLoadsImagesAutomatically(customSettings.loadsImagesAutomatically);
+    settings.setMinimumFontSize(customSettings.minimumFontSize);
+    settings.setMinimumLogicalFontSize(customSettings.minimumLogicalFontSize);
+    setInitialScale(customSettings.initialScale);
+    settings.setNeedInitialFocus(customSettings.needInitialFocus);
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-      settings.setOffscreenPreRaster(options.offscreenPreRaster);
-    settings.setSansSerifFontFamily(options.sansSerifFontFamily);
-    settings.setSerifFontFamily(options.serifFontFamily);
-    settings.setStandardFontFamily(options.standardFontFamily);
-    if (options.preferredContentMode != null &&
-            options.preferredContentMode == PreferredContentModeOptionType.DESKTOP.toValue()) {
+      settings.setOffscreenPreRaster(customSettings.offscreenPreRaster);
+    settings.setSansSerifFontFamily(customSettings.sansSerifFontFamily);
+    settings.setSerifFontFamily(customSettings.serifFontFamily);
+    settings.setStandardFontFamily(customSettings.standardFontFamily);
+    if (customSettings.preferredContentMode != null &&
+            customSettings.preferredContentMode == PreferredContentModeOptionType.DESKTOP.toValue()) {
       setDesktopMode(true);
     }
-    settings.setSaveFormData(options.saveFormData);
-    if (options.incognito)
+    settings.setSaveFormData(customSettings.saveFormData);
+    if (customSettings.incognito)
       setIncognito(true);
-    if (options.hardwareAcceleration)
+    if (customSettings.hardwareAcceleration)
       setLayerType(View.LAYER_TYPE_HARDWARE, null);
     else
       setLayerType(View.LAYER_TYPE_SOFTWARE, null);
-    if (options.regexToCancelSubFramesLoading != null) {
-      regexToCancelSubFramesLoadingCompiled = Pattern.compile(options.regexToCancelSubFramesLoading);
+    if (customSettings.regexToCancelSubFramesLoading != null) {
+      regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
-    setScrollBarStyle(options.scrollBarStyle);
-    if (options.scrollBarDefaultDelayBeforeFade != null) {
-      setScrollBarDefaultDelayBeforeFade(options.scrollBarDefaultDelayBeforeFade);
+    setScrollBarStyle(customSettings.scrollBarStyle);
+    if (customSettings.scrollBarDefaultDelayBeforeFade != null) {
+      setScrollBarDefaultDelayBeforeFade(customSettings.scrollBarDefaultDelayBeforeFade);
     } else {
-      options.scrollBarDefaultDelayBeforeFade = getScrollBarDefaultDelayBeforeFade();
+      customSettings.scrollBarDefaultDelayBeforeFade = getScrollBarDefaultDelayBeforeFade();
     }
-    setScrollbarFadingEnabled(options.scrollbarFadingEnabled);
-    if (options.scrollBarFadeDuration != null) {
-      setScrollBarFadeDuration(options.scrollBarFadeDuration);
+    setScrollbarFadingEnabled(customSettings.scrollbarFadingEnabled);
+    if (customSettings.scrollBarFadeDuration != null) {
+      setScrollBarFadeDuration(customSettings.scrollBarFadeDuration);
     } else {
-      options.scrollBarFadeDuration = getScrollBarFadeDuration();
+      customSettings.scrollBarFadeDuration = getScrollBarFadeDuration();
     }
-    setVerticalScrollbarPosition(options.verticalScrollbarPosition);
+    setVerticalScrollbarPosition(customSettings.verticalScrollbarPosition);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      if (options.verticalScrollbarThumbColor != null)
-        setVerticalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(options.verticalScrollbarThumbColor)));
-      if (options.verticalScrollbarTrackColor != null)
-        setVerticalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(options.verticalScrollbarTrackColor)));
-      if (options.horizontalScrollbarThumbColor != null)
-        setHorizontalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(options.horizontalScrollbarThumbColor)));
-      if (options.horizontalScrollbarTrackColor != null)
-        setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(options.horizontalScrollbarTrackColor)));
+      if (customSettings.verticalScrollbarThumbColor != null)
+        setVerticalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(customSettings.verticalScrollbarThumbColor)));
+      if (customSettings.verticalScrollbarTrackColor != null)
+        setVerticalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(customSettings.verticalScrollbarTrackColor)));
+      if (customSettings.horizontalScrollbarThumbColor != null)
+        setHorizontalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(customSettings.horizontalScrollbarThumbColor)));
+      if (customSettings.horizontalScrollbarTrackColor != null)
+        setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(customSettings.horizontalScrollbarTrackColor)));
     }
 
-    setOverScrollMode(options.overScrollMode);
-    if (options.networkAvailable != null) {
-      setNetworkAvailable(options.networkAvailable);
+    setOverScrollMode(customSettings.overScrollMode);
+    if (customSettings.networkAvailable != null) {
+      setNetworkAvailable(customSettings.networkAvailable);
     }
-    if (options.rendererPriorityPolicy != null && !options.rendererPriorityPolicy.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+    if (customSettings.rendererPriorityPolicy != null && !customSettings.rendererPriorityPolicy.isEmpty() && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       setRendererPriorityPolicy(
-              (int) options.rendererPriorityPolicy.get("rendererRequestedPriority"),
-              (boolean) options.rendererPriorityPolicy.get("waivedWhenNotVisible"));
-    } else if ((options.rendererPriorityPolicy == null || (options.rendererPriorityPolicy != null && options.rendererPriorityPolicy.isEmpty())) &&
+              (int) customSettings.rendererPriorityPolicy.get("rendererRequestedPriority"),
+              (boolean) customSettings.rendererPriorityPolicy.get("waivedWhenNotVisible"));
+    } else if ((customSettings.rendererPriorityPolicy == null || (customSettings.rendererPriorityPolicy != null && customSettings.rendererPriorityPolicy.isEmpty())) &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      options.rendererPriorityPolicy.put("rendererRequestedPriority", getRendererRequestedPriority());
-      options.rendererPriorityPolicy.put("waivedWhenNotVisible", getRendererPriorityWaivedWhenNotVisible());
+      customSettings.rendererPriorityPolicy.put("rendererRequestedPriority", getRendererRequestedPriority());
+      customSettings.rendererPriorityPolicy.put("waivedWhenNotVisible", getRendererPriorityWaivedWhenNotVisible());
     }
 
     contentBlockerHandler.getRuleList().clear();
-    for (Map<String, Map<String, Object>> contentBlocker : options.contentBlockers) {
+    for (Map<String, Map<String, Object>> contentBlocker : customSettings.contentBlockers) {
       // compile ContentBlockerTrigger urlFilter
       ContentBlockerTrigger trigger = ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
       ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
@@ -405,7 +404,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       }
     };
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !options.useHybridComposition) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && !customSettings.useHybridComposition) {
       checkContextMenuShouldBeClosedTask = new Runnable() {
         @Override
         public void run() {
@@ -439,9 +438,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           checkScrollStoppedTask.run();
         }
 
-        if (options.disableHorizontalScroll && options.disableVerticalScroll) {
+        if (customSettings.disableHorizontalScroll && customSettings.disableVerticalScroll) {
           return (event.getAction() == MotionEvent.ACTION_MOVE);
-        } else if (options.disableHorizontalScroll || options.disableVerticalScroll) {
+        } else if (customSettings.disableHorizontalScroll || customSettings.disableVerticalScroll) {
           switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN: {
               // save the x
@@ -453,7 +452,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             case MotionEvent.ACTION_MOVE:
             case MotionEvent.ACTION_CANCEL:
             case MotionEvent.ACTION_UP: {
-              if (options.disableHorizontalScroll) {
+              if (customSettings.disableHorizontalScroll) {
                 // set x so that it doesn't move
                 event.setLocation(m_downX, event.getY());
               } else {
@@ -638,94 +637,94 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     });
   }
 
-  public void setOptions(InAppWebViewOptions newOptions, HashMap<String, Object> newOptionsMap) {
+  public void setSettings(InAppWebViewSettings newSettings, HashMap<String, Object> newSettingsMap) {
 
     WebSettings settings = getSettings();
 
-    if (newOptionsMap.get("javaScriptEnabled") != null && options.javaScriptEnabled != newOptions.javaScriptEnabled)
-      settings.setJavaScriptEnabled(newOptions.javaScriptEnabled);
+    if (newSettingsMap.get("javaScriptEnabled") != null && customSettings.javaScriptEnabled != newSettings.javaScriptEnabled)
+      settings.setJavaScriptEnabled(newSettings.javaScriptEnabled);
 
-    if (newOptionsMap.get("useShouldInterceptAjaxRequest") != null && options.useShouldInterceptAjaxRequest != newOptions.useShouldInterceptAjaxRequest) {
+    if (newSettingsMap.get("useShouldInterceptAjaxRequest") != null && customSettings.useShouldInterceptAjaxRequest != newSettings.useShouldInterceptAjaxRequest) {
       enablePluginScriptAtRuntime(
               InterceptAjaxRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE,
-              newOptions.useShouldInterceptAjaxRequest,
+              newSettings.useShouldInterceptAjaxRequest,
               InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT
       );
     }
 
-    if (newOptionsMap.get("useShouldInterceptFetchRequest") != null && options.useShouldInterceptFetchRequest != newOptions.useShouldInterceptFetchRequest) {
+    if (newSettingsMap.get("useShouldInterceptFetchRequest") != null && customSettings.useShouldInterceptFetchRequest != newSettings.useShouldInterceptFetchRequest) {
       enablePluginScriptAtRuntime(
               InterceptFetchRequestJS.FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE,
-              newOptions.useShouldInterceptFetchRequest,
+              newSettings.useShouldInterceptFetchRequest,
               InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT
       );
     }
 
-    if (newOptionsMap.get("useOnLoadResource") != null && options.useOnLoadResource != newOptions.useOnLoadResource) {
+    if (newSettingsMap.get("useOnLoadResource") != null && customSettings.useOnLoadResource != newSettings.useOnLoadResource) {
       enablePluginScriptAtRuntime(
               OnLoadResourceJS.FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE,
-              newOptions.useOnLoadResource,
+              newSettings.useOnLoadResource,
               OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT
       );
     }
 
-    if (newOptionsMap.get("javaScriptCanOpenWindowsAutomatically") != null && options.javaScriptCanOpenWindowsAutomatically != newOptions.javaScriptCanOpenWindowsAutomatically)
-      settings.setJavaScriptCanOpenWindowsAutomatically(newOptions.javaScriptCanOpenWindowsAutomatically);
+    if (newSettingsMap.get("javaScriptCanOpenWindowsAutomatically") != null && customSettings.javaScriptCanOpenWindowsAutomatically != newSettings.javaScriptCanOpenWindowsAutomatically)
+      settings.setJavaScriptCanOpenWindowsAutomatically(newSettings.javaScriptCanOpenWindowsAutomatically);
 
-    if (newOptionsMap.get("builtInZoomControls") != null && options.builtInZoomControls != newOptions.builtInZoomControls)
-      settings.setBuiltInZoomControls(newOptions.builtInZoomControls);
+    if (newSettingsMap.get("builtInZoomControls") != null && customSettings.builtInZoomControls != newSettings.builtInZoomControls)
+      settings.setBuiltInZoomControls(newSettings.builtInZoomControls);
 
-    if (newOptionsMap.get("displayZoomControls") != null && options.displayZoomControls != newOptions.displayZoomControls)
-      settings.setDisplayZoomControls(newOptions.displayZoomControls);
+    if (newSettingsMap.get("displayZoomControls") != null && customSettings.displayZoomControls != newSettings.displayZoomControls)
+      settings.setDisplayZoomControls(newSettings.displayZoomControls);
 
-    if (newOptionsMap.get("safeBrowsingEnabled") != null && options.safeBrowsingEnabled != newOptions.safeBrowsingEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
-      settings.setSafeBrowsingEnabled(newOptions.safeBrowsingEnabled);
+    if (newSettingsMap.get("safeBrowsingEnabled") != null && customSettings.safeBrowsingEnabled != newSettings.safeBrowsingEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.O)
+      settings.setSafeBrowsingEnabled(newSettings.safeBrowsingEnabled);
 
-    if (newOptionsMap.get("mediaPlaybackRequiresUserGesture") != null && options.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture)
-      settings.setMediaPlaybackRequiresUserGesture(newOptions.mediaPlaybackRequiresUserGesture);
+    if (newSettingsMap.get("mediaPlaybackRequiresUserGesture") != null && customSettings.mediaPlaybackRequiresUserGesture != newSettings.mediaPlaybackRequiresUserGesture)
+      settings.setMediaPlaybackRequiresUserGesture(newSettings.mediaPlaybackRequiresUserGesture);
 
-    if (newOptionsMap.get("databaseEnabled") != null && options.databaseEnabled != newOptions.databaseEnabled)
-      settings.setDatabaseEnabled(newOptions.databaseEnabled);
+    if (newSettingsMap.get("databaseEnabled") != null && customSettings.databaseEnabled != newSettings.databaseEnabled)
+      settings.setDatabaseEnabled(newSettings.databaseEnabled);
 
-    if (newOptionsMap.get("domStorageEnabled") != null && options.domStorageEnabled != newOptions.domStorageEnabled)
-      settings.setDomStorageEnabled(newOptions.domStorageEnabled);
+    if (newSettingsMap.get("domStorageEnabled") != null && customSettings.domStorageEnabled != newSettings.domStorageEnabled)
+      settings.setDomStorageEnabled(newSettings.domStorageEnabled);
 
-    if (newOptionsMap.get("userAgent") != null && !options.userAgent.equals(newOptions.userAgent) && !newOptions.userAgent.isEmpty())
-      settings.setUserAgentString(newOptions.userAgent);
+    if (newSettingsMap.get("userAgent") != null && !customSettings.userAgent.equals(newSettings.userAgent) && !newSettings.userAgent.isEmpty())
+      settings.setUserAgentString(newSettings.userAgent);
 
-    if (newOptionsMap.get("applicationNameForUserAgent") != null && !options.applicationNameForUserAgent.equals(newOptions.applicationNameForUserAgent) && !newOptions.applicationNameForUserAgent.isEmpty()) {
+    if (newSettingsMap.get("applicationNameForUserAgent") != null && !customSettings.applicationNameForUserAgent.equals(newSettings.applicationNameForUserAgent) && !newSettings.applicationNameForUserAgent.isEmpty()) {
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-        String userAgent = (newOptions.userAgent != null && !newOptions.userAgent.isEmpty()) ? newOptions.userAgent : WebSettings.getDefaultUserAgent(getContext());
-        String userAgentWithApplicationName = userAgent + " " + options.applicationNameForUserAgent;
+        String userAgent = (newSettings.userAgent != null && !newSettings.userAgent.isEmpty()) ? newSettings.userAgent : WebSettings.getDefaultUserAgent(getContext());
+        String userAgentWithApplicationName = userAgent + " " + customSettings.applicationNameForUserAgent;
         settings.setUserAgentString(userAgentWithApplicationName);
       }
     }
 
-    if (newOptionsMap.get("clearCache") != null && newOptions.clearCache)
+    if (newSettingsMap.get("clearCache") != null && newSettings.clearCache)
       clearAllCache();
-    else if (newOptionsMap.get("clearSessionCache") != null && newOptions.clearSessionCache)
+    else if (newSettingsMap.get("clearSessionCache") != null && newSettings.clearSessionCache)
       CookieManager.getInstance().removeSessionCookie();
 
-    if (newOptionsMap.get("thirdPartyCookiesEnabled") != null && options.thirdPartyCookiesEnabled != newOptions.thirdPartyCookiesEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-      CookieManager.getInstance().setAcceptThirdPartyCookies(this, newOptions.thirdPartyCookiesEnabled);
+    if (newSettingsMap.get("thirdPartyCookiesEnabled") != null && customSettings.thirdPartyCookiesEnabled != newSettings.thirdPartyCookiesEnabled && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
+      CookieManager.getInstance().setAcceptThirdPartyCookies(this, newSettings.thirdPartyCookiesEnabled);
 
-    if (newOptionsMap.get("useWideViewPort") != null && options.useWideViewPort != newOptions.useWideViewPort)
-      settings.setUseWideViewPort(newOptions.useWideViewPort);
+    if (newSettingsMap.get("useWideViewPort") != null && customSettings.useWideViewPort != newSettings.useWideViewPort)
+      settings.setUseWideViewPort(newSettings.useWideViewPort);
 
-    if (newOptionsMap.get("supportZoom") != null && options.supportZoom != newOptions.supportZoom)
-      settings.setSupportZoom(newOptions.supportZoom);
+    if (newSettingsMap.get("supportZoom") != null && customSettings.supportZoom != newSettings.supportZoom)
+      settings.setSupportZoom(newSettings.supportZoom);
 
-    if (newOptionsMap.get("textZoom") != null && !options.textZoom.equals(newOptions.textZoom))
-      settings.setTextZoom(newOptions.textZoom);
+    if (newSettingsMap.get("textZoom") != null && !customSettings.textZoom.equals(newSettings.textZoom))
+      settings.setTextZoom(newSettings.textZoom);
 
-    if (newOptionsMap.get("verticalScrollBarEnabled") != null && options.verticalScrollBarEnabled != newOptions.verticalScrollBarEnabled)
-      setVerticalScrollBarEnabled(newOptions.verticalScrollBarEnabled);
+    if (newSettingsMap.get("verticalScrollBarEnabled") != null && customSettings.verticalScrollBarEnabled != newSettings.verticalScrollBarEnabled)
+      setVerticalScrollBarEnabled(newSettings.verticalScrollBarEnabled);
 
-    if (newOptionsMap.get("horizontalScrollBarEnabled") != null && options.horizontalScrollBarEnabled != newOptions.horizontalScrollBarEnabled)
-      setHorizontalScrollBarEnabled(newOptions.horizontalScrollBarEnabled);
+    if (newSettingsMap.get("horizontalScrollBarEnabled") != null && customSettings.horizontalScrollBarEnabled != newSettings.horizontalScrollBarEnabled)
+      setHorizontalScrollBarEnabled(newSettings.horizontalScrollBarEnabled);
 
-    if (newOptionsMap.get("transparentBackground") != null && options.transparentBackground != newOptions.transparentBackground) {
-      if (newOptions.transparentBackground) {
+    if (newSettingsMap.get("transparentBackground") != null && customSettings.transparentBackground != newSettings.transparentBackground) {
+      if (newSettings.transparentBackground) {
         setBackgroundColor(Color.TRANSPARENT);
       } else {
         setBackgroundColor(Color.parseColor("#FFFFFF"));
@@ -733,118 +732,118 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP)
-      if (newOptionsMap.get("mixedContentMode") != null && (options.mixedContentMode == null || !options.mixedContentMode.equals(newOptions.mixedContentMode)))
-        settings.setMixedContentMode(newOptions.mixedContentMode);
+      if (newSettingsMap.get("mixedContentMode") != null && (customSettings.mixedContentMode == null || !customSettings.mixedContentMode.equals(newSettings.mixedContentMode)))
+        settings.setMixedContentMode(newSettings.mixedContentMode);
 
-    if (newOptionsMap.get("supportMultipleWindows") != null && options.supportMultipleWindows != newOptions.supportMultipleWindows)
-      settings.setSupportMultipleWindows(newOptions.supportMultipleWindows);
+    if (newSettingsMap.get("supportMultipleWindows") != null && customSettings.supportMultipleWindows != newSettings.supportMultipleWindows)
+      settings.setSupportMultipleWindows(newSettings.supportMultipleWindows);
 
-    if (newOptionsMap.get("useOnDownloadStart") != null && options.useOnDownloadStart != newOptions.useOnDownloadStart) {
-      if (newOptions.useOnDownloadStart) {
+    if (newSettingsMap.get("useOnDownloadStart") != null && customSettings.useOnDownloadStart != newSettings.useOnDownloadStart) {
+      if (newSettings.useOnDownloadStart) {
         setDownloadListener(new DownloadStartListener());
       } else {
         setDownloadListener(null);
       }
     }
 
-    if (newOptionsMap.get("allowContentAccess") != null && options.allowContentAccess != newOptions.allowContentAccess)
-      settings.setAllowContentAccess(newOptions.allowContentAccess);
+    if (newSettingsMap.get("allowContentAccess") != null && customSettings.allowContentAccess != newSettings.allowContentAccess)
+      settings.setAllowContentAccess(newSettings.allowContentAccess);
 
-    if (newOptionsMap.get("allowFileAccess") != null && options.allowFileAccess != newOptions.allowFileAccess)
-      settings.setAllowFileAccess(newOptions.allowFileAccess);
+    if (newSettingsMap.get("allowFileAccess") != null && customSettings.allowFileAccess != newSettings.allowFileAccess)
+      settings.setAllowFileAccess(newSettings.allowFileAccess);
 
-    if (newOptionsMap.get("allowFileAccessFromFileURLs") != null && options.allowFileAccessFromFileURLs != newOptions.allowFileAccessFromFileURLs)
-      settings.setAllowFileAccessFromFileURLs(newOptions.allowFileAccessFromFileURLs);
+    if (newSettingsMap.get("allowFileAccessFromFileURLs") != null && customSettings.allowFileAccessFromFileURLs != newSettings.allowFileAccessFromFileURLs)
+      settings.setAllowFileAccessFromFileURLs(newSettings.allowFileAccessFromFileURLs);
 
-    if (newOptionsMap.get("allowUniversalAccessFromFileURLs") != null && options.allowUniversalAccessFromFileURLs != newOptions.allowUniversalAccessFromFileURLs)
-      settings.setAllowUniversalAccessFromFileURLs(newOptions.allowUniversalAccessFromFileURLs);
+    if (newSettingsMap.get("allowUniversalAccessFromFileURLs") != null && customSettings.allowUniversalAccessFromFileURLs != newSettings.allowUniversalAccessFromFileURLs)
+      settings.setAllowUniversalAccessFromFileURLs(newSettings.allowUniversalAccessFromFileURLs);
 
-    if (newOptionsMap.get("cacheEnabled") != null && options.cacheEnabled != newOptions.cacheEnabled)
-      setCacheEnabled(newOptions.cacheEnabled);
+    if (newSettingsMap.get("cacheEnabled") != null && customSettings.cacheEnabled != newSettings.cacheEnabled)
+      setCacheEnabled(newSettings.cacheEnabled);
 
-    if (newOptionsMap.get("appCachePath") != null && (options.appCachePath == null || !options.appCachePath.equals(newOptions.appCachePath)))
-      settings.setAppCachePath(newOptions.appCachePath);
+    if (newSettingsMap.get("appCachePath") != null && (customSettings.appCachePath == null || !customSettings.appCachePath.equals(newSettings.appCachePath)))
+      settings.setAppCachePath(newSettings.appCachePath);
 
-    if (newOptionsMap.get("blockNetworkImage") != null && options.blockNetworkImage != newOptions.blockNetworkImage)
-      settings.setBlockNetworkImage(newOptions.blockNetworkImage);
+    if (newSettingsMap.get("blockNetworkImage") != null && customSettings.blockNetworkImage != newSettings.blockNetworkImage)
+      settings.setBlockNetworkImage(newSettings.blockNetworkImage);
 
-    if (newOptionsMap.get("blockNetworkLoads") != null && options.blockNetworkLoads != newOptions.blockNetworkLoads)
-      settings.setBlockNetworkLoads(newOptions.blockNetworkLoads);
+    if (newSettingsMap.get("blockNetworkLoads") != null && customSettings.blockNetworkLoads != newSettings.blockNetworkLoads)
+      settings.setBlockNetworkLoads(newSettings.blockNetworkLoads);
 
-    if (newOptionsMap.get("cacheMode") != null && !options.cacheMode.equals(newOptions.cacheMode))
-      settings.setCacheMode(newOptions.cacheMode);
+    if (newSettingsMap.get("cacheMode") != null && !customSettings.cacheMode.equals(newSettings.cacheMode))
+      settings.setCacheMode(newSettings.cacheMode);
 
-    if (newOptionsMap.get("cursiveFontFamily") != null && !options.cursiveFontFamily.equals(newOptions.cursiveFontFamily))
-      settings.setCursiveFontFamily(newOptions.cursiveFontFamily);
+    if (newSettingsMap.get("cursiveFontFamily") != null && !customSettings.cursiveFontFamily.equals(newSettings.cursiveFontFamily))
+      settings.setCursiveFontFamily(newSettings.cursiveFontFamily);
 
-    if (newOptionsMap.get("defaultFixedFontSize") != null && !options.defaultFixedFontSize.equals(newOptions.defaultFixedFontSize))
-      settings.setDefaultFixedFontSize(newOptions.defaultFixedFontSize);
+    if (newSettingsMap.get("defaultFixedFontSize") != null && !customSettings.defaultFixedFontSize.equals(newSettings.defaultFixedFontSize))
+      settings.setDefaultFixedFontSize(newSettings.defaultFixedFontSize);
 
-    if (newOptionsMap.get("defaultFontSize") != null && !options.defaultFontSize.equals(newOptions.defaultFontSize))
-      settings.setDefaultFontSize(newOptions.defaultFontSize);
+    if (newSettingsMap.get("defaultFontSize") != null && !customSettings.defaultFontSize.equals(newSettings.defaultFontSize))
+      settings.setDefaultFontSize(newSettings.defaultFontSize);
 
-    if (newOptionsMap.get("defaultTextEncodingName") != null && !options.defaultTextEncodingName.equals(newOptions.defaultTextEncodingName))
-      settings.setDefaultTextEncodingName(newOptions.defaultTextEncodingName);
+    if (newSettingsMap.get("defaultTextEncodingName") != null && !customSettings.defaultTextEncodingName.equals(newSettings.defaultTextEncodingName))
+      settings.setDefaultTextEncodingName(newSettings.defaultTextEncodingName);
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N)
-      if (newOptionsMap.get("disabledActionModeMenuItems") != null && (options.disabledActionModeMenuItems == null ||
-              !options.disabledActionModeMenuItems.equals(newOptions.disabledActionModeMenuItems)))
-        settings.setDisabledActionModeMenuItems(newOptions.disabledActionModeMenuItems);
+      if (newSettingsMap.get("disabledActionModeMenuItems") != null && (customSettings.disabledActionModeMenuItems == null ||
+              !customSettings.disabledActionModeMenuItems.equals(newSettings.disabledActionModeMenuItems)))
+        settings.setDisabledActionModeMenuItems(newSettings.disabledActionModeMenuItems);
 
-    if (newOptionsMap.get("fantasyFontFamily") != null && !options.fantasyFontFamily.equals(newOptions.fantasyFontFamily))
-      settings.setFantasyFontFamily(newOptions.fantasyFontFamily);
+    if (newSettingsMap.get("fantasyFontFamily") != null && !customSettings.fantasyFontFamily.equals(newSettings.fantasyFontFamily))
+      settings.setFantasyFontFamily(newSettings.fantasyFontFamily);
 
-    if (newOptionsMap.get("fixedFontFamily") != null && !options.fixedFontFamily.equals(newOptions.fixedFontFamily))
-      settings.setFixedFontFamily(newOptions.fixedFontFamily);
+    if (newSettingsMap.get("fixedFontFamily") != null && !customSettings.fixedFontFamily.equals(newSettings.fixedFontFamily))
+      settings.setFixedFontFamily(newSettings.fixedFontFamily);
 
-    if (newOptionsMap.get("forceDark") != null && !options.forceDark.equals(newOptions.forceDark))
+    if (newSettingsMap.get("forceDark") != null && !customSettings.forceDark.equals(newSettings.forceDark))
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q)
-        settings.setForceDark(newOptions.forceDark);
+        settings.setForceDark(newSettings.forceDark);
 
-    if (newOptionsMap.get("geolocationEnabled") != null && options.geolocationEnabled != newOptions.geolocationEnabled)
-      settings.setGeolocationEnabled(newOptions.geolocationEnabled);
+    if (newSettingsMap.get("geolocationEnabled") != null && customSettings.geolocationEnabled != newSettings.geolocationEnabled)
+      settings.setGeolocationEnabled(newSettings.geolocationEnabled);
 
-    if (newOptionsMap.get("layoutAlgorithm") != null && options.layoutAlgorithm != newOptions.layoutAlgorithm) {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && newOptions.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
-        settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+    if (newSettingsMap.get("layoutAlgorithm") != null && customSettings.layoutAlgorithm != newSettings.layoutAlgorithm) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && newSettings.layoutAlgorithm.equals(WebSettings.LayoutAlgorithm.TEXT_AUTOSIZING)) {
+        settings.setLayoutAlgorithm(newSettings.layoutAlgorithm);
       } else {
-        settings.setLayoutAlgorithm(newOptions.layoutAlgorithm);
+        settings.setLayoutAlgorithm(newSettings.layoutAlgorithm);
       }
     }
 
-    if (newOptionsMap.get("loadWithOverviewMode") != null && options.loadWithOverviewMode != newOptions.loadWithOverviewMode)
-      settings.setLoadWithOverviewMode(newOptions.loadWithOverviewMode);
+    if (newSettingsMap.get("loadWithOverviewMode") != null && customSettings.loadWithOverviewMode != newSettings.loadWithOverviewMode)
+      settings.setLoadWithOverviewMode(newSettings.loadWithOverviewMode);
 
-    if (newOptionsMap.get("loadsImagesAutomatically") != null && options.loadsImagesAutomatically != newOptions.loadsImagesAutomatically)
-      settings.setLoadsImagesAutomatically(newOptions.loadsImagesAutomatically);
+    if (newSettingsMap.get("loadsImagesAutomatically") != null && customSettings.loadsImagesAutomatically != newSettings.loadsImagesAutomatically)
+      settings.setLoadsImagesAutomatically(newSettings.loadsImagesAutomatically);
 
-    if (newOptionsMap.get("minimumFontSize") != null && !options.minimumFontSize.equals(newOptions.minimumFontSize))
-      settings.setMinimumFontSize(newOptions.minimumFontSize);
+    if (newSettingsMap.get("minimumFontSize") != null && !customSettings.minimumFontSize.equals(newSettings.minimumFontSize))
+      settings.setMinimumFontSize(newSettings.minimumFontSize);
 
-    if (newOptionsMap.get("minimumLogicalFontSize") != null && !options.minimumLogicalFontSize.equals(newOptions.minimumLogicalFontSize))
-      settings.setMinimumLogicalFontSize(newOptions.minimumLogicalFontSize);
+    if (newSettingsMap.get("minimumLogicalFontSize") != null && !customSettings.minimumLogicalFontSize.equals(newSettings.minimumLogicalFontSize))
+      settings.setMinimumLogicalFontSize(newSettings.minimumLogicalFontSize);
 
-    if (newOptionsMap.get("initialScale") != null && !options.initialScale.equals(newOptions.initialScale))
-      setInitialScale(newOptions.initialScale);
+    if (newSettingsMap.get("initialScale") != null && !customSettings.initialScale.equals(newSettings.initialScale))
+      setInitialScale(newSettings.initialScale);
 
-    if (newOptionsMap.get("needInitialFocus") != null && options.needInitialFocus != newOptions.needInitialFocus)
-      settings.setNeedInitialFocus(newOptions.needInitialFocus);
+    if (newSettingsMap.get("needInitialFocus") != null && customSettings.needInitialFocus != newSettings.needInitialFocus)
+      settings.setNeedInitialFocus(newSettings.needInitialFocus);
 
-    if (newOptionsMap.get("offscreenPreRaster") != null && options.offscreenPreRaster != newOptions.offscreenPreRaster)
+    if (newSettingsMap.get("offscreenPreRaster") != null && customSettings.offscreenPreRaster != newSettings.offscreenPreRaster)
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M)
-        settings.setOffscreenPreRaster(newOptions.offscreenPreRaster);
+        settings.setOffscreenPreRaster(newSettings.offscreenPreRaster);
 
-    if (newOptionsMap.get("sansSerifFontFamily") != null && !options.sansSerifFontFamily.equals(newOptions.sansSerifFontFamily))
-      settings.setSansSerifFontFamily(newOptions.sansSerifFontFamily);
+    if (newSettingsMap.get("sansSerifFontFamily") != null && !customSettings.sansSerifFontFamily.equals(newSettings.sansSerifFontFamily))
+      settings.setSansSerifFontFamily(newSettings.sansSerifFontFamily);
 
-    if (newOptionsMap.get("serifFontFamily") != null && !options.serifFontFamily.equals(newOptions.serifFontFamily))
-      settings.setSerifFontFamily(newOptions.serifFontFamily);
+    if (newSettingsMap.get("serifFontFamily") != null && !customSettings.serifFontFamily.equals(newSettings.serifFontFamily))
+      settings.setSerifFontFamily(newSettings.serifFontFamily);
 
-    if (newOptionsMap.get("standardFontFamily") != null && !options.standardFontFamily.equals(newOptions.standardFontFamily))
-      settings.setStandardFontFamily(newOptions.standardFontFamily);
+    if (newSettingsMap.get("standardFontFamily") != null && !customSettings.standardFontFamily.equals(newSettings.standardFontFamily))
+      settings.setStandardFontFamily(newSettings.standardFontFamily);
 
-    if (newOptionsMap.get("preferredContentMode") != null && !options.preferredContentMode.equals(newOptions.preferredContentMode)) {
-      switch (fromValue(newOptions.preferredContentMode)) {
+    if (newSettingsMap.get("preferredContentMode") != null && !customSettings.preferredContentMode.equals(newSettings.preferredContentMode)) {
+      switch (fromValue(newSettings.preferredContentMode)) {
         case DESKTOP:
           setDesktopMode(true);
           break;
@@ -855,30 +854,30 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       }
     }
 
-    if (newOptionsMap.get("saveFormData") != null && options.saveFormData != newOptions.saveFormData)
-      settings.setSaveFormData(newOptions.saveFormData);
+    if (newSettingsMap.get("saveFormData") != null && customSettings.saveFormData != newSettings.saveFormData)
+      settings.setSaveFormData(newSettings.saveFormData);
 
-    if (newOptionsMap.get("incognito") != null && options.incognito != newOptions.incognito)
-      setIncognito(newOptions.incognito);
+    if (newSettingsMap.get("incognito") != null && customSettings.incognito != newSettings.incognito)
+      setIncognito(newSettings.incognito);
 
-    if (newOptionsMap.get("hardwareAcceleration") != null && options.hardwareAcceleration != newOptions.hardwareAcceleration) {
-      if (newOptions.hardwareAcceleration)
+    if (newSettingsMap.get("hardwareAcceleration") != null && customSettings.hardwareAcceleration != newSettings.hardwareAcceleration) {
+      if (newSettings.hardwareAcceleration)
         setLayerType(View.LAYER_TYPE_HARDWARE, null);
       else
         setLayerType(View.LAYER_TYPE_SOFTWARE, null);
     }
 
-    if (newOptionsMap.get("regexToCancelSubFramesLoading") != null && (options.regexToCancelSubFramesLoading == null ||
-            !options.regexToCancelSubFramesLoading.equals(newOptions.regexToCancelSubFramesLoading))) {
-      if (newOptions.regexToCancelSubFramesLoading == null)
+    if (newSettingsMap.get("regexToCancelSubFramesLoading") != null && (customSettings.regexToCancelSubFramesLoading == null ||
+            !customSettings.regexToCancelSubFramesLoading.equals(newSettings.regexToCancelSubFramesLoading))) {
+      if (newSettings.regexToCancelSubFramesLoading == null)
         regexToCancelSubFramesLoadingCompiled = null;
       else
-        regexToCancelSubFramesLoadingCompiled = Pattern.compile(options.regexToCancelSubFramesLoading);
+        regexToCancelSubFramesLoadingCompiled = Pattern.compile(customSettings.regexToCancelSubFramesLoading);
     }
 
-    if (newOptions.contentBlockers != null) {
+    if (newSettings.contentBlockers != null) {
       contentBlockerHandler.getRuleList().clear();
-      for (Map<String, Map<String, Object>> contentBlocker : newOptions.contentBlockers) {
+      for (Map<String, Map<String, Object>> contentBlocker : newSettings.contentBlockers) {
         // compile ContentBlockerTrigger urlFilter
         ContentBlockerTrigger trigger = ContentBlockerTrigger.fromMap(contentBlocker.get("trigger"));
         ContentBlockerAction action = ContentBlockerAction.fromMap(contentBlocker.get("action"));
@@ -886,63 +885,63 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       }
     }
 
-    if (newOptionsMap.get("scrollBarStyle") != null && !options.scrollBarStyle.equals(newOptions.scrollBarStyle))
-      setScrollBarStyle(newOptions.scrollBarStyle);
+    if (newSettingsMap.get("scrollBarStyle") != null && !customSettings.scrollBarStyle.equals(newSettings.scrollBarStyle))
+      setScrollBarStyle(newSettings.scrollBarStyle);
 
-    if (newOptionsMap.get("scrollBarDefaultDelayBeforeFade") != null && (options.scrollBarDefaultDelayBeforeFade == null ||
-            !options.scrollBarDefaultDelayBeforeFade.equals(newOptions.scrollBarDefaultDelayBeforeFade)))
-      setScrollBarDefaultDelayBeforeFade(newOptions.scrollBarDefaultDelayBeforeFade);
+    if (newSettingsMap.get("scrollBarDefaultDelayBeforeFade") != null && (customSettings.scrollBarDefaultDelayBeforeFade == null ||
+            !customSettings.scrollBarDefaultDelayBeforeFade.equals(newSettings.scrollBarDefaultDelayBeforeFade)))
+      setScrollBarDefaultDelayBeforeFade(newSettings.scrollBarDefaultDelayBeforeFade);
 
-    if (newOptionsMap.get("scrollbarFadingEnabled") != null && !options.scrollbarFadingEnabled.equals(newOptions.scrollbarFadingEnabled))
-      setScrollbarFadingEnabled(newOptions.scrollbarFadingEnabled);
+    if (newSettingsMap.get("scrollbarFadingEnabled") != null && !customSettings.scrollbarFadingEnabled.equals(newSettings.scrollbarFadingEnabled))
+      setScrollbarFadingEnabled(newSettings.scrollbarFadingEnabled);
 
-    if (newOptionsMap.get("scrollBarFadeDuration") != null && (options.scrollBarFadeDuration == null ||
-            !options.scrollBarFadeDuration.equals(newOptions.scrollBarFadeDuration)))
-      setScrollBarFadeDuration(newOptions.scrollBarFadeDuration);
+    if (newSettingsMap.get("scrollBarFadeDuration") != null && (customSettings.scrollBarFadeDuration == null ||
+            !customSettings.scrollBarFadeDuration.equals(newSettings.scrollBarFadeDuration)))
+      setScrollBarFadeDuration(newSettings.scrollBarFadeDuration);
 
-    if (newOptionsMap.get("verticalScrollbarPosition") != null && !options.verticalScrollbarPosition.equals(newOptions.verticalScrollbarPosition))
-      setVerticalScrollbarPosition(newOptions.verticalScrollbarPosition);
+    if (newSettingsMap.get("verticalScrollbarPosition") != null && !customSettings.verticalScrollbarPosition.equals(newSettings.verticalScrollbarPosition))
+      setVerticalScrollbarPosition(newSettings.verticalScrollbarPosition);
 
-    if (newOptionsMap.get("disableVerticalScroll") != null && options.disableVerticalScroll != newOptions.disableVerticalScroll)
-      setVerticalScrollBarEnabled(!newOptions.disableVerticalScroll && newOptions.verticalScrollBarEnabled);
+    if (newSettingsMap.get("disableVerticalScroll") != null && customSettings.disableVerticalScroll != newSettings.disableVerticalScroll)
+      setVerticalScrollBarEnabled(!newSettings.disableVerticalScroll && newSettings.verticalScrollBarEnabled);
 
-    if (newOptionsMap.get("disableHorizontalScroll") != null && options.disableHorizontalScroll != newOptions.disableHorizontalScroll)
-      setHorizontalScrollBarEnabled(!newOptions.disableHorizontalScroll && newOptions.horizontalScrollBarEnabled);
+    if (newSettingsMap.get("disableHorizontalScroll") != null && customSettings.disableHorizontalScroll != newSettings.disableHorizontalScroll)
+      setHorizontalScrollBarEnabled(!newSettings.disableHorizontalScroll && newSettings.horizontalScrollBarEnabled);
 
-    if (newOptionsMap.get("overScrollMode") != null && !options.overScrollMode.equals(newOptions.overScrollMode))
-      setOverScrollMode(newOptions.overScrollMode);
+    if (newSettingsMap.get("overScrollMode") != null && !customSettings.overScrollMode.equals(newSettings.overScrollMode))
+      setOverScrollMode(newSettings.overScrollMode);
 
-    if (newOptionsMap.get("networkAvailable") != null && options.networkAvailable != newOptions.networkAvailable)
-      setNetworkAvailable(newOptions.networkAvailable);
+    if (newSettingsMap.get("networkAvailable") != null && customSettings.networkAvailable != newSettings.networkAvailable)
+      setNetworkAvailable(newSettings.networkAvailable);
 
-    if (newOptionsMap.get("rendererPriorityPolicy") != null &&
-            (options.rendererPriorityPolicy.get("rendererRequestedPriority") != newOptions.rendererPriorityPolicy.get("rendererRequestedPriority") ||
-                    options.rendererPriorityPolicy.get("waivedWhenNotVisible") != newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible")) &&
+    if (newSettingsMap.get("rendererPriorityPolicy") != null &&
+            (customSettings.rendererPriorityPolicy.get("rendererRequestedPriority") != newSettings.rendererPriorityPolicy.get("rendererRequestedPriority") ||
+                    customSettings.rendererPriorityPolicy.get("waivedWhenNotVisible") != newSettings.rendererPriorityPolicy.get("waivedWhenNotVisible")) &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       setRendererPriorityPolicy(
-              (int) newOptions.rendererPriorityPolicy.get("rendererRequestedPriority"),
-              (boolean) newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible"));
+              (int) newSettings.rendererPriorityPolicy.get("rendererRequestedPriority"),
+              (boolean) newSettings.rendererPriorityPolicy.get("waivedWhenNotVisible"));
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-      if (newOptionsMap.get("verticalScrollbarThumbColor") != null && !Util.objEquals(options.verticalScrollbarThumbColor, newOptions.verticalScrollbarThumbColor))
-        setVerticalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(newOptions.verticalScrollbarThumbColor)));
+      if (newSettingsMap.get("verticalScrollbarThumbColor") != null && !Util.objEquals(customSettings.verticalScrollbarThumbColor, newSettings.verticalScrollbarThumbColor))
+        setVerticalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(newSettings.verticalScrollbarThumbColor)));
 
-      if (newOptionsMap.get("verticalScrollbarTrackColor") != null && !Util.objEquals(options.verticalScrollbarTrackColor, newOptions.verticalScrollbarTrackColor))
-        setVerticalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newOptions.verticalScrollbarTrackColor)));
+      if (newSettingsMap.get("verticalScrollbarTrackColor") != null && !Util.objEquals(customSettings.verticalScrollbarTrackColor, newSettings.verticalScrollbarTrackColor))
+        setVerticalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newSettings.verticalScrollbarTrackColor)));
 
-      if (newOptionsMap.get("horizontalScrollbarThumbColor") != null && !Util.objEquals(options.horizontalScrollbarThumbColor, newOptions.horizontalScrollbarThumbColor))
-        setHorizontalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(newOptions.horizontalScrollbarThumbColor)));
+      if (newSettingsMap.get("horizontalScrollbarThumbColor") != null && !Util.objEquals(customSettings.horizontalScrollbarThumbColor, newSettings.horizontalScrollbarThumbColor))
+        setHorizontalScrollbarThumbDrawable(new ColorDrawable(Color.parseColor(newSettings.horizontalScrollbarThumbColor)));
 
-      if (newOptionsMap.get("horizontalScrollbarTrackColor") != null && !Util.objEquals(options.horizontalScrollbarTrackColor, newOptions.horizontalScrollbarTrackColor))
-        setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newOptions.horizontalScrollbarTrackColor)));
+      if (newSettingsMap.get("horizontalScrollbarTrackColor") != null && !Util.objEquals(customSettings.horizontalScrollbarTrackColor, newSettings.horizontalScrollbarTrackColor))
+        setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newSettings.horizontalScrollbarTrackColor)));
     }
 
-    options = newOptions;
+    customSettings = newSettings;
   }
 
-  public Map<String, Object> getOptions() {
-    return (options != null) ? options.getRealOptions(this) : null;
+  public Map<String, Object> getCustomSettings() {
+    return (customSettings != null) ? customSettings.getRealSettings(this) : null;
   }
 
   public void enablePluginScriptAtRuntime(final String flagVariable,
@@ -1278,7 +1277,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       setOverScrollMode(OVER_SCROLL_NEVER);
       pullToRefreshLayout.setEnabled(pullToRefreshLayout.options.enabled);
       // reset over scroll mode
-      setOverScrollMode(options.overScrollMode);
+      setOverScrollMode(customSettings.overScrollMode);
     }
 
     if (overScrolledHorizontally || overScrolledVertically) {
@@ -1299,7 +1298,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Override
   public InputConnection onCreateInputConnection(EditorInfo outAttrs) {
     InputConnection connection = super.onCreateInputConnection(outAttrs);
-    if (connection == null && !options.useHybridComposition && containerView != null) {
+    if (connection == null && !customSettings.useHybridComposition && containerView != null) {
       // workaround to hide the Keyboard when the user click outside
       // on something not focusable such as input or a textarea.
       containerView
@@ -1323,7 +1322,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public ActionMode startActionMode(ActionMode.Callback callback) {
-    if (options.useHybridComposition && !options.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
+    if (customSettings.useHybridComposition && !customSettings.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
       return super.startActionMode(callback);
     }
     return rebuildActionMode(super.startActionMode(callback), callback);
@@ -1332,7 +1331,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
   public ActionMode startActionMode(ActionMode.Callback callback, int type) {
-    if (options.useHybridComposition && !options.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
+    if (customSettings.useHybridComposition && !customSettings.disableContextMenu && (contextMenu == null || contextMenu.keySet().size() == 0)) {
       return super.startActionMode(callback, type);
     }
     return rebuildActionMode(super.startActionMode(callback, type), callback);
@@ -1343,7 +1342,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           final ActionMode.Callback callback
   ) {
     // fix Android 10 clipboard not working properly https://github.com/pichillilorenzo/flutter_inappwebview/issues/678
-    if (!options.useHybridComposition && containerView != null) {
+    if (!customSettings.useHybridComposition && containerView != null) {
       onWindowFocusChanged(containerView.isFocused());
     }
 
@@ -1357,7 +1356,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     Menu actionMenu = actionMode.getMenu();
-    if (options.disableContextMenu) {
+    if (customSettings.disableContextMenu) {
       actionMenu.clear();
       return actionMode;
     }

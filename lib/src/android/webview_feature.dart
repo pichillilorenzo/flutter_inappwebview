@@ -152,7 +152,7 @@ class AndroidWebViewFeature {
           "SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL");
 
   ///Use [SAFE_BROWSING_ALLOWLIST] instead.
-  @Deprecated('Use `SAFE_BROWSING_ALLOWLIST` instead')
+  @Deprecated('Use SAFE_BROWSING_ALLOWLIST instead')
   static const SAFE_BROWSING_WHITELIST =
       const AndroidWebViewFeature._internal("SAFE_BROWSING_WHITELIST");
 

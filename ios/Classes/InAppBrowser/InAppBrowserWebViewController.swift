@@ -28,8 +28,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var initialUrlRequest: URLRequest?
     var initialFile: String?
     var contextMenu: [String: Any]?
-    var browserOptions: InAppBrowserOptions?
-    var webViewOptions: InAppWebViewOptions?
+    var browserSettings: InAppBrowserSettings?
+    var webViewSettings: InAppWebViewSettings?
     var initialData: String?
     var initialMimeType: String?
     var initialEncoding: String?
@@ -47,7 +47,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             userScripts.append(UserScript.fromMap(map: intialUserScript, windowId: windowId)!)
         }
         
-        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewOptions)
+        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewSettings)
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView.contextMenu = contextMenu
@@ -67,7 +67,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         let pullToRefreshLayoutChannel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id,
                                                               binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        let pullToRefreshOptions = PullToRefreshOptions()
+        let pullToRefreshOptions = PullToRefreshSettings()
         let _ = pullToRefreshOptions.parse(options: pullToRefreshInitialOptions)
         let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, options: pullToRefreshOptions)
         webView.pullToRefreshControl = pullToRefreshControl
@@ -118,7 +118,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             webView.load(webViewTransport.request)
         } else {
             if #available(iOS 11.0, *) {
-                if let contentBlockers = webView.options?.contentBlockers, contentBlockers.count > 0 {
+                if let contentBlockers = webView.settings?.contentBlockers, contentBlockers.count > 0 {
                     do {
                         let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
                         let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
@@ -159,7 +159,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         else if let initialData = initialData {
             let baseUrl = URL(string: initialBaseUrl!)!
             var allowingReadAccessToURL: URL? = nil
-            if let allowingReadAccessTo = webView?.options?.allowingReadAccessTo, baseUrl.scheme == "file" {
+            if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo, baseUrl.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
                 if allowingReadAccessToURL?.scheme != "file" {
                     allowingReadAccessToURL = nil
@@ -169,7 +169,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         }
         else if let initialUrlRequest = initialUrlRequest {
             var allowingReadAccessToURL: URL? = nil
-            if let allowingReadAccessTo = webView.options?.allowingReadAccessTo, let url = initialUrlRequest.url, url.scheme == "file" {
+            if let allowingReadAccessTo = webView.settings?.allowingReadAccessTo, let url = initialUrlRequest.url, url.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
                 if allowingReadAccessToURL?.scheme != "file" {
                     allowingReadAccessToURL = nil
@@ -194,14 +194,14 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func prepareNavigationControllerBeforeViewWillAppear() {
-        if let browserOptions = browserOptions {
+        if let browserOptions = browserSettings {
             navigationController?.modalPresentationStyle = UIModalPresentationStyle(rawValue: browserOptions.presentationStyle)!
             navigationController?.modalTransitionStyle = UIModalTransitionStyle(rawValue: browserOptions.transitionStyle)!
         }
     }
     
     public func prepareWebView() {
-        webView.options = webViewOptions
+        webView.settings = webViewSettings
         webView.prepare()
               
         searchBar = UISearchBar()
@@ -231,7 +231,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         toolbarItems = [backButton, spacer, forwardButton, spacer, shareButton, spacer, reloadButton]
         
-        if let browserOptions = browserOptions {
+        if let browserOptions = browserSettings {
             if !browserOptions.hideToolbarTop {
                 navigationController?.navigationBar.isHidden = false
                 if browserOptions.hideUrlBar {
@@ -426,14 +426,14 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         webView.goBackOrForward(steps: steps)
     }
 
-    public func setOptions(newOptions: InAppBrowserOptions, newOptionsMap: [String: Any]) {
+    public func setSettings(newSettings: InAppBrowserSettings, newSettingsMap: [String: Any]) {
         
-        let newInAppWebViewOptions = InAppWebViewOptions()
-        let _ = newInAppWebViewOptions.parse(options: newOptionsMap)
-        self.webView.setOptions(newOptions: newInAppWebViewOptions, newOptionsMap: newOptionsMap)
+        let newInAppWebViewOptions = InAppWebViewSettings()
+        let _ = newInAppWebViewOptions.parse(options: newSettingsMap)
+        self.webView.setOptions(newSettings: newInAppWebViewOptions, newOptionsMap: newSettingsMap)
         
-        if newOptionsMap["hidden"] != nil, browserOptions?.hidden != newOptions.hidden {
-            if newOptions.hidden {
+        if newSettingsMap["hidden"] != nil, browserSettings?.hidden != newSettings.hidden {
+            if newSettings.hidden {
                 hide()
             }
             else {
@@ -441,68 +441,68 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newOptionsMap["hideUrlBar"] != nil, browserOptions?.hideUrlBar != newOptions.hideUrlBar {
-            searchBar.isHidden = newOptions.hideUrlBar
+        if newSettingsMap["hideUrlBar"] != nil, browserSettings?.hideUrlBar != newSettings.hideUrlBar {
+            searchBar.isHidden = newSettings.hideUrlBar
         }
 
-        if newOptionsMap["hideToolbarTop"] != nil, browserOptions?.hideToolbarTop != newOptions.hideToolbarTop {
-            navigationController?.navigationBar.isHidden = newOptions.hideToolbarTop
+        if newSettingsMap["hideToolbarTop"] != nil, browserSettings?.hideToolbarTop != newSettings.hideToolbarTop {
+            navigationController?.navigationBar.isHidden = newSettings.hideToolbarTop
         }
 
-        if newOptionsMap["toolbarTopBackgroundColor"] != nil, browserOptions?.toolbarTopBackgroundColor != newOptions.toolbarTopBackgroundColor {
-            if let bgColor = newOptions.toolbarTopBackgroundColor, !bgColor.isEmpty {
+        if newSettingsMap["toolbarTopBackgroundColor"] != nil, browserSettings?.toolbarTopBackgroundColor != newSettings.toolbarTopBackgroundColor {
+            if let bgColor = newSettings.toolbarTopBackgroundColor, !bgColor.isEmpty {
                 navigationController?.navigationBar.backgroundColor = UIColor(hexString: bgColor)
             } else {
                 navigationController?.navigationBar.backgroundColor = nil
             }
         }
         
-        if newOptionsMap["toolbarTopBarTintColor"] != nil, browserOptions?.toolbarTopBarTintColor != newOptions.toolbarTopBarTintColor {
-            if let barTintColor = newOptions.toolbarTopBarTintColor, !barTintColor.isEmpty {
+        if newSettingsMap["toolbarTopBarTintColor"] != nil, browserSettings?.toolbarTopBarTintColor != newSettings.toolbarTopBarTintColor {
+            if let barTintColor = newSettings.toolbarTopBarTintColor, !barTintColor.isEmpty {
                 navigationController?.navigationBar.barTintColor = UIColor(hexString: barTintColor)
             } else {
                 navigationController?.navigationBar.barTintColor = nil
             }
         }
         
-        if newOptionsMap["toolbarTopTintColor"] != nil, browserOptions?.toolbarTopTintColor != newOptions.toolbarTopTintColor {
-            if let tintColor = newOptions.toolbarTopTintColor, !tintColor.isEmpty {
+        if newSettingsMap["toolbarTopTintColor"] != nil, browserSettings?.toolbarTopTintColor != newSettings.toolbarTopTintColor {
+            if let tintColor = newSettings.toolbarTopTintColor, !tintColor.isEmpty {
                 navigationController?.navigationBar.tintColor = UIColor(hexString: tintColor)
             } else {
                 navigationController?.navigationBar.tintColor = nil
             }
         }
 
-        if newOptionsMap["hideToolbarBottom"] != nil, browserOptions?.hideToolbarBottom != newOptions.hideToolbarBottom {
+        if newSettingsMap["hideToolbarBottom"] != nil, browserSettings?.hideToolbarBottom != newSettings.hideToolbarBottom {
             navigationController?.isToolbarHidden = !newOptions.hideToolbarBottom
         }
 
-        if newOptionsMap["toolbarBottomBackgroundColor"] != nil, browserOptions?.toolbarBottomBackgroundColor != newOptions.toolbarBottomBackgroundColor {
-            if let bgColor = newOptions.toolbarBottomBackgroundColor, !bgColor.isEmpty {
+        if newSettingsMap["toolbarBottomBackgroundColor"] != nil, browserSettings?.toolbarBottomBackgroundColor != newSettings.toolbarBottomBackgroundColor {
+            if let bgColor = newSettings.toolbarBottomBackgroundColor, !bgColor.isEmpty {
                 navigationController?.toolbar.barTintColor = UIColor(hexString: bgColor)
             } else {
                 navigationController?.toolbar.barTintColor = nil
             }
         }
         
-        if newOptionsMap["toolbarBottomTintColor"] != nil, browserOptions?.toolbarBottomTintColor != newOptions.toolbarBottomTintColor {
-            if let tintColor = newOptions.toolbarBottomTintColor, !tintColor.isEmpty {
+        if newSettingsMap["toolbarBottomTintColor"] != nil, browserSettings?.toolbarBottomTintColor != newSettings.toolbarBottomTintColor {
+            if let tintColor = newSettings.toolbarBottomTintColor, !tintColor.isEmpty {
                 navigationController?.toolbar.tintColor = UIColor(hexString: tintColor)
             } else {
                 navigationController?.toolbar.tintColor = nil
             }
         }
 
-        if newOptionsMap["toolbarTopTranslucent"] != nil, browserOptions?.toolbarTopTranslucent != newOptions.toolbarTopTranslucent {
-            navigationController?.navigationBar.isTranslucent = newOptions.toolbarTopTranslucent
+        if newSettingsMap["toolbarTopTranslucent"] != nil, browserSettings?.toolbarTopTranslucent != newSettings.toolbarTopTranslucent {
+            navigationController?.navigationBar.isTranslucent = newSettings.toolbarTopTranslucent
         }
         
-        if newOptionsMap["toolbarBottomTranslucent"] != nil, browserOptions?.toolbarBottomTranslucent != newOptions.toolbarBottomTranslucent {
-            navigationController?.toolbar.isTranslucent = newOptions.toolbarBottomTranslucent
+        if newSettingsMap["toolbarBottomTranslucent"] != nil, browserSettings?.toolbarBottomTranslucent != newSettings.toolbarBottomTranslucent {
+            navigationController?.toolbar.isTranslucent = newSettings.toolbarBottomTranslucent
         }
 
-        if newOptionsMap["closeButtonCaption"] != nil, browserOptions?.closeButtonCaption != newOptions.closeButtonCaption {
-            if let closeButtonCaption = newOptions.closeButtonCaption, !closeButtonCaption.isEmpty {
+        if newSettingsMap["closeButtonCaption"] != nil, browserSettings?.closeButtonCaption != newSettings.closeButtonCaption {
+            if let closeButtonCaption = newSettings.closeButtonCaption, !closeButtonCaption.isEmpty {
                 if let oldTitle = closeButton.title, !oldTitle.isEmpty {
                     closeButton.title = closeButtonCaption
                 } else {
@@ -515,38 +515,38 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
 
-        if newOptionsMap["closeButtonColor"] != nil, browserOptions?.closeButtonColor != newOptions.closeButtonColor {
-            if let tintColor = newOptions.closeButtonColor, !tintColor.isEmpty {
+        if newSettingsMap["closeButtonColor"] != nil, browserSettings?.closeButtonColor != newSettings.closeButtonColor {
+            if let tintColor = newSettings.closeButtonColor, !tintColor.isEmpty {
                 closeButton.tintColor = UIColor(hexString: tintColor)
             } else {
                 closeButton.tintColor = nil
             }
         }
         
-        if newOptionsMap["presentationStyle"] != nil, browserOptions?.presentationStyle != newOptions.presentationStyle {
-            navigationController?.modalPresentationStyle = UIModalPresentationStyle(rawValue: newOptions.presentationStyle)!
+        if newSettingsMap["presentationStyle"] != nil, browserSettings?.presentationStyle != newSettings.presentationStyle {
+            navigationController?.modalPresentationStyle = UIModalPresentationStyle(rawValue: newSettings.presentationStyle)!
         }
         
-        if newOptionsMap["transitionStyle"] != nil, browserOptions?.transitionStyle != newOptions.transitionStyle {
-            navigationController?.modalTransitionStyle = UIModalTransitionStyle(rawValue: newOptions.transitionStyle)!
+        if newSettingsMap["transitionStyle"] != nil, browserSettings?.transitionStyle != newSettings.transitionStyle {
+            navigationController?.modalTransitionStyle = UIModalTransitionStyle(rawValue: newSettings.transitionStyle)!
         }
         
-        if newOptionsMap["hideProgressBar"] != nil, browserOptions?.hideProgressBar != newOptions.hideProgressBar {
-            progressBar.isHidden = newOptions.hideProgressBar
+        if newSettingsMap["hideProgressBar"] != nil, browserSettings?.hideProgressBar != newSettings.hideProgressBar {
+            progressBar.isHidden = newSettings.hideProgressBar
         }
         
-        self.browserOptions = newOptions
-        self.webViewOptions = newInAppWebViewOptions
+        self.browserSettings = newSettings
+        self.webViewSettings = newInAppWebViewOptions
     }
     
-    public func getOptions() -> [String: Any?]? {
-        let webViewOptionsMap = self.webView.getOptions()
-        if (self.browserOptions == nil || webViewOptionsMap == nil) {
+    public func getSettings() -> [String: Any?]? {
+        let webViewSettingsMap = self.webView.getSettings()
+        if (self.browserSettings == nil || webViewSettingsMap == nil) {
             return nil
         }
-        var optionsMap = self.browserOptions!.getRealOptions(obj: self)
-        optionsMap.merge(webViewOptionsMap!, uniquingKeysWith: { (current, _) in current })
-        return optionsMap
+        var settingsMap = self.browserSettings!.getRealSettings(obj: self)
+        settingsMap.merge(webViewSettingsMap!, uniquingKeysWith: { (current, _) in current })
+        return settingsMap
     }
     
     public func dispose() {

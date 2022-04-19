@@ -68,7 +68,7 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
     InAppWebView webView = (InAppWebView) view;
-    if (webView.options.useShouldOverrideUrlLoading) {
+    if (webView.customSettings.useShouldOverrideUrlLoading) {
       boolean isRedirect = false;
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         isRedirect = request.isRedirect();
@@ -100,7 +100,7 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public boolean shouldOverrideUrlLoading(WebView webView, String url) {
     InAppWebView inAppWebView = (InAppWebView) webView;
-    if (inAppWebView.options.useShouldOverrideUrlLoading) {
+    if (inAppWebView.customSettings.useShouldOverrideUrlLoading) {
       onShouldOverrideUrlLoading(inAppWebView, url, "GET", null,true, false, false);
       return true;
     }
@@ -254,7 +254,7 @@ public class InAppWebViewClient extends WebViewClient {
     Map<String, Object> obj = new HashMap<>();
     // url argument sometimes doesn't contain the new changed URL, so we get it again from the webview.
     obj.put("url", url);
-    obj.put("androidIsReload", isReload);
+    obj.put("isReload", isReload);
     channel.invokeMethod("onUpdateVisitedHistory", obj);
   }
   
@@ -291,7 +291,7 @@ public class InAppWebViewClient extends WebViewClient {
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
     final InAppWebView webView = (InAppWebView) view;
 
-    if (webView.options.disableDefaultErrorPage) {
+    if (webView.customSettings.disableDefaultErrorPage) {
       webView.stopLoading();
       webView.loadUrl("about:blank");
     }
@@ -602,7 +602,7 @@ public class InAppWebViewClient extends WebViewClient {
 
     final InAppWebView webView = (InAppWebView) view;
 
-    if (webView.options.useShouldInterceptRequest) {
+    if (webView.customSettings.useShouldInterceptRequest) {
       WebResourceResponse onShouldInterceptResponse = onShouldInterceptRequest(url);
       return onShouldInterceptResponse;
     }
@@ -624,7 +624,7 @@ public class InAppWebViewClient extends WebViewClient {
 
     String scheme = uri.getScheme();
 
-    if (webView.options.resourceCustomSchemes != null && webView.options.resourceCustomSchemes.contains(scheme)) {
+    if (webView.customSettings.resourceCustomSchemes != null && webView.customSettings.resourceCustomSchemes.contains(scheme)) {
       final Map<String, Object> obj = new HashMap<>();
       obj.put("url", url);
 
@@ -672,7 +672,7 @@ public class InAppWebViewClient extends WebViewClient {
 
     String url = request.getUrl().toString();
 
-    if (webView.options.useShouldInterceptRequest) {
+    if (webView.customSettings.useShouldInterceptRequest) {
       WebResourceResponse onShouldInterceptResponse = onShouldInterceptRequest(request);
       return onShouldInterceptResponse;
     }
@@ -792,7 +792,7 @@ public class InAppWebViewClient extends WebViewClient {
   public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
     final InAppWebView webView = (InAppWebView) view;
 
-    if (webView.options.useOnRenderProcessGone) {
+    if (webView.customSettings.useOnRenderProcessGone) {
       Boolean didCrash = detail.didCrash();
       Integer rendererPriorityAtExit = detail.rendererPriorityAtExit();
 

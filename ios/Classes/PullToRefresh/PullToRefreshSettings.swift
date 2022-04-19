@@ -18,16 +18,16 @@ public class PullToRefreshSettings : IWebViewSettings<PullToRefreshControl> {
         super.init()
     }
     
-    override func parse(options: [String: Any?]) -> PullToRefreshSettings {
-        let _ = super.parse(options: options)
-        if let attributedTitle = options["attributedTitle"] as? [String: Any?] {
+    override func parse(settings: [String: Any?]) -> PullToRefreshSettings {
+        let _ = super.parse(settings: settings)
+        if let attributedTitle = settings["attributedTitle"] as? [String: Any?] {
             self.attributedTitle = attributedTitle
         }
         return self
     }
     
     override func getRealSettings(obj: PullToRefreshControl?) -> [String: Any?] {
-        let realOptions: [String: Any?] = toMap()
-        return realOptions
+        let realSettings: [String: Any?] = toMap()
+        return realSettings
     }
 }

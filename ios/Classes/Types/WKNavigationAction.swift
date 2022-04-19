@@ -13,9 +13,11 @@ extension WKNavigationAction {
         return [
             "request": request.toMap(),
             "isForMainFrame": targetFrame?.isMainFrame ?? false,
-            "iosWKNavigationType": navigationType.rawValue,
-            "iosSourceFrame": sourceFrame.toMap(),
-            "iosTargetFrame": targetFrame?.toMap()
+            "hasGesture": nil,
+            "isRedirect": nil,
+            "navigationType": navigationType.rawValue,
+            "sourceFrame": sourceFrame.toMap(),
+            "targetFrame": targetFrame?.toMap()
         ]
     }
 }

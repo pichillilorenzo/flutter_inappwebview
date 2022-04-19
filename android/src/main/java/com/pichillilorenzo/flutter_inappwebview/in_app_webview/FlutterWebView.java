@@ -51,14 +51,14 @@ public class FlutterWebView implements PlatformWebView {
     DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
     displayListenerProxy.onPreWebViewInitialization(displayManager);
     
-    Map<String, Object> initialOptions = (Map<String, Object>) params.get("initialOptions");
+    Map<String, Object> initialSettings = (Map<String, Object>) params.get("initialSettings");
     Map<String, Object> contextMenu = (Map<String, Object>) params.get("contextMenu");
     Integer windowId = (Integer) params.get("windowId");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) params.get("initialUserScripts");
     Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) params.get("pullToRefreshOptions");
 
-    InAppWebViewOptions options = new InAppWebViewOptions();
-    options.parse(initialOptions);
+    InAppWebViewSettings options = new InAppWebViewSettings();
+    options.parse(initialSettings);
 
     if (plugin.activity == null) {
       Log.e(LOG_TAG, "\n\n\nERROR: You need to upgrade your Flutter project to use the new Java Embedding API:\n\n" +
@@ -175,26 +175,26 @@ public class FlutterWebView implements PlatformWebView {
 
   @Override
   public void onInputConnectionLocked() {
-    if (webView != null && webView.inAppBrowserDelegate == null && !webView.options.useHybridComposition)
+    if (webView != null && webView.inAppBrowserDelegate == null && !webView.customSettings.useHybridComposition)
       webView.lockInputConnection();
   }
 
   @Override
   public void onInputConnectionUnlocked() {
-    if (webView != null && webView.inAppBrowserDelegate == null && !webView.options.useHybridComposition)
+    if (webView != null && webView.inAppBrowserDelegate == null && !webView.customSettings.useHybridComposition)
       webView.unlockInputConnection();
   }
 
   @Override
   public void onFlutterViewAttached(@NonNull View flutterView) {
-    if (webView != null && !webView.options.useHybridComposition) {
+    if (webView != null && !webView.customSettings.useHybridComposition) {
       webView.setContainerView(flutterView);
     }
   }
 
   @Override
   public void onFlutterViewDetached() {
-    if (webView != null && !webView.options.useHybridComposition) {
+    if (webView != null && !webView.customSettings.useHybridComposition) {
       webView.setContainerView(null);
     }
   }

@@ -1,11 +1,11 @@
 package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
 
-import com.pichillilorenzo.flutter_inappwebview.Options;
+import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContextMenuOptions implements Options<Object> {
+public class ContextMenuOptions implements IWebViewSettings<Object> {
   public static final String LOG_TAG = "ContextMenuOptions";
 
   public Boolean hideDefaultSystemContextMenuItems = false;
@@ -35,7 +35,7 @@ public class ContextMenuOptions implements Options<Object> {
   }
 
   @Override
-  public Map<String, Object> getRealOptions(Object obj) {
+  public Map<String, Object> getRealSettings(Object obj) {
     Map<String, Object> realOptions = toMap();
     return realOptions;
   }

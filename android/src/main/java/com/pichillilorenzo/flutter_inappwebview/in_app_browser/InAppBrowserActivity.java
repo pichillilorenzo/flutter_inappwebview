@@ -29,7 +29,7 @@ import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewChromeClient;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewOptions;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewSettings;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
@@ -55,7 +55,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public ActionBar actionBar;
   public Menu menu;
   public SearchView searchView;
-  public InAppBrowserOptions options;
+  public InAppBrowserSettings customSettings;
   public ProgressBar progressBar;
   public boolean isHidden = false;
   public String fromActivity;
@@ -101,16 +101,16 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     fromActivity = b.getString("fromActivity");
 
-    Map<String, Object> optionsMap = (Map<String, Object>) b.getSerializable("options");
+    Map<String, Object> settingsMap = (Map<String, Object>) b.getSerializable("settings");
     Map<String, Object> contextMenu = (Map<String, Object>) b.getSerializable("contextMenu");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) b.getSerializable("initialUserScripts");
 
-    options = new InAppBrowserOptions();
-    options.parse(optionsMap);
+    customSettings = new InAppBrowserSettings();
+    customSettings.parse(settingsMap);
 
-    InAppWebViewOptions webViewOptions = new InAppWebViewOptions();
-    webViewOptions.parse(optionsMap);
-    webView.options = webViewOptions;
+    InAppWebViewSettings webViewSettings = new InAppWebViewSettings();
+    webViewSettings.parse(settingsMap);
+    webView.customSettings = webViewSettings;
     webView.contextMenu = contextMenu;
 
     List<UserScript> userScripts = new ArrayList<>();
@@ -169,29 +169,29 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     webView.prepare();
 
-    if (options.hidden)
+    if (customSettings.hidden)
       hide();
     else
       show();
 
     progressBar = findViewById(R.id.progressBar);
 
-    if (options.hideProgressBar)
+    if (customSettings.hideProgressBar)
       progressBar.setMax(0);
     else
       progressBar.setMax(100);
 
     if (actionBar != null) {
-      actionBar.setDisplayShowTitleEnabled(!options.hideTitleBar);
+      actionBar.setDisplayShowTitleEnabled(!customSettings.hideTitleBar);
 
-      if (options.hideToolbarTop)
+      if (customSettings.hideToolbarTop)
         actionBar.hide();
 
-      if (options.toolbarTopBackgroundColor != null && !options.toolbarTopBackgroundColor.isEmpty())
-        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(options.toolbarTopBackgroundColor)));
+      if (customSettings.toolbarTopBackgroundColor != null && !customSettings.toolbarTopBackgroundColor.isEmpty())
+        actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(customSettings.toolbarTopBackgroundColor)));
 
-      if (options.toolbarTopFixedTitle != null && !options.toolbarTopFixedTitle.isEmpty())
-        actionBar.setTitle(options.toolbarTopFixedTitle);
+      if (customSettings.toolbarTopFixedTitle != null && !customSettings.toolbarTopFixedTitle.isEmpty())
+        actionBar.setTitle(customSettings.toolbarTopFixedTitle);
     }
   }
 
@@ -206,12 +206,12 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
     searchView.setFocusable(true);
 
-    if (options.hideUrlBar)
+    if (customSettings.hideUrlBar)
       menu.findItem(R.id.menu_search).setVisible(false);
 
     searchView.setQuery(webView.getUrl(), false);
 
-    if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty()))
+    if (actionBar != null && (customSettings.toolbarTopFixedTitle == null || customSettings.toolbarTopFixedTitle.isEmpty()))
       actionBar.setTitle(webView.getTitle());
 
     searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
@@ -257,18 +257,18 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   public boolean onKeyDown(int keyCode, KeyEvent event) {
     if (keyCode == KeyEvent.KEYCODE_BACK) {
-      if (options.shouldCloseOnBackButtonPressed) {
+      if (customSettings.shouldCloseOnBackButtonPressed) {
         close(null);
         return true;
       }
-      if (options.allowGoBackWithBackButton) {
+      if (customSettings.allowGoBackWithBackButton) {
         if (canGoBack())
           goBack();
-        else if (options.closeOnCannotGoBack)
+        else if (customSettings.closeOnCannotGoBack)
           close(null);
         return true;
       }
-      if (!options.shouldCloseOnBackButtonPressed) {
+      if (!customSettings.shouldCloseOnBackButtonPressed) {
         return true;
       }
     }
@@ -355,64 +355,64 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     close(null);
   }
 
-  public void setOptions(InAppBrowserOptions newOptions, HashMap<String, Object> newOptionsMap) {
+  public void setSettings(InAppBrowserSettings newSettings, HashMap<String, Object> newSettingsMap) {
 
-    InAppWebViewOptions newInAppWebViewOptions = new InAppWebViewOptions();
-    newInAppWebViewOptions.parse(newOptionsMap);
-    webView.setOptions(newInAppWebViewOptions, newOptionsMap);
+    InAppWebViewSettings newInAppWebViewSettings = new InAppWebViewSettings();
+    newInAppWebViewSettings.parse(newSettingsMap);
+    webView.setSettings(newInAppWebViewSettings, newSettingsMap);
 
-    if (newOptionsMap.get("hidden") != null && options.hidden != newOptions.hidden) {
-      if (newOptions.hidden)
+    if (newSettingsMap.get("hidden") != null && customSettings.hidden != newSettings.hidden) {
+      if (newSettings.hidden)
         hide();
       else
         show();
     }
 
-    if (newOptionsMap.get("hideProgressBar") != null && options.hideProgressBar != newOptions.hideProgressBar && progressBar != null) {
-      if (newOptions.hideProgressBar)
+    if (newSettingsMap.get("hideProgressBar") != null && customSettings.hideProgressBar != newSettings.hideProgressBar && progressBar != null) {
+      if (newSettings.hideProgressBar)
         progressBar.setMax(0);
       else
         progressBar.setMax(100);
     }
 
-    if (actionBar != null && newOptionsMap.get("hideTitleBar") != null && options.hideTitleBar != newOptions.hideTitleBar)
-      actionBar.setDisplayShowTitleEnabled(!newOptions.hideTitleBar);
+    if (actionBar != null && newSettingsMap.get("hideTitleBar") != null && customSettings.hideTitleBar != newSettings.hideTitleBar)
+      actionBar.setDisplayShowTitleEnabled(!newSettings.hideTitleBar);
 
-    if (actionBar != null && newOptionsMap.get("hideToolbarTop") != null && options.hideToolbarTop != newOptions.hideToolbarTop) {
-      if (newOptions.hideToolbarTop)
+    if (actionBar != null && newSettingsMap.get("hideToolbarTop") != null && customSettings.hideToolbarTop != newSettings.hideToolbarTop) {
+      if (newSettings.hideToolbarTop)
         actionBar.hide();
       else
         actionBar.show();
     }
 
-    if (actionBar != null && newOptionsMap.get("toolbarTopBackgroundColor") != null &&
-            !Util.objEquals(options.toolbarTopBackgroundColor, newOptions.toolbarTopBackgroundColor) &&
-            !newOptions.toolbarTopBackgroundColor.isEmpty())
-      actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(newOptions.toolbarTopBackgroundColor)));
+    if (actionBar != null && newSettingsMap.get("toolbarTopBackgroundColor") != null &&
+            !Util.objEquals(customSettings.toolbarTopBackgroundColor, newSettings.toolbarTopBackgroundColor) &&
+            !newSettings.toolbarTopBackgroundColor.isEmpty())
+      actionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor(newSettings.toolbarTopBackgroundColor)));
 
-    if (actionBar != null && newOptionsMap.get("toolbarTopFixedTitle") != null &&
-            !Util.objEquals(options.toolbarTopFixedTitle, newOptions.toolbarTopFixedTitle) &&
-            !newOptions.toolbarTopFixedTitle.isEmpty())
-      actionBar.setTitle(newOptions.toolbarTopFixedTitle);
+    if (actionBar != null && newSettingsMap.get("toolbarTopFixedTitle") != null &&
+            !Util.objEquals(customSettings.toolbarTopFixedTitle, newSettings.toolbarTopFixedTitle) &&
+            !newSettings.toolbarTopFixedTitle.isEmpty())
+      actionBar.setTitle(newSettings.toolbarTopFixedTitle);
 
-    if (newOptionsMap.get("hideUrlBar") != null && options.hideUrlBar != newOptions.hideUrlBar) {
-      if (newOptions.hideUrlBar)
+    if (newSettingsMap.get("hideUrlBar") != null && customSettings.hideUrlBar != newSettings.hideUrlBar) {
+      if (newSettings.hideUrlBar)
         menu.findItem(R.id.menu_search).setVisible(false);
       else
         menu.findItem(R.id.menu_search).setVisible(true);
     }
 
-    options = newOptions;
+    customSettings = newSettings;
   }
 
-  public Map<String, Object> getOptions() {
-    Map<String, Object> webViewOptionsMap = webView.getOptions();
-    if (options == null || webViewOptionsMap == null)
+  public Map<String, Object> getCustomSettings() {
+    Map<String, Object> webViewSettingsMap = webView.getCustomSettings();
+    if (customSettings == null || webViewSettingsMap == null)
       return null;
 
-    Map<String, Object> optionsMap = options.getRealOptions(this);
-    optionsMap.putAll(webViewOptionsMap);
-    return optionsMap;
+    Map<String, Object> settingsMap = customSettings.getRealSettings(this);
+    settingsMap.putAll(webViewSettingsMap);
+    return settingsMap;
   }
 
   @Override
@@ -422,7 +422,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   @Override
   public void didChangeTitle(String title) {
-    if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty())) {
+    if (actionBar != null && (customSettings.toolbarTopFixedTitle == null || customSettings.toolbarTopFixedTitle.isEmpty())) {
       actionBar.setTitle(title);
     }
   }

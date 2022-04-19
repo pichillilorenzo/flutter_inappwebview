@@ -21,17 +21,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   final GlobalKey webViewKey = GlobalKey();
 
   InAppWebViewController? webViewController;
-  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(
-        useShouldOverrideUrlLoading: true,
-        mediaPlaybackRequiresUserGesture: false
-      ),
-      android: AndroidInAppWebViewOptions(
-        useHybridComposition: true,
-      ),
-      ios: IOSInAppWebViewOptions(
-        allowsInlineMediaPlayback: true,
-      ));
+  InAppWebViewSettings settings = InAppWebViewSettings(
+      useShouldOverrideUrlLoading: true,
+      mediaPlaybackRequiresUserGesture: false,
+      useHybridComposition: true,
+      allowsInlineMediaPlayback: true,
+  );
 
   late PullToRefreshController pullToRefreshController;
   late ContextMenu contextMenu;
@@ -126,7 +121,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     URLRequest(url: Uri.parse("https://github.com/flutter")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
-                    initialOptions: options,
+                    initialSettings: settings,
                     pullToRefreshController: pullToRefreshController,
                     onWebViewCreated: (controller) {
                       webViewController = controller;

@@ -9,7 +9,7 @@ import '../context_menu.dart';
 import '../types.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
-import 'in_app_webview_options.dart';
+import 'in_app_webview_settings.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_options.dart';
 import '../util.dart';
@@ -49,7 +49,8 @@ class HeadlessInAppWebView implements WebView {
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,
-      this.initialOptions,
+      @Deprecated('Use initialSettings instead') this.initialOptions,
+      this.initialSettings,
       this.contextMenu,
       this.initialUserScripts,
       this.pullToRefreshController,
@@ -64,7 +65,7 @@ class HeadlessInAppWebView implements WebView {
       this.shouldOverrideUrlLoading,
       this.onLoadResource,
       this.onScrollChanged,
-      @Deprecated('Use `onDownloadStartRequest` instead')
+      @Deprecated('Use onDownloadStartRequest instead')
           this.onDownloadStart,
       this.onDownloadStartRequest,
       this.onLoadResourceCustomScheme,
@@ -91,25 +92,41 @@ class HeadlessInAppWebView implements WebView {
       this.onWindowFocus,
       this.onWindowBlur,
       this.onOverScrolled,
-      this.androidOnSafeBrowsingHit,
-      this.androidOnPermissionRequest,
-      this.androidOnGeolocationPermissionsShowPrompt,
-      this.androidOnGeolocationPermissionsHidePrompt,
-      this.androidShouldInterceptRequest,
-      this.androidOnRenderProcessGone,
-      this.androidOnRenderProcessResponsive,
-      this.androidOnRenderProcessUnresponsive,
-      this.androidOnFormResubmission,
-      @Deprecated('Use `onZoomScaleChanged` instead')
-          this.androidOnScaleChanged,
-      this.androidOnReceivedIcon,
-      this.androidOnReceivedTouchIconUrl,
-      this.androidOnJsBeforeUnload,
-      this.androidOnReceivedLoginRequest,
-      this.iosOnWebContentProcessDidTerminate,
-      this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
-      this.iosOnNavigationResponse,
-      this.iosShouldAllowDeprecatedTLS}) {
+      @Deprecated('Use onSafeBrowsingHit instead') this.androidOnSafeBrowsingHit,
+      this.onSafeBrowsingHit,
+      @Deprecated('Use onPermissionRequest instead') this.androidOnPermissionRequest,
+      this.onPermissionRequest,
+      @Deprecated('Use onGeolocationPermissionsShowPrompt instead') this.androidOnGeolocationPermissionsShowPrompt,
+      this.onGeolocationPermissionsShowPrompt,
+      @Deprecated('Use onGeolocationPermissionsHidePrompt instead') this.androidOnGeolocationPermissionsHidePrompt,
+      this.onGeolocationPermissionsHidePrompt,
+      @Deprecated('Use shouldInterceptRequest instead') this.androidShouldInterceptRequest,
+      this.shouldInterceptRequest,
+      @Deprecated('Use onRenderProcessGone instead') this.androidOnRenderProcessGone,
+      this.onRenderProcessGone,
+      @Deprecated('Use onRenderProcessResponsive instead') this.androidOnRenderProcessResponsive,
+      this.onRenderProcessResponsive,
+      @Deprecated('Use onRenderProcessUnresponsive instead') this.androidOnRenderProcessUnresponsive,
+      this.onRenderProcessUnresponsive,
+      @Deprecated('Use onFormResubmission instead') this.androidOnFormResubmission,
+      this.onFormResubmission,
+      @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
+      @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
+      this.onReceivedIcon,
+      @Deprecated('Use onReceivedTouchIconUrl instead') this.androidOnReceivedTouchIconUrl,
+      this.onReceivedTouchIconUrl,
+      @Deprecated('Use onJsBeforeUnload instead') this.androidOnJsBeforeUnload,
+      this.onJsBeforeUnload,
+      @Deprecated('Use onReceivedLoginRequest instead') this.androidOnReceivedLoginRequest,
+      this.onReceivedLoginRequest,
+      @Deprecated('Use onWebContentProcessDidTerminate instead') this.iosOnWebContentProcessDidTerminate,
+      this.onWebContentProcessDidTerminate,
+      @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead') this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+      this.onDidReceiveServerRedirectForProvisionalNavigation,
+      @Deprecated('Use onNavigationResponse instead') this.iosOnNavigationResponse,
+      this.onNavigationResponse,
+      @Deprecated('Use shouldAllowDeprecatedTLS instead') this.iosShouldAllowDeprecatedTLS,
+      this.shouldAllowDeprecatedTLS,}) {
     id = IdGenerator.generate();
     webViewController = new InAppWebViewController(id, this);
     this._channel =
@@ -137,6 +154,12 @@ class HeadlessInAppWebView implements WebView {
       return;
     }
     _started = true;
+
+    Map<String, dynamic> initialSettings = (this.initialSettings != null ?
+      this.initialSettings?.toMap() :
+      // ignore: deprecated_member_use_from_same_package
+      this.initialOptions?.toMap()) ?? {};
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent(
@@ -145,7 +168,7 @@ class HeadlessInAppWebView implements WebView {
               'initialUrlRequest': this.initialUrlRequest?.toMap(),
               'initialFile': this.initialFile,
               'initialData': this.initialData?.toMap(),
-              'initialOptions': this.initialOptions?.toMap() ?? {},
+              'initialSettings': initialSettings,
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
               'implementation': this.implementation.toValue(),
@@ -215,7 +238,11 @@ class HeadlessInAppWebView implements WebView {
   final String? initialFile;
 
   @override
+  @Deprecated('Use initialSettings instead')
   final InAppWebViewGroupOptions? initialOptions;
+
+  @override
+  final InAppWebViewSettings? initialSettings;
 
   @override
   final ContextMenu? contextMenu;
@@ -232,20 +259,28 @@ class HeadlessInAppWebView implements WebView {
   @override
   final WebViewImplementation implementation;
 
+  ///Use [onGeolocationPermissionsHidePrompt] instead.
   @override
+  @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
   void Function(InAppWebViewController controller)?
       androidOnGeolocationPermissionsHidePrompt;
 
+  ///Use [onGeolocationPermissionsShowPrompt] instead.
   @override
+  @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
   Future<GeolocationPermissionShowPromptResponse?> Function(
           InAppWebViewController controller, String origin)?
       androidOnGeolocationPermissionsShowPrompt;
 
+  ///Use [onPermissionRequest] instead.
   @override
+  @Deprecated('Use onPermissionRequest instead')
   Future<PermissionRequestResponse?> Function(InAppWebViewController controller,
       String origin, List<String> resources)? androidOnPermissionRequest;
 
+  ///Use [onSafeBrowsingHit] instead.
   @override
+  @Deprecated('Use onSafeBrowsingHit instead')
   Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
       Uri url, SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
@@ -257,20 +292,28 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller, String? title)?
       onTitleChanged;
 
+  ///Use [onDidReceiveServerRedirectForProvisionalNavigation] instead.
   @override
+  @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead')
   void Function(InAppWebViewController controller)?
       iosOnDidReceiveServerRedirectForProvisionalNavigation;
 
+  ///Use [onWebContentProcessDidTerminate] instead.
   @override
+  @Deprecated('Use onWebContentProcessDidTerminate instead')
   void Function(InAppWebViewController controller)?
       iosOnWebContentProcessDidTerminate;
 
+  ///Use [onNavigationResponse] instead.
   @override
+  @Deprecated('Use onNavigationResponse instead')
   Future<IOSNavigationResponseAction?> Function(
       InAppWebViewController controller,
       IOSWKNavigationResponse navigationResponse)? iosOnNavigationResponse;
 
+  ///Use [shouldAllowDeprecatedTLS] instead.
   @override
+  @Deprecated('Use shouldAllowDeprecatedTLS instead')
   Future<IOSShouldAllowDeprecatedTLSAction?> Function(
       InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? iosShouldAllowDeprecatedTLS;
@@ -304,7 +347,7 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller)? onWindowBlur;
 
   ///Use [onDownloadStartRequest] instead
-  @Deprecated('Use `onDownloadStartRequest` instead')
+  @Deprecated('Use onDownloadStartRequest instead')
   @override
   final void Function(InAppWebViewController controller, Uri url)?
       onDownloadStart;
@@ -383,7 +426,7 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   void Function(
-          InAppWebViewController controller, Uri? url, bool? androidIsReload)?
+          InAppWebViewController controller, Uri? url, bool? isReload)?
       onUpdateVisitedHistory;
 
   @override
@@ -419,50 +462,119 @@ class HeadlessInAppWebView implements WebView {
           InAppWebViewController controller, double oldScale, double newScale)?
       onZoomScaleChanged;
 
+  ///Use [shouldInterceptRequest] instead.
   @override
+  @Deprecated('Use shouldInterceptRequest instead')
   Future<WebResourceResponse?> Function(
           InAppWebViewController controller, WebResourceRequest request)?
       androidShouldInterceptRequest;
 
+  ///Use [onRenderProcessUnresponsive] instead.
   @override
+  @Deprecated('Use onRenderProcessUnresponsive instead')
   Future<WebViewRenderProcessAction?> Function(
           InAppWebViewController controller, Uri? url)?
       androidOnRenderProcessUnresponsive;
 
+  ///Use [onRenderProcessResponsive] instead.
   @override
+  @Deprecated('Use onRenderProcessResponsive instead')
   Future<WebViewRenderProcessAction?> Function(
           InAppWebViewController controller, Uri? url)?
       androidOnRenderProcessResponsive;
 
+  ///Use [onRenderProcessGone] instead.
   @override
+  @Deprecated('Use onRenderProcessGone instead')
   void Function(
           InAppWebViewController controller, RenderProcessGoneDetail detail)?
       androidOnRenderProcessGone;
 
+  ///Use [onFormResubmission] instead.
   @override
+  @Deprecated('Use onFormResubmission instead')
   Future<FormResubmissionAction?> Function(
       InAppWebViewController controller, Uri? url)? androidOnFormResubmission;
 
   ///Use [onZoomScaleChanged] instead.
-  @Deprecated('Use `onZoomScaleChanged` instead')
+  @Deprecated('Use onZoomScaleChanged instead')
   @override
   void Function(
           InAppWebViewController controller, double oldScale, double newScale)?
       androidOnScaleChanged;
 
+  ///Use [onReceivedIcon] instead
   @override
+  @Deprecated('Use onReceivedIcon instead')
   void Function(InAppWebViewController controller, Uint8List icon)?
       androidOnReceivedIcon;
 
+  ///Use [onReceivedTouchIconUrl] instead
   @override
+  @Deprecated('Use onReceivedTouchIconUrl instead')
   void Function(InAppWebViewController controller, Uri url, bool precomposed)?
       androidOnReceivedTouchIconUrl;
 
+  ///Use [onJsBeforeUnload] instead.
   @override
+  @Deprecated('Use onJsBeforeUnload instead')
   Future<JsBeforeUnloadResponse?> Function(InAppWebViewController controller,
       JsBeforeUnloadRequest jsBeforeUnloadRequest)? androidOnJsBeforeUnload;
 
+  ///Use [onReceivedLoginRequest] instead.
   @override
+  @Deprecated('Use onReceivedLoginRequest instead')
   void Function(InAppWebViewController controller, LoginRequest loginRequest)?
       androidOnReceivedLoginRequest;
+
+  @override
+  void Function(InAppWebViewController controller)? onDidReceiveServerRedirectForProvisionalNavigation;
+
+  @override
+  Future<FormResubmissionAction?> Function(InAppWebViewController controller, Uri? url)? onFormResubmission;
+
+  @override
+  void Function(InAppWebViewController controller)? onGeolocationPermissionsHidePrompt;
+
+  @override
+  Future<GeolocationPermissionShowPromptResponse?> Function(InAppWebViewController controller, String origin)? onGeolocationPermissionsShowPrompt;
+
+  @override
+  Future<JsBeforeUnloadResponse?> Function(InAppWebViewController controller, JsBeforeUnloadRequest jsBeforeUnloadRequest)? onJsBeforeUnload;
+
+  @override
+  Future<NavigationResponseAction?> Function(InAppWebViewController controller, NavigationResponse navigationResponse)? onNavigationResponse;
+
+  @override
+  Future<PermissionRequestResponse?> Function(InAppWebViewController controller, String origin, List<String> resources)? onPermissionRequest;
+
+  @override
+  void Function(InAppWebViewController controller, Uint8List icon)? onReceivedIcon;
+
+  @override
+  void Function(InAppWebViewController controller, LoginRequest loginRequest)? onReceivedLoginRequest;
+
+  @override
+  void Function(InAppWebViewController controller, Uri url, bool precomposed)? onReceivedTouchIconUrl;
+
+  @override
+  void Function(InAppWebViewController controller, RenderProcessGoneDetail detail)? onRenderProcessGone;
+
+  @override
+  Future<WebViewRenderProcessAction?> Function(InAppWebViewController controller, Uri? url)? onRenderProcessResponsive;
+
+  @override
+  Future<WebViewRenderProcessAction?> Function(InAppWebViewController controller, Uri? url)? onRenderProcessUnresponsive;
+
+  @override
+  Future<SafeBrowsingResponse?> Function(InAppWebViewController controller, Uri url, SafeBrowsingThreat? threatType)? onSafeBrowsingHit;
+
+  @override
+  void Function(InAppWebViewController controller)? onWebContentProcessDidTerminate;
+
+  @override
+  Future<ShouldAllowDeprecatedTLSAction?> Function(InAppWebViewController controller, URLAuthenticationChallenge challenge)? shouldAllowDeprecatedTLS;
+
+  @override
+  Future<WebResourceResponse?> Function(InAppWebViewController controller, WebResourceRequest request)? shouldInterceptRequest;
 }

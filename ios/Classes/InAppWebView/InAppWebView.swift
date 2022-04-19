@@ -15,7 +15,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     var windowCreated = false
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channel: FlutterMethodChannel?
-    var options: InAppWebViewOptions?
+    var settings: InAppWebViewSettings?
     var pullToRefreshControl: PullToRefreshControl?
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
@@ -148,7 +148,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         if sender == recognizerForDisablingContextMenuOnLinks,
-           let options = options, !options.disableLongPressContextMenuOnLinks {
+           let settings = settings, !settings.disableLongPressContextMenuOnLinks {
             return
         }
         
@@ -231,7 +231,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public override func canPerformAction(_ action: Selector, withSender sender: Any?) -> Bool {
         if let _ = sender as? UIMenuController {
-            if self.options?.disableContextMenu == true {
+            if self.settings?.disableContextMenu == true {
                 if !onCreateContextMenuEventTriggeredWhenMenuDisabled {
                     // workaround to trigger onCreateContextMenu event as the same on Android
                     self.onCreateContextMenu()
@@ -246,7 +246,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if let menu = contextMenu {
                 let contextMenuOptions = ContextMenuOptions()
                 if let contextMenuOptionsMap = menu["options"] as? [String: Any?] {
-                    let _ = contextMenuOptions.parse(options: contextMenuOptionsMap)
+                    let _ = contextMenuOptions.parse(settings: contextMenuOptionsMap)
                     if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuOptions.hideDefaultSystemContextMenuItems {
                         return false
                     }
@@ -326,15 +326,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                                                name: UIWindow.didBecomeHiddenNotification,
                                                object: window)
         
-        if let options = options {
-            if options.transparentBackground {
+        if let settings = settings {
+            if settings.transparentBackground {
                 isOpaque = false
                 backgroundColor = UIColor.clear
                 scrollView.backgroundColor = UIColor.clear
             }
             
             // prevent webView from bouncing
-            if options.disallowOverScroll {
+            if settings.disallowOverScroll {
                 if responds(to: #selector(getter: scrollView)) {
                     scrollView.bounces = false
                 }
@@ -348,47 +348,47 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             if #available(iOS 11.0, *) {
-                accessibilityIgnoresInvertColors = options.accessibilityIgnoresInvertColors
+                accessibilityIgnoresInvertColors = settings.accessibilityIgnoresInvertColors
                 scrollView.contentInsetAdjustmentBehavior =
-                    UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: options.contentInsetAdjustmentBehavior)!
+                    UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: settings.contentInsetAdjustmentBehavior)!
             }
             
-            allowsBackForwardNavigationGestures = options.allowsBackForwardNavigationGestures
+            allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
             if #available(iOS 9.0, *) {
-                allowsLinkPreview = options.allowsLinkPreview
-                if !options.userAgent.isEmpty {
-                    customUserAgent = options.userAgent
+                allowsLinkPreview = settings.allowsLinkPreview
+                if !settings.userAgent.isEmpty {
+                    customUserAgent = settings.userAgent
                 }
             }
             
             if #available(iOS 13.0, *) {
-                scrollView.automaticallyAdjustsScrollIndicatorInsets = options.automaticallyAdjustsScrollIndicatorInsets
+                scrollView.automaticallyAdjustsScrollIndicatorInsets = settings.automaticallyAdjustsScrollIndicatorInsets
             }
             
-            scrollView.showsVerticalScrollIndicator = !options.disableVerticalScroll
-            scrollView.showsHorizontalScrollIndicator = !options.disableHorizontalScroll
-            scrollView.showsVerticalScrollIndicator = options.verticalScrollBarEnabled
-            scrollView.showsHorizontalScrollIndicator = options.horizontalScrollBarEnabled
-            scrollView.isScrollEnabled = !(options.disableVerticalScroll && options.disableHorizontalScroll)
-            scrollView.isDirectionalLockEnabled = options.isDirectionalLockEnabled
+            scrollView.showsVerticalScrollIndicator = !settings.disableVerticalScroll
+            scrollView.showsHorizontalScrollIndicator = !settings.disableHorizontalScroll
+            scrollView.showsVerticalScrollIndicator = settings.verticalScrollBarEnabled
+            scrollView.showsHorizontalScrollIndicator = settings.horizontalScrollBarEnabled
+            scrollView.isScrollEnabled = !(settings.disableVerticalScroll && settings.disableHorizontalScroll)
+            scrollView.isDirectionalLockEnabled = settings.isDirectionalLockEnabled
 
-            scrollView.decelerationRate = Util.getDecelerationRate(type: options.decelerationRate)
-            scrollView.alwaysBounceVertical = options.alwaysBounceVertical
-            scrollView.alwaysBounceHorizontal = options.alwaysBounceHorizontal
-            scrollView.scrollsToTop = options.scrollsToTop
-            scrollView.isPagingEnabled = options.isPagingEnabled
-            scrollView.maximumZoomScale = CGFloat(options.maximumZoomScale)
-            scrollView.minimumZoomScale = CGFloat(options.minimumZoomScale)
+            scrollView.decelerationRate = Util.getDecelerationRate(type: settings.decelerationRate)
+            scrollView.alwaysBounceVertical = settings.alwaysBounceVertical
+            scrollView.alwaysBounceHorizontal = settings.alwaysBounceHorizontal
+            scrollView.scrollsToTop = settings.scrollsToTop
+            scrollView.isPagingEnabled = settings.isPagingEnabled
+            scrollView.maximumZoomScale = CGFloat(settings.maximumZoomScale)
+            scrollView.minimumZoomScale = CGFloat(settings.minimumZoomScale)
             
             if #available(iOS 14.0, *) {
-                mediaType = options.mediaType
-                pageZoom = CGFloat(options.pageZoom)
+                mediaType = settings.mediaType
+                pageZoom = CGFloat(settings.pageZoom)
             }
             
             // debugging is always enabled for iOS,
             // there isn't any option to set about it such as on Android.
             
-            if options.clearCache {
+            if settings.clearCache {
                 clearCache()
             }
         }
@@ -403,23 +403,23 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         configuration.preferences = WKPreferences()
-        if let options = options {
+        if let settings = settings {
             if #available(iOS 9.0, *) {
-                configuration.allowsAirPlayForMediaPlayback = options.allowsAirPlayForMediaPlayback
-                configuration.allowsPictureInPictureMediaPlayback = options.allowsPictureInPictureMediaPlayback
+                configuration.allowsAirPlayForMediaPlayback = settings.allowsAirPlayForMediaPlayback
+                configuration.allowsPictureInPictureMediaPlayback = settings.allowsPictureInPictureMediaPlayback
             }
             
-            configuration.preferences.javaScriptCanOpenWindowsAutomatically = options.javaScriptCanOpenWindowsAutomatically
-            configuration.preferences.minimumFontSize = CGFloat(options.minimumFontSize)
+            configuration.preferences.javaScriptCanOpenWindowsAutomatically = settings.javaScriptCanOpenWindowsAutomatically
+            configuration.preferences.minimumFontSize = CGFloat(settings.minimumFontSize)
             
             if #available(iOS 13.0, *) {
-                configuration.preferences.isFraudulentWebsiteWarningEnabled = options.isFraudulentWebsiteWarningEnabled
-                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: options.preferredContentMode)!
+                configuration.preferences.isFraudulentWebsiteWarningEnabled = settings.isFraudulentWebsiteWarningEnabled
+                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: settings.preferredContentMode)!
             }
             
-            configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
+            configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
             if #available(iOS 14.0, *) {
-                configuration.defaultWebpagePreferences.allowsContentJavaScript = options.javaScriptEnabled
+                configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
             }
         }
     }
@@ -434,7 +434,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController = WKUserContentController()
         configuration.userContentController.initialize()
         
-        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
         
@@ -448,19 +448,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.addPluginScript(LAST_TOUCHED_ANCHOR_OR_IMAGE_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(FIND_TEXT_HIGHLIGHT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(ORIGINAL_VIEWPORT_METATAG_CONTENT_JS_PLUGIN_SCRIPT)
-        if let options = options {
-            if options.useShouldInterceptAjaxRequest {
+        if let settings = settings {
+            if settings.useShouldInterceptAjaxRequest {
                 configuration.userContentController.addPluginScript(INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT)
             }
-            if options.useShouldInterceptFetchRequest {
+            if settings.useShouldInterceptFetchRequest {
                 configuration.userContentController.addPluginScript(INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT)
             }
-            if options.useOnLoadResource {
+            if settings.useOnLoadResource {
                 configuration.userContentController.addPluginScript(ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT)
             }
-            if !options.supportZoom {
+            if !settings.supportZoom {
                 configuration.userContentController.addPluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
-            } else if options.enableViewportScale {
+            } else if settings.enableViewportScale {
                 configuration.userContentController.addPluginScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
             }
         }
@@ -474,64 +474,64 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         configuration.userContentController.sync(scriptMessageHandler: self)
     }
     
-    public static func preWKWebViewConfiguration(options: InAppWebViewOptions?) -> WKWebViewConfiguration {
+    public static func preWKWebViewConfiguration(settings: InAppWebViewSettings?) -> WKWebViewConfiguration {
         let configuration = WKWebViewConfiguration()
         
         configuration.processPool = WKProcessPoolManager.sharedProcessPool
         
-        if let options = options {
-            configuration.allowsInlineMediaPlayback = options.allowsInlineMediaPlayback
-            configuration.suppressesIncrementalRendering = options.suppressesIncrementalRendering
-            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: options.selectionGranularity)!
+        if let settings = settings {
+            configuration.allowsInlineMediaPlayback = settings.allowsInlineMediaPlayback
+            configuration.suppressesIncrementalRendering = settings.suppressesIncrementalRendering
+            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: settings.selectionGranularity)!
             
-            if options.allowUniversalAccessFromFileURLs {
-                configuration.setValue(options.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
+            if settings.allowUniversalAccessFromFileURLs {
+                configuration.setValue(settings.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
             }
             
-            if options.allowFileAccessFromFileURLs {
-                configuration.preferences.setValue(options.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
+            if settings.allowFileAccessFromFileURLs {
+                configuration.preferences.setValue(settings.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
             }
             
             if #available(iOS 9.0, *) {
-                if options.incognito {
+                if settings.incognito {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-                } else if options.cacheEnabled {
+                } else if settings.cacheEnabled {
                     configuration.websiteDataStore = WKWebsiteDataStore.default()
                 }
-                if !options.applicationNameForUserAgent.isEmpty {
+                if !settings.applicationNameForUserAgent.isEmpty {
                     if let applicationNameForUserAgent = configuration.applicationNameForUserAgent {
-                        configuration.applicationNameForUserAgent = applicationNameForUserAgent + " " + options.applicationNameForUserAgent
+                        configuration.applicationNameForUserAgent = applicationNameForUserAgent + " " + settings.applicationNameForUserAgent
                     }
                 }
             }
             
             if #available(iOS 10.0, *) {
-                configuration.ignoresViewportScaleLimits = options.ignoresViewportScaleLimits
+                configuration.ignoresViewportScaleLimits = settings.ignoresViewportScaleLimits
                 
                 var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
-                for type in options.dataDetectorTypes {
+                for type in settings.dataDetectorTypes {
                     let dataDetectorType = Util.getDataDetectorType(type: type)
                     dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
                 }
                 configuration.dataDetectorTypes = dataDetectorTypes
                 
-                configuration.mediaTypesRequiringUserActionForPlayback = options.mediaPlaybackRequiresUserGesture ? .all : []
+                configuration.mediaTypesRequiringUserActionForPlayback = settings.mediaPlaybackRequiresUserGesture ? .all : []
             } else {
                 // Fallback on earlier versions
-                configuration.mediaPlaybackRequiresUserAction = options.mediaPlaybackRequiresUserGesture
+                configuration.mediaPlaybackRequiresUserAction = settings.mediaPlaybackRequiresUserGesture
             }
             
             if #available(iOS 11.0, *) {
-                for scheme in options.resourceCustomSchemes {
+                for scheme in settings.resourceCustomSchemes {
                     configuration.setURLSchemeHandler(CustomeSchemeHandler(), forURLScheme: scheme)
                 }
-                if options.sharedCookiesEnabled {
+                if settings.sharedCookiesEnabled {
                     // More info to sending cookies with WKWebView
                     // https://stackoverflow.com/questions/26573137/can-i-set-the-cookies-to-be-used-by-a-wkwebview/26577303#26577303
                     // Set Cookies in iOS 11 and above, initialize websiteDataStore before setting cookies
                     // See also https://forums.developer.apple.com/thread/97194
                     // check if websiteDataStore has not been initialized before
-                    if(!options.incognito && !options.cacheEnabled) {
+                    if(!settings.incognito && !settings.cacheEnabled) {
                         configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                     }
                     for cookie in HTTPCookieStorage.shared.cookies ?? [] {
@@ -541,7 +541,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             if #available(iOS 14.0, *) {
-                configuration.limitsNavigationsToAppBoundDomains = options.limitsNavigationsToAppBoundDomains
+                configuration.limitsNavigationsToAppBoundDomains = settings.limitsNavigationsToAppBoundDomains
             }
         }
         
@@ -663,7 +663,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if let snapshotWidth = with["snapshotWidth"] as? Double {
                 snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
             }
-            if #available(iOS 13.0, *), let afterScreenUpdates = with["iosAfterScreenUpdates"] as? Bool {
+            if #available(iOS 13.0, *), let afterScreenUpdates = with["afterScreenUpdates"] as? Bool {
                 snapshotConfiguration!.afterScreenUpdates = afterScreenUpdates
             }
         }
@@ -802,15 +802,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         loadUrl(urlRequest: urlRequest, allowingReadAccessTo: nil)
     }
     
-    func setOptions(newOptions: InAppWebViewOptions, newOptionsMap: [String: Any]) {
+    func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
         
-        // MUST be the first! In this way, all the options that uses evaluateJavaScript can be applied/blocked!
+        // MUST be the first! In this way, all the settings that uses evaluateJavaScript can be applied/blocked!
         if #available(iOS 13.0, *) {
-            if newOptionsMap["applePayAPIEnabled"] != nil && options?.applePayAPIEnabled != newOptions.applePayAPIEnabled {
-                if let options = options {
-                    options.applePayAPIEnabled = newOptions.applePayAPIEnabled
+            if newSettingsMap["applePayAPIEnabled"] != nil && settings?.applePayAPIEnabled != newSettings.applePayAPIEnabled {
+                if let settings = settings {
+                    settings.applePayAPIEnabled = newSettings.applePayAPIEnabled
                 }
-                if !newOptions.applePayAPIEnabled {
+                if !newSettings.applePayAPIEnabled {
                     // re-add WKUserScripts for the next page load
                     prepareAndAddUserScripts()
                 } else {
@@ -819,8 +819,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if newOptionsMap["transparentBackground"] != nil && options?.transparentBackground != newOptions.transparentBackground {
-            if newOptions.transparentBackground {
+        if newSettingsMap["transparentBackground"] != nil && settings?.transparentBackground != newSettings.transparentBackground {
+            if newSettings.transparentBackground {
                 isOpaque = false
                 backgroundColor = UIColor.clear
                 scrollView.backgroundColor = UIColor.clear
@@ -831,47 +831,47 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if newOptionsMap["disallowOverScroll"] != nil && options?.disallowOverScroll != newOptions.disallowOverScroll {
+        if newSettingsMap["disallowOverScroll"] != nil && settings?.disallowOverScroll != newSettings.disallowOverScroll {
             if responds(to: #selector(getter: scrollView)) {
-                scrollView.bounces = !newOptions.disallowOverScroll
+                scrollView.bounces = !newSettings.disallowOverScroll
             }
             else {
                 for subview: UIView in subviews {
                     if subview is UIScrollView {
-                        (subview as! UIScrollView).bounces = !newOptions.disallowOverScroll
+                        (subview as! UIScrollView).bounces = !newSettings.disallowOverScroll
                     }
                 }
             }
         }
         
         if #available(iOS 9.0, *) {
-            if (newOptionsMap["incognito"] != nil && options?.incognito != newOptions.incognito && newOptions.incognito) {
+            if (newSettingsMap["incognito"] != nil && settings?.incognito != newSettings.incognito && newSettings.incognito) {
                 configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
-            } else if (newOptionsMap["cacheEnabled"] != nil && options?.cacheEnabled != newOptions.cacheEnabled && newOptions.cacheEnabled) {
+            } else if (newSettingsMap["cacheEnabled"] != nil && settings?.cacheEnabled != newSettings.cacheEnabled && newSettings.cacheEnabled) {
                 configuration.websiteDataStore = WKWebsiteDataStore.default()
             }
         }
         
         if #available(iOS 11.0, *) {
-            if (newOptionsMap["sharedCookiesEnabled"] != nil && options?.sharedCookiesEnabled != newOptions.sharedCookiesEnabled && newOptions.sharedCookiesEnabled) {
-                if(!newOptions.incognito && !newOptions.cacheEnabled) {
+            if (newSettingsMap["sharedCookiesEnabled"] != nil && settings?.sharedCookiesEnabled != newSettings.sharedCookiesEnabled && newSettings.sharedCookiesEnabled) {
+                if(!newSettings.incognito && !newSettings.cacheEnabled) {
                     configuration.websiteDataStore = WKWebsiteDataStore.nonPersistent()
                 }
                 for cookie in HTTPCookieStorage.shared.cookies ?? [] {
                     configuration.websiteDataStore.httpCookieStore.setCookie(cookie, completionHandler: nil)
                 }
             }
-            if newOptionsMap["accessibilityIgnoresInvertColors"] != nil && options?.accessibilityIgnoresInvertColors != newOptions.accessibilityIgnoresInvertColors {
-                accessibilityIgnoresInvertColors = newOptions.accessibilityIgnoresInvertColors
+            if newSettingsMap["accessibilityIgnoresInvertColors"] != nil && settings?.accessibilityIgnoresInvertColors != newSettings.accessibilityIgnoresInvertColors {
+                accessibilityIgnoresInvertColors = newSettings.accessibilityIgnoresInvertColors
             }
-            if newOptionsMap["contentInsetAdjustmentBehavior"] != nil && options?.contentInsetAdjustmentBehavior != newOptions.contentInsetAdjustmentBehavior {
+            if newSettingsMap["contentInsetAdjustmentBehavior"] != nil && settings?.contentInsetAdjustmentBehavior != newSettings.contentInsetAdjustmentBehavior {
                 scrollView.contentInsetAdjustmentBehavior =
-                    UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: newOptions.contentInsetAdjustmentBehavior)!
+                    UIScrollView.ContentInsetAdjustmentBehavior.init(rawValue: newSettings.contentInsetAdjustmentBehavior)!
             }
         }
         
-        if newOptionsMap["enableViewportScale"] != nil && options?.enableViewportScale != newOptions.enableViewportScale {
-            if !newOptions.enableViewportScale {
+        if newSettingsMap["enableViewportScale"] != nil && settings?.enableViewportScale != newSettings.enableViewportScale {
+            if !newSettings.enableViewportScale {
                 if configuration.userContentController.userScripts.contains(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(ENABLE_VIEWPORT_SCALE_JS_PLUGIN_SCRIPT)
                     evaluateJavaScript(NOT_ENABLE_VIEWPORT_SCALE_JS_SOURCE)
@@ -882,8 +882,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if newOptionsMap["supportZoom"] != nil && options?.supportZoom != newOptions.supportZoom {
-            if newOptions.supportZoom {
+        if newSettingsMap["supportZoom"] != nil && settings?.supportZoom != newSettings.supportZoom {
+            if newSettings.supportZoom {
                 if configuration.userContentController.userScripts.contains(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT) {
                     configuration.userContentController.removePluginScript(NOT_SUPPORT_ZOOM_JS_PLUGIN_SCRIPT)
                     evaluateJavaScript(SUPPORT_ZOOM_JS_SOURCE)
@@ -894,77 +894,77 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        if newOptionsMap["useOnLoadResource"] != nil && options?.useOnLoadResource != newOptions.useOnLoadResource {
-            if let applePayAPIEnabled = options?.applePayAPIEnabled, !applePayAPIEnabled {
+        if newSettingsMap["useOnLoadResource"] != nil && settings?.useOnLoadResource != newSettings.useOnLoadResource {
+            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
                 enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_ON_LOAD_RESOURCE_JS_SOURCE,
-                                            enable: newOptions.useOnLoadResource,
+                                            enable: newSettings.useOnLoadResource,
                                             pluginScript: ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT)
             } else {
-                newOptions.useOnLoadResource = false
+                newSettings.useOnLoadResource = false
             }
         }
         
-        if newOptionsMap["useShouldInterceptAjaxRequest"] != nil && options?.useShouldInterceptAjaxRequest != newOptions.useShouldInterceptAjaxRequest {
-            if let applePayAPIEnabled = options?.applePayAPIEnabled, !applePayAPIEnabled {
+        if newSettingsMap["useShouldInterceptAjaxRequest"] != nil && settings?.useShouldInterceptAjaxRequest != newSettings.useShouldInterceptAjaxRequest {
+            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
                 enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_AJAX_REQUEST_JS_SOURCE,
-                                            enable: newOptions.useShouldInterceptAjaxRequest,
+                                            enable: newSettings.useShouldInterceptAjaxRequest,
                                             pluginScript: INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT)
             } else {
-                newOptions.useShouldInterceptFetchRequest = false
+                newSettings.useShouldInterceptFetchRequest = false
             }
         }
         
-        if newOptionsMap["useShouldInterceptFetchRequest"] != nil && options?.useShouldInterceptFetchRequest != newOptions.useShouldInterceptFetchRequest {
-            if let applePayAPIEnabled = options?.applePayAPIEnabled, !applePayAPIEnabled {
+        if newSettingsMap["useShouldInterceptFetchRequest"] != nil && settings?.useShouldInterceptFetchRequest != newSettings.useShouldInterceptFetchRequest {
+            if let applePayAPIEnabled = settings?.applePayAPIEnabled, !applePayAPIEnabled {
                 enablePluginScriptAtRuntime(flagVariable: FLAG_VARIABLE_FOR_SHOULD_INTERCEPT_FETCH_REQUEST_JS_SOURCE,
-                                            enable: newOptions.useShouldInterceptFetchRequest,
+                                            enable: newSettings.useShouldInterceptFetchRequest,
                                             pluginScript: INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT)
             } else {
-                newOptions.useShouldInterceptFetchRequest = false
+                newSettings.useShouldInterceptFetchRequest = false
             }
         }
         
-        if newOptionsMap["mediaPlaybackRequiresUserGesture"] != nil && options?.mediaPlaybackRequiresUserGesture != newOptions.mediaPlaybackRequiresUserGesture {
+        if newSettingsMap["mediaPlaybackRequiresUserGesture"] != nil && settings?.mediaPlaybackRequiresUserGesture != newSettings.mediaPlaybackRequiresUserGesture {
             if #available(iOS 10.0, *) {
-                configuration.mediaTypesRequiringUserActionForPlayback = (newOptions.mediaPlaybackRequiresUserGesture) ? .all : []
+                configuration.mediaTypesRequiringUserActionForPlayback = (newSettings.mediaPlaybackRequiresUserGesture) ? .all : []
             } else {
                 // Fallback on earlier versions
-                configuration.mediaPlaybackRequiresUserAction = newOptions.mediaPlaybackRequiresUserGesture
+                configuration.mediaPlaybackRequiresUserAction = newSettings.mediaPlaybackRequiresUserGesture
             }
         }
         
-        if newOptionsMap["allowsInlineMediaPlayback"] != nil && options?.allowsInlineMediaPlayback != newOptions.allowsInlineMediaPlayback {
-            configuration.allowsInlineMediaPlayback = newOptions.allowsInlineMediaPlayback
+        if newSettingsMap["allowsInlineMediaPlayback"] != nil && settings?.allowsInlineMediaPlayback != newSettings.allowsInlineMediaPlayback {
+            configuration.allowsInlineMediaPlayback = newSettings.allowsInlineMediaPlayback
         }
         
-        if newOptionsMap["suppressesIncrementalRendering"] != nil && options?.suppressesIncrementalRendering != newOptions.suppressesIncrementalRendering {
-            configuration.suppressesIncrementalRendering = newOptions.suppressesIncrementalRendering
+        if newSettingsMap["suppressesIncrementalRendering"] != nil && settings?.suppressesIncrementalRendering != newSettings.suppressesIncrementalRendering {
+            configuration.suppressesIncrementalRendering = newSettings.suppressesIncrementalRendering
         }
         
-        if newOptionsMap["allowsBackForwardNavigationGestures"] != nil && options?.allowsBackForwardNavigationGestures != newOptions.allowsBackForwardNavigationGestures {
-            allowsBackForwardNavigationGestures = newOptions.allowsBackForwardNavigationGestures
+        if newSettingsMap["allowsBackForwardNavigationGestures"] != nil && settings?.allowsBackForwardNavigationGestures != newSettings.allowsBackForwardNavigationGestures {
+            allowsBackForwardNavigationGestures = newSettings.allowsBackForwardNavigationGestures
         }
         
-        if newOptionsMap["javaScriptCanOpenWindowsAutomatically"] != nil && options?.javaScriptCanOpenWindowsAutomatically != newOptions.javaScriptCanOpenWindowsAutomatically {
-            configuration.preferences.javaScriptCanOpenWindowsAutomatically = newOptions.javaScriptCanOpenWindowsAutomatically
+        if newSettingsMap["javaScriptCanOpenWindowsAutomatically"] != nil && settings?.javaScriptCanOpenWindowsAutomatically != newSettings.javaScriptCanOpenWindowsAutomatically {
+            configuration.preferences.javaScriptCanOpenWindowsAutomatically = newSettings.javaScriptCanOpenWindowsAutomatically
         }
         
-        if newOptionsMap["minimumFontSize"] != nil && options?.minimumFontSize != newOptions.minimumFontSize {
-            configuration.preferences.minimumFontSize = CGFloat(newOptions.minimumFontSize)
+        if newSettingsMap["minimumFontSize"] != nil && settings?.minimumFontSize != newSettings.minimumFontSize {
+            configuration.preferences.minimumFontSize = CGFloat(newSettings.minimumFontSize)
         }
         
-        if newOptionsMap["selectionGranularity"] != nil && options?.selectionGranularity != newOptions.selectionGranularity {
-            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: newOptions.selectionGranularity)!
+        if newSettingsMap["selectionGranularity"] != nil && settings?.selectionGranularity != newSettings.selectionGranularity {
+            configuration.selectionGranularity = WKSelectionGranularity.init(rawValue: newSettings.selectionGranularity)!
         }
         
         if #available(iOS 10.0, *) {
-            if newOptionsMap["ignoresViewportScaleLimits"] != nil && options?.ignoresViewportScaleLimits != newOptions.ignoresViewportScaleLimits {
-                configuration.ignoresViewportScaleLimits = newOptions.ignoresViewportScaleLimits
+            if newSettingsMap["ignoresViewportScaleLimits"] != nil && settings?.ignoresViewportScaleLimits != newSettings.ignoresViewportScaleLimits {
+                configuration.ignoresViewportScaleLimits = newSettings.ignoresViewportScaleLimits
             }
             
-            if newOptionsMap["dataDetectorTypes"] != nil && options?.dataDetectorTypes != newOptions.dataDetectorTypes {
+            if newSettingsMap["dataDetectorTypes"] != nil && settings?.dataDetectorTypes != newSettings.dataDetectorTypes {
                 var dataDetectorTypes = WKDataDetectorTypes.init(rawValue: 0)
-                for type in newOptions.dataDetectorTypes {
+                for type in newSettings.dataDetectorTypes {
                     let dataDetectorType = Util.getDataDetectorType(type: type)
                     dataDetectorTypes = WKDataDetectorTypes(rawValue: dataDetectorTypes.rawValue | dataDetectorType.rawValue)
                 }
@@ -973,112 +973,112 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         if #available(iOS 13.0, *) {
-            if newOptionsMap["isFraudulentWebsiteWarningEnabled"] != nil && options?.isFraudulentWebsiteWarningEnabled != newOptions.isFraudulentWebsiteWarningEnabled {
-                configuration.preferences.isFraudulentWebsiteWarningEnabled = newOptions.isFraudulentWebsiteWarningEnabled
+            if newSettingsMap["isFraudulentWebsiteWarningEnabled"] != nil && settings?.isFraudulentWebsiteWarningEnabled != newSettings.isFraudulentWebsiteWarningEnabled {
+                configuration.preferences.isFraudulentWebsiteWarningEnabled = newSettings.isFraudulentWebsiteWarningEnabled
             }
-            if newOptionsMap["preferredContentMode"] != nil && options?.preferredContentMode != newOptions.preferredContentMode {
-                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: newOptions.preferredContentMode)!
+            if newSettingsMap["preferredContentMode"] != nil && settings?.preferredContentMode != newSettings.preferredContentMode {
+                configuration.defaultWebpagePreferences.preferredContentMode = WKWebpagePreferences.ContentMode(rawValue: newSettings.preferredContentMode)!
             }
-            if newOptionsMap["automaticallyAdjustsScrollIndicatorInsets"] != nil && options?.automaticallyAdjustsScrollIndicatorInsets != newOptions.automaticallyAdjustsScrollIndicatorInsets {
-                scrollView.automaticallyAdjustsScrollIndicatorInsets = newOptions.automaticallyAdjustsScrollIndicatorInsets
+            if newSettingsMap["automaticallyAdjustsScrollIndicatorInsets"] != nil && settings?.automaticallyAdjustsScrollIndicatorInsets != newSettings.automaticallyAdjustsScrollIndicatorInsets {
+                scrollView.automaticallyAdjustsScrollIndicatorInsets = newSettings.automaticallyAdjustsScrollIndicatorInsets
             }
         }
         
-        if newOptionsMap["disableVerticalScroll"] != nil && options?.disableVerticalScroll != newOptions.disableVerticalScroll {
-            scrollView.showsVerticalScrollIndicator = !newOptions.disableVerticalScroll
+        if newSettingsMap["disableVerticalScroll"] != nil && settings?.disableVerticalScroll != newSettings.disableVerticalScroll {
+            scrollView.showsVerticalScrollIndicator = !newSettings.disableVerticalScroll
         }
-        if newOptionsMap["disableHorizontalScroll"] != nil && options?.disableHorizontalScroll != newOptions.disableHorizontalScroll {
-            scrollView.showsHorizontalScrollIndicator = !newOptions.disableHorizontalScroll
-        }
-        
-        if newOptionsMap["verticalScrollBarEnabled"] != nil && options?.verticalScrollBarEnabled != newOptions.verticalScrollBarEnabled {
-            scrollView.showsVerticalScrollIndicator = newOptions.verticalScrollBarEnabled
-        }
-        if newOptionsMap["horizontalScrollBarEnabled"] != nil && options?.horizontalScrollBarEnabled != newOptions.horizontalScrollBarEnabled {
-            scrollView.showsHorizontalScrollIndicator = newOptions.horizontalScrollBarEnabled
+        if newSettingsMap["disableHorizontalScroll"] != nil && settings?.disableHorizontalScroll != newSettings.disableHorizontalScroll {
+            scrollView.showsHorizontalScrollIndicator = !newSettings.disableHorizontalScroll
         }
         
-        if newOptionsMap["isDirectionalLockEnabled"] != nil && options?.isDirectionalLockEnabled != newOptions.isDirectionalLockEnabled {
-            scrollView.isDirectionalLockEnabled = newOptions.isDirectionalLockEnabled
+        if newSettingsMap["verticalScrollBarEnabled"] != nil && settings?.verticalScrollBarEnabled != newSettings.verticalScrollBarEnabled {
+            scrollView.showsVerticalScrollIndicator = newSettings.verticalScrollBarEnabled
+        }
+        if newSettingsMap["horizontalScrollBarEnabled"] != nil && settings?.horizontalScrollBarEnabled != newSettings.horizontalScrollBarEnabled {
+            scrollView.showsHorizontalScrollIndicator = newSettings.horizontalScrollBarEnabled
         }
         
-        if newOptionsMap["decelerationRate"] != nil && options?.decelerationRate != newOptions.decelerationRate {
-            scrollView.decelerationRate = Util.getDecelerationRate(type: newOptions.decelerationRate)
+        if newSettingsMap["isDirectionalLockEnabled"] != nil && settings?.isDirectionalLockEnabled != newSettings.isDirectionalLockEnabled {
+            scrollView.isDirectionalLockEnabled = newSettings.isDirectionalLockEnabled
         }
-        if newOptionsMap["alwaysBounceVertical"] != nil && options?.alwaysBounceVertical != newOptions.alwaysBounceVertical {
-            scrollView.alwaysBounceVertical = newOptions.alwaysBounceVertical
+        
+        if newSettingsMap["decelerationRate"] != nil && settings?.decelerationRate != newSettings.decelerationRate {
+            scrollView.decelerationRate = Util.getDecelerationRate(type: newSettings.decelerationRate)
         }
-        if newOptionsMap["alwaysBounceHorizontal"] != nil && options?.alwaysBounceHorizontal != newOptions.alwaysBounceHorizontal {
-            scrollView.alwaysBounceHorizontal = newOptions.alwaysBounceHorizontal
+        if newSettingsMap["alwaysBounceVertical"] != nil && settings?.alwaysBounceVertical != newSettings.alwaysBounceVertical {
+            scrollView.alwaysBounceVertical = newSettings.alwaysBounceVertical
         }
-        if newOptionsMap["scrollsToTop"] != nil && options?.scrollsToTop != newOptions.scrollsToTop {
-            scrollView.scrollsToTop = newOptions.scrollsToTop
+        if newSettingsMap["alwaysBounceHorizontal"] != nil && settings?.alwaysBounceHorizontal != newSettings.alwaysBounceHorizontal {
+            scrollView.alwaysBounceHorizontal = newSettings.alwaysBounceHorizontal
         }
-        if newOptionsMap["isPagingEnabled"] != nil && options?.isPagingEnabled != newOptions.isPagingEnabled {
-            scrollView.scrollsToTop = newOptions.isPagingEnabled
+        if newSettingsMap["scrollsToTop"] != nil && settings?.scrollsToTop != newSettings.scrollsToTop {
+            scrollView.scrollsToTop = newSettings.scrollsToTop
         }
-        if newOptionsMap["maximumZoomScale"] != nil && options?.maximumZoomScale != newOptions.maximumZoomScale {
-            scrollView.maximumZoomScale = CGFloat(newOptions.maximumZoomScale)
+        if newSettingsMap["isPagingEnabled"] != nil && settings?.isPagingEnabled != newSettings.isPagingEnabled {
+            scrollView.scrollsToTop = newSettings.isPagingEnabled
         }
-        if newOptionsMap["minimumZoomScale"] != nil && options?.minimumZoomScale != newOptions.minimumZoomScale {
-            scrollView.minimumZoomScale = CGFloat(newOptions.minimumZoomScale)
+        if newSettingsMap["maximumZoomScale"] != nil && settings?.maximumZoomScale != newSettings.maximumZoomScale {
+            scrollView.maximumZoomScale = CGFloat(newSettings.maximumZoomScale)
+        }
+        if newSettingsMap["minimumZoomScale"] != nil && settings?.minimumZoomScale != newSettings.minimumZoomScale {
+            scrollView.minimumZoomScale = CGFloat(newSettings.minimumZoomScale)
         }
         
         if #available(iOS 9.0, *) {
-            if newOptionsMap["allowsLinkPreview"] != nil && options?.allowsLinkPreview != newOptions.allowsLinkPreview {
-                allowsLinkPreview = newOptions.allowsLinkPreview
+            if newSettingsMap["allowsLinkPreview"] != nil && settings?.allowsLinkPreview != newSettings.allowsLinkPreview {
+                allowsLinkPreview = newSettings.allowsLinkPreview
             }
-            if newOptionsMap["allowsAirPlayForMediaPlayback"] != nil && options?.allowsAirPlayForMediaPlayback != newOptions.allowsAirPlayForMediaPlayback {
-                configuration.allowsAirPlayForMediaPlayback = newOptions.allowsAirPlayForMediaPlayback
+            if newSettingsMap["allowsAirPlayForMediaPlayback"] != nil && settings?.allowsAirPlayForMediaPlayback != newSettings.allowsAirPlayForMediaPlayback {
+                configuration.allowsAirPlayForMediaPlayback = newSettings.allowsAirPlayForMediaPlayback
             }
-            if newOptionsMap["allowsPictureInPictureMediaPlayback"] != nil && options?.allowsPictureInPictureMediaPlayback != newOptions.allowsPictureInPictureMediaPlayback {
-                configuration.allowsPictureInPictureMediaPlayback = newOptions.allowsPictureInPictureMediaPlayback
+            if newSettingsMap["allowsPictureInPictureMediaPlayback"] != nil && settings?.allowsPictureInPictureMediaPlayback != newSettings.allowsPictureInPictureMediaPlayback {
+                configuration.allowsPictureInPictureMediaPlayback = newSettings.allowsPictureInPictureMediaPlayback
             }
-            if newOptionsMap["applicationNameForUserAgent"] != nil && options?.applicationNameForUserAgent != newOptions.applicationNameForUserAgent && newOptions.applicationNameForUserAgent != "" {
-                configuration.applicationNameForUserAgent = newOptions.applicationNameForUserAgent
+            if newSettingsMap["applicationNameForUserAgent"] != nil && settings?.applicationNameForUserAgent != newSettings.applicationNameForUserAgent && newSettings.applicationNameForUserAgent != "" {
+                configuration.applicationNameForUserAgent = newSettings.applicationNameForUserAgent
             }
-            if newOptionsMap["userAgent"] != nil && options?.userAgent != newOptions.userAgent && newOptions.userAgent != "" {
-                customUserAgent = newOptions.userAgent
+            if newSettingsMap["userAgent"] != nil && settings?.userAgent != newSettings.userAgent && newSettings.userAgent != "" {
+                customUserAgent = newSettings.userAgent
             }
         }
         
-        if newOptionsMap["allowUniversalAccessFromFileURLs"] != nil && options?.allowUniversalAccessFromFileURLs != newOptions.allowUniversalAccessFromFileURLs {
-            configuration.setValue(newOptions.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
+        if newSettingsMap["allowUniversalAccessFromFileURLs"] != nil && settings?.allowUniversalAccessFromFileURLs != newSettings.allowUniversalAccessFromFileURLs {
+            configuration.setValue(newSettings.allowUniversalAccessFromFileURLs, forKey: "allowUniversalAccessFromFileURLs")
         }
         
-        if newOptionsMap["allowFileAccessFromFileURLs"] != nil && options?.allowFileAccessFromFileURLs != newOptions.allowFileAccessFromFileURLs {
-            configuration.preferences.setValue(newOptions.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
+        if newSettingsMap["allowFileAccessFromFileURLs"] != nil && settings?.allowFileAccessFromFileURLs != newSettings.allowFileAccessFromFileURLs {
+            configuration.preferences.setValue(newSettings.allowFileAccessFromFileURLs, forKey: "allowFileAccessFromFileURLs")
         }
         
-        if newOptionsMap["clearCache"] != nil && newOptions.clearCache {
+        if newSettingsMap["clearCache"] != nil && newSettings.clearCache {
             clearCache()
         }
         
-        if newOptionsMap["javaScriptEnabled"] != nil && options?.javaScriptEnabled != newOptions.javaScriptEnabled {
-            configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
+        if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
+            configuration.preferences.javaScriptEnabled = newSettings.javaScriptEnabled
         }
         
         if #available(iOS 14.0, *) {
-            if options?.mediaType != newOptions.mediaType {
-                mediaType = newOptions.mediaType
+            if settings?.mediaType != newSettings.mediaType {
+                mediaType = newSettings.mediaType
             }
             
-            if newOptionsMap["pageZoom"] != nil && options?.pageZoom != newOptions.pageZoom {
-                pageZoom = CGFloat(newOptions.pageZoom)
+            if newSettingsMap["pageZoom"] != nil && settings?.pageZoom != newSettings.pageZoom {
+                pageZoom = CGFloat(newSettings.pageZoom)
             }
             
-            if newOptionsMap["limitsNavigationsToAppBoundDomains"] != nil && options?.limitsNavigationsToAppBoundDomains != newOptions.limitsNavigationsToAppBoundDomains {
-                configuration.limitsNavigationsToAppBoundDomains = newOptions.limitsNavigationsToAppBoundDomains
+            if newSettingsMap["limitsNavigationsToAppBoundDomains"] != nil && settings?.limitsNavigationsToAppBoundDomains != newSettings.limitsNavigationsToAppBoundDomains {
+                configuration.limitsNavigationsToAppBoundDomains = newSettings.limitsNavigationsToAppBoundDomains
             }
             
-            if newOptionsMap["javaScriptEnabled"] != nil && options?.javaScriptEnabled != newOptions.javaScriptEnabled {
-                configuration.defaultWebpagePreferences.allowsContentJavaScript = newOptions.javaScriptEnabled
+            if newSettingsMap["javaScriptEnabled"] != nil && settings?.javaScriptEnabled != newSettings.javaScriptEnabled {
+                configuration.defaultWebpagePreferences.allowsContentJavaScript = newSettings.javaScriptEnabled
             }
         }
         
-        if #available(iOS 11.0, *), newOptionsMap["contentBlockers"] != nil {
+        if #available(iOS 11.0, *), newSettingsMap["contentBlockers"] != nil {
             configuration.userContentController.removeAllContentRuleLists()
-            let contentBlockers = newOptions.contentBlockers
+            let contentBlockers = newSettings.contentBlockers
             if contentBlockers.count > 0 {
                 do {
                     let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
@@ -1098,16 +1098,16 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        scrollView.isScrollEnabled = !(newOptions.disableVerticalScroll && newOptions.disableHorizontalScroll)
+        scrollView.isScrollEnabled = !(newSettings.disableVerticalScroll && newSettings.disableHorizontalScroll)
         
-        self.options = newOptions
+        self.settings = newSettings
     }
     
-    func getOptions() -> [String: Any?]? {
-        if (self.options == nil) {
+    func getSettings() -> [String: Any?]? {
+        if (self.settings == nil) {
             return nil
         }
-        return self.options!.getRealOptions(obj: self)
+        return self.settings!.getRealSettings(obj: self)
     }
     
     public func enablePluginScriptAtRuntime(flagVariable: String, enable: Bool, pluginScript: PluginScript) {
@@ -1224,7 +1224,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public override func evaluateJavaScript(_ javaScriptString: String, completionHandler: ((Any?, Error?) -> Void)? = nil) {
-        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             if let completionHandler = completionHandler {
                 completionHandler(nil, nil)
             }
@@ -1235,7 +1235,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     @available(iOS 14.0, *)
     public func evaluateJavaScript(_ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
-        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
         super.evaluateJavaScript(javaScript, in: frame, in: contentWorld, completionHandler: completionHandler)
@@ -1252,7 +1252,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     @available(iOS 14.0, *)
     public func callAsyncJavaScript(_ functionBody: String, arguments: [String : Any] = [:], frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
-        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             return
         }
         super.callAsyncJavaScript(functionBody, arguments: arguments, in: frame, in: contentWorld, completionHandler: completionHandler)
@@ -1291,7 +1291,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     @available(iOS 10.3, *)
     public func callAsyncJavaScript(functionBody: String, arguments: [String:Any], completionHandler: ((Any?) -> Void)? = nil) {
-        if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
+        if let applePayAPIEnabled = settings?.applePayAPIEnabled, applePayAPIEnabled {
             completionHandler?(nil)
         }
         
@@ -1468,7 +1468,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         if navigationAction.request.url != nil {
             
-            if let useShouldOverrideUrlLoading = options?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading {
+            if let useShouldOverrideUrlLoading = settings?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading {
                 shouldOverrideUrlLoading(navigationAction: navigationAction, result: { (result) -> Void in
                     if result is FlutterError {
                         print((result as! FlutterError).message ?? "")
@@ -1509,7 +1509,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
         }
         
-        let useOnNavigationResponse = options?.useOnNavigationResponse
+        let useOnNavigationResponse = settings?.useOnNavigationResponse
         
         if useOnNavigationResponse != nil, useOnNavigationResponse! {
             onNavigationResponse(navigationResponse: navigationResponse, result: { (result) -> Void in
@@ -1542,7 +1542,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             })
         }
         
-        if let useOnDownloadStart = options?.useOnDownloadStart, useOnDownloadStart {
+        if let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
             let mimeType = navigationResponse.response.mimeType
             if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
                 if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
@@ -2064,8 +2064,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     /// an observer that observes the scrollView.contentOffset property.
     /// This way, we don't need to call setNeedsLayout() and all works fine.
     public func onScrollChanged(startedByUser: Bool, oldContentOffset: CGPoint?) {
-        let disableVerticalScroll = options?.disableVerticalScroll ?? false
-        let disableHorizontalScroll = options?.disableHorizontalScroll ?? false
+        let disableVerticalScroll = settings?.disableVerticalScroll ?? false
+        let disableHorizontalScroll = settings?.disableHorizontalScroll ?? false
         if startedByUser {
             if disableVerticalScroll && disableHorizontalScroll {
                 scrollView.contentOffset = CGPoint(x: lastScrollX, y: lastScrollY);
@@ -2130,7 +2130,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         
         var arguments: [String: Any?] = navigationAction.toMap()
         arguments["windowId"] = windowId
-        arguments["iosWindowFeatures"] = windowFeatures.toMap()
+        arguments["isDialog"] = nil
+        arguments["windowFeatures"] = windowFeatures.toMap()
 
         channel?.invokeMethod("onCreateWindow", arguments: arguments, result: { (result) -> Void in
             if result is FlutterError {
@@ -2414,7 +2415,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let arguments: [String: Any?] = [
             "url": frame.request.url?.absoluteString,
             "message": message,
-            "iosIsMainFrame": frame.isMainFrame
+            "isMainFrame": frame.isMainFrame
         ]
         channel?.invokeMethod("onJsAlert", arguments: arguments, result: result)
     }
@@ -2423,7 +2424,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         let arguments: [String: Any?] = [
             "url": frame.request.url?.absoluteString,
             "message": message,
-            "iosIsMainFrame": frame.isMainFrame
+            "isMainFrame": frame.isMainFrame
         ]
         channel?.invokeMethod("onJsConfirm", arguments: arguments, result: result)
     }
@@ -2433,7 +2434,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             "url": frame.request.url?.absoluteString,
             "message": message,
             "defaultValue": defaultValue as Any,
-            "iosIsMainFrame": frame.isMainFrame
+            "isMainFrame": frame.isMainFrame
         ]
         channel?.invokeMethod("onJsPrompt", arguments: arguments, result: result)
     }
@@ -2957,6 +2958,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     
     // https://stackoverflow.com/a/58001395/4637638
     public override var inputAccessoryView: UIView? {
-        return options?.disableInputAccessoryView ?? false ? nil : super.inputAccessoryView
+        return settings?.disableInputAccessoryView ?? false ? nil : super.inputAccessoryView
     }
 }

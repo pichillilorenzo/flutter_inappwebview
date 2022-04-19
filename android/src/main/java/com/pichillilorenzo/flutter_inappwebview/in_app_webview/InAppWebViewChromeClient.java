@@ -172,7 +172,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Map<String, Object> obj = new HashMap<>();
     obj.put("url", url);
     obj.put("message", message);
-    obj.put("iosIsMainFrame", null);
+    obj.put("isMainFrame", null);
 
     channel.invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
       @Override
@@ -257,7 +257,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     Map<String, Object> obj = new HashMap<>();
     obj.put("url", url);
     obj.put("message", message);
-    obj.put("iosIsMainFrame", null);
+    obj.put("isMainFrame", null);
 
     channel.invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
       @Override
@@ -356,7 +356,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     obj.put("url", url);
     obj.put("message", message);
     obj.put("defaultValue", defaultValue);
-    obj.put("iosIsMainFrame", null);
+    obj.put("isMainFrame", null);
 
     channel.invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
       @Override

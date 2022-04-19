@@ -21,9 +21,7 @@ class _HeadlessInAppWebViewExampleScreenState
 
     headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
-      initialOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(),
-      ),
+      initialSettings: InAppWebViewSettings(),
       onWebViewCreated: (controller) {
         print('HeadlessInAppWebView created!');
       },

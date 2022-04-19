@@ -1,11 +1,10 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
-import 'in_app_webview/in_app_webview_options.dart';
+import 'in_app_webview/in_app_webview_settings.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'platform_util.dart';
 
@@ -15,7 +14,7 @@ import 'types.dart';
 ///On Android, it is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).
 ///On iOS, it is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
 ///
-///**NOTE for iOS below 11.0 (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] and [IOSCookieManager.getAllCookies] are not supported!)
+///**NOTE for iOS below 11.0 (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] and [CookieManager.getAllCookies] are not supported!)
 ///has been implemented using JavaScript because there is no other way to work with them on iOS below 11.0.
 ///See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
 class CookieManager {
@@ -24,6 +23,8 @@ class CookieManager {
       'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
   ///Contains only iOS-specific methods of [CookieManager].
+  ///Use [CookieManager] instead.
+  @Deprecated("Use CookieManager instead")
   late IOSCookieManager ios;
 
   ///Gets the [CookieManager] shared instance.
@@ -34,6 +35,7 @@ class CookieManager {
   static CookieManager _init() {
     _channel.setMethodCallHandler(_handleMethod);
     _instance = CookieManager();
+    // ignore: deprecated_member_use_from_same_package
     _instance!.ios = IOSCookieManager.instance();
     return _instance!;
   }
@@ -51,6 +53,10 @@ class CookieManager {
   ///
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to set the cookie (session-only cookie won't work! In that case, you should set also [expiresDate] or [maxAge]).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - CookieManager.setCookie](https://developer.android.com/reference/android/webkit/CookieManager#setCookie(java.lang.String,%20java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
+  ///- iOS ([Official API - WKHTTPCookieStore.setCookie](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882007-setcookie))
   Future<void> setCookie(
       {required Uri url,
       required String name,
@@ -131,8 +137,8 @@ class CookieManager {
     cookieValue += ";";
 
     if (webViewController != null) {
-      InAppWebViewGroupOptions? options = await webViewController.getOptions();
-      if (options != null && options.crossPlatform.javaScriptEnabled) {
+      InAppWebViewSettings? settings = await webViewController.getSettings();
+      if (settings != null && settings.javaScriptEnabled) {
         await webViewController.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
         return;
@@ -162,6 +168,10 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
   ///If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be found!).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - CookieManager.getCookie](https://developer.android.com/reference/android/webkit/CookieManager#getCookie(java.lang.String)))
+  ///- iOS ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
   Future<List<Cookie>> getCookies(
       {required Uri url,
       InAppWebViewController? iosBelow11WebViewController}) async {
@@ -206,8 +216,8 @@ class CookieManager {
     List<Cookie> cookies = [];
 
     if (webViewController != null) {
-      InAppWebViewGroupOptions? options = await webViewController.getOptions();
-      if (options != null && options.crossPlatform.javaScriptEnabled) {
+      InAppWebViewSettings? settings = await webViewController.getSettings();
+      if (settings != null && settings.javaScriptEnabled) {
         List<String> documentCookies = (await webViewController
                 .evaluateJavascript(source: 'document.cookie') as String)
             .split(';')
@@ -259,6 +269,10 @@ class CookieManager {
   ///**NOTE for iOS below 11.0**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
   ///If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be found!).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<Cookie?> getCookie(
       {required Uri url,
       required String name,
@@ -311,6 +325,10 @@ class CookieManager {
   ///
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be deleted!).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS ([Official API - WKHTTPCookieStore.delete](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882009-delete)
   Future<void> deleteCookie(
       {required Uri url,
       required String name,
@@ -357,6 +375,10 @@ class CookieManager {
   ///
   ///**NOTE for iOS below 11.0**: If [iosBelow11WebViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!).
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<void> deleteCookies(
       {required Uri url,
       String domain = "",
@@ -396,9 +418,42 @@ class CookieManager {
   ///Removes all cookies.
   ///
   ///**NOTE for iOS**: available from iOS 11.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - CookieManager.removeAllCookies](https://developer.android.com/reference/android/webkit/CookieManager#removeAllCookies(android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
+  ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   Future<void> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('deleteAllCookies', args);
+  }
+
+  ///Fetches all stored cookies.
+  ///
+  ///**NOTE**: available on iOS 11.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
+  Future<List<Cookie>> getAllCookies() async {
+    List<Cookie> cookies = [];
+
+    Map<String, dynamic> args = <String, dynamic>{};
+    List<dynamic> cookieListMap =
+    await CookieManager._channel.invokeMethod('getAllCookies', args);
+    cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
+
+    cookieListMap.forEach((cookieMap) {
+      cookies.add(Cookie(
+          name: cookieMap["name"],
+          value: cookieMap["value"],
+          expiresDate: cookieMap["expiresDate"],
+          isSessionOnly: cookieMap["isSessionOnly"],
+          domain: cookieMap["domain"],
+          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          isSecure: cookieMap["isSecure"],
+          isHttpOnly: cookieMap["isHttpOnly"],
+          path: cookieMap["path"]));
+    });
+    return cookies;
   }
 
   String _getDomainName(Uri url) {
@@ -418,6 +473,8 @@ class CookieManager {
 }
 
 ///Class that contains only iOS-specific methods of [CookieManager].
+///Use [CookieManager] instead.
+@Deprecated("Use CookieManager instead")
 class IOSCookieManager {
   static IOSCookieManager? _instance;
 

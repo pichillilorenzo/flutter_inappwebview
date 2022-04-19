@@ -23,31 +23,31 @@ extension URLRequest {
                 setValue(value, forHTTPHeaderField: key)
             }
         }
-        if let iosAllowsCellularAccess = fromPluginMap["iosAllowsCellularAccess"] as? Bool {
+        if let iosAllowsCellularAccess = fromPluginMap["allowsCellularAccess"] as? Bool {
             allowsCellularAccess = iosAllowsCellularAccess
         }
-        if #available(iOS 13.0, *), let iosAllowsConstrainedNetworkAccess = fromPluginMap["iosAllowsConstrainedNetworkAccess"] as? Bool {
+        if #available(iOS 13.0, *), let iosAllowsConstrainedNetworkAccess = fromPluginMap["allowsConstrainedNetworkAccess"] as? Bool {
             allowsConstrainedNetworkAccess = iosAllowsConstrainedNetworkAccess
         }
-        if #available(iOS 13.0, *), let iosAllowsExpensiveNetworkAccess = fromPluginMap["iosAllowsExpensiveNetworkAccess"] as? Bool {
+        if #available(iOS 13.0, *), let iosAllowsExpensiveNetworkAccess = fromPluginMap["allowsExpensiveNetworkAccess"] as? Bool {
             allowsExpensiveNetworkAccess = iosAllowsExpensiveNetworkAccess
         }
-        if let iosCachePolicy = fromPluginMap["iosCachePolicy"] as? Int {
+        if let iosCachePolicy = fromPluginMap["cachePolicy"] as? Int {
             cachePolicy = CachePolicy.init(rawValue: UInt(iosCachePolicy)) ?? .useProtocolCachePolicy
         }
-        if let iosHttpShouldHandleCookies = fromPluginMap["iosHttpShouldHandleCookies"] as? Bool {
+        if let iosHttpShouldHandleCookies = fromPluginMap["httpShouldHandleCookies"] as? Bool {
             httpShouldHandleCookies = iosHttpShouldHandleCookies
         }
-        if let iosHttpShouldUsePipelining = fromPluginMap["iosHttpShouldUsePipelining"] as? Bool {
+        if let iosHttpShouldUsePipelining = fromPluginMap["httpShouldUsePipelining"] as? Bool {
             httpShouldUsePipelining = iosHttpShouldUsePipelining
         }
-        if let iosNetworkServiceType = fromPluginMap["iosNetworkServiceType"] as? Int {
+        if let iosNetworkServiceType = fromPluginMap["networkServiceType"] as? Int {
             networkServiceType = NetworkServiceType.init(rawValue: UInt(iosNetworkServiceType)) ?? .default
         }
-        if let iosTimeoutInterval = fromPluginMap["iosTimeoutInterval"] as? Double {
+        if let iosTimeoutInterval = fromPluginMap["timeoutInterval"] as? Double {
             timeoutInterval = iosTimeoutInterval
         }
-        if let iosMainDocumentURL = fromPluginMap["iosMainDocumentURL"] as? String {
+        if let iosMainDocumentURL = fromPluginMap["mainDocumentURL"] as? String {
             mainDocumentURL = URL(string: iosMainDocumentURL)!
         }
     }
@@ -64,15 +64,15 @@ extension URLRequest {
             "method": httpMethod,
             "headers": allHTTPHeaderFields,
             "body": httpBody.map(FlutterStandardTypedData.init(bytes:)),
-            "iosAllowsCellularAccess": allowsCellularAccess,
-            "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
-            "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
-            "iosCachePolicy": cachePolicy.rawValue,
-            "iosHttpShouldHandleCookies": httpShouldHandleCookies,
-            "iosHttpShouldUsePipelining": httpShouldUsePipelining,
-            "iosNetworkServiceType": networkServiceType.rawValue,
-            "iosTimeoutInterval": timeoutInterval,
-            "iosMainDocumentURL": mainDocumentURL?.absoluteString
+            "allowsCellularAccess": allowsCellularAccess,
+            "allowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
+            "allowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
+            "cachePolicy": cachePolicy.rawValue,
+            "httpShouldHandleCookies": httpShouldHandleCookies,
+            "httpShouldUsePipelining": httpShouldUsePipelining,
+            "networkServiceType": networkServiceType.rawValue,
+            "timeoutInterval": timeoutInterval,
+            "mainDocumentURL": mainDocumentURL?.absoluteString
         ]
     }
 }

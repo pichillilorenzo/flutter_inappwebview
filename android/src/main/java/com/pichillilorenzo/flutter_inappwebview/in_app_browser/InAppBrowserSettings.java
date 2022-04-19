@@ -2,13 +2,13 @@ package com.pichillilorenzo.flutter_inappwebview.in_app_browser;
 
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.Options;
+import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
 import com.pichillilorenzo.flutter_inappwebview.R;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class InAppBrowserOptions implements Options<InAppBrowserActivity> {
+public class InAppBrowserOptions implements IWebViewSettings<InAppBrowserActivity> {
 
   public static final String LOG_TAG = "InAppBrowserOptions";
 

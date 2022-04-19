@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PullToRefreshOptions : Options<PullToRefreshControl> {
+public class PullToRefreshSettings : IWebViewSettings<PullToRefreshControl> {
     
     var enabled = true
     var color: String?
@@ -18,7 +18,7 @@ public class PullToRefreshOptions : Options<PullToRefreshControl> {
         super.init()
     }
     
-    override func parse(options: [String: Any?]) -> PullToRefreshOptions {
+    override func parse(options: [String: Any?]) -> PullToRefreshSettings {
         let _ = super.parse(options: options)
         if let attributedTitle = options["attributedTitle"] as? [String: Any?] {
             self.attributedTitle = attributedTitle
@@ -26,7 +26,7 @@ public class PullToRefreshOptions : Options<PullToRefreshControl> {
         return self
     }
     
-    override func getRealOptions(obj: PullToRefreshControl?) -> [String: Any?] {
+    override func getRealSettings(obj: PullToRefreshControl?) -> [String: Any?] {
         let realOptions: [String: Any?] = toMap()
         return realOptions
     }

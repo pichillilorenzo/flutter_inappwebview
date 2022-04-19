@@ -1,17 +1,15 @@
 import 'dart:ui';
 
-import 'package:flutter_inappwebview/src/util.dart';
-
+import '../../util.dart';
 import '../../types.dart';
-
-import '../../in_app_browser/in_app_browser_options.dart';
-
-import '../in_app_webview_options.dart';
+import '../../in_app_browser/in_app_browser_settings.dart';
+import '../in_app_webview_settings.dart';
 import '../webview.dart';
 
 class AndroidOptions {}
 
-///This class represents all the Android-only WebView options available.
+///Use [InAppWebViewSettings] instead.
+@Deprecated('Use InAppWebViewSettings instead')
 class AndroidInAppWebViewOptions
     implements WebViewOptions, BrowserOptions, AndroidOptions {
   ///Sets the text zoom of the page in percent. The default value is `100`.
@@ -360,77 +358,77 @@ class AndroidInAppWebViewOptions
   }
 
   static AndroidInAppWebViewOptions fromMap(Map<String, dynamic> map) {
-    AndroidInAppWebViewOptions options = AndroidInAppWebViewOptions();
-    options.textZoom = map["textZoom"];
-    options.clearSessionCache = map["clearSessionCache"];
-    options.builtInZoomControls = map["builtInZoomControls"];
-    options.displayZoomControls = map["displayZoomControls"];
-    options.databaseEnabled = map["databaseEnabled"];
-    options.domStorageEnabled = map["domStorageEnabled"];
-    options.useWideViewPort = map["useWideViewPort"];
-    options.safeBrowsingEnabled = map["safeBrowsingEnabled"];
-    options.mixedContentMode =
+    var instance = AndroidInAppWebViewOptions();
+    instance.textZoom = map["textZoom"];
+    instance.clearSessionCache = map["clearSessionCache"];
+    instance.builtInZoomControls = map["builtInZoomControls"];
+    instance.displayZoomControls = map["displayZoomControls"];
+    instance.databaseEnabled = map["databaseEnabled"];
+    instance.domStorageEnabled = map["domStorageEnabled"];
+    instance.useWideViewPort = map["useWideViewPort"];
+    instance.safeBrowsingEnabled = map["safeBrowsingEnabled"];
+    instance.mixedContentMode =
         AndroidMixedContentMode.fromValue(map["mixedContentMode"]);
-    options.allowContentAccess = map["allowContentAccess"];
-    options.allowFileAccess = map["allowFileAccess"];
-    options.appCachePath = map["appCachePath"];
-    options.blockNetworkImage = map["blockNetworkImage"];
-    options.blockNetworkLoads = map["blockNetworkLoads"];
-    options.cacheMode = AndroidCacheMode.fromValue(map["cacheMode"]);
-    options.cursiveFontFamily = map["cursiveFontFamily"];
-    options.defaultFixedFontSize = map["defaultFixedFontSize"];
-    options.defaultFontSize = map["defaultFontSize"];
-    options.defaultTextEncodingName = map["defaultTextEncodingName"];
-    options.disabledActionModeMenuItems =
+    instance.allowContentAccess = map["allowContentAccess"];
+    instance.allowFileAccess = map["allowFileAccess"];
+    instance.appCachePath = map["appCachePath"];
+    instance.blockNetworkImage = map["blockNetworkImage"];
+    instance.blockNetworkLoads = map["blockNetworkLoads"];
+    instance.cacheMode = AndroidCacheMode.fromValue(map["cacheMode"]);
+    instance.cursiveFontFamily = map["cursiveFontFamily"];
+    instance.defaultFixedFontSize = map["defaultFixedFontSize"];
+    instance.defaultFontSize = map["defaultFontSize"];
+    instance.defaultTextEncodingName = map["defaultTextEncodingName"];
+    instance.disabledActionModeMenuItems =
         AndroidActionModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
-    options.fantasyFontFamily = map["fantasyFontFamily"];
-    options.fixedFontFamily = map["fixedFontFamily"];
-    options.forceDark = AndroidForceDark.fromValue(map["forceDark"]);
-    options.geolocationEnabled = map["geolocationEnabled"];
-    options.layoutAlgorithm =
+    instance.fantasyFontFamily = map["fantasyFontFamily"];
+    instance.fixedFontFamily = map["fixedFontFamily"];
+    instance.forceDark = AndroidForceDark.fromValue(map["forceDark"]);
+    instance.geolocationEnabled = map["geolocationEnabled"];
+    instance.layoutAlgorithm =
         AndroidLayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
-    options.loadWithOverviewMode = map["loadWithOverviewMode"];
-    options.loadsImagesAutomatically = map["loadsImagesAutomatically"];
-    options.minimumLogicalFontSize = map["minimumLogicalFontSize"];
-    options.initialScale = map["initialScale"];
-    options.needInitialFocus = map["needInitialFocus"];
-    options.offscreenPreRaster = map["offscreenPreRaster"];
-    options.sansSerifFontFamily = map["sansSerifFontFamily"];
-    options.serifFontFamily = map["serifFontFamily"];
-    options.standardFontFamily = map["standardFontFamily"];
-    options.saveFormData = map["saveFormData"];
-    options.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
-    options.hardwareAcceleration = map["hardwareAcceleration"];
-    options.supportMultipleWindows = map["supportMultipleWindows"];
-    options.regexToCancelSubFramesLoading =
+    instance.loadWithOverviewMode = map["loadWithOverviewMode"];
+    instance.loadsImagesAutomatically = map["loadsImagesAutomatically"];
+    instance.minimumLogicalFontSize = map["minimumLogicalFontSize"];
+    instance.initialScale = map["initialScale"];
+    instance.needInitialFocus = map["needInitialFocus"];
+    instance.offscreenPreRaster = map["offscreenPreRaster"];
+    instance.sansSerifFontFamily = map["sansSerifFontFamily"];
+    instance.serifFontFamily = map["serifFontFamily"];
+    instance.standardFontFamily = map["standardFontFamily"];
+    instance.saveFormData = map["saveFormData"];
+    instance.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
+    instance.hardwareAcceleration = map["hardwareAcceleration"];
+    instance.supportMultipleWindows = map["supportMultipleWindows"];
+    instance.regexToCancelSubFramesLoading =
         map["regexToCancelSubFramesLoading"];
-    options.useHybridComposition = map["useHybridComposition"];
-    options.useShouldInterceptRequest = map["useShouldInterceptRequest"];
-    options.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-    options.overScrollMode =
+    instance.useHybridComposition = map["useHybridComposition"];
+    instance.useShouldInterceptRequest = map["useShouldInterceptRequest"];
+    instance.useOnRenderProcessGone = map["useOnRenderProcessGone"];
+    instance.overScrollMode =
         AndroidOverScrollMode.fromValue(map["overScrollMode"]);
-    options.networkAvailable = map["networkAvailable"];
-    options.scrollBarStyle =
+    instance.networkAvailable = map["networkAvailable"];
+    instance.scrollBarStyle =
         AndroidScrollBarStyle.fromValue(map["scrollBarStyle"]);
-    options.verticalScrollbarPosition =
+    instance.verticalScrollbarPosition =
         AndroidVerticalScrollbarPosition.fromValue(
             map["verticalScrollbarPosition"]);
-    options.scrollBarDefaultDelayBeforeFade =
+    instance.scrollBarDefaultDelayBeforeFade =
         map["scrollBarDefaultDelayBeforeFade"];
-    options.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
-    options.scrollBarFadeDuration = map["scrollBarFadeDuration"];
-    options.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
+    instance.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
+    instance.scrollBarFadeDuration = map["scrollBarFadeDuration"];
+    instance.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
         map["rendererPriorityPolicy"]?.cast<String, dynamic>());
-    options.disableDefaultErrorPage = map["disableDefaultErrorPage"];
-    options.verticalScrollbarThumbColor =
+    instance.disableDefaultErrorPage = map["disableDefaultErrorPage"];
+    instance.verticalScrollbarThumbColor =
         UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
-    options.verticalScrollbarTrackColor =
+    instance.verticalScrollbarTrackColor =
         UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
-    options.horizontalScrollbarThumbColor =
+    instance.horizontalScrollbarThumbColor =
         UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
-    options.horizontalScrollbarTrackColor =
+    instance.horizontalScrollbarTrackColor =
         UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
-    return options;
+    return instance;
   }
 
   @override

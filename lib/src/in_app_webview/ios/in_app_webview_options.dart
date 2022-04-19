@@ -1,14 +1,15 @@
 import '../../types.dart';
 
-import '../../in_app_browser/in_app_browser_options.dart';
+import '../../in_app_browser/in_app_browser_settings.dart';
 
-import '../in_app_webview_options.dart';
+import '../in_app_webview_settings.dart';
 import '../webview.dart';
 import '../in_app_webview_controller.dart';
 
 class IosOptions {}
 
-///This class represents all the iOS-only WebView options available.
+///Use [InAppWebViewSettings] instead.
+@Deprecated('Use InAppWebViewSettings instead')
 class IOSInAppWebViewOptions
     implements WebViewOptions, BrowserOptions, IosOptions {
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
@@ -324,55 +325,55 @@ class IOSInAppWebViewOptions
       }
     });
 
-    IOSInAppWebViewOptions options = IOSInAppWebViewOptions();
-    options.disallowOverScroll = map["disallowOverScroll"];
-    options.enableViewportScale = map["enableViewportScale"];
-    options.suppressesIncrementalRendering =
+    var instance = IOSInAppWebViewOptions();
+    instance.disallowOverScroll = map["disallowOverScroll"];
+    instance.enableViewportScale = map["enableViewportScale"];
+    instance.suppressesIncrementalRendering =
         map["suppressesIncrementalRendering"];
-    options.allowsAirPlayForMediaPlayback =
+    instance.allowsAirPlayForMediaPlayback =
         map["allowsAirPlayForMediaPlayback"];
-    options.allowsBackForwardNavigationGestures =
+    instance.allowsBackForwardNavigationGestures =
         map["allowsBackForwardNavigationGestures"];
-    options.allowsLinkPreview = map["allowsLinkPreview"];
-    options.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
-    options.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
-    options.allowsPictureInPictureMediaPlayback =
+    instance.allowsLinkPreview = map["allowsLinkPreview"];
+    instance.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
+    instance.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
+    instance.allowsPictureInPictureMediaPlayback =
         map["allowsPictureInPictureMediaPlayback"];
-    options.isFraudulentWebsiteWarningEnabled =
+    instance.isFraudulentWebsiteWarningEnabled =
         map["isFraudulentWebsiteWarningEnabled"];
-    options.selectionGranularity =
+    instance.selectionGranularity =
         IOSWKSelectionGranularity.fromValue(map["selectionGranularity"])!;
-    options.dataDetectorTypes = dataDetectorTypes;
-    options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
-    options.automaticallyAdjustsScrollIndicatorInsets =
+    instance.dataDetectorTypes = dataDetectorTypes;
+    instance.sharedCookiesEnabled = map["sharedCookiesEnabled"];
+    instance.automaticallyAdjustsScrollIndicatorInsets =
         map["automaticallyAdjustsScrollIndicatorInsets"];
-    options.accessibilityIgnoresInvertColors =
+    instance.accessibilityIgnoresInvertColors =
         map["accessibilityIgnoresInvertColors"];
-    options.decelerationRate =
+    instance.decelerationRate =
         IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
-    options.alwaysBounceVertical = map["alwaysBounceVertical"];
-    options.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
-    options.scrollsToTop = map["scrollsToTop"];
-    options.isPagingEnabled = map["isPagingEnabled"];
-    options.maximumZoomScale = map["maximumZoomScale"];
-    options.minimumZoomScale = map["minimumZoomScale"];
-    options.contentInsetAdjustmentBehavior =
+    instance.alwaysBounceVertical = map["alwaysBounceVertical"];
+    instance.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
+    instance.scrollsToTop = map["scrollsToTop"];
+    instance.isPagingEnabled = map["isPagingEnabled"];
+    instance.maximumZoomScale = map["maximumZoomScale"];
+    instance.minimumZoomScale = map["minimumZoomScale"];
+    instance.contentInsetAdjustmentBehavior =
         IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
             map["contentInsetAdjustmentBehavior"])!;
-    options.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
-    options.mediaType = map["mediaType"];
-    options.pageZoom = map["pageZoom"];
-    options.limitsNavigationsToAppBoundDomains =
+    instance.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
+    instance.mediaType = map["mediaType"];
+    instance.pageZoom = map["pageZoom"];
+    instance.limitsNavigationsToAppBoundDomains =
         map["limitsNavigationsToAppBoundDomains"];
-    options.useOnNavigationResponse = map["useOnNavigationResponse"];
-    options.applePayAPIEnabled = map["applePayAPIEnabled"];
-    options.allowingReadAccessTo = map["allowingReadAccessTo"] != null
+    instance.useOnNavigationResponse = map["useOnNavigationResponse"];
+    instance.applePayAPIEnabled = map["applePayAPIEnabled"];
+    instance.allowingReadAccessTo = map["allowingReadAccessTo"] != null
         ? Uri.parse(map["allowingReadAccessTo"])
         : null;
-    options.disableLongPressContextMenuOnLinks =
+    instance.disableLongPressContextMenuOnLinks =
         map["disableLongPressContextMenuOnLinks"];
-    options.disableInputAccessoryView = map["disableInputAccessoryView"];
-    return options;
+    instance.disableInputAccessoryView = map["disableInputAccessoryView"];
+    return instance;
   }
 
   @override

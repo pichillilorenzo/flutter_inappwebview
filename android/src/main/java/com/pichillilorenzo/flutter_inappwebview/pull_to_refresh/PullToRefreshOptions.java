@@ -2,12 +2,12 @@ package com.pichillilorenzo.flutter_inappwebview.pull_to_refresh;
 
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.Options;
+import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PullToRefreshOptions implements Options<PullToRefreshLayout> {
+public class PullToRefreshOptions implements IWebViewSettings<PullToRefreshLayout> {
   public static final String LOG_TAG = "PullToRefreshOptions";
 
   public Boolean enabled = true;
@@ -67,7 +67,7 @@ public class PullToRefreshOptions implements Options<PullToRefreshLayout> {
   }
 
   @Override
-  public Map<String, Object> getRealOptions(PullToRefreshLayout pullToRefreshLayout) {
+  public Map<String, Object> getRealSettings(PullToRefreshLayout pullToRefreshLayout) {
     Map<String, Object> realOptions = toMap();
     return realOptions;
   }

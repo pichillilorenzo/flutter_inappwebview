@@ -2,13 +2,15 @@ import 'dart:ui';
 
 import '../../in_app_webview/ios/in_app_webview_options.dart';
 
-import '../in_app_browser_options.dart';
+import '../in_app_browser_settings.dart';
 import '../in_app_browser.dart';
 
 import '../../types.dart';
 import '../../util.dart';
 
 ///This class represents all the iOS-only [InAppBrowser] options available.
+///Use [InAppBrowserSettings] instead.
+@Deprecated('Use InAppBrowserSettings instead')
 class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   ///Set to `true` to set the toolbar at the top translucent. The default value is `true`.
   bool toolbarTopTranslucent;
@@ -72,22 +74,22 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   }
 
   static IOSInAppBrowserOptions fromMap(Map<String, dynamic> map) {
-    IOSInAppBrowserOptions options = IOSInAppBrowserOptions();
-    options.toolbarTopTranslucent = map["toolbarTopTranslucent"];
-    options.toolbarTopTintColor = UtilColor.fromHex(map["toolbarTopTintColor"]);
-    options.hideToolbarBottom = map["hideToolbarBottom"];
-    options.toolbarBottomBackgroundColor =
+    var instance = IOSInAppBrowserOptions();
+    instance.toolbarTopTranslucent = map["toolbarTopTranslucent"];
+    instance.toolbarTopTintColor = UtilColor.fromHex(map["toolbarTopTintColor"]);
+    instance.hideToolbarBottom = map["hideToolbarBottom"];
+    instance.toolbarBottomBackgroundColor =
         UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
-    options.toolbarBottomTintColor =
+    instance.toolbarBottomTintColor =
         UtilColor.fromHex(map["toolbarBottomTintColor"]);
-    options.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
-    options.closeButtonCaption = map["closeButtonCaption"];
-    options.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
-    options.presentationStyle =
+    instance.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
+    instance.closeButtonCaption = map["closeButtonCaption"];
+    instance.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
+    instance.presentationStyle =
         IOSUIModalPresentationStyle.fromValue(map["presentationStyle"])!;
-    options.transitionStyle =
+    instance.transitionStyle =
         IOSUIModalTransitionStyle.fromValue(map["transitionStyle"])!;
-    return options;
+    return instance;
   }
 
   @override

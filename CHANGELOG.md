@@ -1,3 +1,7 @@
+## 5.4.0+1
+
+- Merged "[Android] Explicitly export for the receiver defined in AndroidManifest" [#1147](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1147) (thanks to [AlexV525](https://github.com/AlexV525))
+
 ## 5.4.0
 
 - `getOriginalUrl` method is cross-platform now

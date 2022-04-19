@@ -36,8 +36,8 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 ## Requirements
 
-- Dart sdk: ">=2.12.0-0 <3.0.0"
-- Flutter: ">=1.22.2"
+- Dart sdk: ">=2.14.0 <3.0.0"
+- Flutter: ">=2.5.0"
 - Android: `minSdkVersion 17` and add support for `androidx` (see [AndroidX Migration](https://flutter.dev/docs/development/androidx-migration) to migrate an existing app)
 - iOS: `--ios-language swift`, Xcode version `>= 12`
 
@@ -58,5 +58,7 @@ Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://f
 * [WebStorageManager](https://inappwebview.dev/docs/web-storage-manager/basic-usage/): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 
 ## Support
+
+Use the [develop branch](https://github.com/pichillilorenzo/flutter_inappwebview/tree/develop) when making a pull request.
 
 Did you find this plugin useful? Please consider to [make a donation](https://inappwebview.dev/donate/) to help improve it!

@@ -11,7 +11,7 @@ import '../../in_app_webview/android/in_app_webview_options.dart';
 ///This class represents all the Android-only [ChromeSafariBrowser] options available.
 class AndroidChromeCustomTabsOptions
     implements ChromeSafariBrowserOptions, AndroidOptions {
-  ///Use `shareState` instead.
+  ///Use [shareState] instead.
   @Deprecated('Use `shareState` instead')
   bool? addDefaultShareMenuItem;
 

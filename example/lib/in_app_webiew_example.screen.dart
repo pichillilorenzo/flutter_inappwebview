@@ -167,8 +167,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
-                      await Future.delayed(Duration(seconds: 2));
-                      await controller.closeAllMediaPresentations();
                     },
                     onLoadError: (controller, url, code, message) {
                       pullToRefreshController.endRefreshing();

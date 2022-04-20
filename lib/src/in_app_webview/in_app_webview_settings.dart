@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -1232,153 +1233,157 @@ class InAppWebViewSettings
       }
     });
 
-    var instance = InAppWebViewSettings();
-    instance.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
-    instance.useOnLoadResource = map["useOnLoadResource"];
-    instance.useOnDownloadStart = map["useOnDownloadStart"];
-    instance.clearCache = map["clearCache"];
-    instance.userAgent = map["userAgent"];
-    instance.applicationNameForUserAgent = map["applicationNameForUserAgent"];
-    instance.javaScriptEnabled = map["javaScriptEnabled"];
-    instance.javaScriptCanOpenWindowsAutomatically =
+    var settings = InAppWebViewSettings();
+    settings.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
+    settings.useOnLoadResource = map["useOnLoadResource"];
+    settings.useOnDownloadStart = map["useOnDownloadStart"];
+    settings.clearCache = map["clearCache"];
+    settings.userAgent = map["userAgent"];
+    settings.applicationNameForUserAgent = map["applicationNameForUserAgent"];
+    settings.javaScriptEnabled = map["javaScriptEnabled"];
+    settings.javaScriptCanOpenWindowsAutomatically =
         map["javaScriptCanOpenWindowsAutomatically"];
-    instance.mediaPlaybackRequiresUserGesture =
+    settings.mediaPlaybackRequiresUserGesture =
         map["mediaPlaybackRequiresUserGesture"];
-    instance.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
-    instance.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
-    instance.resourceCustomSchemes =
+    settings.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
+    settings.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
+    settings.resourceCustomSchemes =
         List<String>.from(map["resourceCustomSchemes"] ?? []);
-    instance.contentBlockers = contentBlockers;
-    instance.preferredContentMode =
+    settings.contentBlockers = contentBlockers;
+    settings.preferredContentMode =
         UserPreferredContentMode.fromValue(map["preferredContentMode"]);
-    instance.useShouldInterceptAjaxRequest =
+    settings.useShouldInterceptAjaxRequest =
         map["useShouldInterceptAjaxRequest"];
-    instance.useShouldInterceptFetchRequest =
+    settings.useShouldInterceptFetchRequest =
         map["useShouldInterceptFetchRequest"];
-    instance.incognito = map["incognito"];
-    instance.cacheEnabled = map["cacheEnabled"];
-    instance.transparentBackground = map["transparentBackground"];
-    instance.disableVerticalScroll = map["disableVerticalScroll"];
-    instance.disableHorizontalScroll = map["disableHorizontalScroll"];
-    instance.disableContextMenu = map["disableContextMenu"];
-    instance.supportZoom = map["supportZoom"];
-    instance.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-    instance.allowUniversalAccessFromFileURLs =
+    settings.incognito = map["incognito"];
+    settings.cacheEnabled = map["cacheEnabled"];
+    settings.transparentBackground = map["transparentBackground"];
+    settings.disableVerticalScroll = map["disableVerticalScroll"];
+    settings.disableHorizontalScroll = map["disableHorizontalScroll"];
+    settings.disableContextMenu = map["disableContextMenu"];
+    settings.supportZoom = map["supportZoom"];
+    settings.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
+    settings.allowUniversalAccessFromFileURLs =
         map["allowUniversalAccessFromFileURLs"];
-    instance.textZoom = map["textZoom"];
-    instance.clearSessionCache = map["clearSessionCache"];
-    instance.builtInZoomControls = map["builtInZoomControls"];
-    instance.displayZoomControls = map["displayZoomControls"];
-    instance.databaseEnabled = map["databaseEnabled"];
-    instance.domStorageEnabled = map["domStorageEnabled"];
-    instance.useWideViewPort = map["useWideViewPort"];
-    instance.safeBrowsingEnabled = map["safeBrowsingEnabled"];
-    instance.mixedContentMode =
-        MixedContentMode.fromValue(map["mixedContentMode"]);
-    instance.allowContentAccess = map["allowContentAccess"];
-    instance.allowFileAccess = map["allowFileAccess"];
-    instance.appCachePath = map["appCachePath"];
-    instance.blockNetworkImage = map["blockNetworkImage"];
-    instance.blockNetworkLoads = map["blockNetworkLoads"];
-    instance.cacheMode = CacheMode.fromValue(map["cacheMode"]);
-    instance.cursiveFontFamily = map["cursiveFontFamily"];
-    instance.defaultFixedFontSize = map["defaultFixedFontSize"];
-    instance.defaultFontSize = map["defaultFontSize"];
-    instance.defaultTextEncodingName = map["defaultTextEncodingName"];
-    instance.disabledActionModeMenuItems =
-        ActionModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
-    instance.fantasyFontFamily = map["fantasyFontFamily"];
-    instance.fixedFontFamily = map["fixedFontFamily"];
-    instance.forceDark = ForceDark.fromValue(map["forceDark"]);
-    instance.geolocationEnabled = map["geolocationEnabled"];
-    instance.layoutAlgorithm =
-        LayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
-    instance.loadWithOverviewMode = map["loadWithOverviewMode"];
-    instance.loadsImagesAutomatically = map["loadsImagesAutomatically"];
-    instance.minimumLogicalFontSize = map["minimumLogicalFontSize"];
-    instance.initialScale = map["initialScale"];
-    instance.needInitialFocus = map["needInitialFocus"];
-    instance.offscreenPreRaster = map["offscreenPreRaster"];
-    instance.sansSerifFontFamily = map["sansSerifFontFamily"];
-    instance.serifFontFamily = map["serifFontFamily"];
-    instance.standardFontFamily = map["standardFontFamily"];
-    instance.saveFormData = map["saveFormData"];
-    instance.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
-    instance.hardwareAcceleration = map["hardwareAcceleration"];
-    instance.supportMultipleWindows = map["supportMultipleWindows"];
-    instance.regexToCancelSubFramesLoading =
-        map["regexToCancelSubFramesLoading"];
-    instance.useHybridComposition = map["useHybridComposition"];
-    instance.useShouldInterceptRequest = map["useShouldInterceptRequest"];
-    instance.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-    instance.overScrollMode = OverScrollMode.fromValue(map["overScrollMode"]);
-    instance.networkAvailable = map["networkAvailable"];
-    instance.scrollBarStyle = ScrollBarStyle.fromValue(map["scrollBarStyle"]);
-    instance.verticalScrollbarPosition =
-        VerticalScrollbarPosition.fromValue(map["verticalScrollbarPosition"]);
-    instance.scrollBarDefaultDelayBeforeFade =
-        map["scrollBarDefaultDelayBeforeFade"];
-    instance.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
-    instance.scrollBarFadeDuration = map["scrollBarFadeDuration"];
-    instance.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
-        map["rendererPriorityPolicy"]?.cast<String, dynamic>());
-    instance.disableDefaultErrorPage = map["disableDefaultErrorPage"];
-    instance.verticalScrollbarThumbColor =
-        UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
-    instance.verticalScrollbarTrackColor =
-        UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
-    instance.horizontalScrollbarThumbColor =
-        UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
-    instance.horizontalScrollbarTrackColor =
-        UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
-    instance.disallowOverScroll = map["disallowOverScroll"];
-    instance.enableViewportScale = map["enableViewportScale"];
-    instance.suppressesIncrementalRendering =
-        map["suppressesIncrementalRendering"];
-    instance.allowsAirPlayForMediaPlayback =
-        map["allowsAirPlayForMediaPlayback"];
-    instance.allowsBackForwardNavigationGestures =
-        map["allowsBackForwardNavigationGestures"];
-    instance.allowsLinkPreview = map["allowsLinkPreview"];
-    instance.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
-    instance.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
-    instance.allowsPictureInPictureMediaPlayback =
-        map["allowsPictureInPictureMediaPlayback"];
-    instance.isFraudulentWebsiteWarningEnabled =
-        map["isFraudulentWebsiteWarningEnabled"];
-    instance.selectionGranularity =
-        SelectionGranularity.fromValue(map["selectionGranularity"])!;
-    instance.dataDetectorTypes = dataDetectorTypes;
-    instance.sharedCookiesEnabled = map["sharedCookiesEnabled"];
-    instance.automaticallyAdjustsScrollIndicatorInsets =
-        map["automaticallyAdjustsScrollIndicatorInsets"];
-    instance.accessibilityIgnoresInvertColors =
-        map["accessibilityIgnoresInvertColors"];
-    instance.decelerationRate =
-        ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
-    instance.alwaysBounceVertical = map["alwaysBounceVertical"];
-    instance.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
-    instance.scrollsToTop = map["scrollsToTop"];
-    instance.isPagingEnabled = map["isPagingEnabled"];
-    instance.maximumZoomScale = map["maximumZoomScale"];
-    instance.minimumZoomScale = map["minimumZoomScale"];
-    instance.contentInsetAdjustmentBehavior =
-        ScrollViewContentInsetAdjustmentBehavior.fromValue(
-            map["contentInsetAdjustmentBehavior"])!;
-    instance.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
-    instance.mediaType = map["mediaType"];
-    instance.pageZoom = map["pageZoom"];
-    instance.limitsNavigationsToAppBoundDomains =
-        map["limitsNavigationsToAppBoundDomains"];
-    instance.useOnNavigationResponse = map["useOnNavigationResponse"];
-    instance.applePayAPIEnabled = map["applePayAPIEnabled"];
-    instance.allowingReadAccessTo = map["allowingReadAccessTo"] != null
-        ? Uri.parse(map["allowingReadAccessTo"])
-        : null;
-    instance.disableLongPressContextMenuOnLinks =
-        map["disableLongPressContextMenuOnLinks"];
-    instance.disableInputAccessoryView = map["disableInputAccessoryView"];
-    return instance;
+    if (Platform.isAndroid) {
+      settings.textZoom = map["textZoom"];
+      settings.clearSessionCache = map["clearSessionCache"];
+      settings.builtInZoomControls = map["builtInZoomControls"];
+      settings.displayZoomControls = map["displayZoomControls"];
+      settings.databaseEnabled = map["databaseEnabled"];
+      settings.domStorageEnabled = map["domStorageEnabled"];
+      settings.useWideViewPort = map["useWideViewPort"];
+      settings.safeBrowsingEnabled = map["safeBrowsingEnabled"];
+      settings.mixedContentMode =
+          MixedContentMode.fromValue(map["mixedContentMode"]);
+      settings.allowContentAccess = map["allowContentAccess"];
+      settings.allowFileAccess = map["allowFileAccess"];
+      settings.appCachePath = map["appCachePath"];
+      settings.blockNetworkImage = map["blockNetworkImage"];
+      settings.blockNetworkLoads = map["blockNetworkLoads"];
+      settings.cacheMode = CacheMode.fromValue(map["cacheMode"]);
+      settings.cursiveFontFamily = map["cursiveFontFamily"];
+      settings.defaultFixedFontSize = map["defaultFixedFontSize"];
+      settings.defaultFontSize = map["defaultFontSize"];
+      settings.defaultTextEncodingName = map["defaultTextEncodingName"];
+      settings.disabledActionModeMenuItems =
+          ActionModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
+      settings.fantasyFontFamily = map["fantasyFontFamily"];
+      settings.fixedFontFamily = map["fixedFontFamily"];
+      settings.forceDark = ForceDark.fromValue(map["forceDark"]);
+      settings.geolocationEnabled = map["geolocationEnabled"];
+      settings.layoutAlgorithm =
+          LayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
+      settings.loadWithOverviewMode = map["loadWithOverviewMode"];
+      settings.loadsImagesAutomatically = map["loadsImagesAutomatically"];
+      settings.minimumLogicalFontSize = map["minimumLogicalFontSize"];
+      settings.initialScale = map["initialScale"];
+      settings.needInitialFocus = map["needInitialFocus"];
+      settings.offscreenPreRaster = map["offscreenPreRaster"];
+      settings.sansSerifFontFamily = map["sansSerifFontFamily"];
+      settings.serifFontFamily = map["serifFontFamily"];
+      settings.standardFontFamily = map["standardFontFamily"];
+      settings.saveFormData = map["saveFormData"];
+      settings.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
+      settings.hardwareAcceleration = map["hardwareAcceleration"];
+      settings.supportMultipleWindows = map["supportMultipleWindows"];
+      settings.regexToCancelSubFramesLoading =
+      map["regexToCancelSubFramesLoading"];
+      settings.useHybridComposition = map["useHybridComposition"];
+      settings.useShouldInterceptRequest = map["useShouldInterceptRequest"];
+      settings.useOnRenderProcessGone = map["useOnRenderProcessGone"];
+      settings.overScrollMode = OverScrollMode.fromValue(map["overScrollMode"]);
+      settings.networkAvailable = map["networkAvailable"];
+      settings.scrollBarStyle = ScrollBarStyle.fromValue(map["scrollBarStyle"]);
+      settings.verticalScrollbarPosition =
+          VerticalScrollbarPosition.fromValue(map["verticalScrollbarPosition"]);
+      settings.scrollBarDefaultDelayBeforeFade =
+      map["scrollBarDefaultDelayBeforeFade"];
+      settings.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
+      settings.scrollBarFadeDuration = map["scrollBarFadeDuration"];
+      settings.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
+          map["rendererPriorityPolicy"]?.cast<String, dynamic>());
+      settings.disableDefaultErrorPage = map["disableDefaultErrorPage"];
+      settings.verticalScrollbarThumbColor =
+          UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
+      settings.verticalScrollbarTrackColor =
+          UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
+      settings.horizontalScrollbarThumbColor =
+          UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
+      settings.horizontalScrollbarTrackColor =
+          UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
+    }
+    if (Platform.isIOS || Platform.isMacOS) {
+      settings.disallowOverScroll = map["disallowOverScroll"];
+      settings.enableViewportScale = map["enableViewportScale"];
+      settings.suppressesIncrementalRendering =
+      map["suppressesIncrementalRendering"];
+      settings.allowsAirPlayForMediaPlayback =
+      map["allowsAirPlayForMediaPlayback"];
+      settings.allowsBackForwardNavigationGestures =
+      map["allowsBackForwardNavigationGestures"];
+      settings.allowsLinkPreview = map["allowsLinkPreview"];
+      settings.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
+      settings.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
+      settings.allowsPictureInPictureMediaPlayback =
+      map["allowsPictureInPictureMediaPlayback"];
+      settings.isFraudulentWebsiteWarningEnabled =
+      map["isFraudulentWebsiteWarningEnabled"];
+      settings.selectionGranularity =
+      SelectionGranularity.fromValue(map["selectionGranularity"])!;
+      settings.dataDetectorTypes = dataDetectorTypes;
+      settings.sharedCookiesEnabled = map["sharedCookiesEnabled"];
+      settings.automaticallyAdjustsScrollIndicatorInsets =
+      map["automaticallyAdjustsScrollIndicatorInsets"];
+      settings.accessibilityIgnoresInvertColors =
+      map["accessibilityIgnoresInvertColors"];
+      settings.decelerationRate =
+      ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
+      settings.alwaysBounceVertical = map["alwaysBounceVertical"];
+      settings.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
+      settings.scrollsToTop = map["scrollsToTop"];
+      settings.isPagingEnabled = map["isPagingEnabled"];
+      settings.maximumZoomScale = map["maximumZoomScale"];
+      settings.minimumZoomScale = map["minimumZoomScale"];
+      settings.contentInsetAdjustmentBehavior =
+      ScrollViewContentInsetAdjustmentBehavior.fromValue(
+          map["contentInsetAdjustmentBehavior"])!;
+      settings.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
+      settings.mediaType = map["mediaType"];
+      settings.pageZoom = map["pageZoom"];
+      settings.limitsNavigationsToAppBoundDomains =
+      map["limitsNavigationsToAppBoundDomains"];
+      settings.useOnNavigationResponse = map["useOnNavigationResponse"];
+      settings.applePayAPIEnabled = map["applePayAPIEnabled"];
+      settings.allowingReadAccessTo = map["allowingReadAccessTo"] != null
+          ? Uri.parse(map["allowingReadAccessTo"])
+          : null;
+      settings.disableLongPressContextMenuOnLinks =
+      map["disableLongPressContextMenuOnLinks"];
+      settings.disableInputAccessoryView = map["disableInputAccessoryView"];
+    }
+    return settings;
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -225,31 +226,47 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   }
 
   static ChromeSafariBrowserSettings fromMap(Map<String, dynamic> map) {
-    ChromeSafariBrowserSettings options = new ChromeSafariBrowserSettings();
-    options.shareState = map["shareState"];
-    options.showTitle = map["showTitle"];
-    options.toolbarBackgroundColor =
-        UtilColor.fromHex(map["toolbarBackgroundColor"]);
-    options.enableUrlBarHiding = map["enableUrlBarHiding"];
-    options.instantAppsEnabled = map["instantAppsEnabled"];
-    options.packageName = map["packageName"];
-    options.keepAliveEnabled = map["keepAliveEnabled"];
-    options.isSingleInstance = map["isSingleInstance"];
-    options.noHistory = map["noHistory"];
-    options.isTrustedWebActivity = map["isTrustedWebActivity"];
-    options.additionalTrustedOrigins = map["additionalTrustedOrigins"];
-    switch (map["displayMode"]["type"]) {
-      case "IMMERSIVE_MODE":
-        options.displayMode =
-            TrustedWebActivityImmersiveDisplayMode.fromMap(map["displayMode"]);
-        break;
-      case "DEFAULT_MODE":
-      default:
-        options.displayMode = TrustedWebActivityDefaultDisplayMode();
-        break;
+    ChromeSafariBrowserSettings settings = new ChromeSafariBrowserSettings();
+    if (Platform.isAndroid) {
+      settings.shareState = map["shareState"];
+      settings.showTitle = map["showTitle"];
+      settings.toolbarBackgroundColor =
+          UtilColor.fromHex(map["toolbarBackgroundColor"]);
+      settings.enableUrlBarHiding = map["enableUrlBarHiding"];
+      settings.instantAppsEnabled = map["instantAppsEnabled"];
+      settings.packageName = map["packageName"];
+      settings.keepAliveEnabled = map["keepAliveEnabled"];
+      settings.isSingleInstance = map["isSingleInstance"];
+      settings.noHistory = map["noHistory"];
+      settings.isTrustedWebActivity = map["isTrustedWebActivity"];
+      settings.additionalTrustedOrigins = map["additionalTrustedOrigins"];
+      switch (map["displayMode"]["type"]) {
+        case "IMMERSIVE_MODE":
+          settings.displayMode =
+              TrustedWebActivityImmersiveDisplayMode.fromMap(map["displayMode"]);
+          break;
+        case "DEFAULT_MODE":
+        default:
+          settings.displayMode = TrustedWebActivityDefaultDisplayMode();
+          break;
+      }
+      settings.screenOrientation = map["screenOrientation"];
     }
-    options.screenOrientation = map["screenOrientation"];
-    return options;
+    if (Platform.isIOS || Platform.isMacOS) {
+      settings.entersReaderIfAvailable = map["entersReaderIfAvailable"];
+      settings.barCollapsingEnabled = map["barCollapsingEnabled"];
+      settings.dismissButtonStyle =
+        DismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
+      settings.preferredBarTintColor =
+          UtilColor.fromHex(map["preferredBarTintColor"]);
+      settings.preferredControlTintColor =
+          UtilColor.fromHex(map["preferredControlTintColor"]);
+      settings.presentationStyle =
+        ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+      settings.transitionStyle =
+        ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+    }
+    return settings;
   }
 
   @override

@@ -1,3 +1,4 @@
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -273,35 +274,39 @@ class InAppBrowserSettings
   }
 
   static InAppBrowserSettings fromMap(Map<String, dynamic> map) {
-    var instance = InAppBrowserSettings();
-    instance.hidden = map["hidden"];
-    instance.hideToolbarTop = map["hideToolbarTop"];
-    instance.toolbarTopBackgroundColor =
+    var settings = InAppBrowserSettings();
+    settings.hidden = map["hidden"];
+    settings.hideToolbarTop = map["hideToolbarTop"];
+    settings.toolbarTopBackgroundColor =
         UtilColor.fromHex(map["toolbarTopBackgroundColor"]);
-    instance.hideUrlBar = map["hideUrlBar"];
-    instance.hideProgressBar = map["hideProgressBar"];
-    instance.hideTitleBar = map["hideTitleBar"];
-    instance.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
-    instance.closeOnCannotGoBack = map["closeOnCannotGoBack"];
-    instance.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
-    instance.shouldCloseOnBackButtonPressed =
-        map["shouldCloseOnBackButtonPressed"];
-    instance.toolbarTopTranslucent = map["toolbarTopTranslucent"];
-    instance.toolbarTopTintColor =
-        UtilColor.fromHex(map["toolbarTopTintColor"]);
-    instance.hideToolbarBottom = map["hideToolbarBottom"];
-    instance.toolbarBottomBackgroundColor =
-        UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
-    instance.toolbarBottomTintColor =
-        UtilColor.fromHex(map["toolbarBottomTintColor"]);
-    instance.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
-    instance.closeButtonCaption = map["closeButtonCaption"];
-    instance.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
-    instance.presentationStyle =
-        ModalPresentationStyle.fromValue(map["presentationStyle"])!;
-    instance.transitionStyle =
-        ModalTransitionStyle.fromValue(map["transitionStyle"])!;
-    return instance;
+    settings.hideUrlBar = map["hideUrlBar"];
+    settings.hideProgressBar = map["hideProgressBar"];
+    if (Platform.isAndroid) {
+      settings.hideTitleBar = map["hideTitleBar"];
+      settings.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
+      settings.closeOnCannotGoBack = map["closeOnCannotGoBack"];
+      settings.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
+      settings.shouldCloseOnBackButtonPressed =
+      map["shouldCloseOnBackButtonPressed"];
+    }
+    if (Platform.isIOS || Platform.isMacOS) {
+      settings.toolbarTopTranslucent = map["toolbarTopTranslucent"];
+      settings.toolbarTopTintColor =
+          UtilColor.fromHex(map["toolbarTopTintColor"]);
+      settings.hideToolbarBottom = map["hideToolbarBottom"];
+      settings.toolbarBottomBackgroundColor =
+          UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
+      settings.toolbarBottomTintColor =
+          UtilColor.fromHex(map["toolbarBottomTintColor"]);
+      settings.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
+      settings.closeButtonCaption = map["closeButtonCaption"];
+      settings.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
+      settings.presentationStyle =
+      ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+      settings.transitionStyle =
+      ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+    }
+    return settings;
   }
 
   @override

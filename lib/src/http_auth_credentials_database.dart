@@ -28,7 +28,11 @@ class HttpAuthCredentialDatabase {
 
   ///Gets a map list of all HTTP auth credentials saved.
   ///Each map contains the key `protectionSpace` of type [URLProtectionSpace]
-  ///and the key `credentials` of type `List<URLCredential>` that contains all the HTTP auth credentials saved for that `protectionSpace`.
+  ///and the key `credentials` of type List<[URLCredential]> that contains all the HTTP auth credentials saved for that `protectionSpace`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
   Future<List<URLProtectionSpaceHttpAuthCredentials>>
       getAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -48,6 +52,10 @@ class HttpAuthCredentialDatabase {
   }
 
   ///Gets all the HTTP auth credentials saved for that [protectionSpace].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<List<URLCredential>> getHttpAuthCredentials(
       {required URLProtectionSpace protectionSpace}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -68,6 +76,10 @@ class HttpAuthCredentialDatabase {
   }
 
   ///Saves an HTTP auth [credential] for that [protectionSpace].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
   Future<void> setHttpAuthCredential(
       {required URLProtectionSpace protectionSpace,
       required URLCredential credential}) async {
@@ -82,6 +94,10 @@ class HttpAuthCredentialDatabase {
   }
 
   ///Removes an HTTP auth [credential] for that [protectionSpace].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
   Future<void> removeHttpAuthCredential(
       {required URLProtectionSpace protectionSpace,
       required URLCredential credential}) async {
@@ -96,6 +112,10 @@ class HttpAuthCredentialDatabase {
   }
 
   ///Removes all the HTTP auth credentials saved for that [protectionSpace].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<void> removeHttpAuthCredentials(
       {required URLProtectionSpace protectionSpace}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -107,6 +127,10 @@ class HttpAuthCredentialDatabase {
   }
 
   ///Removes all the HTTP auth credentials saved in the database.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<void> clearAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('clearAllAuthCredentials', args);

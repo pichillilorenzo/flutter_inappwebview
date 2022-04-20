@@ -80,7 +80,7 @@ public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
             backgroundColor = UIColor(hexString: color)
             result(true)
             break
-        case "setAttributedTitle":
+        case "setStyledTitle":
             let attributedTitleMap = arguments!["attributedTitle"] as! [String: Any?]
             attributedTitle = NSAttributedString.fromMap(map: attributedTitleMap)
             result(true)

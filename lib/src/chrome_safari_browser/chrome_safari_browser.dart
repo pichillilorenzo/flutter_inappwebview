@@ -4,7 +4,7 @@ import 'dart:collection';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/src/util.dart';
 
-import 'chrome_safari_browser_options.dart';
+import 'chrome_safari_browser_settings.dart';
 
 class ChromeSafariBrowserAlreadyOpenedException implements Exception {
   final dynamic message;
@@ -84,8 +84,13 @@ class ChromeSafariBrowser {
   ///[url]: The [url] to load.
   ///
   ///[options]: Options for the [ChromeSafariBrowser].
+  ///
+  ///[settings]: Settings for the [ChromeSafariBrowser].
   Future<void> open(
-      {required Uri url, ChromeSafariBrowserClassOptions? options}) async {
+      {required Uri url,
+      // ignore: deprecated_member_use_from_same_package
+      @Deprecated('Use settings instead') ChromeSafariBrowserClassOptions? options,
+      ChromeSafariBrowserSettings? settings}) async {
     assert(url.toString().isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
 
@@ -94,10 +99,13 @@ class ChromeSafariBrowser {
       menuItemList.add({"id": value.id, "label": value.label});
     });
 
+    var initialSettings = settings?.toMap() ?? options?.toMap() ??
+        ChromeSafariBrowserSettings().toMap();
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent('url', () => url.toString());
-    args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('menuItemList', () => menuItemList);
     await _sharedChannel.invokeMethod('open', args);
     this._isOpened = true;

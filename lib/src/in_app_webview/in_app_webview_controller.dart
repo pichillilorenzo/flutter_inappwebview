@@ -1327,6 +1327,8 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
           Uri? iosAllowingReadAccessTo,
       Uri? allowingReadAccessTo}) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
+    assert(allowingReadAccessTo == null ||
+        allowingReadAccessTo.isScheme("file"));
     assert(iosAllowingReadAccessTo == null ||
         iosAllowingReadAccessTo.isScheme("file"));
 
@@ -1385,6 +1387,8 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
       @Deprecated('Use allowingReadAccessTo instead')
           Uri? iosAllowingReadAccessTo,
       Uri? allowingReadAccessTo}) async {
+    assert(allowingReadAccessTo == null ||
+        allowingReadAccessTo.isScheme("file"));
     assert(iosAllowingReadAccessTo == null ||
         iosAllowingReadAccessTo.isScheme("file"));
 
@@ -2514,7 +2518,7 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
   ///
   ///This method should be called when the page is loaded, for example, when the [WebView.onLoadStop] is fired, otherwise the [WebMessageChannel] won't work.
   ///
-  ///**NOTE for Android native WebView**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL].
+  ///**NOTE for Android native WebView**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL].
   ///
   ///**NOTE**: On iOS, it is implemented using JavaScript.
   ///
@@ -2534,7 +2538,7 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
   ///
   ///A target origin can be set as a wildcard ("*"). However this is not recommended.
   ///
-  ///**NOTE for Android native WebView**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.POST_WEB_MESSAGE].
+  ///**NOTE for Android native WebView**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.POST_WEB_MESSAGE].
   ///
   ///**NOTE**: On iOS, it is implemented using JavaScript.
   ///
@@ -2692,7 +2696,7 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
   /// // Flutter App
   /// child: InAppWebView(
   ///   onWebViewCreated: (controller) async {
-  ///     if (!Platform.isAndroid || await AndroidWebViewFeature.isFeatureSupported(AndroidWebViewFeature.WEB_MESSAGE_LISTENER)) {
+  ///     if (!Platform.isAndroid || await WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
   ///       await controller.addWebMessageListener(WebMessageListener(
   ///         jsObjectName: "myObject",
   ///         onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) {
@@ -2706,7 +2710,7 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
   /// ),
   ///```
   ///
-  ///**NOTE for Android**: This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.WEB_MESSAGE_LISTENER].
+  ///**NOTE for Android**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.WEB_MESSAGE_LISTENER].
   ///
   ///**NOTE for iOS**: This is implemented using Javascript.
   ///
@@ -2764,7 +2768,7 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
 
   ///Returns a URL pointing to the privacy policy for Safe Browsing reporting.
   ///
-  ///This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.SAFE_BROWSING_PRIVACY_POLICY_URL].
+  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SAFE_BROWSING_PRIVACY_POLICY_URL].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.getSafeBrowsingPrivacyPolicyUrl](https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()))
@@ -2787,7 +2791,7 @@ class InAppWebViewController with AndroidInAppWebViewControllerMixin, IOSInAppWe
   ///
   ///All other rules, including wildcards, are invalid. The correct syntax for hosts is defined by [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3.2.2).
   ///
-  ///This method should only be called if [AndroidWebViewFeature.isFeatureSupported] returns `true` for [AndroidWebViewFeature.SAFE_BROWSING_ALLOWLIST].
+  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SAFE_BROWSING_ALLOWLIST].
   ///
   ///[hosts] represents the list of hosts. This value must never be `null`.
   ///

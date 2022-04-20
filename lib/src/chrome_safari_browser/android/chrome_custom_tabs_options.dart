@@ -3,12 +3,14 @@ import 'dart:ui';
 import '../../util.dart';
 import '../../types.dart';
 
-import '../chrome_safari_browser_options.dart';
+import '../chrome_safari_browser_settings.dart';
 import '../chrome_safari_browser.dart';
 
 import '../../in_app_webview/android/in_app_webview_options.dart';
 
 ///This class represents all the Android-only [ChromeSafariBrowser] options available.
+///Use [ChromeSafariBrowserSettings] instead.
+@Deprecated('Use ChromeSafariBrowserSettings instead')
 class AndroidChromeCustomTabsOptions
     implements ChromeSafariBrowserOptions, AndroidOptions {
   ///Use [shareState] instead.

@@ -43,9 +43,9 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
       case "open":
         {
           String url = (String) call.argument("url");
-          HashMap<String, Object> options = (HashMap<String, Object>) call.argument("options");
+          HashMap<String, Object> settings = (HashMap<String, Object>) call.argument("settings");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(plugin.activity, id, url, options, menuItemList, result);
+          open(plugin.activity, id, url, settings, menuItemList, result);
         }
         break;
       case "isAvailable":
@@ -56,7 +56,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     }
   }
 
-  public void open(Activity activity, String id, String url, HashMap<String, Object> options,
+  public void open(Activity activity, String id, String url, HashMap<String, Object> settings,
                    List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
 
     Intent intent = null;
@@ -65,17 +65,17 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putBoolean("isData", false);
     extras.putString("id", id);
     extras.putString("managerId", this.id);
-    extras.putSerializable("options", options);
+    extras.putSerializable("settings", settings);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 
-    Boolean isSingleInstance = (Boolean) Util.getOrDefault(options, "isSingleInstance", false);
-    Boolean isTrustedWebActivity = (Boolean) Util.getOrDefault(options, "isTrustedWebActivity", false);
+    Boolean isSingleInstance = (Boolean) Util.getOrDefault(settings, "isSingleInstance", false);
+    Boolean isTrustedWebActivity = (Boolean) Util.getOrDefault(settings, "isTrustedWebActivity", false);
     if (CustomTabActivityHelper.isAvailable(activity)) {
       intent = new Intent(activity, !isSingleInstance ? 
               (!isTrustedWebActivity ? ChromeCustomTabsActivity.class : TrustedWebActivity.class) :
               (!isTrustedWebActivity ? ChromeCustomTabsActivitySingleInstance.class : TrustedWebActivitySingleInstance.class));
       intent.putExtras(extras);
-      Boolean noHistory = (Boolean) Util.getOrDefault(options, "noHistory", false);
+      Boolean noHistory = (Boolean) Util.getOrDefault(settings, "noHistory", false);
       if (noHistory) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
       }

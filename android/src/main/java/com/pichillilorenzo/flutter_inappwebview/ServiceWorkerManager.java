@@ -34,7 +34,7 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
 
   public ServiceWorkerManager(final InAppWebViewFlutterPlugin plugin) {
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_android_serviceworkercontroller");
+    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_serviceworkercontroller");
     channel.setMethodCallHandler(this);
     if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
       serviceWorkerController = ServiceWorkerControllerCompat.getInstance();

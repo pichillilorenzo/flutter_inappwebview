@@ -132,13 +132,21 @@ class PullToRefreshController {
     await _channel?.invokeMethod('setSize', args);
   }
 
-  ///Sets the styled title text to display in the refresh control.
-  ///
-  ///**NOTE**: Available only on iOS.
+  ///Use [setStyledTitle] instead.
+  @Deprecated("Use setStyledTitle instead")
   Future<void> setAttributedTitle(IOSNSAttributedString attributedTitle) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
-    await _channel?.invokeMethod('setAttributedTitle', args);
+    await _channel?.invokeMethod('setStyledTitle', args);
+  }
+
+  ///Sets the styled title text to display in the refresh control.
+  ///
+  ///**NOTE**: Available only on iOS.
+  Future<void> setStyledTitle(AttributedString attributedTitle) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
+    await _channel?.invokeMethod('setStyledTitle', args);
   }
 
   void initMethodChannel(dynamic id) {

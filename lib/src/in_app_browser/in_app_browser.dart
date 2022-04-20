@@ -103,6 +103,8 @@ class InAppBrowser {
   ///[urlRequest]: The [urlRequest] to load.
   ///
   ///[options]: Options for the [InAppBrowser].
+  ///
+  ///[settings]: Settings for the [InAppBrowser].
   Future<void> openUrlRequest(
       {required URLRequest urlRequest,
         // ignore: deprecated_member_use_from_same_package
@@ -166,6 +168,8 @@ class InAppBrowser {
   ///[headers]: The additional headers to be used in the HTTP request for this URL, specified as a map from name to value.
   ///
   ///[options]: Options for the [InAppBrowser].
+  ///
+  ///[settings]: Settings for the [InAppBrowser].
   Future<void> openFile(
       {required String assetFilePath,
       // ignore: deprecated_member_use_from_same_package
@@ -203,17 +207,19 @@ class InAppBrowser {
   ///The [androidHistoryUrl] parameter is the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL. This parameter is used only on Android.
   ///
   ///The [options] parameter specifies the options for the [InAppBrowser].
+  ///
+  ///[settings]: Settings for the [InAppBrowser].
   Future<void> openData(
       {required String data,
       String mimeType = "text/html",
       String encoding = "utf8",
       Uri? baseUrl,
-      Uri? androidHistoryUrl,
+      @Deprecated("Use historyUrl instead") Uri? androidHistoryUrl,
+      Uri? historyUrl,
       // ignore: deprecated_member_use_from_same_package
       @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
       InAppBrowserClassSettings? settings}) async {
     this.throwIfAlreadyOpened(message: 'Cannot open data!');
-
 
     var initialSettings = settings?.toMap() ?? options?.toMap() ??
         InAppBrowserClassSettings().toMap();
@@ -226,7 +232,7 @@ class InAppBrowser {
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
     args.putIfAbsent(
-        'historyUrl', () => androidHistoryUrl?.toString() ?? "about:blank");
+        'historyUrl', () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank");
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('implementation', () => implementation.toValue());

@@ -12,7 +12,7 @@ import SafariServices
 public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafariViewControllerDelegate {
     
     var channel: FlutterMethodChannel?
-    var safariOptions: SafariBrowserOptions?
+    var safariSettings: SafariBrowserSettings?
     var id: String = ""
     var menuItemList: [[String: Any]] = []
     
@@ -55,25 +55,25 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     
     
     func prepareSafariBrowser() {
-        guard let safariOptions = safariOptions else {
+        guard let safariSettings = safariSettings else {
             return
         }
         
         if #available(iOS 11.0, *) {
-            self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: safariOptions.dismissButtonStyle)!
+            self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: safariSettings.dismissButtonStyle)!
         }
         
         if #available(iOS 10.0, *) {
-            if let preferredBarTintColor = safariOptions.preferredBarTintColor, !preferredBarTintColor.isEmpty {
+            if let preferredBarTintColor = safariSettings.preferredBarTintColor, !preferredBarTintColor.isEmpty {
                 self.preferredBarTintColor = UIColor(hexString: preferredBarTintColor)
             }
-            if let preferredControlTintColor = safariOptions.preferredControlTintColor, !preferredControlTintColor.isEmpty {
+            if let preferredControlTintColor = safariSettings.preferredControlTintColor, !preferredControlTintColor.isEmpty {
                 self.preferredControlTintColor = UIColor(hexString: preferredControlTintColor)
             }
         }
         
-        self.modalPresentationStyle = UIModalPresentationStyle(rawValue: safariOptions.presentationStyle)!
-        self.modalTransitionStyle = UIModalTransitionStyle(rawValue: safariOptions.transitionStyle)!
+        self.modalPresentationStyle = UIModalPresentationStyle(rawValue: safariSettings.presentationStyle)!
+        self.modalTransitionStyle = UIModalTransitionStyle(rawValue: safariSettings.transitionStyle)!
     }
     
     func close(result: FlutterResult?) {

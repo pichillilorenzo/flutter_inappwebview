@@ -14,9 +14,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChromeCustomTabsOptions implements IWebViewSettings<ChromeCustomTabsActivity> {
+public class ChromeCustomTabsSettings implements IWebViewSettings<ChromeCustomTabsActivity> {
 
-  final static String LOG_TAG = "ChromeCustomTabsOptions";
+  final static String LOG_TAG = "ChromeCustomTabsSettings";
 
   @Deprecated
   public Boolean addDefaultShareMenuItem;
@@ -36,7 +36,7 @@ public class ChromeCustomTabsOptions implements IWebViewSettings<ChromeCustomTab
   public Integer screenOrientation = ScreenOrientation.DEFAULT;
 
   @Override
-  public ChromeCustomTabsOptions parse(Map<String, Object> options) {
+  public ChromeCustomTabsSettings parse(Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();

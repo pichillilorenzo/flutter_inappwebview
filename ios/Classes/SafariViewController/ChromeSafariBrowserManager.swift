@@ -34,9 +34,9 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
             case "open":
                 let id: String = arguments!["id"] as! String
                 let url = arguments!["url"] as! String
-                let options = arguments!["options"] as! [String: Any?]
+                let settings = arguments!["settings"] as! [String: Any?]
                 let menuItemList = arguments!["menuItemList"] as! [[String: Any]]
-                open(id: id, url: url, options: options,  menuItemList: menuItemList, result: result)
+                open(id: id, url: url, settings: settings,  menuItemList: menuItemList, result: result)
                 break
             case "isAvailable":
                 if #available(iOS 9.0, *) {
@@ -51,7 +51,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func open(id: String, url: String, options: [String: Any?], menuItemList: [[String: Any]], result: @escaping FlutterResult) {
+    public func open(id: String, url: String, settings: [String: Any?], menuItemList: [[String: Any]], result: @escaping FlutterResult) {
         let absoluteUrl = URL(string: url)!.absoluteURL
         
         if #available(iOS 9.0, *) {
@@ -59,15 +59,15 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
             if let flutterViewController = UIApplication.shared.delegate?.window.unsafelyUnwrapped?.rootViewController {
                 // flutterViewController could be casted to FlutterViewController if needed
                 
-                let safariOptions = SafariBrowserOptions()
-                let _ = safariOptions.parse(options: options)
+                let safariSettings = SafariBrowserSettings()
+                let _ = safariSettings.parse(settings: settings)
                 
                 let safari: SafariViewController
                 
                 if #available(iOS 11.0, *) {
                     let config = SFSafariViewController.Configuration()
-                    config.entersReaderIfAvailable = safariOptions.entersReaderIfAvailable
-                    config.barCollapsingEnabled = safariOptions.barCollapsingEnabled
+                    config.entersReaderIfAvailable = safariSettings.entersReaderIfAvailable
+                    config.barCollapsingEnabled = safariSettings.barCollapsingEnabled
                     
                     safari = SafariViewController(url: absoluteUrl, configuration: config)
                 } else {
@@ -79,7 +79,7 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
                 safari.menuItemList = menuItemList
                 safari.prepareMethodChannel()
                 safari.delegate = safari
-                safari.safariOptions = safariOptions
+                safari.safariSettings = safariSettings
                 safari.prepareSafariBrowser()
                 
                 flutterViewController.present(safari, animated: true) {

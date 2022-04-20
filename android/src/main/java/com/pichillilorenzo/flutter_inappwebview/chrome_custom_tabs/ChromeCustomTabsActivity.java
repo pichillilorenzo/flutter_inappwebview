@@ -6,7 +6,6 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.util.Log;
 
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
@@ -29,7 +28,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   public MethodChannel channel;
   public String id;
   public CustomTabsIntent.Builder builder;
-  public ChromeCustomTabsOptions options;
+  public ChromeCustomTabsSettings customSettings;
   public CustomTabActivityHelper customTabActivityHelper;
   public CustomTabsSession customTabsSession;
   protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
@@ -56,8 +55,8 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
 
     final String url = b.getString("url");
 
-    options = new ChromeCustomTabsOptions();
-    options.parse((HashMap<String, Object>) b.getSerializable("options"));
+    customSettings = new ChromeCustomTabsSettings();
+    customSettings.parse((HashMap<String, Object>) b.getSerializable("settings"));
 
     final List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) b.getSerializable("menuItemList");
 
@@ -154,23 +153,23 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   private void prepareCustomTabs(List<HashMap<String, Object>> menuItemList) {
-    if (options.addDefaultShareMenuItem != null) {
-      builder.setShareState(options.addDefaultShareMenuItem ?
+    if (customSettings.addDefaultShareMenuItem != null) {
+      builder.setShareState(customSettings.addDefaultShareMenuItem ?
               CustomTabsIntent.SHARE_STATE_ON : CustomTabsIntent.SHARE_STATE_OFF);
     } else {
-      builder.setShareState(options.shareState);
+      builder.setShareState(customSettings.shareState);
     }
 
-    if (options.toolbarBackgroundColor != null && !options.toolbarBackgroundColor.isEmpty()) {
+    if (customSettings.toolbarBackgroundColor != null && !customSettings.toolbarBackgroundColor.isEmpty()) {
       CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
       builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder
-              .setToolbarColor(Color.parseColor(options.toolbarBackgroundColor))
+              .setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor))
               .build());
     }
 
-    builder.setShowTitle(options.showTitle);
-    builder.setUrlBarHidingEnabled(options.enableUrlBarHiding);
-    builder.setInstantAppsEnabled(options.instantAppsEnabled);
+    builder.setShowTitle(customSettings.showTitle);
+    builder.setUrlBarHidingEnabled(customSettings.enableUrlBarHiding);
+    builder.setInstantAppsEnabled(customSettings.instantAppsEnabled);
 
     for (HashMap<String, Object> menuItem : menuItemList) {
       int id = (int) menuItem.get("id");
@@ -180,12 +179,12 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   private void prepareCustomTabsIntent(CustomTabsIntent customTabsIntent) {
-    if (options.packageName != null)
-      customTabsIntent.intent.setPackage(options.packageName);
+    if (customSettings.packageName != null)
+      customTabsIntent.intent.setPackage(customSettings.packageName);
     else
       customTabsIntent.intent.setPackage(CustomTabsHelper.getPackageNameToUse(this));
 
-    if (options.keepAliveEnabled)
+    if (customSettings.keepAliveEnabled)
       CustomTabsHelper.addKeepAliveExtra(this, customTabsIntent.intent);
   }
 

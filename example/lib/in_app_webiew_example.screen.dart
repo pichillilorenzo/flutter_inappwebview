@@ -118,7 +118,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrlRequest:
-                    URLRequest(url: Uri.parse("https://github.com/flutter")),
+                    URLRequest(url: Uri.parse("https://www.youtube.com/watch?v=7_v6oMtz7tA")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,
@@ -167,6 +167,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
+                      await Future.delayed(Duration(seconds: 2));
+                      await controller.closeAllMediaPresentations();
                     },
                     onLoadError: (controller, url, code, message) {
                       pullToRefreshController.endRefreshing();

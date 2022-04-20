@@ -1,3 +1,8 @@
+## 6.0.0
+
+- Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState` WebView controller methods
+- Deprecated old classes/properties/methods to make them eventually compatible with other operating systems and WebView engines.
+
 ## 5.4.0+2
 
 - Fixed Android `ChromeCustomTabsActivity` not responding to the `ActionBroadcastReceiver`

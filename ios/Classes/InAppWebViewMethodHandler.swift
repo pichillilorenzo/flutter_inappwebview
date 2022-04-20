@@ -547,6 +547,44 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(false)
                 }
                 break
+            case "pauseAllMediaPlayback":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    webView.pauseAllMediaPlayback(completionHandler: { () -> Void in
+                        result(true)
+                    })
+                } else {
+                    result(false)
+                }
+                break
+            case "setAllMediaPlaybackSuspended":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    let suspended = arguments!["suspended"] as! Bool
+                    webView.setAllMediaPlaybackSuspended(suspended, completionHandler: { () -> Void in
+                        result(true)
+                    })
+                } else {
+                    result(false)
+                }
+                break
+            case "closeAllMediaPresentations":
+            if let webView = self.webView, #available(iOS 14.5, *) {
+                    // closeAllMediaPresentations with completionHandler v15.0 makes the app crash
+                    // with error EXC_BAD_ACCESS, so use closeAllMediaPresentations v14.5
+                    webView.closeAllMediaPresentations()
+                    result(true)
+                } else {
+                    result(false)
+                }
+                break
+            case "requestMediaPlaybackState":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    webView.requestMediaPlaybackState(completionHandler: { (state) -> Void in
+                        result(state.rawValue)
+                    })
+                } else {
+                    result(nil)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

@@ -5,6 +5,7 @@ import android.app.PendingIntent;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
@@ -217,9 +218,9 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     extras.putString(ActionBroadcastReceiver.CHROME_MANAGER_ID, manager.id);
     actionIntent.putExtras(extras);
 
-    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.M) {
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
       return PendingIntent.getBroadcast(
-              this, actionSourceId, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
+              this, actionSourceId, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
     } else {
       return PendingIntent.getBroadcast(
               this, actionSourceId, actionIntent, PendingIntent.FLAG_UPDATE_CURRENT);

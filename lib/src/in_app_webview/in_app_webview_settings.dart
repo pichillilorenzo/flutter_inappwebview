@@ -33,9 +33,9 @@ class WebViewOptions {
   }
 }
 
-
 ///This class represents all the WebView settings available.
-class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
+class InAppWebViewSettings
+    implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
@@ -957,126 +957,127 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
 
   InAppWebViewSettings(
       {this.useShouldOverrideUrlLoading = false,
-        this.useOnLoadResource = false,
-        this.useOnDownloadStart = false,
-        this.clearCache = false,
-        this.userAgent = "",
-        this.applicationNameForUserAgent = "",
-        this.javaScriptEnabled = true,
-        this.javaScriptCanOpenWindowsAutomatically = false,
-        this.mediaPlaybackRequiresUserGesture = true,
-        this.minimumFontSize,
-        this.verticalScrollBarEnabled = true,
-        this.horizontalScrollBarEnabled = true,
-        this.resourceCustomSchemes = const [],
-        this.contentBlockers = const [],
-        this.preferredContentMode = UserPreferredContentMode.RECOMMENDED,
-        this.useShouldInterceptAjaxRequest = false,
-        this.useShouldInterceptFetchRequest = false,
-        this.incognito = false,
-        this.cacheEnabled = true,
-        this.transparentBackground = false,
-        this.disableVerticalScroll = false,
-        this.disableHorizontalScroll = false,
-        this.disableContextMenu = false,
-        this.supportZoom = true,
-        this.allowFileAccessFromFileURLs = false,
-        this.allowUniversalAccessFromFileURLs = false,
-        this.textZoom = 100,
-        this.clearSessionCache = false,
-        this.builtInZoomControls = true,
-        this.displayZoomControls = false,
-        this.databaseEnabled = true,
-        this.domStorageEnabled = true,
-        this.useWideViewPort = true,
-        this.safeBrowsingEnabled = true,
-        this.mixedContentMode,
-        this.allowContentAccess = true,
-        this.allowFileAccess = true,
-        this.appCachePath,
-        this.blockNetworkImage = false,
-        this.blockNetworkLoads = false,
-        this.cacheMode = CacheMode.LOAD_DEFAULT,
-        this.cursiveFontFamily = "cursive",
-        this.defaultFixedFontSize = 16,
-        this.defaultFontSize = 16,
-        this.defaultTextEncodingName = "UTF-8",
-        this.disabledActionModeMenuItems,
-        this.fantasyFontFamily = "fantasy",
-        this.fixedFontFamily = "monospace",
-        this.forceDark = ForceDark.FORCE_DARK_OFF,
-        this.geolocationEnabled = true,
-        this.layoutAlgorithm,
-        this.loadWithOverviewMode = true,
-        this.loadsImagesAutomatically = true,
-        this.minimumLogicalFontSize = 8,
-        this.needInitialFocus = true,
-        this.offscreenPreRaster = false,
-        this.sansSerifFontFamily = "sans-serif",
-        this.serifFontFamily = "sans-serif",
-        this.standardFontFamily = "sans-serif",
-        this.saveFormData = true,
-        this.thirdPartyCookiesEnabled = true,
-        this.hardwareAcceleration = true,
-        this.initialScale = 0,
-        this.supportMultipleWindows = false,
-        this.regexToCancelSubFramesLoading,
-        this.useHybridComposition = false,
-        this.useShouldInterceptRequest = false,
-        this.useOnRenderProcessGone = false,
-        this.overScrollMode = OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,
-        this.networkAvailable,
-        this.scrollBarStyle = ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
-        this.verticalScrollbarPosition =
-            VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
-        this.scrollBarDefaultDelayBeforeFade,
-        this.scrollbarFadingEnabled = true,
-        this.scrollBarFadeDuration,
-        this.rendererPriorityPolicy,
-        this.disableDefaultErrorPage = false,
-        this.verticalScrollbarThumbColor,
-        this.verticalScrollbarTrackColor,
-        this.horizontalScrollbarThumbColor,
-        this.horizontalScrollbarTrackColor,
-        this.disallowOverScroll = false,
-        this.enableViewportScale = false,
-        this.suppressesIncrementalRendering = false,
-        this.allowsAirPlayForMediaPlayback = true,
-        this.allowsBackForwardNavigationGestures = true,
-        this.allowsLinkPreview = true,
-        this.ignoresViewportScaleLimits = false,
-        this.allowsInlineMediaPlayback = false,
-        this.allowsPictureInPictureMediaPlayback = true,
-        this.isFraudulentWebsiteWarningEnabled = true,
-        this.selectionGranularity = SelectionGranularity.DYNAMIC,
-        this.dataDetectorTypes = const [DataDetectorTypes.NONE],
-        this.sharedCookiesEnabled = false,
-        this.automaticallyAdjustsScrollIndicatorInsets = false,
-        this.accessibilityIgnoresInvertColors = false,
-        this.decelerationRate = ScrollViewDecelerationRate.NORMAL,
-        this.alwaysBounceVertical = false,
-        this.alwaysBounceHorizontal = false,
-        this.scrollsToTop = true,
-        this.isPagingEnabled = false,
-        this.maximumZoomScale = 1.0,
-        this.minimumZoomScale = 1.0,
-        this.contentInsetAdjustmentBehavior =
-            ScrollViewContentInsetAdjustmentBehavior.NEVER,
-        this.isDirectionalLockEnabled = false,
-        this.mediaType,
-        this.pageZoom = 1.0,
-        this.limitsNavigationsToAppBoundDomains = false,
-        this.useOnNavigationResponse = false,
-        this.applePayAPIEnabled = false,
-        this.allowingReadAccessTo,
-        this.disableLongPressContextMenuOnLinks = false,
-        this.disableInputAccessoryView = false}) {
+      this.useOnLoadResource = false,
+      this.useOnDownloadStart = false,
+      this.clearCache = false,
+      this.userAgent = "",
+      this.applicationNameForUserAgent = "",
+      this.javaScriptEnabled = true,
+      this.javaScriptCanOpenWindowsAutomatically = false,
+      this.mediaPlaybackRequiresUserGesture = true,
+      this.minimumFontSize,
+      this.verticalScrollBarEnabled = true,
+      this.horizontalScrollBarEnabled = true,
+      this.resourceCustomSchemes = const [],
+      this.contentBlockers = const [],
+      this.preferredContentMode = UserPreferredContentMode.RECOMMENDED,
+      this.useShouldInterceptAjaxRequest = false,
+      this.useShouldInterceptFetchRequest = false,
+      this.incognito = false,
+      this.cacheEnabled = true,
+      this.transparentBackground = false,
+      this.disableVerticalScroll = false,
+      this.disableHorizontalScroll = false,
+      this.disableContextMenu = false,
+      this.supportZoom = true,
+      this.allowFileAccessFromFileURLs = false,
+      this.allowUniversalAccessFromFileURLs = false,
+      this.textZoom = 100,
+      this.clearSessionCache = false,
+      this.builtInZoomControls = true,
+      this.displayZoomControls = false,
+      this.databaseEnabled = true,
+      this.domStorageEnabled = true,
+      this.useWideViewPort = true,
+      this.safeBrowsingEnabled = true,
+      this.mixedContentMode,
+      this.allowContentAccess = true,
+      this.allowFileAccess = true,
+      this.appCachePath,
+      this.blockNetworkImage = false,
+      this.blockNetworkLoads = false,
+      this.cacheMode = CacheMode.LOAD_DEFAULT,
+      this.cursiveFontFamily = "cursive",
+      this.defaultFixedFontSize = 16,
+      this.defaultFontSize = 16,
+      this.defaultTextEncodingName = "UTF-8",
+      this.disabledActionModeMenuItems,
+      this.fantasyFontFamily = "fantasy",
+      this.fixedFontFamily = "monospace",
+      this.forceDark = ForceDark.FORCE_DARK_OFF,
+      this.geolocationEnabled = true,
+      this.layoutAlgorithm,
+      this.loadWithOverviewMode = true,
+      this.loadsImagesAutomatically = true,
+      this.minimumLogicalFontSize = 8,
+      this.needInitialFocus = true,
+      this.offscreenPreRaster = false,
+      this.sansSerifFontFamily = "sans-serif",
+      this.serifFontFamily = "sans-serif",
+      this.standardFontFamily = "sans-serif",
+      this.saveFormData = true,
+      this.thirdPartyCookiesEnabled = true,
+      this.hardwareAcceleration = true,
+      this.initialScale = 0,
+      this.supportMultipleWindows = false,
+      this.regexToCancelSubFramesLoading,
+      this.useHybridComposition = false,
+      this.useShouldInterceptRequest = false,
+      this.useOnRenderProcessGone = false,
+      this.overScrollMode = OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,
+      this.networkAvailable,
+      this.scrollBarStyle = ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+      this.verticalScrollbarPosition =
+          VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+      this.scrollBarDefaultDelayBeforeFade,
+      this.scrollbarFadingEnabled = true,
+      this.scrollBarFadeDuration,
+      this.rendererPriorityPolicy,
+      this.disableDefaultErrorPage = false,
+      this.verticalScrollbarThumbColor,
+      this.verticalScrollbarTrackColor,
+      this.horizontalScrollbarThumbColor,
+      this.horizontalScrollbarTrackColor,
+      this.disallowOverScroll = false,
+      this.enableViewportScale = false,
+      this.suppressesIncrementalRendering = false,
+      this.allowsAirPlayForMediaPlayback = true,
+      this.allowsBackForwardNavigationGestures = true,
+      this.allowsLinkPreview = true,
+      this.ignoresViewportScaleLimits = false,
+      this.allowsInlineMediaPlayback = false,
+      this.allowsPictureInPictureMediaPlayback = true,
+      this.isFraudulentWebsiteWarningEnabled = true,
+      this.selectionGranularity = SelectionGranularity.DYNAMIC,
+      this.dataDetectorTypes = const [DataDetectorTypes.NONE],
+      this.sharedCookiesEnabled = false,
+      this.automaticallyAdjustsScrollIndicatorInsets = false,
+      this.accessibilityIgnoresInvertColors = false,
+      this.decelerationRate = ScrollViewDecelerationRate.NORMAL,
+      this.alwaysBounceVertical = false,
+      this.alwaysBounceHorizontal = false,
+      this.scrollsToTop = true,
+      this.isPagingEnabled = false,
+      this.maximumZoomScale = 1.0,
+      this.minimumZoomScale = 1.0,
+      this.contentInsetAdjustmentBehavior =
+          ScrollViewContentInsetAdjustmentBehavior.NEVER,
+      this.isDirectionalLockEnabled = false,
+      this.mediaType,
+      this.pageZoom = 1.0,
+      this.limitsNavigationsToAppBoundDomains = false,
+      this.useOnNavigationResponse = false,
+      this.applePayAPIEnabled = false,
+      this.allowingReadAccessTo,
+      this.disableLongPressContextMenuOnLinks = false,
+      this.disableInputAccessoryView = false}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize =
-      defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
+          defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
     assert(!this.resourceCustomSchemes.contains("http") &&
         !this.resourceCustomSchemes.contains("https"));
-    assert(allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
+    assert(
+        allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
   }
 
   @override
@@ -1099,7 +1100,7 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
       "applicationNameForUserAgent": applicationNameForUserAgent,
       "javaScriptEnabled": javaScriptEnabled,
       "javaScriptCanOpenWindowsAutomatically":
-      javaScriptCanOpenWindowsAutomatically,
+          javaScriptCanOpenWindowsAutomatically,
       "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
       "verticalScrollBarEnabled": verticalScrollBarEnabled,
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
@@ -1177,18 +1178,18 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
       "suppressesIncrementalRendering": suppressesIncrementalRendering,
       "allowsAirPlayForMediaPlayback": allowsAirPlayForMediaPlayback,
       "allowsBackForwardNavigationGestures":
-      allowsBackForwardNavigationGestures,
+          allowsBackForwardNavigationGestures,
       "allowsLinkPreview": allowsLinkPreview,
       "ignoresViewportScaleLimits": ignoresViewportScaleLimits,
       "allowsInlineMediaPlayback": allowsInlineMediaPlayback,
       "allowsPictureInPictureMediaPlayback":
-      allowsPictureInPictureMediaPlayback,
+          allowsPictureInPictureMediaPlayback,
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
       "selectionGranularity": selectionGranularity.toValue(),
       "dataDetectorTypes": dataDetectorTypesList,
       "sharedCookiesEnabled": sharedCookiesEnabled,
       "automaticallyAdjustsScrollIndicatorInsets":
-      automaticallyAdjustsScrollIndicatorInsets,
+          automaticallyAdjustsScrollIndicatorInsets,
       "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
       "decelerationRate": decelerationRate.toValue(),
       "alwaysBounceVertical": alwaysBounceVertical,
@@ -1198,7 +1199,7 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
       "maximumZoomScale": maximumZoomScale,
       "minimumZoomScale": minimumZoomScale,
       "contentInsetAdjustmentBehavior":
-      contentInsetAdjustmentBehavior.toValue(),
+          contentInsetAdjustmentBehavior.toValue(),
       "isDirectionalLockEnabled": isDirectionalLockEnabled,
       "mediaType": mediaType,
       "pageZoom": pageZoom,
@@ -1223,10 +1224,9 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
     }
     List<DataDetectorTypes> dataDetectorTypes = [];
     List<String> dataDetectorTypesList =
-    List<String>.from(map["dataDetectorTypes"] ?? []);
+        List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorTypeValue) {
-      var dataDetectorType =
-      DataDetectorTypes.fromValue(dataDetectorTypeValue);
+      var dataDetectorType = DataDetectorTypes.fromValue(dataDetectorTypeValue);
       if (dataDetectorType != null) {
         dataDetectorTypes.add(dataDetectorType);
       }
@@ -1241,20 +1241,20 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
     instance.applicationNameForUserAgent = map["applicationNameForUserAgent"];
     instance.javaScriptEnabled = map["javaScriptEnabled"];
     instance.javaScriptCanOpenWindowsAutomatically =
-    map["javaScriptCanOpenWindowsAutomatically"];
+        map["javaScriptCanOpenWindowsAutomatically"];
     instance.mediaPlaybackRequiresUserGesture =
-    map["mediaPlaybackRequiresUserGesture"];
+        map["mediaPlaybackRequiresUserGesture"];
     instance.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
     instance.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
     instance.resourceCustomSchemes =
-    List<String>.from(map["resourceCustomSchemes"] ?? []);
+        List<String>.from(map["resourceCustomSchemes"] ?? []);
     instance.contentBlockers = contentBlockers;
     instance.preferredContentMode =
         UserPreferredContentMode.fromValue(map["preferredContentMode"]);
     instance.useShouldInterceptAjaxRequest =
-    map["useShouldInterceptAjaxRequest"];
+        map["useShouldInterceptAjaxRequest"];
     instance.useShouldInterceptFetchRequest =
-    map["useShouldInterceptFetchRequest"];
+        map["useShouldInterceptFetchRequest"];
     instance.incognito = map["incognito"];
     instance.cacheEnabled = map["cacheEnabled"];
     instance.transparentBackground = map["transparentBackground"];
@@ -1264,7 +1264,7 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
     instance.supportZoom = map["supportZoom"];
     instance.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
     instance.allowUniversalAccessFromFileURLs =
-    map["allowUniversalAccessFromFileURLs"];
+        map["allowUniversalAccessFromFileURLs"];
     instance.textZoom = map["textZoom"];
     instance.clearSessionCache = map["clearSessionCache"];
     instance.builtInZoomControls = map["builtInZoomControls"];
@@ -1307,20 +1307,17 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
     instance.hardwareAcceleration = map["hardwareAcceleration"];
     instance.supportMultipleWindows = map["supportMultipleWindows"];
     instance.regexToCancelSubFramesLoading =
-    map["regexToCancelSubFramesLoading"];
+        map["regexToCancelSubFramesLoading"];
     instance.useHybridComposition = map["useHybridComposition"];
     instance.useShouldInterceptRequest = map["useShouldInterceptRequest"];
     instance.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-    instance.overScrollMode =
-        OverScrollMode.fromValue(map["overScrollMode"]);
+    instance.overScrollMode = OverScrollMode.fromValue(map["overScrollMode"]);
     instance.networkAvailable = map["networkAvailable"];
-    instance.scrollBarStyle =
-        ScrollBarStyle.fromValue(map["scrollBarStyle"]);
+    instance.scrollBarStyle = ScrollBarStyle.fromValue(map["scrollBarStyle"]);
     instance.verticalScrollbarPosition =
-        VerticalScrollbarPosition.fromValue(
-            map["verticalScrollbarPosition"]);
+        VerticalScrollbarPosition.fromValue(map["verticalScrollbarPosition"]);
     instance.scrollBarDefaultDelayBeforeFade =
-    map["scrollBarDefaultDelayBeforeFade"];
+        map["scrollBarDefaultDelayBeforeFade"];
     instance.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
     instance.scrollBarFadeDuration = map["scrollBarFadeDuration"];
     instance.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
@@ -1337,28 +1334,28 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
     instance.disallowOverScroll = map["disallowOverScroll"];
     instance.enableViewportScale = map["enableViewportScale"];
     instance.suppressesIncrementalRendering =
-    map["suppressesIncrementalRendering"];
+        map["suppressesIncrementalRendering"];
     instance.allowsAirPlayForMediaPlayback =
-    map["allowsAirPlayForMediaPlayback"];
+        map["allowsAirPlayForMediaPlayback"];
     instance.allowsBackForwardNavigationGestures =
-    map["allowsBackForwardNavigationGestures"];
+        map["allowsBackForwardNavigationGestures"];
     instance.allowsLinkPreview = map["allowsLinkPreview"];
     instance.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
     instance.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
     instance.allowsPictureInPictureMediaPlayback =
-    map["allowsPictureInPictureMediaPlayback"];
+        map["allowsPictureInPictureMediaPlayback"];
     instance.isFraudulentWebsiteWarningEnabled =
-    map["isFraudulentWebsiteWarningEnabled"];
+        map["isFraudulentWebsiteWarningEnabled"];
     instance.selectionGranularity =
-    SelectionGranularity.fromValue(map["selectionGranularity"])!;
+        SelectionGranularity.fromValue(map["selectionGranularity"])!;
     instance.dataDetectorTypes = dataDetectorTypes;
     instance.sharedCookiesEnabled = map["sharedCookiesEnabled"];
     instance.automaticallyAdjustsScrollIndicatorInsets =
-    map["automaticallyAdjustsScrollIndicatorInsets"];
+        map["automaticallyAdjustsScrollIndicatorInsets"];
     instance.accessibilityIgnoresInvertColors =
-    map["accessibilityIgnoresInvertColors"];
+        map["accessibilityIgnoresInvertColors"];
     instance.decelerationRate =
-    ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
+        ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
     instance.alwaysBounceVertical = map["alwaysBounceVertical"];
     instance.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
     instance.scrollsToTop = map["scrollsToTop"];
@@ -1366,20 +1363,20 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
     instance.maximumZoomScale = map["maximumZoomScale"];
     instance.minimumZoomScale = map["minimumZoomScale"];
     instance.contentInsetAdjustmentBehavior =
-    ScrollViewContentInsetAdjustmentBehavior.fromValue(
-        map["contentInsetAdjustmentBehavior"])!;
+        ScrollViewContentInsetAdjustmentBehavior.fromValue(
+            map["contentInsetAdjustmentBehavior"])!;
     instance.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
     instance.mediaType = map["mediaType"];
     instance.pageZoom = map["pageZoom"];
     instance.limitsNavigationsToAppBoundDomains =
-    map["limitsNavigationsToAppBoundDomains"];
+        map["limitsNavigationsToAppBoundDomains"];
     instance.useOnNavigationResponse = map["useOnNavigationResponse"];
     instance.applePayAPIEnabled = map["applePayAPIEnabled"];
     instance.allowingReadAccessTo = map["allowingReadAccessTo"] != null
         ? Uri.parse(map["allowingReadAccessTo"])
         : null;
     instance.disableLongPressContextMenuOnLinks =
-    map["disableLongPressContextMenuOnLinks"];
+        map["disableLongPressContextMenuOnLinks"];
     instance.disableInputAccessoryView = map["disableInputAccessoryView"];
     return instance;
   }
@@ -1393,7 +1390,7 @@ class InAppWebViewSettings implements WebViewOptions, BrowserOptions, AndroidOpt
   String toString() {
     return toMap().toString();
   }
-  
+
   @override
   InAppWebViewSettings copy() {
     return InAppWebViewSettings.fromMap(this.toMap());
@@ -1659,7 +1656,6 @@ class InAppWebViewOptions
                 Map<dynamic, dynamic>.from(contentBlocker))));
       });
     }
-
 
     var instance = InAppWebViewOptions();
     instance.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];

@@ -31,7 +31,7 @@ import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewChromeClient;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewSettings;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
-import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshSettings;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
 
@@ -81,13 +81,13 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     setContentView(R.layout.activity_web_view);
 
-    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) b.getSerializable("pullToRefreshInitialOptions");
+    Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) b.getSerializable("pullToRefreshInitialSettings");
     MethodChannel pullToRefreshLayoutChannel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
-    PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
-    pullToRefreshOptions.parse(pullToRefreshInitialOptions);
+    PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();
+    pullToRefreshSettings.parse(pullToRefreshInitialSettings);
     pullToRefreshLayout = findViewById(R.id.pullToRefresh);
     pullToRefreshLayout.channel = pullToRefreshLayoutChannel;
-    pullToRefreshLayout.options = pullToRefreshOptions;
+    pullToRefreshLayout.options = pullToRefreshSettings;
     pullToRefreshLayout.prepare();
 
     webView = findViewById(R.id.webView);

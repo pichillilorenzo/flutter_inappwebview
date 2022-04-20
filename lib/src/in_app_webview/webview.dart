@@ -530,8 +530,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsShowPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)))
   final Future<GeolocationPermissionShowPromptResponse?> Function(
-      InAppWebViewController controller, String origin)?
-    onGeolocationPermissionsShowPrompt;
+          InAppWebViewController controller, String origin)?
+      onGeolocationPermissionsShowPrompt;
 
   ///Use [onGeolocationPermissionsHidePrompt] instead.
   @Deprecated("Use onGeolocationPermissionsHidePrompt instead")
@@ -544,7 +544,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsHidePrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsHidePrompt()))
   final void Function(InAppWebViewController controller)?
-    onGeolocationPermissionsHidePrompt;
+      onGeolocationPermissionsHidePrompt;
 
   ///Use [shouldInterceptRequest] instead.
   @Deprecated("Use shouldInterceptRequest instead")
@@ -569,8 +569,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldInterceptRequest](https://developer.android.com/reference/android/webkit/WebViewClient#shouldInterceptRequest(android.webkit.WebView,%20android.webkit.WebResourceRequest)))
   final Future<WebResourceResponse?> Function(
-      InAppWebViewController controller, WebResourceRequest request)?
-    shouldInterceptRequest;
+          InAppWebViewController controller, WebResourceRequest request)?
+      shouldInterceptRequest;
 
   ///Use [onRenderProcessUnresponsive] instead.
   @Deprecated("Use onRenderProcessUnresponsive instead")
@@ -598,8 +598,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessUnresponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   final Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)?
-    onRenderProcessUnresponsive;
+      InAppWebViewController controller, Uri? url)? onRenderProcessUnresponsive;
 
   ///Use [onRenderProcessResponsive] instead.
   @Deprecated("Use onRenderProcessResponsive instead")
@@ -620,8 +619,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessResponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   final Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)?
-    onRenderProcessResponsive;
+      InAppWebViewController controller, Uri? url)? onRenderProcessResponsive;
 
   ///Use [onRenderProcessGone] instead.
   @Deprecated("Use onRenderProcessGone instead")
@@ -640,8 +638,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onRenderProcessGone](https://developer.android.com/reference/android/webkit/WebViewClient#onRenderProcessGone(android.webkit.WebView,%20android.webkit.RenderProcessGoneDetail)))
   final void Function(
-      InAppWebViewController controller, RenderProcessGoneDetail detail)?
-    onRenderProcessGone;
+          InAppWebViewController controller, RenderProcessGoneDetail detail)?
+      onRenderProcessGone;
 
   ///Use [onFormResubmission] instead.
   @Deprecated('Use onFormResubmission instead')
@@ -673,7 +671,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedIcon](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)))
   final void Function(InAppWebViewController controller, Uint8List icon)?
-    onReceivedIcon;
+      onReceivedIcon;
 
   ///Use [onReceivedTouchIconUrl] instead.
   @Deprecated('Use onReceivedTouchIconUrl instead')
@@ -690,8 +688,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTouchIconUrl](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)))
   final void Function(
-      InAppWebViewController controller, Uri url, bool precomposed)?
-    onReceivedTouchIconUrl;
+          InAppWebViewController controller, Uri url, bool precomposed)?
+      onReceivedTouchIconUrl;
 
   ///Use [onJsBeforeUnload] instead.
   @Deprecated('Use onJsBeforeUnload instead')
@@ -728,8 +726,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedLoginRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
   final void Function(
-      InAppWebViewController controller, LoginRequest loginRequest)?
-    onReceivedLoginRequest;
+          InAppWebViewController controller, LoginRequest loginRequest)?
+      onReceivedLoginRequest;
 
   ///Use [onWebContentProcessDidTerminate] instead.
   @Deprecated('Use onWebContentProcessDidTerminate instead')
@@ -741,7 +739,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webViewWebContentProcessDidTerminate](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi))
   final void Function(InAppWebViewController controller)?
-    onWebContentProcessDidTerminate;
+      onWebContentProcessDidTerminate;
 
   ///Use [onDidReceiveServerRedirectForProvisionalNavigation] instead.
   @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead')
@@ -753,7 +751,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview))
   final void Function(InAppWebViewController controller)?
-    onDidReceiveServerRedirectForProvisionalNavigation;
+      onDidReceiveServerRedirectForProvisionalNavigation;
 
   ///Use [onNavigationResponse] instead.
   @Deprecated('Use onNavigationResponse instead')
@@ -870,45 +868,64 @@ abstract class WebView {
       this.onWindowBlur,
       this.onOverScrolled,
       this.onZoomScaleChanged,
-      @Deprecated('Use onSafeBrowsingHit instead') this.androidOnSafeBrowsingHit,
+      @Deprecated('Use onSafeBrowsingHit instead')
+          this.androidOnSafeBrowsingHit,
       this.onSafeBrowsingHit,
-      @Deprecated('Use onPermissionRequest instead') this.androidOnPermissionRequest,
+      @Deprecated('Use onPermissionRequest instead')
+          this.androidOnPermissionRequest,
       this.onPermissionRequest,
-      @Deprecated('Use onGeolocationPermissionsShowPrompt instead') this.androidOnGeolocationPermissionsShowPrompt,
+      @Deprecated('Use onGeolocationPermissionsShowPrompt instead')
+          this.androidOnGeolocationPermissionsShowPrompt,
       this.onGeolocationPermissionsShowPrompt,
-      @Deprecated('Use onGeolocationPermissionsHidePrompt instead') this.androidOnGeolocationPermissionsHidePrompt,
+      @Deprecated('Use onGeolocationPermissionsHidePrompt instead')
+          this.androidOnGeolocationPermissionsHidePrompt,
       this.onGeolocationPermissionsHidePrompt,
-      @Deprecated('Use shouldInterceptRequest instead') this.androidShouldInterceptRequest,
+      @Deprecated('Use shouldInterceptRequest instead')
+          this.androidShouldInterceptRequest,
       this.shouldInterceptRequest,
-      @Deprecated('Use onRenderProcessGone instead') this.androidOnRenderProcessGone,
+      @Deprecated('Use onRenderProcessGone instead')
+          this.androidOnRenderProcessGone,
       this.onRenderProcessGone,
-      @Deprecated('Use onRenderProcessResponsive instead') this.androidOnRenderProcessResponsive,
+      @Deprecated('Use onRenderProcessResponsive instead')
+          this.androidOnRenderProcessResponsive,
       this.onRenderProcessResponsive,
-      @Deprecated('Use onRenderProcessUnresponsive instead') this.androidOnRenderProcessUnresponsive,
+      @Deprecated('Use onRenderProcessUnresponsive instead')
+          this.androidOnRenderProcessUnresponsive,
       this.onRenderProcessUnresponsive,
-      @Deprecated('Use onFormResubmission instead') this.androidOnFormResubmission,
+      @Deprecated('Use onFormResubmission instead')
+          this.androidOnFormResubmission,
       this.onFormResubmission,
-      @Deprecated('Use onZoomScaleChanged instead') this.androidOnScaleChanged,
-      @Deprecated('Use onReceivedIcon instead') this.androidOnReceivedIcon,
+      @Deprecated('Use onZoomScaleChanged instead')
+          this.androidOnScaleChanged,
+      @Deprecated('Use onReceivedIcon instead')
+          this.androidOnReceivedIcon,
       this.onReceivedIcon,
-      @Deprecated('Use onReceivedTouchIconUrl instead') this.androidOnReceivedTouchIconUrl,
+      @Deprecated('Use onReceivedTouchIconUrl instead')
+          this.androidOnReceivedTouchIconUrl,
       this.onReceivedTouchIconUrl,
-      @Deprecated('Use onJsBeforeUnload instead') this.androidOnJsBeforeUnload,
+      @Deprecated('Use onJsBeforeUnload instead')
+          this.androidOnJsBeforeUnload,
       this.onJsBeforeUnload,
-      @Deprecated('Use onReceivedLoginRequest instead') this.androidOnReceivedLoginRequest,
+      @Deprecated('Use onReceivedLoginRequest instead')
+          this.androidOnReceivedLoginRequest,
       this.onReceivedLoginRequest,
-      @Deprecated('Use onWebContentProcessDidTerminate instead') this.iosOnWebContentProcessDidTerminate,
+      @Deprecated('Use onWebContentProcessDidTerminate instead')
+          this.iosOnWebContentProcessDidTerminate,
       this.onWebContentProcessDidTerminate,
-      @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead') this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
+      @Deprecated('Use onDidReceiveServerRedirectForProvisionalNavigation instead')
+          this.iosOnDidReceiveServerRedirectForProvisionalNavigation,
       this.onDidReceiveServerRedirectForProvisionalNavigation,
-      @Deprecated('Use onNavigationResponse instead') this.iosOnNavigationResponse,
+      @Deprecated('Use onNavigationResponse instead')
+          this.iosOnNavigationResponse,
       this.onNavigationResponse,
-      @Deprecated('Use shouldAllowDeprecatedTLS instead') this.iosShouldAllowDeprecatedTLS,
+      @Deprecated('Use shouldAllowDeprecatedTLS instead')
+          this.iosShouldAllowDeprecatedTLS,
       this.shouldAllowDeprecatedTLS,
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,
-      @Deprecated('Use initialSettings instead') this.initialOptions,
+      @Deprecated('Use initialSettings instead')
+          this.initialOptions,
       this.initialSettings,
       this.contextMenu,
       this.initialUserScripts,

@@ -438,7 +438,7 @@ class CookieManager {
 
     Map<String, dynamic> args = <String, dynamic>{};
     List<dynamic> cookieListMap =
-    await CookieManager._channel.invokeMethod('getAllCookies', args);
+        await CookieManager._channel.invokeMethod('getAllCookies', args);
     cookieListMap = cookieListMap.cast<Map<dynamic, dynamic>>();
 
     cookieListMap.forEach((cookieMap) {

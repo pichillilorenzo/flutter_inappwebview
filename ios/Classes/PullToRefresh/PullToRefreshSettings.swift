@@ -1,5 +1,5 @@
 //
-//  PullToRefreshOptions.swift
+//  pullToRefreshSettings.swift
 //  flutter_inappwebview
 //
 //  Created by Lorenzo Pichilli on 03/03/21.

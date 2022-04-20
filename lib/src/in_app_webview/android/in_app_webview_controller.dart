@@ -127,7 +127,8 @@ class AndroidInAppWebViewController with AndroidInAppWebViewControllerMixin {
   }
 
   ///Use [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl] instead.
-  @Deprecated("Use InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl instead")
+  @Deprecated(
+      "Use InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl instead")
   static Future<Uri?> getSafeBrowsingPrivacyPolicyUrl() async {
     return await InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl();
   }
@@ -142,15 +143,18 @@ class AndroidInAppWebViewController with AndroidInAppWebViewControllerMixin {
   ///Use [InAppWebViewController.getCurrentWebViewPackage] instead.
   @Deprecated("Use InAppWebViewController.getCurrentWebViewPackage instead")
   static Future<AndroidWebViewPackageInfo?> getCurrentWebViewPackage() async {
-    Map<String, dynamic>? packageInfo = (await InAppWebViewController.getCurrentWebViewPackage())?.toMap();
+    Map<String, dynamic>? packageInfo =
+        (await InAppWebViewController.getCurrentWebViewPackage())?.toMap();
     return AndroidWebViewPackageInfo.fromMap(packageInfo);
   }
 
   ///Use [InAppWebViewController.setWebContentsDebuggingEnabled] instead.
-  @Deprecated("Use InAppWebViewController.setWebContentsDebuggingEnabled instead")
+  @Deprecated(
+      "Use InAppWebViewController.setWebContentsDebuggingEnabled instead")
   static Future<void> setWebContentsDebuggingEnabled(
       bool debuggingEnabled) async {
-    return await InAppWebViewController.setWebContentsDebuggingEnabled(debuggingEnabled);
+    return await InAppWebViewController.setWebContentsDebuggingEnabled(
+        debuggingEnabled);
   }
 
   ///Use [InAppWebViewController.getOriginalUrl] instead.

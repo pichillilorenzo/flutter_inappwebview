@@ -36,7 +36,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var initialBaseUrl: String?
     var previousStatusBarStyle = -1
     var initialUserScripts: [[String: Any]] = []
-    var pullToRefreshInitialOptions: [String: Any?] = [:]
+    var pullToRefreshInitialSettings: [String: Any?] = [:]
     var methodCallDelegate: InAppWebViewMethodHandler?
 
     public override func loadView() {
@@ -47,7 +47,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             userScripts.append(UserScript.fromMap(map: intialUserScript, windowId: windowId)!)
         }
         
-        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: webViewSettings)
+        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView.contextMenu = contextMenu
@@ -67,9 +67,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         let pullToRefreshLayoutChannel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id,
                                                               binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        let pullToRefreshOptions = PullToRefreshSettings()
-        let _ = pullToRefreshOptions.parse(options: pullToRefreshInitialOptions)
-        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, options: pullToRefreshOptions)
+        let pullToRefreshSettings = PullToRefreshSettings()
+        let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
+        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, settings: pullToRefreshSettings)
         webView.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView
         pullToRefreshControl.prepare()
@@ -429,8 +429,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     public func setSettings(newSettings: InAppBrowserSettings, newSettingsMap: [String: Any]) {
         
         let newInAppWebViewOptions = InAppWebViewSettings()
-        let _ = newInAppWebViewOptions.parse(options: newSettingsMap)
-        self.webView.setOptions(newSettings: newInAppWebViewOptions, newOptionsMap: newSettingsMap)
+        let _ = newInAppWebViewOptions.parse(settings: newSettingsMap)
+        self.webView.setSettings(newSettings: newInAppWebViewOptions, newSettingsMap: newSettingsMap)
         
         if newSettingsMap["hidden"] != nil, browserSettings?.hidden != newSettings.hidden {
             if newSettings.hidden {
@@ -474,7 +474,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         }
 
         if newSettingsMap["hideToolbarBottom"] != nil, browserSettings?.hideToolbarBottom != newSettings.hideToolbarBottom {
-            navigationController?.isToolbarHidden = !newOptions.hideToolbarBottom
+            navigationController?.isToolbarHidden = !newSettings.hideToolbarBottom
         }
 
         if newSettingsMap["toolbarBottomBackgroundColor"] != nil, browserSettings?.toolbarBottomBackgroundColor != newSettings.toolbarBottomBackgroundColor {

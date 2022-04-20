@@ -15,7 +15,7 @@ import 'http_auth_credentials_database.dart';
 import 'cookie_manager.dart';
 import 'web_storage/web_storage.dart';
 import 'pull_to_refresh/pull_to_refresh_controller.dart';
-import 'pull_to_refresh/pull_to_refresh_options.dart';
+import 'pull_to_refresh/pull_to_refresh_settings.dart';
 import 'util.dart';
 import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_channel.dart';
@@ -173,12 +173,13 @@ class InAppWebViewInitialData {
       this.mimeType = "text/html",
       this.encoding = "utf8",
       Uri? baseUrl,
-      @Deprecated('Use historyUrl instead')
-      Uri? androidHistoryUrl,
+      @Deprecated('Use historyUrl instead') Uri? androidHistoryUrl,
       Uri? historyUrl}) {
     this.baseUrl = baseUrl == null ? Uri.parse("about:blank") : baseUrl;
     this.historyUrl = historyUrl == null
-        ? (androidHistoryUrl == null ? Uri.parse("about:blank") : androidHistoryUrl)
+        ? (androidHistoryUrl == null
+            ? Uri.parse("about:blank")
+            : androidHistoryUrl)
         : historyUrl;
     // ignore: deprecated_member_use_from_same_package
     this.androidHistoryUrl = this.historyUrl;
@@ -552,8 +553,11 @@ class JsAlertRequest {
   ///**NOTE**: available only on iOS.
   bool? isMainFrame;
 
-  JsAlertRequest({this.url, this.message,
-    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame, this.isMainFrame}) {
+  JsAlertRequest(
+      {this.url,
+      this.message,
+      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+      this.isMainFrame}) {
     // ignore: deprecated_member_use_from_same_package
     this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
   }
@@ -574,11 +578,11 @@ class JsAlertRequest {
       return null;
     }
     return JsAlertRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
-        message: map["message"],
-        // ignore: deprecated_member_use_from_same_package
-        iosIsMainFrame: map["isMainFrame"],
-        isMainFrame: map["isMainFrame"],
+      url: map["url"] != null ? Uri.parse(map["url"]) : null,
+      message: map["message"],
+      // ignore: deprecated_member_use_from_same_package
+      iosIsMainFrame: map["isMainFrame"],
+      isMainFrame: map["isMainFrame"],
     );
   }
 
@@ -664,8 +668,11 @@ class JsConfirmRequest {
   ///**NOTE**: available only on iOS.
   bool? isMainFrame;
 
-  JsConfirmRequest({this.url, this.message,
-    @Deprecated("Use isMainFrame instead") this.iosIsMainFrame, this.isMainFrame}) {
+  JsConfirmRequest(
+      {this.url,
+      this.message,
+      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+      this.isMainFrame}) {
     // ignore: deprecated_member_use_from_same_package
     this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
   }
@@ -785,8 +792,11 @@ class JsPromptRequest {
   bool? isMainFrame;
 
   JsPromptRequest(
-      {this.url, this.message, this.defaultValue,
-        @Deprecated("Use isMainFrame instead") this.iosIsMainFrame, this.isMainFrame}) {
+      {this.url,
+      this.message,
+      this.defaultValue,
+      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+      this.isMainFrame}) {
     // ignore: deprecated_member_use_from_same_package
     this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
   }
@@ -1327,7 +1337,9 @@ class URLCredential {
       @Deprecated("Use persistence instead") this.iosCertificates,
       this.certificates}) {
     // ignore: deprecated_member_use_from_same_package
-    this.persistence = this.persistence ?? URLCredentialPersistence.fromValue(this.iosPersistence?.toValue());
+    this.persistence = this.persistence ??
+        // ignore: deprecated_member_use_from_same_package
+        URLCredentialPersistence.fromValue(this.iosPersistence?.toValue());
     // ignore: deprecated_member_use_from_same_package
     this.certificates = this.certificates ?? this.iosCertificates;
   }
@@ -1336,10 +1348,12 @@ class URLCredential {
     return {
       "username": username,
       "password": password,
-      // ignore: deprecated_member_use_from_same_package
-      "iosCertificates": (certificates ?? iosCertificates)?.map((e) => e.toMap()).toList(),
-      // ignore: deprecated_member_use_from_same_package
-      "certificates": (certificates ?? iosCertificates)?.map((e) => e.toMap()).toList(),
+      "iosCertificates":
+          // ignore: deprecated_member_use_from_same_package
+          (certificates ?? iosCertificates)?.map((e) => e.toMap()).toList(),
+      "certificates":
+          // ignore: deprecated_member_use_from_same_package
+          (certificates ?? iosCertificates)?.map((e) => e.toMap()).toList(),
       // ignore: deprecated_member_use_from_same_package
       "iosPersistence": persistence?.toValue() ?? iosPersistence?.toValue(),
       // ignore: deprecated_member_use_from_same_package
@@ -1367,15 +1381,16 @@ class URLCredential {
     }
 
     return URLCredential(
-      username: map["user"],
-      password: map["password"],
-      // ignore: deprecated_member_use_from_same_package
-      iosCertificates: certificates,
-      certificates: certificates,
-      persistence: URLCredentialPersistence.fromValue(map["persistence"]),
-      // ignore: deprecated_member_use_from_same_package
-      iosPersistence: IOSURLCredentialPersistence.fromValue(map["persistence"])
-    );
+        username: map["user"],
+        password: map["password"],
+        // ignore: deprecated_member_use_from_same_package
+        iosCertificates: certificates,
+        certificates: certificates,
+        persistence: URLCredentialPersistence.fromValue(map["persistence"]),
+        // ignore: deprecated_member_use_from_same_package
+        iosPersistence:
+            // ignore: deprecated_member_use_from_same_package
+            IOSURLCredentialPersistence.fromValue(map["persistence"]));
   }
 
   Map<String, dynamic> toJson() {
@@ -1458,17 +1473,18 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///**NOTE**: available only on iOS.
   String? error;
 
-  HttpAuthenticationChallenge({
-    required this.previousFailureCount,
-    required URLProtectionSpace protectionSpace,
-    @Deprecated("Use failureResponse instead") this.iosFailureResponse,
-    this.failureResponse,
-    this.proposedCredential,
-    @Deprecated("Use error instead") this.iosError,
-    this.error
-  }) : super(protectionSpace: protectionSpace) {
-    // ignore: deprecated_member_use_from_same_package
-    this.failureResponse = this.failureResponse ?? URLResponse.fromMap(this.iosFailureResponse?.toMap());
+  HttpAuthenticationChallenge(
+      {required this.previousFailureCount,
+      required URLProtectionSpace protectionSpace,
+      @Deprecated("Use failureResponse instead") this.iosFailureResponse,
+      this.failureResponse,
+      this.proposedCredential,
+      @Deprecated("Use error instead") this.iosError,
+      this.error})
+      : super(protectionSpace: protectionSpace) {
+    this.failureResponse = this.failureResponse ??
+        // ignore: deprecated_member_use_from_same_package
+        URLResponse.fromMap(this.iosFailureResponse?.toMap());
     // ignore: deprecated_member_use_from_same_package
     this.error = this.error ?? this.iosError;
   }
@@ -1479,10 +1495,12 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
       "previousFailureCount": previousFailureCount,
       "protectionSpace": protectionSpace.toMap(),
       "proposedCredential": proposedCredential?.toMap(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosFailureResponse": failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
-      // ignore: deprecated_member_use_from_same_package
-      "failureResponse": failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
+      "iosFailureResponse":
+          // ignore: deprecated_member_use_from_same_package
+          failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
+      "failureResponse":
+          // ignore: deprecated_member_use_from_same_package
+          failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
       // ignore: deprecated_member_use_from_same_package
       "iosError": error ?? iosError,
       // ignore: deprecated_member_use_from_same_package
@@ -1504,8 +1522,8 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
       // ignore: deprecated_member_use_from_same_package
       iosFailureResponse: IOSURLResponse.fromMap(
           map["failureResponse"]?.cast<String, dynamic>()),
-      failureResponse: URLResponse.fromMap(
-          map["failureResponse"]?.cast<String, dynamic>()),
+      failureResponse:
+          URLResponse.fromMap(map["failureResponse"]?.cast<String, dynamic>()),
       // ignore: deprecated_member_use_from_same_package
       iosError: map["error"],
       error: map["error"],
@@ -1612,23 +1630,23 @@ class URLProtectionSpaceProxyType {
 
   ///The proxy type for HTTP proxies.
   static const NSUR_PROTECTION_SPACE_HTTP_PROXY =
-  const URLProtectionSpaceProxyType._internal(
-      "NSURLProtectionSpaceHTTPProxy");
+      const URLProtectionSpaceProxyType._internal(
+          "NSURLProtectionSpaceHTTPProxy");
 
   ///The proxy type for HTTPS proxies.
   static const NSURL_PROTECTION_SPACE_HTTPS_PROXY =
-  const URLProtectionSpaceProxyType._internal(
-      "NSURLProtectionSpaceHTTPSProxy");
+      const URLProtectionSpaceProxyType._internal(
+          "NSURLProtectionSpaceHTTPSProxy");
 
   ///The proxy type for FTP proxies.
   static const NSURL_PROTECTION_SPACE_FTP_PROXY =
-  const URLProtectionSpaceProxyType._internal(
-      "NSURLProtectionSpaceFTPProxy");
+      const URLProtectionSpaceProxyType._internal(
+          "NSURLProtectionSpaceFTPProxy");
 
   ///The proxy type for SOCKS proxies.
   static const NSURL_PROTECTION_SPACE_SOCKS_PROXY =
-  const URLProtectionSpaceProxyType._internal(
-      "NSURLProtectionSpaceSOCKSProxy");
+      const URLProtectionSpaceProxyType._internal(
+          "NSURLProtectionSpaceSOCKSProxy");
 
   bool operator ==(value) => value == _value;
 
@@ -1705,8 +1723,7 @@ class URLProtectionSpaceAuthenticationMethod {
         .NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE,
     URLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_NEGOTIATE,
-    URLProtectionSpaceAuthenticationMethod
-        .NSURL_AUTHENTICATION_METHOD_NTLM,
+    URLProtectionSpaceAuthenticationMethod.NSURL_AUTHENTICATION_METHOD_NTLM,
     URLProtectionSpaceAuthenticationMethod
         .NSURL_AUTHENTICATION_METHOD_SERVER_TRUST,
   ].toSet();
@@ -1730,23 +1747,23 @@ class URLProtectionSpaceAuthenticationMethod {
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
-  const URLProtectionSpaceAuthenticationMethod._internal(
-      "NSURLAuthenticationMethodClientCertificate");
+      const URLProtectionSpaceAuthenticationMethod._internal(
+          "NSURLAuthenticationMethodClientCertificate");
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
-  const URLProtectionSpaceAuthenticationMethod._internal(
-      "NSURLAuthenticationMethodNegotiate");
+      const URLProtectionSpaceAuthenticationMethod._internal(
+          "NSURLAuthenticationMethodNegotiate");
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
-  const URLProtectionSpaceAuthenticationMethod._internal(
-      "NSURLAuthenticationMethodNTLM");
+      const URLProtectionSpaceAuthenticationMethod._internal(
+          "NSURLAuthenticationMethodNTLM");
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
-  const URLProtectionSpaceAuthenticationMethod._internal(
-      "NSURLAuthenticationMethodServerTrust");
+      const URLProtectionSpaceAuthenticationMethod._internal(
+          "NSURLAuthenticationMethodServerTrust");
 
   bool operator ==(value) => value == _value;
 
@@ -1833,13 +1850,16 @@ class SslError {
   ///The message associated to the [code].
   String? message;
 
-  SslError({@Deprecated('Use code instead') this.androidError,
-    @Deprecated('Use code instead') this.iosError,
-    this.code, this.message}) {
-    // ignore: deprecated_member_use_from_same_package
-    this.code = this.code ?? SslErrorType.fromValue(this.androidError?.toValue() ??
+  SslError(
+      {@Deprecated('Use code instead') this.androidError,
+      @Deprecated('Use code instead') this.iosError,
+      this.code,
+      this.message}) {
+    this.code = this.code ??
         // ignore: deprecated_member_use_from_same_package
-        this.iosError?.toValue());
+        SslErrorType.fromValue(this.androidError?.toValue() ??
+            // ignore: deprecated_member_use_from_same_package
+            this.iosError?.toValue());
   }
 
   static SslError? fromMap(Map<String, dynamic>? map) {
@@ -1847,7 +1867,7 @@ class SslError {
       return null;
     }
     return SslError(
-      // ignore: deprecated_member_use_from_same_package
+        // ignore: deprecated_member_use_from_same_package
         androidError: AndroidSslError.fromValue(map["code"]),
         // ignore: deprecated_member_use_from_same_package
         iosError: IOSSslError.fromValue(map["code"]),
@@ -1956,26 +1976,36 @@ class URLProtectionSpace {
       this.port,
       this.sslCertificate,
       this.sslError,
-      @Deprecated("Use authenticationMethod instead") this.iosAuthenticationMethod,
+      @Deprecated("Use authenticationMethod instead")
+          this.iosAuthenticationMethod,
       this.authenticationMethod,
-      @Deprecated("Use distinguishedNames instead") this.iosDistinguishedNames,
+      @Deprecated("Use distinguishedNames instead")
+          this.iosDistinguishedNames,
       this.distinguishedNames,
-      @Deprecated("Use receivesCredentialSecurely instead") this.iosReceivesCredentialSecurely,
+      @Deprecated("Use receivesCredentialSecurely instead")
+          this.iosReceivesCredentialSecurely,
       this.receivesCredentialSecurely,
-      @Deprecated("Use isProxy instead") this.iosIsProxy,
+      @Deprecated("Use isProxy instead")
+          this.iosIsProxy,
       this.isProxy,
-      @Deprecated("Use proxyType instead") this.iosProxyType,
+      @Deprecated("Use proxyType instead")
+          this.iosProxyType,
       this.proxyType}) {
-    // ignore: deprecated_member_use_from_same_package
-    this.authenticationMethod = this.authenticationMethod ?? URLProtectionSpaceAuthenticationMethod.fromValue(this.iosAuthenticationMethod?.toValue());
-    // ignore: deprecated_member_use_from_same_package
-    this.distinguishedNames = this.distinguishedNames ?? this.iosDistinguishedNames;
-    // ignore: deprecated_member_use_from_same_package
-    this.receivesCredentialSecurely = this.receivesCredentialSecurely ?? this.iosReceivesCredentialSecurely;
+    this.authenticationMethod = this.authenticationMethod ??
+        URLProtectionSpaceAuthenticationMethod.fromValue(
+            // ignore: deprecated_member_use_from_same_package
+            this.iosAuthenticationMethod?.toValue());
+    this.distinguishedNames =
+        // ignore: deprecated_member_use_from_same_package
+        this.distinguishedNames ?? this.iosDistinguishedNames;
+    this.receivesCredentialSecurely =
+        // ignore: deprecated_member_use_from_same_package
+        this.receivesCredentialSecurely ?? this.iosReceivesCredentialSecurely;
     // ignore: deprecated_member_use_from_same_package
     this.isProxy = this.isProxy ?? this.iosIsProxy;
-    // ignore: deprecated_member_use_from_same_package
-    this.proxyType = this.proxyType ?? URLProtectionSpaceProxyType.fromValue(this.iosProxyType?.toValue());
+    this.proxyType = this.proxyType ??
+        // ignore: deprecated_member_use_from_same_package
+        URLProtectionSpaceProxyType.fromValue(this.iosProxyType?.toValue());
   }
 
   static URLProtectionSpace? fromMap(Map<String, dynamic>? map) {
@@ -2006,7 +2036,7 @@ class URLProtectionSpace {
       sslError: SslError.fromMap(map["sslError"]?.cast<String, dynamic>()),
       // ignore: deprecated_member_use_from_same_package
       iosAuthenticationMethod:
-      // ignore: deprecated_member_use_from_same_package
+          // ignore: deprecated_member_use_from_same_package
           IOSNSURLProtectionSpaceAuthenticationMethod.fromValue(
               map["authenticationMethod"]),
       authenticationMethod: URLProtectionSpaceAuthenticationMethod.fromValue(
@@ -2022,7 +2052,7 @@ class URLProtectionSpace {
       isProxy: map["isProxy"],
       // ignore: deprecated_member_use_from_same_package
       iosProxyType:
-      // ignore: deprecated_member_use_from_same_package
+          // ignore: deprecated_member_use_from_same_package
           IOSNSURLProtectionSpaceProxyType.fromValue(map["proxyType"]),
       proxyType: URLProtectionSpaceProxyType.fromValue(map["proxyType"]),
     );
@@ -2036,18 +2066,25 @@ class URLProtectionSpace {
       "port": port,
       "sslCertificate": sslCertificate?.toMap(),
       "sslError": sslError?.toMap(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosAuthenticationMethod": authenticationMethod ?? iosAuthenticationMethod,
+      "iosAuthenticationMethod":
+          // ignore: deprecated_member_use_from_same_package
+          authenticationMethod ?? iosAuthenticationMethod,
       // ignore: deprecated_member_use_from_same_package
       "authenticationMethod": authenticationMethod ?? iosAuthenticationMethod,
       // ignore: deprecated_member_use_from_same_package
-      "iosDistinguishedNames": (distinguishedNames ?? iosDistinguishedNames)?.map((e) => e.toMap()).toList(),
+      "iosDistinguishedNames": (distinguishedNames ?? iosDistinguishedNames)
+          ?.map((e) => e.toMap())
+          .toList(),
       // ignore: deprecated_member_use_from_same_package
-      "distinguishedNames": (distinguishedNames ?? iosDistinguishedNames)?.map((e) => e.toMap()).toList(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosReceivesCredentialSecurely": receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
-      // ignore: deprecated_member_use_from_same_package
-      "receivesCredentialSecurely": receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
+      "distinguishedNames": (distinguishedNames ?? iosDistinguishedNames)
+          ?.map((e) => e.toMap())
+          .toList(),
+      "iosReceivesCredentialSecurely":
+          // ignore: deprecated_member_use_from_same_package
+          receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
+      "receivesCredentialSecurely":
+          // ignore: deprecated_member_use_from_same_package
+          receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
       // ignore: deprecated_member_use_from_same_package
       "iosIsProxy": isProxy ?? iosIsProxy,
       // ignore: deprecated_member_use_from_same_package
@@ -2213,7 +2250,8 @@ class ClientCertResponse {
   ClientCertResponse(
       {required this.certificatePath,
       this.certificatePassword = "",
-      @Deprecated('Use keyStoreType instead') this.androidKeyStoreType = "PKCS12",
+      @Deprecated('Use keyStoreType instead')
+          this.androidKeyStoreType = "PKCS12",
       this.keyStoreType = "PKCS12",
       this.action = ClientCertResponseAction.CANCEL}) {
     if (this.action == ClientCertResponseAction.PROCEED)
@@ -2454,12 +2492,10 @@ class ActionModeMenuItem {
   static const MENU_ITEM_SHARE = const ActionModeMenuItem._internal(1);
 
   ///Disable menu item "Web Search".
-  static const MENU_ITEM_WEB_SEARCH =
-  const ActionModeMenuItem._internal(2);
+  static const MENU_ITEM_WEB_SEARCH = const ActionModeMenuItem._internal(2);
 
   ///Disable all the action mode menu items for text processing.
-  static const MENU_ITEM_PROCESS_TEXT =
-  const ActionModeMenuItem._internal(4);
+  static const MENU_ITEM_PROCESS_TEXT = const ActionModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
 
@@ -2688,11 +2724,11 @@ class LayoutAlgorithm {
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =
-  const LayoutAlgorithm._internal("TEXT_AUTOSIZING");
+      const LayoutAlgorithm._internal("TEXT_AUTOSIZING");
 
   ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
   static const NARROW_COLUMNS =
-  const LayoutAlgorithm._internal("NARROW_COLUMNS");
+      const LayoutAlgorithm._internal("NARROW_COLUMNS");
 
   bool operator ==(value) => value == _value;
 
@@ -2794,13 +2830,11 @@ class MixedContentMode {
 
   ///In this mode, the WebView will allow a secure origin to load content from any other origin, even if that origin is insecure.
   ///This is the least secure mode of operation for the WebView, and where possible apps should not set this mode.
-  static const MIXED_CONTENT_ALWAYS_ALLOW =
-  const MixedContentMode._internal(0);
+  static const MIXED_CONTENT_ALWAYS_ALLOW = const MixedContentMode._internal(0);
 
   ///In this mode, the WebView will not allow a secure origin to load content from an insecure origin.
   ///This is the preferred and most secure mode of operation for the WebView and apps are strongly advised to use this mode.
-  static const MIXED_CONTENT_NEVER_ALLOW =
-  const MixedContentMode._internal(1);
+  static const MIXED_CONTENT_NEVER_ALLOW = const MixedContentMode._internal(1);
 
   ///In this mode, the WebView will attempt to be compatible with the approach of a modern web browser with regard to mixed content.
   ///Some insecure content may be allowed to be loaded by a secure origin and other types of content will be blocked.
@@ -2808,7 +2842,7 @@ class MixedContentMode {
   ///This mode is intended to be used by apps that are not in control of the content that they render but desire to operate in a reasonably secure environment.
   ///For highest security, apps are recommended to use [MixedContentMode.MIXED_CONTENT_NEVER_ALLOW].
   static const MIXED_CONTENT_COMPATIBILITY_MODE =
-  const MixedContentMode._internal(2);
+      const MixedContentMode._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -3024,8 +3058,7 @@ class DataDetectorTypes {
   static const NONE = const DataDetectorTypes._internal("NONE");
 
   ///Phone numbers are detected and turned into links.
-  static const PHONE_NUMBER =
-  const DataDetectorTypes._internal("PHONE_NUMBER");
+  static const PHONE_NUMBER = const DataDetectorTypes._internal("PHONE_NUMBER");
 
   ///URLs in text are detected and turned into links.
   static const LINK = const DataDetectorTypes._internal("LINK");
@@ -3035,23 +3068,23 @@ class DataDetectorTypes {
 
   ///Dates and times that are in the future are detected and turned into links.
   static const CALENDAR_EVENT =
-  const DataDetectorTypes._internal("CALENDAR_EVENT");
+      const DataDetectorTypes._internal("CALENDAR_EVENT");
 
   ///Tracking numbers are detected and turned into links.
   static const TRACKING_NUMBER =
-  const DataDetectorTypes._internal("TRACKING_NUMBER");
+      const DataDetectorTypes._internal("TRACKING_NUMBER");
 
   ///Flight numbers are detected and turned into links.
   static const FLIGHT_NUMBER =
-  const DataDetectorTypes._internal("FLIGHT_NUMBER");
+      const DataDetectorTypes._internal("FLIGHT_NUMBER");
 
   ///Lookup suggestions are detected and turned into links.
   static const LOOKUP_SUGGESTION =
-  const DataDetectorTypes._internal("LOOKUP_SUGGESTION");
+      const DataDetectorTypes._internal("LOOKUP_SUGGESTION");
 
   ///Spotlight suggestions are detected and turned into links.
   static const SPOTLIGHT_SUGGESTION =
-  const DataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
+      const DataDetectorTypes._internal("SPOTLIGHT_SUGGESTION");
 
   ///All of the above data types are turned into links when detected. Choosing this value will automatically include any new detection type that is added.
   static const ALL = const DataDetectorTypes._internal("ALL");
@@ -3174,8 +3207,7 @@ class ScrollViewDecelerationRate {
   String toString() => _value;
 
   ///The default deceleration rate for a scroll view: `0.998`.
-  static const NORMAL =
-  const ScrollViewDecelerationRate._internal("NORMAL");
+  static const NORMAL = const ScrollViewDecelerationRate._internal("NORMAL");
 
   ///A fast deceleration rate for a scroll view: `0.99`.
   static const FAST = const ScrollViewDecelerationRate._internal("FAST");
@@ -3359,12 +3391,10 @@ class ModalPresentationStyle {
   static const CUSTOM = const ModalPresentationStyle._internal(4);
 
   ///A view presentation style in which the presented view covers the screen.
-  static const OVER_FULL_SCREEN =
-  const ModalPresentationStyle._internal(5);
+  static const OVER_FULL_SCREEN = const ModalPresentationStyle._internal(5);
 
   ///A presentation style where the content is displayed over another view controller’s content.
-  static const OVER_CURRENT_CONTEXT =
-  const ModalPresentationStyle._internal(6);
+  static const OVER_CURRENT_CONTEXT = const ModalPresentationStyle._internal(6);
 
   ///A presentation style where the content is displayed in a popover view.
   static const POPOVER = const ModalPresentationStyle._internal(7);
@@ -4943,18 +4973,18 @@ class URLRequestCachePolicy {
   ///Use the caching logic defined in the protocol implementation, if any, for a particular URL load request.
   ///This is the default policy for URL load requests.
   static const USE_PROTOCOL_CACHE_POLICY =
-  const URLRequestCachePolicy._internal(0);
+      const URLRequestCachePolicy._internal(0);
 
   ///The URL load should be loaded only from the originating source.
   ///This policy specifies that no existing cache data should be used to satisfy a URL load request.
   ///
   ///**NOTE**: Always use this policy if you are making HTTP or HTTPS byte-range requests.
   static const RELOAD_IGNORING_LOCAL_CACHE_DATA =
-  const URLRequestCachePolicy._internal(1);
+      const URLRequestCachePolicy._internal(1);
 
   ///Use existing cache data, regardless or age or expiration date, loading from originating source only if there is no cached data.
   static const RETURN_CACHE_DATA_ELSE_LOAD =
-  const URLRequestCachePolicy._internal(2);
+      const URLRequestCachePolicy._internal(2);
 
   ///Use existing cache data, regardless or age or expiration date, and fail if no cached data is available.
   ///
@@ -4962,19 +4992,19 @@ class URLRequestCachePolicy {
   ///no attempt is made to load the data from the originating source, and the load is considered to have failed.
   ///This constant specifies a behavior that is similar to an “offline” mode.
   static const RETURN_CACHE_DATA_DONT_LOAD =
-  const URLRequestCachePolicy._internal(3);
+      const URLRequestCachePolicy._internal(3);
 
   ///Ignore local cache data, and instruct proxies and other intermediates to disregard their caches so far as the protocol allows.
   ///
   ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
   static const RELOAD_IGNORING_LOCAL_AND_REMOTE_CACHE_DATA =
-  const URLRequestCachePolicy._internal(4);
+      const URLRequestCachePolicy._internal(4);
 
   ///Use cache data if the origin source can validate it; otherwise, load from the origin.
   ///
   ///**NOTE**: Versions earlier than macOS 15, iOS 13, watchOS 6, and tvOS 13 don’t implement this constant.
   static const RELOAD_REVALIDATING_CACHE_DATA =
-  const URLRequestCachePolicy._internal(5);
+      const URLRequestCachePolicy._internal(5);
 
   bool operator ==(value) => value == _value;
 
@@ -5147,21 +5177,19 @@ class URLRequestNetworkServiceType {
   ///
   ///Use this service type for interactive situations where the user is anticipating a quick response, like instant messaging or completing a purchase.
   static const RESPONSIVE_DATA =
-  const URLRequestNetworkServiceType._internal(6);
+      const URLRequestNetworkServiceType._internal(6);
 
   ///A service type for streaming audio/video data.
-  static const AV_STREAMING =
-  const URLRequestNetworkServiceType._internal(8);
+  static const AV_STREAMING = const URLRequestNetworkServiceType._internal(8);
 
   ///A service type for responsive (time-sensitive) audio/video data.
-  static const RESPONSIVE_AV =
-  const URLRequestNetworkServiceType._internal(9);
+  static const RESPONSIVE_AV = const URLRequestNetworkServiceType._internal(9);
 
   ///A service type for call signaling.
   ///
   ///Use this service type with network traffic that establishes, maintains, or tears down a VoIP call.
   static const CALL_SIGNALING =
-  const URLRequestNetworkServiceType._internal(11);
+      const URLRequestNetworkServiceType._internal(11);
 
   bool operator ==(value) => value == _value;
 
@@ -5521,12 +5549,15 @@ class NavigationAction {
     this.hasGesture = this.hasGesture ?? this.androidHasGesture;
     // ignore: deprecated_member_use_from_same_package
     this.isRedirect = this.isRedirect ?? this.androidIsRedirect;
-    // ignore: deprecated_member_use_from_same_package
-    this.navigationType = this.navigationType ?? NavigationType.fromValue(this.iosWKNavigationType?.toValue());
-    // ignore: deprecated_member_use_from_same_package
-    this.sourceFrame = this.sourceFrame ?? FrameInfo.fromMap(this.iosSourceFrame?.toMap());
-    // ignore: deprecated_member_use_from_same_package
-    this.targetFrame = this.targetFrame ?? FrameInfo.fromMap(this.iosTargetFrame?.toMap());
+    this.navigationType = this.navigationType ??
+        // ignore: deprecated_member_use_from_same_package
+        NavigationType.fromValue(this.iosWKNavigationType?.toValue());
+    this.sourceFrame =
+        // ignore: deprecated_member_use_from_same_package
+        this.sourceFrame ?? FrameInfo.fromMap(this.iosSourceFrame?.toMap());
+    this.targetFrame =
+        // ignore: deprecated_member_use_from_same_package
+        this.targetFrame ?? FrameInfo.fromMap(this.iosTargetFrame?.toMap());
   }
 
   static NavigationAction? fromMap(Map<String, dynamic>? map) {
@@ -5543,14 +5574,22 @@ class NavigationAction {
         androidIsRedirect: map["isRedirect"] ?? map["androidIsRedirect"],
         isRedirect: map["isRedirect"],
         // ignore: deprecated_member_use_from_same_package
-        iosWKNavigationType: IOSWKNavigationType.fromValue(map["navigationType"]),
+        iosWKNavigationType:
+            // ignore: deprecated_member_use_from_same_package
+            IOSWKNavigationType.fromValue(map["navigationType"]),
         navigationType: NavigationType.fromValue(map["navigationType"]),
         // ignore: deprecated_member_use_from_same_package
-        iosSourceFrame: IOSWKFrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
-        sourceFrame: FrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
+        iosSourceFrame:
+            // ignore: deprecated_member_use_from_same_package
+            IOSWKFrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
+        sourceFrame:
+            FrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
         // ignore: deprecated_member_use_from_same_package
-        iosTargetFrame: IOSWKFrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
-        targetFrame: FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()));
+        iosTargetFrame:
+            // ignore: deprecated_member_use_from_same_package
+            IOSWKFrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
+        targetFrame:
+            FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()));
   }
 
   Map<String, dynamic> toMap() {
@@ -5565,10 +5604,12 @@ class NavigationAction {
       "isRedirect": isRedirect ?? androidIsRedirect,
       // ignore: deprecated_member_use_from_same_package
       "androidIsRedirect": isRedirect ?? androidIsRedirect,
-      // ignore: deprecated_member_use_from_same_package
-      "iosWKNavigationType": navigationType?.toValue() ?? iosWKNavigationType?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "navigationType": navigationType?.toValue() ?? iosWKNavigationType?.toValue(),
+      "iosWKNavigationType":
+          // ignore: deprecated_member_use_from_same_package
+          navigationType?.toValue() ?? iosWKNavigationType?.toValue(),
+      "navigationType":
+          // ignore: deprecated_member_use_from_same_package
+          navigationType?.toValue() ?? iosWKNavigationType?.toValue(),
       // ignore: deprecated_member_use_from_same_package
       "iosSourceFrame": sourceFrame?.toMap() ?? iosSourceFrame?.toMap(),
       // ignore: deprecated_member_use_from_same_package
@@ -5615,24 +5656,31 @@ class CreateWindowAction extends NavigationAction {
 
   CreateWindowAction(
       {required this.windowId,
-      @Deprecated('Use isDialog instead') this.androidIsDialog,
+      @Deprecated('Use isDialog instead')
+          this.androidIsDialog,
       this.isDialog,
-      @Deprecated('Use windowFeatures instead') this.iosWindowFeatures,
+      @Deprecated('Use windowFeatures instead')
+          this.iosWindowFeatures,
       this.windowFeatures,
       required URLRequest request,
       required bool isForMainFrame,
-      @Deprecated('Use hasGesture instead') bool? androidHasGesture,
-      @Deprecated('Use isRedirect instead') bool? androidIsRedirect,
+      @Deprecated('Use hasGesture instead')
+          bool? androidHasGesture,
+      @Deprecated('Use isRedirect instead')
+          bool? androidIsRedirect,
       bool? hasGesture,
       bool? isRedirect,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use navigationType instead') IOSWKNavigationType? iosWKNavigationType,
+      @Deprecated('Use navigationType instead')
+          // ignore: deprecated_member_use_from_same_package
+          IOSWKNavigationType? iosWKNavigationType,
       NavigationType? navigationType,
-        // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use sourceFrame instead') IOSWKFrameInfo? iosSourceFrame,
+      @Deprecated('Use sourceFrame instead')
+          // ignore: deprecated_member_use_from_same_package
+          IOSWKFrameInfo? iosSourceFrame,
       FrameInfo? sourceFrame,
-        // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use targetFrame instead') IOSWKFrameInfo? iosTargetFrame,
+      @Deprecated('Use targetFrame instead')
+          // ignore: deprecated_member_use_from_same_package
+          IOSWKFrameInfo? iosTargetFrame,
       FrameInfo? targetFrame})
       : super(
             request: request,
@@ -5644,18 +5692,29 @@ class CreateWindowAction extends NavigationAction {
             androidIsRedirect: isRedirect ?? androidIsRedirect,
             isRedirect: isRedirect ?? androidIsRedirect,
             // ignore: deprecated_member_use_from_same_package
-            iosWKNavigationType: IOSWKNavigationType.fromValue(navigationType?.toValue()) ?? iosWKNavigationType,
-            navigationType: navigationType ?? NavigationType.fromValue(iosWKNavigationType?.toValue()),
+            iosWKNavigationType:
+                // ignore: deprecated_member_use_from_same_package
+                IOSWKNavigationType.fromValue(navigationType?.toValue()) ??
+                    iosWKNavigationType,
+            navigationType: navigationType ??
+                NavigationType.fromValue(iosWKNavigationType?.toValue()),
             // ignore: deprecated_member_use_from_same_package
-            iosSourceFrame: IOSWKFrameInfo.fromMap(sourceFrame?.toMap()) ?? iosSourceFrame,
-            sourceFrame: sourceFrame ?? FrameInfo.fromMap(iosSourceFrame?.toMap()),
+            iosSourceFrame:
+                // ignore: deprecated_member_use_from_same_package
+                IOSWKFrameInfo.fromMap(sourceFrame?.toMap()) ?? iosSourceFrame,
+            sourceFrame:
+                sourceFrame ?? FrameInfo.fromMap(iosSourceFrame?.toMap()),
             // ignore: deprecated_member_use_from_same_package
-            iosTargetFrame: IOSWKFrameInfo.fromMap(targetFrame?.toMap()) ?? iosTargetFrame,
-            targetFrame: targetFrame ?? FrameInfo.fromMap(iosTargetFrame?.toMap())) {
+            iosTargetFrame:
+                // ignore: deprecated_member_use_from_same_package
+                IOSWKFrameInfo.fromMap(targetFrame?.toMap()) ?? iosTargetFrame,
+            targetFrame:
+                targetFrame ?? FrameInfo.fromMap(iosTargetFrame?.toMap())) {
     // ignore: deprecated_member_use_from_same_package
     this.isDialog = this.isDialog ?? this.androidIsDialog;
-    // ignore: deprecated_member_use_from_same_package
-    this.windowFeatures = this.windowFeatures ?? WindowFeatures.fromMap(this.iosWindowFeatures?.toMap());
+    this.windowFeatures = this.windowFeatures ??
+        // ignore: deprecated_member_use_from_same_package
+        WindowFeatures.fromMap(this.iosWindowFeatures?.toMap());
   }
 
   static CreateWindowAction? fromMap(Map<String, dynamic>? map) {
@@ -5682,20 +5741,21 @@ class CreateWindowAction extends NavigationAction {
         isRedirect: map["isRedirect"],
         // ignore: deprecated_member_use_from_same_package
         iosWKNavigationType:
-        // ignore: deprecated_member_use_from_same_package
+            // ignore: deprecated_member_use_from_same_package
             IOSWKNavigationType.fromValue(map["navigationType"]),
-        navigationType:
-          NavigationType.fromValue(map["navigationType"]),
+        navigationType: NavigationType.fromValue(map["navigationType"]),
         // ignore: deprecated_member_use_from_same_package
-        iosSourceFrame: IOSWKFrameInfo.fromMap(
-            map["sourceFrame"]?.cast<String, dynamic>()),
-        sourceFrame: FrameInfo.fromMap(
-            map["sourceFrame"]?.cast<String, dynamic>()),
+        iosSourceFrame:
+            // ignore: deprecated_member_use_from_same_package
+            IOSWKFrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
+        sourceFrame:
+            FrameInfo.fromMap(map["sourceFrame"]?.cast<String, dynamic>()),
         // ignore: deprecated_member_use_from_same_package
-        iosTargetFrame: IOSWKFrameInfo.fromMap(
-            map["targetFrame"]?.cast<String, dynamic>()),
-        targetFrame: FrameInfo.fromMap(
-            map["targetFrame"]?.cast<String, dynamic>()));
+        iosTargetFrame:
+            // ignore: deprecated_member_use_from_same_package
+            IOSWKFrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
+        targetFrame:
+            FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()));
   }
 
   @override
@@ -5707,8 +5767,9 @@ class CreateWindowAction extends NavigationAction {
       "androidIsDialog": isDialog ?? androidIsDialog,
       // ignore: deprecated_member_use_from_same_package
       "isDialog": isDialog ?? androidIsDialog,
-      // ignore: deprecated_member_use_from_same_package
-      "iosWindowFeatures": windowFeatures?.toMap() ?? iosWindowFeatures?.toMap(),
+      "iosWindowFeatures":
+          // ignore: deprecated_member_use_from_same_package
+          windowFeatures?.toMap() ?? iosWindowFeatures?.toMap(),
       // ignore: deprecated_member_use_from_same_package
       "windowFeatures": windowFeatures?.toMap() ?? iosWindowFeatures?.toMap(),
     });
@@ -5821,48 +5882,47 @@ class WebsiteDataType {
   ///
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeFetchCache =
-  const WebsiteDataType._internal("WKWebsiteDataTypeFetchCache");
+      const WebsiteDataType._internal("WKWebsiteDataTypeFetchCache");
 
   ///On-disk caches.
   static const WKWebsiteDataTypeDiskCache =
-  const WebsiteDataType._internal("WKWebsiteDataTypeDiskCache");
+      const WebsiteDataType._internal("WKWebsiteDataTypeDiskCache");
 
   ///In-memory caches.
   static const WKWebsiteDataTypeMemoryCache =
-  const WebsiteDataType._internal("WKWebsiteDataTypeMemoryCache");
+      const WebsiteDataType._internal("WKWebsiteDataTypeMemoryCache");
 
   ///HTML offline web application caches.
   static const WKWebsiteDataTypeOfflineWebApplicationCache =
-  const WebsiteDataType._internal(
-      "WKWebsiteDataTypeOfflineWebApplicationCache");
+      const WebsiteDataType._internal(
+          "WKWebsiteDataTypeOfflineWebApplicationCache");
 
   ///Cookies.
   static const WKWebsiteDataTypeCookies =
-  const WebsiteDataType._internal("WKWebsiteDataTypeCookies");
+      const WebsiteDataType._internal("WKWebsiteDataTypeCookies");
 
   ///HTML session storage.
   static const WKWebsiteDataTypeSessionStorage =
-  const WebsiteDataType._internal("WKWebsiteDataTypeSessionStorage");
+      const WebsiteDataType._internal("WKWebsiteDataTypeSessionStorage");
 
   ///HTML local storage.
   static const WKWebsiteDataTypeLocalStorage =
-  const WebsiteDataType._internal("WKWebsiteDataTypeLocalStorage");
+      const WebsiteDataType._internal("WKWebsiteDataTypeLocalStorage");
 
   ///WebSQL databases.
   static const WKWebsiteDataTypeWebSQLDatabases =
-  const WebsiteDataType._internal("WKWebsiteDataTypeWebSQLDatabases");
+      const WebsiteDataType._internal("WKWebsiteDataTypeWebSQLDatabases");
 
   ///IndexedDB databases.
   static const WKWebsiteDataTypeIndexedDBDatabases =
-  const WebsiteDataType._internal(
-      "WKWebsiteDataTypeIndexedDBDatabases");
+      const WebsiteDataType._internal("WKWebsiteDataTypeIndexedDBDatabases");
 
   ///Service worker registrations.
   ///
   ///**NOTE**: available on iOS 11.3+.
   static const WKWebsiteDataTypeServiceWorkerRegistrations =
-  const WebsiteDataType._internal(
-      "WKWebsiteDataTypeServiceWorkerRegistrations");
+      const WebsiteDataType._internal(
+          "WKWebsiteDataTypeServiceWorkerRegistrations");
 
   ///Returns a set of all available website data types.
   // ignore: non_constant_identifier_names
@@ -6426,7 +6486,7 @@ class OverScrollMode {
 
   ///Allow a user to over-scroll this view only if the content is large enough to meaningfully scroll, provided it is a view that can scroll.
   static const OVER_SCROLL_IF_CONTENT_SCROLLS =
-  const OverScrollMode._internal(1);
+      const OverScrollMode._internal(1);
 
   ///Never allow a user to over-scroll this view.
   static const OVER_SCROLL_NEVER = const OverScrollMode._internal(2);
@@ -6545,23 +6605,22 @@ class ScrollBarStyle {
 
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
-  static const SCROLLBARS_INSIDE_OVERLAY =
-  const ScrollBarStyle._internal(0);
+  static const SCROLLBARS_INSIDE_OVERLAY = const ScrollBarStyle._internal(0);
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
-  const ScrollBarStyle._internal(16777216);
+      const ScrollBarStyle._internal(16777216);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
   static const SCROLLBARS_OUTSIDE_OVERLAY =
-  const ScrollBarStyle._internal(33554432);
+      const ScrollBarStyle._internal(33554432);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
-  const ScrollBarStyle._internal(50331648);
+      const ScrollBarStyle._internal(50331648);
 
   bool operator ==(value) => value == _value;
 
@@ -6687,15 +6746,15 @@ class VerticalScrollbarPosition {
 
   ///Position the scroll bar at the default position as determined by the system.
   static const SCROLLBAR_POSITION_DEFAULT =
-  const VerticalScrollbarPosition._internal(0);
+      const VerticalScrollbarPosition._internal(0);
 
   ///Position the scroll bar along the left edge.
   static const SCROLLBAR_POSITION_LEFT =
-  const VerticalScrollbarPosition._internal(1);
+      const VerticalScrollbarPosition._internal(1);
 
   ///Position the scroll bar along the right edge.
   static const SCROLLBAR_POSITION_RIGHT =
-  const VerticalScrollbarPosition._internal(2);
+      const VerticalScrollbarPosition._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -6775,7 +6834,7 @@ class WebViewPackageInfo {
   static WebViewPackageInfo? fromMap(Map<String, dynamic>? map) {
     return map != null
         ? WebViewPackageInfo(
-        versionName: map["versionName"], packageName: map["packageName"])
+            versionName: map["versionName"], packageName: map["packageName"])
         : null;
   }
 
@@ -7360,19 +7419,19 @@ class ScrollViewContentInsetAdjustmentBehavior {
 
   ///Automatically adjust the scroll view insets.
   static const AUTOMATIC =
-  const ScrollViewContentInsetAdjustmentBehavior._internal(0);
+      const ScrollViewContentInsetAdjustmentBehavior._internal(0);
 
   ///Adjust the insets only in the scrollable directions.
   static const SCROLLABLE_AXES =
-  const ScrollViewContentInsetAdjustmentBehavior._internal(1);
+      const ScrollViewContentInsetAdjustmentBehavior._internal(1);
 
   ///Do not adjust the scroll view insets.
   static const NEVER =
-  const ScrollViewContentInsetAdjustmentBehavior._internal(2);
+      const ScrollViewContentInsetAdjustmentBehavior._internal(2);
 
   ///Always include the safe area insets in the content adjustment.
   static const ALWAYS =
-  const ScrollViewContentInsetAdjustmentBehavior._internal(3);
+      const ScrollViewContentInsetAdjustmentBehavior._internal(3);
 
   bool operator ==(value) => value == _value;
 
@@ -7736,7 +7795,10 @@ class UserScript {
       ContentWorld? contentWorld}) {
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
     // ignore: deprecated_member_use_from_same_package
-    this.forMainFrameOnly = this.iosForMainFrameOnly != null ? this.iosForMainFrameOnly! : this.forMainFrameOnly;
+    this.forMainFrameOnly = this.iosForMainFrameOnly != null
+        // ignore: deprecated_member_use_from_same_package
+        ? this.iosForMainFrameOnly!
+        : this.forMainFrameOnly;
   }
 
   Map<String, dynamic> toMap() {
@@ -7989,7 +8051,10 @@ class ScreenshotConfiguration {
       this.afterScreenUpdates = true}) {
     assert(this.quality >= 0);
     // ignore: deprecated_member_use_from_same_package
-    this.afterScreenUpdates = this.iosAfterScreenUpdates != null ? this.iosAfterScreenUpdates! : this.afterScreenUpdates;
+    this.afterScreenUpdates = this.iosAfterScreenUpdates != null
+        // ignore: deprecated_member_use_from_same_package
+        ? this.iosAfterScreenUpdates!
+        : this.afterScreenUpdates;
   }
 
   Map<String, dynamic> toMap() {
@@ -8415,12 +8480,12 @@ class URLResponse {
 
   URLResponse(
       {this.url,
-        required this.expectedContentLength,
-        this.mimeType,
-        this.suggestedFilename,
-        this.textEncodingName,
-        this.headers,
-        this.statusCode});
+      required this.expectedContentLength,
+      this.mimeType,
+      this.suggestedFilename,
+      this.textEncodingName,
+      this.headers,
+      this.statusCode});
 
   static URLResponse? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -8540,16 +8605,15 @@ class NavigationResponse {
 
   NavigationResponse(
       {this.response,
-        required this.isForMainFrame,
-        required this.canShowMIMEType});
+      required this.isForMainFrame,
+      required this.canShowMIMEType});
 
   static NavigationResponse? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
     return NavigationResponse(
-      response:
-      URLResponse.fromMap(map["response"]?.cast<String, dynamic>()),
+      response: URLResponse.fromMap(map["response"]?.cast<String, dynamic>()),
       isForMainFrame: map["isForMainFrame"],
       canShowMIMEType: map["canShowMIMEType"],
     );
@@ -8831,43 +8895,57 @@ class URLRequest {
   ///**NOTE**: available only on iOS.
   Uri? mainDocumentURL;
 
-  URLRequest(
-      {required this.url,
-      this.method,
-      this.headers,
-      this.body,
-      @Deprecated("Use allowsCellularAccess instead") this.iosAllowsCellularAccess,
-      this.allowsCellularAccess,
-      @Deprecated("Use allowsConstrainedNetworkAccess instead") this.iosAllowsConstrainedNetworkAccess,
-      this.allowsConstrainedNetworkAccess,
-      @Deprecated("Use allowsExpensiveNetworkAccess instead") this.iosAllowsExpensiveNetworkAccess,
-      this.allowsExpensiveNetworkAccess,
-      @Deprecated("Use cachePolicy instead") this.iosCachePolicy,
-      this.cachePolicy,
-      @Deprecated("Use httpShouldHandleCookies instead") this.iosHttpShouldHandleCookies,
-      this.httpShouldHandleCookies,
-      @Deprecated("Use httpShouldUsePipelining instead") this.iosHttpShouldUsePipelining,
-      this.httpShouldUsePipelining,
-      @Deprecated("Use networkServiceType instead") this.iosNetworkServiceType,
-      this.networkServiceType,
-      @Deprecated("Use timeoutInterval instead") this.iosTimeoutInterval,
-      this.timeoutInterval,
-      @Deprecated("Use mainDocumentURL instead") this.iosMainDocumentURL,
-      this.mainDocumentURL,}) {
-    // ignore: deprecated_member_use_from_same_package
-    this.allowsCellularAccess = this.allowsCellularAccess ?? this.iosAllowsCellularAccess;
-    // ignore: deprecated_member_use_from_same_package
-    this.allowsConstrainedNetworkAccess = this.allowsConstrainedNetworkAccess ?? this.iosAllowsConstrainedNetworkAccess;
-    // ignore: deprecated_member_use_from_same_package
-    this.allowsExpensiveNetworkAccess = this.allowsExpensiveNetworkAccess ?? this.iosAllowsExpensiveNetworkAccess;
-    // ignore: deprecated_member_use_from_same_package
-    this.cachePolicy = this.cachePolicy ?? URLRequestCachePolicy.fromValue(this.iosCachePolicy?.toValue());
-    // ignore: deprecated_member_use_from_same_package
-    this.httpShouldHandleCookies = this.httpShouldHandleCookies ?? this.iosHttpShouldHandleCookies;
-    // ignore: deprecated_member_use_from_same_package
-    this.httpShouldUsePipelining = this.httpShouldUsePipelining ?? this.iosHttpShouldUsePipelining;
-    // ignore: deprecated_member_use_from_same_package
-    this.networkServiceType = this.networkServiceType ?? URLRequestNetworkServiceType.fromValue(this.iosNetworkServiceType?.toValue());
+  URLRequest({
+    required this.url,
+    this.method,
+    this.headers,
+    this.body,
+    @Deprecated("Use allowsCellularAccess instead")
+        this.iosAllowsCellularAccess,
+    this.allowsCellularAccess,
+    @Deprecated("Use allowsConstrainedNetworkAccess instead")
+        this.iosAllowsConstrainedNetworkAccess,
+    this.allowsConstrainedNetworkAccess,
+    @Deprecated("Use allowsExpensiveNetworkAccess instead")
+        this.iosAllowsExpensiveNetworkAccess,
+    this.allowsExpensiveNetworkAccess,
+    @Deprecated("Use cachePolicy instead") this.iosCachePolicy,
+    this.cachePolicy,
+    @Deprecated("Use httpShouldHandleCookies instead")
+        this.iosHttpShouldHandleCookies,
+    this.httpShouldHandleCookies,
+    @Deprecated("Use httpShouldUsePipelining instead")
+        this.iosHttpShouldUsePipelining,
+    this.httpShouldUsePipelining,
+    @Deprecated("Use networkServiceType instead") this.iosNetworkServiceType,
+    this.networkServiceType,
+    @Deprecated("Use timeoutInterval instead") this.iosTimeoutInterval,
+    this.timeoutInterval,
+    @Deprecated("Use mainDocumentURL instead") this.iosMainDocumentURL,
+    this.mainDocumentURL,
+  }) {
+    this.allowsCellularAccess =
+        // ignore: deprecated_member_use_from_same_package
+        this.allowsCellularAccess ?? this.iosAllowsCellularAccess;
+    this.allowsConstrainedNetworkAccess = this.allowsConstrainedNetworkAccess ??
+        // ignore: deprecated_member_use_from_same_package
+        this.iosAllowsConstrainedNetworkAccess;
+    this.allowsExpensiveNetworkAccess = this.allowsExpensiveNetworkAccess ??
+        // ignore: deprecated_member_use_from_same_package
+        this.iosAllowsExpensiveNetworkAccess;
+    this.cachePolicy = this.cachePolicy ??
+        // ignore: deprecated_member_use_from_same_package
+        URLRequestCachePolicy.fromValue(this.iosCachePolicy?.toValue());
+    this.httpShouldHandleCookies =
+        // ignore: deprecated_member_use_from_same_package
+        this.httpShouldHandleCookies ?? this.iosHttpShouldHandleCookies;
+    this.httpShouldUsePipelining =
+        // ignore: deprecated_member_use_from_same_package
+        this.httpShouldUsePipelining ?? this.iosHttpShouldUsePipelining;
+    this.networkServiceType =
+        this.networkServiceType ?? URLRequestNetworkServiceType.fromValue(
+            // ignore: deprecated_member_use_from_same_package
+            this.iosNetworkServiceType?.toValue());
     // ignore: deprecated_member_use_from_same_package
     this.timeoutInterval = this.timeoutInterval ?? this.iosTimeoutInterval;
     // ignore: deprecated_member_use_from_same_package
@@ -8902,8 +8980,11 @@ class URLRequest {
       iosHttpShouldUsePipelining: map["httpShouldUsePipelining"],
       httpShouldUsePipelining: map["httpShouldUsePipelining"],
       // ignore: deprecated_member_use_from_same_package
-      iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
-      networkServiceType: URLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
+      iosNetworkServiceType:
+          // ignore: deprecated_member_use_from_same_package
+          IOSURLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
+      networkServiceType:
+          URLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
       // ignore: deprecated_member_use_from_same_package
       iosTimeoutInterval: map["timeoutInterval"],
       timeoutInterval: map["timeoutInterval"],
@@ -8923,34 +9004,45 @@ class URLRequest {
       "headers": headers,
       "method": method,
       "body": body,
-      // ignore: deprecated_member_use_from_same_package
-      "iosAllowsCellularAccess": allowsCellularAccess ?? iosAllowsCellularAccess,
+      "iosAllowsCellularAccess":
+          // ignore: deprecated_member_use_from_same_package
+          allowsCellularAccess ?? iosAllowsCellularAccess,
       // ignore: deprecated_member_use_from_same_package
       "allowsCellularAccess": allowsCellularAccess ?? iosAllowsCellularAccess,
-      // ignore: deprecated_member_use_from_same_package
-      "iosAllowsConstrainedNetworkAccess": allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
-      // ignore: deprecated_member_use_from_same_package
-      "allowsConstrainedNetworkAccess": allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
-      // ignore: deprecated_member_use_from_same_package
-      "iosAllowsExpensiveNetworkAccess": allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
-      // ignore: deprecated_member_use_from_same_package
-      "allowsExpensiveNetworkAccess": allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
+      "iosAllowsConstrainedNetworkAccess":
+          // ignore: deprecated_member_use_from_same_package
+          allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
+      "allowsConstrainedNetworkAccess":
+          // ignore: deprecated_member_use_from_same_package
+          allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
+      "iosAllowsExpensiveNetworkAccess":
+          // ignore: deprecated_member_use_from_same_package
+          allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
+      "allowsExpensiveNetworkAccess":
+          // ignore: deprecated_member_use_from_same_package
+          allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
       // ignore: deprecated_member_use_from_same_package
       "iosCachePolicy": cachePolicy?.toValue() ?? iosCachePolicy?.toValue(),
       // ignore: deprecated_member_use_from_same_package
       "cachePolicy": cachePolicy?.toValue() ?? iosCachePolicy?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosHttpShouldHandleCookies": httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
-      // ignore: deprecated_member_use_from_same_package
-      "httpShouldHandleCookies": httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
-      // ignore: deprecated_member_use_from_same_package
-      "iosHttpShouldUsePipelining": httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
-      // ignore: deprecated_member_use_from_same_package
-      "httpShouldUsePipelining": httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
-      // ignore: deprecated_member_use_from_same_package
-      "iosNetworkServiceType": networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "networkServiceType": networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
+      "iosHttpShouldHandleCookies":
+          // ignore: deprecated_member_use_from_same_package
+          httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
+      "httpShouldHandleCookies":
+          // ignore: deprecated_member_use_from_same_package
+          httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
+      "iosHttpShouldUsePipelining":
+          // ignore: deprecated_member_use_from_same_package
+          httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
+      "httpShouldUsePipelining":
+          // ignore: deprecated_member_use_from_same_package
+          httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
+      "iosNetworkServiceType":
+          // ignore: deprecated_member_use_from_same_package
+          networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
+      "networkServiceType":
+          // ignore: deprecated_member_use_from_same_package
+          networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
       // ignore: deprecated_member_use_from_same_package
       "iosTimeoutInterval": timeoutInterval ?? iosTimeoutInterval,
       // ignore: deprecated_member_use_from_same_package
@@ -9000,13 +9092,13 @@ class WindowFeatures {
 
   WindowFeatures(
       {this.allowsResizing,
-        this.height,
-        this.menuBarVisibility,
-        this.statusBarVisibility,
-        this.toolbarsVisibility,
-        this.width,
-        this.x,
-        this.y});
+      this.height,
+      this.menuBarVisibility,
+      this.statusBarVisibility,
+      this.toolbarsVisibility,
+      this.width,
+      this.x,
+      this.y});
 
   static WindowFeatures? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -9123,7 +9215,7 @@ class IOSWKWindowFeatures {
 }
 
 ///Class that represents a string with associated attributes
-///used by the [PullToRefreshController] and [PullToRefreshOptions] classes.
+///used by the [PullToRefreshController] and [PullToRefreshSettings] classes.
 class AttributedString {
   ///The characters for the new object.
   String string;
@@ -9633,7 +9725,7 @@ class AttributedStringTextEffectStyle {
 
   ///A graphical text effect that gives glyphs the appearance of letterpress printing, which involves pressing the type into the paper.
   static const LETTERPRESS_STYLE =
-  const AttributedStringTextEffectStyle._internal("letterpressStyle");
+      const AttributedStringTextEffectStyle._internal("letterpressStyle");
 
   bool operator ==(value) => value == _value;
 
@@ -9996,13 +10088,14 @@ class TrustedWebActivityImmersiveDisplayMode
 
   TrustedWebActivityImmersiveDisplayMode(
       {required this.isSticky,
-        this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
-        this.layoutInDisplayCutoutMode}) {
+      this.displayCutoutMode = LayoutInDisplayCutoutMode.DEFAULT,
+      this.layoutInDisplayCutoutMode}) {
     // ignore: deprecated_member_use_from_same_package
-    this.displayCutoutMode = this.layoutInDisplayCutoutMode != null ?
-      // ignore: deprecated_member_use_from_same_package
-      LayoutInDisplayCutoutMode.fromValue(this.layoutInDisplayCutoutMode!.toValue())! :
-      this.displayCutoutMode;
+    this.displayCutoutMode = this.layoutInDisplayCutoutMode != null
+        ? LayoutInDisplayCutoutMode.fromValue(
+            // ignore: deprecated_member_use_from_same_package
+            this.layoutInDisplayCutoutMode!.toValue())!
+        : this.displayCutoutMode;
   }
 
   static TrustedWebActivityImmersiveDisplayMode? fromMap(
@@ -10088,8 +10181,7 @@ class LayoutInDisplayCutoutMode {
   ///Content renders into the cutout area in both portrait and landscape modes.
   ///
   ///**NOTE**: available on Android 28+.
-  static const SHORT_EDGES =
-  const LayoutInDisplayCutoutMode._internal(1);
+  static const SHORT_EDGES = const LayoutInDisplayCutoutMode._internal(1);
 
   ///Content never renders into the cutout area.
   ///

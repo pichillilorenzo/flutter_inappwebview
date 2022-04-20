@@ -6,7 +6,7 @@ import '../in_app_browser/in_app_browser.dart';
 import '../util.dart';
 import '../types.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
-import 'pull_to_refresh_options.dart';
+import 'pull_to_refresh_settings.dart';
 
 ///A standard controller that can initiate the refreshing of a scroll view’s contents.
 ///This should be used whenever the user can refresh the contents of a WebView via a vertical swipe gesture.
@@ -16,14 +16,24 @@ import 'pull_to_refresh_options.dart';
 ///
 ///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.
 class PullToRefreshController {
+  @Deprecated("Use settings instead")
+  // ignore: deprecated_member_use_from_same_package
   late PullToRefreshOptions options;
+  late PullToRefreshSettings settings;
   MethodChannel? _channel;
 
   ///Event called when a swipe gesture triggers a refresh.
   final void Function()? onRefresh;
 
-  PullToRefreshController({PullToRefreshOptions? options, this.onRefresh}) {
+  PullToRefreshController(
+      {
+      // ignore: deprecated_member_use_from_same_package
+      @Deprecated("Use settings instead") PullToRefreshOptions? options,
+      PullToRefreshSettings? settings,
+      this.onRefresh}) {
+    // ignore: deprecated_member_use_from_same_package
     this.options = options ?? PullToRefreshOptions();
+    this.settings = settings ?? PullToRefreshSettings();
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {

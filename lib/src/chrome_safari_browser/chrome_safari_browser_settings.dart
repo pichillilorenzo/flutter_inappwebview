@@ -32,7 +32,6 @@ class ChromeSafariBrowserOptions {
 
 ///Class that represents the settings that can be used for an [ChromeSafariBrowser] window.
 class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
-
   ///The share state that should be applied to the custom tab. The default value is [CustomTabsShareState.SHARE_STATE_DEFAULT].
   ///
   ///**NOTE**: Not available in a Trusted Web Activity.
@@ -179,25 +178,25 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
 
   ChromeSafariBrowserSettings(
       {this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
-        this.showTitle = true,
-        this.toolbarBackgroundColor,
-        this.enableUrlBarHiding = false,
-        this.instantAppsEnabled = false,
-        this.packageName,
-        this.keepAliveEnabled = false,
-        this.isSingleInstance = false,
-        this.noHistory = false,
-        this.isTrustedWebActivity = false,
-        this.additionalTrustedOrigins = const [],
-        this.displayMode,
-        this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
-        this.entersReaderIfAvailable = false,
-        this.barCollapsingEnabled = false,
-        this.dismissButtonStyle = DismissButtonStyle.DONE,
-        this.preferredBarTintColor,
-        this.preferredControlTintColor,
-        this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-        this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL});
+      this.showTitle = true,
+      this.toolbarBackgroundColor,
+      this.enableUrlBarHiding = false,
+      this.instantAppsEnabled = false,
+      this.packageName,
+      this.keepAliveEnabled = false,
+      this.isSingleInstance = false,
+      this.noHistory = false,
+      this.isTrustedWebActivity = false,
+      this.additionalTrustedOrigins = const [],
+      this.displayMode,
+      this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
+      this.entersReaderIfAvailable = false,
+      this.barCollapsingEnabled = false,
+      this.dismissButtonStyle = DismissButtonStyle.DONE,
+      this.preferredBarTintColor,
+      this.preferredControlTintColor,
+      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL});
 
   @override
   Map<String, dynamic> toMap() {
@@ -226,8 +225,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   }
 
   static ChromeSafariBrowserSettings fromMap(Map<String, dynamic> map) {
-    ChromeSafariBrowserSettings options =
-    new ChromeSafariBrowserSettings();
+    ChromeSafariBrowserSettings options = new ChromeSafariBrowserSettings();
     options.shareState = map["shareState"];
     options.showTitle = map["showTitle"];
     options.toolbarBackgroundColor =

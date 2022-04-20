@@ -88,8 +88,9 @@ class ChromeSafariBrowser {
   ///[settings]: Settings for the [ChromeSafariBrowser].
   Future<void> open(
       {required Uri url,
-      // ignore: deprecated_member_use_from_same_package
-      @Deprecated('Use settings instead') ChromeSafariBrowserClassOptions? options,
+      @Deprecated('Use settings instead')
+          // ignore: deprecated_member_use_from_same_package
+          ChromeSafariBrowserClassOptions? options,
       ChromeSafariBrowserSettings? settings}) async {
     assert(url.toString().isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
@@ -99,7 +100,8 @@ class ChromeSafariBrowser {
       menuItemList.add({"id": value.id, "label": value.label});
     });
 
-    var initialSettings = settings?.toMap() ?? options?.toMap() ??
+    var initialSettings = settings?.toMap() ??
+        options?.toMap() ??
         ChromeSafariBrowserSettings().toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};

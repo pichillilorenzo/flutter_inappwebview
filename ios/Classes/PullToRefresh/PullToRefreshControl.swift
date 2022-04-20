@@ -11,14 +11,14 @@ import Flutter
 public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
     
     var channel: FlutterMethodChannel?
-    var options: PullToRefreshSettings?
+    var settings: PullToRefreshSettings?
     var shouldCallOnRefresh = false
     var delegate: PullToRefreshDelegate?
     
-    public init(channel: FlutterMethodChannel?, options: PullToRefreshSettings?) {
+    public init(channel: FlutterMethodChannel?, settings: PullToRefreshSettings?) {
         super.init()
         self.channel = channel
-        self.options = options
+        self.settings = settings
     }
     
     required init?(coder: NSCoder) {
@@ -31,7 +31,7 @@ public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
     
     public func prepare() {
         self.channel?.setMethodCallHandler(self.handle)
-        if let options = options {
+        if let options = settings {
             if options.enabled {
                 delegate?.enablePullToRefresh()
             }

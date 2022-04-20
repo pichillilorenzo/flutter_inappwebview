@@ -29,12 +29,13 @@ abstract class IOSInAppWebViewControllerMixin {
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   Future<Uint8List?> createPdf(
-      // ignore: deprecated_member_use_from_same_package
-      {@Deprecated("Use pdfConfiguration instead") IOSWKPDFConfiguration? iosWKPdfConfiguration,
-        PDFConfiguration? pdfConfiguration}) async {
+      {@Deprecated("Use pdfConfiguration instead")
+          // ignore: deprecated_member_use_from_same_package
+          IOSWKPDFConfiguration? iosWKPdfConfiguration,
+      PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent(
-        'pdfConfiguration', () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
+    args.putIfAbsent('pdfConfiguration',
+        () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
     return await _channel.invokeMethod('createPdf', args);
   }
 

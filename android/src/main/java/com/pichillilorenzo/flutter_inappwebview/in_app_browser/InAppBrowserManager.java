@@ -174,7 +174,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     Map<String, Object> contextMenu = (Map<String, Object>) arguments.get("contextMenu");
     Integer windowId = (Integer) arguments.get("windowId");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) arguments.get("initialUserScripts");
-    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) arguments.get("pullToRefreshOptions");
+    Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) arguments.get("pullToRefreshSettings");
 
     Bundle extras = new Bundle();
     extras.putString("fromActivity", activity.getClass().getName());
@@ -191,7 +191,7 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     extras.putSerializable("contextMenu", (Serializable) contextMenu);
     extras.putInt("windowId", windowId != null ? windowId : -1);
     extras.putSerializable("initialUserScripts", (Serializable) initialUserScripts);
-    extras.putSerializable("pullToRefreshInitialOptions", (Serializable) pullToRefreshInitialOptions);
+    extras.putSerializable("pullToRefreshInitialSettings", (Serializable) pullToRefreshInitialSettings);
     startInAppBrowserActivity(activity, extras);
   }
 

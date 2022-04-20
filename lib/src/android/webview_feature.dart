@@ -72,174 +72,167 @@ class WebViewFeature {
 
   ///
   static const CREATE_WEB_MESSAGE_CHANNEL =
-  const WebViewFeature._internal("CREATE_WEB_MESSAGE_CHANNEL");
+      const WebViewFeature._internal("CREATE_WEB_MESSAGE_CHANNEL");
 
   ///
   static const DISABLED_ACTION_MODE_MENU_ITEMS =
-  const WebViewFeature._internal("DISABLED_ACTION_MODE_MENU_ITEMS");
+      const WebViewFeature._internal("DISABLED_ACTION_MODE_MENU_ITEMS");
 
   ///
   static const FORCE_DARK = const WebViewFeature._internal("FORCE_DARK");
 
   ///
   static const FORCE_DARK_STRATEGY =
-  const WebViewFeature._internal("FORCE_DARK_STRATEGY");
+      const WebViewFeature._internal("FORCE_DARK_STRATEGY");
 
   ///
   static const GET_WEB_CHROME_CLIENT =
-  const WebViewFeature._internal("GET_WEB_CHROME_CLIENT");
+      const WebViewFeature._internal("GET_WEB_CHROME_CLIENT");
 
   ///
   static const GET_WEB_VIEW_CLIENT =
-  const WebViewFeature._internal("GET_WEB_VIEW_CLIENT");
+      const WebViewFeature._internal("GET_WEB_VIEW_CLIENT");
 
   ///
   static const GET_WEB_VIEW_RENDERER =
-  const WebViewFeature._internal("GET_WEB_VIEW_RENDERER");
+      const WebViewFeature._internal("GET_WEB_VIEW_RENDERER");
 
   ///
-  static const MULTI_PROCESS =
-  const WebViewFeature._internal("MULTI_PROCESS");
+  static const MULTI_PROCESS = const WebViewFeature._internal("MULTI_PROCESS");
 
   ///
   static const OFF_SCREEN_PRERASTER =
-  const WebViewFeature._internal("OFF_SCREEN_PRERASTER");
+      const WebViewFeature._internal("OFF_SCREEN_PRERASTER");
 
   ///
   static const POST_WEB_MESSAGE =
-  const WebViewFeature._internal("POST_WEB_MESSAGE");
+      const WebViewFeature._internal("POST_WEB_MESSAGE");
 
   ///
   static const PROXY_OVERRIDE =
-  const WebViewFeature._internal("PROXY_OVERRIDE");
+      const WebViewFeature._internal("PROXY_OVERRIDE");
 
   ///
   static const RECEIVE_HTTP_ERROR =
-  const WebViewFeature._internal("RECEIVE_HTTP_ERROR");
+      const WebViewFeature._internal("RECEIVE_HTTP_ERROR");
 
   ///
   static const RECEIVE_WEB_RESOURCE_ERROR =
-  const WebViewFeature._internal("RECEIVE_WEB_RESOURCE_ERROR");
+      const WebViewFeature._internal("RECEIVE_WEB_RESOURCE_ERROR");
 
   ///
   static const SAFE_BROWSING_ALLOWLIST =
-  const WebViewFeature._internal("SAFE_BROWSING_ALLOWLIST");
+      const WebViewFeature._internal("SAFE_BROWSING_ALLOWLIST");
 
   ///
   static const SAFE_BROWSING_ENABLE =
-  const WebViewFeature._internal("SAFE_BROWSING_ENABLE");
+      const WebViewFeature._internal("SAFE_BROWSING_ENABLE");
 
   ///
   static const SAFE_BROWSING_HIT =
-  const WebViewFeature._internal("SAFE_BROWSING_HIT");
+      const WebViewFeature._internal("SAFE_BROWSING_HIT");
 
   ///
   static const SAFE_BROWSING_PRIVACY_POLICY_URL =
-  const WebViewFeature._internal("SAFE_BROWSING_PRIVACY_POLICY_URL");
+      const WebViewFeature._internal("SAFE_BROWSING_PRIVACY_POLICY_URL");
 
   ///
   static const SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY =
-  const WebViewFeature._internal(
-      "SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY");
+      const WebViewFeature._internal("SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY");
 
   ///
   static const SAFE_BROWSING_RESPONSE_PROCEED =
-  const WebViewFeature._internal("SAFE_BROWSING_RESPONSE_PROCEED");
+      const WebViewFeature._internal("SAFE_BROWSING_RESPONSE_PROCEED");
 
   ///
   static const SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL =
-  const WebViewFeature._internal(
-      "SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL");
+      const WebViewFeature._internal(
+          "SAFE_BROWSING_RESPONSE_SHOW_INTERSTITIAL");
 
   ///Use [SAFE_BROWSING_ALLOWLIST] instead.
   @Deprecated('Use SAFE_BROWSING_ALLOWLIST instead')
   static const SAFE_BROWSING_WHITELIST =
-  const WebViewFeature._internal("SAFE_BROWSING_WHITELIST");
+      const WebViewFeature._internal("SAFE_BROWSING_WHITELIST");
 
   ///
   static const SERVICE_WORKER_BASIC_USAGE =
-  const WebViewFeature._internal("SERVICE_WORKER_BASIC_USAGE");
+      const WebViewFeature._internal("SERVICE_WORKER_BASIC_USAGE");
 
   ///
   static const SERVICE_WORKER_BLOCK_NETWORK_LOADS =
-  const WebViewFeature._internal(
-      "SERVICE_WORKER_BLOCK_NETWORK_LOADS");
+      const WebViewFeature._internal("SERVICE_WORKER_BLOCK_NETWORK_LOADS");
 
   ///
   static const SERVICE_WORKER_CACHE_MODE =
-  const WebViewFeature._internal("SERVICE_WORKER_CACHE_MODE");
+      const WebViewFeature._internal("SERVICE_WORKER_CACHE_MODE");
 
   ///
   static const SERVICE_WORKER_CONTENT_ACCESS =
-  const WebViewFeature._internal("SERVICE_WORKER_CONTENT_ACCESS");
+      const WebViewFeature._internal("SERVICE_WORKER_CONTENT_ACCESS");
 
   ///
   static const SERVICE_WORKER_FILE_ACCESS =
-  const WebViewFeature._internal("SERVICE_WORKER_FILE_ACCESS");
+      const WebViewFeature._internal("SERVICE_WORKER_FILE_ACCESS");
 
   ///
   static const SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST =
-  const WebViewFeature._internal(
-      "SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
+      const WebViewFeature._internal("SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
 
   ///
   static const SHOULD_OVERRIDE_WITH_REDIRECTS =
-  const WebViewFeature._internal("SHOULD_OVERRIDE_WITH_REDIRECTS");
+      const WebViewFeature._internal("SHOULD_OVERRIDE_WITH_REDIRECTS");
 
   ///
   static const START_SAFE_BROWSING =
-  const WebViewFeature._internal("START_SAFE_BROWSING");
+      const WebViewFeature._internal("START_SAFE_BROWSING");
 
   ///
   static const TRACING_CONTROLLER_BASIC_USAGE =
-  const WebViewFeature._internal("TRACING_CONTROLLER_BASIC_USAGE");
+      const WebViewFeature._internal("TRACING_CONTROLLER_BASIC_USAGE");
 
   ///
   static const VISUAL_STATE_CALLBACK =
-  const WebViewFeature._internal("VISUAL_STATE_CALLBACK");
+      const WebViewFeature._internal("VISUAL_STATE_CALLBACK");
 
   ///
   static const WEB_MESSAGE_CALLBACK_ON_MESSAGE =
-  const WebViewFeature._internal("WEB_MESSAGE_CALLBACK_ON_MESSAGE");
+      const WebViewFeature._internal("WEB_MESSAGE_CALLBACK_ON_MESSAGE");
 
   ///
   static const WEB_MESSAGE_LISTENER =
-  const WebViewFeature._internal("WEB_MESSAGE_LISTENER");
+      const WebViewFeature._internal("WEB_MESSAGE_LISTENER");
 
   ///
   static const WEB_MESSAGE_PORT_CLOSE =
-  const WebViewFeature._internal("WEB_MESSAGE_PORT_CLOSE");
+      const WebViewFeature._internal("WEB_MESSAGE_PORT_CLOSE");
 
   ///
   static const WEB_MESSAGE_PORT_POST_MESSAGE =
-  const WebViewFeature._internal("WEB_MESSAGE_PORT_POST_MESSAGE");
+      const WebViewFeature._internal("WEB_MESSAGE_PORT_POST_MESSAGE");
 
   ///
   static const WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK =
-  const WebViewFeature._internal(
-      "WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK");
+      const WebViewFeature._internal("WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK");
 
   ///
   static const WEB_RESOURCE_ERROR_GET_CODE =
-  const WebViewFeature._internal("WEB_RESOURCE_ERROR_GET_CODE");
+      const WebViewFeature._internal("WEB_RESOURCE_ERROR_GET_CODE");
 
   ///
   static const WEB_RESOURCE_ERROR_GET_DESCRIPTION =
-  const WebViewFeature._internal(
-      "WEB_RESOURCE_ERROR_GET_DESCRIPTION");
+      const WebViewFeature._internal("WEB_RESOURCE_ERROR_GET_DESCRIPTION");
 
   ///
   static const WEB_RESOURCE_REQUEST_IS_REDIRECT =
-  const WebViewFeature._internal("WEB_RESOURCE_REQUEST_IS_REDIRECT");
+      const WebViewFeature._internal("WEB_RESOURCE_REQUEST_IS_REDIRECT");
 
   ///
   static const WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE =
-  const WebViewFeature._internal(
-      "WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE");
+      const WebViewFeature._internal("WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE");
 
   ///
   static const WEB_VIEW_RENDERER_TERMINATE =
-  const WebViewFeature._internal("WEB_VIEW_RENDERER_TERMINATE");
+      const WebViewFeature._internal("WEB_VIEW_RENDERER_TERMINATE");
 
   bool operator ==(value) => value == _value;
 
@@ -257,7 +250,6 @@ class WebViewFeature {
     return await _channel.invokeMethod('isFeatureSupported', args);
   }
 }
-
 
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
 ///Use [WebViewFeature] instead.

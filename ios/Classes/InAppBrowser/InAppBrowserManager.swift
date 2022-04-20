@@ -80,7 +80,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         let contextMenu = arguments["contextMenu"] as! [String: Any]
         let windowId = arguments["windowId"] as? Int64
         let initialUserScripts = arguments["initialUserScripts"] as? [[String: Any]]
-        let pullToRefreshInitialOptions = arguments["pullToRefreshOptions"] as! [String: Any?]
+        let pullToRefreshInitialSettings = arguments["pullToRefreshSettings"] as! [String: Any?]
         
         let webViewController = prepareInAppBrowserWebViewController(settings: settings)
         
@@ -94,7 +94,7 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         webViewController.contextMenu = contextMenu
         webViewController.windowId = windowId
         webViewController.initialUserScripts = initialUserScripts ?? []
-        webViewController.pullToRefreshInitialOptions = pullToRefreshInitialOptions
+        webViewController.pullToRefreshInitialSettings = pullToRefreshInitialSettings
         
         presentViewController(webViewController: webViewController)
     }

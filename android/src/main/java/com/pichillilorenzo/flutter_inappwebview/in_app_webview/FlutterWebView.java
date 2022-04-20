@@ -21,7 +21,7 @@ import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
-import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshOptions;
+import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshSettings;
 import com.pichillilorenzo.flutter_inappwebview.types.PlatformWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
@@ -55,7 +55,7 @@ public class FlutterWebView implements PlatformWebView {
     Map<String, Object> contextMenu = (Map<String, Object>) params.get("contextMenu");
     Integer windowId = (Integer) params.get("windowId");
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) params.get("initialUserScripts");
-    Map<String, Object> pullToRefreshInitialOptions = (Map<String, Object>) params.get("pullToRefreshOptions");
+    Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) params.get("pullToRefreshSettings");
 
     InAppWebViewSettings options = new InAppWebViewSettings();
     options.parse(initialSettings);
@@ -81,9 +81,9 @@ public class FlutterWebView implements PlatformWebView {
       // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
       webView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
       MethodChannel pullToRefreshLayoutChannel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
-      PullToRefreshOptions pullToRefreshOptions = new PullToRefreshOptions();
-      pullToRefreshOptions.parse(pullToRefreshInitialOptions);
-      pullToRefreshLayout = new PullToRefreshLayout(context, pullToRefreshLayoutChannel, pullToRefreshOptions);
+      PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();
+      pullToRefreshSettings.parse(pullToRefreshInitialSettings);
+      pullToRefreshLayout = new PullToRefreshLayout(context, pullToRefreshLayoutChannel, pullToRefreshSettings);
       pullToRefreshLayout.addView(webView);
       pullToRefreshLayout.prepare();
     }

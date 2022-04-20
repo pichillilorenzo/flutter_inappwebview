@@ -33,7 +33,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         let contextMenu = params["contextMenu"] as? [String: Any]
         let windowId = params["windowId"] as? Int64
         let initialUserScripts = params["initialUserScripts"] as? [[String: Any]]
-        let pullToRefreshInitialOptions = params["pullToRefreshOptions"] as! [String: Any?]
+        let pullToRefreshInitialSettings = params["pullToRefreshSettings"] as! [String: Any?]
         
         var userScripts: [UserScript] = []
         if let initialUserScripts = initialUserScripts {
@@ -44,7 +44,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         
         let settings = InAppWebViewSettings()
         let _ = settings.parse(settings: initialSettings)
-        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(options: settings)
+        let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: settings)
         
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
@@ -65,9 +65,9 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         
         let pullToRefreshLayoutChannel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + String(describing: viewId),
                                                               binaryMessenger: registrar.messenger())
-        let pullToRefreshOptions = PullToRefreshSettings()
-        let _ = pullToRefreshOptions.parse(settings: pullToRefreshInitialOptions)
-        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, options: pullToRefreshOptions)
+        let pullToRefreshSettings = PullToRefreshSettings()
+        let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
+        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, settings: pullToRefreshSettings)
         webView!.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView!
         pullToRefreshControl.prepare()

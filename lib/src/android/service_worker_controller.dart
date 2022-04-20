@@ -28,17 +28,15 @@ class ServiceWorkerController {
   }
 
   static Future<dynamic> _handleMethod(MethodCall call) async {
-    ServiceWorkerController controller =
-    ServiceWorkerController.instance();
-    ServiceWorkerClient? serviceWorkerClient =
-        controller.serviceWorkerClient;
+    ServiceWorkerController controller = ServiceWorkerController.instance();
+    ServiceWorkerClient? serviceWorkerClient = controller.serviceWorkerClient;
 
     switch (call.method) {
       case "shouldInterceptRequest":
         if (serviceWorkerClient != null &&
             serviceWorkerClient.shouldInterceptRequest != null) {
           Map<String, dynamic> arguments =
-          call.arguments.cast<String, dynamic>();
+              call.arguments.cast<String, dynamic>();
           WebResourceRequest request = WebResourceRequest.fromMap(arguments)!;
 
           return (await serviceWorkerClient.shouldInterceptRequest!(request))
@@ -164,7 +162,7 @@ class ServiceWorkerClient {
   ///
   ///**NOTE**: available on Android 24+.
   final Future<WebResourceResponse?> Function(WebResourceRequest request)?
-  shouldInterceptRequest;
+      shouldInterceptRequest;
 
   ServiceWorkerClient({this.shouldInterceptRequest});
 }

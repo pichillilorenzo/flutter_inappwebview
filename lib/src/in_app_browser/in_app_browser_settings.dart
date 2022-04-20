@@ -46,7 +46,7 @@ class InAppBrowserClassSettings {
 
   InAppBrowserClassSettings(
       {InAppBrowserSettings? browserSettings,
-        InAppWebViewSettings? webViewSettings}) {
+      InAppWebViewSettings? webViewSettings}) {
     this.browserSettings = browserSettings ?? InAppBrowserSettings();
     this.webViewSettings = webViewSettings ?? InAppWebViewSettings();
   }
@@ -60,7 +60,8 @@ class InAppBrowserClassSettings {
     return options;
   }
 
-  static Map<String, dynamic> instanceToMap(InAppBrowserClassSettings settings) {
+  static Map<String, dynamic> instanceToMap(
+      InAppBrowserClassSettings settings) {
     return settings.toMap();
   }
 
@@ -73,7 +74,8 @@ class InAppBrowserClassSettings {
     return toMap().toString();
   }
 
-  static InAppBrowserClassSettings fromMap(Map<String, dynamic> options, {InAppBrowserClassSettings? instance}) {
+  static InAppBrowserClassSettings fromMap(Map<String, dynamic> options,
+      {InAppBrowserClassSettings? instance}) {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
@@ -88,8 +90,8 @@ class InAppBrowserClassSettings {
 }
 
 ///This class represents all [InAppBrowser] settings available.
-class InAppBrowserSettings implements BrowserOptions, AndroidOptions, IosOptions {
-
+class InAppBrowserSettings
+    implements BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
   ///The default value is `false`.
   ///
@@ -224,25 +226,25 @@ class InAppBrowserSettings implements BrowserOptions, AndroidOptions, IosOptions
 
   InAppBrowserSettings(
       {this.hidden = false,
-        this.hideToolbarTop = false,
-        this.toolbarTopBackgroundColor,
-        this.hideUrlBar = false,
-        this.hideProgressBar = false,
-        this.toolbarTopTranslucent = true,
-        this.toolbarTopTintColor,
-        this.hideToolbarBottom = false,
-        this.toolbarBottomBackgroundColor,
-        this.toolbarBottomTintColor,
-        this.toolbarBottomTranslucent = true,
-        this.closeButtonCaption,
-        this.closeButtonColor,
-        this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-        this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
-        this.hideTitleBar = false,
-        this.toolbarTopFixedTitle,
-        this.closeOnCannotGoBack = true,
-        this.allowGoBackWithBackButton = true,
-        this.shouldCloseOnBackButtonPressed = false});
+      this.hideToolbarTop = false,
+      this.toolbarTopBackgroundColor,
+      this.hideUrlBar = false,
+      this.hideProgressBar = false,
+      this.toolbarTopTranslucent = true,
+      this.toolbarTopTintColor,
+      this.hideToolbarBottom = false,
+      this.toolbarBottomBackgroundColor,
+      this.toolbarBottomTintColor,
+      this.toolbarBottomTranslucent = true,
+      this.closeButtonCaption,
+      this.closeButtonColor,
+      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+      this.hideTitleBar = false,
+      this.toolbarTopFixedTitle,
+      this.closeOnCannotGoBack = true,
+      this.allowGoBackWithBackButton = true,
+      this.shouldCloseOnBackButtonPressed = false});
 
   @override
   Map<String, dynamic> toMap() {
@@ -282,9 +284,11 @@ class InAppBrowserSettings implements BrowserOptions, AndroidOptions, IosOptions
     instance.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
     instance.closeOnCannotGoBack = map["closeOnCannotGoBack"];
     instance.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
-    instance.shouldCloseOnBackButtonPressed = map["shouldCloseOnBackButtonPressed"];
+    instance.shouldCloseOnBackButtonPressed =
+        map["shouldCloseOnBackButtonPressed"];
     instance.toolbarTopTranslucent = map["toolbarTopTranslucent"];
-    instance.toolbarTopTintColor = UtilColor.fromHex(map["toolbarTopTintColor"]);
+    instance.toolbarTopTintColor =
+        UtilColor.fromHex(map["toolbarTopTintColor"]);
     instance.hideToolbarBottom = map["hideToolbarBottom"];
     instance.toolbarBottomBackgroundColor =
         UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
@@ -294,9 +298,9 @@ class InAppBrowserSettings implements BrowserOptions, AndroidOptions, IosOptions
     instance.closeButtonCaption = map["closeButtonCaption"];
     instance.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
     instance.presentationStyle =
-    ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+        ModalPresentationStyle.fromValue(map["presentationStyle"])!;
     instance.transitionStyle =
-    ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+        ModalTransitionStyle.fromValue(map["transitionStyle"])!;
     return instance;
   }
 

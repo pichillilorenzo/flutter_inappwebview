@@ -6,7 +6,6 @@ import '_static_channel.dart';
 import 'android/web_storage_manager.dart';
 import 'ios/web_storage_manager.dart';
 
-
 import '../types.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the web storage used by WebView instances.
@@ -48,8 +47,8 @@ class WebStorageManager {
 
     Map<String, dynamic> args = <String, dynamic>{};
     List<Map<dynamic, dynamic>> origins =
-    (await _staticChannel.invokeMethod('getOrigins', args))
-        .cast<Map<dynamic, dynamic>>();
+        (await _staticChannel.invokeMethod('getOrigins', args))
+            .cast<Map<dynamic, dynamic>>();
 
     for (var origin in origins) {
       originsList.add(WebStorageOrigin(
@@ -121,8 +120,8 @@ class WebStorageManager {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
     List<Map<dynamic, dynamic>> records =
-    (await _staticChannel.invokeMethod('fetchDataRecords', args))
-        .cast<Map<dynamic, dynamic>>();
+        (await _staticChannel.invokeMethod('fetchDataRecords', args))
+            .cast<Map<dynamic, dynamic>>();
     for (var record in records) {
       List<String> dataTypesString = record["dataTypes"].cast<String>();
       Set<WebsiteDataType> dataTypes = Set();
@@ -148,7 +147,7 @@ class WebStorageManager {
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
   Future<void> removeDataFor(
       {required Set<WebsiteDataType> dataTypes,
-        required List<WebsiteDataRecord> dataRecords}) async {
+      required List<WebsiteDataRecord> dataRecords}) async {
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
       dataTypesList.add(dataType.toValue());
@@ -174,8 +173,7 @@ class WebStorageManager {
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   Future<void> removeDataModifiedSince(
-      {required Set<WebsiteDataType> dataTypes,
-        required DateTime date}) async {
+      {required Set<WebsiteDataType> dataTypes, required DateTime date}) async {
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
       dataTypesList.add(dataType.toValue());

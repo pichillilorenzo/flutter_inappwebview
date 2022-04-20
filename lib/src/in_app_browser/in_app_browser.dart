@@ -107,14 +107,21 @@ class InAppBrowser {
   ///[settings]: Settings for the [InAppBrowser].
   Future<void> openUrlRequest(
       {required URLRequest urlRequest,
-        // ignore: deprecated_member_use_from_same_package
-        @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
-        InAppBrowserClassSettings? settings}) async {
+      // ignore: deprecated_member_use_from_same_package
+      @Deprecated('Use settings instead') InAppBrowserClassOptions? options,
+      InAppBrowserClassSettings? settings}) async {
     this.throwIfAlreadyOpened(message: 'Cannot open $urlRequest!');
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
 
-    var initialSettings = settings?.toMap() ?? options?.toMap() ??
+    var initialSettings = settings?.toMap() ??
+        options?.toMap() ??
         InAppBrowserClassSettings().toMap();
+
+    Map<String, dynamic> pullToRefreshSettings =
+        pullToRefreshController?.settings.toMap() ??
+            // ignore: deprecated_member_use_from_same_package
+            pullToRefreshController?.options.toMap() ??
+            PullToRefreshSettings(enabled: false).toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
@@ -125,11 +132,7 @@ class InAppBrowser {
     args.putIfAbsent('implementation', () => implementation.toValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    args.putIfAbsent(
-        'pullToRefreshOptions',
-        () =>
-            pullToRefreshController?.options.toMap() ??
-            PullToRefreshOptions(enabled: false).toMap());
+    args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     await _sharedChannel.invokeMethod('open', args);
   }
 
@@ -178,8 +181,15 @@ class InAppBrowser {
     this.throwIfAlreadyOpened(message: 'Cannot open $assetFilePath!');
     assert(assetFilePath.isNotEmpty);
 
-    var initialSettings = settings?.toMap() ?? options?.toMap() ??
+    var initialSettings = settings?.toMap() ??
+        options?.toMap() ??
         InAppBrowserClassSettings().toMap();
+
+    Map<String, dynamic> pullToRefreshSettings =
+        pullToRefreshController?.settings.toMap() ??
+            // ignore: deprecated_member_use_from_same_package
+            pullToRefreshController?.options.toMap() ??
+            PullToRefreshSettings(enabled: false).toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
@@ -190,11 +200,7 @@ class InAppBrowser {
     args.putIfAbsent('implementation', () => implementation.toValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    args.putIfAbsent(
-        'pullToRefreshOptions',
-        () =>
-            pullToRefreshController?.options.toMap() ??
-            PullToRefreshOptions(enabled: false).toMap());
+    args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     await _sharedChannel.invokeMethod('open', args);
   }
 
@@ -221,8 +227,15 @@ class InAppBrowser {
       InAppBrowserClassSettings? settings}) async {
     this.throwIfAlreadyOpened(message: 'Cannot open data!');
 
-    var initialSettings = settings?.toMap() ?? options?.toMap() ??
+    var initialSettings = settings?.toMap() ??
+        options?.toMap() ??
         InAppBrowserClassSettings().toMap();
+
+    Map<String, dynamic> pullToRefreshSettings =
+        pullToRefreshController?.settings.toMap() ??
+            // ignore: deprecated_member_use_from_same_package
+            pullToRefreshController?.options.toMap() ??
+            PullToRefreshSettings(enabled: false).toMap();
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
@@ -231,18 +244,14 @@ class InAppBrowser {
     args.putIfAbsent('mimeType', () => mimeType);
     args.putIfAbsent('encoding', () => encoding);
     args.putIfAbsent('baseUrl', () => baseUrl?.toString() ?? "about:blank");
-    args.putIfAbsent(
-        'historyUrl', () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank");
+    args.putIfAbsent('historyUrl',
+        () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank");
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
     args.putIfAbsent('implementation', () => implementation.toValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
-    args.putIfAbsent(
-        'pullToRefreshOptions',
-        () =>
-            pullToRefreshController?.options.toMap() ??
-            PullToRefreshOptions(enabled: false).toMap());
+    args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
     await _sharedChannel.invokeMethod('open', args);
   }
 
@@ -309,7 +318,8 @@ class InAppBrowser {
   }
 
   ///Sets the [InAppBrowser] settings with the new [settings] and evaluates them.
-  Future<void> setSettings({required InAppBrowserClassSettings settings}) async {
+  Future<void> setSettings(
+      {required InAppBrowserClassSettings settings}) async {
     this.throwIfNotOpened();
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -323,10 +333,11 @@ class InAppBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
 
     Map<dynamic, dynamic>? settings =
-    await _channel.invokeMethod('getSettings', args);
+        await _channel.invokeMethod('getSettings', args);
     if (settings != null) {
       settings = settings.cast<String, dynamic>();
-      return InAppBrowserClassSettings.fromMap(settings as Map<String, dynamic>);
+      return InAppBrowserClassSettings.fromMap(
+          settings as Map<String, dynamic>);
     }
 
     return null;
@@ -802,7 +813,7 @@ class InAppBrowser {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onGeolocationPermissionsShowPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onGeolocationPermissionsShowPrompt(java.lang.String,%20android.webkit.GeolocationPermissions.Callback)))
   Future<GeolocationPermissionShowPromptResponse?>?
-    onGeolocationPermissionsShowPrompt(String origin) {}
+      onGeolocationPermissionsShowPrompt(String origin) {}
 
   ///Use [onGeolocationPermissionsHidePrompt] instead.
   @Deprecated("Use onGeolocationPermissionsHidePrompt instead")
@@ -863,8 +874,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessUnresponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
-  Future<WebViewRenderProcessAction?>? onRenderProcessUnresponsive(
-      Uri? url) {}
+  Future<WebViewRenderProcessAction?>? onRenderProcessUnresponsive(Uri? url) {}
 
   ///Use [onRenderProcessResponsive] instead.
   @Deprecated("Use onRenderProcessResponsive instead")
@@ -883,8 +893,7 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessResponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
-  Future<WebViewRenderProcessAction?>? onRenderProcessResponsive(
-      Uri? url) {}
+  Future<WebViewRenderProcessAction?>? onRenderProcessResponsive(Uri? url) {}
 
   ///Use [onRenderProcessGone] instead.
   @Deprecated("Use onRenderProcessGone instead")
@@ -928,7 +937,6 @@ class InAppBrowser {
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedIcon](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedIcon(android.webkit.WebView,%20android.graphics.Bitmap)))
   void onReceivedIcon(Uint8List icon) {}
 
-
   ///Use [onReceivedTouchIconUrl] instead.
   @Deprecated('Use onReceivedTouchIconUrl instead')
   void androidOnReceivedTouchIconUrl(Uri url, bool precomposed) {}
@@ -942,7 +950,6 @@ class InAppBrowser {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTouchIconUrl](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)))
   void onReceivedTouchIconUrl(Uri url, bool precomposed) {}
-
 
   ///Use [onJsBeforeUnload] instead.
   @Deprecated('Use onJsBeforeUnload instead')

@@ -76,7 +76,8 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
   static IOSInAppBrowserOptions fromMap(Map<String, dynamic> map) {
     var instance = IOSInAppBrowserOptions();
     instance.toolbarTopTranslucent = map["toolbarTopTranslucent"];
-    instance.toolbarTopTintColor = UtilColor.fromHex(map["toolbarTopTintColor"]);
+    instance.toolbarTopTintColor =
+        UtilColor.fromHex(map["toolbarTopTintColor"]);
     instance.hideToolbarBottom = map["hideToolbarBottom"];
     instance.toolbarBottomBackgroundColor =
         UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);

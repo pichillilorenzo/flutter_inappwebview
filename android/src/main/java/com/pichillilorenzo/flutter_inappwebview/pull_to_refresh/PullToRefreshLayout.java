@@ -21,9 +21,9 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements MethodCha
   static final String LOG_TAG = "PullToRefreshLayout";
   
   public MethodChannel channel;
-  public PullToRefreshOptions options;
+  public PullToRefreshSettings options;
 
-  public PullToRefreshLayout(@NonNull Context context, @NonNull MethodChannel channel, @NonNull PullToRefreshOptions options) {
+  public PullToRefreshLayout(@NonNull Context context, @NonNull MethodChannel channel, @NonNull PullToRefreshSettings options) {
     super(context);
     this.channel = channel;
     this.options = options;

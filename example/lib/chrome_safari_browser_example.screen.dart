@@ -64,17 +64,15 @@ class _ChromeSafariBrowserExampleScreenState
               onPressed: () async {
                 await widget.browser.open(
                     url: Uri.parse("https://flutter.dev/"),
-                    options: ChromeSafariBrowserClassOptions(
-                        android: AndroidChromeCustomTabsOptions(
-                            shareState: CustomTabsShareState.SHARE_STATE_OFF,
-                            isSingleInstance: false,
-                            isTrustedWebActivity: false,
-                            keepAliveEnabled: true),
-                        ios: IOSSafariOptions(
-                            dismissButtonStyle:
-                                IOSSafariDismissButtonStyle.CLOSE,
-                            presentationStyle:
-                                IOSUIModalPresentationStyle.OVER_FULL_SCREEN)));
+                    settings: ChromeSafariBrowserSettings(
+                        shareState: CustomTabsShareState.SHARE_STATE_OFF,
+                        isSingleInstance: false,
+                        isTrustedWebActivity: false,
+                        keepAliveEnabled: true,
+                        dismissButtonStyle: DismissButtonStyle.CLOSE,
+                        presentationStyle:
+                        ModalPresentationStyle.OVER_FULL_SCREEN
+                    ));
               },
               child: Text("Open Chrome Safari Browser")),
         ));

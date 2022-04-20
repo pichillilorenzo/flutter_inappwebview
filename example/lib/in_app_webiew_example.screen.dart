@@ -70,7 +70,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
         });
 
     pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
+      settings: PullToRefreshSettings(
         color: Colors.blue,
       ),
       onRefresh: () async {
@@ -132,7 +132,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         urlController.text = this.url;
                       });
                     },
-                    androidOnPermissionRequest: (controller, origin, resources) async {
+                    onPermissionRequest: (controller, origin, resources) async {
                       return PermissionRequestResponse(
                           resources: resources,
                           action: PermissionRequestResponseAction.GRANT);

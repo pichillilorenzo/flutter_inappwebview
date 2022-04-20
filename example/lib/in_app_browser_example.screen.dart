@@ -91,7 +91,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
     super.initState();
 
     pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
+      settings: PullToRefreshSettings(
         color: Colors.black,
       ),
       onRefresh: () async {

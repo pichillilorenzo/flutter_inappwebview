@@ -20,18 +20,18 @@ Future main() async {
   // await Permission.storage.request();
 
   if (Platform.isAndroid) {
-    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    await InAppWebViewController.setWebContentsDebuggingEnabled(true);
 
-    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
-        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
-        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+    var swAvailable = await WebViewFeature.isFeatureSupported(
+        WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+    var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
+        WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
 
     if (swAvailable && swInterceptAvailable) {
-      AndroidServiceWorkerController serviceWorkerController =
-          AndroidServiceWorkerController.instance();
+      ServiceWorkerController serviceWorkerController =
+          ServiceWorkerController.instance();
 
-      serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
+      serviceWorkerController.serviceWorkerClient = ServiceWorkerClient(
         shouldInterceptRequest: (request) async {
           print(request);
           return null;

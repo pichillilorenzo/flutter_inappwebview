@@ -75,8 +75,7 @@ class InAppWebViewController
 
   InAppWebViewController(dynamic id, WebView webview) {
     this._id = id;
-    this._channel =
-        MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
+    this._channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
     this._webview = webview;
     this._userScripts =
@@ -2103,7 +2102,7 @@ class InAppWebViewController
   }
 
   ///Gets the URL that was originally requested for the current page.
-  ///This is not always the same as the URL passed to [InAppWebView.onLoadStarted] because although the load for that URL has begun,
+  ///This is not always the same as the URL passed to [InAppWebView.onLoadStart] because although the load for that URL has begun,
   ///the current page may not have changed. Also, there may have been redirects resulting in a different URL to that originally requested.
   ///
   ///**Supported Platforms/Implementations**:
@@ -2781,7 +2780,7 @@ class InAppWebViewController
   /// // Flutter App
   /// child: InAppWebView(
   ///   onWebViewCreated: (controller) async {
-  ///     if (!Platform.isAndroid || await WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
+  ///     if (defaultTargetPlatform != TargetPlatform.android || await WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
   ///       await controller.addWebMessageListener(WebMessageListener(
   ///         jsObjectName: "myObject",
   ///         onPostMessage: (message, sourceOrigin, isMainFrame, replyProxy) {
@@ -2832,6 +2831,15 @@ class InAppWebViewController
   Future<bool> canScrollHorizontally() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canScrollHorizontally', args);
+  }
+
+  ///Returns the iframe `id` attribute used on the Web platform.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  Future<String?> getIFrameId() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('getIFrameId', args);
   }
 
   ///Gets the default user agent.
@@ -2947,5 +2955,15 @@ class InAppWebViewController
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlScheme', () => urlScheme);
     return await _staticChannel.invokeMethod('handlesURLScheme', args);
+  }
+
+  ///Used internally.
+  MethodChannel getChannel() {
+    return _channel;
+  }
+
+  ///Used internally.
+  int getViewId() {
+    return _id;
   }
 }

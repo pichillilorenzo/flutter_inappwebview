@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -281,7 +280,7 @@ class InAppBrowserSettings
         UtilColor.fromHex(map["toolbarTopBackgroundColor"]);
     settings.hideUrlBar = map["hideUrlBar"];
     settings.hideProgressBar = map["hideProgressBar"];
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       settings.hideTitleBar = map["hideTitleBar"];
       settings.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
       settings.closeOnCannotGoBack = map["closeOnCannotGoBack"];
@@ -289,7 +288,7 @@ class InAppBrowserSettings
       settings.shouldCloseOnBackButtonPressed =
       map["shouldCloseOnBackButtonPressed"];
     }
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       settings.toolbarTopTranslucent = map["toolbarTopTranslucent"];
       settings.toolbarTopTintColor =
           UtilColor.fromHex(map["toolbarTopTintColor"]);

@@ -14,6 +14,8 @@ dependencies:
 dev_dependencies:
   flutter_test:
     sdk: flutter
+  flutter_web_plugins:
+    sdk: flutter
   pedantic: ^1.11.1
 
 # For information on the generic Dart part of this file, see the
@@ -28,6 +30,10 @@ flutter:
         pluginClass: InAppWebViewFlutterPlugin
       ios:
         pluginClass: InAppWebViewFlutterPlugin
+      web:
+        pluginClass: FlutterInAppWebViewWebPlatform
+        fileName: flutter_inappwebview_web.dart
+
 
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html

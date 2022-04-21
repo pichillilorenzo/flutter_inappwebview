@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -996,6 +995,56 @@ class InAppWebViewSettings
   ///- iOS
   bool upgradeKnownHostsToHTTPS;
 
+  ///Specifies a feature policy for the iframe. A list of origins the frame is allowed to display content from.
+  ///This attribute also accepts the values `self` and `src` which represent the origin in the iframe's src attribute.
+  ///The default value is `src`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeAllow;
+
+  ///A boolean value indicating whether the inline frame is willing to be placed into full screen mode.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  bool? iframeAllowFullscreen;
+
+  ///A DOMTokenList that reflects the sandbox HTML attribute, indicating extra restrictions on the behavior of the nested content.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeSandox;
+
+  ///A string that reflects the width HTML attribute, indicating the width of the frame.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeWidth;
+
+  ///A string that reflects the height HTML attribute, indicating the height of the frame.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeHeight;
+
+  ///A string that reflects the `referrerpolicy` HTML attribute indicating which referrer to use when fetching the linked resource.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeReferrerPolicy;
+
+  ///A string that reflects the `name` HTML attribute, containing a name by which to refer to the frame.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeName;
+
+  ///Specifies the Content Security Policy that an embedded document must agree to enforce upon itself.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Web
+  String? iframeCsp;
+
   InAppWebViewSettings(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
@@ -1115,7 +1164,15 @@ class InAppWebViewSettings
       this.underPageBackgroundColor,
       this.isTextInteractionEnabled = true,
       this.isSiteSpecificQuirksModeEnabled = true,
-      this.upgradeKnownHostsToHTTPS = true}) {
+      this.upgradeKnownHostsToHTTPS = true,
+      this.iframeAllow,
+      this.iframeAllowFullscreen,
+      this.iframeSandox,
+      this.iframeWidth,
+      this.iframeHeight,
+      this.iframeReferrerPolicy,
+      this.iframeName,
+      this.iframeCsp,}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize =
           defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
@@ -1257,7 +1314,15 @@ class InAppWebViewSettings
       "underPageBackgroundColor": underPageBackgroundColor?.toHex(),
       "isTextInteractionEnabled": isTextInteractionEnabled,
       "isSiteSpecificQuirksModeEnabled": isSiteSpecificQuirksModeEnabled,
-      "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS
+      "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
+      "iframeAllow": iframeAllow,
+      "iframeAllowFullscreen": iframeAllowFullscreen,
+      "iframeSandox": iframeSandox,
+      "iframeWidth": iframeWidth,
+      "iframeHeight": iframeHeight,
+      "iframeReferrerPolicy": iframeReferrerPolicy,
+      "iframeName": iframeName,
+      "iframeCsp": iframeCsp,
     };
   }
 
@@ -1314,7 +1379,17 @@ class InAppWebViewSettings
     settings.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
     settings.allowUniversalAccessFromFileURLs =
         map["allowUniversalAccessFromFileURLs"];
-    if (Platform.isAndroid) {
+    if (kIsWeb) {
+      settings.iframeAllow = map["iframeAllow"];
+      settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
+      settings.iframeSandox = map["iframeSandox"];
+      settings.iframeWidth = map["iframeWidth"];
+      settings.iframeHeight = map["iframeHeight"];
+      settings.iframeReferrerPolicy = map["iframeReferrerPolicy"];
+      settings.iframeName = map["iframeName"];
+      settings.iframeCsp = map["iframeCsp"];
+    }
+    if (defaultTargetPlatform == TargetPlatform.android) {
       settings.textZoom = map["textZoom"];
       settings.clearSessionCache = map["clearSessionCache"];
       settings.builtInZoomControls = map["builtInZoomControls"];
@@ -1382,7 +1457,7 @@ class InAppWebViewSettings
       settings.horizontalScrollbarTrackColor =
           UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
     }
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       settings.disallowOverScroll = map["disallowOverScroll"];
       settings.enableViewportScale = map["enableViewportScale"];
       settings.suppressesIncrementalRendering =

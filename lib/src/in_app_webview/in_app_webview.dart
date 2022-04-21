@@ -9,6 +9,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 
+import '../web/web_platform_manager.dart';
+
 import '../context_menu.dart';
 import '../types.dart';
 
@@ -29,6 +31,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
   ///The window id of a [CreateWindowAction.windowId].
+  @override
   final int? windowId;
 
   const InAppWebView({
@@ -537,7 +540,21 @@ class _InAppWebViewState extends State<InAppWebView> {
             widget.pullToRefreshController?.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
-    if (defaultTargetPlatform == TargetPlatform.android) {
+    if (kIsWeb) {
+      return HtmlElementView(
+        viewType: 'com.pichillilorenzo/flutter_inappwebview',
+        onPlatformViewCreated: (int viewId) {
+          var webViewHtmlElement = WebPlatformManager.webViews[viewId]!;
+          webViewHtmlElement.initialSettings = widget.initialSettings;
+          webViewHtmlElement.initialUrlRequest = widget.initialUrlRequest;
+          webViewHtmlElement.initialFile = widget.initialFile;
+          webViewHtmlElement.initialData = widget.initialData;
+          webViewHtmlElement.prepare();
+          webViewHtmlElement.makeInitialLoad();
+          _onPlatformViewCreated(viewId);
+        },
+      );
+    } else if (defaultTargetPlatform == TargetPlatform.android) {
       var useHybridComposition = (widget.initialSettings != null
               ? widget.initialSettings?.useHybridComposition
               :
@@ -642,6 +659,10 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   void dispose() {
+    int viewId = _controller.getViewId();
+    if (kIsWeb && WebPlatformManager.webViews.containsKey(viewId)) {
+      WebPlatformManager.webViews.remove(viewId);
+    }
     super.dispose();
   }
 

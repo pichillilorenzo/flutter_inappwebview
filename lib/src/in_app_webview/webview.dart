@@ -791,12 +791,27 @@ abstract class WebView {
   ///Initial url request that will be loaded.
   ///
   ///**NOTE for Android**: when loading an URL Request using "POST" method, headers are ignored.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   final URLRequest? initialUrlRequest;
 
   ///Initial asset file that will be loaded. See [InAppWebViewController.loadFile] for explanation.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   final String? initialFile;
 
   ///Initial [InAppWebViewInitialData] that will be loaded.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   final InAppWebViewInitialData? initialData;
 
   ///Use [initialSettings] instead.
@@ -804,9 +819,18 @@ abstract class WebView {
   final InAppWebViewGroupOptions? initialOptions;
 
   ///Initial settings that will be used.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   final InAppWebViewSettings? initialSettings;
 
   ///Context menu which contains custom menu items to be shown when [ContextMenu] is presented.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   final ContextMenu? contextMenu;
 
   ///Initial list of user scripts to be loaded at start or end of a page loading.
@@ -816,11 +840,19 @@ abstract class WebView {
   ///**NOTE for iOS**: this property will be ignored if the [WebView.windowId] has been set.
   ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
   ///This is a limitation of the native iOS WebKit APIs.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
   ///Represents the pull-to-refresh feature controller.
   ///
   ///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   final PullToRefreshController? pullToRefreshController;
 
   ///Represents the WebView native implementation to be used.

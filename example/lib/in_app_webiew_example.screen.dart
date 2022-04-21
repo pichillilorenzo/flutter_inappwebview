@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:io';
 // import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 // import 'package:path_provider/path_provider.dart';
@@ -28,7 +29,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       allowsInlineMediaPlayback: true
   );
 
-  late PullToRefreshController pullToRefreshController;
+  PullToRefreshController? pullToRefreshController;
   late ContextMenu contextMenu;
   String url = "";
   double progress = 0;
@@ -69,7 +70,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               contextMenuItemClicked.title);
         });
 
-    pullToRefreshController = PullToRefreshController(
+    pullToRefreshController = !kIsWeb ? PullToRefreshController(
       settings: PullToRefreshSettings(
         color: Colors.blue,
       ),
@@ -81,7 +82,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               urlRequest: URLRequest(url: await webViewController?.getUrl()));
         }
       },
-    );
+    ) : null;
   }
 
   @override
@@ -118,7 +119,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrlRequest:
-                    URLRequest(url: Uri.parse("http://github.com/flutter/")),
+                    URLRequest(url: Uri.parse("http://flutter.dev/")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,
@@ -162,18 +163,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       return NavigationActionPolicy.ALLOW;
                     },
                     onLoadStop: (controller, url) async {
-                      pullToRefreshController.endRefreshing();
+                      pullToRefreshController?.endRefreshing();
                       setState(() {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
                     },
                     onLoadError: (controller, url, code, message) {
-                      pullToRefreshController.endRefreshing();
+                      pullToRefreshController?.endRefreshing();
                     },
                     onProgressChanged: (controller, progress) {
                       if (progress == 100) {
-                        pullToRefreshController.endRefreshing();
+                        pullToRefreshController?.endRefreshing();
                       }
                       setState(() {
                         this.progress = progress / 100;
@@ -190,7 +191,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       print(consoleMessage);
                     },
                   ),
-                  progress < 1.0
+                  !kIsWeb && progress < 1.0
                       ? LinearProgressIndicator(value: progress)
                       : Container(),
                 ],

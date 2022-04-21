@@ -1,4 +1,3 @@
-import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
@@ -227,7 +226,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
 
   static ChromeSafariBrowserSettings fromMap(Map<String, dynamic> map) {
     ChromeSafariBrowserSettings settings = new ChromeSafariBrowserSettings();
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       settings.shareState = map["shareState"];
       settings.showTitle = map["showTitle"];
       settings.toolbarBackgroundColor =
@@ -252,7 +251,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       }
       settings.screenOrientation = map["screenOrientation"];
     }
-    if (Platform.isIOS || Platform.isMacOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       settings.entersReaderIfAvailable = map["entersReaderIfAvailable"];
       settings.barCollapsingEnabled = map["barCollapsingEnabled"];
       settings.dismissButtonStyle =

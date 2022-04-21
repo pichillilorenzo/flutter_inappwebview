@@ -131,7 +131,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
-                      print((await controller.getSettings())?.upgradeKnownHostsToHTTPS);
                     },
                     onPermissionRequest: (controller, origin, resources) async {
                       return PermissionRequestResponse(
@@ -168,7 +167,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
-                      print((await controller.getSettings())?.upgradeKnownHostsToHTTPS);
                     },
                     onLoadError: (controller, url, code, message) {
                       pullToRefreshController.endRefreshing();

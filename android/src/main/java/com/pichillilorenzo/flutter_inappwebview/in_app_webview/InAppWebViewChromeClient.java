@@ -1113,6 +1113,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       Map<String, Object> obj = new HashMap<>();
       obj.put("origin", request.getOrigin().toString());
       obj.put("resources", Arrays.asList(request.getResources()));
+      obj.put("frame", null);
       channel.invokeMethod("onPermissionRequest", obj, new MethodChannel.Result() {
         @Override
         public void success(Object response) {

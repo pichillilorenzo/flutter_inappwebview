@@ -796,8 +796,8 @@ class InAppBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
-  Future<PermissionRequestResponse?>? onPermissionRequest(
-      String origin, List<String> resources) {}
+  Future<PermissionResponse?>? onPermissionRequest(
+      PermissionRequest permissionRequest) {}
 
   ///Use [onGeolocationPermissionsShowPrompt] instead.
   @Deprecated("Use onGeolocationPermissionsShowPrompt instead")

@@ -570,8 +570,8 @@ class HeadlessInAppWebView implements WebView {
       NavigationResponse navigationResponse)? onNavigationResponse;
 
   @override
-  Future<PermissionRequestResponse?> Function(InAppWebViewController controller,
-      String origin, List<String> resources)? onPermissionRequest;
+  Future<PermissionResponse?> Function(InAppWebViewController controller,
+      PermissionRequest permissionRequest)? onPermissionRequest;
 
   @override
   void Function(InAppWebViewController controller, Uint8List icon)?

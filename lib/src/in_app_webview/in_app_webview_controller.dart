@@ -731,10 +731,15 @@ class InAppWebViewController
           String origin = call.arguments["origin"];
           List<String> resources = call.arguments["resources"].cast<String>();
 
+          Map<String, dynamic> arguments =
+            call.arguments.cast<String, dynamic>();
+          PermissionRequest permissionRequest =
+            PermissionRequest.fromMap(arguments)!;
+
           if (_webview != null) {
             if (_webview!.onPermissionRequest != null)
               return (await _webview!.onPermissionRequest!(
-                      this, origin, resources))
+                      this, permissionRequest))
                   ?.toMap();
             else {
               // ignore: deprecated_member_use_from_same_package
@@ -743,12 +748,11 @@ class InAppWebViewController
                   ?.toMap();
             }
           } else {
-            return ((await _inAppBrowser!
-                        .onPermissionRequest(origin, resources)) ??
+            return (await _inAppBrowser!
+                        .onPermissionRequest(permissionRequest))?.toMap() ??
                     (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
-                        .androidOnPermissionRequest(origin, resources)))
-                ?.toMap();
+                        .androidOnPermissionRequest(origin, resources))?.toMap();
           }
         }
         break;

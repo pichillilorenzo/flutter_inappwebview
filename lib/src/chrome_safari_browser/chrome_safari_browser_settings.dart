@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 
 import '../util.dart';
 import 'android/chrome_custom_tabs_options.dart';
-import 'ios/safari_options.dart';
+import 'apple/safari_options.dart';
 import '../types.dart';
 
 class ChromeSafariBrowserOptions {

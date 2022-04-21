@@ -10,7 +10,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
 import 'android/in_app_webview_controller.dart';
-import 'ios/in_app_webview_controller.dart';
+import 'apple/in_app_webview_controller.dart';
 
 import '../context_menu.dart';
 import '../types.dart';
@@ -2295,12 +2295,27 @@ class InAppWebViewController
   ///Returns an instance of [Color] representing the `content` value of the
   ///`<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
   ///
-  ///**NOTE**: It is implemented using JavaScript.
+  ///**NOTE**: on Android and iOS < 15.0, it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ///- iOS
+  ///- iOS ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor))
   Future<Color?> getMetaThemeColor() async {
+    Color? themeColor;
+
+    try {
+      Map<String, dynamic> args = <String, dynamic>{};
+      themeColor = UtilColor.fromStringRepresentation(await _channel.invokeMethod('getMetaThemeColor', args));
+    } catch (e) {
+      // not implemented
+    }
+
+    if (themeColor != null) {
+      return themeColor;
+    }
+
+    // try using javascript
+
     var metaTags = await getMetaTags();
     MetaTag? metaTagThemeColor;
 
@@ -2317,9 +2332,11 @@ class InAppWebViewController
 
     var colorValue = metaTagThemeColor.content;
 
-    return colorValue != null
+    themeColor = colorValue != null
         ? UtilColor.fromStringRepresentation(colorValue)
         : null;
+
+    return themeColor;
   }
 
   ///Returns the scrolled left position of the current WebView.

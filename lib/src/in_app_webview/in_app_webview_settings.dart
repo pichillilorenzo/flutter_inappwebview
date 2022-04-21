@@ -4,7 +4,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 
 import 'android/in_app_webview_options.dart';
-import 'ios/in_app_webview_options.dart';
+import 'apple/in_app_webview_options.dart';
 import '../content_blocker.dart';
 import '../types.dart';
 import '../util.dart';
@@ -956,6 +956,46 @@ class InAppWebViewSettings
   ///- iOS
   bool disableInputAccessoryView;
 
+  ///The color the web view displays behind the active page, visible when the user scrolls beyond the bounds of the page.
+  ///
+  ///The web view derives the default value of this property from the content of the page,
+  ///using the background colors of the `<html>` and `<body>` elements with the background color of the web view.
+  ///To override the default color, set this property to a new color.
+  ///
+  ///**NOTE**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  Color? underPageBackgroundColor;
+
+  ///A Boolean value indicating whether text interaction is enabled or not.
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 14.5+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  bool isTextInteractionEnabled;
+
+  ///A Boolean value indicating whether WebKit will apply built-in workarounds (quirks)
+  ///to improve compatibility with certain known websites. You can disable site-specific quirks
+  ///to help test your website without these workarounds. The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  bool isSiteSpecificQuirksModeEnabled;
+
+  ///A Boolean value indicating whether HTTP requests to servers known to support HTTPS should be automatically upgraded to HTTPS requests.
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 14.5+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  bool upgradeKnownHostsToHTTPS;
+
   InAppWebViewSettings(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
@@ -1071,7 +1111,11 @@ class InAppWebViewSettings
       this.applePayAPIEnabled = false,
       this.allowingReadAccessTo,
       this.disableLongPressContextMenuOnLinks = false,
-      this.disableInputAccessoryView = false}) {
+      this.disableInputAccessoryView = false,
+      this.underPageBackgroundColor,
+      this.isTextInteractionEnabled = true,
+      this.isSiteSpecificQuirksModeEnabled = true,
+      this.upgradeKnownHostsToHTTPS = true}) {
     if (this.minimumFontSize == null)
       this.minimumFontSize =
           defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
@@ -1210,6 +1254,10 @@ class InAppWebViewSettings
       "allowingReadAccessTo": allowingReadAccessTo.toString(),
       "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
       "disableInputAccessoryView": disableInputAccessoryView,
+      "underPageBackgroundColor": underPageBackgroundColor?.toHex(),
+      "isTextInteractionEnabled": isTextInteractionEnabled,
+      "isSiteSpecificQuirksModeEnabled": isSiteSpecificQuirksModeEnabled,
+      "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS
     };
   }
 
@@ -1382,6 +1430,10 @@ class InAppWebViewSettings
       settings.disableLongPressContextMenuOnLinks =
       map["disableLongPressContextMenuOnLinks"];
       settings.disableInputAccessoryView = map["disableInputAccessoryView"];
+      settings.underPageBackgroundColor = UtilColor.fromHex(map["underPageBackgroundColor"]);
+      settings.isTextInteractionEnabled = map["isTextInteractionEnabled"];
+      settings.isSiteSpecificQuirksModeEnabled = map["isSiteSpecificQuirksModeEnabled"];
+      settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
     }
     return settings;
   }

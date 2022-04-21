@@ -567,7 +567,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 }
                 break
             case "closeAllMediaPresentations":
-            if let webView = self.webView, #available(iOS 14.5, *) {
+                if let webView = self.webView, #available(iOS 14.5, *) {
                     // closeAllMediaPresentations with completionHandler v15.0 makes the app crash
                     // with error EXC_BAD_ACCESS, so use closeAllMediaPresentations v14.5
                     webView.closeAllMediaPresentations()
@@ -581,6 +581,13 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     webView.requestMediaPlaybackState(completionHandler: { (state) -> Void in
                         result(state.rawValue)
                     })
+                } else {
+                    result(nil)
+                }
+                break
+            case "getMetaThemeColor":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    result(webView.themeColor?.hexString)
                 } else {
                     result(nil)
                 }

@@ -25,7 +25,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       useShouldOverrideUrlLoading: true,
       mediaPlaybackRequiresUserGesture: false,
       useHybridComposition: true,
-      allowsInlineMediaPlayback: true,
+      allowsInlineMediaPlayback: true
   );
 
   late PullToRefreshController pullToRefreshController;
@@ -118,7 +118,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrlRequest:
-                    URLRequest(url: Uri.parse("https://www.youtube.com/watch?v=7_v6oMtz7tA")),
+                    URLRequest(url: Uri.parse("http://github.com/flutter/")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,
@@ -126,11 +126,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     onWebViewCreated: (controller) {
                       webViewController = controller;
                     },
-                    onLoadStart: (controller, url) {
+                    onLoadStart: (controller, url) async {
                       setState(() {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
+                      print((await controller.getSettings())?.upgradeKnownHostsToHTTPS);
                     },
                     onPermissionRequest: (controller, origin, resources) async {
                       return PermissionRequestResponse(
@@ -167,6 +168,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
+                      print((await controller.getSettings())?.upgradeKnownHostsToHTTPS);
                     },
                     onLoadError: (controller, url, code, message) {
                       pullToRefreshController.endRefreshing();

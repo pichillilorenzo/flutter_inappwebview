@@ -70,6 +70,10 @@ public class InAppWebViewSettings: IWebViewSettings<InAppWebView> {
     var allowingReadAccessTo: String? = nil
     var disableLongPressContextMenuOnLinks = false
     var disableInputAccessoryView = false
+    var underPageBackgroundColor: String?
+    var isTextInteractionEnabled = true
+    var isSiteSpecificQuirksModeEnabled = true
+    var upgradeKnownHostsToHTTPS = true
     
     override init(){
         super.init()
@@ -132,6 +136,14 @@ public class InAppWebViewSettings: IWebViewSettings<InAppWebView> {
                 realSettings["pageZoom"] = Float(webView.pageZoom)
                 realSettings["limitsNavigationsToAppBoundDomains"] = configuration.limitsNavigationsToAppBoundDomains
                 realSettings["javaScriptEnabled"] = configuration.defaultWebpagePreferences.allowsContentJavaScript
+            }
+            if #available(iOS 14.5, *) {
+                realSettings["isTextInteractionEnabled"] = configuration.preferences.isTextInteractionEnabled
+                realSettings["upgradeKnownHostsToHTTPS"] = configuration.upgradeKnownHostsToHTTPS
+            }
+            if #available(iOS 15.0, *) {
+                realSettings["underPageBackgroundColor"] = webView.underPageBackgroundColor.hexString
+                realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
             }
         }
         return realSettings

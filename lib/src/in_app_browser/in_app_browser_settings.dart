@@ -11,8 +11,8 @@ import '../in_app_webview/in_app_webview_settings.dart';
 import 'android/in_app_browser_options.dart';
 import '../in_app_webview/android/in_app_webview_options.dart';
 
-import 'ios/in_app_browser_options.dart';
-import '../in_app_webview/ios/in_app_webview_options.dart';
+import 'apple/in_app_browser_options.dart';
+import '../in_app_webview/apple/in_app_webview_options.dart';
 
 class BrowserOptions {
   Map<String, dynamic> toMap() {

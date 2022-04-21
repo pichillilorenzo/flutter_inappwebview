@@ -385,6 +385,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 pageZoom = CGFloat(settings.pageZoom)
             }
             
+            if #available(iOS 15.0, *) {
+                if let underPageBackgroundColor = settings.underPageBackgroundColor, !underPageBackgroundColor.isEmpty {
+                    self.underPageBackgroundColor = UIColor(hexString: underPageBackgroundColor)
+                }
+            }
+            
             // debugging is always enabled for iOS,
             // there isn't any option to set about it such as on Android.
             
@@ -420,6 +426,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.preferences.javaScriptEnabled = settings.javaScriptEnabled
             if #available(iOS 14.0, *) {
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = settings.javaScriptEnabled
+            }
+            
+            if #available(iOS 14.5, *) {
+                configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
+            }
+            
+            if #available(iOS 15.0, *) {
+                configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
             }
         }
     }
@@ -542,6 +556,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             
             if #available(iOS 14.0, *) {
                 configuration.limitsNavigationsToAppBoundDomains = settings.limitsNavigationsToAppBoundDomains
+            }
+            
+            if #available(iOS 14.5, *) {
+                configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
         }
         
@@ -1095,6 +1113,26 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 } catch {
                     print(error.localizedDescription)
                 }
+            }
+        }
+        
+        if #available(iOS 14.5, *) {
+            if newSettingsMap["upgradeKnownHostsToHTTPS"] != nil && settings?.upgradeKnownHostsToHTTPS != newSettings.upgradeKnownHostsToHTTPS {
+                configuration.upgradeKnownHostsToHTTPS = newSettings.upgradeKnownHostsToHTTPS
+            }
+            if newSettingsMap["isTextInteractionEnabled"] != nil && settings?.isTextInteractionEnabled != newSettings.isTextInteractionEnabled {
+                configuration.preferences.isTextInteractionEnabled = newSettings.isTextInteractionEnabled
+            }
+        }
+        
+        if #available(iOS 15.0, *) {
+            if newSettingsMap["underPageBackgroundColor"] != nil, settings?.underPageBackgroundColor != newSettings.underPageBackgroundColor,
+               let underPageBackgroundColor = newSettings.underPageBackgroundColor, !underPageBackgroundColor.isEmpty {
+                self.underPageBackgroundColor = UIColor(hexString: underPageBackgroundColor)
+            }
+            if newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil &&
+                settings?.isSiteSpecificQuirksModeEnabled != newSettings.isSiteSpecificQuirksModeEnabled {
+                configuration.preferences.isSiteSpecificQuirksModeEnabled = newSettings.isSiteSpecificQuirksModeEnabled
             }
         }
         

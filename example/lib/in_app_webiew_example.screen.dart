@@ -132,10 +132,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                         urlController.text = this.url;
                       });
                     },
-                    onPermissionRequest: (controller, origin, resources) async {
-                      return PermissionRequestResponse(
-                          resources: resources,
-                          action: PermissionRequestResponseAction.GRANT);
+                    onPermissionRequest: (controller, request) async {
+                      return PermissionResponse(
+                          resources: request.resources,
+                          action: PermissionResponseAction.GRANT);
                     },
                     shouldOverrideUrlLoading: (controller, navigationAction) async {
                       var uri = navigationAction.request.url!;

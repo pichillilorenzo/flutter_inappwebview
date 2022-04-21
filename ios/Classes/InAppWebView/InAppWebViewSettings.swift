@@ -143,7 +143,9 @@ public class InAppWebViewSettings: IWebViewSettings<InAppWebView> {
             }
             if #available(iOS 15.0, *) {
                 realSettings["underPageBackgroundColor"] = webView.underPageBackgroundColor.hexString
-                realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
+                if configuration.preferences.responds(to: #selector(getter: self.isSiteSpecificQuirksModeEnabled)) {
+                    realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
+                }
             }
         }
         return realSettings

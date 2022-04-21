@@ -4756,6 +4756,10 @@ class PermissionResourceType {
     PermissionResourceType.RESOURCE_MIDI_SYSEX,
     PermissionResourceType.RESOURCE_PROTECTED_MEDIA_ID,
     PermissionResourceType.RESOURCE_VIDEO_CAPTURE,
+    PermissionResourceType.CAMERA,
+    PermissionResourceType.MICROPHONE,
+    PermissionResourceType.CAMERA_AND_MICROPHONE,
+    PermissionResourceType.DEVICE_ORIENTATION_AND_MOTION,
   ].toSet();
 
   static final Set<PermissionResourceType> _androidValues = [
@@ -4766,7 +4770,10 @@ class PermissionResourceType {
   ].toSet();
 
   static final Set<PermissionResourceType> _appleValues = <PermissionResourceType>[
-
+    PermissionResourceType.CAMERA,
+    PermissionResourceType.MICROPHONE,
+    PermissionResourceType.CAMERA_AND_MICROPHONE,
+    PermissionResourceType.DEVICE_ORIENTATION_AND_MOTION,
   ].toSet();
 
   static PermissionResourceType? fromValue(dynamic? value) {
@@ -4903,7 +4910,7 @@ class PermissionRequest {
     return {
       "origin": origin.toString(), 
       "resources": resources.map((e) => e.toValue()).toList(),
-      "initiatedByFrame": frame?.toMap()
+      "frame": frame?.toMap()
     };
   }
 
@@ -4930,7 +4937,10 @@ class PermissionResponse {
         this.action = PermissionResponseAction.DENY});
 
   Map<String, dynamic> toMap() {
-    return {"resources": resources, "action": action?.toValue()};
+    return {
+      "resources": resources.map((e) => e.toValue()).toList(),
+      "action": action?.toValue()
+    };
   }
 
   Map<String, dynamic> toJson() {

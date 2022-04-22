@@ -6,6 +6,10 @@
 - Added support for `onPermissionRequest` event on iOS 15.0+
 - Updated `getMetaThemeColor` on iOS 15.0+
 
+## 5.4.0+3
+
+- Fixed Android error in some cases when calling `setServiceWorkerClient` java method on `ServiceWorkerManager` initialization
+
 ## 5.4.0+2
 
 - Fixed Android `ChromeCustomTabsActivity` not responding to the `ActionBroadcastReceiver`

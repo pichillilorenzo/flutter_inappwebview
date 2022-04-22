@@ -31,12 +31,13 @@ Future main() async {
       ServiceWorkerController serviceWorkerController =
           ServiceWorkerController.instance();
 
-      serviceWorkerController.serviceWorkerClient = ServiceWorkerClient(
+      await serviceWorkerController
+          .setServiceWorkerClient(ServiceWorkerClient(
         shouldInterceptRequest: (request) async {
           print(request);
           return null;
         },
-      );
+      ));
     }
   }
 

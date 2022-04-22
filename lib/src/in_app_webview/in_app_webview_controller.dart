@@ -1385,9 +1385,13 @@ class InAppWebViewController
   ///
   ///**NOTE for Android**: when loading an URL Request using "POST" method, headers are ignored.
   ///
+  ///**NOTE for Web**: if method is "GET" and headers are empty, it will change the `src` of the iframe.
+  ///For all other cases it will try to create an XMLHttpRequest and load the result inside the iframe.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String))). If method is "POST", [Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[]))
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
+  ///- Web
   Future<void> loadUrl(
       {required URLRequest urlRequest,
       @Deprecated('Use allowingReadAccessTo instead')
@@ -1432,7 +1436,9 @@ class InAppWebViewController
   ///
   ///- [mimeType] argument specifies the format of the data. The default value is `"text/html"`.
   ///- [encoding] argument specifies the encoding of the data. The default value is `"utf8"`.
+  ///**NOTE**: not used on Web.
   ///- [historyUrl] is an Android-specific argument that represents the URL to use as the history entry. The default value is `about:blank`. If non-null, this must be a valid URL.
+  ///**NOTE**: not used on Web.
   ///- [allowingReadAccessTo], used in combination with [baseUrl] (using the `file://` scheme),
   ///it represents the URL from which to read the web content.
   ///This [baseUrl] must be a file-based URL (using the `file://` scheme).
@@ -1443,6 +1449,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadDataWithBaseURL](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
   ///- iOS ([Official API - WKWebView.loadHTMLString](https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring) or [Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1415011-load))
+  ///- Web
   Future<void> loadData(
       {required String data,
       String mimeType = "text/html",
@@ -1511,6 +1518,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)))
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load))
+  ///- Web
   Future<void> loadFile({required String assetFilePath}) async {
     assert(assetFilePath.isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1520,9 +1528,12 @@ class InAppWebViewController
 
   ///Reloads the WebView.
   ///
+  ///**NOTE**: on Web, if `window.location.reload()` is not accessible inside the iframe, it will reload using the iframe `src` attribute.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.reload](https://developer.android.com/reference/android/webkit/WebView#reload()))
   ///- iOS ([Official API - WKWebView.reload](https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload))
+  ///- Web ([Official API - Location.reload](https://developer.mozilla.org/en-US/docs/Web/API/Location/reload))
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('reload', args);
@@ -1533,6 +1544,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBack](https://developer.android.com/reference/android/webkit/WebView#goBack()))
   ///- iOS ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
+  ///- Web ([Official API - History.back](https://developer.mozilla.org/en-US/docs/Web/API/History/back))
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('goBack', args);
@@ -1553,6 +1565,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goForward](https://developer.android.com/reference/android/webkit/WebView#goForward()))
   ///- iOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
+  ///- Web ([Official API - History.forward](https://developer.mozilla.org/en-US/docs/Web/API/History/forward))
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('goForward', args);
@@ -1630,6 +1643,7 @@ class InAppWebViewController
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
   ///For more information about content worlds, see [ContentWorld].
   ///Available on iOS 14.0+.
+  ///**NOTE**: not used on Web.
   ///
   ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
   ///because, in these events, the [WebView] is not ready to handle it yet.
@@ -1639,6 +1653,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.evaluateJavascript](https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
+  ///- Web ([Official API - Window.eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval?retiredLocale=it))
   Future<dynamic> evaluateJavascript(
       {required String source, ContentWorld? contentWorld}) async {
     Map<String, dynamic> args = <String, dynamic>{};

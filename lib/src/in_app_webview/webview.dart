@@ -20,6 +20,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
   ///Event fired when the [WebView] starts to load an [url].
@@ -27,6 +28,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
+  ///- Web
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
   ///Event fired when the [WebView] finishes loading an [url].
@@ -34,6 +36,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
+  ///- Web ([Official API - Window.onload](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event))
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
 
   ///Event fired when the [WebView] encounters an error loading an [url].

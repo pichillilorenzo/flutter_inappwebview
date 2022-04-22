@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'dart:html';
+import 'dart:js' as js;
 
 import '../in_app_webview/in_app_webview_settings.dart';
 import '../types.dart';
@@ -16,12 +17,16 @@ class InAppWebViewWebElement {
   String? initialFile;
 
   late InAppWebViewSettings settings;
+  late js.JsObject bridgeJsObject;
+  WebHistory webHistory = WebHistory(list: [], currentIndex: -1);
 
   InAppWebViewWebElement({required int viewId, required BinaryMessenger messenger}) {
     this._viewId = viewId;
     this._messenger = messenger;
     iframe = IFrameElement()
       ..id = 'flutter_inappwebview-$_viewId'
+      ..style.height = '100%'
+      ..style.width = '100%'
       ..style.border = 'none';
 
     _channel = MethodChannel(
@@ -32,19 +37,16 @@ class InAppWebViewWebElement {
 
     this._channel.setMethodCallHandler(handleMethodCall);
 
-    iframe.addEventListener('load', (event) async {
-      var obj = {
-        "url": iframe.src
-      };
-      _channel.invokeMethod("onLoadStart", obj);
-      await Future.delayed(Duration(milliseconds: 100));
-      _channel.invokeMethod("onLoadStop", obj);
-    });
+    bridgeJsObject = js.JsObject.fromBrowserObject(js.context['flutter_inappwebview']);
+    bridgeJsObject['viewId'] = _viewId;
+    bridgeJsObject['iframeId'] = iframe.id;
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
+      case "getIFrameId":
+        return iframe.id;
       case "loadUrl":
         URLRequest urlRequest = URLRequest.fromMap(call.arguments["urlRequest"].cast<String, dynamic>())!;
         await _loadUrl(urlRequest: urlRequest);
@@ -61,8 +63,15 @@ class InAppWebViewWebElement {
       case "reload":
         await _reload();
         break;
-      case "getIFrameId":
-        return iframe.id;
+      case "goBack":
+        await _goBack();
+        break;
+      case "goForward":
+        await _goForward();
+        break;
+      case "evaluateJavascript":
+        String source = call.arguments["source"];
+        return await _evaluateJavascript(source: source);
       default:
         throw PlatformException(
           code: 'Unimplemented',
@@ -78,19 +87,13 @@ class InAppWebViewWebElement {
     if (settings.iframeSandox != null) {
       iframe.setAttribute("sandbox", settings.iframeSandox ?? "");
     }
-    var width = settings.iframeWidth ?? iframe.width;
-    if (width == null || width.isEmpty) {
-      width = '100%';
-    }
-    var height = settings.iframeHeight ?? iframe.height;
-    if (height == null || height.isEmpty) {
-      height = '100%';
-    }
-    iframe.width = iframe.style.width = width;
-    iframe.height = iframe.style.height = height;
+    iframe.style.width = settings.iframeWidth ?? iframe.style.width;
+    iframe.style.height = settings.iframeHeight ?? iframe.style.height;
     iframe.referrerPolicy = settings.iframeReferrerPolicy ?? iframe.referrerPolicy;
     iframe.name = settings.iframeName ?? iframe.name;
     iframe.csp = settings.iframeCsp ?? iframe.csp;
+
+    bridgeJsObject.callMethod("prepare");
   }
 
   void makeInitialLoad() async {
@@ -129,20 +132,48 @@ class InAppWebViewWebElement {
     } else {
       iframe.src = _convertHttpResponseToData(await _makeRequest(urlRequest));
     }
+    var obj = {
+      "url": iframe.src
+    };
+    _channel.invokeMethod("onLoadStart", obj);
   }
 
   Future<void> _loadData({required String data, String mimeType = "text/html"}) async {
     iframe.src = 'data:$mimeType,' + Uri.encodeFull(data);
+    var obj = {
+      "url": iframe.src
+    };
+    _channel.invokeMethod("onLoadStart", obj);
   }
 
   Future<void> _loadFile({required String assetFilePath}) async {
     iframe.src = assetFilePath;
+    var obj = {
+      "url": iframe.src
+    };
+    _channel.invokeMethod("onLoadStart", obj);
   }
 
   Future<void> _reload() async {
-    var src = iframe.src;
-    if (src != null) {
-      iframe.contentWindow?.location.href = src;
-    }
+    bridgeJsObject.callMethod("reload");
+  }
+
+  Future<void> _goBack() async {
+    bridgeJsObject.callMethod("goBack");
+  }
+
+  Future<void> _goForward() async {
+    bridgeJsObject.callMethod("goForward");
+  }
+
+  Future<dynamic> _evaluateJavascript({required String source}) async {
+    return bridgeJsObject.callMethod("evaluateJavascript", [source]);
+  }
+
+  onIFrameLoaded(String url) async {
+    var obj = {
+      "url": url
+    };
+    _channel.invokeMethod("onLoadStop", obj);
   }
 }

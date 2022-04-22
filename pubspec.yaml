@@ -10,6 +10,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  js: ^0.6.3
 
 dev_dependencies:
   flutter_test:
@@ -38,6 +39,7 @@ flutter:
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css
+    - packages/flutter_inappwebview/assets/web/web_support.js
   # To add assets to your plugin package, add an assets section, like this:
   # assets:
   #  - images/a_dot_burr.jpeg

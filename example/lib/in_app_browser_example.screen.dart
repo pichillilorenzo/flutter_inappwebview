@@ -83,7 +83,6 @@ class InAppBrowserExampleScreen extends StatefulWidget {
 }
 
 class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
-
   late PullToRefreshController pullToRefreshController;
 
   @override
@@ -99,7 +98,8 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
           widget.browser.webViewController.reload();
         } else if (Platform.isIOS) {
           widget.browser.webViewController.loadUrl(
-              urlRequest: URLRequest(url: await widget.browser.webViewController.getUrl()));
+              urlRequest: URLRequest(
+                  url: await widget.browser.webViewController.getUrl()));
         }
       },
     );

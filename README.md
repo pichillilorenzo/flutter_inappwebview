@@ -59,6 +59,4 @@ Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://f
 
 ## Support
 
-Use the [develop branch](https://github.com/pichillilorenzo/flutter_inappwebview/tree/develop) when making a pull request.
-
 Did you find this plugin useful? Please consider to [make a donation](https://inappwebview.dev/donate/) to help improve it!

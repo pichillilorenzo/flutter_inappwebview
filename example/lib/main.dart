@@ -31,12 +31,13 @@ Future main() async {
       AndroidServiceWorkerController serviceWorkerController =
           AndroidServiceWorkerController.instance();
 
-      serviceWorkerController.serviceWorkerClient = AndroidServiceWorkerClient(
+      await serviceWorkerController
+          .setServiceWorkerClient(AndroidServiceWorkerClient(
         shouldInterceptRequest: (request) async {
           print(request);
           return null;
         },
-      );
+      ));
     }
   }
 

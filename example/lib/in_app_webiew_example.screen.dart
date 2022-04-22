@@ -121,6 +121,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     // contextMenu: contextMenu,
                     initialUrlRequest:
                     URLRequest(url: Uri.parse("https://www.pubnub.com/developers/demos/webrtc/launch/")),
+                    // initialUrlRequest:
+                    // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,

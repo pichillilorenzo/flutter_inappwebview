@@ -25,7 +25,7 @@ abstract class WebView {
 
   ///Event fired when the [WebView] starts to load an [url].
   ///
-  ///**NOTE**: on Web it will be dispatched at the same time of [onLoadStop] event
+  ///**NOTE for Web**: it will be dispatched at the same time of [onLoadStop] event
   ///because there isn't any way to capture the real load start event from an iframe.
   ///
   ///**Supported Platforms/Implementations**:
@@ -76,9 +76,12 @@ abstract class WebView {
 
   ///Event fired when the [WebView] receives a [ConsoleMessage].
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onConsoleMessage](https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)))
   ///- iOS
+  ///- Web
   final void Function(
           InAppWebViewController controller, ConsoleMessage consoleMessage)?
       onConsoleMessage;
@@ -120,9 +123,12 @@ abstract class WebView {
   ///
   ///[y] represents the current vertical scroll origin in pixels.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.onScrollChanged](https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)))
   ///- iOS ([Official API - UIScrollViewDelegate.scrollViewDidScroll](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll))
+  ///- Web ([Official API - Window.onscroll](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll))
   final void Function(InAppWebViewController controller, int x, int y)?
       onScrollChanged;
 
@@ -164,10 +170,10 @@ abstract class WebView {
   ///
   ///**NOTE**: to allow JavaScript to open windows, you need to set [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically] option to `true`.
   ///
-  ///**NOTE**: on Android you need to set [InAppWebViewSettings.supportMultipleWindows] option to `true`.
+  ///**NOTE for Android**: you need to set [InAppWebViewSettings.supportMultipleWindows] option to `true`.
   ///Also, if the request has been created using JavaScript (`window.open()`), then there are some limitation: check the [NavigationAction] class.
   ///
-  ///**NOTE**: on iOS, setting these initial options: [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
+  ///**NOTE for iOS**: setting these initial options: [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
   ///[InAppWebViewSettings.useShouldInterceptFetchRequest], [InAppWebViewSettings.applicationNameForUserAgent], [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically],
   ///[InAppWebViewSettings.javaScriptEnabled], [InAppWebViewSettings.minimumFontSize], [InAppWebViewSettings.preferredContentMode], [InAppWebViewSettings.incognito],
   ///[InAppWebViewSettings.cacheEnabled], [InAppWebViewSettings.mediaPlaybackRequiresUserGesture],
@@ -379,6 +385,8 @@ abstract class WebView {
   ///[url] represents the url being visited.
   ///
   ///[isReload] indicates if this url is being reloaded. Available only on Android.
+  ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.doUpdateVisitedHistory](https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)))

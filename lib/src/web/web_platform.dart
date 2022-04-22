@@ -65,6 +65,16 @@ void _dartNativeCommunication(String method, int viewId, [List? args]) {
         String url = args![0] as String;
         webViewHtmlElement.onUpdateVisitedHistory(url);
         break;
+      case 'onScrollChanged':
+        int x = args![0] as int;
+        int y = args[1] as int;
+        webViewHtmlElement.onScrollChanged(x, y);
+        break;
+      case 'onConsoleMessage':
+        String type = args![0] as String;
+        String? message = args[1] as String?;
+        webViewHtmlElement.onConsoleMessage(type, message);
+        break;
     }
   }
 }

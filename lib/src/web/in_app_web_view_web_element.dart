@@ -233,4 +233,36 @@ class InAppWebViewWebElement {
     };
     _channel.invokeMethod("onUpdateVisitedHistory", obj);
   }
+
+  onScrollChanged(int x, int y) async {
+    var obj = {
+      "x": x,
+      "y": y
+    };
+    _channel.invokeMethod("onScrollChanged", obj);
+  }
+
+  onConsoleMessage(String type, String? message) async {
+    int messageLevel = 1;
+    switch (type) {
+      case 'debug':
+        messageLevel = 0;
+        break;
+      case 'error':
+        messageLevel = 3;
+        break;
+      case 'warn':
+        messageLevel = 2;
+        break;
+      case 'info':
+      case 'log':
+      default:
+        messageLevel = 1;
+    }
+    var obj = {
+      "messageLevel": messageLevel,
+      "message": message
+    };
+    _channel.invokeMethod("onConsoleMessage", obj);
+  }
 }

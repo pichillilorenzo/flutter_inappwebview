@@ -1015,18 +1015,6 @@ class InAppWebViewSettings
   ///- Web
   String? iframeSandox;
 
-  ///A string that reflects the width HTML attribute, indicating the width of the frame.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Web
-  String? iframeWidth;
-
-  ///A string that reflects the height HTML attribute, indicating the height of the frame.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Web
-  String? iframeHeight;
-
   ///A string that reflects the `referrerpolicy` HTML attribute indicating which referrer to use when fetching the linked resource.
   ///
   ///**Supported Platforms/Implementations**:
@@ -1168,8 +1156,6 @@ class InAppWebViewSettings
       this.iframeAllow,
       this.iframeAllowFullscreen,
       this.iframeSandox,
-      this.iframeWidth,
-      this.iframeHeight,
       this.iframeReferrerPolicy,
       this.iframeName,
       this.iframeCsp,}) {
@@ -1318,8 +1304,6 @@ class InAppWebViewSettings
       "iframeAllow": iframeAllow,
       "iframeAllowFullscreen": iframeAllowFullscreen,
       "iframeSandox": iframeSandox,
-      "iframeWidth": iframeWidth,
-      "iframeHeight": iframeHeight,
       "iframeReferrerPolicy": iframeReferrerPolicy,
       "iframeName": iframeName,
       "iframeCsp": iframeCsp,
@@ -1383,8 +1367,6 @@ class InAppWebViewSettings
       settings.iframeAllow = map["iframeAllow"];
       settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
       settings.iframeSandox = map["iframeSandox"];
-      settings.iframeWidth = map["iframeWidth"];
-      settings.iframeHeight = map["iframeHeight"];
       settings.iframeReferrerPolicy = map["iframeReferrerPolicy"];
       settings.iframeName = map["iframeName"];
       settings.iframeCsp = map["iframeCsp"];

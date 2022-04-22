@@ -102,8 +102,6 @@ class InAppWebViewWebElement {
     if (settings.iframeSandox != null) {
       iframe.setAttribute("sandbox", settings.iframeSandox ?? "");
     }
-    iframe.style.width = settings.iframeWidth ?? iframe.style.width;
-    iframe.style.height = settings.iframeHeight ?? iframe.style.height;
     iframe.referrerPolicy = settings.iframeReferrerPolicy ?? iframe.referrerPolicy;
     iframe.name = settings.iframeName ?? iframe.name;
     iframe.csp = settings.iframeCsp ?? iframe.csp;
@@ -190,12 +188,6 @@ class InAppWebViewWebElement {
     }
     if (settings.iframeSandox != newSettings.iframeSandox) {
       iframe.setAttribute("sandbox", newSettings.iframeSandox ?? "");
-    }
-    if (settings.iframeWidth != newSettings.iframeWidth) {
-      iframe.style.width = newSettings.iframeWidth;
-    }
-    if (settings.iframeHeight != newSettings.iframeHeight) {
-      iframe.style.height = newSettings.iframeHeight;
     }
     if (settings.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
       iframe.referrerPolicy = newSettings.iframeReferrerPolicy;

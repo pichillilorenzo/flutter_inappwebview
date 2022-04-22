@@ -1864,19 +1864,16 @@ class InAppWebViewController
   ///Use [setSettings] instead.
   @Deprecated('Use setSettings instead')
   Future<void> setOptions({required InAppWebViewGroupOptions options}) async {
-    Map<String, dynamic> args = <String, dynamic>{};
-
-    args.putIfAbsent('settings', () => options.toMap());
-    await _channel.invokeMethod('setSettings', args);
+    InAppWebViewSettings settings = InAppWebViewSettings.fromMap(options.toMap());
+    await setSettings(settings: settings);
   }
 
   ///Use [getSettings] instead.
   @Deprecated('Use getSettings instead')
   Future<InAppWebViewGroupOptions?> getOptions() async {
-    Map<String, dynamic> args = <String, dynamic>{};
+    InAppWebViewSettings? settings = await getSettings();
 
-    Map<dynamic, dynamic>? options =
-        await _channel.invokeMethod('getSettings', args);
+    Map<dynamic, dynamic>? options = settings?.toMap();
     if (options != null) {
       options = options.cast<String, dynamic>();
       return InAppWebViewGroupOptions.fromMap(options as Map<String, dynamic>);

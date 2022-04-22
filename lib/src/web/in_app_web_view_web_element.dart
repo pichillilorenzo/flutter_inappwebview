@@ -18,7 +18,7 @@ class InAppWebViewWebElement {
 
   late InAppWebViewSettings settings;
   late js.JsObject bridgeJsObject;
-  WebHistory webHistory = WebHistory(list: [], currentIndex: -1);
+  bool isLoading = false;
 
   InAppWebViewWebElement({required int viewId, required BinaryMessenger messenger}) {
     this._viewId = viewId;
@@ -49,29 +49,44 @@ class InAppWebViewWebElement {
         return iframe.id;
       case "loadUrl":
         URLRequest urlRequest = URLRequest.fromMap(call.arguments["urlRequest"].cast<String, dynamic>())!;
-        await _loadUrl(urlRequest: urlRequest);
+        await loadUrl(urlRequest: urlRequest);
         break;
       case "loadData":
         String data = call.arguments["data"];
         String mimeType = call.arguments["mimeType"];
-        await _loadData(data: data, mimeType: mimeType);
+        await loadData(data: data, mimeType: mimeType);
         break;
       case "loadFile":
         String assetFilePath = call.arguments["assetFilePath"];
-        await _loadFile(assetFilePath: assetFilePath);
+        await loadFile(assetFilePath: assetFilePath);
         break;
       case "reload":
-        await _reload();
+        await reload();
         break;
       case "goBack":
-        await _goBack();
+        await goBack();
         break;
       case "goForward":
-        await _goForward();
+        await goForward();
         break;
+      case "goBackOrForward":
+        int steps = call.arguments["steps"];
+        await goBackOrForward(steps: steps);
+        break;
+      case "isLoading":
+        return isLoading;
       case "evaluateJavascript":
         String source = call.arguments["source"];
-        return await _evaluateJavascript(source: source);
+        return await evaluateJavascript(source: source);
+      case "stopLoading":
+        await stopLoading();
+        break;
+      case "getSettings":
+        return await settings.toMap();
+      case "setSettings":
+        InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(call.arguments["settings"].cast<String, dynamic>());
+        setSettings(newSettings);
+        break;
       default:
         throw PlatformException(
           code: 'Unimplemented',
@@ -98,11 +113,11 @@ class InAppWebViewWebElement {
 
   void makeInitialLoad() async {
     if (initialUrlRequest != null) {
-      _loadUrl(urlRequest: initialUrlRequest!);
+      loadUrl(urlRequest: initialUrlRequest!);
     } else if (initialData != null) {
-      _loadData(data: initialData!.data, mimeType: initialData!.mimeType);
+      loadData(data: initialData!.data, mimeType: initialData!.mimeType);
     } else if (initialFile != null) {
-      _loadFile(assetFilePath: initialFile!);
+      loadFile(assetFilePath: initialFile!);
     }
   }
 
@@ -125,55 +140,97 @@ class InAppWebViewWebElement {
     return 'data:$contentType,' + Uri.encodeFull(httpRequest.responseText ?? '');
   }
 
-  Future<void> _loadUrl({required URLRequest urlRequest}) async {
+  Future<void> loadUrl({required URLRequest urlRequest}) async {
     if ((urlRequest.method == null || urlRequest.method == "GET") &&
         (urlRequest.headers == null || urlRequest.headers!.isEmpty)) {
       iframe.src = urlRequest.url.toString();
     } else {
       iframe.src = _convertHttpResponseToData(await _makeRequest(urlRequest));
     }
-    var obj = {
-      "url": iframe.src
-    };
-    _channel.invokeMethod("onLoadStart", obj);
   }
 
-  Future<void> _loadData({required String data, String mimeType = "text/html"}) async {
+  Future<void> loadData({required String data, String mimeType = "text/html"}) async {
     iframe.src = 'data:$mimeType,' + Uri.encodeFull(data);
-    var obj = {
-      "url": iframe.src
-    };
-    _channel.invokeMethod("onLoadStart", obj);
   }
 
-  Future<void> _loadFile({required String assetFilePath}) async {
+  Future<void> loadFile({required String assetFilePath}) async {
     iframe.src = assetFilePath;
-    var obj = {
-      "url": iframe.src
-    };
-    _channel.invokeMethod("onLoadStart", obj);
   }
 
-  Future<void> _reload() async {
+  Future<void> reload() async {
     bridgeJsObject.callMethod("reload");
   }
 
-  Future<void> _goBack() async {
+  Future<void> goBack() async {
     bridgeJsObject.callMethod("goBack");
   }
 
-  Future<void> _goForward() async {
+  Future<void> goForward() async {
     bridgeJsObject.callMethod("goForward");
   }
 
-  Future<dynamic> _evaluateJavascript({required String source}) async {
+  Future<void> goBackOrForward({required int steps}) async {
+    bridgeJsObject.callMethod("goBackOrForward", [steps]);
+  }
+
+  Future<dynamic> evaluateJavascript({required String source}) async {
     return bridgeJsObject.callMethod("evaluateJavascript", [source]);
   }
 
-  onIFrameLoaded(String url) async {
+  Future<void> stopLoading() async {
+    bridgeJsObject.callMethod("stopLoading");
+  }
+
+  Future<void> setSettings(InAppWebViewSettings newSettings) async {
+    if (settings.iframeAllow != newSettings.iframeAllow) {
+      iframe.allow = newSettings.iframeAllow;
+    }
+    if (settings.iframeAllowFullscreen != newSettings.iframeAllowFullscreen) {
+      iframe.allowFullscreen = newSettings.iframeAllowFullscreen;
+    }
+    if (settings.iframeSandox != newSettings.iframeSandox) {
+      iframe.setAttribute("sandbox", newSettings.iframeSandox ?? "");
+    }
+    if (settings.iframeWidth != newSettings.iframeWidth) {
+      iframe.style.width = newSettings.iframeWidth;
+    }
+    if (settings.iframeHeight != newSettings.iframeHeight) {
+      iframe.style.height = newSettings.iframeHeight;
+    }
+    if (settings.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
+      iframe.referrerPolicy = newSettings.iframeReferrerPolicy;
+    }
+    if (settings.iframeName != newSettings.iframeName) {
+      iframe.name = newSettings.iframeName;
+    }
+    if (settings.iframeCsp != newSettings.iframeCsp) {
+      iframe.csp = newSettings.iframeCsp;
+    }
+    settings = newSettings;
+  }
+
+  onLoadStart(String url) async {
+    isLoading = true;
+
+    var obj = {
+      "url": url
+    };
+    _channel.invokeMethod("onLoadStart", obj);
+  }
+
+  onLoadStop(String url) async {
+    isLoading = false;
+
     var obj = {
       "url": url
     };
     _channel.invokeMethod("onLoadStop", obj);
+  }
+
+  onUpdateVisitedHistory(String url) async {
+    var obj = {
+      "url": url
+    };
+    _channel.invokeMethod("onUpdateVisitedHistory", obj);
   }
 }

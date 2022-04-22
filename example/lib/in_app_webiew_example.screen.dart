@@ -119,10 +119,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   InAppWebView(
                     key: webViewKey,
                     // contextMenu: contextMenu,
-                    initialUrlRequest:
-                    URLRequest(url: Uri.parse("https://www.pubnub.com/developers/demos/webrtc/launch/")),
                     // initialUrlRequest:
-                    // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                    // URLRequest(url: Uri.parse("https://www.pubnub.com/developers/demos/webrtc/launch/")),
+                    initialUrlRequest:
+                    URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,
@@ -219,6 +219,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 child: Icon(Icons.refresh),
                 onPressed: () {
                   webViewController?.reload();
+                },
+              ),
+              ElevatedButton(
+                child: Icon(Icons.cancel),
+                onPressed: () {
+                  webViewController?.stopLoading();
                 },
               ),
             ],

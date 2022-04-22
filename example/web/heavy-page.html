@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <base href="$FLUTTER_BASE_HREF">
 
   <meta charset="UTF-8">
   <meta content="IE=Edge" http-equiv="X-UA-Compatible">
@@ -19,11 +20,10 @@
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
-  <h1>Simple Page 2</h1>
+  <h1>Heavy Page</h1>
   <a href="/page.html">Go to page 1</a>
   <br>
-  <a href="/heavy-page.html">Go to heavy-page</a>
-  <br>
-  <button onclick="window.history.pushState({}, '', '#test-state-change')">Test state change</button>
+  <p id="infotext">Loading image...</p>
+  <img src="https://picsum.photos/5000" alt="Loading failed" onerror="this.src = ''; window.infotext != null ? infotext.remove() : null" onload="window.infotext != null ? infotext.remove() : null">
 </body>
 </html>

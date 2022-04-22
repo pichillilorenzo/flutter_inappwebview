@@ -25,6 +25,9 @@ abstract class WebView {
 
   ///Event fired when the [WebView] starts to load an [url].
   ///
+  ///**NOTE**: on Web it will be dispatched at the same time of [onLoadStop] event
+  ///because there isn't any way to capture the real load start event from an iframe.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
@@ -380,6 +383,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.doUpdateVisitedHistory](https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)))
   ///- iOS
+  ///- Web
   final void Function(
           InAppWebViewController controller, Uri? url, bool? isReload)?
       onUpdateVisitedHistory;

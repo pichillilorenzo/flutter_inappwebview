@@ -1586,6 +1586,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBackOrForward](https://developer.android.com/reference/android/webkit/WebView#goBackOrForward(int)))
   ///- iOS ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
+  ///- Web ([Official API - History.go](https://developer.mozilla.org/en-US/docs/Web/API/History/go))
   Future<void> goBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('steps', () => steps);
@@ -1608,6 +1609,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<void> goTo({required WebHistoryItem historyItem}) async {
     var steps = historyItem.offset;
     if (steps != null) {
@@ -1620,6 +1622,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('isLoading', args);

@@ -53,9 +53,17 @@ void _dartNativeCommunication(String method, int viewId, [List? args]) {
   if (WebPlatformManager.webViews.containsKey(viewId)) {
     var webViewHtmlElement = WebPlatformManager.webViews[viewId] as InAppWebViewWebElement;
     switch (method) {
-      case 'iframeLoaded':
+      case 'onLoadStart':
         String url = args![0] as String;
-        webViewHtmlElement.onIFrameLoaded(url);
+        webViewHtmlElement.onLoadStart(url);
+        break;
+      case 'onLoadStop':
+        String url = args![0] as String;
+        webViewHtmlElement.onLoadStop(url);
+        break;
+      case 'onUpdateVisitedHistory':
+        String url = args![0] as String;
+        webViewHtmlElement.onUpdateVisitedHistory(url);
         break;
     }
   }

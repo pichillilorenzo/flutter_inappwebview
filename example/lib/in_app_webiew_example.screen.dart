@@ -26,7 +26,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       useShouldOverrideUrlLoading: true,
       mediaPlaybackRequiresUserGesture: false,
       useHybridComposition: true,
-      allowsInlineMediaPlayback: true
+      allowsInlineMediaPlayback: true,
+      iframeAllow: "camera; microphone"
   );
 
   PullToRefreshController? pullToRefreshController;
@@ -119,7 +120,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     key: webViewKey,
                     // contextMenu: contextMenu,
                     initialUrlRequest:
-                    URLRequest(url: Uri.parse("https://flutter.dev")),
+                    URLRequest(url: Uri.parse("https://www.pubnub.com/developers/demos/webrtc/launch/")),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,

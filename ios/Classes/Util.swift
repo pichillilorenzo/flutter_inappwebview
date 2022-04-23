@@ -12,7 +12,7 @@ var SharedLastTouchPointTimestamp: [InAppWebView: Int64] = [:]
 
 public class Util {
     public static func getUrlAsset(assetFilePath: String) throws -> URL {
-        let key = SwiftFlutterPlugin.instance!.registrar!.lookupKey(forAsset: assetFilePath)
+        let key = SwiftFlutterPlugin.instance?.registrar?.lookupKey(forAsset: assetFilePath)
         guard let assetURL = Bundle.main.url(forResource: key, withExtension: nil) else {
             throw NSError(domain: assetFilePath + " asset file cannot be found!", code: 0)
         }
@@ -20,7 +20,7 @@ public class Util {
     }
     
     public static func getAbsPathAsset(assetFilePath: String) throws -> String {
-        let key = SwiftFlutterPlugin.instance!.registrar!.lookupKey(forAsset: assetFilePath)
+        let key = SwiftFlutterPlugin.instance?.registrar?.lookupKey(forAsset: assetFilePath)
         guard let assetAbsPath = Bundle.main.path(forResource: key, ofType: nil) else {
             throw NSError(domain: assetFilePath + " asset file cannot be found!", code: 0)
         }

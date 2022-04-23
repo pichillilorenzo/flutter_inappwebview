@@ -53,7 +53,13 @@ class MyWebStorageManager: NSObject, FlutterPlugin {
     
     public static func fetchDataRecords(dataTypes: Set<String>, result: @escaping FlutterResult) {
         var recordList: [[String: Any?]] = []
-        MyWebStorageManager.websiteDataStore!.fetchDataRecords(ofTypes: dataTypes) { (data) in
+        
+        guard let websiteDataStore = MyWebStorageManager.websiteDataStore else {
+            result(recordList)
+            return
+        }
+        
+        websiteDataStore.fetchDataRecords(ofTypes: dataTypes) { (data) in
             for record in data {
                 recordList.append([
                     "displayName": record.displayName,
@@ -68,7 +74,13 @@ class MyWebStorageManager: NSObject, FlutterPlugin {
     
     public static func removeDataFor(dataTypes: Set<String>, recordList: [[String: Any?]], result: @escaping FlutterResult) {
         var records: [WKWebsiteDataRecord] = []
-        MyWebStorageManager.websiteDataStore!.fetchDataRecords(ofTypes: dataTypes) { (data) in
+        
+        guard let websiteDataStore = MyWebStorageManager.websiteDataStore else {
+            result(false)
+            return
+        }
+        
+        websiteDataStore.fetchDataRecords(ofTypes: dataTypes) { (data) in
             for record in data {
                 for r in recordList {
                     let displayName = r["displayName"] as! String
@@ -78,16 +90,28 @@ class MyWebStorageManager: NSObject, FlutterPlugin {
                     }
                 }
             }
-            MyWebStorageManager.websiteDataStore!.removeData(ofTypes: dataTypes, for: records) {
+            websiteDataStore.removeData(ofTypes: dataTypes, for: records) {
                 result(true)
             }
         }
     }
     
     public static func removeDataModifiedSince(dataTypes: Set<String>, timestamp: Int64, result: @escaping FlutterResult) {
+        guard let websiteDataStore = MyWebStorageManager.websiteDataStore else {
+            result(false)
+            return
+        }
+        
         let date = NSDate(timeIntervalSince1970: TimeInterval(timestamp))
-        MyWebStorageManager.websiteDataStore!.removeData(ofTypes: dataTypes, modifiedSince: date as Date) {
+        websiteDataStore.removeData(ofTypes: dataTypes, modifiedSince: date as Date) {
             result(true)
         }
+    }
+    
+    public func dispose() {
+        MyWebStorageManager.channel?.setMethodCallHandler(nil)
+        MyWebStorageManager.channel = nil
+        MyWebStorageManager.registrar = nil
+        MyWebStorageManager.websiteDataStore = nil
     }
 }

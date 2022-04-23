@@ -26,7 +26,9 @@ import androidx.annotation.Nullable;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebView;
 
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -77,6 +79,10 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    Collection<HeadlessInAppWebView> headlessInAppWebViews = webViews.values();
+    for (HeadlessInAppWebView headlessInAppWebView : headlessInAppWebViews) {
+      headlessInAppWebView.dispose();
+    }
     webViews.clear();
   }
 }

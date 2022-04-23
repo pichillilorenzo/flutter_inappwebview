@@ -49,16 +49,39 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         headlessInAppWebViewManager = HeadlessInAppWebViewManager(registrar: registrar)
         chromeSafariBrowserManager = ChromeSafariBrowserManager(registrar: registrar)
         inAppWebViewStatic = InAppWebViewStatic(registrar: registrar)
+        credentialDatabase = CredentialDatabase(registrar: registrar)
         if #available(iOS 11.0, *) {
             myCookieManager = MyCookieManager(registrar: registrar)
         }
         if #available(iOS 9.0, *) {
             myWebStorageManager = MyWebStorageManager(registrar: registrar)
         }
-        credentialDatabase = CredentialDatabase(registrar: registrar)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
         SwiftFlutterPlugin.instance = SwiftFlutterPlugin(with: registrar)
+    }
+    
+    public func detachFromEngine(for registrar: FlutterPluginRegistrar) {
+        platformUtil?.dispose()
+        platformUtil = nil
+        inAppBrowserManager?.dispose()
+        inAppBrowserManager = nil
+        headlessInAppWebViewManager?.dispose()
+        headlessInAppWebViewManager = nil
+        chromeSafariBrowserManager?.dispose()
+        chromeSafariBrowserManager = nil
+        inAppWebViewStatic?.dispose()
+        inAppWebViewStatic = nil
+        credentialDatabase?.dispose()
+        credentialDatabase = nil
+        if #available(iOS 11.0, *) {
+            (myCookieManager as! MyCookieManager?)?.dispose()
+            myCookieManager = nil
+        }
+        if #available(iOS 9.0, *) {
+            (myWebStorageManager as! MyWebStorageManager?)?.dispose()
+            myWebStorageManager = nil
+        }
     }
 }

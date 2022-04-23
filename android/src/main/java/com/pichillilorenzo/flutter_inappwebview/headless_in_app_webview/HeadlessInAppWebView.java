@@ -110,12 +110,16 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
   public void dispose() {
     channel.setMethodCallHandler(null);
     HeadlessInAppWebViewManager.webViews.remove(id);
-    ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
-    ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
-    if (mainView != null) {
-      mainView.removeView(flutterWebView.getView());
+    if (plugin != null) {
+      ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
+      ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
+      if (mainView != null && flutterWebView != null) {
+        mainView.removeView(flutterWebView.getView());
+      }
     }
-    flutterWebView.dispose();
+    if (flutterWebView != null) {
+      flutterWebView.dispose();
+    }
     flutterWebView = null;
     plugin = null;
   }

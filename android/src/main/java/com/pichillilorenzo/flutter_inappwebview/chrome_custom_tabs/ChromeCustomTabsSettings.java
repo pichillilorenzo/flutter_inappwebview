@@ -7,14 +7,14 @@ import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.trusted.ScreenOrientation;
 import androidx.browser.trusted.TrustedWebActivityDisplayMode;
 
-import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
+import com.pichillilorenzo.flutter_inappwebview.ISettings;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class ChromeCustomTabsSettings implements IWebViewSettings<ChromeCustomTabsActivity> {
+public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActivity> {
 
   final static String LOG_TAG = "ChromeCustomTabsSettings";
 

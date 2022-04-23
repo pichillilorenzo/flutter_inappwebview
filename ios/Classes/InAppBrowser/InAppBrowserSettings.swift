@@ -8,7 +8,7 @@
 import Foundation
 
 @objcMembers
-public class InAppBrowserSettings: IWebViewSettings<InAppBrowserWebViewController> {
+public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {
     
     var hidden = false
     var hideToolbarTop = true

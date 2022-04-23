@@ -203,13 +203,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if let menu = self.contextMenu {
             if let menuItems = menu["menuItems"] as? [[String : Any]] {
                 for menuItem in menuItems {
-                    let id = menuItem["iosId"] as! String
+                    let id = menuItem["id"]!
                     let title = menuItem["title"] as! String
-                    let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" + id
+                    let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" +
+                                            (id is Int64 ? String(id as! Int64) : id as! String)
                     if !self.responds(to: Selector(targetMethodName)) {
                         let customAction: () -> Void = {
                             let arguments: [String: Any?] = [
-                                "iosId": id,
+                                "id": id,
+                                "iosId": id is Int64 ? String(id as! Int64) : id as! String,
                                 "androidId": nil,
                                 "title": title
                             ]
@@ -244,10 +246,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             if let menu = contextMenu {
-                let contextMenuOptions = ContextMenuOptions()
-                if let contextMenuOptionsMap = menu["options"] as? [String: Any?] {
-                    let _ = contextMenuOptions.parse(settings: contextMenuOptionsMap)
-                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuOptions.hideDefaultSystemContextMenuItems {
+                let contextMenuSettings = ContextMenuSettings()
+                if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
+                    let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
+                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuSettings.hideDefaultSystemContextMenuItems {
                         return false
                     }
                 }
@@ -256,6 +258,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
                 let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
                 let arguments: [String: Any?] = [
+                    "id": id,
                     "iosId": id,
                     "androidId": nil,
                     "title": action.description

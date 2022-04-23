@@ -121,14 +121,14 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
               ElevatedButton(
                   onPressed: () async {
                     await widget.browser.openUrlRequest(
-                        urlRequest:
-                            URLRequest(url: Uri.parse("https://flutter.dev")),
-                        settings: InAppBrowserClassSettings(
-                          webViewSettings: InAppWebViewSettings(
-                            useShouldOverrideUrlLoading: true,
-                            useOnLoadResource: true,
-                          ),
+                      urlRequest:
+                          URLRequest(url: Uri.parse("https://flutter.dev")),
+                      settings: InAppBrowserClassSettings(
+                        webViewSettings: InAppWebViewSettings(
+                          useShouldOverrideUrlLoading: true,
+                          useOnLoadResource: true,
                         ),
+                      ),
                     );
                   },
                   child: Text("Open In-App Browser")),

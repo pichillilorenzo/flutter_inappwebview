@@ -9,7 +9,7 @@ import Foundation
 
 @available(iOS 9.0, *)
 @objcMembers
-public class SafariBrowserSettings: IWebViewSettings<SafariViewController> {
+public class SafariBrowserSettings: ISettings<SafariViewController> {
     
     var entersReaderIfAvailable = false
     var barCollapsingEnabled = false

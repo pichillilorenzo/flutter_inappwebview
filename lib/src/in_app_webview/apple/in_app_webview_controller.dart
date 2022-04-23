@@ -107,7 +107,8 @@ abstract class AppleInAppWebViewControllerMixin {
   ///- iOS ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate)).
   Future<MediaPlaybackState?> requestMediaPlaybackState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaPlaybackState.fromValue(await _channel.invokeMethod('requestMediaPlaybackState', args));
+    return MediaPlaybackState.fromValue(
+        await _channel.invokeMethod('requestMediaPlaybackState', args));
   }
 }
 

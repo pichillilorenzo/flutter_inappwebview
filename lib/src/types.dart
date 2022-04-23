@@ -4769,7 +4769,8 @@ class PermissionResourceType {
     PermissionResourceType.RESOURCE_VIDEO_CAPTURE,
   ].toSet();
 
-  static final Set<PermissionResourceType> _appleValues = <PermissionResourceType>[
+  static final Set<PermissionResourceType> _appleValues =
+      <PermissionResourceType>[
     PermissionResourceType.CAMERA,
     PermissionResourceType.MICROPHONE,
     PermissionResourceType.CAMERA_AND_MICROPHONE,
@@ -4779,7 +4780,8 @@ class PermissionResourceType {
   static PermissionResourceType? fromValue(dynamic? value) {
     if (value != null) {
       try {
-        Set<PermissionResourceType> valueList = <PermissionResourceType>[].toSet();
+        Set<PermissionResourceType> valueList =
+            <PermissionResourceType>[].toSet();
         if (Platform.isAndroid) {
           valueList = PermissionResourceType._androidValues;
         } else if (Platform.isIOS || Platform.isMacOS) {
@@ -4815,52 +4817,51 @@ class PermissionResourceType {
   ///Resource belongs to audio capture device, like microphone.
   ///
   ///**NOTE**: available only on Android.
-  static const RESOURCE_AUDIO_CAPTURE = const PermissionResourceType._internal('android.webkit.resource.AUDIO_CAPTURE');
+  static const RESOURCE_AUDIO_CAPTURE = const PermissionResourceType._internal(
+      'android.webkit.resource.AUDIO_CAPTURE');
 
-  ///Resource will allow sysex messages to be sent to or received from MIDI devices. 
-  ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware. 
+  ///Resource will allow sysex messages to be sent to or received from MIDI devices.
+  ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware.
   ///Permission may be requested for this resource in API levels 21 and above, if the Android device has been updated to WebView 45 or above.
   ///
   ///**NOTE**: available only on Android.
-  static const RESOURCE_MIDI_SYSEX =
-  const PermissionResourceType._internal('android.webkit.resource.MIDI_SYSEX');
+  static const RESOURCE_MIDI_SYSEX = const PermissionResourceType._internal(
+      'android.webkit.resource.MIDI_SYSEX');
 
   ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
   ///
   ///**NOTE**: available only on Android.
   static const RESOURCE_PROTECTED_MEDIA_ID =
-  const PermissionResourceType._internal('android.webkit.resource.PROTECTED_MEDIA_ID');
-
+      const PermissionResourceType._internal(
+          'android.webkit.resource.PROTECTED_MEDIA_ID');
 
   ///Resource belongs to video capture device, like camera.
   ///
   ///**NOTE**: available only on Android.
-  static const RESOURCE_VIDEO_CAPTURE =
-  const PermissionResourceType._internal('android.webkit.resource.VIDEO_CAPTURE');
+  static const RESOURCE_VIDEO_CAPTURE = const PermissionResourceType._internal(
+      'android.webkit.resource.VIDEO_CAPTURE');
 
   ///A media device that can capture video.
   ///
   ///**NOTE**: available only on iOS.
-  static const CAMERA =
-  const PermissionResourceType._internal(0);
+  static const CAMERA = const PermissionResourceType._internal(0);
 
   ///A media device that can capture audio.
   ///
   ///**NOTE**: available only on iOS.
-  static const MICROPHONE =
-  const PermissionResourceType._internal(1);
+  static const MICROPHONE = const PermissionResourceType._internal(1);
 
   ///A media device or devices that can capture audio and video.
   ///
   ///**NOTE**: available only on iOS.
   static const CAMERA_AND_MICROPHONE =
-  const PermissionResourceType._internal(2);
+      const PermissionResourceType._internal(2);
 
   ///Resource belongs to the device’s orientation and motion.
   ///
   ///**NOTE**: available only on iOS.
   static const DEVICE_ORIENTATION_AND_MOTION =
-  const PermissionResourceType._internal('deviceOrientationAndMotion');
+      const PermissionResourceType._internal('deviceOrientationAndMotion');
 
   bool operator ==(value) => value == _value;
 
@@ -4880,9 +4881,7 @@ class PermissionRequest {
   FrameInfo? frame;
 
   PermissionRequest(
-      {required this.origin,
-        this.resources = const [],
-      this.frame});
+      {required this.origin, this.resources = const [], this.frame});
 
   static PermissionRequest? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -4891,8 +4890,7 @@ class PermissionRequest {
 
     List<PermissionResourceType> resources = [];
     if (map["resources"] != null) {
-      (map["resources"].cast<dynamic>() as List<dynamic>)
-          .forEach((element) {
+      (map["resources"].cast<dynamic>() as List<dynamic>).forEach((element) {
         var resource = PermissionResourceType.fromValue(element);
         if (resource != null) {
           resources.add(resource);
@@ -4908,7 +4906,7 @@ class PermissionRequest {
 
   Map<String, dynamic> toMap() {
     return {
-      "origin": origin.toString(), 
+      "origin": origin.toString(),
       "resources": resources.map((e) => e.toValue()).toList(),
       "frame": frame?.toMap()
     };
@@ -4933,8 +4931,7 @@ class PermissionResponse {
   PermissionResponseAction? action;
 
   PermissionResponse(
-      {this.resources = const [],
-        this.action = PermissionResponseAction.DENY});
+      {this.resources = const [], this.action = PermissionResponseAction.DENY});
 
   Map<String, dynamic> toMap() {
     return {
@@ -10688,16 +10685,13 @@ class MediaPlaybackState {
   static const NONE = const MediaPlaybackState._internal(0);
 
   ///The media is playing.
-  static const PLAYING =
-  const MediaPlaybackState._internal(1);
+  static const PLAYING = const MediaPlaybackState._internal(1);
 
   ///The media playback is paused.
-  static const PAUSED =
-  const MediaPlaybackState._internal(2);
+  static const PAUSED = const MediaPlaybackState._internal(2);
 
   ///The media is not playing, and cannot be resumed until the user revokes the suspension.
-  static const SUSPENDED =
-  const MediaPlaybackState._internal(3);
+  static const SUSPENDED = const MediaPlaybackState._internal(3);
 
   bool operator ==(value) => value == _value;
 

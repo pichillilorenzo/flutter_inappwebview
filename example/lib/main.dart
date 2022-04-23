@@ -31,8 +31,7 @@ Future main() async {
       ServiceWorkerController serviceWorkerController =
           ServiceWorkerController.instance();
 
-      await serviceWorkerController
-          .setServiceWorkerClient(ServiceWorkerClient(
+      await serviceWorkerController.setServiceWorkerClient(ServiceWorkerClient(
         shouldInterceptRequest: (request) async {
           print(request);
           return null;

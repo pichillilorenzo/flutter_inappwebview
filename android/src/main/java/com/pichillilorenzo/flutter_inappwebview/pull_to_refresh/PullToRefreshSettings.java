@@ -2,12 +2,12 @@ package com.pichillilorenzo.flutter_inappwebview.pull_to_refresh;
 
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
+import com.pichillilorenzo.flutter_inappwebview.ISettings;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class PullToRefreshSettings implements IWebViewSettings<PullToRefreshLayout> {
+public class PullToRefreshSettings implements ISettings<PullToRefreshLayout> {
   public static final String LOG_TAG = "PullToRefreshSettings";
 
   public Boolean enabled = true;

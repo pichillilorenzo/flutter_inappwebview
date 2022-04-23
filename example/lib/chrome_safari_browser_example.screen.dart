@@ -71,8 +71,7 @@ class _ChromeSafariBrowserExampleScreenState
                         keepAliveEnabled: true,
                         dismissButtonStyle: DismissButtonStyle.CLOSE,
                         presentationStyle:
-                        ModalPresentationStyle.OVER_FULL_SCREEN
-                    ));
+                            ModalPresentationStyle.OVER_FULL_SCREEN));
               },
               child: Text("Open Chrome Safari Browser")),
         ));

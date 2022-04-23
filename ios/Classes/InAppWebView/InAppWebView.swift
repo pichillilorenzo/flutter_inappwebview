@@ -1629,11 +1629,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             return
         }
         
-        if #available(iOS 14.5, *), navigationAction.request.url!.absoluteString.hasSuffix(".dat") {
-            decisionHandler(.download)
-            return
-        }
-        
         if navigationAction.request.url != nil {
             
             if let useShouldOverrideUrlLoading = settings?.useShouldOverrideUrlLoading, useShouldOverrideUrlLoading {

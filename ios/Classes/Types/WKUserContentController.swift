@@ -21,7 +21,7 @@ extension WKUserContentController {
     var contentWorlds: Set<WKContentWorld> {
         get {
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))
-            return WKUserContentController._contentWorlds[tmpAddress]!
+            return WKUserContentController._contentWorlds[tmpAddress] ?? []
         }
         set(newValue) {
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))
@@ -33,7 +33,7 @@ extension WKUserContentController {
     var userOnlyScripts: [WKUserScriptInjectionTime:OrderedSet<UserScript>] {
         get {
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))
-            return WKUserContentController._userOnlyScripts[tmpAddress]!
+            return WKUserContentController._userOnlyScripts[tmpAddress] ?? [:]
         }
         set(newValue) {
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))
@@ -45,7 +45,7 @@ extension WKUserContentController {
     var pluginScripts: [WKUserScriptInjectionTime:OrderedSet<PluginScript>] {
         get {
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))
-            return WKUserContentController._pluginScripts[tmpAddress]!
+            return WKUserContentController._pluginScripts[tmpAddress] ?? [:]
         }
         set(newValue) {
             let tmpAddress = String(format: "%p", unsafeBitCast(self, to: Int.self))

@@ -525,8 +525,7 @@ abstract class WebView {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
-  final Future<PermissionResponse?> Function(
-      InAppWebViewController controller,
+  final Future<PermissionResponse?> Function(InAppWebViewController controller,
       PermissionRequest permissionRequest)? onPermissionRequest;
 
   ///Use [onGeolocationPermissionsShowPrompt] instead.

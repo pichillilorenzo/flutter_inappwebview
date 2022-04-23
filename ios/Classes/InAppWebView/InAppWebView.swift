@@ -9,7 +9,10 @@ import Flutter
 import Foundation
 import WebKit
 
-public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate, PullToRefreshDelegate {
+public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
+                            WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate,
+                            WKDownloadDelegate,
+                            PullToRefreshDelegate {
 
     var windowId: Int64?
     var windowCreated = false
@@ -203,13 +206,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         if let menu = self.contextMenu {
             if let menuItems = menu["menuItems"] as? [[String : Any]] {
                 for menuItem in menuItems {
-                    let id = menuItem["iosId"] as! String
+                    let id = menuItem["id"]!
                     let title = menuItem["title"] as! String
-                    let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" + id
+                    let targetMethodName = "onContextMenuActionItemClicked-" + String(self.hash) + "-" +
+                                            (id is Int64 ? String(id as! Int64) : id as! String)
                     if !self.responds(to: Selector(targetMethodName)) {
                         let customAction: () -> Void = {
                             let arguments: [String: Any?] = [
-                                "iosId": id,
+                                "id": id,
+                                "iosId": id is Int64 ? String(id as! Int64) : id as! String,
                                 "androidId": nil,
                                 "title": title
                             ]
@@ -244,10 +249,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             if let menu = contextMenu {
-                let contextMenuOptions = ContextMenuOptions()
-                if let contextMenuOptionsMap = menu["options"] as? [String: Any?] {
-                    let _ = contextMenuOptions.parse(settings: contextMenuOptionsMap)
-                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuOptions.hideDefaultSystemContextMenuItems {
+                let contextMenuSettings = ContextMenuSettings()
+                if let contextMenuSettingsMap = menu["settings"] as? [String: Any?] {
+                    let _ = contextMenuSettings.parse(settings: contextMenuSettingsMap)
+                    if !action.description.starts(with: "onContextMenuActionItemClicked-") && contextMenuSettings.hideDefaultSystemContextMenuItems {
                         return false
                     }
                 }
@@ -256,6 +261,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             if contextMenuIsShowing, !action.description.starts(with: "onContextMenuActionItemClicked-") {
                 let id = action.description.compactMap({ $0.asciiValue?.description }).joined()
                 let arguments: [String: Any?] = [
+                    "id": id,
                     "iosId": id,
                     "androidId": nil,
                     "title": action.description
@@ -1514,11 +1520,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     var action = response["action"] as? Int
                     action = action != nil ? action : 0;
                     switch action {
-                    case 1:
-                        decisionHandler(.grant)
-                        break
-                    default:
-                        decisionHandler(.deny)
+                        case 1:
+                            decisionHandler(.grant)
+                            break
+                        case 2:
+                            decisionHandler(.prompt)
+                            break
+                        default:
+                            decisionHandler(.deny)
                     }
                     return;
                 }
@@ -1552,11 +1561,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     var action = response["action"] as? Int
                     action = action != nil ? action : 0;
                     switch action {
-                    case 1:
-                        decisionHandler(.grant)
-                        break
-                    default:
-                        decisionHandler(.deny)
+                        case 1:
+                            decisionHandler(.grant)
+                            break
+                        case 2:
+                            decisionHandler(.prompt)
+                            break
+                        default:
+                            decisionHandler(.deny)
                     }
                     return;
                 }
@@ -1573,6 +1585,39 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         self.webView(webView, decidePolicyFor: navigationAction, decisionHandler: {(navigationActionPolicy) -> Void in
             decisionHandler(navigationActionPolicy, preferences)
         })
+    }
+    
+    @available(iOS 14.5, *)
+    public func download(_ download: WKDownload, decideDestinationUsing response: URLResponse, suggestedFilename: String, completionHandler: @escaping (URL?) -> Void) {
+        if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
+            let downloadStartRequest = DownloadStartRequest(url: url.absoluteString,
+                                                            userAgent: nil,
+                                                            contentDisposition: nil,
+                                                            mimeType: response.mimeType,
+                                                            contentLength: response.expectedContentLength,
+                                                            suggestedFilename: suggestedFilename,
+                                                            textEncodingName: response.textEncodingName)
+            onDownloadStartRequest(request: downloadStartRequest)
+        }
+        download.delegate = nil
+        // cancel the download
+        completionHandler(nil)
+    }
+    
+    @available(iOS 14.5, *)
+    public func webView(_ webView: WKWebView, navigationResponse: WKNavigationResponse, didBecome download: WKDownload) {
+        let response = navigationResponse.response
+        if let url = response.url, let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
+            let downloadStartRequest = DownloadStartRequest(url: url.absoluteString,
+                                                            userAgent: nil,
+                                                            contentDisposition: nil,
+                                                            mimeType: response.mimeType,
+                                                            contentLength: response.expectedContentLength,
+                                                            suggestedFilename: response.suggestedFilename,
+                                                            textEncodingName: response.textEncodingName)
+            onDownloadStartRequest(request: downloadStartRequest)
+        }
+        download.delegate = nil
     }
     
     public func webView(_ webView: WKWebView,
@@ -1602,7 +1647,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         if let r = result {
                             response = r as! [String: Any]
                             let action = response["action"] as? Int
-                            let navigationActionPolicy = WKNavigationActionPolicy.init(rawValue: action ?? WKNavigationActionPolicy.cancel.rawValue) ??
+                            let navigationActionPolicy = WKNavigationActionPolicy
+                                .init(rawValue: action ?? WKNavigationActionPolicy.cancel.rawValue) ??
                                 WKNavigationActionPolicy.cancel
                             decisionHandler(navigationActionPolicy)
                             return;
@@ -1644,15 +1690,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     var response: [String: Any]
                     if let r = result {
                         response = r as! [String: Any]
-                        var action = response["action"] as? Int
-                        action = action != nil ? action : 0;
-                        switch action {
-                            case 1:
-                                decisionHandler(.allow)
-                                break
-                            default:
-                                decisionHandler(.cancel)
-                        }
+                        let action = response["action"] as? Int
+                        let navigationActionPolicy = WKNavigationResponsePolicy
+                            .init(rawValue: action ?? WKNavigationResponsePolicy.cancel.rawValue) ??
+                            WKNavigationResponsePolicy.cancel
+                        decisionHandler(navigationActionPolicy)
                         return;
                     }
                     decisionHandler(.allow)
@@ -1661,21 +1703,26 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
         
         if let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
-            let mimeType = navigationResponse.response.mimeType
-            if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
-                if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
-                    let downloadStartRequest = DownloadStartRequest(url: url.absoluteString,
-                                                                    userAgent: nil,
-                                                                    contentDisposition: nil,
-                                                                    mimeType: mimeType,
-                                                                    contentLength: navigationResponse.response.expectedContentLength,
-                                                                    suggestedFilename: navigationResponse.response.suggestedFilename,
-                                                                    textEncodingName: navigationResponse.response.textEncodingName)
-                    onDownloadStartRequest(request: downloadStartRequest)
-                    if useOnNavigationResponse == nil || !useOnNavigationResponse! {
-                        decisionHandler(.cancel)
+            if #available(iOS 14.5, *), !navigationResponse.canShowMIMEType {
+                decisionHandler(.download)
+                return
+            } else {
+                let mimeType = navigationResponse.response.mimeType
+                if let url = navigationResponse.response.url, navigationResponse.isForMainFrame {
+                    if url.scheme != "file", mimeType != nil, !mimeType!.starts(with: "text/") {
+                        let downloadStartRequest = DownloadStartRequest(url: url.absoluteString,
+                                                                        userAgent: nil,
+                                                                        contentDisposition: nil,
+                                                                        mimeType: mimeType,
+                                                                        contentLength: navigationResponse.response.expectedContentLength,
+                                                                        suggestedFilename: navigationResponse.response.suggestedFilename,
+                                                                        textEncodingName: navigationResponse.response.textEncodingName)
+                        onDownloadStartRequest(request: downloadStartRequest)
+                        if useOnNavigationResponse == nil || !useOnNavigationResponse! {
+                            decisionHandler(.cancel)
+                        }
+                        return
                     }
-                    return
                 }
             }
         }
@@ -1791,8 +1838,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                                 completionHandler(.useCredential, credential)
                                 break
                             case 2:
-                                if InAppWebView.credentialsProposed.count == 0 {
-                                    for (protectionSpace, credentials) in CredentialDatabase.credentialStore!.allCredentials {
+                                if InAppWebView.credentialsProposed.count == 0, let credentialStore = CredentialDatabase.credentialStore {
+                                    for (protectionSpace, credentials) in credentialStore.allCredentials {
                                         if protectionSpace.host == host && protectionSpace.realm == realm &&
                                         protectionSpace.protocol == prot && protectionSpace.port == port {
                                             for credential in credentials {
@@ -3023,6 +3070,12 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     }
     
     public func dispose() {
+        channel = nil
+        removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
+        removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
+        removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
+        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
         resumeTimers()
         stopLoading()
         disposeWebMessageChannels()
@@ -3043,15 +3096,10 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             InAppWebView.windowWebViews.removeValue(forKey: wId)
         }
         configuration.userContentController.dispose(windowId: windowId)
-        removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
-        removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
-        removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
         NotificationCenter.default.removeObserver(self)
         for imp in customIMPs {
             imp_removeBlock(imp)
         }
-        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
-        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
         longPressRecognizer.removeTarget(self, action: #selector(longPressGestureDetected))
         longPressRecognizer.delegate = nil
         scrollView.removeGestureRecognizer(longPressRecognizer)
@@ -3068,7 +3116,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         navigationDelegate = nil
         scrollView.delegate = nil
         isPausedTimersCompletionHandler = nil
-        channel = nil
         SharedLastTouchPointTimestamp.removeValue(forKey: self)
         callAsyncJavaScriptBelowIOS14Results.removeAll()
         super.removeFromSuperview()

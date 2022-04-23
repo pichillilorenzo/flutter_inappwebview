@@ -6,7 +6,7 @@ import android.webkit.WebSettings;
 
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
+import com.pichillilorenzo.flutter_inappwebview.ISettings;
 import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 
@@ -18,7 +18,7 @@ import java.util.Map;
 import static android.webkit.WebSettings.LayoutAlgorithm.NARROW_COLUMNS;
 import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
-public class InAppWebViewSettings implements IWebViewSettings<InAppWebViewInterface> {
+public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
   public static final String LOG_TAG = "InAppWebViewSettings";
 

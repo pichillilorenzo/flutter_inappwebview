@@ -222,5 +222,6 @@ public class WebMessageListener : FlutterMethodCallDelegate {
     
     deinit {
         print("WebMessageListener - dealloc")
+        dispose()
     }
 }

@@ -241,8 +241,8 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       settings.additionalTrustedOrigins = map["additionalTrustedOrigins"];
       switch (map["displayMode"]["type"]) {
         case "IMMERSIVE_MODE":
-          settings.displayMode =
-              TrustedWebActivityImmersiveDisplayMode.fromMap(map["displayMode"]);
+          settings.displayMode = TrustedWebActivityImmersiveDisplayMode.fromMap(
+              map["displayMode"]);
           break;
         case "DEFAULT_MODE":
         default:
@@ -255,15 +255,15 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       settings.entersReaderIfAvailable = map["entersReaderIfAvailable"];
       settings.barCollapsingEnabled = map["barCollapsingEnabled"];
       settings.dismissButtonStyle =
-        DismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
+          DismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
       settings.preferredBarTintColor =
           UtilColor.fromHex(map["preferredBarTintColor"]);
       settings.preferredControlTintColor =
           UtilColor.fromHex(map["preferredControlTintColor"]);
       settings.presentationStyle =
-        ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+          ModalPresentationStyle.fromValue(map["presentationStyle"])!;
       settings.transitionStyle =
-        ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+          ModalTransitionStyle.fromValue(map["transitionStyle"])!;
     }
     return settings;
   }

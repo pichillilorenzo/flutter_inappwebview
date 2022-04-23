@@ -7,7 +7,7 @@
 
 import Foundation
 
-public class PullToRefreshSettings : IWebViewSettings<PullToRefreshControl> {
+public class PullToRefreshSettings : ISettings<PullToRefreshControl> {
     
     var enabled = true
     var color: String?

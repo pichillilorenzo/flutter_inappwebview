@@ -7,6 +7,19 @@
 - Added support for `onPermissionRequest` event on iOS 15.0+
 - Updated `getMetaThemeColor` on iOS 15.0+
 
+## 5.4.1+1
+
+- Fixed Android default context menu over custom context menu on API Level 31+ 
+
+## 5.4.1
+
+- Managed iOS native `detachFromEngine` flutter plugin event and updated `dispose` methods
+- Updated Android native `HeadlessInAppWebViewManager.dispose` and `HeadlessInAppWebView.dispose` methods
+
+## 5.4.0+3
+
+- Fixed Android error in some cases when calling `setServiceWorkerClient` java method on `ServiceWorkerManager` initialization
+
 ## 5.4.0+2
 
 - Fixed Android `ChromeCustomTabsActivity` not responding to the `ActionBroadcastReceiver`

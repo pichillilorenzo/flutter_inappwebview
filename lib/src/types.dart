@@ -4716,6 +4716,11 @@ class PermissionResponseAction {
   ///Grants origin the permission to access the given resources.
   static const GRANT = const PermissionResponseAction._internal(1);
 
+  ///Prompt the user for permission for the requested resource.
+  ///
+  ///**NOTE**: available only on iOS 15.0+. It will fallback to [DENY].
+  static const PROMPT = const PermissionResponseAction._internal(2);
+
   bool operator ==(value) => value == _value;
 
   @override
@@ -4768,7 +4773,8 @@ class PermissionResourceType {
     PermissionResourceType.RESOURCE_VIDEO_CAPTURE,
   ].toSet();
 
-  static final Set<PermissionResourceType> _appleValues = <PermissionResourceType>[
+  static final Set<PermissionResourceType> _appleValues =
+      <PermissionResourceType>[
     PermissionResourceType.CAMERA,
     PermissionResourceType.MICROPHONE,
     PermissionResourceType.CAMERA_AND_MICROPHONE,
@@ -4814,52 +4820,51 @@ class PermissionResourceType {
   ///Resource belongs to audio capture device, like microphone.
   ///
   ///**NOTE**: available only on Android.
-  static const RESOURCE_AUDIO_CAPTURE = const PermissionResourceType._internal('android.webkit.resource.AUDIO_CAPTURE');
+  static const RESOURCE_AUDIO_CAPTURE = const PermissionResourceType._internal(
+      'android.webkit.resource.AUDIO_CAPTURE');
 
-  ///Resource will allow sysex messages to be sent to or received from MIDI devices. 
-  ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware. 
+  ///Resource will allow sysex messages to be sent to or received from MIDI devices.
+  ///These messages are privileged operations, e.g. modifying sound libraries and sampling data, or even updating the MIDI device's firmware.
   ///Permission may be requested for this resource in API levels 21 and above, if the Android device has been updated to WebView 45 or above.
   ///
   ///**NOTE**: available only on Android.
-  static const RESOURCE_MIDI_SYSEX =
-  const PermissionResourceType._internal('android.webkit.resource.MIDI_SYSEX');
+  static const RESOURCE_MIDI_SYSEX = const PermissionResourceType._internal(
+      'android.webkit.resource.MIDI_SYSEX');
 
   ///Resource belongs to protected media identifier. After the user grants this resource, the origin can use EME APIs to generate the license requests.
   ///
   ///**NOTE**: available only on Android.
   static const RESOURCE_PROTECTED_MEDIA_ID =
-  const PermissionResourceType._internal('android.webkit.resource.PROTECTED_MEDIA_ID');
-
+      const PermissionResourceType._internal(
+          'android.webkit.resource.PROTECTED_MEDIA_ID');
 
   ///Resource belongs to video capture device, like camera.
   ///
   ///**NOTE**: available only on Android.
-  static const RESOURCE_VIDEO_CAPTURE =
-  const PermissionResourceType._internal('android.webkit.resource.VIDEO_CAPTURE');
+  static const RESOURCE_VIDEO_CAPTURE = const PermissionResourceType._internal(
+      'android.webkit.resource.VIDEO_CAPTURE');
 
   ///A media device that can capture video.
   ///
   ///**NOTE**: available only on iOS.
-  static const CAMERA =
-  const PermissionResourceType._internal(0);
+  static const CAMERA = const PermissionResourceType._internal(0);
 
   ///A media device that can capture audio.
   ///
   ///**NOTE**: available only on iOS.
-  static const MICROPHONE =
-  const PermissionResourceType._internal(1);
+  static const MICROPHONE = const PermissionResourceType._internal(1);
 
   ///A media device or devices that can capture audio and video.
   ///
   ///**NOTE**: available only on iOS.
   static const CAMERA_AND_MICROPHONE =
-  const PermissionResourceType._internal(2);
+      const PermissionResourceType._internal(2);
 
   ///Resource belongs to the device’s orientation and motion.
   ///
   ///**NOTE**: available only on iOS.
   static const DEVICE_ORIENTATION_AND_MOTION =
-  const PermissionResourceType._internal('deviceOrientationAndMotion');
+      const PermissionResourceType._internal('deviceOrientationAndMotion');
 
   bool operator ==(value) => value == _value;
 
@@ -4873,15 +4878,16 @@ class PermissionRequest {
   Uri origin;
 
   ///List of resources the web content wants to access.
+  ///
+  ///**NOTE for iOS**: this list will have only 1 element and will be used by the [PermissionResponse.action]
+  ///as the resource to consider when applying the corresponding action.
   List<PermissionResourceType> resources;
 
   ///The frame that initiates the request in the web view.
   FrameInfo? frame;
 
   PermissionRequest(
-      {required this.origin,
-        this.resources = const [],
-      this.frame});
+      {required this.origin, this.resources = const [], this.frame});
 
   static PermissionRequest? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
@@ -4890,8 +4896,7 @@ class PermissionRequest {
 
     List<PermissionResourceType> resources = [];
     if (map["resources"] != null) {
-      (map["resources"].cast<dynamic>() as List<dynamic>)
-          .forEach((element) {
+      (map["resources"].cast<dynamic>() as List<dynamic>).forEach((element) {
         var resource = PermissionResourceType.fromValue(element);
         if (resource != null) {
           resources.add(resource);
@@ -4907,7 +4912,7 @@ class PermissionRequest {
 
   Map<String, dynamic> toMap() {
     return {
-      "origin": origin.toString(), 
+      "origin": origin.toString(),
       "resources": resources.map((e) => e.toValue()).toList(),
       "frame": frame?.toMap()
     };
@@ -4926,14 +4931,15 @@ class PermissionRequest {
 ///Class that represents the response used by the [WebView.onPermissionRequest] event.
 class PermissionResponse {
   ///Resources granted to be accessed by origin.
+  ///
+  ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
 
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.
   PermissionResponseAction? action;
 
   PermissionResponse(
-      {this.resources = const [],
-        this.action = PermissionResponseAction.DENY});
+      {this.resources = const [], this.action = PermissionResponseAction.DENY});
 
   Map<String, dynamic> toMap() {
     return {
@@ -4994,6 +5000,11 @@ class NavigationActionPolicy {
 
   ///Allow the navigation to continue.
   static const ALLOW = const NavigationActionPolicy._internal(1);
+
+  ///Turn the navigation into a download.
+  ///
+  ///**NOTE**: available only on iOS 14.5+. It will fallback to [CANCEL].
+  static const DOWNLOAD = const NavigationActionPolicy._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -5763,6 +5774,11 @@ class NavigationAction {
   ///**NOTE**: available only on iOS.
   FrameInfo? targetFrame;
 
+  ///A value indicating whether the web content used a download attribute to indicate that this should be downloaded.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? shouldPerformDownload;
+
   NavigationAction(
       {required this.request,
       required this.isForMainFrame,
@@ -5775,7 +5791,8 @@ class NavigationAction {
       @Deprecated("Use sourceFrame instead") this.iosSourceFrame,
       this.sourceFrame,
       @Deprecated("Use targetFrame instead") this.iosTargetFrame,
-      this.targetFrame}) {
+      this.targetFrame,
+      this.shouldPerformDownload}) {
     // ignore: deprecated_member_use_from_same_package
     this.hasGesture = this.hasGesture ?? this.androidHasGesture;
     // ignore: deprecated_member_use_from_same_package
@@ -5820,7 +5837,8 @@ class NavigationAction {
             // ignore: deprecated_member_use_from_same_package
             IOSWKFrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
         targetFrame:
-            FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()));
+            FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
+        shouldPerformDownload: map["shouldPerformDownload"]);
   }
 
   Map<String, dynamic> toMap() {
@@ -5849,6 +5867,7 @@ class NavigationAction {
       "iosTargetFrame": targetFrame?.toMap() ?? iosTargetFrame?.toMap(),
       // ignore: deprecated_member_use_from_same_package
       "targetFrame": targetFrame?.toMap() ?? iosTargetFrame?.toMap(),
+      "shouldPerformDownload": shouldPerformDownload
     };
   }
 
@@ -8955,6 +8974,11 @@ class NavigationResponseAction {
   ///Allow the navigation to continue.
   static const ALLOW = const NavigationResponseAction._internal(1);
 
+  ///Turn the navigation into a download.
+  ///
+  ///**NOTE**: available only on iOS 14.5+. It will fallback to [CANCEL].
+  static const DOWNLOAD = const NavigationResponseAction._internal(2);
+
   bool operator ==(value) => value == _value;
 
   @override
@@ -10687,16 +10711,13 @@ class MediaPlaybackState {
   static const NONE = const MediaPlaybackState._internal(0);
 
   ///The media is playing.
-  static const PLAYING =
-  const MediaPlaybackState._internal(1);
+  static const PLAYING = const MediaPlaybackState._internal(1);
 
   ///The media playback is paused.
-  static const PAUSED =
-  const MediaPlaybackState._internal(2);
+  static const PAUSED = const MediaPlaybackState._internal(2);
 
   ///The media is not playing, and cannot be resumed until the user revokes the suspension.
-  static const SUSPENDED =
-  const MediaPlaybackState._internal(3);
+  static const SUSPENDED = const MediaPlaybackState._internal(3);
 
   bool operator ==(value) => value == _value;
 

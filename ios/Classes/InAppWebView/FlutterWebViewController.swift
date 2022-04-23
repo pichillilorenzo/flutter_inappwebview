@@ -164,7 +164,8 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
     
     func dispose() {
         channel?.setMethodCallHandler(nil)
-        methodCallDelegate?.webView = nil
+        channel = nil
+        methodCallDelegate?.dispose()
         methodCallDelegate = nil
         webView?.dispose()
         webView = nil

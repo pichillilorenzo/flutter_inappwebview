@@ -72,4 +72,12 @@ class InAppWebViewStatic: NSObject, FlutterPlugin {
             completionHandler(defaultUserAgent)
         }
     }
+    
+    public func dispose() {
+        InAppWebViewStatic.channel?.setMethodCallHandler(nil)
+        InAppWebViewStatic.channel = nil
+        InAppWebViewStatic.registrar = nil
+        InAppWebViewStatic.webViewForUserAgent = nil
+        InAppWebViewStatic.defaultUserAgent = nil
+    }
 }

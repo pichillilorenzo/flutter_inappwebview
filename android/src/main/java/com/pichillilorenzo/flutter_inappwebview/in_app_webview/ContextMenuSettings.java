@@ -1,16 +1,16 @@
 package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
 
-import com.pichillilorenzo.flutter_inappwebview.IWebViewSettings;
+import com.pichillilorenzo.flutter_inappwebview.ISettings;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ContextMenuOptions implements IWebViewSettings<Object> {
+public class ContextMenuSettings implements ISettings<Object> {
   public static final String LOG_TAG = "ContextMenuOptions";
 
   public Boolean hideDefaultSystemContextMenuItems = false;
 
-  public ContextMenuOptions parse(Map<String, Object> options) {
+  public ContextMenuSettings parse(Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();

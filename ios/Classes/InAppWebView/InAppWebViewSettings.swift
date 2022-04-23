@@ -9,7 +9,7 @@ import Foundation
 import WebKit
 
 @objcMembers
-public class InAppWebViewSettings: IWebViewSettings<InAppWebView> {
+public class InAppWebViewSettings: ISettings<InAppWebView> {
     
     var useShouldOverrideUrlLoading = false
     var useOnLoadResource = false

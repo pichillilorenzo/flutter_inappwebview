@@ -100,6 +100,11 @@ class MyCookieManager: NSObject, FlutterPlugin {
                           isHttpOnly: Bool?,
                           sameSite: String?,
                           result: @escaping FlutterResult) {
+        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
+            result(false)
+            return
+        }
+        
         var properties: [HTTPCookiePropertyKey: Any] = [:]
         properties[.originURL] = url
         properties[.name] = name
@@ -138,7 +143,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
         
         let cookie = HTTPCookie(properties: properties)!
         
-        MyCookieManager.httpCookieStore!.setCookie(cookie, completionHandler: {() in
+        httpCookieStore.setCookie(cookie, completionHandler: {() in
             result(true)
         })
     }
@@ -146,8 +151,13 @@ class MyCookieManager: NSObject, FlutterPlugin {
     public static func getCookies(url: String, result: @escaping FlutterResult) {
         var cookieList: [[String: Any?]] = []
         
+        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
+            result(cookieList)
+            return
+        }
+        
         if let urlHost = URL(string: url)?.host {
-            MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
+            httpCookieStore.getAllCookies { (cookies) in
                 for cookie in cookies {
                     if urlHost.hasSuffix(cookie.domain) || ".\(urlHost)".hasSuffix(cookie.domain) {
                         var sameSite: String? = nil
@@ -189,7 +199,12 @@ class MyCookieManager: NSObject, FlutterPlugin {
     public static func getAllCookies(result: @escaping FlutterResult) {
         var cookieList: [[String: Any?]] = []
         
-        MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
+        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
+            result(cookieList)
+            return
+        }
+        
+        httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
                 var sameSite: String? = nil
                 if #available(iOS 13.0, *) {
@@ -221,7 +236,12 @@ class MyCookieManager: NSObject, FlutterPlugin {
     }
     
     public static func deleteCookie(url: String, name: String, domain: String, path: String, result: @escaping FlutterResult) {
-        MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
+        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
+            result(false)
+            return
+        }
+    
+        httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
                 var originURL = ""
                 if cookie.properties![.originURL] is String {
@@ -234,7 +254,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
                     continue
                 }
                 if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.name == name && cookie.path == path {
-                    MyCookieManager.httpCookieStore!.delete(cookie, completionHandler: {
+                    httpCookieStore.delete(cookie, completionHandler: {
                         result(true)
                     })
                     return
@@ -245,7 +265,12 @@ class MyCookieManager: NSObject, FlutterPlugin {
     }
     
     public static func deleteCookies(url: String, domain: String, path: String, result: @escaping FlutterResult) {
-        MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
+        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
+            result(false)
+            return
+        }
+        
+        httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
                 var originURL = ""
                 if cookie.properties![.originURL] is String {
@@ -258,7 +283,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
                     continue
                 }
                 if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.path == path {
-                    MyCookieManager.httpCookieStore!.delete(cookie, completionHandler: nil)
+                    httpCookieStore.delete(cookie, completionHandler: nil)
                 }
             }
             result(true)
@@ -271,5 +296,12 @@ class MyCookieManager: NSObject, FlutterPlugin {
         WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes as! Set<String>, modifiedSince: date as Date, completionHandler:{
             result(true)
         })
+    }
+    
+    public func dispose() {
+        MyCookieManager.channel?.setMethodCallHandler(nil)
+        MyCookieManager.channel = nil
+        MyCookieManager.registrar = nil
+        MyCookieManager.httpCookieStore = nil
     }
 }

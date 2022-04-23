@@ -1,12 +1,7 @@
 import 'dart:collection';
-// import 'dart:convert';
-import 'dart:io';
-// import 'dart:typed_data';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-// import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'main.dart';
@@ -43,8 +38,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     contextMenu = ContextMenu(
         menuItems: [
           ContextMenuItem(
-              androidId: 1,
-              iosId: "1",
+              id: 1,
               title: "Special",
               action: () async {
                 print("Menu item Special clicked!");
@@ -62,11 +56,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
           print("onHideContextMenu");
         },
         onContextMenuActionItemClicked: (contextMenuItemClicked) async {
-          var id = (Platform.isAndroid)
-              ? contextMenuItemClicked.androidId
-              : contextMenuItemClicked.iosId;
           print("onContextMenuActionItemClicked: " +
-              id.toString() +
+              contextMenuItemClicked.id.toString() +
               " " +
               contextMenuItemClicked.title);
         });
@@ -76,9 +67,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
         color: Colors.blue,
       ),
       onRefresh: () async {
-        if (Platform.isAndroid) {
+        if (defaultTargetPlatform == TargetPlatform.android) {
           webViewController?.reload();
-        } else if (Platform.isIOS) {
+        } else if (defaultTargetPlatform == TargetPlatform.iOS) {
           webViewController?.loadUrl(
               urlRequest: URLRequest(url: await webViewController?.getUrl()));
         }

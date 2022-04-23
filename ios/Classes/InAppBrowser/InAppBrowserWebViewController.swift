@@ -182,6 +182,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     
     deinit {
         print("InAppBrowserWebViewController - dealloc")
+        dispose()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -550,7 +551,10 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func dispose() {
-        webView.dispose()
+        onExit()
+        channel?.setMethodCallHandler(nil)
+        channel = nil
+        webView?.dispose()
         webView = nil
         view = nil
         if previousStatusBarStyle != -1 {
@@ -563,18 +567,15 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         backButton.target = nil
         reloadButton.target = nil
         shareButton.target = nil
-        onExit()
-        channel?.setMethodCallHandler(nil)
-        channel = nil
         methodCallDelegate?.webView = nil
         methodCallDelegate = nil
     }
     
     public func onBrowserCreated() {
-        channel!.invokeMethod("onBrowserCreated", arguments: [])
+        channel?.invokeMethod("onBrowserCreated", arguments: [])
     }
     
     public func onExit() {
-        channel!.invokeMethod("onExit", arguments: [])
+        channel?.invokeMethod("onExit", arguments: [])
     }
 }

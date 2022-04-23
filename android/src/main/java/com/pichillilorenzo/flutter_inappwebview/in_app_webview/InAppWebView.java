@@ -54,8 +54,6 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.types.DownloadStartRequest;
-import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -76,6 +74,8 @@ import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PrintJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PromisePolyfillJS;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
+import com.pichillilorenzo.flutter_inappwebview.types.DownloadStartRequest;
+import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
@@ -1356,8 +1356,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     Menu actionMenu = actionMode.getMenu();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      actionMode.hide(3000);
+    }
+    List<MenuItem> defaultMenuItems = new ArrayList<>();
+    for (int i = 0; i < actionMenu.size(); i++) {
+      defaultMenuItems.add(actionMenu.getItem(i));
+    }
+    actionMenu.clear();
+    actionMode.finish();
     if (customSettings.disableContextMenu) {
-      actionMenu.clear();
       return actionMode;
     }
 
@@ -1367,19 +1375,18 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     LinearLayout menuItemListLayout = (LinearLayout) horizontalScrollView.getChildAt(0);
 
     List<Map<String, Object>> customMenuItems = new ArrayList<>();
-    ContextMenuOptions contextMenuOptions = new ContextMenuOptions();
+    ContextMenuSettings contextMenuSettings = new ContextMenuSettings();
     if (contextMenu != null) {
       customMenuItems = (List<Map<String, Object>>) contextMenu.get("menuItems");
-      Map<String, Object> contextMenuOptionsMap = (Map<String, Object>) contextMenu.get("options");
-      if (contextMenuOptionsMap != null) {
-        contextMenuOptions.parse(contextMenuOptionsMap);
+      Map<String, Object> contextMenuSettingsMap = (Map<String, Object>) contextMenu.get("settings");
+      if (contextMenuSettingsMap != null) {
+        contextMenuSettings.parse(contextMenuSettingsMap);
       }
     }
     customMenuItems = customMenuItems == null ? new ArrayList<Map<String, Object>>() : customMenuItems;
 
-    if (contextMenuOptions.hideDefaultSystemContextMenuItems == null || !contextMenuOptions.hideDefaultSystemContextMenuItems) {
-      for (int i = 0; i < actionMenu.size(); i++) {
-        final MenuItem menuItem = actionMenu.getItem(i);
+    if (contextMenuSettings.hideDefaultSystemContextMenuItems == null || !contextMenuSettings.hideDefaultSystemContextMenuItems) {
+      for (final MenuItem menuItem : defaultMenuItems) {
         final int itemId = menuItem.getItemId();
         final String itemTitle = menuItem.getTitle().toString();
 
@@ -1393,6 +1400,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             callback.onActionItemClicked(actionMode, menuItem);
 
             Map<String, Object> obj = new HashMap<>();
+            obj.put("id", itemId);
             obj.put("androidId", itemId);
             obj.put("iosId", null);
             obj.put("title", itemTitle);
@@ -1406,7 +1414,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
 
     for (final Map<String, Object> menuItem : customMenuItems) {
-      final int itemId = (int) menuItem.get("androidId");
+      final int itemId = (int) menuItem.get("id");
       final String itemTitle = (String) menuItem.get("title");
       TextView text = (TextView) LayoutInflater.from(this.getContext())
               .inflate(R.layout.floating_action_mode_item, this, false);
@@ -1417,6 +1425,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
           hideContextMenu();
 
           Map<String, Object> obj = new HashMap<>();
+          obj.put("id", itemId);
           obj.put("androidId", itemId);
           obj.put("iosId", null);
           obj.put("title", itemTitle);
@@ -1456,7 +1465,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         checkContextMenuShouldBeClosedTask.run();
       }
     }
-    actionMenu.clear();
 
     return actionMode;
   }

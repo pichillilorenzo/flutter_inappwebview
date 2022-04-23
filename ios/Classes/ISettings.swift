@@ -8,13 +8,13 @@
 import Foundation
 
 @objcMembers
-public class IWebViewSettings<T>: NSObject {
+public class ISettings<T>: NSObject {
     
     override init(){
         super.init()
     }
     
-    func parse(settings: [String: Any?]) -> IWebViewSettings {
+    func parse(settings: [String: Any?]) -> ISettings {
         for (key, value) in settings {
             if !(value is NSNull), value != nil, self.responds(to: Selector(key)) {
                 self.setValue(value, forKey: key)

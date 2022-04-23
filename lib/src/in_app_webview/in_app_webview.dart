@@ -472,8 +472,7 @@ class InAppWebView extends StatefulWidget implements WebView {
       NavigationResponse navigationResponse)? onNavigationResponse;
 
   @override
-  final Future<PermissionResponse?> Function(
-      InAppWebViewController controller,
+  final Future<PermissionResponse?> Function(InAppWebViewController controller,
       PermissionRequest permissionRequest)? onPermissionRequest;
 
   @override

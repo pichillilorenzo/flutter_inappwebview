@@ -83,7 +83,6 @@ class InAppBrowserExampleScreen extends StatefulWidget {
 }
 
 class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
-
   late PullToRefreshController pullToRefreshController;
 
   @override
@@ -99,7 +98,8 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
           widget.browser.webViewController.reload();
         } else if (Platform.isIOS) {
           widget.browser.webViewController.loadUrl(
-              urlRequest: URLRequest(url: await widget.browser.webViewController.getUrl()));
+              urlRequest: URLRequest(
+                  url: await widget.browser.webViewController.getUrl()));
         }
       },
     );
@@ -121,14 +121,14 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
               ElevatedButton(
                   onPressed: () async {
                     await widget.browser.openUrlRequest(
-                        urlRequest:
-                            URLRequest(url: Uri.parse("https://flutter.dev")),
-                        settings: InAppBrowserClassSettings(
-                          webViewSettings: InAppWebViewSettings(
-                            useShouldOverrideUrlLoading: true,
-                            useOnLoadResource: true,
-                          ),
+                      urlRequest:
+                          URLRequest(url: Uri.parse("https://flutter.dev")),
+                      settings: InAppBrowserClassSettings(
+                        webViewSettings: InAppWebViewSettings(
+                          useShouldOverrideUrlLoading: true,
+                          useOnLoadResource: true,
                         ),
+                      ),
                     );
                   },
                   child: Text("Open In-App Browser")),

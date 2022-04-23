@@ -38,50 +38,6 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
     channel.setMethodCallHandler(this);
     if (WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_BASIC_USAGE)) {
       serviceWorkerController = ServiceWorkerControllerCompat.getInstance();
-      serviceWorkerController.setServiceWorkerClient(new ServiceWorkerClientCompat() {
-        @Nullable
-        @Override
-        public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
-          final Map<String, Object> obj = new HashMap<>();
-          obj.put("url", request.getUrl().toString());
-          obj.put("method", request.getMethod());
-          obj.put("headers", request.getRequestHeaders());
-          obj.put("isForMainFrame", request.isForMainFrame());
-          obj.put("hasGesture", request.hasGesture());
-          obj.put("isRedirect", request.isRedirect());
-
-          Util.WaitFlutterResult flutterResult;
-          try {
-            flutterResult = Util.invokeMethodAndWait(channel, "shouldInterceptRequest", obj);
-          } catch (InterruptedException e) {
-            e.printStackTrace();
-            return null;
-          }
-
-          if (flutterResult.error != null) {
-            Log.e(LOG_TAG, flutterResult.error);
-          }
-          else if (flutterResult.result != null) {
-            Map<String, Object> res = (Map<String, Object>) flutterResult.result;
-            String contentType = (String) res.get("contentType");
-            String contentEncoding = (String) res.get("contentEncoding");
-            byte[] data = (byte[]) res.get("data");
-            Map<String, String> responseHeaders = (Map<String, String>) res.get("headers");
-            Integer statusCode = (Integer) res.get("statusCode");
-            String reasonPhrase = (String) res.get("reasonPhrase");
-
-            ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
-
-            if ((responseHeaders == null && statusCode == null && reasonPhrase == null) || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-              return new WebResourceResponse(contentType, contentEncoding, inputStream);
-            } else {
-              return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
-            }
-          }
-
-          return null;
-        }
-      });
     } else {
       serviceWorkerController = null;
     }
@@ -92,6 +48,13 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
     ServiceWorkerWebSettingsCompat serviceWorkerWebSettings = (serviceWorkerController != null) ? serviceWorkerController.getServiceWorkerWebSettings() : null;
 
     switch (call.method) {
+      case "setServiceWorkerClient":
+        {
+          Boolean isNull = (Boolean) call.argument("isNull");
+          setServiceWorkerClient(isNull);
+        }
+        result.success(true);
+        break;
       case "getAllowContentAccess":
         if (serviceWorkerWebSettings != null && WebViewFeature.isFeatureSupported(WebViewFeature.SERVICE_WORKER_CONTENT_ACCESS)) {
           result.success(serviceWorkerWebSettings.getAllowContentAccess());
@@ -152,9 +115,62 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
         result.notImplemented();
     }
   }
+  
+  private void setServiceWorkerClient(Boolean isNull) {
+    if (serviceWorkerController != null) {
+      serviceWorkerController.setServiceWorkerClient(isNull ? null : new ServiceWorkerClientCompat() {
+        @Nullable
+        @Override
+        public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
+          final Map<String, Object> obj = new HashMap<>();
+          obj.put("url", request.getUrl().toString());
+          obj.put("method", request.getMethod());
+          obj.put("headers", request.getRequestHeaders());
+          obj.put("isForMainFrame", request.isForMainFrame());
+          obj.put("hasGesture", request.hasGesture());
+          obj.put("isRedirect", request.isRedirect());
+
+          Util.WaitFlutterResult flutterResult;
+          try {
+            flutterResult = Util.invokeMethodAndWait(channel, "shouldInterceptRequest", obj);
+          } catch (InterruptedException e) {
+            e.printStackTrace();
+            return null;
+          }
+
+          if (flutterResult.error != null) {
+            Log.e(LOG_TAG, flutterResult.error);
+          }
+          else if (flutterResult.result != null) {
+            Map<String, Object> res = (Map<String, Object>) flutterResult.result;
+            String contentType = (String) res.get("contentType");
+            String contentEncoding = (String) res.get("contentEncoding");
+            byte[] data = (byte[]) res.get("data");
+            Map<String, String> responseHeaders = (Map<String, String>) res.get("headers");
+            Integer statusCode = (Integer) res.get("statusCode");
+            String reasonPhrase = (String) res.get("reasonPhrase");
+
+            ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
+
+            if ((responseHeaders == null && statusCode == null && reasonPhrase == null) || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
+              return new WebResourceResponse(contentType, contentEncoding, inputStream);
+            } else {
+              return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
+            }
+          }
+
+          return null;
+        }
+      }); 
+    }
+  }
 
   public void dispose() {
     channel.setMethodCallHandler(null);
+    if (serviceWorkerController != null) {
+      serviceWorkerController.setServiceWorkerClient(null);
+      serviceWorkerController = null; 
+    }
     plugin = null;
   }
 }

@@ -286,7 +286,7 @@ class InAppBrowserSettings
       settings.closeOnCannotGoBack = map["closeOnCannotGoBack"];
       settings.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
       settings.shouldCloseOnBackButtonPressed =
-      map["shouldCloseOnBackButtonPressed"];
+          map["shouldCloseOnBackButtonPressed"];
     }
     if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       settings.toolbarTopTranslucent = map["toolbarTopTranslucent"];
@@ -301,9 +301,9 @@ class InAppBrowserSettings
       settings.closeButtonCaption = map["closeButtonCaption"];
       settings.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
       settings.presentationStyle =
-      ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+          ModalPresentationStyle.fromValue(map["presentationStyle"])!;
       settings.transitionStyle =
-      ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+          ModalTransitionStyle.fromValue(map["transitionStyle"])!;
     }
     return settings;
   }

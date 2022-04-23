@@ -731,9 +731,9 @@ class InAppWebViewController
           List<String> resources = call.arguments["resources"].cast<String>();
 
           Map<String, dynamic> arguments =
-            call.arguments.cast<String, dynamic>();
+              call.arguments.cast<String, dynamic>();
           PermissionRequest permissionRequest =
-            PermissionRequest.fromMap(arguments)!;
+              PermissionRequest.fromMap(arguments)!;
 
           if (_webview != null) {
             if (_webview!.onPermissionRequest != null)
@@ -747,11 +747,12 @@ class InAppWebViewController
                   ?.toMap();
             }
           } else {
-            return (await _inAppBrowser!
-                        .onPermissionRequest(permissionRequest))?.toMap() ??
-                    (await _inAppBrowser!
+            return (await _inAppBrowser!.onPermissionRequest(permissionRequest))
+                    ?.toMap() ??
+                (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
-                        .androidOnPermissionRequest(origin, resources))?.toMap();
+                        .androidOnPermissionRequest(origin, resources))
+                    ?.toMap();
           }
         }
         break;
@@ -944,16 +945,18 @@ class InAppWebViewController
         if (contextMenu != null) {
           int? androidId = call.arguments["androidId"];
           String? iosId = call.arguments["iosId"];
+          dynamic id = call.arguments["id"];
           String title = call.arguments["title"];
 
           ContextMenuItem menuItemClicked = ContextMenuItem(
-              androidId: androidId, iosId: iosId, title: title, action: null);
+              id: id,
+              androidId: androidId,
+              iosId: iosId,
+              title: title,
+              action: null);
 
           for (var menuItem in contextMenu.menuItems) {
-            if ((defaultTargetPlatform == TargetPlatform.android &&
-                    menuItem.androidId == androidId) ||
-                (defaultTargetPlatform == TargetPlatform.iOS &&
-                    menuItem.iosId == iosId)) {
+            if (menuItem.id == id) {
               menuItemClicked = menuItem;
               if (menuItem.action != null) {
                 menuItem.action!();
@@ -1864,7 +1867,8 @@ class InAppWebViewController
   ///Use [setSettings] instead.
   @Deprecated('Use setSettings instead')
   Future<void> setOptions({required InAppWebViewGroupOptions options}) async {
-    InAppWebViewSettings settings = InAppWebViewSettings.fromMap(options.toMap());
+    InAppWebViewSettings settings =
+        InAppWebViewSettings.fromMap(options.toMap());
     await setSettings(settings: settings);
   }
 
@@ -2325,7 +2329,8 @@ class InAppWebViewController
 
     try {
       Map<String, dynamic> args = <String, dynamic>{};
-      themeColor = UtilColor.fromStringRepresentation(await _channel.invokeMethod('getMetaThemeColor', args));
+      themeColor = UtilColor.fromStringRepresentation(
+          await _channel.invokeMethod('getMetaThemeColor', args));
     } catch (e) {
       // not implemented
     }

@@ -1414,7 +1414,7 @@ class InAppWebViewSettings
       settings.hardwareAcceleration = map["hardwareAcceleration"];
       settings.supportMultipleWindows = map["supportMultipleWindows"];
       settings.regexToCancelSubFramesLoading =
-      map["regexToCancelSubFramesLoading"];
+          map["regexToCancelSubFramesLoading"];
       settings.useHybridComposition = map["useHybridComposition"];
       settings.useShouldInterceptRequest = map["useShouldInterceptRequest"];
       settings.useOnRenderProcessGone = map["useOnRenderProcessGone"];
@@ -1424,7 +1424,7 @@ class InAppWebViewSettings
       settings.verticalScrollbarPosition =
           VerticalScrollbarPosition.fromValue(map["verticalScrollbarPosition"]);
       settings.scrollBarDefaultDelayBeforeFade =
-      map["scrollBarDefaultDelayBeforeFade"];
+          map["scrollBarDefaultDelayBeforeFade"];
       settings.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
       settings.scrollBarFadeDuration = map["scrollBarFadeDuration"];
       settings.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
@@ -1443,28 +1443,28 @@ class InAppWebViewSettings
       settings.disallowOverScroll = map["disallowOverScroll"];
       settings.enableViewportScale = map["enableViewportScale"];
       settings.suppressesIncrementalRendering =
-      map["suppressesIncrementalRendering"];
+          map["suppressesIncrementalRendering"];
       settings.allowsAirPlayForMediaPlayback =
-      map["allowsAirPlayForMediaPlayback"];
+          map["allowsAirPlayForMediaPlayback"];
       settings.allowsBackForwardNavigationGestures =
-      map["allowsBackForwardNavigationGestures"];
+          map["allowsBackForwardNavigationGestures"];
       settings.allowsLinkPreview = map["allowsLinkPreview"];
       settings.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
       settings.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
       settings.allowsPictureInPictureMediaPlayback =
-      map["allowsPictureInPictureMediaPlayback"];
+          map["allowsPictureInPictureMediaPlayback"];
       settings.isFraudulentWebsiteWarningEnabled =
-      map["isFraudulentWebsiteWarningEnabled"];
+          map["isFraudulentWebsiteWarningEnabled"];
       settings.selectionGranularity =
-      SelectionGranularity.fromValue(map["selectionGranularity"])!;
+          SelectionGranularity.fromValue(map["selectionGranularity"])!;
       settings.dataDetectorTypes = dataDetectorTypes;
       settings.sharedCookiesEnabled = map["sharedCookiesEnabled"];
       settings.automaticallyAdjustsScrollIndicatorInsets =
-      map["automaticallyAdjustsScrollIndicatorInsets"];
+          map["automaticallyAdjustsScrollIndicatorInsets"];
       settings.accessibilityIgnoresInvertColors =
-      map["accessibilityIgnoresInvertColors"];
+          map["accessibilityIgnoresInvertColors"];
       settings.decelerationRate =
-      ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
+          ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
       settings.alwaysBounceVertical = map["alwaysBounceVertical"];
       settings.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
       settings.scrollsToTop = map["scrollsToTop"];
@@ -1472,24 +1472,26 @@ class InAppWebViewSettings
       settings.maximumZoomScale = map["maximumZoomScale"];
       settings.minimumZoomScale = map["minimumZoomScale"];
       settings.contentInsetAdjustmentBehavior =
-      ScrollViewContentInsetAdjustmentBehavior.fromValue(
-          map["contentInsetAdjustmentBehavior"])!;
+          ScrollViewContentInsetAdjustmentBehavior.fromValue(
+              map["contentInsetAdjustmentBehavior"])!;
       settings.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
       settings.mediaType = map["mediaType"];
       settings.pageZoom = map["pageZoom"];
       settings.limitsNavigationsToAppBoundDomains =
-      map["limitsNavigationsToAppBoundDomains"];
+          map["limitsNavigationsToAppBoundDomains"];
       settings.useOnNavigationResponse = map["useOnNavigationResponse"];
       settings.applePayAPIEnabled = map["applePayAPIEnabled"];
       settings.allowingReadAccessTo = map["allowingReadAccessTo"] != null
           ? Uri.parse(map["allowingReadAccessTo"])
           : null;
       settings.disableLongPressContextMenuOnLinks =
-      map["disableLongPressContextMenuOnLinks"];
+          map["disableLongPressContextMenuOnLinks"];
       settings.disableInputAccessoryView = map["disableInputAccessoryView"];
-      settings.underPageBackgroundColor = UtilColor.fromHex(map["underPageBackgroundColor"]);
+      settings.underPageBackgroundColor =
+          UtilColor.fromHex(map["underPageBackgroundColor"]);
       settings.isTextInteractionEnabled = map["isTextInteractionEnabled"];
-      settings.isSiteSpecificQuirksModeEnabled = map["isSiteSpecificQuirksModeEnabled"];
+      settings.isSiteSpecificQuirksModeEnabled =
+          map["isSiteSpecificQuirksModeEnabled"];
       settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
     }
     return settings;

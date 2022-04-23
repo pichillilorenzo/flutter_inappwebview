@@ -553,8 +553,12 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
         }
     }
     
+    public func dispose() {
+        webView = nil
+    }
+    
     deinit {
         print("InAppWebViewMethodHandler - dealloc")
-        webView = nil
+        dispose()
     }
 }

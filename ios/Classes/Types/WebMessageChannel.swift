@@ -126,6 +126,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
     
     public func dispose() {
         channel?.setMethodCallHandler(nil)
+        channel = nil
         for port in ports {
             port.dispose()
         }
@@ -140,11 +141,11 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
             }
         })();
         """)
-        channel = nil
         webView = nil
     }
     
     deinit {
         print("WebMessageChannel - dealloc")
+        dispose()
     }
 }

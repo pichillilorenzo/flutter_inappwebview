@@ -1,3 +1,8 @@
+## 5.4.1
+
+- Managed iOS native `detachFromEngine` flutter plugin event and updated `dispose` methods
+- Updated Android native `HeadlessInAppWebViewManager.dispose` and `HeadlessInAppWebView.dispose` methods
+
 ## 5.4.0+3
 
 - Fixed Android error in some cases when calling `setServiceWorkerClient` java method on `ServiceWorkerManager` initialization

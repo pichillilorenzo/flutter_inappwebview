@@ -109,5 +109,6 @@ public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
     
     deinit {
         print("PullToRefreshControl - dealloc")
+        dispose()
     }
 }

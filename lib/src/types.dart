@@ -4717,6 +4717,11 @@ class PermissionResponseAction {
   ///Grants origin the permission to access the given resources.
   static const GRANT = const PermissionResponseAction._internal(1);
 
+  ///Prompt the user for permission for the requested resource.
+  ///
+  ///**NOTE**: available only on iOS 15.0+. It will fallback to [DENY].
+  static const PROMPT = const PermissionResponseAction._internal(2);
+
   bool operator ==(value) => value == _value;
 
   @override
@@ -4875,6 +4880,9 @@ class PermissionRequest {
   Uri origin;
 
   ///List of resources the web content wants to access.
+  ///
+  ///**NOTE for iOS**: this list will have only 1 element and will be used by the [PermissionResponse.action]
+  ///as the resource to consider when applying the corresponding action.
   List<PermissionResourceType> resources;
 
   ///The frame that initiates the request in the web view.
@@ -4925,6 +4933,8 @@ class PermissionRequest {
 ///Class that represents the response used by the [WebView.onPermissionRequest] event.
 class PermissionResponse {
   ///Resources granted to be accessed by origin.
+  ///
+  ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
   List<PermissionResourceType> resources;
 
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.
@@ -4992,6 +5002,11 @@ class NavigationActionPolicy {
 
   ///Allow the navigation to continue.
   static const ALLOW = const NavigationActionPolicy._internal(1);
+
+  ///Turn the navigation into a download.
+  ///
+  ///**NOTE**: available only on iOS 14.5+. It will fallback to [CANCEL].
+  static const DOWNLOAD = const NavigationActionPolicy._internal(2);
 
   bool operator ==(value) => value == _value;
 
@@ -5761,6 +5776,11 @@ class NavigationAction {
   ///**NOTE**: available only on iOS.
   FrameInfo? targetFrame;
 
+  ///A value indicating whether the web content used a download attribute to indicate that this should be downloaded.
+  ///
+  ///**NOTE**: available only on iOS.
+  bool? shouldPerformDownload;
+
   NavigationAction(
       {required this.request,
       required this.isForMainFrame,
@@ -5773,7 +5793,8 @@ class NavigationAction {
       @Deprecated("Use sourceFrame instead") this.iosSourceFrame,
       this.sourceFrame,
       @Deprecated("Use targetFrame instead") this.iosTargetFrame,
-      this.targetFrame}) {
+      this.targetFrame,
+      this.shouldPerformDownload}) {
     // ignore: deprecated_member_use_from_same_package
     this.hasGesture = this.hasGesture ?? this.androidHasGesture;
     // ignore: deprecated_member_use_from_same_package
@@ -5818,7 +5839,8 @@ class NavigationAction {
             // ignore: deprecated_member_use_from_same_package
             IOSWKFrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
         targetFrame:
-            FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()));
+            FrameInfo.fromMap(map["targetFrame"]?.cast<String, dynamic>()),
+        shouldPerformDownload: map["shouldPerformDownload"]);
   }
 
   Map<String, dynamic> toMap() {
@@ -5847,6 +5869,7 @@ class NavigationAction {
       "iosTargetFrame": targetFrame?.toMap() ?? iosTargetFrame?.toMap(),
       // ignore: deprecated_member_use_from_same_package
       "targetFrame": targetFrame?.toMap() ?? iosTargetFrame?.toMap(),
+      "shouldPerformDownload": shouldPerformDownload
     };
   }
 
@@ -8952,6 +8975,11 @@ class NavigationResponseAction {
 
   ///Allow the navigation to continue.
   static const ALLOW = const NavigationResponseAction._internal(1);
+
+  ///Turn the navigation into a download.
+  ///
+  ///**NOTE**: available only on iOS 14.5+. It will fallback to [CANCEL].
+  static const DOWNLOAD = const NavigationResponseAction._internal(2);
 
   bool operator ==(value) => value == _value;
 

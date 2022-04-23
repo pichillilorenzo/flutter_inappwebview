@@ -25,6 +25,7 @@ public class NavigationAction {
     navigationActionMap.put("navigationType", null);
     navigationActionMap.put("sourceFrame", null);
     navigationActionMap.put("targetFrame", null);
+    navigationActionMap.put("shouldPerformDownload", null);
     return navigationActionMap;
   }
 

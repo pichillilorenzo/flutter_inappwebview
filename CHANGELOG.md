@@ -1,3 +1,7 @@
+## 5.4.1+1
+
+- Fixed Android default context menu over custom context menu on API Level 31+ 
+
 ## 5.4.1
 
 - Managed iOS native `detachFromEngine` flutter plugin event and updated `dispose` methods

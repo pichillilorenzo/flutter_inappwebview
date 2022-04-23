@@ -81,8 +81,8 @@ class ContextMenuItem {
 
   ContextMenuItem(
       {this.id,
-      this.androidId,
-      this.iosId,
+      @Deprecated("Use id instead") this.androidId,
+      @Deprecated("Use id instead") this.iosId,
       required this.title,
       this.action}) {
     if (defaultTargetPlatform == TargetPlatform.android) {

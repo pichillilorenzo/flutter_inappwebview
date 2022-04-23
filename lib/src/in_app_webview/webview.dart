@@ -188,9 +188,13 @@ abstract class WebView {
   ///Also, note that calling [InAppWebViewController.setSettings] method using the controller of the new created WebView,
   ///it will update also the WebView options of the caller WebView.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///Also, there is no way to block the opening the window in a synchronous way, so returning `true` will just close it quickly.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onCreateWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
+  ///- Web
   final Future<bool?> Function(InAppWebViewController controller,
       CreateWindowAction createWindowAction)? onCreateWindow;
 
@@ -205,17 +209,23 @@ abstract class WebView {
   ///Event fired when the JavaScript `window` object of the WebView has received focus.
   ///This is the result of the `focus` JavaScript event applied to the `window` object.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web ([Official API - Window.onfocus](https://developer.mozilla.org/en-US/docs/Web/API/Window/focus_event))
   final void Function(InAppWebViewController controller)? onWindowFocus;
 
   ///Event fired when the JavaScript `window` object of the WebView has lost focus.
   ///This is the result of the `blur` JavaScript event applied to the `window` object.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web ([Official API - Window.onblur](https://developer.mozilla.org/en-US/docs/Web/API/Window/blur_event))
   final void Function(InAppWebViewController controller)? onWindowBlur;
 
   ///Event fired when javascript calls the `alert()` method to display an alert dialog.
@@ -400,9 +410,12 @@ abstract class WebView {
   ///
   ///[url] represents the url on which is called.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   final void Function(InAppWebViewController controller, Uri? url)? onPrint;
 
   ///Event fired when an HTML element of the webview has been clicked and held.
@@ -420,6 +433,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onShowCustomView](https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)))
   ///- iOS ([Official API - UIWindow.didBecomeVisibleNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621621-didbecomevisiblenotification))
+  ///- Web ([Official API - Document.onfullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event))
   final void Function(InAppWebViewController controller)? onEnterFullscreen;
 
   ///Event fired when the current page has exited full screen mode.
@@ -431,6 +445,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onHideCustomView](https://developer.android.com/reference/android/webkit/WebChromeClient#onHideCustomView()))
   ///- iOS ([Official API - UIWindow.didBecomeHiddenNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621617-didbecomehiddennotification))
+  ///- Web ([Official API - Document.onfullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event))
   final void Function(InAppWebViewController controller)? onExitFullscreen;
 
   ///Called when the web view begins to receive web content.
@@ -450,9 +465,12 @@ abstract class WebView {
   ///
   ///[title] represents the string containing the new title of the document.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTitle](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)))
   ///- iOS
+  ///- Web
   final void Function(InAppWebViewController controller, String? title)?
       onTitleChanged;
 
@@ -478,9 +496,12 @@ abstract class WebView {
   ///
   ///[newScale] The new zoom scale factor.
   ///
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onScaleChanged](https://developer.android.com/reference/android/webkit/WebViewClient#onScaleChanged(android.webkit.WebView,%20float,%20float)))
   ///- iOS ([Official API - UIScrollViewDelegate.scrollViewDidZoom](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619409-scrollviewdidzoom))
+  ///- Web
   final void Function(
           InAppWebViewController controller, double oldScale, double newScale)?
       onZoomScaleChanged;

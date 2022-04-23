@@ -201,40 +201,40 @@ class InAppWebViewWebElement {
     settings = newSettings;
   }
 
-  onLoadStart(String url) async {
+  void onLoadStart(String url) async {
     isLoading = true;
 
     var obj = {
       "url": url
     };
-    _channel.invokeMethod("onLoadStart", obj);
+    await _channel.invokeMethod("onLoadStart", obj);
   }
 
-  onLoadStop(String url) async {
+  void onLoadStop(String url) async {
     isLoading = false;
 
     var obj = {
       "url": url
     };
-    _channel.invokeMethod("onLoadStop", obj);
+    await _channel.invokeMethod("onLoadStop", obj);
   }
 
-  onUpdateVisitedHistory(String url) async {
+  void onUpdateVisitedHistory(String url) async {
     var obj = {
       "url": url
     };
-    _channel.invokeMethod("onUpdateVisitedHistory", obj);
+    await _channel.invokeMethod("onUpdateVisitedHistory", obj);
   }
 
-  onScrollChanged(int x, int y) async {
+  void onScrollChanged(int x, int y) async {
     var obj = {
       "x": x,
       "y": y
     };
-    _channel.invokeMethod("onScrollChanged", obj);
+    await _channel.invokeMethod("onScrollChanged", obj);
   }
 
-  onConsoleMessage(String type, String? message) async {
+  void onConsoleMessage(String type, String? message) async {
     int messageLevel = 1;
     switch (type) {
       case 'debug':
@@ -255,6 +255,75 @@ class InAppWebViewWebElement {
       "messageLevel": messageLevel,
       "message": message
     };
-    _channel.invokeMethod("onConsoleMessage", obj);
+    await _channel.invokeMethod("onConsoleMessage", obj);
+  }
+
+  Future<bool?> onCreateWindow(int windowId, String url, String? target, String? windowFeatures) async {
+    Map<String, dynamic> windowFeaturesMap = {};
+    List<String> features = windowFeatures?.split(",") ?? [];
+    for (var feature in features) {
+      var keyValue = feature.trim().split("=");
+      if (keyValue.length == 2) {
+        var key = keyValue[0].trim();
+        var value = keyValue[1].trim();
+        if (['height', 'width', 'x', 'y'].contains(key)) {
+          windowFeaturesMap[key] = double.parse(value);
+        } else {
+          windowFeaturesMap[key] = value;
+        }
+      }
+    }
+
+    var obj = {
+      "windowId": windowId,
+      "isForMainFrame": true,
+      "request": {
+        "url": url,
+        "method": "GET"
+      },
+      "windowFeatures": windowFeaturesMap
+    };
+    return await _channel.invokeMethod("onCreateWindow", obj);
+  }
+
+  void onWindowFocus() async {
+    await _channel.invokeMethod("onWindowFocus");
+  }
+
+  void onWindowBlur() async {
+    await _channel.invokeMethod("onWindowBlur");
+  }
+
+  void onPrint(String? url) async {
+    var obj = {
+      "url": url
+    };
+
+    await _channel.invokeMethod("onPrint", obj);
+  }
+
+  void onEnterFullscreen() async {
+    await _channel.invokeMethod("onEnterFullscreen");
+  }
+
+  void onExitFullscreen() async {
+    await _channel.invokeMethod("onExitFullscreen");
+  }
+
+  void onTitleChanged(String? title) async {
+    var obj = {
+      "title": title
+    };
+
+    await _channel.invokeMethod("onTitleChanged", obj);
+  }
+
+  void onZoomScaleChanged(double oldScale, double newScale) async {
+    var obj = {
+      "oldScale": oldScale,
+      "newScale": newScale
+    };
+
+    await _channel.invokeMethod("onZoomScaleChanged", obj);
   }
 }

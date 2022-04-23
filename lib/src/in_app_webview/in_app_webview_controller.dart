@@ -994,6 +994,27 @@ class InAppWebViewController
             _inAppBrowser!.onOverScrolled(x, y, clampedX, clampedY);
         }
         break;
+      case "onWindowFocus":
+        if (_webview != null && _webview!.onWindowFocus != null)
+          _webview!.onWindowFocus!(this);
+        else if (_inAppBrowser != null) _inAppBrowser!.onWindowFocus();
+        break;
+      case "onWindowBlur":
+        if (_webview != null && _webview!.onWindowBlur != null)
+          _webview!.onWindowBlur!(this);
+        else if (_inAppBrowser != null) _inAppBrowser!.onWindowBlur();
+        break;
+      case "onPrint":
+        if ((_webview != null && _webview!.onPrint != null) ||
+            _inAppBrowser != null) {
+          String? url = call.arguments["url"];
+          Uri? uri = url != null ? Uri.parse(url) : null;
+          if (_webview != null && _webview!.onPrint != null)
+            _webview!.onPrint!(this, uri);
+          else
+            _inAppBrowser!.onPrint(uri);
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json

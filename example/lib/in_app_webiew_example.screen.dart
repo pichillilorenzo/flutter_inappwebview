@@ -22,7 +22,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       mediaPlaybackRequiresUserGesture: false,
       useHybridComposition: true,
       allowsInlineMediaPlayback: true,
-      iframeAllow: "camera; microphone"
+      iframeAllow: "camera; microphone",
+      iframeAllowFullscreen: true
   );
 
   PullToRefreshController? pullToRefreshController;
@@ -46,7 +47,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 await webViewController?.clearFocus();
               })
         ],
-        options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
+        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
@@ -183,6 +184,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     },
                     onConsoleMessage: (controller, consoleMessage) {
                       print(consoleMessage);
+                    },
+                    onZoomScaleChanged: (controller, oldScale, newScale) {
+                      print("$oldScale $newScale");
                     },
                   ),
                   !kIsWeb && progress < 1.0

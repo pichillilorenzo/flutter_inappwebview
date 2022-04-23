@@ -36,7 +36,7 @@ class ContextMenu {
       {this.menuItems = const [],
       this.onCreateContextMenu,
       this.onHideContextMenu,
-      this.options,
+      @Deprecated("Use settings instead") this.options,
       this.settings,
       this.onContextMenuActionItemClicked});
 

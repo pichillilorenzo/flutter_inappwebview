@@ -186,9 +186,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     onConsoleMessage: (controller, consoleMessage) {
                       print(consoleMessage);
                     },
-                    onZoomScaleChanged: (controller, oldScale, newScale) {
-                      print("$oldScale $newScale");
-                    },
                   ),
                   !kIsWeb && progress < 1.0
                       ? LinearProgressIndicator(value: progress)

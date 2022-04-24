@@ -23,7 +23,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       useHybridComposition: true,
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
-      iframeAllowFullscreen: true
+      iframeAllowFullscreen: true,
+      javaScriptCanOpenWindowsAutomatically: false
   );
 
   PullToRefreshController? pullToRefreshController;

@@ -1552,7 +1552,7 @@ class InAppWebViewController
 
   ///Reloads the WebView.
   ///
-  ///**NOTE**: on Web, if `window.location.reload()` is not accessible inside the iframe, it will reload using the iframe `src` attribute.
+  ///**NOTE for Web**: if `window.location.reload()` is not accessible inside the iframe, it will reload using the iframe `src` attribute.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.reload](https://developer.android.com/reference/android/webkit/WebView#reload()))
@@ -1564,6 +1564,8 @@ class InAppWebViewController
   }
 
   ///Goes back in the history of the WebView.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBack](https://developer.android.com/reference/android/webkit/WebView#goBack()))
@@ -1586,6 +1588,8 @@ class InAppWebViewController
 
   ///Goes forward in the history of the WebView.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goForward](https://developer.android.com/reference/android/webkit/WebView#goForward()))
   ///- iOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
@@ -1606,6 +1610,8 @@ class InAppWebViewController
   }
 
   ///Goes to the history item that is the number of steps away from the current item. Steps is negative if backward and positive if forward.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBackOrForward](https://developer.android.com/reference/android/webkit/WebView#goBackOrForward(int)))
@@ -1629,6 +1635,8 @@ class InAppWebViewController
   }
 
   ///Navigates to a [WebHistoryItem] from the back-forward [WebHistory.list] and sets it as the current item.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -1654,9 +1662,12 @@ class InAppWebViewController
 
   ///Stops the WebView from loading.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.stopLoading](https://developer.android.com/reference/android/webkit/WebView#stopLoading()))
   ///- iOS ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
+  ///- Web ([Official API - Window.stop](https://developer.mozilla.org/en-US/docs/Web/API/Window/stop))
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('stopLoading', args);
@@ -1677,6 +1688,8 @@ class InAppWebViewController
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.evaluateJavascript](https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
@@ -1687,7 +1700,7 @@ class InAppWebViewController
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     var data = await _channel.invokeMethod('evaluateJavascript', args);
-    if (data != null && defaultTargetPlatform == TargetPlatform.android) {
+    if (data != null && (defaultTargetPlatform == TargetPlatform.android || kIsWeb)) {
       try {
         // try to json decode the data coming from JavaScript
         // otherwise return it as it is.

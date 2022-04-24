@@ -97,16 +97,28 @@ class InAppWebViewWebElement {
 
   void prepare() {
     settings = initialSettings ?? InAppWebViewSettings();
+
+    Set<Sandbox> sandbox = Set.from(Sandbox.values);
+
+    if (!settings.javaScriptEnabled) {
+      sandbox.remove(Sandbox.ALLOW_SCRIPTS);
+    }
+
     iframe.allow = settings.iframeAllow ?? iframe.allow;
     iframe.allowFullscreen = settings.iframeAllowFullscreen ?? iframe.allowFullscreen;
-    if (settings.iframeSandox != null) {
-      iframe.setAttribute("sandbox", settings.iframeSandox ?? "");
-    }
-    iframe.referrerPolicy = settings.iframeReferrerPolicy ?? iframe.referrerPolicy;
+    iframe.referrerPolicy = settings.iframeReferrerPolicy?.toValue() ?? iframe.referrerPolicy;
     iframe.name = settings.iframeName ?? iframe.name;
     iframe.csp = settings.iframeCsp ?? iframe.csp;
 
-    bridgeJsObject.callMethod("prepare");
+    if (settings.iframeSandbox != null && settings.iframeSandbox != Sandbox.ALLOW_ALL) {
+      iframe.setAttribute("sandbox", settings.iframeSandbox!.map((e) => e.toValue()).join(" "));
+    } else if (settings.iframeSandbox == Sandbox.ALLOW_ALL) {
+      iframe.removeAttribute("sandbox");
+    } else if (sandbox != Sandbox.values) {
+      iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+    }
+
+    bridgeJsObject.callMethod("prepare", [js.JsObject.jsify(settings.toMap())]);
   }
 
   void makeInitialLoad() async {
@@ -179,18 +191,39 @@ class InAppWebViewWebElement {
     bridgeJsObject.callMethod("stopLoading");
   }
 
+  Set<Sandbox> getSandbox() {
+    var sandbox = iframe.sandbox;
+    Set<Sandbox> values = Set();
+    if (sandbox != null) {
+      for (int i = 0; i < sandbox.length; i++) {
+        var token = Sandbox.fromValue(sandbox.item(i));
+        if (token != null) {
+          values.add(token);
+        }
+      }
+    }
+    return values.isEmpty ? Set.from(Sandbox.values) : values;
+  }
+
   Future<void> setSettings(InAppWebViewSettings newSettings) async {
+    Set<Sandbox> sandbox = getSandbox();
+
+    if (settings.javaScriptEnabled != newSettings.javaScriptEnabled) {
+      if (!newSettings.javaScriptEnabled) {
+        sandbox.remove(Sandbox.ALLOW_SCRIPTS);
+      } else {
+        sandbox.add(Sandbox.ALLOW_SCRIPTS);
+      }
+    }
+
     if (settings.iframeAllow != newSettings.iframeAllow) {
       iframe.allow = newSettings.iframeAllow;
     }
     if (settings.iframeAllowFullscreen != newSettings.iframeAllowFullscreen) {
       iframe.allowFullscreen = newSettings.iframeAllowFullscreen;
     }
-    if (settings.iframeSandox != newSettings.iframeSandox) {
-      iframe.setAttribute("sandbox", newSettings.iframeSandox ?? "");
-    }
     if (settings.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
-      iframe.referrerPolicy = newSettings.iframeReferrerPolicy;
+      iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toValue();
     }
     if (settings.iframeName != newSettings.iframeName) {
       iframe.name = newSettings.iframeName;
@@ -198,6 +231,20 @@ class InAppWebViewWebElement {
     if (settings.iframeCsp != newSettings.iframeCsp) {
       iframe.csp = newSettings.iframeCsp;
     }
+
+    if (settings.iframeSandbox != newSettings.iframeSandbox) {
+      var sandbox = newSettings.iframeSandbox;
+      if (sandbox != null && sandbox != Sandbox.ALLOW_ALL) {
+        iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+      } else if (sandbox == Sandbox.ALLOW_ALL) {
+        iframe.removeAttribute("sandbox");
+      }
+    } else if (sandbox != Sandbox.values) {
+      iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+    }
+
+    bridgeJsObject.callMethod("setSettings", [js.JsObject.jsify(settings.toMap()), js.JsObject.jsify(newSettings.toMap())]);
+
     settings = newSettings;
   }
 

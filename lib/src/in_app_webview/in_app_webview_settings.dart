@@ -87,13 +87,17 @@ class InAppWebViewSettings
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   bool javaScriptEnabled;
 
   ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   ///
+  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   bool javaScriptCanOpenWindowsAutomatically;
 
   ///Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
@@ -995,31 +999,31 @@ class InAppWebViewSettings
   ///- iOS
   bool upgradeKnownHostsToHTTPS;
 
-  ///Specifies a feature policy for the iframe. A list of origins the frame is allowed to display content from.
-  ///This attribute also accepts the values `self` and `src` which represent the origin in the iframe's src attribute.
-  ///The default value is `src`.
+  ///Specifies a feature policy for the `<iframe>`.
+  ///The policy defines what features are available to the `<iframe>` based on the origin of the request
+  ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
   String? iframeAllow;
 
-  ///A boolean value indicating whether the inline frame is willing to be placed into full screen mode.
+  ///Set to true if the `<iframe>` can activate fullscreen mode by calling the `requestFullscreen()` method.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
   bool? iframeAllowFullscreen;
 
-  ///A DOMTokenList that reflects the sandbox HTML attribute, indicating extra restrictions on the behavior of the nested content.
+  ///Applies extra restrictions to the content in the frame.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
-  String? iframeSandox;
+  List<Sandbox>? iframeSandbox;
 
   ///A string that reflects the `referrerpolicy` HTML attribute indicating which referrer to use when fetching the linked resource.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
-  String? iframeReferrerPolicy;
+  ReferrerPolicy? iframeReferrerPolicy;
 
   ///A string that reflects the `name` HTML attribute, containing a name by which to refer to the frame.
   ///
@@ -1027,7 +1031,7 @@ class InAppWebViewSettings
   ///- Web
   String? iframeName;
 
-  ///Specifies the Content Security Policy that an embedded document must agree to enforce upon itself.
+  ///A Content Security Policy enforced for the embedded resource.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
@@ -1155,7 +1159,7 @@ class InAppWebViewSettings
       this.upgradeKnownHostsToHTTPS = true,
       this.iframeAllow,
       this.iframeAllowFullscreen,
-      this.iframeSandox,
+      this.iframeSandbox,
       this.iframeReferrerPolicy,
       this.iframeName,
       this.iframeCsp,}) {
@@ -1303,7 +1307,7 @@ class InAppWebViewSettings
       "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
       "iframeAllow": iframeAllow,
       "iframeAllowFullscreen": iframeAllowFullscreen,
-      "iframeSandox": iframeSandox,
+      "iframeSandbox": iframeSandbox?.map((e) => e.toValue()),
       "iframeReferrerPolicy": iframeReferrerPolicy,
       "iframeName": iframeName,
       "iframeCsp": iframeCsp,
@@ -1366,8 +1370,9 @@ class InAppWebViewSettings
     if (kIsWeb) {
       settings.iframeAllow = map["iframeAllow"];
       settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
-      settings.iframeSandox = map["iframeSandox"];
-      settings.iframeReferrerPolicy = map["iframeReferrerPolicy"];
+      settings.iframeSandbox = (map["iframeSandbox"] as List<String?>?)
+          ?.map((e) => Sandbox.fromValue(e)) as List<Sandbox>?;
+      settings.iframeReferrerPolicy = ReferrerPolicy.fromValue(map["iframeReferrerPolicy"]);
       settings.iframeName = map["iframeName"];
       settings.iframeCsp = map["iframeCsp"];
     }

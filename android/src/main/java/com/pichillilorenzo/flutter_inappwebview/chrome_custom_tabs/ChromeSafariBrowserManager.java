@@ -41,15 +41,22 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
 
     switch (call.method) {
       case "open":
-        {
+        if (plugin != null) {
           String url = (String) call.argument("url");
           HashMap<String, Object> settings = (HashMap<String, Object>) call.argument("settings");
+          HashMap<String, Object> actionButton = (HashMap<String, Object>) call.argument("actionButton");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(plugin.activity, id, url, settings, menuItemList, result);
+          open(plugin.activity, id, url, settings, actionButton, menuItemList, result);
+        } else {
+          result.success(false);
         }
         break;
       case "isAvailable":
-        result.success(CustomTabActivityHelper.isAvailable(plugin.activity));
+        if (plugin != null) {
+          result.success(CustomTabActivityHelper.isAvailable(plugin.activity));
+        } else {
+          result.success(false);
+        }
         break;
       default:
         result.notImplemented();
@@ -57,6 +64,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
   }
 
   public void open(Activity activity, String id, String url, HashMap<String, Object> settings,
+                   HashMap<String, Object> actionButton,
                    List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
 
     Intent intent = null;
@@ -66,6 +74,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putString("id", id);
     extras.putString("managerId", this.id);
     extras.putSerializable("settings", settings);
+    extras.putSerializable("actionButton", (Serializable) actionButton);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 
     Boolean isSingleInstance = (Boolean) Util.getOrDefault(settings, "isSingleInstance", false);

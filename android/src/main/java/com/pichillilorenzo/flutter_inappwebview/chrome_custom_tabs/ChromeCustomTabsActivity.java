@@ -3,11 +3,14 @@ package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 import android.app.Activity;
 import android.app.PendingIntent;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -15,7 +18,10 @@ import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
+import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsMenuItem;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +42,10 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   protected boolean onChromeSafariBrowserOpened = false;
   protected boolean onChromeSafariBrowserCompletedInitialLoad = false;
   public ChromeSafariBrowserManager manager;
+  public String initialUrl;
+  public List<CustomTabsMenuItem> menuItems = new ArrayList<>();
+  @Nullable
+  public CustomTabsActionButton actionButton;
 
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -54,12 +64,15 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + id);
     channel.setMethodCallHandler(this);
 
-    final String url = b.getString("url");
+    initialUrl = b.getString("url");
 
     customSettings = new ChromeCustomTabsSettings();
     customSettings.parse((HashMap<String, Object>) b.getSerializable("settings"));
-
-    final List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) b.getSerializable("menuItemList");
+    actionButton = CustomTabsActionButton.fromMap((Map<String, Object>) b.getSerializable("actionButton"));
+    List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItemList");
+    for (Map<String, Object> menuItem : menuItemList) {
+      menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
+    }
 
     final ChromeCustomTabsActivity chromeCustomTabsActivity = this;
 
@@ -67,7 +80,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     customTabActivityHelper.setConnectionCallback(new CustomTabActivityHelper.ConnectionCallback() {
       @Override
       public void onCustomTabsConnected() {
-        customTabsConnected(url, menuItemList);
+        customTabsConnected();
       }
 
       @Override
@@ -139,13 +152,13 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     }
   }
 
-  public void customTabsConnected (String url, List<HashMap<String, Object>> menuItemList) {
+  public void customTabsConnected() {
     customTabsSession = customTabActivityHelper.getSession();
-    Uri uri = Uri.parse(url);
+    Uri uri = Uri.parse(initialUrl);
     customTabActivityHelper.mayLaunchUrl(uri, null, null);
 
     builder = new CustomTabsIntent.Builder(customTabsSession);
-    prepareCustomTabs(menuItemList);
+    prepareCustomTabs();
 
     CustomTabsIntent customTabsIntent = builder.build();
     prepareCustomTabsIntent(customTabsIntent);
@@ -153,7 +166,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     CustomTabActivityHelper.openCustomTab(this, customTabsIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
-  private void prepareCustomTabs(List<HashMap<String, Object>> menuItemList) {
+  private void prepareCustomTabs() {
     if (customSettings.addDefaultShareMenuItem != null) {
       builder.setShareState(customSettings.addDefaultShareMenuItem ?
               CustomTabsIntent.SHARE_STATE_ON : CustomTabsIntent.SHARE_STATE_OFF);
@@ -172,10 +185,21 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     builder.setUrlBarHidingEnabled(customSettings.enableUrlBarHiding);
     builder.setInstantAppsEnabled(customSettings.instantAppsEnabled);
 
-    for (HashMap<String, Object> menuItem : menuItemList) {
-      int id = (int) menuItem.get("id");
-      String label = (String) menuItem.get("label");
-      builder.addMenuItem(label, createPendingIntent(id));
+    for (CustomTabsMenuItem menuItem : menuItems) {
+      builder.addMenuItem(menuItem.getLabel(), 
+              createPendingIntent(menuItem.getId()));
+    }
+
+    if (actionButton != null) {
+      byte[] data = actionButton.getIcon();
+      BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+      bitmapOptions.inMutable = true;
+      Bitmap bmp = BitmapFactory.decodeByteArray(
+              data, 0, data.length, bitmapOptions
+      );
+      builder.setActionButton(bmp, actionButton.getDescription(),
+              createPendingIntent(actionButton.getId()),
+              actionButton.isShouldTint());
     }
   }
 

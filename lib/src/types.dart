@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:io';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:ui';
@@ -4787,9 +4786,9 @@ class PermissionResourceType {
       try {
         Set<PermissionResourceType> valueList =
             <PermissionResourceType>[].toSet();
-        if (Platform.isAndroid) {
+        if (defaultTargetPlatform == TargetPlatform.android) {
           valueList = PermissionResourceType._androidValues;
-        } else if (Platform.isIOS || Platform.isMacOS) {
+        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
           valueList = PermissionResourceType._appleValues;
         }
         return valueList.firstWhere((element) => element.toValue() == value);
@@ -7380,9 +7379,9 @@ class SslErrorType {
     if (value != null) {
       try {
         Set<SslErrorType> valueList = <SslErrorType>[].toSet();
-        if (Platform.isAndroid) {
+        if (defaultTargetPlatform == TargetPlatform.android) {
           valueList = SslErrorType._androidValues;
-        } else if (Platform.isIOS || Platform.isMacOS) {
+        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
           valueList = SslErrorType._appleValues;
         }
         return valueList.firstWhere((element) => element.toValue() == value);
@@ -7397,7 +7396,7 @@ class SslErrorType {
 
   @override
   String toString() {
-    if (Platform.isAndroid) {
+    if (defaultTargetPlatform == TargetPlatform.android) {
       switch (_value) {
         case 1:
           return "SSL_EXPIRED";
@@ -7413,7 +7412,7 @@ class SslErrorType {
         default:
           return "SSL_NOTYETVALID";
       }
-    } else if (Platform.isIOS || Platform.isMacOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       switch (_value) {
         case 3:
           return "DENY";

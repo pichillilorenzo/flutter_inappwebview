@@ -199,9 +199,11 @@ class ChromeSafariBrowserActionButton {
   final void Function(String url, String title) action;
 
   ChromeSafariBrowserActionButton(
-      {required this.id, required this.icon,
-        required this.description, required this.action,
-        this.shouldTint = false});
+      {required this.id,
+      required this.icon,
+      required this.description,
+      required this.action,
+      this.shouldTint = false});
 
   Map<String, dynamic> toMap() {
     return {

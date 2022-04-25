@@ -11,7 +11,7 @@ class PlatformUtil {
 
   PlatformUtil({required BinaryMessenger messenger}) {
     this._messenger = messenger;
-    
+
     _channel = MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_platformutil',
       const StandardMethodCodec(),
@@ -29,13 +29,15 @@ class PlatformUtil {
       default:
         throw PlatformException(
           code: 'Unimplemented',
-          details: 'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
+          details:
+              'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
         );
     }
   }
 
   String getWebCookieExpirationDate(int timestamp) {
-    var bridgeJsObject = js.JsObject.fromBrowserObject(js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
+    var bridgeJsObject = js.JsObject.fromBrowserObject(
+        js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
     return bridgeJsObject.callMethod("getCookieExpirationDate", [timestamp]);
   }
 

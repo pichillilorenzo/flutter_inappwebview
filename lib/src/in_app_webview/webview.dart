@@ -27,6 +27,8 @@ abstract class WebView {
   ///
   ///**NOTE for Web**: it will be dispatched at the same time of [onLoadStop] event
   ///because there isn't any way to capture the real load start event from an iframe.
+  ///If `window.location.href` isn't accessible inside the iframe,
+  ///the [url] parameter will have the current value of the `iframe.src` attribute.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
@@ -35,6 +37,9 @@ abstract class WebView {
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
   ///Event fired when the [WebView] finishes loading an [url].
+  ///
+  ///**NOTE for Web**: If `window.location.href` isn't accessible inside the iframe,
+  ///the [url] parameter will have the current value of the `iframe.src` attribute.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))

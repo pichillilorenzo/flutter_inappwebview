@@ -11,10 +11,12 @@ class HeadlessInAppWebViewWebElement {
   InAppWebViewWebElement? webView;
   late MethodChannel? _channel;
 
-  HeadlessInAppWebViewWebElement({required this.id, required BinaryMessenger messenger,
-    required this.webView}) {
+  HeadlessInAppWebViewWebElement(
+      {required this.id,
+      required BinaryMessenger messenger,
+      required this.webView}) {
     this._messenger = messenger;
-    
+
     _channel = MethodChannel(
       'com.pichillilorenzo/flutter_headless_inappwebview_${this.id}',
       const StandardMethodCodec(),
@@ -38,7 +40,8 @@ class HeadlessInAppWebViewWebElement {
       default:
         throw PlatformException(
           code: 'Unimplemented',
-          details: 'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
+          details:
+              'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
         );
     }
   }
@@ -54,7 +57,8 @@ class HeadlessInAppWebViewWebElement {
 
   Size getSize() {
     var width = webView?.iframe.getBoundingClientRect().width.toDouble() ?? 0.0;
-    var height = webView?.iframe.getBoundingClientRect().height.toDouble() ?? 0.0;
+    var height =
+        webView?.iframe.getBoundingClientRect().height.toDouble() ?? 0.0;
     return Size(width, height);
   }
 

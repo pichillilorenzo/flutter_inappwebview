@@ -47,8 +47,7 @@ class PlatformUtil {
   }
 
   ///Get cookie expiration date used by Web platform.
-  Future<String> getWebCookieExpirationDate(
-      {required DateTime date}) async {
+  Future<String> getWebCookieExpirationDate({required DateTime date}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('date', () => date.millisecondsSinceEpoch);
     return await _channel.invokeMethod('getWebCookieExpirationDate', args);

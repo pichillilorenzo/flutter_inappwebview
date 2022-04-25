@@ -20,14 +20,16 @@ class HeadlessInAppWebViewManager {
       const StandardMethodCodec(),
       _messenger,
     );
-    HeadlessInAppWebViewManager._sharedChannel.setMethodCallHandler(handleMethod);
+    HeadlessInAppWebViewManager._sharedChannel
+        .setMethodCallHandler(handleMethod);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
     switch (call.method) {
       case "run":
         String id = call.arguments["id"];
-        Map<String, dynamic> params = call.arguments["params"].cast<String, dynamic>();
+        Map<String, dynamic> params =
+            call.arguments["params"].cast<String, dynamic>();
         run(id, params);
         break;
       default:
@@ -39,21 +41,21 @@ class HeadlessInAppWebViewManager {
   void run(String id, Map<String, dynamic> params) {
     var webView = InAppWebViewWebElement(viewId: id, messenger: _messenger);
     var headlessWebView = HeadlessInAppWebViewWebElement(
-        id: id,
-        messenger: _messenger,
-        webView: webView
-    );
+        id: id, messenger: _messenger, webView: webView);
     WebPlatformManager.webViews.putIfAbsent(id, () => webView);
     webView.iframe.style.display = 'none';
-    Map<String, dynamic> initialSettings = params["initialSettings"].cast<String, dynamic>();
+    Map<String, dynamic> initialSettings =
+        params["initialSettings"].cast<String, dynamic>();
     if (initialSettings.isEmpty) {
       webView.initialSettings = InAppWebViewSettings();
     } else {
       webView.initialSettings = InAppWebViewSettings.fromMap(initialSettings);
     }
-    webView.initialUrlRequest = URLRequest.fromMap(params["initialUrlRequest"]?.cast<String, dynamic>());
+    webView.initialUrlRequest = URLRequest.fromMap(
+        params["initialUrlRequest"]?.cast<String, dynamic>());
     webView.initialFile = params["initialFile"];
-    webView.initialData = InAppWebViewInitialData.fromMap(params["initialData"]?.cast<String, dynamic>());
+    webView.initialData = InAppWebViewInitialData.fromMap(
+        params["initialData"]?.cast<String, dynamic>());
     document.body?.append(webView.iframe);
     webView.prepare();
     headlessWebView.onWebViewCreated();

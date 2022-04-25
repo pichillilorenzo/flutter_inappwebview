@@ -288,7 +288,8 @@ class InAppBrowserSettings
       settings.shouldCloseOnBackButtonPressed =
           map["shouldCloseOnBackButtonPressed"];
     }
-    if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       settings.toolbarTopTranslucent = map["toolbarTopTranslucent"];
       settings.toolbarTopTintColor =
           UtilColor.fromHex(map["toolbarTopTintColor"]);

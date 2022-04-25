@@ -82,7 +82,8 @@ class CookieManager {
       bool? isSecure,
       bool? isHttpOnly,
       HTTPCookieSameSitePolicy? sameSite,
-      @Deprecated("Use webViewController instead") InAppWebViewController? iosBelow11WebViewController,
+      @Deprecated("Use webViewController instead")
+          InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     if (domain == null) domain = _getDomainName(url);
 
@@ -200,7 +201,8 @@ class CookieManager {
   ///- Web
   Future<List<Cookie>> getCookies(
       {required Uri url,
-      @Deprecated("Use webViewController instead") InAppWebViewController? iosBelow11WebViewController,
+      @Deprecated("Use webViewController instead")
+          InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
 
@@ -318,7 +320,8 @@ class CookieManager {
   Future<Cookie?> getCookie(
       {required Uri url,
       required String name,
-      @Deprecated("Use webViewController instead") InAppWebViewController? iosBelow11WebViewController,
+      @Deprecated("Use webViewController instead")
+          InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
@@ -388,7 +391,8 @@ class CookieManager {
       required String name,
       String domain = "",
       String path = "/",
-      @Deprecated("Use webViewController instead") InAppWebViewController? iosBelow11WebViewController,
+      @Deprecated("Use webViewController instead")
+          InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     if (domain.isEmpty) domain = _getDomainName(url);
 
@@ -449,7 +453,8 @@ class CookieManager {
       {required Uri url,
       String domain = "",
       String path = "/",
-      @Deprecated("Use webViewController instead") InAppWebViewController? iosBelow11WebViewController,
+      @Deprecated("Use webViewController instead")
+          InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
     if (domain.isEmpty) domain = _getDomainName(url);
 
@@ -537,13 +542,13 @@ class CookieManager {
   Future<String> _getCookieExpirationDate(int expiresDate) async {
     var platformUtil = PlatformUtil.instance();
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
-    return !kIsWeb ?
-        await platformUtil.formatDate(
-          date: dateTime,
-          format: 'EEE, dd MMM yyyy hh:mm:ss z',
-          locale: 'en_US',
-          timezone: 'GMT') :
-        await platformUtil.getWebCookieExpirationDate(date: dateTime);
+    return !kIsWeb
+        ? await platformUtil.formatDate(
+            date: dateTime,
+            format: 'EEE, dd MMM yyyy hh:mm:ss z',
+            locale: 'en_US',
+            timezone: 'GMT')
+        : await platformUtil.getWebCookieExpirationDate(date: dateTime);
   }
 }
 

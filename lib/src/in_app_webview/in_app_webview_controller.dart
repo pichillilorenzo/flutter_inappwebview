@@ -75,7 +75,8 @@ class InAppWebViewController
 
   InAppWebViewController(dynamic id, WebView webview) {
     this._id = id;
-    this._channel = MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
+    this._channel =
+        MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
     this._webview = webview;
     this._userScripts =
@@ -1700,7 +1701,8 @@ class InAppWebViewController
     args.putIfAbsent('source', () => source);
     args.putIfAbsent('contentWorld', () => contentWorld?.toMap());
     var data = await _channel.invokeMethod('evaluateJavascript', args);
-    if (data != null && (defaultTargetPlatform == TargetPlatform.android || kIsWeb)) {
+    if (data != null &&
+        (defaultTargetPlatform == TargetPlatform.android || kIsWeb)) {
       try {
         // try to json decode the data coming from JavaScript
         // otherwise return it as it is.

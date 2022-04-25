@@ -21,7 +21,8 @@ class InAppWebViewWebElement {
   late js.JsObject bridgeJsObject;
   bool isLoading = false;
 
-  InAppWebViewWebElement({required dynamic viewId, required BinaryMessenger messenger}) {
+  InAppWebViewWebElement(
+      {required dynamic viewId, required BinaryMessenger messenger}) {
     this._viewId = viewId;
     this._messenger = messenger;
     iframe = IFrameElement()
@@ -38,8 +39,10 @@ class InAppWebViewWebElement {
 
     this._channel?.setMethodCallHandler(handleMethodCall);
 
-    bridgeJsObject = js.JsObject.fromBrowserObject(js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
-    bridgeJsObject['webViews'][_viewId] = bridgeJsObject.callMethod("createFlutterInAppWebView", [_viewId, iframe.id]);
+    bridgeJsObject = js.JsObject.fromBrowserObject(
+        js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
+    bridgeJsObject['webViews'][_viewId] = bridgeJsObject
+        .callMethod("createFlutterInAppWebView", [_viewId, iframe.id]);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -48,7 +51,8 @@ class InAppWebViewWebElement {
       case "getIFrameId":
         return iframe.id;
       case "loadUrl":
-        URLRequest urlRequest = URLRequest.fromMap(call.arguments["urlRequest"].cast<String, dynamic>())!;
+        URLRequest urlRequest = URLRequest.fromMap(
+            call.arguments["urlRequest"].cast<String, dynamic>())!;
         await loadUrl(urlRequest: urlRequest);
         break;
       case "loadData":
@@ -84,7 +88,8 @@ class InAppWebViewWebElement {
       case "getSettings":
         return await settings.toMap();
       case "setSettings":
-        InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(call.arguments["settings"].cast<String, dynamic>());
+        InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(
+            call.arguments["settings"].cast<String, dynamic>());
         setSettings(newSettings);
         break;
       case "dispose":
@@ -93,7 +98,8 @@ class InAppWebViewWebElement {
       default:
         throw PlatformException(
           code: 'Unimplemented',
-          details: 'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
+          details:
+              'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
         );
     }
   }
@@ -108,13 +114,17 @@ class InAppWebViewWebElement {
     }
 
     iframe.allow = settings.iframeAllow ?? iframe.allow;
-    iframe.allowFullscreen = settings.iframeAllowFullscreen ?? iframe.allowFullscreen;
-    iframe.referrerPolicy = settings.iframeReferrerPolicy?.toValue() ?? iframe.referrerPolicy;
+    iframe.allowFullscreen =
+        settings.iframeAllowFullscreen ?? iframe.allowFullscreen;
+    iframe.referrerPolicy =
+        settings.iframeReferrerPolicy?.toValue() ?? iframe.referrerPolicy;
     iframe.name = settings.iframeName ?? iframe.name;
     iframe.csp = settings.iframeCsp ?? iframe.csp;
 
-    if (settings.iframeSandbox != null && settings.iframeSandbox != Sandbox.ALLOW_ALL) {
-      iframe.setAttribute("sandbox", settings.iframeSandbox!.map((e) => e.toValue()).join(" "));
+    if (settings.iframeSandbox != null &&
+        settings.iframeSandbox != Sandbox.ALLOW_ALL) {
+      iframe.setAttribute(
+          "sandbox", settings.iframeSandbox!.map((e) => e.toValue()).join(" "));
     } else if (settings.iframeSandbox == Sandbox.ALLOW_ALL) {
       iframe.removeAttribute("sandbox");
     } else if (sandbox != Sandbox.values) {
@@ -143,23 +153,26 @@ class InAppWebViewWebElement {
     }
   }
 
-  Future<HttpRequest> _makeRequest(URLRequest urlRequest, {bool? withCredentials, String? responseType, String? mimeType, void onProgress(ProgressEvent e)?}) {
-    return HttpRequest.request(
-        urlRequest.url?.toString() ?? 'about:blank',
+  Future<HttpRequest> _makeRequest(URLRequest urlRequest,
+      {bool? withCredentials,
+      String? responseType,
+      String? mimeType,
+      void onProgress(ProgressEvent e)?}) {
+    return HttpRequest.request(urlRequest.url?.toString() ?? 'about:blank',
         method: urlRequest.method,
         requestHeaders: urlRequest.headers,
         sendData: urlRequest.body,
         withCredentials: withCredentials,
         responseType: responseType,
         mimeType: mimeType,
-        onProgress: onProgress
-    );
+        onProgress: onProgress);
   }
 
   String _convertHttpResponseToData(HttpRequest httpRequest) {
     final String contentType =
         httpRequest.getResponseHeader('content-type') ?? 'text/html';
-    return 'data:$contentType,' + Uri.encodeFull(httpRequest.responseText ?? '');
+    return 'data:$contentType,' +
+        Uri.encodeFull(httpRequest.responseText ?? '');
   }
 
   Future<void> loadUrl({required URLRequest urlRequest}) async {
@@ -171,7 +184,8 @@ class InAppWebViewWebElement {
     }
   }
 
-  Future<void> loadData({required String data, String mimeType = "text/html"}) async {
+  Future<void> loadData(
+      {required String data, String mimeType = "text/html"}) async {
     iframe.src = 'data:$mimeType,' + Uri.encodeFull(data);
   }
 
@@ -247,7 +261,8 @@ class InAppWebViewWebElement {
     if (settings.iframeSandbox != newSettings.iframeSandbox) {
       var sandbox = newSettings.iframeSandbox;
       if (sandbox != null && sandbox != Sandbox.ALLOW_ALL) {
-        iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+        iframe.setAttribute(
+            "sandbox", sandbox.map((e) => e.toValue()).join(" "));
       } else if (sandbox == Sandbox.ALLOW_ALL) {
         iframe.removeAttribute("sandbox");
       }
@@ -263,33 +278,24 @@ class InAppWebViewWebElement {
   void onLoadStart(String url) async {
     isLoading = true;
 
-    var obj = {
-      "url": url
-    };
+    var obj = {"url": url};
     await _channel?.invokeMethod("onLoadStart", obj);
   }
 
   void onLoadStop(String url) async {
     isLoading = false;
 
-    var obj = {
-      "url": url
-    };
+    var obj = {"url": url};
     await _channel?.invokeMethod("onLoadStop", obj);
   }
 
   void onUpdateVisitedHistory(String url) async {
-    var obj = {
-      "url": url
-    };
+    var obj = {"url": url};
     await _channel?.invokeMethod("onUpdateVisitedHistory", obj);
   }
 
   void onScrollChanged(int x, int y) async {
-    var obj = {
-      "x": x,
-      "y": y
-    };
+    var obj = {"x": x, "y": y};
     await _channel?.invokeMethod("onScrollChanged", obj);
   }
 
@@ -310,14 +316,12 @@ class InAppWebViewWebElement {
       default:
         messageLevel = 1;
     }
-    var obj = {
-      "messageLevel": messageLevel,
-      "message": message
-    };
+    var obj = {"messageLevel": messageLevel, "message": message};
     await _channel?.invokeMethod("onConsoleMessage", obj);
   }
 
-  Future<bool?> onCreateWindow(int windowId, String url, String? target, String? windowFeatures) async {
+  Future<bool?> onCreateWindow(
+      int windowId, String url, String? target, String? windowFeatures) async {
     Map<String, dynamic> windowFeaturesMap = {};
     List<String> features = windowFeatures?.split(",") ?? [];
     for (var feature in features) {
@@ -336,10 +340,7 @@ class InAppWebViewWebElement {
     var obj = {
       "windowId": windowId,
       "isForMainFrame": true,
-      "request": {
-        "url": url,
-        "method": "GET"
-      },
+      "request": {"url": url, "method": "GET"},
       "windowFeatures": windowFeaturesMap
     };
     return await _channel?.invokeMethod("onCreateWindow", obj);
@@ -354,9 +355,7 @@ class InAppWebViewWebElement {
   }
 
   void onPrint(String? url) async {
-    var obj = {
-      "url": url
-    };
+    var obj = {"url": url};
 
     await _channel?.invokeMethod("onPrint", obj);
   }
@@ -370,18 +369,13 @@ class InAppWebViewWebElement {
   }
 
   void onTitleChanged(String? title) async {
-    var obj = {
-      "title": title
-    };
+    var obj = {"title": title};
 
     await _channel?.invokeMethod("onTitleChanged", obj);
   }
 
   void onZoomScaleChanged(double oldScale, double newScale) async {
-    var obj = {
-      "oldScale": oldScale,
-      "newScale": newScale
-    };
+    var obj = {"oldScale": oldScale, "newScale": newScale};
 
     await _channel?.invokeMethod("onZoomScaleChanged", obj);
   }
@@ -393,7 +387,8 @@ class InAppWebViewWebElement {
     if (WebPlatformManager.webViews.containsKey(_viewId)) {
       WebPlatformManager.webViews.remove(_viewId);
     }
-    bridgeJsObject = js.JsObject.fromBrowserObject(js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
+    bridgeJsObject = js.JsObject.fromBrowserObject(
+        js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
     var webViews = bridgeJsObject['webViews'] as js.JsObject;
     if (webViews.hasProperty(_viewId)) {
       webViews.deleteProperty(_viewId);

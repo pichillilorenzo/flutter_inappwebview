@@ -4795,14 +4795,15 @@ class PermissionResourceType {
     PermissionResourceType.DEVICE_ORIENTATION_AND_MOTION,
   ].toSet();
 
-  static PermissionResourceType? fromValue(dynamic? value) {
+  static PermissionResourceType? fromValue(dynamic value) {
     if (value != null) {
       try {
         Set<PermissionResourceType> valueList =
             <PermissionResourceType>[].toSet();
         if (defaultTargetPlatform == TargetPlatform.android) {
           valueList = PermissionResourceType._androidValues;
-        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+        } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.macOS) {
           valueList = PermissionResourceType._appleValues;
         }
         return valueList.firstWhere((element) => element.toValue() == value);
@@ -7395,7 +7396,8 @@ class SslErrorType {
         Set<SslErrorType> valueList = <SslErrorType>[].toSet();
         if (defaultTargetPlatform == TargetPlatform.android) {
           valueList = SslErrorType._androidValues;
-        } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+        } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.macOS) {
           valueList = SslErrorType._appleValues;
         }
         return valueList.firstWhere((element) => element.toValue() == value);
@@ -7426,7 +7428,8 @@ class SslErrorType {
         default:
           return "SSL_NOTYETVALID";
       }
-    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       switch (_value) {
         case 3:
           return "DENY";
@@ -10768,8 +10771,7 @@ class Sandbox {
       return _NONE;
     }
     try {
-      return Sandbox.values
-          .firstWhere((element) => element.toValue() == value);
+      return Sandbox.values.firstWhere((element) => element.toValue() == value);
     } catch (e) {
       return null;
     }
@@ -10778,7 +10780,8 @@ class Sandbox {
   String? toValue() => _value;
 
   @override
-  String toString() => _value == null ? "allow-all" : (_value == "" ? "allow-none" : "");
+  String toString() =>
+      _value == null ? "allow-all" : (_value == "" ? "allow-none" : "");
 
   static const _ALL = const Sandbox._internal(null);
   static const _NONE = const Sandbox._internal("");
@@ -10799,10 +10802,12 @@ class Sandbox {
   static const ALLOW_MODALS = const Sandbox._internal("allow-modals");
 
   ///Lets the resource lock the screen orientation.
-  static const ALLOW_ORIENTATION_LOCK = const Sandbox._internal("allow-orientation-lock");
+  static const ALLOW_ORIENTATION_LOCK =
+      const Sandbox._internal("allow-orientation-lock");
 
   ///Lets the resource use the Pointer Lock API.
-  static const ALLOW_POINTER_LOCK = const Sandbox._internal("allow-pointer-lock");
+  static const ALLOW_POINTER_LOCK =
+      const Sandbox._internal("allow-pointer-lock");
 
   ///Allows popups (such as `window.open()`, `target="_blank"`, or `showModalDialog()`).
   ///If this keyword is not used, the popup will silently fail to open.
@@ -10810,10 +10815,12 @@ class Sandbox {
 
   ///Lets the sandboxed document open new windows without those windows inheriting the sandboxing.
   ///For example, this can safely sandbox an advertisement without forcing the same restrictions upon the page the ad links to.
-  static const ALLOW_POPUPS_TO_ESCAPE_SANDBOX = const Sandbox._internal("allow-popups-to-escape-sandbox");
+  static const ALLOW_POPUPS_TO_ESCAPE_SANDBOX =
+      const Sandbox._internal("allow-popups-to-escape-sandbox");
 
   ///Lets the resource start a presentation session.
-  static const ALLOW_PRESENTATION = const Sandbox._internal("allow-presentation");
+  static const ALLOW_PRESENTATION =
+      const Sandbox._internal("allow-presentation");
 
   ///If this token is not used, the resource is treated as being from a special origin that always fails the
   ///same-origin policy (potentially preventing access to data storage/cookies and some JavaScript APIs).
@@ -10823,10 +10830,12 @@ class Sandbox {
   static const ALLOW_SCRIPTS = const Sandbox._internal("allow-scripts");
 
   ///Lets the resource navigate the top-level browsing context (the one named `_top`).
-  static const ALLOW_TOP_NAVIGATION = const Sandbox._internal("allow-top-navigation");
+  static const ALLOW_TOP_NAVIGATION =
+      const Sandbox._internal("allow-top-navigation");
 
   ///Lets the resource navigate the top-level browsing context, but only if initiated by a user gesture.
-  static const ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION = const Sandbox._internal("allow-top-navigation-by-user-activation");
+  static const ALLOW_TOP_NAVIGATION_BY_USER_ACTIVATION =
+      const Sandbox._internal("allow-top-navigation-by-user-activation");
 
   bool operator ==(value) => value == _value;
 

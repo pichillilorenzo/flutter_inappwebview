@@ -45,6 +45,18 @@ Send a submission request to the [Submit App](https://inappwebview.dev/submit-ap
 
 Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://flutter.io/using-packages/).
 
+### Installation - Web support
+
+To make it work properly on the Web platformm, you need to add the `web_support.js` file inside the `<head>` of your `web/index.html` file:
+
+```html
+<head>
+    <!-- ... -->
+    <script src="/packages/flutter_inappwebview/assets/web/web_support.js" defer></script>
+    <!-- ... -->
+</head>
+```  
+
 ## Main Classes Overview
 
 * [InAppWebView](https://inappwebview.dev/docs/in-app-webview/basic-usage/): Flutter Widget for adding an inline native WebView integrated into the flutter widget tree.

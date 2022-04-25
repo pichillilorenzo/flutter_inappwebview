@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -19,8 +20,12 @@ class _HeadlessInAppWebViewExampleScreenState
   void initState() {
     super.initState();
 
+    var url = !kIsWeb
+        ? Uri.parse("https://flutter.dev")
+        : Uri.parse("http://localhost:${Uri.base.port}/page.html");
+
     headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
+      initialUrlRequest: URLRequest(url: url),
       initialSettings: InAppWebViewSettings(),
       onWebViewCreated: (controller) {
         print('HeadlessInAppWebView created!');
@@ -78,6 +83,9 @@ class _HeadlessInAppWebViewExampleScreenState
                 },
                 child: Text("Run HeadlessInAppWebView")),
           ),
+          Container(
+            height: 10,
+          ),
           Center(
             child: ElevatedButton(
                 onPressed: () async {
@@ -90,6 +98,9 @@ class _HeadlessInAppWebViewExampleScreenState
                   }
                 },
                 child: Text("Send console.log message")),
+          ),
+          Container(
+            height: 10,
           ),
           Center(
             child: ElevatedButton(

@@ -251,7 +251,8 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       }
       settings.screenOrientation = map["screenOrientation"];
     }
-    if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       settings.entersReaderIfAvailable = map["entersReaderIfAvailable"];
       settings.barCollapsingEnabled = map["barCollapsingEnabled"];
       settings.dismissButtonStyle =

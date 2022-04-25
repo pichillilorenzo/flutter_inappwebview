@@ -1,3 +1,7 @@
+## 5.4.1+2
+
+- Fixed "Android ServiceWorkerControllerCompat.setServiceWorkerClient(null) makes Webivew Plugin Crashes" [#1151](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1151)
+
 ## 5.4.1+1
 
 - Fixed Android default context menu over custom context menu on API Level 31+ 

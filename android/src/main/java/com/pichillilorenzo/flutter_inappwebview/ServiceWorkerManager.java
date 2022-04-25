@@ -118,7 +118,9 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
   
   private void setServiceWorkerClient(Boolean isNull) {
     if (serviceWorkerController != null) {
-      serviceWorkerController.setServiceWorkerClient(isNull ? null : new ServiceWorkerClientCompat() {
+      // set ServiceWorkerClient as null makes the app crashes, so just set a dummy ServiceWorkerClientCompat.
+      // https://github.com/pichillilorenzo/flutter_inappwebview/issues/1151
+      serviceWorkerController.setServiceWorkerClient(isNull ? dummyServiceWorkerClientCompat() : new ServiceWorkerClientCompat() {
         @Nullable
         @Override
         public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
@@ -165,10 +167,20 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
     }
   }
 
+  private ServiceWorkerClientCompat dummyServiceWorkerClientCompat() {
+    return new ServiceWorkerClientCompat() {
+      @Nullable
+      @Override
+      public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
+        return null;
+      }
+    };
+  }
+
   public void dispose() {
     channel.setMethodCallHandler(null);
     if (serviceWorkerController != null) {
-      serviceWorkerController.setServiceWorkerClient(null);
+      serviceWorkerController.setServiceWorkerClient(dummyServiceWorkerClientCompat());
       serviceWorkerController = null; 
     }
     plugin = null;

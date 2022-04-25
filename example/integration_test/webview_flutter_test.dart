@@ -5449,7 +5449,7 @@ setTimeout(function() {
   });
 
   group('Service Worker', () {
-    testWidgets('AndroidInAppWebViewController', (WidgetTester tester) async {
+    testWidgets('shouldInterceptRequest', (WidgetTester tester) async {
       final Completer completer = Completer();
 
       var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
@@ -5486,6 +5486,39 @@ setTimeout(function() {
       );
 
       expect(completer.future, completes);
+    }, skip: !Platform.isAndroid);
+
+    testWidgets('setServiceWorkerClient to null', (WidgetTester tester) async {
+      final Completer<String> pageLoaded = Completer<String>();
+
+      var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+          AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+      var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+          AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+
+      if (swAvailable && swInterceptAvailable) {
+        AndroidServiceWorkerController serviceWorkerController =
+        AndroidServiceWorkerController.instance();
+
+        await serviceWorkerController.setServiceWorkerClient(null);
+      }
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrlRequest:
+            URLRequest(url: Uri.parse('https://mdn.github.io/sw-test/')),
+            onLoadStop: (controller, url) {
+              pageLoaded.complete(url!.toString());
+            },
+          ),
+        ),
+      );
+
+      final String url = await pageLoaded.future;
+      expect(url, "https://mdn.github.io/sw-test/");
     }, skip: !Platform.isAndroid);
   });
 

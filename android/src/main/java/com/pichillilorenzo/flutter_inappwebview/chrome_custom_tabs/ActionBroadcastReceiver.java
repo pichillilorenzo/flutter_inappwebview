@@ -34,7 +34,7 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
       obj.put("url", url);
       obj.put("title", title);
       obj.put("id", id);
-      channel.invokeMethod("onChromeSafariBrowserMenuItemActionPerform", obj);
+      channel.invokeMethod("onChromeSafariBrowserItemActionPerform", obj);
     }
   }
 }

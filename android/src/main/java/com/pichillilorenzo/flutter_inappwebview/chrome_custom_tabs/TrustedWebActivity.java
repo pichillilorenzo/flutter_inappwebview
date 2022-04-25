@@ -18,9 +18,9 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
   public TrustedWebActivityIntentBuilder builder;
 
   @Override
-  public void customTabsConnected (String url, List<HashMap<String, Object>> menuItemList) {
+  public void customTabsConnected() {
     customTabsSession = customTabActivityHelper.getSession();
-    Uri uri = Uri.parse(url);
+    Uri uri = Uri.parse(initialUrl);
     customTabActivityHelper.mayLaunchUrl(uri, null, null);
 
     builder = new TrustedWebActivityIntentBuilder(uri);

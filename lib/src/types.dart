@@ -4798,7 +4798,8 @@ class PermissionResourceType {
   static PermissionResourceType? fromValue(dynamic? value) {
     if (value != null) {
       try {
-        Set<PermissionResourceType> valueList = <PermissionResourceType>[].toSet();
+        Set<PermissionResourceType> valueList =
+            <PermissionResourceType>[].toSet();
         if (defaultTargetPlatform == TargetPlatform.android) {
           valueList = PermissionResourceType._androidValues;
         } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {

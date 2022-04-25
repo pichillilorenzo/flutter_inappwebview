@@ -4148,7 +4148,7 @@ setTimeout(function() {
       if (Platform.isAndroid) {
         await pageLoaded.future;
         expect(await controller.evaluateJavascript(source: "document.body"),
-            isNull);
+            isEmpty);
       } else if (Platform.isIOS) {
         expect(pageLoaded.future, doesNotComplete);
       }
@@ -5449,7 +5449,7 @@ setTimeout(function() {
   });
 
   group('Service Worker', () {
-    testWidgets('AndroidInAppWebViewController', (WidgetTester tester) async {
+    testWidgets('shouldInterceptRequest', (WidgetTester tester) async {
       final Completer completer = Completer();
 
       var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
@@ -5486,6 +5486,39 @@ setTimeout(function() {
       );
 
       expect(completer.future, completes);
+    }, skip: !Platform.isAndroid);
+
+    testWidgets('setServiceWorkerClient to null', (WidgetTester tester) async {
+      final Completer<String> pageLoaded = Completer<String>();
+
+      var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
+          AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
+      var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
+          AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
+
+      if (swAvailable && swInterceptAvailable) {
+        AndroidServiceWorkerController serviceWorkerController =
+        AndroidServiceWorkerController.instance();
+
+        await serviceWorkerController.setServiceWorkerClient(null);
+      }
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrlRequest:
+            URLRequest(url: Uri.parse('https://mdn.github.io/sw-test/')),
+            onLoadStop: (controller, url) {
+              pageLoaded.complete(url!.toString());
+            },
+          ),
+        ),
+      );
+
+      final String url = await pageLoaded.future;
+      expect(url, "https://mdn.github.io/sw-test/");
     }, skip: !Platform.isAndroid);
   });
 
@@ -5814,7 +5847,57 @@ setTimeout(function() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
+    test('add custom menu item', () async {
+      var chromeSafariBrowser = new MyChromeSafariBrowser();
+      chromeSafariBrowser.addMenuItem(ChromeSafariBrowserMenuItem(
+          id: 2,
+          label: 'Custom item menu 1',
+          action: (url, title) {
+            print('Custom item menu 1 clicked!');
+          }));
+      expect(chromeSafariBrowser.isOpened(), false);
+
+      await chromeSafariBrowser.open(
+          url: Uri.parse("https://github.com/flutter"));
+      await chromeSafariBrowser.browserCreated.future;
+      expect(chromeSafariBrowser.isOpened(), true);
+      expect(() async {
+        await chromeSafariBrowser.open(url: Uri.parse("https://flutter.dev"));
+      }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+      await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+      await chromeSafariBrowser.close();
+      await chromeSafariBrowser.browserClosed.future;
+      expect(chromeSafariBrowser.isOpened(), false);
+    });
+
     group('Android Custom Tabs', () {
+      test('add custom action button', () async {
+        var chromeSafariBrowser = new MyChromeSafariBrowser();
+        var actionButtonIcon = await rootBundle.load('test_assets/images/flutter-logo.png');
+        chromeSafariBrowser.setActionButton(ChromeSafariBrowserActionButton(
+            id: 1,
+            description: 'Action Button description',
+            icon: actionButtonIcon.buffer.asUint8List(),
+            action: (url, title) {
+              print('Action Button 1 clicked!');
+            }));
+        expect(chromeSafariBrowser.isOpened(), false);
+
+        await chromeSafariBrowser.open(
+            url: Uri.parse("https://github.com/flutter"));
+        await chromeSafariBrowser.browserCreated.future;
+        expect(chromeSafariBrowser.isOpened(), true);
+        expect(() async {
+          await chromeSafariBrowser.open(url: Uri.parse("https://flutter.dev"));
+        }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+        await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+        await chromeSafariBrowser.close();
+        await chromeSafariBrowser.browserClosed.future;
+        expect(chromeSafariBrowser.isOpened(), false);
+      });
+
       test('Custom Tabs single instance', () async {
         var chromeSafariBrowser = new MyChromeSafariBrowser();
         expect(chromeSafariBrowser.isOpened(), false);

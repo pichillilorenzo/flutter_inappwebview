@@ -4148,7 +4148,7 @@ setTimeout(function() {
       if (Platform.isAndroid) {
         await pageLoaded.future;
         expect(await controller.evaluateJavascript(source: "document.body"),
-            isNull);
+            isEmpty);
       } else if (Platform.isIOS) {
         expect(pageLoaded.future, doesNotComplete);
       }
@@ -5847,7 +5847,57 @@ setTimeout(function() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
+    test('add custom menu item', () async {
+      var chromeSafariBrowser = new MyChromeSafariBrowser();
+      chromeSafariBrowser.addMenuItem(ChromeSafariBrowserMenuItem(
+          id: 2,
+          label: 'Custom item menu 1',
+          action: (url, title) {
+            print('Custom item menu 1 clicked!');
+          }));
+      expect(chromeSafariBrowser.isOpened(), false);
+
+      await chromeSafariBrowser.open(
+          url: Uri.parse("https://github.com/flutter"));
+      await chromeSafariBrowser.browserCreated.future;
+      expect(chromeSafariBrowser.isOpened(), true);
+      expect(() async {
+        await chromeSafariBrowser.open(url: Uri.parse("https://flutter.dev"));
+      }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+      await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+      await chromeSafariBrowser.close();
+      await chromeSafariBrowser.browserClosed.future;
+      expect(chromeSafariBrowser.isOpened(), false);
+    });
+
     group('Android Custom Tabs', () {
+      test('add custom action button', () async {
+        var chromeSafariBrowser = new MyChromeSafariBrowser();
+        var actionButtonIcon = await rootBundle.load('test_assets/images/flutter-logo.png');
+        chromeSafariBrowser.setActionButton(ChromeSafariBrowserActionButton(
+            id: 1,
+            description: 'Action Button description',
+            icon: actionButtonIcon.buffer.asUint8List(),
+            action: (url, title) {
+              print('Action Button 1 clicked!');
+            }));
+        expect(chromeSafariBrowser.isOpened(), false);
+
+        await chromeSafariBrowser.open(
+            url: Uri.parse("https://github.com/flutter"));
+        await chromeSafariBrowser.browserCreated.future;
+        expect(chromeSafariBrowser.isOpened(), true);
+        expect(() async {
+          await chromeSafariBrowser.open(url: Uri.parse("https://flutter.dev"));
+        }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
+
+        await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+        await chromeSafariBrowser.close();
+        await chromeSafariBrowser.browserClosed.future;
+        expect(chromeSafariBrowser.isOpened(), false);
+      });
+
       test('Custom Tabs single instance', () async {
         var chromeSafariBrowser = new MyChromeSafariBrowser();
         expect(chromeSafariBrowser.isOpened(), false);

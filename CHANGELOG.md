@@ -1,3 +1,7 @@
+## 5.4.2
+
+- Added `setActionButton` method to `ChromeSafariBrowser` class
+
 ## 5.4.1+2
 
 - Fixed "Android ServiceWorkerControllerCompat.setServiceWorkerClient(null) makes Webivew Plugin Crashes" [#1151](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1151)

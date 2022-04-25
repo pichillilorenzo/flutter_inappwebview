@@ -243,7 +243,7 @@ class InAppWebViewWebElement {
       iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
     }
 
-    bridgeJsObject.callMethod("setSettings", [js.JsObject.jsify(settings.toMap()), js.JsObject.jsify(newSettings.toMap())]);
+    bridgeJsObject.callMethod("setSettings", [js.JsObject.jsify(newSettings.toMap())]);
 
     settings = newSettings;
   }

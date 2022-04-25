@@ -24,7 +24,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
       iframeAllowFullscreen: true,
-      javaScriptCanOpenWindowsAutomatically: false
+    disableVerticalScroll: true,
+    disableHorizontalScroll: true,
   );
 
   PullToRefreshController? pullToRefreshController;
@@ -116,6 +117,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     // URLRequest(url: Uri.parse("https://www.pubnub.com/developers/demos/webrtc/launch/")),
                     initialUrlRequest:
                     URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                    // initialUrlRequest:
+                    // URLRequest(url: Uri.parse('https://flutter.dev')),
                     // initialFile: "assets/index.html",
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,
@@ -159,11 +162,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       return NavigationActionPolicy.ALLOW;
                     },
                     onLoadStop: (controller, url) async {
+                      print("onLoadStop");
                       pullToRefreshController?.endRefreshing();
                       setState(() {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
+                      await Future.delayed(Duration(seconds: 2));
+                      await controller.setSettings(settings: settings.copy()
+                        ..disableVerticalScroll = false
+                        ..disableHorizontalScroll = false
+                      );
                     },
                     onLoadError: (controller, url, code, message) {
                       pullToRefreshController?.endRefreshing();

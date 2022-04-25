@@ -118,17 +118,24 @@ class InAppWebViewSettings
 
   ///Define whether the vertical scrollbar should be drawn or not. The default value is `true`.
   ///
+  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
+  ///It must have the same value of [horizontalScrollBarEnabled] to take effect.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   bool verticalScrollBarEnabled;
 
   ///Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
   ///
+  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
+  ///It must have the same value of [verticalScrollBarEnabled] to take effect.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   bool horizontalScrollBarEnabled;
 
   ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
@@ -201,16 +208,22 @@ class InAppWebViewSettings
 
   ///Set to `true` to disable vertical scroll. The default value is `false`.
   ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  bool disableVerticalScroll;
-
-  ///Set to `true` to disable horizontal scroll. The default value is `false`.
+  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
+  bool disableVerticalScroll;
+
+  ///Set to `true` to disable horizontal scroll. The default value is `false`.
+  ///
+  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   bool disableHorizontalScroll;
 
   ///Set to `true` to disable context menu. The default value is `false`.

@@ -40,6 +40,10 @@ class InAppBrowserNotOpenedException implements Exception {
 
 ///This class uses the native WebView of the platform.
 ///The [webViewController] field can be used to access the [InAppWebViewController] API.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class InAppBrowser {
   ///View ID used internally.
   late final String id;

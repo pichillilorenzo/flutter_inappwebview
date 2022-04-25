@@ -6,6 +6,10 @@ import 'types.dart';
 ///Class that represents the WebView context menu. It used by [WebView.contextMenu].
 ///
 ///**NOTE**: To make it work properly on Android, JavaScript should be enabled!
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class ContextMenu {
   ///Event fired when the context menu for this WebView is being built.
   ///

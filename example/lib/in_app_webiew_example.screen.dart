@@ -24,8 +24,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
       allowsInlineMediaPlayback: true,
       iframeAllow: "camera; microphone",
       iframeAllowFullscreen: true,
-    disableVerticalScroll: true,
-    disableHorizontalScroll: true,
   );
 
   PullToRefreshController? pullToRefreshController;
@@ -123,7 +121,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     initialUserScripts: UnmodifiableListView<UserScript>([]),
                     initialSettings: settings,
                     pullToRefreshController: pullToRefreshController,
-                    onWebViewCreated: (controller) {
+                    onWebViewCreated: (controller) async {
                       webViewController = controller;
                     },
                     onLoadStart: (controller, url) async {
@@ -162,17 +160,11 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       return NavigationActionPolicy.ALLOW;
                     },
                     onLoadStop: (controller, url) async {
-                      print("onLoadStop");
                       pullToRefreshController?.endRefreshing();
                       setState(() {
                         this.url = url.toString();
                         urlController.text = this.url;
                       });
-                      await Future.delayed(Duration(seconds: 2));
-                      await controller.setSettings(settings: settings.copy()
-                        ..disableVerticalScroll = false
-                        ..disableHorizontalScroll = false
-                      );
                     },
                     onLoadError: (controller, url, code, message) {
                       pullToRefreshController?.endRefreshing();

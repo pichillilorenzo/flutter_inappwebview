@@ -18,6 +18,11 @@ import '../util.dart';
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 ///
 ///Remember to dispose it when you don't need it anymore.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- Web
 class HeadlessInAppWebView implements WebView {
   ///View ID.
   late final String id;

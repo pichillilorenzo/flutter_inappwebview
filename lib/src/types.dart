@@ -184,6 +184,20 @@ class InAppWebViewInitialData {
     this.androidHistoryUrl = this.historyUrl;
   }
 
+  static InAppWebViewInitialData? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return InAppWebViewInitialData(
+        data: map["data"],
+        mimeType: map["mimeType"],
+        encoding: map["encoding"],
+        baseUrl: map["baseUrl"],
+        // ignore: deprecated_member_use_from_same_package
+        androidHistoryUrl: map["androidHistoryUrl"],
+        historyUrl: map["historyUrl"]);
+  }
+
   Map<String, String> toMap() {
     return {
       "data": data,

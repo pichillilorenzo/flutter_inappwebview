@@ -20,6 +20,11 @@ import 'in_app_webview_settings.dart';
 import '../pull_to_refresh/main.dart';
 
 ///Flutter Widget for adding an **inline native WebView** integrated in the flutter widget tree.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- Web
 class InAppWebView extends StatefulWidget implements WebView {
   /// `gestureRecognizers` specifies which gestures should be consumed by the WebView.
   /// It is possible for other gesture recognizers to be competing with the web view on pointer

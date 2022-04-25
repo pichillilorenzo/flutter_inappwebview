@@ -7,6 +7,10 @@ import 'package:flutter/services.dart' show rootBundle;
 import 'mime_type_resolver.dart';
 
 ///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server. The default [port] value is `8080`.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class InAppLocalhostServer {
   bool _started = false;
   HttpServer? _server;

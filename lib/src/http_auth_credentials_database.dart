@@ -8,6 +8,10 @@ import 'package:flutter/services.dart';
 ///On Android, this class has a custom implementation using `android.database.sqlite.SQLiteDatabase` because
 ///[WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase)
 ///doesn't offer the same functionalities as iOS `URLCredentialStorage`.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class HttpAuthCredentialDatabase {
   static HttpAuthCredentialDatabase? _instance;
   static const MethodChannel _channel = const MethodChannel(

@@ -36,6 +36,10 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///**NOTE**: If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for
 ///`android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml`
 ///(you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class ChromeSafariBrowser {
   ///View ID used internally.
   late final String id;

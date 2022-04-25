@@ -228,9 +228,12 @@ class InAppWebViewSettings
 
   ///Set to `true` to disable context menu. The default value is `false`.
   ///
+  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   bool disableContextMenu;
 
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.

@@ -15,6 +15,10 @@ import 'pull_to_refresh_settings.dart';
 ///(for example [WebView.onWebViewCreated] or [InAppBrowser.onBrowserCreated]).
 ///
 ///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class PullToRefreshController {
   @Deprecated("Use settings instead")
   // ignore: deprecated_member_use_from_same_package

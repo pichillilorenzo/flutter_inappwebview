@@ -3,14 +3,15 @@ import 'package:flutter/services.dart';
 import 'dart:html';
 import 'dart:js' as js;
 
+import 'web_platform_manager.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import '../types.dart';
 
 class InAppWebViewWebElement {
-  late int _viewId;
+  late dynamic _viewId;
   late BinaryMessenger _messenger;
   late IFrameElement iframe;
-  late MethodChannel _channel;
+  late MethodChannel? _channel;
   InAppWebViewSettings? initialSettings;
   URLRequest? initialUrlRequest;
   InAppWebViewInitialData? initialData;
@@ -20,7 +21,7 @@ class InAppWebViewWebElement {
   late js.JsObject bridgeJsObject;
   bool isLoading = false;
 
-  InAppWebViewWebElement({required int viewId, required BinaryMessenger messenger}) {
+  InAppWebViewWebElement({required dynamic viewId, required BinaryMessenger messenger}) {
     this._viewId = viewId;
     this._messenger = messenger;
     iframe = IFrameElement()
@@ -35,11 +36,10 @@ class InAppWebViewWebElement {
       _messenger,
     );
 
-    this._channel.setMethodCallHandler(handleMethodCall);
+    this._channel?.setMethodCallHandler(handleMethodCall);
 
-    bridgeJsObject = js.JsObject.fromBrowserObject(js.context['flutter_inappwebview']);
-    bridgeJsObject['viewId'] = _viewId;
-    bridgeJsObject['iframeId'] = iframe.id;
+    bridgeJsObject = js.JsObject.fromBrowserObject(js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
+    bridgeJsObject['webViews'][_viewId] = bridgeJsObject.callMethod("createFlutterInAppWebView", [_viewId, iframe.id]);
   }
 
   /// Handles method calls over the MethodChannel of this plugin.
@@ -87,6 +87,9 @@ class InAppWebViewWebElement {
         InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(call.arguments["settings"].cast<String, dynamic>());
         setSettings(newSettings);
         break;
+      case "dispose":
+        dispose();
+        break;
       default:
         throw PlatformException(
           code: 'Unimplemented',
@@ -118,7 +121,16 @@ class InAppWebViewWebElement {
       iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
     }
 
-    bridgeJsObject.callMethod("prepare", [js.JsObject.jsify(settings.toMap())]);
+    _callMethod("prepare", [js.JsObject.jsify(settings.toMap())]);
+  }
+
+  dynamic _callMethod(Object method, [List? args]) {
+    var webViews = bridgeJsObject['webViews'] as js.JsObject;
+    if (webViews.hasProperty(_viewId)) {
+      var webview = bridgeJsObject['webViews'][_viewId] as js.JsObject;
+      return webview.callMethod(method, args);
+    }
+    return null;
   }
 
   void makeInitialLoad() async {
@@ -168,27 +180,27 @@ class InAppWebViewWebElement {
   }
 
   Future<void> reload() async {
-    bridgeJsObject.callMethod("reload");
+    _callMethod("reload");
   }
 
   Future<void> goBack() async {
-    bridgeJsObject.callMethod("goBack");
+    _callMethod("goBack");
   }
 
   Future<void> goForward() async {
-    bridgeJsObject.callMethod("goForward");
+    _callMethod("goForward");
   }
 
   Future<void> goBackOrForward({required int steps}) async {
-    bridgeJsObject.callMethod("goBackOrForward", [steps]);
+    _callMethod("goBackOrForward", [steps]);
   }
 
   Future<dynamic> evaluateJavascript({required String source}) async {
-    return bridgeJsObject.callMethod("evaluateJavascript", [source]);
+    return _callMethod("evaluateJavascript", [source]);
   }
 
   Future<void> stopLoading() async {
-    bridgeJsObject.callMethod("stopLoading");
+    _callMethod("stopLoading");
   }
 
   Set<Sandbox> getSandbox() {
@@ -243,7 +255,7 @@ class InAppWebViewWebElement {
       iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
     }
 
-    bridgeJsObject.callMethod("setSettings", [js.JsObject.jsify(newSettings.toMap())]);
+    _callMethod("setSettings", [js.JsObject.jsify(newSettings.toMap())]);
 
     settings = newSettings;
   }
@@ -254,7 +266,7 @@ class InAppWebViewWebElement {
     var obj = {
       "url": url
     };
-    await _channel.invokeMethod("onLoadStart", obj);
+    await _channel?.invokeMethod("onLoadStart", obj);
   }
 
   void onLoadStop(String url) async {
@@ -263,14 +275,14 @@ class InAppWebViewWebElement {
     var obj = {
       "url": url
     };
-    await _channel.invokeMethod("onLoadStop", obj);
+    await _channel?.invokeMethod("onLoadStop", obj);
   }
 
   void onUpdateVisitedHistory(String url) async {
     var obj = {
       "url": url
     };
-    await _channel.invokeMethod("onUpdateVisitedHistory", obj);
+    await _channel?.invokeMethod("onUpdateVisitedHistory", obj);
   }
 
   void onScrollChanged(int x, int y) async {
@@ -278,7 +290,7 @@ class InAppWebViewWebElement {
       "x": x,
       "y": y
     };
-    await _channel.invokeMethod("onScrollChanged", obj);
+    await _channel?.invokeMethod("onScrollChanged", obj);
   }
 
   void onConsoleMessage(String type, String? message) async {
@@ -302,7 +314,7 @@ class InAppWebViewWebElement {
       "messageLevel": messageLevel,
       "message": message
     };
-    await _channel.invokeMethod("onConsoleMessage", obj);
+    await _channel?.invokeMethod("onConsoleMessage", obj);
   }
 
   Future<bool?> onCreateWindow(int windowId, String url, String? target, String? windowFeatures) async {
@@ -330,15 +342,15 @@ class InAppWebViewWebElement {
       },
       "windowFeatures": windowFeaturesMap
     };
-    return await _channel.invokeMethod("onCreateWindow", obj);
+    return await _channel?.invokeMethod("onCreateWindow", obj);
   }
 
   void onWindowFocus() async {
-    await _channel.invokeMethod("onWindowFocus");
+    await _channel?.invokeMethod("onWindowFocus");
   }
 
   void onWindowBlur() async {
-    await _channel.invokeMethod("onWindowBlur");
+    await _channel?.invokeMethod("onWindowBlur");
   }
 
   void onPrint(String? url) async {
@@ -346,15 +358,15 @@ class InAppWebViewWebElement {
       "url": url
     };
 
-    await _channel.invokeMethod("onPrint", obj);
+    await _channel?.invokeMethod("onPrint", obj);
   }
 
   void onEnterFullscreen() async {
-    await _channel.invokeMethod("onEnterFullscreen");
+    await _channel?.invokeMethod("onEnterFullscreen");
   }
 
   void onExitFullscreen() async {
-    await _channel.invokeMethod("onExitFullscreen");
+    await _channel?.invokeMethod("onExitFullscreen");
   }
 
   void onTitleChanged(String? title) async {
@@ -362,7 +374,7 @@ class InAppWebViewWebElement {
       "title": title
     };
 
-    await _channel.invokeMethod("onTitleChanged", obj);
+    await _channel?.invokeMethod("onTitleChanged", obj);
   }
 
   void onZoomScaleChanged(double oldScale, double newScale) async {
@@ -371,6 +383,20 @@ class InAppWebViewWebElement {
       "newScale": newScale
     };
 
-    await _channel.invokeMethod("onZoomScaleChanged", obj);
+    await _channel?.invokeMethod("onZoomScaleChanged", obj);
+  }
+
+  void dispose() {
+    _channel?.setMethodCallHandler(null);
+    _channel = null;
+    iframe.remove();
+    if (WebPlatformManager.webViews.containsKey(_viewId)) {
+      WebPlatformManager.webViews.remove(_viewId);
+    }
+    bridgeJsObject = js.JsObject.fromBrowserObject(js.context[WebPlatformManager.BRIDGE_JS_OBJECT_NAME]);
+    var webViews = bridgeJsObject['webViews'] as js.JsObject;
+    if (webViews.hasProperty(_viewId)) {
+      webViews.deleteProperty(_viewId);
+    }
   }
 }

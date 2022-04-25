@@ -5,6 +5,11 @@ import '../types.dart';
 
 ///Class that provides access to the JavaScript [Web Storage API](https://developer.mozilla.org/en-US/docs/Web/API/Web_Storage_API): `window.sessionStorage` and `window.localStorage`.
 ///It used by [InAppWebViewController.webStorage].
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- Web
 class WebStorage {
   ///Represents `window.localStorage`.
   LocalStorage localStorage;
@@ -55,6 +60,13 @@ class Storage {
   }
 
   ///Returns an integer representing the number of data items stored in the Storage object.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<int?> length() async {
     var result = await _controller.evaluateJavascript(source: """
     window.$webStorageType.length;
@@ -63,6 +75,13 @@ class Storage {
   }
 
   ///When passed a [key] name and [value], will add that key to the storage, or update that key's value if it already exists.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<void> setItem({required String key, required dynamic value}) async {
     var encodedValue = json.encode(value);
     await _controller.evaluateJavascript(source: """
@@ -71,6 +90,13 @@ class Storage {
   }
 
   ///When passed a [key] name, will return that key's value, or `null` if the key does not exist, in the given Storage object.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<dynamic> getItem({required String key}) async {
     var itemValue = await _controller.evaluateJavascript(source: """
     window.$webStorageType.getItem("$key");
@@ -88,6 +114,13 @@ class Storage {
   }
 
   ///When passed a [key] name, will remove that key from the given Storage object if it exists.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<void> removeItem({required String key}) async {
     await _controller.evaluateJavascript(source: """
     window.$webStorageType.removeItem("$key");
@@ -95,6 +128,13 @@ class Storage {
   }
 
   ///Returns the list of all items from the given Storage object.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<List<WebStorageItem>> getItems() async {
     var webStorageItems = <WebStorageItem>[];
 
@@ -128,6 +168,13 @@ class Storage {
   }
 
   ///Clears all keys stored in a given Storage object.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<void> clear() async {
     await _controller.evaluateJavascript(source: """
     window.$webStorageType.clear();
@@ -136,6 +183,13 @@ class Storage {
 
   ///When passed a number [index], returns the name of the nth key in a given Storage object.
   ///The order of keys is user-agent defined, so you should not rely on it.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<String> key({required int index}) async {
     var result = await _controller.evaluateJavascript(source: """
     window.$webStorageType.key($index);

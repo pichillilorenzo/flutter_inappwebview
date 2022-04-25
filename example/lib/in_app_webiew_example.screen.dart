@@ -169,20 +169,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
-                    if (url?.host == 'github.com') {
-                      await controller.loadUrl(
-                          urlRequest: URLRequest(
-                              url: Uri.parse('https://flutter-header-echo.herokuapp.com/'),
-                              headers: {
-                                'test_header': 'flutter_test_header'
-                              }));
-                      final String? currentUrl = (await controller.getUrl())?.toString();
-                      print(currentUrl);
-                      await Future.delayed(Duration(seconds: 2));
-                      final String? content = await controller.evaluateJavascript(
-                          source: 'document.documentElement.innerText');
-                      print(content);
-                    }
                   },
                   onLoadError: (controller, url, code, message) {
                     pullToRefreshController.endRefreshing();

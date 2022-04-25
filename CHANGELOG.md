@@ -1,6 +1,6 @@
 ## 6.0.0
 
-- Deprecated old classes/properties/methods to make them eventually compatible with other operating systems and WebView engines.
+- Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.
 - Added Web support
 - Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState` WebView controller methods
 - Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS` WebView settings

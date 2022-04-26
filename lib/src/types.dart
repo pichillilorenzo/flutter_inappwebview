@@ -2475,7 +2475,8 @@ class ActionModeMenuItem {
         return ActionModeMenuItem.values
             .firstWhere((element) => element.toValue() == value);
       } catch (e) {
-        return null;
+        // maybe coming from a Bitwise OR operator
+        return ActionModeMenuItem._internal(value);
       }
     }
     return null;
@@ -2493,9 +2494,9 @@ class ActionModeMenuItem {
       case 4:
         return "MENU_ITEM_PROCESS_TEXT";
       case 0:
-      default:
         return "MENU_ITEM_NONE";
     }
+    return _value.toString();
   }
 
   ///No menu items should be disabled.
@@ -2511,6 +2512,9 @@ class ActionModeMenuItem {
   static const MENU_ITEM_PROCESS_TEXT = const ActionModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
+
+  ActionModeMenuItem operator |(ActionModeMenuItem value) =>
+      ActionModeMenuItem._internal(value.toValue() | _value);
 
   @override
   int get hashCode => _value.hashCode;
@@ -2540,7 +2544,8 @@ class AndroidActionModeMenuItem {
         return AndroidActionModeMenuItem.values
             .firstWhere((element) => element.toValue() == value);
       } catch (e) {
-        return null;
+        // maybe coming from a Bitwise OR operator
+        return AndroidActionModeMenuItem._internal(value);
       }
     }
     return null;
@@ -2558,9 +2563,9 @@ class AndroidActionModeMenuItem {
       case 4:
         return "MENU_ITEM_PROCESS_TEXT";
       case 0:
-      default:
         return "MENU_ITEM_NONE";
     }
+    return _value.toString();
   }
 
   ///No menu items should be disabled.
@@ -2571,13 +2576,16 @@ class AndroidActionModeMenuItem {
 
   ///Disable menu item "Web Search".
   static const MENU_ITEM_WEB_SEARCH =
-      const AndroidActionModeMenuItem._internal(2);
+  const AndroidActionModeMenuItem._internal(2);
 
   ///Disable all the action mode menu items for text processing.
   static const MENU_ITEM_PROCESS_TEXT =
-      const AndroidActionModeMenuItem._internal(4);
+  const AndroidActionModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
+
+  AndroidActionModeMenuItem operator |(AndroidActionModeMenuItem value) =>
+      AndroidActionModeMenuItem._internal(value.toValue() | _value);
 
   @override
   int get hashCode => _value.hashCode;

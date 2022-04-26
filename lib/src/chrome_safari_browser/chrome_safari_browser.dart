@@ -1,9 +1,11 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
+import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import '../util.dart';
 
 import 'chrome_safari_browser_settings.dart';
 
@@ -42,6 +44,13 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///- Android native WebView
 ///- iOS
 class ChromeSafariBrowser {
+  ///Enables [ChromeSafariBrowser] debug logging info.
+  ///
+  ///The default value is the same value of [kDebugMode],
+  ///so it is enabled by default when the application is compiled in debug mode
+  ///and disabled when it is not.
+  static bool debugLogging = kDebugMode;
+
   ///View ID used internally.
   late final String id;
 
@@ -60,7 +69,19 @@ class ChromeSafariBrowser {
     _isOpened = false;
   }
 
+  _debugLog(String method, dynamic args) {
+    if (ChromeSafariBrowser.debugLogging) {
+      String message =
+          "ChromeSafariBrowser ID " + id + " calling \"" +
+          method.toString() + "\" using " + args.toString();
+      developer.log(message,
+          name: this.runtimeType.toString());
+    }
+  }
+
   Future<dynamic> handleMethod(MethodCall call) async {
+    _debugLog(call.method, call.arguments);
+
     switch (call.method) {
       case "onChromeSafariBrowserOpened":
         onOpened();

@@ -663,7 +663,7 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   void dispose() {
-    int viewId = _controller.getViewId();
+    dynamic viewId = _controller.getViewId();
     if (kIsWeb && WebPlatformManager.webViews.containsKey(viewId)) {
       WebPlatformManager.webViews.remove(viewId);
     }

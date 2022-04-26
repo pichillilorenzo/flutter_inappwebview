@@ -105,13 +105,21 @@ class InAppWebViewController
         localStorage: LocalStorage(this), sessionStorage: SessionStorage(this));
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
-
-    if (WebView.debugLogging && (call.method.startsWith("on") || call.method.startsWith("should")) &&
-        call.method != "onCallJsHandler") {
-      developer.log(
-          call.method.toString() + ": using " + call.arguments.toString(),
+  _debugLog(String method, dynamic args) {
+    if (WebView.debugLogging) {
+      String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
+      String message =
+          (_inAppBrowser == null ? "WebView ID " : "InAppBrowser ID " + viewId) +
+          " calling \"" +
+          method.toString() + "\" using " + args.toString();
+      developer.log(message,
           name: this.runtimeType.toString());
+    }
+  }
+
+  Future<dynamic> handleMethod(MethodCall call) async {
+    if (WebView.debugLogging && call.method != "onCallJsHandler") {
+      _debugLog(call.method, call.arguments);
     }
 
     switch (call.method) {
@@ -1032,11 +1040,7 @@ class InAppWebViewController
         // decode args to json
         List<dynamic> args = jsonDecode(call.arguments["args"]);
 
-        if (WebView.debugLogging && (handlerName.startsWith("on") || handlerName.startsWith("should"))) {
-          developer.log(
-              handlerName.toString() + ": using " + args.toString(),
-              name: this.runtimeType.toString());
-        }
+        _debugLog(handlerName, args);
 
         switch (handlerName) {
           case "onLoadResource":
@@ -3038,7 +3042,7 @@ class InAppWebViewController
   }
 
   ///Used internally.
-  int getViewId() {
+  dynamic getViewId() {
     return _id;
   }
 }

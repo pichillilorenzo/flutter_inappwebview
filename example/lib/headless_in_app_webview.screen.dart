@@ -34,19 +34,16 @@ class _HeadlessInAppWebViewExampleScreenState
         print("CONSOLE MESSAGE: " + consoleMessage.message);
       },
       onLoadStart: (controller, url) async {
-        print("onLoadStart $url");
         setState(() {
           this.url = url.toString();
         });
       },
       onLoadStop: (controller, url) async {
-        print("onLoadStop $url");
         setState(() {
           this.url = url.toString();
         });
       },
       onUpdateVisitedHistory: (controller, url, androidIsReload) {
-        print("onUpdateVisitedHistory $url");
         setState(() {
           this.url = url.toString();
         });
@@ -106,6 +103,9 @@ class _HeadlessInAppWebViewExampleScreenState
             child: ElevatedButton(
                 onPressed: () {
                   headlessWebView?.dispose();
+                  setState(() {
+                    this.url = "";
+                  });
                 },
                 child: Text("Dispose HeadlessInAppWebView")),
           )

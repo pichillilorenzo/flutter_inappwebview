@@ -35,7 +35,6 @@ flutter:
         pluginClass: FlutterInAppWebViewWebPlatform
         fileName: flutter_inappwebview_web.dart
 
-
   assets:
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html
     - packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css

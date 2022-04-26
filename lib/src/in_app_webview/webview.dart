@@ -1,6 +1,9 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview_web.dart';
+
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 import '../context_menu.dart';
@@ -10,10 +13,14 @@ import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import 'headless_in_app_webview.dart';
 
-///Abstract class that represents a WebView. Used by [InAppWebView] and [HeadlessInAppWebView].
+///Abstract class that represents a WebView. Used by [InAppWebView], [HeadlessInAppWebView] and the WebView of [InAppBrowser].
 abstract class WebView {
-  ///Enables WebView debug logging info. Logging is on by default.
-  static bool debugLogging = true;
+  ///Enables [WebView] debug logging info.
+  ///
+  ///The default value is the same value of [kDebugMode],
+  ///so it is enabled by default when the application is compiled in debug mode
+  ///and disabled when it is not.
+  static bool debugLogging = kDebugMode;
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;

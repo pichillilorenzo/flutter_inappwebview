@@ -19,10 +19,7 @@
  *
 */
 
-@JS()
 library flutter_inappwebview;
 
-import 'package:js/js.dart';
-
 export 'src/main.dart';
-export 'src/web/main.dart';
+export 'src/web/main_stub.dart' if (dart.library.html) 'src/web/main.dart';

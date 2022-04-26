@@ -58,7 +58,6 @@ class InAppWebViewController
   Set<String> _webMessageListenerObjNames = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
-  // ignore: unused_field
   dynamic _id;
 
   InAppBrowser? _inAppBrowser;
@@ -109,8 +108,8 @@ class InAppWebViewController
     if (WebView.debugLogging) {
       String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
       String message =
-          (_inAppBrowser == null ? "WebView ID " : "InAppBrowser ID " + viewId) +
-          " calling \"" +
+          (_inAppBrowser == null ? "WebView" : "InAppBrowser")
+             + " ID " + viewId + " calling \"" +
           method.toString() + "\" using " + args.toString();
       developer.log(message,
           name: this.runtimeType.toString());

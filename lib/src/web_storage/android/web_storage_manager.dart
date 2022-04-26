@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-import '../../types.dart';
+import '../../types/main.dart';
 import '../_static_channel.dart';
 
 ///Class that is used to manage the JavaScript storage APIs provided by the WebView.

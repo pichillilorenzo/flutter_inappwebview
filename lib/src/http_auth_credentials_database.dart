@@ -1,6 +1,6 @@
 import 'dart:async';
 
-import 'types.dart';
+import 'types/main.dart';
 import 'package:flutter/services.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.

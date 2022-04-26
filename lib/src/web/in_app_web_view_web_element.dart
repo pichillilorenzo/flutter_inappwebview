@@ -5,7 +5,7 @@ import 'dart:js' as js;
 
 import 'web_platform_manager.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 class InAppWebViewWebElement {
   late dynamic _viewId;

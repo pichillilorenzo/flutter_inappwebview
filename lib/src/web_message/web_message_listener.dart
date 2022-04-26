@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 ///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
 class WebMessageListener {

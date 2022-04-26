@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
 import 'webview_feature.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 ///Class that manages Service Workers used by [WebView].
 ///

@@ -1,3 +1,4 @@
+export 'types/main.dart';
 export 'in_app_webview/main.dart';
 export 'in_app_browser/main.dart';
 export 'chrome_safari_browser/main.dart';
@@ -5,7 +6,7 @@ export 'android/main.dart';
 export 'apple/main.dart';
 export 'x509_certificate/main.dart';
 export 'web_storage/main.dart';
-export 'types.dart';
+export 'types/main.dart';
 export 'cookie_manager.dart';
 export 'in_app_localhost_server.dart';
 export 'content_blocker.dart';

@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import '../../util.dart';
-import '../../types.dart';
+import '../../types/main.dart';
 import '../../in_app_browser/in_app_browser_settings.dart';
 import '../in_app_webview_settings.dart';
 import '../webview.dart';

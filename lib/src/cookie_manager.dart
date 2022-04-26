@@ -8,7 +8,7 @@ import 'in_app_webview/in_app_webview_settings.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'platform_util.dart';
 
-import 'types.dart';
+import 'types/main.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the cookies used by WebView instances.
 ///On Android, it is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).

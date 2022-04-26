@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/services.dart';
 
-import '../../types.dart';
+import '../../types/main.dart';
 import '../_static_channel.dart';
 
 ///Class that represents various types of data that a website might make use of.

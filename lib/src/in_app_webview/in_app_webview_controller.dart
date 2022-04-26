@@ -14,7 +14,7 @@ import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
 
 import '../context_menu.dart';
-import '../types.dart';
+import '../types/main.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../web_storage/web_storage.dart';
 import '../util.dart';

@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../util.dart';
-import '../types.dart';
+import '../types/main.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import 'pull_to_refresh_settings.dart';
 

@@ -1,6 +1,6 @@
 import 'dart:ui';
 import '../util.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 ///Pull-To-Refresh Settings
 class PullToRefreshSettings {

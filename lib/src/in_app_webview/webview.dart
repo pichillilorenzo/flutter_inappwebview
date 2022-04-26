@@ -7,7 +7,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview_web.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 import '../context_menu.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';

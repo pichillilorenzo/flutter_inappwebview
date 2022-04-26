@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import '../util.dart';
 import 'android/chrome_custom_tabs_options.dart';
 import 'apple/safari_options.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 class ChromeSafariBrowserOptions {
   Map<String, dynamic> toMap() {

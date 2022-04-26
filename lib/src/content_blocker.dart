@@ -1,4 +1,4 @@
-import 'types.dart';
+import 'types/main.dart';
 
 ///Class that represents a set of rules to use block content in the browser window.
 ///

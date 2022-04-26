@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/src/types.dart';
+import 'package:flutter_inappwebview/src/types/main.dart';
 
 import '../util.dart';
 

@@ -1,0 +1,48 @@
+import '../in_app_webview/webview.dart';
+import 'renderer_priority.dart';
+
+///Class that represents the priority policy will be used to determine whether an out of process renderer should be considered to be a target for OOM killing.
+///When a WebView is destroyed it will cease to be considerered when calculating the renderer priority.
+///Once no WebViews remain associated with the renderer, the priority of the renderer will be reduced to [RendererPriority.RENDERER_PRIORITY_WAIVED].
+///The default policy is to set the priority to [RendererPriority.RENDERER_PRIORITY_IMPORTANT] regardless of visibility,
+///and this should not be changed unless the caller also handles renderer crashes with [WebView.onRenderProcessGone].
+///Any other setting will result in WebView renderers being killed by the system more aggressively than the application.
+class RendererPriorityPolicy {
+  ///The minimum priority at which this WebView desires the renderer process to be bound.
+  RendererPriority? rendererRequestedPriority;
+
+  ///If true, this flag specifies that when this WebView is not visible, it will be treated as if it had requested a priority of [RendererPriority.RENDERER_PRIORITY_WAIVED].
+  bool waivedWhenNotVisible;
+
+  RendererPriorityPolicy(
+      {required this.rendererRequestedPriority,
+        required this.waivedWhenNotVisible});
+
+  ///Gets a possible [RendererPriorityPolicy] instance from a [Map] value.
+  static RendererPriorityPolicy? fromMap(Map<String, dynamic>? map) {
+    return map != null
+        ? RendererPriorityPolicy(
+        rendererRequestedPriority:
+        RendererPriority.fromValue(map["rendererRequestedPriority"]),
+        waivedWhenNotVisible: map["waivedWhenNotVisible"])
+        : null;
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toMap() {
+    return {
+      "rendererRequestedPriority": rendererRequestedPriority?.toValue(),
+      "waivedWhenNotVisible": waivedWhenNotVisible
+    };
+  }
+
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}

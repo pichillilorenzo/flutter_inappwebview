@@ -12,7 +12,7 @@ import 'package:flutter/gestures.dart';
 import '../web/web_platform_manager.dart';
 
 import '../context_menu.dart';
-import '../types.dart';
+import '../types/main.dart';
 
 import 'webview.dart';
 import 'in_app_webview_controller.dart';

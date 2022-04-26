@@ -5,7 +5,7 @@ import '../../in_app_webview/apple/in_app_webview_options.dart';
 import '../in_app_browser_settings.dart';
 import '../in_app_browser.dart';
 
-import '../../types.dart';
+import '../../types/main.dart';
 import '../../util.dart';
 
 ///This class represents all the iOS-only [InAppBrowser] options available.

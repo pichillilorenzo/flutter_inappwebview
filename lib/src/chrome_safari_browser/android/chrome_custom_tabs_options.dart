@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import '../../util.dart';
-import '../../types.dart';
+import '../../types/main.dart';
 
 import '../chrome_safari_browser_settings.dart';
 import '../chrome_safari_browser.dart';

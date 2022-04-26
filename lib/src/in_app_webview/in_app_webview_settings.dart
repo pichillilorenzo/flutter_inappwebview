@@ -5,7 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
 import '../content_blocker.dart';
-import '../types.dart';
+import '../types/main.dart';
 import '../util.dart';
 import '../in_app_browser/in_app_browser_settings.dart';
 import 'webview.dart';

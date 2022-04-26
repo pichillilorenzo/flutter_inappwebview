@@ -3,7 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/services.dart';
 
-import '../../types.dart';
+import '../../types/main.dart';
 import '../in_app_webview_controller.dart';
 
 ///Class mixin that contains only iOS-specific methods for the WebView.

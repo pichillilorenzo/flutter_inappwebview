@@ -1,7 +1,7 @@
 import 'package:flutter/foundation.dart';
 
 import 'in_app_webview/webview.dart';
-import 'types.dart';
+import 'types/main.dart';
 
 ///Class that represents the WebView context menu. It used by [WebView.contextMenu].
 ///

@@ -6,7 +6,7 @@ import '_static_channel.dart';
 import 'android/web_storage_manager.dart';
 import 'ios/web_storage_manager.dart';
 
-import '../types.dart';
+import '../types/main.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 ///On Android, it is implemented using [WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html).

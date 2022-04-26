@@ -2,7 +2,7 @@ import 'dart:core';
 
 import 'package:flutter/services.dart';
 
-import '../../types.dart';
+import '../../types/main.dart';
 import '../../android/webview_feature.dart';
 import '../in_app_webview_controller.dart';
 

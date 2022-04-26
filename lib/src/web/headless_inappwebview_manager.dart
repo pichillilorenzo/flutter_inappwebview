@@ -6,7 +6,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 import 'in_app_web_view_web_element.dart';
 import 'headless_in_app_web_view_web_element.dart';
 
-import '../types.dart';
+import '../types/main.dart';
 
 class HeadlessInAppWebViewManager {
   static late MethodChannel _sharedChannel;

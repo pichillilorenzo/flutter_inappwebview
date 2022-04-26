@@ -1,4 +1,4 @@
-import '../../types.dart';
+import '../../types/main.dart';
 
 import '../../in_app_browser/in_app_browser_settings.dart';
 

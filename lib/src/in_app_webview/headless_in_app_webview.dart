@@ -6,7 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
-import '../types.dart';
+import '../types/main.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';

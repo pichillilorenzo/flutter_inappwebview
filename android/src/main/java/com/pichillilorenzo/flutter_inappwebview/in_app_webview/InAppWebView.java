@@ -175,7 +175,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     this.options = options;
     this.contextMenu = contextMenu;
     this.userContentController.addUserOnlyScripts(userScripts);
-    plugin.activity.registerForContextMenu(this);
+    if (plugin != null && plugin.activity != null) {
+      plugin.activity.registerForContextMenu(this);
+    }
   }
 
   public void prepare() {
@@ -1216,20 +1218,22 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   public void printCurrentPage() {
-    // Get a PrintManager instance
-    PrintManager printManager = (PrintManager) plugin.activity.getSystemService(Context.PRINT_SERVICE);
+    if (plugin != null && plugin.activity != null) {
+      // Get a PrintManager instance
+      PrintManager printManager = (PrintManager) plugin.activity.getSystemService(Context.PRINT_SERVICE);
 
-    if (printManager != null) {
-      String jobName = getTitle() + " Document";
+      if (printManager != null) {
+        String jobName = getTitle() + " Document";
 
-      // Get a printCurrentPage adapter instance
-      PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
+        // Get a printCurrentPage adapter instance
+        PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
 
-      // Create a printCurrentPage job with name and adapter instance
-      printManager.print(jobName, printAdapter,
-              new PrintAttributes.Builder().build());
-    } else {
-      Log.e(LOG_TAG, "No PrintManager available");
+        // Create a printCurrentPage job with name and adapter instance
+        printManager.print(jobName, printAdapter,
+                new PrintAttributes.Builder().build());
+      } else {
+        Log.e(LOG_TAG, "No PrintManager available");
+      }
     }
   }
 

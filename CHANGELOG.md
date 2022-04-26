@@ -1,3 +1,7 @@
+## 5.4.2+1
+
+- Fixed "Latest version 5.4.2 crashes on Android - HeadlessInAppWebView.dispose" [#1155](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1155)
+
 ## 5.4.2
 
 - Added `setActionButton` method to `ChromeSafariBrowser` class

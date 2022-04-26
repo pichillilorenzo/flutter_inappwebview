@@ -15,6 +15,21 @@ import 'package:path_provider/path_provider.dart';
 
 import '.env.dart';
 
+/// Returns a matcher that matches the isNullOrEmpty property.
+const Matcher isNullOrEmpty = _NullOrEmpty();
+
+class _NullOrEmpty extends Matcher {
+  const _NullOrEmpty();
+
+  @override
+  bool matches(Object? item, Map matchState) =>
+      item == null || (item as dynamic).isEmpty;
+
+  @override
+  Description describe(Description description) =>
+      description.add('null or empty');
+}
+
 class Foo {
   String? bar;
   String? baz;
@@ -4148,7 +4163,7 @@ setTimeout(function() {
       if (Platform.isAndroid) {
         await pageLoaded.future;
         expect(await controller.evaluateJavascript(source: "document.body"),
-            isEmpty);
+            isNullOrEmpty);
       } else if (Platform.isIOS) {
         expect(pageLoaded.future, doesNotComplete);
       }
@@ -5498,7 +5513,7 @@ setTimeout(function() {
 
       if (swAvailable && swInterceptAvailable) {
         AndroidServiceWorkerController serviceWorkerController =
-        AndroidServiceWorkerController.instance();
+            AndroidServiceWorkerController.instance();
 
         await serviceWorkerController.setServiceWorkerClient(null);
       }
@@ -5509,7 +5524,7 @@ setTimeout(function() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest:
-            URLRequest(url: Uri.parse('https://mdn.github.io/sw-test/')),
+                URLRequest(url: Uri.parse('https://mdn.github.io/sw-test/')),
             onLoadStop: (controller, url) {
               pageLoaded.complete(url!.toString());
             },
@@ -5874,7 +5889,8 @@ setTimeout(function() {
     group('Android Custom Tabs', () {
       test('add custom action button', () async {
         var chromeSafariBrowser = new MyChromeSafariBrowser();
-        var actionButtonIcon = await rootBundle.load('test_assets/images/flutter-logo.png');
+        var actionButtonIcon =
+            await rootBundle.load('test_assets/images/flutter-logo.png');
         chromeSafariBrowser.setActionButton(ChromeSafariBrowserActionButton(
             id: 1,
             description: 'Action Button description',
@@ -5892,7 +5908,8 @@ setTimeout(function() {
           await chromeSafariBrowser.open(url: Uri.parse("https://flutter.dev"));
         }, throwsA(isInstanceOf<ChromeSafariBrowserAlreadyOpenedException>()));
 
-        await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
+        await expectLater(
+            chromeSafariBrowser.firstPageLoaded.future, completes);
         await chromeSafariBrowser.close();
         await chromeSafariBrowser.browserClosed.future;
         expect(chromeSafariBrowser.isOpened(), false);

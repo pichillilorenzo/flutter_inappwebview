@@ -70,21 +70,23 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
   }
 
   public void prepare(Map<String, Object> params) {
-    // Add the headless WebView to the view hierarchy.
-    // This way is also possible to take screenshots.
-    ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
-    ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
-    if (mainView != null) {
-      View view = flutterWebView.getView();
-      final Map<String, Object> initialSize = (Map<String, Object>) params.get("initialSize");
-      Size2D size = Size2D.fromMap(initialSize);
-      if (size != null) {
-        setSize(size);
-      } else {
-        view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    if (plugin != null && plugin.activity != null) {
+      // Add the headless WebView to the view hierarchy.
+      // This way is also possible to take screenshots.
+      ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
+      ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
+      if (mainView != null && flutterWebView != null) {
+        View view = flutterWebView.getView();
+        final Map<String, Object> initialSize = (Map<String, Object>) params.get("initialSize");
+        Size2D size = Size2D.fromMap(initialSize);
+        if (size != null) {
+          setSize(size);
+        } else {
+          view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+        }
+        mainView.addView(view, 0);
+        view.setVisibility(View.INVISIBLE);
       }
-      mainView.addView(view, 0);
-      view.setVisibility(View.INVISIBLE);
     }
   }
   
@@ -110,7 +112,7 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
   public void dispose() {
     channel.setMethodCallHandler(null);
     HeadlessInAppWebViewManager.webViews.remove(id);
-    if (plugin != null) {
+    if (plugin != null && plugin.activity != null) {
       ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
       ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
       if (mainView != null && flutterWebView != null) {

@@ -3,6 +3,7 @@ import 'dart:collection';
 import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:core';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -105,6 +106,14 @@ class InAppWebViewController
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
+
+    if (WebView.debugLogging && (call.method.startsWith("on") || call.method.startsWith("should")) &&
+        call.method != "onCallJsHandler") {
+      developer.log(
+          call.method.toString() + ": using " + call.arguments.toString(),
+          name: this.runtimeType.toString());
+    }
+
     switch (call.method) {
       case "onLoadStart":
         _injectedScriptsFromURL.clear();
@@ -951,7 +960,9 @@ class InAppWebViewController
 
           ContextMenuItem menuItemClicked = ContextMenuItem(
               id: id,
+              // ignore: deprecated_member_use_from_same_package
               androidId: androidId,
+              // ignore: deprecated_member_use_from_same_package
               iosId: iosId,
               title: title,
               action: null);
@@ -1020,6 +1031,12 @@ class InAppWebViewController
         String handlerName = call.arguments["handlerName"];
         // decode args to json
         List<dynamic> args = jsonDecode(call.arguments["args"]);
+
+        if (WebView.debugLogging && (handlerName.startsWith("on") || handlerName.startsWith("should"))) {
+          developer.log(
+              handlerName.toString() + ": using " + args.toString(),
+              name: this.runtimeType.toString());
+        }
 
         switch (handlerName) {
           case "onLoadResource":

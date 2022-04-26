@@ -12,6 +12,9 @@ import 'headless_in_app_webview.dart';
 
 ///Abstract class that represents a WebView. Used by [InAppWebView] and [HeadlessInAppWebView].
 abstract class WebView {
+  ///Enables WebView debug logging info. Logging is on by default.
+  static bool debugLogging = true;
+
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
 
@@ -187,6 +190,7 @@ abstract class WebView {
   ///[InAppWebViewSettings.allowsPictureInPictureMediaPlayback], [InAppWebViewSettings.isFraudulentWebsiteWarningEnabled],
   ///[InAppWebViewSettings.allowsInlineMediaPlayback], [InAppWebViewSettings.suppressesIncrementalRendering], [InAppWebViewSettings.selectionGranularity],
   ///[InAppWebViewSettings.ignoresViewportScaleLimits], [InAppWebViewSettings.limitsNavigationsToAppBoundDomains],
+  ///[InAppWebViewSettings.upgradeKnownHostsToHTTPS],
   ///will have no effect due to a `WKWebView` limitation when creating the new window WebView: it's impossible to return the new `WKWebView`
   ///with a different `WKWebViewConfiguration` instance (see https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview).
   ///So, these options will be inherited from the caller WebView.

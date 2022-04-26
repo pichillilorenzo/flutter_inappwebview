@@ -1966,7 +1966,8 @@ class AndroidActionModeMenuItem {
         return AndroidActionModeMenuItem.values
             .firstWhere((element) => element.toValue() == value);
       } catch (e) {
-        return null;
+        // maybe coming from a Bitwise OR operator
+        return AndroidActionModeMenuItem._internal(value);
       }
     }
     return null;
@@ -1984,9 +1985,9 @@ class AndroidActionModeMenuItem {
       case 4:
         return "MENU_ITEM_PROCESS_TEXT";
       case 0:
-      default:
         return "MENU_ITEM_NONE";
     }
+    return _value.toString();
   }
 
   ///No menu items should be disabled.
@@ -2004,6 +2005,9 @@ class AndroidActionModeMenuItem {
       const AndroidActionModeMenuItem._internal(4);
 
   bool operator ==(value) => value == _value;
+
+  AndroidActionModeMenuItem operator |(AndroidActionModeMenuItem value) =>
+      AndroidActionModeMenuItem._internal(value.toValue() | _value);
 
   @override
   int get hashCode => _value.hashCode;

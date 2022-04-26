@@ -1,3 +1,7 @@
+## 5.4.3
+
+- Added Bitwise OR operator support for `AndroidActionModeMenuItem` class
+
 ## 5.4.2+1
 
 - Fixed "Latest version 5.4.2 crashes on Android - HeadlessInAppWebView.dispose" [#1155](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1155)

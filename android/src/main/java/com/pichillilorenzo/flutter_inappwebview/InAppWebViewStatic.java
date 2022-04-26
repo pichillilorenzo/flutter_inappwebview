@@ -79,7 +79,7 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
           result.success(false);
         break;
       case "getCurrentWebViewPackage":
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O && plugin != null && plugin.activity != null) {
           result.success(convertWebViewPackageToMap(WebViewCompat.getCurrentWebViewPackage(plugin.activity)));
         } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           //with Android Lollipop (API 21) they started to update the WebView

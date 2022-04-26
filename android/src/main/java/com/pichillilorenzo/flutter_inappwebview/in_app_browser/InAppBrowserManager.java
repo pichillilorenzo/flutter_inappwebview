@@ -72,13 +72,19 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
   public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     switch (call.method) {
       case "open":
-        open(plugin.activity, (Map<String, Object>) call.arguments());
-        result.success(true);
+        if (plugin != null && plugin.activity != null) {
+          open(plugin.activity, (Map<String, Object>) call.arguments());
+          result.success(true);
+        } else {
+          result.success(false);
+        }
         break;
       case "openWithSystemBrowser":
-        {
+        if (plugin != null && plugin.activity != null) {
           String url = (String) call.argument("url");
           openWithSystemBrowser(plugin.activity, url, result);
+        } else {
+          result.success(false);
         }
         break;
       default:

@@ -41,7 +41,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
 
     switch (call.method) {
       case "open":
-        if (plugin != null) {
+        if (plugin != null && plugin.activity != null) {
           String url = (String) call.argument("url");
           HashMap<String, Object> settings = (HashMap<String, Object>) call.argument("settings");
           HashMap<String, Object> actionButton = (HashMap<String, Object>) call.argument("actionButton");
@@ -52,7 +52,7 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
         }
         break;
       case "isAvailable":
-        if (plugin != null) {
+        if (plugin != null && plugin.activity != null) {
           result.success(CustomTabActivityHelper.isAvailable(plugin.activity));
         } else {
           result.success(false);

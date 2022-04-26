@@ -41,6 +41,7 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
   protected boolean onChromeSafariBrowserOpened = false;
   protected boolean onChromeSafariBrowserCompletedInitialLoad = false;
+  @Nullable
   public ChromeSafariBrowserManager manager;
   public String initialUrl;
   public List<CustomTabsMenuItem> menuItems = new ArrayList<>();
@@ -137,11 +138,13 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
         this.onDestroy();
         this.close();
 
-        // https://stackoverflow.com/a/41596629/4637638
-        Intent myIntent = new Intent(manager.plugin.activity, manager.plugin.activity.getClass());
-        myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-        manager.plugin.activity.startActivity(myIntent);
+        if (manager != null && manager.plugin != null && manager.plugin.activity != null) {
+          // https://stackoverflow.com/a/41596629/4637638
+          Intent myIntent = new Intent(manager.plugin.activity, manager.plugin.activity.getClass());
+          myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+          myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+          manager.plugin.activity.startActivity(myIntent);
+        }
 
         dispose();
         

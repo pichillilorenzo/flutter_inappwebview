@@ -15,6 +15,21 @@ import 'package:path_provider/path_provider.dart';
 
 import '.env.dart';
 
+/// Returns a matcher that matches the isNullOrEmpty property.
+const Matcher isNullOrEmpty = _NullOrEmpty();
+
+class _NullOrEmpty extends Matcher {
+  const _NullOrEmpty();
+
+  @override
+  bool matches(Object? item, Map matchState) =>
+      item == null || (item as dynamic).isEmpty;
+
+  @override
+  Description describe(Description description) =>
+      description.add('null or empty');
+}
+
 class Foo {
   String? bar;
   String? baz;
@@ -4148,7 +4163,7 @@ setTimeout(function() {
       if (Platform.isAndroid) {
         await pageLoaded.future;
         expect(await controller.evaluateJavascript(source: "document.body"),
-            isEmpty);
+            isNullOrEmpty);
       } else if (Platform.isIOS) {
         expect(pageLoaded.future, doesNotComplete);
       }

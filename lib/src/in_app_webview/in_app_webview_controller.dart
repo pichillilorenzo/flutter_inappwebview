@@ -1034,6 +1034,22 @@ class InAppWebViewController
             _inAppBrowser!.onPrint(uri);
         }
         break;
+      case "onInjectedScriptLoaded":
+        String id = call.arguments[0];
+        var onLoadCallback = _injectedScriptsFromURL[id]?.onLoad;
+        if ((_webview != null || _inAppBrowser != null) &&
+            onLoadCallback != null) {
+          onLoadCallback();
+        }
+        return null;
+      case "onInjectedScriptError":
+        String id = call.arguments[0];
+        var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
+        if ((_webview != null || _inAppBrowser != null) &&
+            onErrorCallback != null) {
+          onErrorCallback();
+        }
+        return null;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json
@@ -1165,7 +1181,7 @@ class InAppWebViewController
           try {
             return jsonEncode(await javaScriptHandlersMap[handlerName]!(args));
           } catch (error) {
-            print(error);
+            developer.log(error.toString(), name: this.runtimeType.toString());
             return null;
           }
         }
@@ -1194,9 +1210,12 @@ class InAppWebViewController
 
   ///Gets the title for the current page.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getTitle](https://developer.android.com/reference/android/webkit/WebView#getTitle()))
   ///- iOS ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
+  ///- Web
   Future<String?> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getTitle', args);
@@ -1222,6 +1241,7 @@ class InAppWebViewController
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<String?> getHtml() async {
     String? html;
 
@@ -1245,13 +1265,13 @@ class InAppWebViewController
         html = utf8.decode(bytes.buffer.asUint8List());
       } catch (e) {}
     } else {
-      HttpClient client = new HttpClient();
       try {
+        HttpClient client = HttpClient();
         var htmlRequest = await client.getUrl(webviewUrl);
         html =
             await (await htmlRequest.close()).transform(Utf8Decoder()).join();
       } catch (e) {
-        print(e);
+        developer.log(e.toString(), name: this.runtimeType.toString());
       }
     }
 
@@ -1260,13 +1280,15 @@ class InAppWebViewController
 
   ///Gets the list of all favicons for the current page.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<List<Favicon>> getFavicons() async {
     List<Favicon> favicons = [];
 
-    HttpClient client = new HttpClient();
     var webviewUrl = await getUrl();
 
     if (webviewUrl == null) {
@@ -1336,6 +1358,7 @@ class InAppWebViewController
 
     // try to get /favicon.ico
     try {
+      HttpClient client = HttpClient();
       var faviconUrl =
           webviewUrl.scheme + "://" + webviewUrl.host + "/favicon.ico";
       var faviconUri = Uri.parse(faviconUrl);
@@ -1345,8 +1368,8 @@ class InAppWebViewController
         favicons.add(Favicon(url: faviconUri, rel: "shortcut icon"));
       }
     } catch (e) {
-      print("/favicon.ico file not found: " + e.toString());
-      // print(stacktrace);
+      developer.log("/favicon.ico file not found: " + e.toString(),
+          name: this.runtimeType.toString());
     }
 
     // try to get the manifest file
@@ -1358,13 +1381,14 @@ class InAppWebViewController
           webviewUrl.scheme + "://" + webviewUrl.host + "/manifest.json";
     }
     try {
+      HttpClient client = HttpClient();
       manifestRequest = await client.getUrl(Uri.parse(manifestUrl));
       manifestResponse = await manifestRequest.close();
       manifestFound = manifestResponse.statusCode == 200 &&
           manifestResponse.headers.contentType?.mimeType == "application/json";
     } catch (e) {
-      print("Manifest file not found: " + e.toString());
-      // print(stacktrace);
+      developer.log("Manifest file not found: " + e.toString(),
+          name: this.runtimeType.toString());
     }
 
     if (manifestFound) {
@@ -1470,9 +1494,12 @@ class InAppWebViewController
   ///controller.postUrl(url: Uri.parse("https://www.example.com/"), postData: postData);
   ///```
   ///
+  ///**NOTE for Web**: it will try to create an XMLHttpRequest and load the result inside the iframe.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[])))
   ///- iOS
+  ///- Web
   Future<void> postUrl({required Uri url, required Uint8List postData}) async {
     assert(url.toString().isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1745,9 +1772,12 @@ class InAppWebViewController
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<void> injectJavascriptFileFromUrl(
       {required Uri urlFile,
       ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
@@ -1770,9 +1800,12 @@ class InAppWebViewController
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<dynamic> injectJavascriptFileFromAsset(
       {required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
@@ -1786,9 +1819,12 @@ class InAppWebViewController
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<void> injectCSSCode({required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('source', () => source);
@@ -1804,9 +1840,12 @@ class InAppWebViewController
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<void> injectCSSFileFromUrl(
       {required Uri urlFile,
       CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
@@ -1825,9 +1864,12 @@ class InAppWebViewController
   ///Instead, you should call this method, for example, inside the [WebView.onLoadStop] event or in any other events
   ///where you know the page is ready "enough".
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<void> injectCSSFileFromAsset({required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
     await injectCSSCode(source: source);
@@ -2076,9 +2118,12 @@ class InAppWebViewController
   ///
   ///[animated] `true` to animate the scroll transition, `false` to make the scoll transition immediate.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.scrollTo](https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)))
   ///- iOS ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
+  ///- Web ([Official API - Window.scrollTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo))
   Future<void> scrollTo(
       {required int x, required int y, bool animated = false}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2096,9 +2141,12 @@ class InAppWebViewController
   ///
   ///[animated] `true` to animate the scroll transition, `false` to make the scoll transition immediate.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.scrollBy](https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)))
   ///- iOS ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
+  ///- Web ([Official API - Window.scrollBy](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy))
   Future<void> scrollBy(
       {required int x, required int y, bool animated = false}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2137,9 +2185,12 @@ class InAppWebViewController
   ///
   ///**NOTE**: available on Android 21+.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintManager](https://developer.android.com/reference/android/print/PrintManager))
   ///- iOS ([Official API - UIPrintInteractionController](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller))
+  ///- Web ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print))
   Future<void> printCurrentPage() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('printCurrentPage', args);
@@ -2147,9 +2198,12 @@ class InAppWebViewController
 
   ///Gets the height of the HTML content.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getContentHeight](https://developer.android.com/reference/android/webkit/WebView#getContentHeight()))
   ///- iOS ([Official API - UIScrollView.contentSize](https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize))
+  ///- Web ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
   Future<int?> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getContentHeight', args);
@@ -2186,9 +2240,12 @@ class InAppWebViewController
   ///This is not always the same as the URL passed to [InAppWebView.onLoadStart] because although the load for that URL has begun,
   ///the current page may not have changed. Also, there may have been redirects resulting in a different URL to that originally requested.
   ///
+  ///**NOTE for Web**: it will return the current value of the `iframe.src` attribute.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getOriginalUrl](https://developer.android.com/reference/android/webkit/WebView#getOriginalUrl()))
   ///- iOS
+  ///- Web
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getOriginalUrl', args);
@@ -2217,9 +2274,12 @@ class InAppWebViewController
   ///
   ///**NOTE for Android native WebView**: available only on Android 19+.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<String?> getSelectedText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getSelectedText', args);
@@ -2314,9 +2374,12 @@ class InAppWebViewController
   ///
   ///**NOTE**: It is implemented using JavaScript.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<List<MetaTag>> getMetaTags() async {
     List<MetaTag> metaTags = [];
 
@@ -2379,11 +2442,14 @@ class InAppWebViewController
   ///Returns an instance of [Color] representing the `content` value of the
   ///`<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
   ///
-  ///**NOTE**: on Android and iOS < 15.0, it is implemented using JavaScript.
+  ///**NOTE**: on Android, Web and iOS < 15.0, it is implemented using JavaScript.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor))
+  ///- Web
   Future<Color?> getMetaThemeColor() async {
     Color? themeColor;
 
@@ -2391,16 +2457,12 @@ class InAppWebViewController
       Map<String, dynamic> args = <String, dynamic>{};
       themeColor = UtilColor.fromStringRepresentation(
           await _channel.invokeMethod('getMetaThemeColor', args));
+      return themeColor;
     } catch (e) {
       // not implemented
     }
 
-    if (themeColor != null) {
-      return themeColor;
-    }
-
     // try using javascript
-
     var metaTags = await getMetaTags();
     MetaTag? metaTagThemeColor;
 

@@ -48,32 +48,32 @@ Future<dynamic> _dartNativeCommunication(String method, dynamic viewId,
         WebPlatformManager.webViews[viewId] as InAppWebViewWebElement;
     switch (method) {
       case 'onLoadStart':
-        var url = args![0] as String;
+        String url = args![0];
         webViewHtmlElement.onLoadStart(url);
         break;
       case 'onLoadStop':
-        var url = args![0] as String;
+        String url = args![0];
         webViewHtmlElement.onLoadStop(url);
         break;
       case 'onUpdateVisitedHistory':
-        var url = args![0] as String;
+        String url = args![0];
         webViewHtmlElement.onUpdateVisitedHistory(url);
         break;
       case 'onScrollChanged':
-        var x = (args![0] as double).toInt();
-        var y = (args[1] as double).toInt();
+        int x = (args![0] as double).toInt();
+        int y = (args[1] as double).toInt();
         webViewHtmlElement.onScrollChanged(x, y);
         break;
       case 'onConsoleMessage':
-        var type = args![0] as String;
-        var message = args[1] as String?;
+        String type = args![0];
+        String? message = args[1];
         webViewHtmlElement.onConsoleMessage(type, message);
         break;
       case 'onCreateWindow':
-        var windowId = args![0] as int;
-        var url = args[1] as String? ?? 'about:blank';
-        var target = args[2] as String?;
-        var windowFeatures = args[3] as String?;
+        int windowId = args![0];
+        String url = args[1] ?? 'about:blank';
+        String? target = args[2];
+        String? windowFeatures = args[3];
         return await webViewHtmlElement.onCreateWindow(
             windowId, url, target, windowFeatures);
       case 'onWindowFocus':
@@ -83,7 +83,7 @@ Future<dynamic> _dartNativeCommunication(String method, dynamic viewId,
         webViewHtmlElement.onWindowBlur();
         break;
       case 'onPrint':
-        var url = args![0] as String?;
+        String? url = args![0];
         webViewHtmlElement.onPrint(url);
         break;
       case 'onEnterFullscreen':
@@ -93,13 +93,21 @@ Future<dynamic> _dartNativeCommunication(String method, dynamic viewId,
         webViewHtmlElement.onExitFullscreen();
         break;
       case 'onTitleChanged':
-        var title = args![0] as String?;
+        String? title = args![0];
         webViewHtmlElement.onTitleChanged(title);
         break;
       case 'onZoomScaleChanged':
-        var oldScale = args![0] as double;
-        var newScale = args[1] as double;
+        double oldScale = args![0];
+        double newScale = args[1];
         webViewHtmlElement.onZoomScaleChanged(oldScale, newScale);
+        break;
+      case 'onInjectedScriptLoaded':
+        String id = args![0];
+        webViewHtmlElement.onInjectedScriptLoaded(id);
+        break;
+      case 'onInjectedScriptError':
+        String id = args![0];
+        webViewHtmlElement.onInjectedScriptError(id);
         break;
     }
   }

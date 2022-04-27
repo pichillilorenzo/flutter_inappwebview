@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 import 'package:flutter/services.dart';
 import 'dart:html';
 import 'dart:js' as js;
@@ -49,7 +50,7 @@ class InAppWebViewWebElement {
   Future<dynamic> handleMethodCall(MethodCall call) async {
     switch (call.method) {
       case "getIFrameId":
-        return iframe.id;
+        return getIFrameId();
       case "loadUrl":
         URLRequest urlRequest = URLRequest.fromMap(
             call.arguments["urlRequest"].cast<String, dynamic>())!;
@@ -90,10 +91,51 @@ class InAppWebViewWebElement {
       case "setSettings":
         InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(
             call.arguments["settings"].cast<String, dynamic>());
-        setSettings(newSettings);
+        await setSettings(newSettings);
         break;
       case "getUrl":
-        return getUrl();
+        return await getUrl();
+      case "getTitle":
+        return await getTitle();
+      case "postUrl":
+        String url = call.arguments["url"];
+        Uint8List postData = call.arguments["postData"];
+        return await postUrl(url: url, postData: postData);
+      case "injectJavascriptFileFromUrl":
+        String urlFile = call.arguments["urlFile"];
+        Map<String, dynamic> scriptHtmlTagAttributes = call.arguments["scriptHtmlTagAttributes"].cast<String, dynamic>();
+        await injectJavascriptFileFromUrl(urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes);
+        break;
+      case "injectCSSCode":
+        String source = call.arguments["source"];
+        await injectCSSCode(source: source);
+        break;
+      case "injectCSSFileFromUrl":
+        String urlFile = call.arguments["urlFile"];
+        Map<String, dynamic> cssLinkHtmlTagAttributes = call.arguments["cssLinkHtmlTagAttributes"].cast<String, dynamic>();
+        await injectCSSFileFromUrl(urlFile: urlFile, cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes);
+        break;
+      case "scrollTo":
+        int x = call.arguments["x"];
+        int y = call.arguments["y"];
+        bool animated = call.arguments["animated"];
+        await scrollTo(x: x, y: y, animated: animated);
+        break;
+      case "scrollBy":
+        int x = call.arguments["x"];
+        int y = call.arguments["y"];
+        bool animated = call.arguments["animated"];
+        await scrollBy(x: x, y: y, animated: animated);
+        break;
+      case "printCurrentPage":
+        await printCurrentPage();
+        break;
+      case "getContentHeight":
+        return await getContentHeight();
+      case "getOriginalUrl":
+        return await getOriginalUrl();
+      case "getSelectedText":
+        return await getSelectedText();
       case "dispose":
         dispose();
         break;
@@ -177,6 +219,10 @@ class InAppWebViewWebElement {
         Uri.encodeFull(httpRequest.responseText ?? '');
   }
 
+  String getIFrameId() {
+    return iframe.id;
+  }
+
   Future<void> loadUrl({required URLRequest urlRequest}) async {
     if ((urlRequest.method == null || urlRequest.method == "GET") &&
         (urlRequest.headers == null || urlRequest.headers!.isEmpty)) {
@@ -225,6 +271,56 @@ class InAppWebViewWebElement {
       url = iframe.src;
     }
     return url;
+  }
+
+  Future<String?> getTitle() async {
+    return _callMethod("getTitle");
+  }
+
+  Future<void> postUrl({required String url, required Uint8List postData}) async {
+    await loadUrl(urlRequest: URLRequest(url: Uri.parse(url), method: "POST", body: postData));
+  }
+
+  Future<void> injectJavascriptFileFromUrl({required String urlFile,
+    Map<String, dynamic>? scriptHtmlTagAttributes}) async {
+    _callMethod("injectJavascriptFileFromUrl",
+        [urlFile, scriptHtmlTagAttributes != null ?
+        js.JsObject.jsify(scriptHtmlTagAttributes) : null]);
+  }
+
+  Future<void> injectCSSCode({required String source}) async {
+    _callMethod("injectCSSCode", [source]);
+  }
+
+  Future<void> injectCSSFileFromUrl({required String urlFile,
+    Map<String, dynamic>? cssLinkHtmlTagAttributes}) async {
+    _callMethod("injectCSSFileFromUrl",
+        [urlFile, cssLinkHtmlTagAttributes != null ?
+        js.JsObject.jsify(cssLinkHtmlTagAttributes) : null]);
+  }
+
+  Future<void> scrollTo({required int x, required int y, bool animated = false}) async {
+    _callMethod('scrollTo', [x, y, animated]);
+  }
+
+  Future<void> scrollBy({required int x, required int y, bool animated = false}) async {
+    _callMethod('scrollBy', [x, y, animated]);
+  }
+
+  Future<void> printCurrentPage() async {
+    _callMethod('printCurrentPage');
+  }
+
+  Future<int?> getContentHeight() async {
+    return _callMethod('getContentHeight');
+  }
+
+  Future<String?> getOriginalUrl() async {
+    return iframe.src;
+  }
+
+  Future<String?> getSelectedText() async {
+    return _callMethod('getSelectedText');
   }
 
   Set<Sandbox> getSandbox() {
@@ -388,6 +484,14 @@ class InAppWebViewWebElement {
     var obj = {"oldScale": oldScale, "newScale": newScale};
 
     await _channel?.invokeMethod("onZoomScaleChanged", obj);
+  }
+
+  void onInjectedScriptLoaded(String id) async {
+    await _channel?.invokeMethod("onInjectedScriptLoaded", [id]);
+  }
+
+  void onInjectedScriptError(String id) async {
+    await _channel?.invokeMethod("onInjectedScriptError", [id]);
   }
 
   void dispose() {

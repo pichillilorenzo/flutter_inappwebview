@@ -1,4 +1,5 @@
 import 'dart:collection';
+import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -114,16 +115,17 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
+                  // initialUrlRequest:
+                  //     URLRequest(url: Uri.parse("https://flutter.dev")),
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse("https://flutter.dev")),
+                  URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
                   // contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
-                  onWebViewCreated: (controller) async {
+                  onWebViewCreated: (controller) {
                     webViewController = controller;
-                    print(await controller.getUrl());
                   },
                   onLoadStart: (controller, url) async {
                     setState(() {
@@ -149,10 +151,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       "javascript",
                       "about"
                     ].contains(uri.scheme)) {
-                      if (await canLaunch(url)) {
+                      if (await canLaunchUrl(uri)) {
                         // Launch the App
-                        await launch(
-                          url,
+                        await launchUrl(
+                          uri,
                         );
                         // and cancel the request
                         return NavigationActionPolicy.CANCEL;

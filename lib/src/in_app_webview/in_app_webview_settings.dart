@@ -544,7 +544,7 @@ class InAppWebViewSettings
   ///- Android native WebView
   String? regexToCancelSubFramesLoading;
 
-  ///Set to `true` to enable Flutter's new Hybrid Composition. The default value is `false`.
+  ///Set to `false` to disable Flutter Hybrid Composition. The default value is `true`.
   ///Hybrid Composition is supported starting with Flutter v1.20+.
   ///
   ///**NOTE**: It is recommended to use Hybrid Composition only on Android 10+ for a release app,
@@ -1119,7 +1119,7 @@ class InAppWebViewSettings
     this.initialScale = 0,
     this.supportMultipleWindows = false,
     this.regexToCancelSubFramesLoading,
-    this.useHybridComposition = false,
+    this.useHybridComposition = true,
     this.useShouldInterceptRequest = false,
     this.useOnRenderProcessGone = false,
     this.overScrollMode = OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,

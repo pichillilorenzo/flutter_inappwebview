@@ -136,6 +136,16 @@ class InAppWebViewWebElement {
         return await getOriginalUrl();
       case "getSelectedText":
         return await getSelectedText();
+      case "getScrollX":
+        return await getScrollX();
+      case "getScrollY":
+        return await getScrollY();
+      case "isSecureContext":
+        return await isSecureContext();
+      case "canScrollVertically":
+        return await canScrollVertically();
+      case "canScrollHorizontally":
+        return await canScrollHorizontally();
       case "dispose":
         dispose();
         break;
@@ -321,6 +331,26 @@ class InAppWebViewWebElement {
 
   Future<String?> getSelectedText() async {
     return _callMethod('getSelectedText');
+  }
+
+  Future<int?> getScrollX() async {
+    return _callMethod('getScrollX');
+  }
+
+  Future<int?> getScrollY() async {
+    return _callMethod('getScrollY');
+  }
+
+  Future<bool> isSecureContext() async {
+    return _callMethod('isSecureContext');
+  }
+
+  Future<bool> canScrollVertically() async {
+    return _callMethod('canScrollVertically');
+  }
+
+  Future<bool> canScrollHorizontally() async {
+    return _callMethod('canScrollHorizontally');
   }
 
   Set<Sandbox> getSandbox() {

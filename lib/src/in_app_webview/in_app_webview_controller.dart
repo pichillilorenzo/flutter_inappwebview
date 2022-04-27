@@ -2488,9 +2488,12 @@ class InAppWebViewController
 
   ///Returns the scrolled left position of the current WebView.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.getScrollX](https://developer.android.com/reference/android/view/View#getScrollX()))
   ///- iOS ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
+  ///- Web ([Official API - Window.scrollX](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX))
   Future<int?> getScrollX() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getScrollX', args);
@@ -2498,9 +2501,12 @@ class InAppWebViewController
 
   ///Returns the scrolled top position of the current WebView.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.getScrollY](https://developer.android.com/reference/android/view/View#getScrollY()))
   ///- iOS ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
+  ///- Web ([Official API - Window.scrollY](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY))
   Future<int?> getScrollY() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getScrollY', args);
@@ -2731,9 +2737,12 @@ class InAppWebViewController
   ///
   ///**NOTE for Android**: available Android 21.0+.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin. Returns `false` otherwise.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web ([Official API - Window.isSecureContext](https://developer.mozilla.org/en-US/docs/Web/API/Window/isSecureContext))
   Future<bool> isSecureContext() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('isSecureContext', args);
@@ -2959,9 +2968,12 @@ class InAppWebViewController
 
   ///Returns `true` if the webpage can scroll vertically, otherwise `false`.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<bool> canScrollVertically() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canScrollVertically', args);
@@ -2969,9 +2981,12 @@ class InAppWebViewController
 
   ///Returns `true` if the webpage can scroll horizontally, otherwise `false`.
   ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- Web
   Future<bool> canScrollHorizontally() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canScrollHorizontally', args);

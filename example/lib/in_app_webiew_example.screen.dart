@@ -169,6 +169,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
+
                   },
                   onLoadError: (controller, url, code, message) {
                     pullToRefreshController?.endRefreshing();

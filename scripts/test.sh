@@ -39,6 +39,6 @@ else
   FAILED=1
 fi
 
-kill $(jobs -p)
+jobs -p | xargs kill
 
 exit $FAILED

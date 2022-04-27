@@ -115,10 +115,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  // initialUrlRequest:
-                  //     URLRequest(url: Uri.parse("https://flutter.dev")),
                   initialUrlRequest:
-                  URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                      URLRequest(url: Uri.parse("https://flutter.dev")),
+                  // initialUrlRequest:
+                  // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
@@ -169,7 +169,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
-
                   },
                   onLoadError: (controller, url, code, message) {
                     pullToRefreshController?.endRefreshing();

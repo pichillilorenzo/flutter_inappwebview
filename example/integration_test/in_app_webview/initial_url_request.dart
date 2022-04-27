@@ -5,7 +5,15 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
+import '../constants.dart';
+
 void initialUrlRequest() {
+  final shouldSkip = !kIsWeb || ![
+    TargetPlatform.android,
+    TargetPlatform.iOS,
+    TargetPlatform.macOS,
+  ].contains(defaultTargetPlatform);
+
   testWidgets('initialUrlRequest', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     await tester.pumpWidget(
@@ -14,20 +22,18 @@ void initialUrlRequest() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest:
-          URLRequest(url: Uri.parse('https://github.com/flutter')),
+          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
         ),
       ),
     );
+
     final InAppWebViewController controller =
     await controllerCompleter.future;
     final String? currentUrl = (await controller.getUrl())?.toString();
-    expect(currentUrl, 'https://github.com/flutter');
-  }, skip: !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform));
+
+    expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());
+  }, skip: shouldSkip);
 }

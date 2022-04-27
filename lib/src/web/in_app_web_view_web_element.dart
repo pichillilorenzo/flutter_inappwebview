@@ -92,6 +92,8 @@ class InAppWebViewWebElement {
             call.arguments["settings"].cast<String, dynamic>());
         setSettings(newSettings);
         break;
+      case "getUrl":
+        return getUrl();
       case "dispose":
         dispose();
         break;
@@ -215,6 +217,14 @@ class InAppWebViewWebElement {
 
   Future<void> stopLoading() async {
     _callMethod("stopLoading");
+  }
+
+  Future<String?> getUrl() async {
+    String? url = _callMethod("getUrl");
+    if (url == null || url.isEmpty || url == 'about:blank') {
+      url = iframe.src;
+    }
+    return url;
   }
 
   Set<Sandbox> getSandbox() {

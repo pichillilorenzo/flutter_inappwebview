@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
-import 'dart:io';
+// import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
@@ -89,7 +89,7 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-  if (Platform.isAndroid) {
+  if (defaultTargetPlatform == TargetPlatform.android) {
     InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
@@ -350,141 +350,141 @@ void main() {
       pageLoads.close();
     });
 
-    group("iOS loadFileURL", () {
-      late Directory appSupportDir;
-      late File fileHtml;
-      late File fileJs;
-
-      setUpAll(() async {
-        appSupportDir = (await getApplicationSupportDirectory());
-
-        final Directory htmlFolder = Directory('${appSupportDir.path}/html/');
-        if (!await htmlFolder.exists()) {
-          await htmlFolder.create(recursive: true);
-        }
-
-        final Directory jsFolder = Directory('${appSupportDir.path}/js/');
-        if (!await jsFolder.exists()) {
-          await jsFolder.create(recursive: true);
-        }
-
-        var html = """
-      <!DOCTYPE html><html>
-      <head>
-        <title>file scheme</title>
-      </head>
-      <body>
-        <script src="../js/main.js"></script>
-      </body>
-      </html>
-    """;
-        fileHtml = File(htmlFolder.path + "index.html");
-        fileHtml.writeAsStringSync(html);
-
-        var js = """
-      console.log('message');
-      """;
-        fileJs = File(jsFolder.path + "main.js");
-        fileJs.writeAsStringSync(js);
-      });
-
-      testWidgets('initialUrl with file:// scheme and allowingReadAccessTo',
-          (WidgetTester tester) async {
-        final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
-            Completer<ConsoleMessage?>();
-        await tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: InAppWebView(
-              key: GlobalKey(),
-              initialUrlRequest:
-                  URLRequest(url: Uri.parse('file://${fileHtml.path}')),
-              onConsoleMessage: (controller, consoleMessage) {
-                consoleMessageShouldNotComplete.complete(consoleMessage);
-              },
-            ),
-          ),
-        );
-        var result = await consoleMessageShouldNotComplete.future
-            .timeout(const Duration(seconds: 2), onTimeout: () => null);
-        expect(result, null);
-
-        final Completer<ConsoleMessage> consoleMessageCompleter =
-            Completer<ConsoleMessage>();
-        await tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: InAppWebView(
-              key: GlobalKey(),
-              initialUrlRequest:
-                  URLRequest(url: Uri.parse('file://${fileHtml.path}')),
-              initialOptions: InAppWebViewGroupOptions(
-                  ios: IOSInAppWebViewOptions(
-                      allowingReadAccessTo:
-                          Uri.parse('file://${appSupportDir.path}/'))),
-              onConsoleMessage: (controller, consoleMessage) {
-                consoleMessageCompleter.complete(consoleMessage);
-              },
-            ),
-          ),
-        );
-        final ConsoleMessage consoleMessage =
-            await consoleMessageCompleter.future;
-        expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
-        expect(consoleMessage.message, 'message');
-      }, skip: !Platform.isIOS);
-
-      testWidgets(
-          'loadUrl with file:// scheme and allowingReadAccessTo argument',
-          (WidgetTester tester) async {
-        final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
-            Completer<ConsoleMessage?>();
-        await tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: InAppWebView(
-              key: GlobalKey(),
-              onWebViewCreated: (controller) {
-                controller.loadUrl(
-                    urlRequest:
-                        URLRequest(url: Uri.parse('file://${fileHtml.path}')));
-              },
-              onConsoleMessage: (controller, consoleMessage) {
-                consoleMessageShouldNotComplete.complete(consoleMessage);
-              },
-            ),
-          ),
-        );
-        var result = await consoleMessageShouldNotComplete.future
-            .timeout(const Duration(seconds: 2), onTimeout: () => null);
-        expect(result, null);
-
-        final Completer<ConsoleMessage> consoleMessageCompleter =
-            Completer<ConsoleMessage>();
-        await tester.pumpWidget(
-          Directionality(
-            textDirection: TextDirection.ltr,
-            child: InAppWebView(
-              key: GlobalKey(),
-              onWebViewCreated: (controller) {
-                controller.loadUrl(
-                    urlRequest:
-                        URLRequest(url: Uri.parse('file://${fileHtml.path}')),
-                    allowingReadAccessTo:
-                        Uri.parse('file://${appSupportDir.path}/'));
-              },
-              onConsoleMessage: (controller, consoleMessage) {
-                consoleMessageCompleter.complete(consoleMessage);
-              },
-            ),
-          ),
-        );
-        final ConsoleMessage consoleMessage =
-            await consoleMessageCompleter.future;
-        expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
-        expect(consoleMessage.message, 'message');
-      }, skip: !Platform.isIOS);
-    }, skip: !Platform.isIOS);
+    // group("iOS loadFileURL", () {
+    //   late Directory appSupportDir;
+    //   late File fileHtml;
+    //   late File fileJs;
+    //
+    //   setUpAll(() async {
+    //     appSupportDir = (await getApplicationSupportDirectory());
+    //
+    //     final Directory htmlFolder = Directory('${appSupportDir.path}/html/');
+    //     if (!await htmlFolder.exists()) {
+    //       await htmlFolder.create(recursive: true);
+    //     }
+    //
+    //     final Directory jsFolder = Directory('${appSupportDir.path}/js/');
+    //     if (!await jsFolder.exists()) {
+    //       await jsFolder.create(recursive: true);
+    //     }
+    //
+    //     var html = """
+    //   <!DOCTYPE html><html>
+    //   <head>
+    //     <title>file scheme</title>
+    //   </head>
+    //   <body>
+    //     <script src="../js/main.js"></script>
+    //   </body>
+    //   </html>
+    // """;
+    //     fileHtml = File(htmlFolder.path + "index.html");
+    //     fileHtml.writeAsStringSync(html);
+    //
+    //     var js = """
+    //   console.log('message');
+    //   """;
+    //     fileJs = File(jsFolder.path + "main.js");
+    //     fileJs.writeAsStringSync(js);
+    //   });
+    //
+    //   testWidgets('initialUrl with file:// scheme and allowingReadAccessTo',
+    //       (WidgetTester tester) async {
+    //     final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
+    //         Completer<ConsoleMessage?>();
+    //     await tester.pumpWidget(
+    //       Directionality(
+    //         textDirection: TextDirection.ltr,
+    //         child: InAppWebView(
+    //           key: GlobalKey(),
+    //           initialUrlRequest:
+    //               URLRequest(url: Uri.parse('file://${fileHtml.path}')),
+    //           onConsoleMessage: (controller, consoleMessage) {
+    //             consoleMessageShouldNotComplete.complete(consoleMessage);
+    //           },
+    //         ),
+    //       ),
+    //     );
+    //     var result = await consoleMessageShouldNotComplete.future
+    //         .timeout(const Duration(seconds: 2), onTimeout: () => null);
+    //     expect(result, null);
+    //
+    //     final Completer<ConsoleMessage> consoleMessageCompleter =
+    //         Completer<ConsoleMessage>();
+    //     await tester.pumpWidget(
+    //       Directionality(
+    //         textDirection: TextDirection.ltr,
+    //         child: InAppWebView(
+    //           key: GlobalKey(),
+    //           initialUrlRequest:
+    //               URLRequest(url: Uri.parse('file://${fileHtml.path}')),
+    //           initialOptions: InAppWebViewGroupOptions(
+    //               ios: IOSInAppWebViewOptions(
+    //                   allowingReadAccessTo:
+    //                       Uri.parse('file://${appSupportDir.path}/'))),
+    //           onConsoleMessage: (controller, consoleMessage) {
+    //             consoleMessageCompleter.complete(consoleMessage);
+    //           },
+    //         ),
+    //       ),
+    //     );
+    //     final ConsoleMessage consoleMessage =
+    //         await consoleMessageCompleter.future;
+    //     expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
+    //     expect(consoleMessage.message, 'message');
+    //   }, skip: defaultTargetPlatform != TargetPlatform.iOS);
+    //
+    //   testWidgets(
+    //       'loadUrl with file:// scheme and allowingReadAccessTo argument',
+    //       (WidgetTester tester) async {
+    //     final Completer<ConsoleMessage?> consoleMessageShouldNotComplete =
+    //         Completer<ConsoleMessage?>();
+    //     await tester.pumpWidget(
+    //       Directionality(
+    //         textDirection: TextDirection.ltr,
+    //         child: InAppWebView(
+    //           key: GlobalKey(),
+    //           onWebViewCreated: (controller) {
+    //             controller.loadUrl(
+    //                 urlRequest:
+    //                     URLRequest(url: Uri.parse('file://${fileHtml.path}')));
+    //           },
+    //           onConsoleMessage: (controller, consoleMessage) {
+    //             consoleMessageShouldNotComplete.complete(consoleMessage);
+    //           },
+    //         ),
+    //       ),
+    //     );
+    //     var result = await consoleMessageShouldNotComplete.future
+    //         .timeout(const Duration(seconds: 2), onTimeout: () => null);
+    //     expect(result, null);
+    //
+    //     final Completer<ConsoleMessage> consoleMessageCompleter =
+    //         Completer<ConsoleMessage>();
+    //     await tester.pumpWidget(
+    //       Directionality(
+    //         textDirection: TextDirection.ltr,
+    //         child: InAppWebView(
+    //           key: GlobalKey(),
+    //           onWebViewCreated: (controller) {
+    //             controller.loadUrl(
+    //                 urlRequest:
+    //                     URLRequest(url: Uri.parse('file://${fileHtml.path}')),
+    //                 allowingReadAccessTo:
+    //                     Uri.parse('file://${appSupportDir.path}/'));
+    //           },
+    //           onConsoleMessage: (controller, consoleMessage) {
+    //             consoleMessageCompleter.complete(consoleMessage);
+    //           },
+    //         ),
+    //       ),
+    //     );
+    //     final ConsoleMessage consoleMessage =
+    //         await consoleMessageCompleter.future;
+    //     expect(consoleMessage.messageLevel, ConsoleMessageLevel.LOG);
+    //     expect(consoleMessage.message, 'message');
+    //   }, skip: defaultTargetPlatform != TargetPlatform.iOS);
+    // }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
     testWidgets('JavaScript Handler', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -899,7 +899,7 @@ void main() {
         await controller.evaluateJavascript(source: "exitFullscreen();");
 
         await expectLater(onExitFullscreenCompleter.future, completes);
-      }, skip: true /*!Platform.isAndroid*/);
+      }, skip: true /*defaultTargetPlatform != TargetPlatform.android*/);
     });
 
     group('Audio playback policy', () {
@@ -1205,8 +1205,8 @@ void main() {
         scrollPosY = await controller.getScrollY();
         expect(scrollPosX, X_SCROLL * 2);
         expect(scrollPosY, Y_SCROLL * 2);
-      }, skip: !Platform.isAndroid);
-    }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     group('shouldOverrideUrlLoading', () {
       final String page =
@@ -1318,7 +1318,7 @@ void main() {
             'https://github.com/pichillilorenzo/flutter_inappwebview');
 
         pageLoads.close();
-      }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
       testWidgets('can block requests', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -1439,9 +1439,9 @@ void main() {
       final String url = await errorUrlCompleter.future;
       final int code = await errorCodeCompleter.future;
 
-      if (Platform.isAndroid) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
         expect(code, -2);
-      } else if (Platform.isIOS) {
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         expect(code, -1003);
       }
       expect(url, 'https://www.notawebsite..com/');
@@ -1502,7 +1502,7 @@ void main() {
           await controllerCompleter.future;
       final String? currentUrl = (await controller.getUrl())?.toString();
       expect(currentUrl, 'https://github.com/flutter');
-    }, skip: !Platform.isIOS);
+    }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
     testWidgets('target _blank opens in same window',
         (WidgetTester tester) async {
@@ -1587,7 +1587,7 @@ void main() {
 
         pageLoads.close();
       },
-      skip: true /* !Platform.isAndroid */,
+      skip: true /* defaultTargetPlatform != TargetPlatform.android */,
     );
 
     testWidgets(
@@ -1663,7 +1663,7 @@ void main() {
           completion(null),
         );
       },
-      skip: !Platform.isAndroid,
+      skip: defaultTargetPlatform != TargetPlatform.android,
     );
 
     group('intercept ajax request', () {
@@ -3016,7 +3016,7 @@ setTimeout(function() {
 
       final String url = await pageLoaded.future;
       expect(url, "chrome://safe-browsing/match?type=malware");
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     testWidgets('onScrollChanged', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -3295,7 +3295,7 @@ setTimeout(function() {
 
       expect(listEquals(resources, ['android.webkit.resource.VIDEO_CAPTURE']),
           true);
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     testWidgets('androidShouldInterceptRequest', (WidgetTester tester) async {
       List<String> resourceList = [
@@ -3352,7 +3352,7 @@ setTimeout(function() {
       await pageLoaded.future;
       await loadedResourceCompleter.future;
       expect(resourceLoaded, containsAll(resourceList));
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     testWidgets('androidOnReceivedIcon', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -3383,7 +3383,7 @@ setTimeout(function() {
       await pageLoaded.future;
       final Uint8List icon = await onReceivedIconCompleter.future;
       expect(icon, isNotNull);
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     testWidgets('androidOnReceivedTouchIconUrl', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -3423,7 +3423,7 @@ setTimeout(function() {
       final String url = await onReceivedTouchIconUrlCompleter.future;
 
       expect(url, "https://placehold.it/72x72");
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     testWidgets('androidOnJsBeforeUnload', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -3466,7 +3466,7 @@ setTimeout(function() {
           source: "window.location.href = 'https://github.com/flutter';");
       final String url = await onJsBeforeUnloadCompleter.future;
       expect(url, 'https://github.com/flutter');
-    }, skip: true /*!Platform.isAndroid*/);
+    }, skip: true /*defaultTargetPlatform != TargetPlatform.android*/);
 
     group("iosOnNavigationResponse", () {
       testWidgets('allow navigation', (WidgetTester tester) async {
@@ -3503,7 +3503,7 @@ setTimeout(function() {
         await pageLoaded.future;
         final String url = await onNavigationResponseCompleter.future;
         expect(url, 'https://github.com/flutter');
-      }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
       testWidgets('cancel navigation', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -3539,8 +3539,8 @@ setTimeout(function() {
         final String url = await onNavigationResponseCompleter.future;
         expect(url, 'https://github.com/flutter');
         expect(pageLoaded.future, doesNotComplete);
-      }, skip: !Platform.isIOS);
-    }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
+    }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
     testWidgets('initialUserScripts', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -4104,11 +4104,11 @@ setTimeout(function() {
       final InAppWebViewController controller =
           await controllerCompleter.future;
 
-      if (Platform.isAndroid) {
+      if (defaultTargetPlatform == TargetPlatform.android) {
         await pageLoaded.future;
         expect(await controller.evaluateJavascript(source: "document.body"),
             isNullOrEmpty);
-      } else if (Platform.isIOS) {
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
         expect(pageLoaded.future, doesNotComplete);
       }
     });
@@ -4797,52 +4797,52 @@ setTimeout(function() {
       pageLoads.close();
     });
 
-    testWidgets('saveWebArchive', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
-      final Completer<void> pageLoaded = Completer<void>();
-
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: Uri.parse('https://github.com/flutter')),
-            onWebViewCreated: (controller) {
-              controllerCompleter.complete(controller);
-            },
-            onLoadStop: (controller, url) {
-              pageLoaded.complete();
-            },
-          ),
-        ),
-      );
-
-      final InAppWebViewController controller =
-          await controllerCompleter.future;
-      await pageLoaded.future;
-
-      // wait a little bit after page load otherwise Android will not save the web archive
-      await Future.delayed(Duration(seconds: 1));
-
-      var supportDir = await getApplicationSupportDirectory();
-
-      var fileName = "flutter-website.";
-      if (Platform.isAndroid) {
-        fileName = fileName + WebArchiveFormat.MHT.toValue();
-      } else if (Platform.isIOS) {
-        fileName = fileName + WebArchiveFormat.WEBARCHIVE.toValue();
-      }
-
-      var fullPath = supportDir.path + Platform.pathSeparator + fileName;
-      var path = await controller.saveWebArchive(filePath: fullPath);
-      expect(path, isNotNull);
-      expect(path, endsWith(fileName));
-
-      path = await controller.saveWebArchive(
-          filePath: supportDir.path, autoname: true);
-      expect(path, isNotNull);
-    });
+    // testWidgets('saveWebArchive', (WidgetTester tester) async {
+    //   final Completer controllerCompleter = Completer<InAppWebViewController>();
+    //   final Completer<void> pageLoaded = Completer<void>();
+    //
+    //   await tester.pumpWidget(
+    //     Directionality(
+    //       textDirection: TextDirection.ltr,
+    //       child: InAppWebView(
+    //         key: GlobalKey(),
+    //         initialUrlRequest:
+    //             URLRequest(url: Uri.parse('https://github.com/flutter')),
+    //         onWebViewCreated: (controller) {
+    //           controllerCompleter.complete(controller);
+    //         },
+    //         onLoadStop: (controller, url) {
+    //           pageLoaded.complete();
+    //         },
+    //       ),
+    //     ),
+    //   );
+    //
+    //   final InAppWebViewController controller =
+    //       await controllerCompleter.future;
+    //   await pageLoaded.future;
+    //
+    //   // wait a little bit after page load otherwise Android will not save the web archive
+    //   await Future.delayed(Duration(seconds: 1));
+    //
+    //   var supportDir = await getApplicationSupportDirectory();
+    //
+    //   var fileName = "flutter-website.";
+    //   if (defaultTargetPlatform == TargetPlatform.android) {
+    //     fileName = fileName + WebArchiveFormat.MHT.toValue();
+    //   } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    //     fileName = fileName + WebArchiveFormat.WEBARCHIVE.toValue();
+    //   }
+    //
+    //   var fullPath = supportDir.path + Platform.pathSeparator + fileName;
+    //   var path = await controller.saveWebArchive(filePath: fullPath);
+    //   expect(path, isNotNull);
+    //   expect(path, endsWith(fileName));
+    //
+    //   path = await controller.saveWebArchive(
+    //       filePath: supportDir.path, autoname: true);
+    //   expect(path, isNotNull);
+    // });
 
     testWidgets('isSecureContext', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -5070,7 +5070,7 @@ setTimeout(function() {
             await controllerCompleter.future;
         await pageLoaded.future;
         await expectLater(controller.android.clearSslPreferences(), completes);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       testWidgets('pause/resume', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -5100,7 +5100,7 @@ setTimeout(function() {
         await expectLater(controller.android.pause(), completes);
         await Future.delayed(Duration(seconds: 1));
         await expectLater(controller.android.resume(), completes);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       testWidgets('getOriginalUrl', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -5159,7 +5159,7 @@ setTimeout(function() {
         expect(await controller.android.pageDown(bottom: false), true);
         await Future.delayed(Duration(seconds: 1));
         expect(await controller.android.pageUp(top: false), true);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       testWidgets('zoomIn/zoomOut', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -5189,7 +5189,7 @@ setTimeout(function() {
         expect(await controller.android.zoomIn(), true);
         await Future.delayed(Duration(seconds: 1));
         expect(await controller.android.zoomOut(), true);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       testWidgets('clearHistory', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -5231,39 +5231,39 @@ setTimeout(function() {
         expect(webHistory!.list!.length, 1);
 
         pageLoads.close();
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       test('clearClientCertPreferences', () async {
         await expectLater(
             AndroidInAppWebViewController.clearClientCertPreferences(),
             completes);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       test('getSafeBrowsingPrivacyPolicyUrl', () async {
         expect(
             await AndroidInAppWebViewController
                 .getSafeBrowsingPrivacyPolicyUrl(),
             isNotNull);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       test('setSafeBrowsingWhitelist', () async {
         expect(
             await AndroidInAppWebViewController.setSafeBrowsingWhitelist(
                 hosts: ["flutter.dev", "github.com"]),
             true);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       test('getCurrentWebViewPackage', () async {
         expect(await AndroidInAppWebViewController.getCurrentWebViewPackage(),
             isNotNull);
-      }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
 
       test('setWebContentsDebuggingEnabled', () async {
         expect(
             AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true),
             completes);
-      }, skip: !Platform.isAndroid);
-    }, skip: !Platform.isAndroid);
+      }, skip: defaultTargetPlatform != TargetPlatform.android);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     group('ios methods', () {
       testWidgets('reloadFromOrigin', (WidgetTester tester) async {
@@ -5292,7 +5292,7 @@ setTimeout(function() {
             await controllerCompleter.future;
         await pageLoaded.future;
         await expectLater(controller.ios.reloadFromOrigin(), completes);
-      }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
       testWidgets('createPdf', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -5325,7 +5325,7 @@ setTimeout(function() {
         var pdf = await controller.ios
             .createPdf(iosWKPdfConfiguration: iosWKPdfConfiguration);
         expect(pdf, isNotNull);
-      }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
       testWidgets('createWebArchiveData', (WidgetTester tester) async {
         final Completer controllerCompleter =
@@ -5354,7 +5354,7 @@ setTimeout(function() {
         await pageLoaded.future;
 
         expect(await controller.ios.createWebArchiveData(), isNotNull);
-      }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
       testWidgets('Apple Pay API enabled', (WidgetTester tester) async {
         final Completer<void> pageLoaded = Completer<void>();
@@ -5398,13 +5398,13 @@ setTimeout(function() {
         await pageLoaded.future;
         final message = await alertMessageCompleter.future;
         expect(message, 'true');
-      }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
 
       test('handlesURLScheme', () async {
         expect(await IOSInAppWebViewController.handlesURLScheme("http"), true);
         expect(await IOSInAppWebViewController.handlesURLScheme("https"), true);
-      }, skip: !Platform.isIOS);
-    }, skip: !Platform.isIOS);
+      }, skip: defaultTargetPlatform != TargetPlatform.iOS);
+    }, skip: defaultTargetPlatform != TargetPlatform.iOS);
   });
 
   group('Service Worker', () {
@@ -5445,7 +5445,7 @@ setTimeout(function() {
       );
 
       expect(completer.future, completes);
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
 
     testWidgets('setServiceWorkerClient to null', (WidgetTester tester) async {
       final Completer<String> pageLoaded = Completer<String>();
@@ -5478,7 +5478,7 @@ setTimeout(function() {
 
       final String url = await pageLoaded.future;
       expect(url, "https://mdn.github.io/sw-test/");
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
   });
 
   group('Cookie Manager', () {
@@ -5924,7 +5924,7 @@ setTimeout(function() {
         await chromeSafariBrowser.browserClosed.future;
         expect(chromeSafariBrowser.isOpened(), false);
       });
-    }, skip: !Platform.isAndroid);
+    }, skip: defaultTargetPlatform != TargetPlatform.android);
   });
 
   group('InAppLocalhostServer', () {

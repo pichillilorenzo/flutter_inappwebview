@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -24,5 +25,9 @@ void initialUrlRequest() {
     await controllerCompleter.future;
     final String? currentUrl = (await controller.getUrl())?.toString();
     expect(currentUrl, 'https://github.com/flutter');
-  });
+  }, skip: !kIsWeb || ![
+    TargetPlatform.android,
+    TargetPlatform.iOS,
+    TargetPlatform.macOS,
+  ].contains(defaultTargetPlatform));
 }

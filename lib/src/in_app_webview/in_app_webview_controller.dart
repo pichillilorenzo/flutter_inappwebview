@@ -1179,9 +1179,13 @@ class InAppWebViewController
   ///Gets the URL for the current page.
   ///This is not always the same as the URL passed to [WebView.onLoadStart] because although the load for that URL has begun, the current page may not have changed.
   ///
+  ///**NOTE for Web**: If `window.location.href` isn't accessible inside the iframe,
+  ///it will return the current value of the `iframe.src` attribute.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getUrl](https://developer.android.com/reference/android/webkit/WebView#getUrl()))
   ///- iOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
+  ///- Web
   Future<Uri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getUrl', args);

@@ -13,6 +13,8 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
 import 'package:path_provider/path_provider.dart';
 
+import 'in_app_webview/main.dart' as in_app_webview_test;
+
 import '.env.dart';
 
 /// Returns a matcher that matches the isNullOrEmpty property.
@@ -87,71 +89,13 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
-
   if (Platform.isAndroid) {
-    AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+    InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
-  group('InAppWebView', () {
-    testWidgets('initialUrlRequest', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: Uri.parse('https://github.com/flutter')),
-            onWebViewCreated: (controller) {
-              controllerCompleter.complete(controller);
-            },
-          ),
-        ),
-      );
-      final InAppWebViewController controller =
-          await controllerCompleter.future;
-      final String? currentUrl = (await controller.getUrl())?.toString();
-      expect(currentUrl, 'https://github.com/flutter');
-    });
+  in_app_webview_test.main();
 
-    testWidgets('set/get options', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
-      final Completer<void> pageLoaded = Completer<void>();
-
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: Uri.parse('https://github.com/flutter')),
-            initialOptions: InAppWebViewGroupOptions(
-                crossPlatform: InAppWebViewOptions(javaScriptEnabled: false)),
-            onWebViewCreated: (controller) {
-              controllerCompleter.complete(controller);
-            },
-            onLoadStop: (controller, url) {
-              pageLoaded.complete();
-            },
-          ),
-        ),
-      );
-      final InAppWebViewController controller =
-          await controllerCompleter.future;
-      await pageLoaded.future;
-
-      InAppWebViewGroupOptions? options = await controller.getOptions();
-      expect(options, isNotNull);
-      expect(options!.crossPlatform.javaScriptEnabled, false);
-
-      await controller.setOptions(
-          options: InAppWebViewGroupOptions(
-              crossPlatform: InAppWebViewOptions(javaScriptEnabled: true)));
-
-      options = await controller.getOptions();
-      expect(options, isNotNull);
-      expect(options!.crossPlatform.javaScriptEnabled, true);
-    });
+  group('OLD InAppWebView', () {
 
     group('javascript code evaluation', () {
       testWidgets('evaluateJavascript', (WidgetTester tester) async {

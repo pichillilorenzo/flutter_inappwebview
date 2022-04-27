@@ -1,4 +1,4 @@
-## 6.0.0
+## 6.0.0-beta.1
 
 - Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.
 - Added Web support

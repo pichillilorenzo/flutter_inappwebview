@@ -94,7 +94,8 @@ class ChromeSafariBrowser {
     assert(url.toString().isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
     if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
-      assert(['http', 'https'].contains(url.scheme), 'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
+      assert(['http', 'https'].contains(url.scheme),
+          'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
     }
 
     List<Map<String, dynamic>> menuItemList = [];

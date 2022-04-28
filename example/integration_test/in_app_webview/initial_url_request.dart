@@ -78,5 +78,5 @@ void initialUrlRequest() {
       final String? currentUrl = (await controller.getUrl())?.toString();
       expect(currentUrl, TEST_URL_1.toString());
     }, skip: shouldSkipTest2);
-  });
+  }, skip: shouldSkip);
 }

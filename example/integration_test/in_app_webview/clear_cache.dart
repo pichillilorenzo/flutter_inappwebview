@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../constants.dart';
 
-void onZoomScaleChanged() {
+void clearCache() {
   final shouldSkip = kIsWeb ||
       ![
         TargetPlatform.android,
@@ -15,12 +15,9 @@ void onZoomScaleChanged() {
         TargetPlatform.macOS,
       ].contains(defaultTargetPlatform);
 
-  testWidgets('onZoomScaleChanged', (WidgetTester tester) async {
+  testWidgets('clearCache', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
-    final Completer<void> onZoomScaleChangedCompleter = Completer<void>();
-
-    var listenForScaleChange = false;
 
     await tester.pumpWidget(
       Directionality(
@@ -28,17 +25,12 @@ void onZoomScaleChanged() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest:
-          URLRequest(url: TEST_URL_1),
+          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
             pageLoaded.complete();
-          },
-          onZoomScaleChanged: (controller, oldScale, newScale) {
-            if (listenForScaleChange) {
-              onZoomScaleChangedCompleter.complete();
-            }
           },
         ),
       ),
@@ -47,10 +39,6 @@ void onZoomScaleChanged() {
     final InAppWebViewController controller =
     await controllerCompleter.future;
     await pageLoaded.future;
-    listenForScaleChange = true;
-
-    await controller.zoomBy(zoomFactor: 2);
-
-    await expectLater(onZoomScaleChangedCompleter.future, completes);
+    await expectLater(controller.clearCache(), completes);
   }, skip: shouldSkip);
 }

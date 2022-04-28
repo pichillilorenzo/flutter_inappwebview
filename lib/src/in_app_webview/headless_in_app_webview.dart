@@ -168,6 +168,13 @@ class HeadlessInAppWebView implements WebView {
   }
 
   ///Runs the headless WebView.
+  ///
+  ///**NOTE for Web**: it will append a new `iframe` to the body.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<void> run() async {
     if (_started) {
       return;
@@ -207,6 +214,11 @@ class HeadlessInAppWebView implements WebView {
   }
 
   ///Disposes the headless WebView.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<void> dispose() async {
     if (!_running) {
       return;
@@ -218,6 +230,11 @@ class HeadlessInAppWebView implements WebView {
   }
 
   ///Indicates if the headless WebView is running or not.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   bool isRunning() {
     return _running;
   }
@@ -230,6 +247,11 @@ class HeadlessInAppWebView implements WebView {
   ///Note that if the [HeadlessInAppWebView] is not running, this method won't have effect.
   ///
   ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<void> setSize(Size size) async {
     if (!_running) {
       return;
@@ -243,6 +265,11 @@ class HeadlessInAppWebView implements WebView {
   ///Gets the current size in pixels of the WebView.
   ///
   ///Note that if the [HeadlessInAppWebView] is not running, this method will return `null`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
   Future<Size?> getSize() async {
     if (!_running) {
       return null;

@@ -1,31 +1,33 @@
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:path_provider/path_provider.dart';
 
 import '../constants.dart';
 
-void reload() {
-  final shouldSkip = !kIsWeb ||
+void webArchive() {
+  final shouldSkip = kIsWeb ||
       ![
         TargetPlatform.android,
         TargetPlatform.iOS,
         TargetPlatform.macOS,
       ].contains(defaultTargetPlatform);
 
-  var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
+  group('web archive', () {
 
-  group('reload', () {
     final shouldSkipTest1 = kIsWeb ||
         ![
           TargetPlatform.iOS,
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-    testWidgets('reload from origin', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+    testWidgets('create data', (WidgetTester tester) async {
+      final Completer controllerCompleter =
+      Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -33,7 +35,8 @@ void reload() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+            initialUrlRequest:
+            URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -45,41 +48,57 @@ void reload() {
       );
 
       final InAppWebViewController controller =
-          await controllerCompleter.future;
+      await controllerCompleter.future;
       await pageLoaded.future;
-      await expectLater(controller.reloadFromOrigin(), completes);
+
+      expect(await controller.createWebArchiveData(), isNotNull);
     }, skip: shouldSkipTest1);
 
-    testWidgets('basic', (WidgetTester tester) async {
+    testWidgets('save', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
-      final StreamController<String> pageLoads =
-          StreamController<String>.broadcast();
+      final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: url),
+            initialUrlRequest:
+            URLRequest(url: TEST_URL_1),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
             onLoadStop: (controller, url) {
-              pageLoads.add(url!.toString());
+              pageLoaded.complete();
             },
           ),
         ),
       );
+
       final InAppWebViewController controller =
-          await controllerCompleter.future;
-      String? reloadUrl = await pageLoads.stream.first;
-      expect(reloadUrl, url.toString());
+      await controllerCompleter.future;
+      await pageLoaded.future;
 
-      await controller.reload();
-      reloadUrl = await pageLoads.stream.first;
-      expect(reloadUrl, url.toString());
+      // wait a little bit after page load otherwise Android will not save the web archive
+      await Future.delayed(Duration(seconds: 1));
 
-      pageLoads.close();
+      var supportDir = await getApplicationSupportDirectory();
+
+      var fileName = "flutter-website.";
+      if (defaultTargetPlatform == TargetPlatform.android) {
+        fileName = fileName + WebArchiveFormat.MHT.toValue();
+      } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+        fileName = fileName + WebArchiveFormat.WEBARCHIVE.toValue();
+      }
+
+      var fullPath = supportDir.path + Platform.pathSeparator + fileName;
+      var path = await controller.saveWebArchive(filePath: fullPath);
+      expect(path, isNotNull);
+      expect(path, endsWith(fileName));
+
+      path = await controller.saveWebArchive(
+          filePath: supportDir.path, autoname: true);
+      expect(path, isNotNull);
     });
   }, skip: shouldSkip);
 }

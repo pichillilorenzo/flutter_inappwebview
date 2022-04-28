@@ -110,7 +110,7 @@ class ChromeSafariBrowser {
 
   ///Opens the [ChromeSafariBrowser] instance with an [url].
   ///
-  ///[url]: The [url] to load.
+  ///[url]: The [url] to load. On iOS, the [url] must use the `http` or `https` scheme.
   ///
   ///[options]: Options for the [ChromeSafariBrowser].
   ///
@@ -123,6 +123,10 @@ class ChromeSafariBrowser {
       ChromeSafariBrowserSettings? settings}) async {
     assert(url.toString().isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+      assert(['http', 'https'].contains(url.scheme),
+          'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
+    }
 
     List<Map<String, dynamic>> menuItemList = [];
     _menuItems.forEach((key, value) {

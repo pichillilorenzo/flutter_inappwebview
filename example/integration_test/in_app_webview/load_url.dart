@@ -8,11 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void loadUrl() {
-  final shouldSkip = !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = !kIsWeb ||
+      ![
+        TargetPlatform.android,
+        TargetPlatform.iOS,
+        TargetPlatform.macOS,
+      ].contains(defaultTargetPlatform);
 
   group('load url', () {
     final shouldSkipTest1 = !kIsWeb ||
@@ -25,15 +26,14 @@ void loadUrl() {
     testWidgets('loadUrl', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
-      StreamController<String>.broadcast();
+          StreamController<String>.broadcast();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-            URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+            initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -44,7 +44,7 @@ void loadUrl() {
         ),
       );
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       var url = await pageLoads.stream.first;
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
 
@@ -66,22 +66,19 @@ void loadUrl() {
     testWidgets('loadUrl with headers', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageStarts =
-      StreamController<String>.broadcast();
+          StreamController<String>.broadcast();
       final StreamController<String> pageLoads =
-      StreamController<String>.broadcast();
+          StreamController<String>.broadcast();
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-            URLRequest(url: TEST_URL_1),
+            initialUrlRequest: URLRequest(url: TEST_URL_1),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            initialSettings: InAppWebViewSettings(
-                javaScriptEnabled: true
-            ),
+            initialSettings: InAppWebViewSettings(javaScriptEnabled: true),
             onLoadStart: (controller, url) {
               pageStarts.add(url!.toString());
             },
@@ -92,7 +89,7 @@ void loadUrl() {
         ),
       );
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       final Map<String, String> headers = <String, String>{
         'test_header': 'flutter_test_header'
       };

@@ -83,7 +83,9 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
     channel.setMethodCallHandler(null);
     Collection<HeadlessInAppWebView> headlessInAppWebViews = webViews.values();
     for (HeadlessInAppWebView headlessInAppWebView : headlessInAppWebViews) {
-      headlessInAppWebView.dispose();
+      if (headlessInAppWebView != null) {
+        headlessInAppWebView.dispose();
+      }
     }
     webViews.clear();
   }

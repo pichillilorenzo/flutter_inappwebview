@@ -1,6 +1,10 @@
-## 5.4.3+1
+## 5.4.3+2
 
 - Fixed "Latest version 5.4.3 crashes on Android" [#1159](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1159)
+
+## 5.4.3+1
+
+- Try to fix "Latest version 5.4.3 crashes on Android" [#1159](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1159)
 
 ## 5.4.3
 
@@ -8,7 +12,7 @@
 
 ## 5.4.2+1
 
-- Fixed "Latest version 5.4.2 crashes on Android - HeadlessInAppWebView.dispose" [#1155](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1155)
+- Try to fix "Latest version 5.4.2 crashes on Android - HeadlessInAppWebView.dispose" [#1155](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1155)
 
 ## 5.4.2
 

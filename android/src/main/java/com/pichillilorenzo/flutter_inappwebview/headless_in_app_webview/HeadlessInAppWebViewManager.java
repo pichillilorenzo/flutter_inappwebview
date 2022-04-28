@@ -26,6 +26,8 @@ import androidx.annotation.Nullable;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebView;
 
+import org.jetbrains.annotations.NotNull;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -50,7 +52,7 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
   }
 
   @Override
-  public void onMethodCall(final MethodCall call, final Result result) {
+  public void onMethodCall(final MethodCall call, @NotNull final Result result) {
     final String id = (String) call.argument("id");
 
     switch (call.method) {
@@ -64,10 +66,11 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
       default:
         result.notImplemented();
     }
-
   }
 
   public void run(String id, HashMap<String, Object> params) {
+    if (plugin == null || plugin.activity == null) return;
+
     FlutterWebView flutterWebView = new FlutterWebView(plugin, plugin.activity, id, params);
     HeadlessInAppWebView headlessInAppWebView = new HeadlessInAppWebView(plugin, id, flutterWebView);
     HeadlessInAppWebViewManager.webViews.put(id, headlessInAppWebView);

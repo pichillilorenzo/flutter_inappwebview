@@ -36,7 +36,8 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   public String id;
   public CustomTabsIntent.Builder builder;
   public ChromeCustomTabsOptions options;
-  public CustomTabActivityHelper customTabActivityHelper;
+  public CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
+  @Nullable
   public CustomTabsSession customTabsSession;
   protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
   protected boolean onChromeSafariBrowserOpened = false;
@@ -60,7 +61,8 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     id = b.getString("id");
 
     String managerId = b.getString("managerId");
-    manager = (ChromeSafariBrowserManager) ChromeSafariBrowserManager.shared.get(managerId);
+    manager = ChromeSafariBrowserManager.shared.get(managerId);
+    if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
 
     channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + id);
     channel.setMethodCallHandler(this);
@@ -77,7 +79,6 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     
     final ChromeCustomTabsActivity chromeCustomTabsActivity = this;
 
-    customTabActivityHelper = new CustomTabActivityHelper();
     customTabActivityHelper.setConnectionCallback(new CustomTabActivityHelper.ConnectionCallback() {
       @Override
       public void onCustomTabsConnected() {

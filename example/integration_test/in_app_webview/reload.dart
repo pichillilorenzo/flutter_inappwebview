@@ -7,13 +7,15 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../constants.dart';
 
-void loadUrl() {
+void reload() {
   final shouldSkip = !kIsWeb ||
       ![
         TargetPlatform.android,
         TargetPlatform.iOS,
         TargetPlatform.macOS,
       ].contains(defaultTargetPlatform);
+
+  var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   testWidgets('reload', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -26,7 +28,7 @@ void loadUrl() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest:
-          URLRequest(url: Uri.parse('https://github.com/flutter')),
+          URLRequest(url: url),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -38,13 +40,13 @@ void loadUrl() {
     );
     final InAppWebViewController controller =
     await controllerCompleter.future;
-    String? url = await pageLoads.stream.first;
-    expect(url, 'https://github.com/flutter');
+    String? reloadUrl = await pageLoads.stream.first;
+    expect(reloadUrl, url.toString());
 
     await controller.reload();
-    url = await pageLoads.stream.first;
-    expect(url, 'https://github.com/flutter');
+    reloadUrl = await pageLoads.stream.first;
+    expect(reloadUrl, url.toString());
 
     pageLoads.close();
-  });
+  }, skip: shouldSkip);
 }

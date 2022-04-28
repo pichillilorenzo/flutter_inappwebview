@@ -112,7 +112,9 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
         break;
       case "clearAllAuthCredentials":
         credentialDatabase.clearAllAuthCredentials();
-        WebViewDatabase.getInstance(plugin.applicationContext).clearHttpAuthUsernamePassword();
+        if (plugin != null && plugin.applicationContext != null) {
+          WebViewDatabase.getInstance(plugin.applicationContext).clearHttpAuthUsernamePassword();
+        }
         result.success(true);
         break;
       default:

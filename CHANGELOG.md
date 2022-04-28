@@ -11,6 +11,10 @@
 
 - On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
 
+## 5.4.3+1
+
+- Fixed "Latest version 5.4.3 crashes on Android" [#1159](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1159)
+
 ## 5.4.3
 
 - Added Bitwise OR operator support for `AndroidActionModeMenuItem` class

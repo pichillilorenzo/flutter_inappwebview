@@ -73,7 +73,8 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     id = b.getString("id");
 
     String managerId = b.getString("managerId");
-    manager = (InAppBrowserManager) InAppBrowserManager.shared.get(managerId);
+    manager = InAppBrowserManager.shared.get(managerId);
+    if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
     
     windowId = b.getInt("windowId");
 
@@ -500,7 +501,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
       methodCallDelegate = null;
     }
     if (webView != null) {
-      if (manager.plugin.activityPluginBinding != null) {
+      if (manager != null && manager.plugin != null && manager.plugin.activityPluginBinding != null) {
         manager.plugin.activityPluginBinding.removeActivityResultListener(webView.inAppWebViewChromeClient);
       }
       ViewGroup vg = (ViewGroup) (webView.getParent());

@@ -204,7 +204,7 @@ abstract class WebView {
   ///Also, note that calling [InAppWebViewController.setSettings] method using the controller of the new created WebView,
   ///it will update also the WebView options of the caller WebView.
   ///
-  ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
+  ///**NOTE for Web**: this event will be called only if the iframe has the same origin. It works only for `window.open()` javascript calls.
   ///Also, there is no way to block the opening the window in a synchronous way, so returning `true` will just close it quickly.
   ///
   ///**Supported Platforms/Implementations**:

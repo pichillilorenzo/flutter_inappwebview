@@ -8,32 +8,75 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void initialUrlRequest() {
-  final shouldSkip = !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = !kIsWeb ||
+      ![
+        TargetPlatform.android,
+        TargetPlatform.iOS,
+        TargetPlatform.macOS,
+      ].contains(defaultTargetPlatform);
 
-  testWidgets('initialUrlRequest', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: InAppWebView(
-          key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-          onWebViewCreated: (controller) {
-            controllerCompleter.complete(controller);
-          },
+  group('initial url request', () {
+    final shouldSkipTest1 = !kIsWeb ||
+        ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
+
+    testWidgets('basic', (WidgetTester tester) async {
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+            onWebViewCreated: (controller) {
+              controllerCompleter.complete(controller);
+            },
+          ),
         ),
-      ),
-    );
+      );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
-    final String? currentUrl = (await controller.getUrl())?.toString();
+      final InAppWebViewController controller =
+          await controllerCompleter.future;
+      final String? currentUrl = (await controller.getUrl())?.toString();
 
-    expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());
-  }, skip: shouldSkip);
+      expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());
+    }, skip: shouldSkipTest1);
+
+    final shouldSkipTest2 = kIsWeb ||
+        ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
+
+    testWidgets('launches with allowsBackForwardNavigationGestures true',
+        (WidgetTester tester) async {
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: SizedBox(
+            width: 400,
+            height: 300,
+            child: InAppWebView(
+              key: GlobalKey(),
+              initialUrlRequest:
+                  URLRequest(url: TEST_URL_1),
+              initialSettings: InAppWebViewSettings(
+                  allowsBackForwardNavigationGestures: true),
+              onWebViewCreated: (controller) {
+                controllerCompleter.complete(controller);
+              },
+            ),
+          ),
+        ),
+      );
+      final InAppWebViewController controller =
+          await controllerCompleter.future;
+      final String? currentUrl = (await controller.getUrl())?.toString();
+      expect(currentUrl, TEST_URL_1.toString());
+    }, skip: shouldSkipTest2);
+  });
 }

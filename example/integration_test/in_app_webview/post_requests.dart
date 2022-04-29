@@ -10,17 +10,17 @@ import 'package:flutter_test/flutter_test.dart';
 import '../.env.dart';
 
 void postRequests() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('POST requests', () {
     testWidgets('initialUrlRequest', (WidgetTester tester) async {
-      final Completer controllerCompleter =
-      Completer<InAppWebViewController>();
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -33,9 +33,7 @@ void postRequests() {
                     "http://${environment["NODE_SERVER_IP"]}:8082/test-post"),
                 method: 'POST',
                 body: Uint8List.fromList(utf8.encode("name=FooBar")),
-                headers: {
-                  'Content-Type': 'application/x-www-form-urlencoded'
-                }),
+                headers: {'Content-Type': 'application/x-www-form-urlencoded'}),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -47,12 +45,12 @@ void postRequests() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await postPageLoaded.future;
 
       final String? currentUrl = (await controller.getUrl())?.toString();
-      expect(currentUrl,
-          'http://${environment["NODE_SERVER_IP"]}:8082/test-post');
+      expect(
+          currentUrl, 'http://${environment["NODE_SERVER_IP"]}:8082/test-post');
 
       final String? pContent = await controller.evaluateJavascript(
           source: "document.querySelector('p').innerHTML;");
@@ -60,8 +58,7 @@ void postRequests() {
     });
 
     testWidgets('loadUrl', (WidgetTester tester) async {
-      final Completer controllerCompleter =
-      Completer<InAppWebViewController>();
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -83,7 +80,7 @@ void postRequests() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
 
       var postData = Uint8List.fromList(utf8.encode("name=FooBar"));
       await controller.loadUrl(
@@ -92,15 +89,13 @@ void postRequests() {
                   "http://${environment["NODE_SERVER_IP"]}:8082/test-post"),
               method: 'POST',
               body: postData,
-              headers: {
-                'Content-Type': 'application/x-www-form-urlencoded'
-              }));
+              headers: {'Content-Type': 'application/x-www-form-urlencoded'}));
 
       await postPageLoaded.future;
 
       final String? currentUrl = (await controller.getUrl())?.toString();
-      expect(currentUrl,
-          'http://${environment["NODE_SERVER_IP"]}:8082/test-post');
+      expect(
+          currentUrl, 'http://${environment["NODE_SERVER_IP"]}:8082/test-post');
 
       final String? pContent = await controller.evaluateJavascript(
           source: "document.querySelector('p').innerHTML;");
@@ -108,8 +103,7 @@ void postRequests() {
     });
 
     testWidgets('postUrl', (WidgetTester tester) async {
-      final Completer controllerCompleter =
-      Completer<InAppWebViewController>();
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -131,7 +125,7 @@ void postRequests() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
 
       var postData = Uint8List.fromList(utf8.encode("name=FooBar"));
       await controller.postUrl(
@@ -142,8 +136,8 @@ void postRequests() {
       await postPageLoaded.future;
 
       final String? currentUrl = (await controller.getUrl())?.toString();
-      expect(currentUrl,
-          'http://${environment["NODE_SERVER_IP"]}:8082/test-post');
+      expect(
+          currentUrl, 'http://${environment["NODE_SERVER_IP"]}:8082/test-post');
 
       final String? pContent = await controller.evaluateJavascript(
           source: "document.querySelector('p').innerHTML;");

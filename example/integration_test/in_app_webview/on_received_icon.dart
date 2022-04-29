@@ -9,24 +9,23 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void onReceivedIcon() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('onReceivedIcon', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
-    final Completer<Uint8List> onReceivedIconCompleter =
-    Completer<Uint8List>();
+    final Completer<Uint8List> onReceivedIconCompleter = Completer<Uint8List>();
 
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },

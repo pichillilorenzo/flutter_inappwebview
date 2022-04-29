@@ -8,17 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void loadData() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('loadData', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final StreamController<String> pageLoads =
-    StreamController<String>.broadcast();
+        StreamController<String>.broadcast();
 
     await tester.pumpWidget(
       Directionality(
@@ -36,8 +37,7 @@ void loadData() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoads.stream.first;
 
     final data = """
@@ -70,7 +70,7 @@ void loadData() {
     if (!kIsWeb) {
       expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());
     } else {
-      expect(currentUrl, 'data:$mimeType,' + Uri.encodeFull(data)) ;
+      expect(currentUrl, 'data:$mimeType,' + Uri.encodeFull(data));
     }
 
     pageLoads.close();

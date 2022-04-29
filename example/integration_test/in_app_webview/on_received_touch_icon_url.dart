@@ -5,13 +5,12 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../constants.dart';
-
 void onReceivedTouchIconUrl() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();

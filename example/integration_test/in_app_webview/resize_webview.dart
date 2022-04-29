@@ -6,14 +6,14 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../constants.dart';
-
 void resizeWebView() {
-  final shouldSkip = kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('resize webview', (WidgetTester tester) async {
     final String resizeTest = '''
@@ -33,7 +33,7 @@ void resizeWebView() {
         </html>
       ''';
     final String resizeTestBase64 =
-    base64Encode(const Utf8Encoder().convert(resizeTest));
+        base64Encode(const Utf8Encoder().convert(resizeTest));
     final Completer<void> resizeCompleter = Completer<void>();
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();

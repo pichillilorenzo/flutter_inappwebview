@@ -8,11 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void setGetSettings() {
-  final shouldSkip = !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   final url = !kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -25,11 +27,8 @@ void setGetSettings() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: url),
-          initialSettings: InAppWebViewSettings(
-              javaScriptEnabled: false
-          ),
+          initialUrlRequest: URLRequest(url: url),
+          initialSettings: InAppWebViewSettings(javaScriptEnabled: false),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -39,8 +38,7 @@ void setGetSettings() {
         ),
       ),
     );
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     InAppWebViewSettings? settings = await controller.getSettings();
@@ -52,8 +50,8 @@ void setGetSettings() {
       expect(settings.iframeSandbox!.contains(Sandbox.ALLOW_SCRIPTS), false);
     }
 
-    await controller.setSettings(settings: InAppWebViewSettings(
-        javaScriptEnabled: true));
+    await controller.setSettings(
+        settings: InAppWebViewSettings(javaScriptEnabled: true));
 
     settings = await controller.getSettings();
     expect(settings, isNotNull);

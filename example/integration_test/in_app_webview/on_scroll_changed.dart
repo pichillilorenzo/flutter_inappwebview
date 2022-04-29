@@ -8,11 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void onScrollChanged() {
-  final shouldSkip = !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -25,8 +27,7 @@ void onScrollChanged() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: url),
+          initialUrlRequest: URLRequest(url: url),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -42,8 +43,7 @@ void onScrollChanged() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     controller.scrollTo(x: 0, y: 500);

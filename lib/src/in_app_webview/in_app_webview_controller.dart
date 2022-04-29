@@ -2090,24 +2090,16 @@ class InAppWebViewController
     await _channel.invokeMethod('clearMatches', args);
   }
 
-  ///Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerCss].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///Use [tRexRunnerHtml] instead.
+  @Deprecated("Use tRexRunnerHtml instead")
   Future<String> getTRexRunnerHtml() async {
-    return await rootBundle.loadString(
-        "packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html");
+    return await InAppWebViewController.tRexRunnerHtml;
   }
 
-  ///Gets the css of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerHtml].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///Use [tRexRunnerCss] instead.
+  @Deprecated("Use tRexRunnerCss instead")
   Future<String> getTRexRunnerCss() async {
-    return await rootBundle.loadString(
-        "packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css");
+    return await InAppWebViewController.tRexRunnerCss;
   }
 
   ///Scrolls the WebView to the position.
@@ -3115,6 +3107,22 @@ class InAppWebViewController
     args.putIfAbsent('urlScheme', () => urlScheme);
     return await _staticChannel.invokeMethod('handlesURLScheme', args);
   }
+
+  ///Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerCss].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  static Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
+        'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
+
+  ///Gets the css of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerHtml].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  static Future<String> get tRexRunnerCss async => await rootBundle.loadString(
+      'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css');
 
   ///Used internally.
   MethodChannel getChannel() {

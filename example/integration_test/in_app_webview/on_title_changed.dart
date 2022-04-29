@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void onTitleChanged() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -27,8 +28,7 @@ void onTitleChanged() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: url),
+          initialUrlRequest: URLRequest(url: url),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -44,8 +44,7 @@ void onTitleChanged() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await controller.evaluateJavascript(
         source: "document.title = 'title test';");

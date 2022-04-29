@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void getProgress() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('getProgress', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -24,8 +25,7 @@ void getProgress() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -36,8 +36,7 @@ void getProgress() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final int? progress = await controller.getProgress();

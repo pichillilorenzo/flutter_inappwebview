@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void pauseResumeTimers() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('pause/resume timers', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -35,8 +36,7 @@ void pauseResumeTimers() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     await controller.evaluateJavascript(source: """
@@ -49,10 +49,9 @@ void pauseResumeTimers() {
     await controller.pauseTimers();
     await Future.delayed(Duration(seconds: 2));
     await controller.resumeTimers();
-    expect(
-        await controller.evaluateJavascript(source: "count;"), lessThan(50));
+    expect(await controller.evaluateJavascript(source: "count;"), lessThan(50));
     await Future.delayed(Duration(seconds: 4));
-    expect(await controller.evaluateJavascript(source: "count;"),
-        greaterThan(50));
+    expect(
+        await controller.evaluateJavascript(source: "count;"), greaterThan(50));
   }, skip: shouldSkip);
 }

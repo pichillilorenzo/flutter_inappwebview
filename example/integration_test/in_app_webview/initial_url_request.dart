@@ -8,20 +8,22 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void initialUrlRequest() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
-
-  group('initial url request', () {
-    final shouldSkipTest1 = !kIsWeb ||
-        ![
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
+
+  group('initial url request', () {
+    final shouldSkipTest1 = kIsWeb
+        ? false
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('basic', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -45,11 +47,12 @@ void initialUrlRequest() {
       expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());
     }, skip: shouldSkipTest1);
 
-    final shouldSkipTest2 = kIsWeb ||
-        ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('launches with allowsBackForwardNavigationGestures true',
         (WidgetTester tester) async {
@@ -62,8 +65,7 @@ void initialUrlRequest() {
             height: 300,
             child: InAppWebView(
               key: GlobalKey(),
-              initialUrlRequest:
-                  URLRequest(url: TEST_URL_1),
+              initialUrlRequest: URLRequest(url: TEST_URL_1),
               initialSettings: InAppWebViewSettings(
                   allowsBackForwardNavigationGestures: true),
               onWebViewCreated: (controller) {

@@ -8,21 +8,23 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void reload() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   group('reload', () {
-    final shouldSkipTest1 = kIsWeb ||
-        ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('reload from origin', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();

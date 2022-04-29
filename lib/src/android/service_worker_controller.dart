@@ -23,8 +23,11 @@ class ServiceWorkerController {
 
   ServiceWorkerClient? get serviceWorkerClient => _serviceWorkerClient;
 
-  ///Sets the service worker client
-  setServiceWorkerClient(ServiceWorkerClient? value) async {
+  ///Sets the service worker client.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - ServiceWorkerControllerCompat.setServiceWorkerClient](https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat#setServiceWorkerClient(androidx.webkit.ServiceWorkerClientCompat)))
+  Future<void> setServiceWorkerClient(ServiceWorkerClient? value) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('isNull', () => value == null);
     await _channel.invokeMethod("setServiceWorkerClient", args);

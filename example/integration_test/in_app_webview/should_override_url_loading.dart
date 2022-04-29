@@ -9,25 +9,19 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void shouldOverrideUrlLoading() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('shouldOverrideUrlLoading', () {
     final String page =
         '''<!DOCTYPE html><head></head><body><a id="link" href="$TEST_URL_3">flutter_inappwebview</a></body></html>''';
     final String pageEncoded = 'data:text/html;charset=utf-8;base64,' +
         base64Encode(const Utf8Encoder().convert(page));
-
-    final shouldSkipTest1 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
 
     testWidgets('can allow requests', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -70,13 +64,14 @@ void shouldOverrideUrlLoading() {
       expect(currentUrl, TEST_URL_2.toString());
 
       pageLoads.close();
-    }, skip: shouldSkipTest1);
+    });
 
-    final shouldSkipTest2 = kIsWeb ||
-        ![
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets(
         'allow requests on iOS only if navigationType == NavigationType.LINK_ACTIVATED',
@@ -138,13 +133,6 @@ void shouldOverrideUrlLoading() {
       pageLoads.close();
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
-
     testWidgets('can block requests', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
@@ -194,14 +182,7 @@ void shouldOverrideUrlLoading() {
           currentUrl, isNot(contains(TEST_URL_4.host.replaceAll("www.", ""))));
 
       pageLoads.close();
-    }, skip: shouldSkipTest3);
-
-    final shouldSkipTest4 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    });
 
     testWidgets('supports asynchronous decisions', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -245,6 +226,6 @@ void shouldOverrideUrlLoading() {
       expect(currentUrl, TEST_URL_2.toString());
 
       pageLoads.close();
-    }, skip: shouldSkipTest4);
+    });
   }, skip: shouldSkip);
 }

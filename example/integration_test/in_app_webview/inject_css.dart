@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void injectCSS() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var url = !kIsWeb ? TEST_URL_ABOUT_BLANK : TEST_WEB_PLATFORM_URL_1;
 
@@ -39,7 +40,7 @@ void injectCSS() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
 
       await controller.injectCSSCode(source: """
@@ -77,7 +78,7 @@ void injectCSS() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
 
       await controller.injectCSSFileFromUrl(
@@ -112,7 +113,7 @@ void injectCSS() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
 
       await controller.injectCSSFileFromAsset(

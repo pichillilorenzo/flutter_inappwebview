@@ -8,14 +8,14 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void loadUrl() {
-  final shouldSkip = !kIsWeb ||
+  final shouldSkip = kIsWeb ? false :
       ![
         TargetPlatform.android,
         TargetPlatform.iOS,
         TargetPlatform.macOS,
       ].contains(defaultTargetPlatform);
 
-  testWidgets('reload', (WidgetTester tester) async {
+  testWidgets('loadUrl', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final StreamController<String> pageLoads =
     StreamController<String>.broadcast();
@@ -26,7 +26,7 @@ void loadUrl() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest:
-          URLRequest(url: Uri.parse('https://github.com/flutter')),
+          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -38,13 +38,14 @@ void loadUrl() {
     );
     final InAppWebViewController controller =
     await controllerCompleter.future;
-    String? url = await pageLoads.stream.first;
-    expect(url, 'https://github.com/flutter');
+    var url = await pageLoads.stream.first;
+    expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
 
-    await controller.reload();
+    await controller.loadUrl(
+        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2));
     url = await pageLoads.stream.first;
-    expect(url, 'https://github.com/flutter');
+    expect(url, TEST_CROSS_PLATFORM_URL_2.toString());
 
     pageLoads.close();
-  });
+  }, skip: shouldSkip);
 }

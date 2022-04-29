@@ -8,11 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void contentBlocker() {
-  final shouldSkip = kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('Content Blocker', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -22,23 +24,22 @@ void contentBlocker() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
-          initialSettings: InAppWebViewSettings(clearCache: true, contentBlockers: [
-                ContentBlocker(
-                    trigger:
-                    ContentBlockerTrigger(urlFilter: ".*", resourceType: [
-                      ContentBlockerTriggerResourceType.IMAGE,
-                      ContentBlockerTriggerResourceType.STYLE_SHEET
-                    ], ifTopUrl: [
-                      TEST_CROSS_PLATFORM_URL_1.toString()
-                    ]),
-                    action: ContentBlockerAction(
-                        type: ContentBlockerActionType.BLOCK))
-              ]),
+          initialSettings:
+              InAppWebViewSettings(clearCache: true, contentBlockers: [
+            ContentBlocker(
+                trigger: ContentBlockerTrigger(urlFilter: ".*", resourceType: [
+                  ContentBlockerTriggerResourceType.IMAGE,
+                  ContentBlockerTriggerResourceType.STYLE_SHEET
+                ], ifTopUrl: [
+                  TEST_CROSS_PLATFORM_URL_1.toString()
+                ]),
+                action:
+                    ContentBlockerAction(type: ContentBlockerActionType.BLOCK))
+          ]),
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },

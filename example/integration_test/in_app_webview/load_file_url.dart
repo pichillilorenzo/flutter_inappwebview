@@ -8,7 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
 
 void loadFileUrl() {
-  final shouldSkip = kIsWeb ||
+  final shouldSkip = kIsWeb ? true :
       ![
         TargetPlatform.iOS,
         TargetPlatform.macOS,

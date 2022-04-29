@@ -9,11 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void getTitle() {
-  final shouldSkip = !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   final String getTitleTest = '''
         <!DOCTYPE html><html>
@@ -24,15 +26,14 @@ void getTitle() {
         </html>
       ''';
   final String getTitleTestBase64 =
-  base64Encode(const Utf8Encoder().convert(getTitleTest));
+      base64Encode(const Utf8Encoder().convert(getTitleTest));
 
-  var url = !kIsWeb ? Uri.parse(
-      'data:text/html;charset=utf-8;base64,$getTitleTestBase64') :
-      TEST_WEB_PLATFORM_URL_1;
+  var url = !kIsWeb
+      ? Uri.parse('data:text/html;charset=utf-8;base64,$getTitleTestBase64')
+      : TEST_WEB_PLATFORM_URL_1;
   var expectedValue = !kIsWeb ? 'Some title' : 'page';
 
   testWidgets('getTitle', (WidgetTester tester) async {
-
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -41,8 +42,7 @@ void getTitle() {
       Directionality(
         textDirection: TextDirection.ltr,
         child: InAppWebView(
-          initialUrlRequest: URLRequest(
-              url: url),
+          initialUrlRequest: URLRequest(url: url),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -56,8 +56,7 @@ void getTitle() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageStarted.future;
     await pageLoaded.future;
 

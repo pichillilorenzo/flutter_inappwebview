@@ -8,10 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void safeBrowsing() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   group('safe browsing', () {
     testWidgets('onSafeBrowsingHit', (WidgetTester tester) async {

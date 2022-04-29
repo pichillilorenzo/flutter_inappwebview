@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../.env.dart';
 
 void httpAuthCredentialDatabase() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('Http Auth Credential Database', () {
     testWidgets('use saved credentials', (WidgetTester tester) async {

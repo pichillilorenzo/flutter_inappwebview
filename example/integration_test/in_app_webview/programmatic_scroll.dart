@@ -9,18 +9,22 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void programmaticScroll() {
-  final shouldSkip = !kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('Programmatic Scroll', () {
-    final shouldSkipTest1 = !kIsWeb || ![
-      TargetPlatform.android,
-      TargetPlatform.iOS,
-      TargetPlatform.macOS,
-    ].contains(defaultTargetPlatform);
+    final shouldSkipTest1 = kIsWeb
+        ? false
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('set and get scroll position', (WidgetTester tester) async {
       final String scrollTestPage = '''
@@ -45,22 +49,21 @@ void programmaticScroll() {
       ''';
 
       final String scrollTestPageBase64 =
-      base64Encode(const Utf8Encoder().convert(scrollTestPage));
+          base64Encode(const Utf8Encoder().convert(scrollTestPage));
 
-      var url = !kIsWeb ? Uri.parse(
-          'data:text/html;charset=utf-8;base64,$scrollTestPageBase64') :
-          TEST_WEB_PLATFORM_URL_1;
+      var url = !kIsWeb
+          ? Uri.parse(
+              'data:text/html;charset=utf-8;base64,$scrollTestPageBase64')
+          : TEST_WEB_PLATFORM_URL_1;
 
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer controllerCompleter =
-      Completer<InAppWebViewController>();
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: InAppWebView(
-            initialUrlRequest: URLRequest(
-                url: url),
+            initialUrlRequest: URLRequest(url: url),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -72,7 +75,7 @@ void programmaticScroll() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
       await controller.scrollTo(x: 0, y: 0);
 
@@ -98,7 +101,15 @@ void programmaticScroll() {
       expect(scrollPosY, Y_SCROLL * 2);
     }, skip: shouldSkipTest1);
 
-    testWidgets('set and get scroll position on Android without Hybrid Composition', (WidgetTester tester) async {
+    final shouldSkipTest2 = kIsWeb
+        ? true
+        : ![
+      TargetPlatform.android,
+    ].contains(defaultTargetPlatform);
+
+    testWidgets(
+        'set and get scroll position on Android without Hybrid Composition',
+        (WidgetTester tester) async {
       final String scrollTestPage = '''
         <!DOCTYPE html>
         <html>
@@ -121,11 +132,10 @@ void programmaticScroll() {
       ''';
 
       final String scrollTestPageBase64 =
-      base64Encode(const Utf8Encoder().convert(scrollTestPage));
+          base64Encode(const Utf8Encoder().convert(scrollTestPage));
 
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer controllerCompleter =
-      Completer<InAppWebViewController>();
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -137,8 +147,7 @@ void programmaticScroll() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            initialSettings: InAppWebViewSettings(
-                useHybridComposition: false),
+            initialSettings: InAppWebViewSettings(useHybridComposition: false),
             onLoadStop: (controller, url) {
               pageLoaded.complete();
             },
@@ -147,7 +156,7 @@ void programmaticScroll() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
       await controller.scrollTo(x: 0, y: 0);
 
@@ -171,6 +180,6 @@ void programmaticScroll() {
       scrollPosY = await controller.getScrollY();
       expect(scrollPosX, X_SCROLL * 2);
       expect(scrollPosY, Y_SCROLL * 2);
-    }, skip: defaultTargetPlatform != TargetPlatform.android);
+    }, skip: shouldSkipTest2);
   }, skip: shouldSkip);
 }

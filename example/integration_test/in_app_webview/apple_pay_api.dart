@@ -6,11 +6,12 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void applePayAPI() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('Apple Pay API enabled', (WidgetTester tester) async {
     final Completer<void> pageLoaded = Completer<void>();

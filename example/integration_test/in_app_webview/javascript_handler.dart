@@ -8,11 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../util.dart';
 
 void javascriptHandler() {
-  final shouldSkip = kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('JavaScript Handler', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -27,7 +29,7 @@ void javascriptHandler() {
         child: InAppWebView(
           key: GlobalKey(),
           initialFile:
-          "test_assets/in_app_webview_javascript_handler_test.html",
+              "test_assets/in_app_webview_javascript_handler_test.html",
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
 
@@ -44,10 +46,10 @@ void javascriptHandler() {
                   messagesReceived.add(args[0] as int);
                   messagesReceived.add(args[1] as bool);
                   messagesReceived.add(args[2] as List<dynamic>?);
-                  messagesReceived.add(args[3]?.cast<String, String>()
-                  as Map<String, String>?);
-                  messagesReceived.add(args[4]?.cast<String, String>()
-                  as Map<String, String>?);
+                  messagesReceived.add(
+                      args[3]?.cast<String, String>() as Map<String, String>?);
+                  messagesReceived.add(
+                      args[4]?.cast<String, String>() as Map<String, String>?);
                   handlerFooWithArgs.complete();
                 });
           },
@@ -69,8 +71,7 @@ void javascriptHandler() {
 
     expect(messagesReceived[0], 1);
     expect(messagesReceived[1], true);
-    expect(
-        listEquals(messagesReceived[2] as List<dynamic>?, ["bar", 5]), true);
+    expect(listEquals(messagesReceived[2] as List<dynamic>?, ["bar", 5]), true);
     expect(mapEquals(messagesReceived[3], {"foo": "baz"}), true);
     expect(
         mapEquals(

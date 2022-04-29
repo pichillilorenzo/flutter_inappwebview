@@ -8,11 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void onNavigationResponse() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group("onNavigationResponse", () {
     testWidgets('allow navigation', (WidgetTester tester) async {
@@ -26,8 +27,7 @@ void onNavigationResponse() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: TEST_URL_1),
+            initialUrlRequest: URLRequest(url: TEST_URL_1),
             initialSettings:
                 InAppWebViewSettings(useOnNavigationResponse: true),
             onWebViewCreated: (controller) {
@@ -61,8 +61,7 @@ void onNavigationResponse() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: TEST_URL_1),
+            initialUrlRequest: URLRequest(url: TEST_URL_1),
             initialSettings:
                 InAppWebViewSettings(useOnNavigationResponse: true),
             onWebViewCreated: (controller) {

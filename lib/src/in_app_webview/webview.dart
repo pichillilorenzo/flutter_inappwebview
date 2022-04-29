@@ -2,7 +2,6 @@ import 'dart:collection';
 import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview_web.dart';
 
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 

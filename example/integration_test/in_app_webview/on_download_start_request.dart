@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../.env.dart';
 
 void onDownloadStartRequest() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('onDownloadStartRequest', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();

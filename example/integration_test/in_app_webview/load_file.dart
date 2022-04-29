@@ -8,17 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void loadFile() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('loadFile', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final StreamController<String> pageLoads =
-    StreamController<String>.broadcast();
+        StreamController<String>.broadcast();
 
     await tester.pumpWidget(
       Directionality(
@@ -36,8 +37,7 @@ void loadFile() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoads.stream.first;
 
     await controller.loadFile(

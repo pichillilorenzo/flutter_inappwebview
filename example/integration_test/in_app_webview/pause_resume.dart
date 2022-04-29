@@ -8,14 +8,14 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void pauseResume() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('pause/resume', (WidgetTester tester) async {
-    final Completer controllerCompleter =
-    Completer<InAppWebViewController>();
+    final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -23,8 +23,7 @@ void pauseResume() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -35,8 +34,7 @@ void pauseResume() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await expectLater(controller.pause(), completes);
     await Future.delayed(Duration(seconds: 1));

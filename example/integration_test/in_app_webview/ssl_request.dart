@@ -8,11 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../.env.dart';
 
 void sslRequest() {
-  final shouldSkip = kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('SSL request', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -23,8 +25,7 @@ void sslRequest() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest: URLRequest(
-              url: Uri.parse(
-                  "https://${environment["NODE_SERVER_IP"]}:4433/")),
+              url: Uri.parse("https://${environment["NODE_SERVER_IP"]}:4433/")),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -45,8 +46,7 @@ void sslRequest() {
         ),
       ),
     );
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final String h1Content = await controller.evaluateJavascript(

@@ -8,15 +8,15 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void createPdf() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('createPdf', (WidgetTester tester) async {
-    final Completer controllerCompleter =
-    Completer<InAppWebViewController>();
+    final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -24,8 +24,7 @@ void createPdf() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -36,8 +35,7 @@ void createPdf() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     var pdfConfiguration = PDFConfiguration(

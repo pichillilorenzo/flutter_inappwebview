@@ -9,12 +9,13 @@ import '../constants.dart';
 import '../util.dart';
 
 void stopLoading() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('stopLoading', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();

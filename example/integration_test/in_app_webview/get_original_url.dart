@@ -8,18 +8,18 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void getOriginalUrl() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   testWidgets('getOriginalUrl', (WidgetTester tester) async {
-    final Completer controllerCompleter =
-    Completer<InAppWebViewController>();
+    final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -27,8 +27,7 @@ void getOriginalUrl() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: url),
+          initialUrlRequest: URLRequest(url: url),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -39,8 +38,7 @@ void getOriginalUrl() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     var originUrl = (await controller.getOriginalUrl())?.toString();
     expect(originUrl, url.toString());

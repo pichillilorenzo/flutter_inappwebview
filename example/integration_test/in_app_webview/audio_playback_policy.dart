@@ -8,22 +8,22 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../constants.dart';
-
 void audioPlaybackPolicy() {
-  final shouldSkip = kIsWeb || ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('Audio playback policy', () {
     String audioTestBase64 = "";
     setUpAll(() async {
       final ByteData audioData =
-      await rootBundle.load('test_assets/sample_audio.ogg');
+          await rootBundle.load('test_assets/sample_audio.ogg');
       final String base64AudioData =
-      base64Encode(Uint8List.view(audioData.buffer));
+          base64Encode(Uint8List.view(audioData.buffer));
       final String audioTest = '''
         <!DOCTYPE html><html>
         <head><title>Audio auto play</title>
@@ -50,7 +50,7 @@ void audioPlaybackPolicy() {
 
     testWidgets('Auto media playback', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
-      Completer<InAppWebViewController>();
+          Completer<InAppWebViewController>();
       Completer<void> pageStarted = Completer<void>();
       Completer<void> pageLoaded = Completer<void>();
 
@@ -66,8 +66,8 @@ void audioPlaybackPolicy() {
               controllerCompleter.complete(controller);
             },
             initialSettings: InAppWebViewSettings(
-                    javaScriptEnabled: true,
-                    mediaPlaybackRequiresUserGesture: false),
+                javaScriptEnabled: true,
+                mediaPlaybackRequiresUserGesture: false),
             onLoadStart: (controller, url) {
               pageStarted.complete();
             },
@@ -82,7 +82,7 @@ void audioPlaybackPolicy() {
       await pageLoaded.future;
 
       bool isPaused =
-      await controller.evaluateJavascript(source: 'isPaused();');
+          await controller.evaluateJavascript(source: 'isPaused();');
       expect(isPaused, false);
 
       controllerCompleter = Completer<InAppWebViewController>();

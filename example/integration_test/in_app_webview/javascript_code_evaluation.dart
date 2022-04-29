@@ -8,20 +8,22 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void javascriptCodeEvaluation() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
-
-  group('javascript code evaluation', () {
-    final shouldSkipTest1 = !kIsWeb ||
-        ![
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
+
+  group('javascript code evaluation', () {
+    final shouldSkipTest1 = kIsWeb
+        ? false
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('evaluateJavascript', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -57,12 +59,13 @@ void javascriptCodeEvaluation() {
           mapEquals(result[3]?.cast<String, String>(), {"foo": "baz"}), true);
     }, skip: shouldSkipTest1);
 
-    final shouldSkipTest2 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest2 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('evaluateJavascript with content world',
         (WidgetTester tester) async {
@@ -100,12 +103,13 @@ void javascriptCodeEvaluation() {
       expect(result, 49);
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest3 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('callAsyncJavaScript', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -159,12 +163,13 @@ void javascriptCodeEvaluation() {
       expect(result.error, 'error message');
     }, skip: shouldSkipTest3);
 
-    final shouldSkipTest4 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest4 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('callAsyncJavaScript with content world',
         (WidgetTester tester) async {

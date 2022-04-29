@@ -8,22 +8,25 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void webHistory() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
-
-  group('web history', () {
-    final shouldSkipTest1 = kIsWeb ||
-        ![
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
           TargetPlatform.android,
           TargetPlatform.iOS,
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-    testWidgets('get history list and go back/forward', (WidgetTester tester) async {
+  group('web history', () {
+    final shouldSkipTest1 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
+
+    testWidgets('get history list and go back/forward',
+        (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
@@ -42,7 +45,8 @@ void webHistory() {
         ),
       );
 
-      final InAppWebViewController controller = await controllerCompleter.future;
+      final InAppWebViewController controller =
+          await controllerCompleter.future;
 
       await Future.delayed(Duration(seconds: 1));
       var url = (await controller.getUrl()).toString();
@@ -50,10 +54,10 @@ void webHistory() {
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory!.currentIndex, 0);
       expect(webHistory.list!.length, 1);
-      expect(webHistory.list![0].url.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(webHistory.list![0].url.toString(),
+          TEST_CROSS_PLATFORM_URL_1.toString());
 
-      await controller.loadUrl(
-          urlRequest: URLRequest(url: TEST_URL_1));
+      await controller.loadUrl(urlRequest: URLRequest(url: TEST_URL_1));
       await Future.delayed(Duration(seconds: 1));
       url = (await controller.getUrl()).toString();
       webHistory = await controller.getCopyBackForwardList();
@@ -64,7 +68,8 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), false);
       expect(webHistory!.currentIndex, 1);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(webHistory.list![0].url.toString(),
+          TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
       await Future.delayed(Duration(seconds: 1));
@@ -79,7 +84,8 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), true);
       expect(webHistory!.currentIndex, 0);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(webHistory.list![0].url.toString(),
+          TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
       await Future.delayed(Duration(seconds: 1));
@@ -94,7 +100,8 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), false);
       expect(webHistory!.currentIndex, 1);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(webHistory.list![0].url.toString(),
+          TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
 
       await Future.delayed(Duration(seconds: 1));
@@ -109,7 +116,8 @@ void webHistory() {
       expect(await controller.canGoBackOrForward(steps: 1), true);
       expect(webHistory!.currentIndex, 0);
       expect(webHistory.list!.length, 2);
-      expect(webHistory.list![0].url.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
+      expect(webHistory.list![0].url.toString(),
+          TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
     }, skip: shouldSkipTest1);
 
@@ -118,7 +126,7 @@ void webHistory() {
     testWidgets('go back/forward on web platform', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
-      StreamController<String>.broadcast();
+          StreamController<String>.broadcast();
 
       await tester.pumpWidget(
         Directionality(
@@ -136,7 +144,8 @@ void webHistory() {
         ),
       );
 
-      final InAppWebViewController controller = await controllerCompleter.future;
+      final InAppWebViewController controller =
+          await controllerCompleter.future;
 
       var url = await pageLoads.stream.first;
       expect(url, TEST_WEB_PLATFORM_URL_1.toString());
@@ -164,24 +173,23 @@ void webHistory() {
       pageLoads.close();
     }, skip: shouldSkipTest2);
 
-    final shouldSkipTest3 = kIsWeb ||
-        ![
-          TargetPlatform.android,
-        ].contains(defaultTargetPlatform);
+    final shouldSkipTest3 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.android,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('clearHistory', (WidgetTester tester) async {
-      final Completer controllerCompleter =
-      Completer<InAppWebViewController>();
+      final Completer controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
-      StreamController<String>.broadcast();
+          StreamController<String>.broadcast();
 
       await tester.pumpWidget(
         Directionality(
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-            URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+            initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -193,11 +201,9 @@ void webHistory() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoads.stream.first;
-      await controller.loadUrl(
-          urlRequest:
-          URLRequest(url: TEST_URL_1));
+      await controller.loadUrl(urlRequest: URLRequest(url: TEST_URL_1));
       await pageLoads.stream.first;
 
       var webHistory = await controller.getCopyBackForwardList();

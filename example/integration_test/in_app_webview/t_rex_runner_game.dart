@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void tRexRunnerGame() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('T-Rex Runner game', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -35,12 +36,11 @@ void tRexRunnerGame() {
       ),
     );
 
-    final InAppWebViewController controller =
     await controllerCompleter.future;
     await pageLoaded.future;
 
-    var html = await controller.getTRexRunnerHtml();
-    var css = await controller.getTRexRunnerCss();
+    var html = await InAppWebViewController.tRexRunnerHtml;
+    var css = await InAppWebViewController.tRexRunnerCss;
 
     expect(html, isNotNull);
     expect(css, isNotNull);

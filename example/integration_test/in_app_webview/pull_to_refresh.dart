@@ -9,12 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void pullToRefresh() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('launches with pull-to-refresh feature',
       (WidgetTester tester) async {
@@ -36,8 +37,7 @@ void pullToRefresh() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-              URLRequest(url: TEST_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_URL_1),
           pullToRefreshController: pullToRefreshController,
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);

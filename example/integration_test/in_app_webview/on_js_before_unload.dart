@@ -8,10 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void onJsBeforeUnload() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('onJsBeforeUnload', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -23,8 +24,7 @@ void onJsBeforeUnload() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: TEST_URL_1),
+          initialUrlRequest: URLRequest(url: TEST_URL_1),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -48,8 +48,7 @@ void onJsBeforeUnload() {
       ),
     );
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
     await controller.evaluateJavascript(
         source: "window.location.href = '$TEST_URL_1';");

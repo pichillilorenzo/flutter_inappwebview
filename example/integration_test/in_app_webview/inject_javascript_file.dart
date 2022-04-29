@@ -8,12 +8,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void injectJavascriptFile() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var url = !kIsWeb ? TEST_URL_ABOUT_BLANK : TEST_WEB_PLATFORM_URL_1;
 
@@ -41,12 +42,12 @@ void injectJavascriptFile() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromUrl(
           urlFile:
-          Uri.parse('https://www.notawebsite..com/jquery-3.3.1.min.js'),
+              Uri.parse('https://www.notawebsite..com/jquery-3.3.1.min.js'),
           scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
             id: 'jquery-error',
             onError: () {
@@ -101,7 +102,7 @@ void injectJavascriptFile() {
       );
 
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromAsset(

@@ -65,10 +65,10 @@ setTimeout(function() {
 
     await firstPushCompleter.future;
     expect((await controller.getUrl())?.toString(),
-        '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}/first-push');
+        '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}first-push');
 
     await secondPushCompleter.future;
     expect((await controller.getUrl())?.toString(),
-        '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}/second-push');
+        '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}second-push');
   }, skip: shouldSkip);
 }

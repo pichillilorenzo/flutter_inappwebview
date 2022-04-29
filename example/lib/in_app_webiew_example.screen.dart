@@ -1,5 +1,4 @@
 import 'dart:collection';
-import 'dart:typed_data';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
@@ -169,6 +168,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
+                    print("getContentHeight: " + (await controller.getContentHeight()).toString());
                   },
                   onLoadError: (controller, url, code, message) {
                     pullToRefreshController?.endRefreshing();
@@ -216,7 +216,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               ElevatedButton(
                 child: Icon(Icons.refresh),
                 onPressed: () {
-                  webViewController?.reload();
+                  webViewController?.reloadFromOrigin();
                 },
               ),
             ],

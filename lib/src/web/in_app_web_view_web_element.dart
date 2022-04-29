@@ -322,7 +322,7 @@ class InAppWebViewWebElement {
   }
 
   Future<int?> getContentHeight() async {
-    return _callMethod('getContentHeight');
+    return (_callMethod('getContentHeight') as num?)?.toInt();
   }
 
   Future<String?> getOriginalUrl() async {
@@ -334,11 +334,11 @@ class InAppWebViewWebElement {
   }
 
   Future<int?> getScrollX() async {
-    return _callMethod('getScrollX');
+    return (_callMethod('getScrollX') as num?)?.toInt();
   }
 
   Future<int?> getScrollY() async {
-    return _callMethod('getScrollY');
+    return (_callMethod('getScrollY') as num?)?.toInt();
   }
 
   Future<bool> isSecureContext() async {

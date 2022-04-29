@@ -111,11 +111,9 @@ void webMessage() {
               controllerCompleter.complete(controller);
             },
             onConsoleMessage: (controller, consoleMessage) {
-              print(consoleMessage);
               webMessageCompleter.complete(consoleMessage.message);
             },
             onLoadStop: (controller, url) async {
-              print(url);
               if (url.toString() == TEST_URL_EXAMPLE.toString()) {
                 pageLoaded.complete();
               }

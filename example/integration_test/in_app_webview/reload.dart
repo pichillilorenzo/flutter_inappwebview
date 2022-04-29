@@ -26,7 +26,7 @@ void reload() {
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
 
-    testWidgets('reload from origin', (WidgetTester tester) async {
+    testWidgets('from origin', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 

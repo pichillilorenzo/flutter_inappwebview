@@ -47,8 +47,7 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
 ///
 ///If you are using the [InAppWebView] widget, an [InAppWebViewController] instance can be obtained by setting the [InAppWebView.onWebViewCreated]
 ///callback. Instead, if you are using an [InAppBrowser] instance, you can get it through the [InAppBrowser.webViewController] attribute.
-class InAppWebViewController
-    with AndroidInAppWebViewControllerMixin, AppleInAppWebViewControllerMixin {
+class InAppWebViewController {
   WebView? _webview;
   late MethodChannel _channel;
   static MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
@@ -2198,7 +2197,15 @@ class InAppWebViewController
   ///- Web ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
   Future<int?> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return await _channel.invokeMethod('getContentHeight', args);
+    var height = await _channel.invokeMethod('getContentHeight', args);
+    if (height == null || height == 0) {
+      // try to use javascript
+      var scrollHeight = await evaluateJavascript(source: "document.documentElement.scrollHeight;");
+      if (scrollHeight != null && scrollHeight is num) {
+        height = scrollHeight.toInt();
+      }
+    }
+    return height;
   }
 
   ///Performs a zoom operation in this WebView.
@@ -2984,6 +2991,207 @@ class InAppWebViewController
     return await _channel.invokeMethod('canScrollHorizontally', args);
   }
 
+  ///Starts Safe Browsing initialization.
+  ///
+  ///URL loads are not guaranteed to be protected by Safe Browsing until after the this method returns true.
+  ///Safe Browsing is not fully supported on all devices. For those devices this method will returns false.
+  ///
+  ///This should not be called if Safe Browsing has been disabled by manifest tag or [AndroidInAppWebViewOptions.safeBrowsingEnabled].
+  ///This prepares resources used for Safe Browsing.
+  ///
+  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.START_SAFE_BROWSING].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.startSafeBrowsing](https://developer.android.com/reference/android/webkit/WebView#startSafeBrowsing(android.content.Context,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
+  Future<bool> startSafeBrowsing() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('startSafeBrowsing', args);
+  }
+
+  ///Clears the SSL preferences table stored in response to proceeding with SSL certificate errors.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.clearSslPreferences](https://developer.android.com/reference/android/webkit/WebView#clearSslPreferences()))
+  Future<void> clearSslPreferences() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('clearSslPreferences', args);
+  }
+
+  ///Does a best-effort attempt to pause any processing that can be paused safely, such as animations and geolocation. Note that this call does not pause JavaScript.
+  ///To pause JavaScript globally, use [InAppWebViewController.pauseTimers]. To resume WebView, call [resume].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.onPause](https://developer.android.com/reference/android/webkit/WebView#onPause()))
+  Future<void> pause() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('pause', args);
+  }
+
+  ///Resumes a WebView after a previous call to [pause].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.onResume](https://developer.android.com/reference/android/webkit/WebView#onResume()))
+  Future<void> resume() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('resume', args);
+  }
+
+  ///Scrolls the contents of this WebView down by half the page size.
+  ///Returns `true` if the page was scrolled.
+  ///
+  ///[bottom] `true` to jump to bottom of page.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.pageDown](https://developer.android.com/reference/android/webkit/WebView#pageDown(boolean)))
+  Future<bool> pageDown({required bool bottom}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("bottom", () => bottom);
+    return await _channel.invokeMethod('pageDown', args);
+  }
+
+  ///Scrolls the contents of this WebView up by half the view size.
+  ///Returns `true` if the page was scrolled.
+  ///
+  ///[top] `true` to jump to the top of the page.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.pageUp](https://developer.android.com/reference/android/webkit/WebView#pageUp(boolean)))
+  Future<bool> pageUp({required bool top}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("top", () => top);
+    return await _channel.invokeMethod('pageUp', args);
+  }
+
+  ///Performs zoom in in this WebView.
+  ///Returns `true` if zoom in succeeds, `false` if no zoom changes.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.zoomIn](https://developer.android.com/reference/android/webkit/WebView#zoomIn()))
+  Future<bool> zoomIn() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('zoomIn', args);
+  }
+
+  ///Performs zoom out in this WebView.
+  ///Returns `true` if zoom out succeeds, `false` if no zoom changes.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.zoomOut](https://developer.android.com/reference/android/webkit/WebView#zoomOut()))
+  Future<bool> zoomOut() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('zoomOut', args);
+  }
+
+  ///Clears the internal back/forward list.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebView.clearHistory](https://developer.android.com/reference/android/webkit/WebView#clearHistory()))
+  Future<void> clearHistory() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('clearHistory', args);
+  }
+
+  ///Reloads the current page, performing end-to-end revalidation using cache-validating conditionals if possible.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.reloadFromOrigin](https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin))
+  Future<void> reloadFromOrigin() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    await _channel.invokeMethod('reloadFromOrigin', args);
+  }
+
+  ///Generates PDF data from the web view’s contents asynchronously.
+  ///Returns `null` if a problem occurred.
+  ///
+  ///[pdfConfiguration] represents the object that specifies the portion of the web view to capture as PDF data.
+  ///
+  ///**NOTE**: available only on iOS 14.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
+  Future<Uint8List?> createPdf(
+      {@Deprecated("Use pdfConfiguration instead")
+      // ignore: deprecated_member_use_from_same_package
+      IOSWKPDFConfiguration? iosWKPdfConfiguration,
+        PDFConfiguration? pdfConfiguration}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('pdfConfiguration',
+            () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
+    return await _channel.invokeMethod('createPdf', args);
+  }
+
+  ///Creates a web archive of the web view’s current contents asynchronously.
+  ///Returns `null` if a problem occurred.
+  ///
+  ///**NOTE**: available only on iOS 14.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.createWebArchiveData](https://developer.apple.com/documentation/webkit/wkwebview/3650491-createwebarchivedata))
+  Future<Uint8List?> createWebArchiveData() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('createWebArchiveData', args);
+  }
+
+  ///A Boolean value indicating whether all resources on the page have been loaded over securely encrypted connections.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.hasOnlySecureContent](https://developer.apple.com/documentation/webkit/wkwebview/1415002-hasonlysecurecontent))
+  Future<bool> hasOnlySecureContent() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('hasOnlySecureContent', args);
+  }
+
+  ///Pauses playback of all media in the web view.
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.pauseAllMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback)).
+  Future<void> pauseAllMediaPlayback() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('pauseAllMediaPlayback', args);
+  }
+
+  ///Changes whether the webpage is suspending playback of all media in the page.
+  ///Pass `true` to pause all media the web view is playing. Neither the user nor the webpage can resume playback until you call this method again with `false`.
+  ///
+  ///[suspended] represents a [bool] value that indicates whether the webpage should suspend media playback.
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.setAllMediaPlaybackSuspended](https://developer.apple.com/documentation/webkit/wkwebview/3752242-setallmediaplaybacksuspended)).
+  Future<void> setAllMediaPlaybackSuspended({required bool suspended}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("suspended", () => suspended);
+    return await _channel.invokeMethod('setAllMediaPlaybackSuspended', args);
+  }
+
+  ///Closes all media the web view is presenting, including picture-in-picture video and fullscreen video.
+  ///
+  ///**NOTE for iOS**: available on iOS 14.5+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.closeAllMediaPresentations](https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations)).
+  Future<void> closeAllMediaPresentations() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('closeAllMediaPresentations', args);
+  }
+
+  ///Requests the playback status of media in the web view.
+  ///Returns a [MediaPlaybackState] that indicates whether the media in the web view is playing, paused, or suspended.
+  ///If there’s no media in the web view to play, this method provides [MediaPlaybackState.NONE].
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate)).
+  Future<MediaPlaybackState?> requestMediaPlaybackState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return MediaPlaybackState.fromValue(
+        await _channel.invokeMethod('requestMediaPlaybackState', args));
+  }
+
   ///Returns the iframe `id` attribute used on the Web platform.
   ///
   ///**Supported Platforms/Implementations**:
@@ -3108,7 +3316,7 @@ class InAppWebViewController
     return await _staticChannel.invokeMethod('handlesURLScheme', args);
   }
 
-  ///Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerCss].
+  ///Gets the html (with javascript) of the Chromium's t-rex runner game. Used in combination with [tRexRunnerCss].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -3116,7 +3324,7 @@ class InAppWebViewController
   static Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
         'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
 
-  ///Gets the css of the Chromium's t-rex runner game. Used in combination with [getTRexRunnerHtml].
+  ///Gets the css of the Chromium's t-rex runner game. Used in combination with [tRexRunnerHtml].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView

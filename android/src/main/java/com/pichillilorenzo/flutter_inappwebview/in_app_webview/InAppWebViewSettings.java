@@ -99,7 +99,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean useShouldInterceptRequest = false;
   public Boolean useOnRenderProcessGone = false;
   public Boolean disableDefaultErrorPage = false;
-  public Boolean useHybridComposition = false;
+  public Boolean useHybridComposition = true;
   @Nullable
   public String verticalScrollbarThumbColor;
   @Nullable

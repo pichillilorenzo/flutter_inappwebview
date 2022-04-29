@@ -36,6 +36,8 @@ void pageDownUp() {
 
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
+    await tester.pump();
+    await Future.delayed(Duration(seconds: 1));
     expect(await controller.pageDown(bottom: false), true);
     await Future.delayed(Duration(seconds: 1));
     expect(await controller.pageUp(top: false), true);

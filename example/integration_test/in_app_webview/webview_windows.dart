@@ -177,11 +177,10 @@ void webViewWindows() {
     final shouldSkipTest4 = kIsWeb
         ? true
         : ![
-            TargetPlatform.android,
             TargetPlatform.iOS,
             TargetPlatform.macOS,
           ].contains(defaultTargetPlatform);
-
+    // on Android, for some reason, it works on an example app but not in this test
     testWidgets('can open new window and go back', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =

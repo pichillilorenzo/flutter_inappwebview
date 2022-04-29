@@ -15,6 +15,8 @@ void loadUrl() {
         TargetPlatform.macOS,
       ].contains(defaultTargetPlatform);
 
+  var initialUrl = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
+
   testWidgets('loadUrl', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final StreamController<String> pageLoads =
@@ -26,7 +28,7 @@ void loadUrl() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+          URLRequest(url: initialUrl),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -39,12 +41,12 @@ void loadUrl() {
     final InAppWebViewController controller =
     await controllerCompleter.future;
     var url = await pageLoads.stream.first;
-    expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
+    expect(url, initialUrl.toString());
 
     await controller.loadUrl(
-        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2));
+        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
     url = await pageLoads.stream.first;
-    expect(url, TEST_CROSS_PLATFORM_URL_2.toString());
+    expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
 
     pageLoads.close();
   }, skip: shouldSkip);

@@ -5,8 +5,6 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import '../constants.dart';
-
 void onFindResultReceived() {
   final shouldSkip = kIsWeb
       ? true
@@ -18,6 +16,7 @@ void onFindResultReceived() {
 
   testWidgets('onFindResultReceived', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<void> pageLoaded = Completer<void>();
     final Completer<int> numberOfMatchesCompleter = Completer<int>();
     await tester.pumpWidget(
       Directionality(
@@ -32,7 +31,7 @@ void onFindResultReceived() {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
-            controller.findAllAsync(find: "InAppWebViewInitialFileTest");
+            pageLoaded.complete();
           },
           onFindResultReceived: (controller, int activeMatchOrdinal,
               int numberOfMatches, bool isDoneCounting) async {
@@ -44,6 +43,12 @@ void onFindResultReceived() {
       ),
     );
 
+    var controller = await controllerCompleter.future;
+    await pageLoaded.future;
+
+    await tester.pump();
+
+    await controller.findAllAsync(find: "InAppWebViewInitialFileTest");
     final int numberOfMatches = await numberOfMatchesCompleter.future;
     expect(numberOfMatches, 2);
   }, skip: shouldSkip);

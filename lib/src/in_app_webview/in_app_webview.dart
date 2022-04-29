@@ -564,7 +564,7 @@ class _InAppWebViewState extends State<InAppWebView> {
               :
               // ignore: deprecated_member_use_from_same_package
               widget.initialOptions?.android.useHybridComposition) ??
-          false;
+          true;
 
       if (!useHybridComposition && widget.pullToRefreshController != null) {
         throw new Exception(

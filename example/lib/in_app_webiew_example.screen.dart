@@ -19,7 +19,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewSettings settings = InAppWebViewSettings(
     useShouldOverrideUrlLoading: true,
     mediaPlaybackRequiresUserGesture: false,
-    useHybridComposition: true,
     allowsInlineMediaPlayback: true,
     iframeAllow: "camera; microphone",
     iframeAllowFullscreen: true,
@@ -216,7 +215,13 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               ElevatedButton(
                 child: Icon(Icons.refresh),
                 onPressed: () {
-                  webViewController?.reloadFromOrigin();
+                  webViewController?.reload();
+                },
+              ),
+              ElevatedButton(
+                child: Icon(Icons.refresh),
+                onPressed: () {
+                  webViewController?.evaluateJavascript(source: "window.open('https://github.com/flutter');");
                 },
               ),
             ],

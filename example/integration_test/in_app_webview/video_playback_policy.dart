@@ -9,12 +9,13 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void videoPlaybackPolicy() {
-  final shouldSkip = kIsWeb ? true :
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('Video playback policy', () {
     String videoTestBase64 = "";
@@ -120,6 +121,13 @@ void videoPlaybackPolicy() {
       expect(isPaused, true);
     });
 
+    final shouldSkipTest2 = kIsWeb
+        ? true
+        : ![
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
+
     testWidgets('Video plays inline when allowsInlineMediaPlayback is true',
         (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
@@ -154,7 +162,14 @@ void videoPlaybackPolicy() {
 
       await pageLoaded.future;
       expect(onEnterFullscreenCompleter.future, doesNotComplete);
-    });
+    }, skip: shouldSkipTest2);
+
+    final shouldSkipTest3 = kIsWeb
+        ? true
+        : ![
+      TargetPlatform.iOS,
+      TargetPlatform.macOS,
+    ].contains(defaultTargetPlatform);
 
     testWidgets(
         'Video plays fullscreen when allowsInlineMediaPlayback is false',
@@ -194,8 +209,15 @@ void videoPlaybackPolicy() {
       await tester.pump();
 
       await expectLater(onEnterFullscreenCompleter.future, completes);
-    });
+    }, skip: shouldSkipTest3);
 
+    final shouldSkipTest4 = kIsWeb
+        ? true
+        : ![
+      TargetPlatform.iOS,
+      TargetPlatform.macOS,
+    ].contains(defaultTargetPlatform);
+    // on Android, entering fullscreen requires user interaction
     testWidgets('exit fullscreen event', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =
           Completer<InAppWebViewController>();
@@ -235,6 +257,6 @@ void videoPlaybackPolicy() {
       await controller.evaluateJavascript(source: "exitFullscreen();");
 
       await expectLater(onExitFullscreenCompleter.future, completes);
-    });
+    }, skip: shouldSkipTest4);
   }, skip: shouldSkip);
 }

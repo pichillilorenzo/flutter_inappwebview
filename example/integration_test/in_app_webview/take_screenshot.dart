@@ -39,6 +39,9 @@ void takeScreenshot() {
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
+    await Future.delayed(Duration(seconds: 1));
+    await tester.pump();
+
     var screenshotConfiguration = ScreenshotConfiguration(
         compressFormat: CompressFormat.JPEG,
         quality: 20,

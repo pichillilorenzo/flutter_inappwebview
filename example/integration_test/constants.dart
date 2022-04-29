@@ -11,7 +11,7 @@ final TEST_WEB_PLATFORM_BASE_URL = Uri.parse(Uri.base.toString().replaceFirst("/
 final TEST_WEB_PLATFORM_URL_1 = Uri.parse(TEST_WEB_PLATFORM_BASE_URL.toString() + 'page.html');
 final TEST_WEB_PLATFORM_URL_2 = Uri.parse(TEST_WEB_PLATFORM_BASE_URL.toString() + 'page-2.html');
 final TEST_WEB_PLATFORM_URL_3 = Uri.parse(TEST_WEB_PLATFORM_BASE_URL.toString() + 'heavy-page.html');
-final TEST_NOT_A_WEBSITE_URL = Uri.parse('https://www.notawebsite..com');
+final TEST_NOT_A_WEBSITE_URL = Uri.parse('https://www.notawebsite..com/');
 final TEST_CHROME_SAFE_BROWSING_MALWARE = Uri.parse('chrome://safe-browsing/match?type=malware');
 final TEST_PERMISSION_SITE = Uri.parse('https://permission.site/');
 final TEST_SERVICE_WORKER_URL = Uri.parse('https://mdn.github.io/sw-test/');

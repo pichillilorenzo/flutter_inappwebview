@@ -8,10 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void setServiceWorkerClient() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('setServiceWorkerClient to null', (WidgetTester tester) async {
     final Completer<String> pageLoaded = Completer<String>();
@@ -33,8 +34,7 @@ void setServiceWorkerClient() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-              URLRequest(url: TEST_SERVICE_WORKER_URL),
+          initialUrlRequest: URLRequest(url: TEST_SERVICE_WORKER_URL),
           onLoadStop: (controller, url) {
             pageLoaded.complete(url!.toString());
           },

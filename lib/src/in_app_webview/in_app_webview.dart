@@ -529,7 +529,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
-  late InAppWebViewController _controller;
+  InAppWebViewController? _controller;
 
   @override
   Widget build(BuildContext context) {
@@ -663,18 +663,19 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   void dispose() {
-    dynamic viewId = _controller.getViewId();
-    if (kIsWeb && WebPlatformManager.webViews.containsKey(viewId)) {
+    dynamic viewId = _controller?.getViewId();
+    if (viewId != null && kIsWeb && WebPlatformManager.webViews.containsKey(viewId)) {
       WebPlatformManager.webViews.remove(viewId);
     }
     super.dispose();
+    _controller = null;
   }
 
   void _onPlatformViewCreated(int id) {
     _controller = InAppWebViewController(id, widget);
     widget.pullToRefreshController?.initMethodChannel(id);
     if (widget.onWebViewCreated != null) {
-      widget.onWebViewCreated!(_controller);
+      widget.onWebViewCreated!(_controller!);
     }
   }
 }

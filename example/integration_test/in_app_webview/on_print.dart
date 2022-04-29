@@ -34,6 +34,7 @@ void onPrint() {
         ),
       ),
     );
+    await tester.pump();
     final String printUrl = await onPrintCompleter.future;
     expect(printUrl, url.toString());
   }, skip: shouldSkip);

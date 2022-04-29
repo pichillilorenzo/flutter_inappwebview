@@ -41,7 +41,7 @@ void printCurrentPage() {
     final InAppWebViewController controller =
     await controllerCompleter.future;
     await pageLoaded.future;
-
+    await tester.pump();
     await expectLater(controller.printCurrentPage(), completes);
   }, skip: shouldSkip);
 }

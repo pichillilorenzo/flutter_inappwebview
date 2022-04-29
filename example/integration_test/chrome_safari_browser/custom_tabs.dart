@@ -6,12 +6,13 @@ import '../constants.dart';
 import '../util.dart';
 
 void customTabs() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
-  group('Custom Tabs', () async {
+  group('Custom Tabs', () {
     test('single instance', () async {
       var chromeSafariBrowser = new MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);

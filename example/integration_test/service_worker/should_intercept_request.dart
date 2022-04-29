@@ -8,10 +8,11 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void shouldInterceptRequest() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('shouldInterceptRequest', (WidgetTester tester) async {
     final Completer completer = Completer();

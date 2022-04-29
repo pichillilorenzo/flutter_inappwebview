@@ -6,12 +6,13 @@ import '../constants.dart';
 import '../util.dart';
 
 void trustedWebActivity() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
-  group('Trusted Web Activity', () async {
+  group('Trusted Web Activity', () {
     test('basic', () async {
       var chromeSafariBrowser = new MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);

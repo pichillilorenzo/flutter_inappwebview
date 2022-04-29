@@ -25,8 +25,6 @@ void webHistory() {
 
     testWidgets('get history list and go back/forward', (WidgetTester tester) async {
       final Completer controllerCompleter = Completer<InAppWebViewController>();
-      final StreamController<String> pageLoads =
-      StreamController<String>.broadcast();
 
       await tester.pumpWidget(
         Directionality(
@@ -37,8 +35,8 @@ void webHistory() {
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
-            onLoadStop: (controller, url) {
-              pageLoads.add(url!.toString());
+            onLoadStart: (controller, url) {
+              // pageLoads.add(url!.toString());
             },
           ),
         ),
@@ -46,7 +44,8 @@ void webHistory() {
 
       final InAppWebViewController controller = await controllerCompleter.future;
 
-      var url = await pageLoads.stream.first;
+      await Future.delayed(Duration(seconds: 1));
+      var url = (await controller.getUrl()).toString();
       var webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory!.currentIndex, 0);
@@ -55,7 +54,8 @@ void webHistory() {
 
       await controller.loadUrl(
           urlRequest: URLRequest(url: TEST_URL_1));
-      url = await pageLoads.stream.first;
+      await Future.delayed(Duration(seconds: 1));
+      url = (await controller.getUrl()).toString();
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_URL_1.toString());
       expect(await controller.canGoBack(), true);
@@ -69,7 +69,8 @@ void webHistory() {
 
       await Future.delayed(Duration(seconds: 1));
       await controller.goBack();
-      url = await pageLoads.stream.first;
+      await Future.delayed(Duration(seconds: 1));
+      url = (await controller.getUrl()).toString();
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(await controller.canGoBack(), false);
@@ -83,7 +84,8 @@ void webHistory() {
 
       await Future.delayed(Duration(seconds: 1));
       await controller.goForward();
-      url = await pageLoads.stream.first;
+      await Future.delayed(Duration(seconds: 1));
+      url = (await controller.getUrl()).toString();
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_URL_1.toString());
       expect(await controller.canGoBack(), true);
@@ -97,7 +99,8 @@ void webHistory() {
 
       await Future.delayed(Duration(seconds: 1));
       await controller.goTo(historyItem: webHistory.list![0]);
-      url = await pageLoads.stream.first;
+      await Future.delayed(Duration(seconds: 1));
+      url = (await controller.getUrl()).toString();
       webHistory = await controller.getCopyBackForwardList();
       expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
       expect(await controller.canGoBack(), false);
@@ -108,8 +111,6 @@ void webHistory() {
       expect(webHistory.list!.length, 2);
       expect(webHistory.list![0].url.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
       expect(webHistory.list![1].url.toString(), TEST_URL_1.toString());
-
-      pageLoads.close();
     }, skip: shouldSkipTest1);
 
     final shouldSkipTest2 = !kIsWeb;

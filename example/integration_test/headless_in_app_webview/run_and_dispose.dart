@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void runAndDispose() {
-  final shouldSkip = !kIsWeb ||
+  final shouldSkip = kIsWeb ? false :
       ![
         TargetPlatform.android,
         TargetPlatform.iOS,

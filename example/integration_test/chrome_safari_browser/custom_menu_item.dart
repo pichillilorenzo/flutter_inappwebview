@@ -6,12 +6,13 @@ import '../constants.dart';
 import '../util.dart';
 
 void customMenuItem() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   test('add custom menu item', () async {
     var chromeSafariBrowser = new MyChromeSafariBrowser();
@@ -23,8 +24,7 @@ void customMenuItem() {
         }));
     expect(chromeSafariBrowser.isOpened(), false);
 
-    await chromeSafariBrowser.open(
-        url: TEST_URL_1);
+    await chromeSafariBrowser.open(url: TEST_URL_1);
     await chromeSafariBrowser.browserCreated.future;
     expect(chromeSafariBrowser.isOpened(), true);
     expect(() async {

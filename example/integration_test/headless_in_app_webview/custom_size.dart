@@ -8,19 +8,19 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void customSize() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   test('set and get custom size', () async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
 
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest:
-      URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
       initialSize: Size(600, 800),
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);

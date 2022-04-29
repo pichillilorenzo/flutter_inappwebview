@@ -10,10 +10,22 @@ function error() {
 # on macOS local IP can be found using something like $(ipconfig getifaddr en0)
 # on linux local IP can be found using something like $(ifconfig en0 | grep "inet " | grep -Fv 127.0.0.1 | awk '{print $2}') or $(ip route get 1 | awk '{print $NF;exit}')
 export NODE_SERVER_IP=$1
+if [ -z "$1" ]; then
+  export NODE_SERVER_IP=$(ipconfig getifaddr en0)
+fi
+
+echo Node Server IP: $NODE_SERVER_IP
+
+if [ -z "$NODE_SERVER_IP" ]; then
+  echo No Server IP found
+  jobs -p | xargs kill
+  exit 1
+fi
+
 PLATFORM=$2
 FAILED=0
 
-if [ $PLATFORM = "web" ]; then
+if [ ! -z "$2" ] && [ $PLATFORM = "web" ]; then
   $PROJECT_DIR/tool/chromedriver --port=4444 &
 fi
 
@@ -26,7 +38,7 @@ flutter --version
 flutter clean
 cd $PROJECT_DIR/example
 flutter clean
-if [ $PLATFORM = "web" ]; then
+if [ ! -z "$2" ] && [ $PLATFORM = "web" ]; then
   flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart  --device-id=chrome
 else
   flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart

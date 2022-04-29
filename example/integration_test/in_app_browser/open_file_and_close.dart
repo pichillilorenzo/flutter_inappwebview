@@ -7,12 +7,13 @@ import '../constants.dart';
 import '../util.dart';
 
 void openFileAndClose() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   test('open file and close', () async {
     var inAppBrowser = new MyInAppBrowser();
@@ -27,8 +28,7 @@ void openFileAndClose() {
     expect(inAppBrowser.isOpened(), true);
     expect(() async {
       await inAppBrowser.openUrlRequest(
-          urlRequest:
-          URLRequest(url: TEST_URL_1));
+          urlRequest: URLRequest(url: TEST_URL_1));
     }, throwsA(isInstanceOf<InAppBrowserAlreadyOpenedException>()));
 
     await inAppBrowser.firstPageLoaded.future;

@@ -207,6 +207,8 @@ void webViewWindows() {
         final InAppWebViewController controller =
             await controllerCompleter.future;
 
+        await tester.pump();
+
         await controller.evaluateJavascript(
             source: 'window.open("$TEST_URL_1");');
         await pageLoads.stream.first;

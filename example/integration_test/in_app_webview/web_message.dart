@@ -98,19 +98,23 @@ void webMessage() {
                 allowedOriginRules: Set.from(["https://*.example.com"]),
                 onPostMessage:
                     (message, sourceOrigin, isMainFrame, replyProxy) {
-                  assert(
-                      sourceOrigin.toString() == TEST_URL_EXAMPLE.toString());
-                  assert(isMainFrame);
-
-                  replyProxy.postMessage(message! + " and back");
+                  if (isMainFrame &&
+                      (sourceOrigin.toString() + '/') ==
+                          TEST_URL_EXAMPLE.toString()) {
+                    replyProxy.postMessage(message! + " and back");
+                  } else {
+                    replyProxy.postMessage("Nope");
+                  }
                 },
               ));
               controllerCompleter.complete(controller);
             },
             onConsoleMessage: (controller, consoleMessage) {
+              print(consoleMessage);
               webMessageCompleter.complete(consoleMessage.message);
             },
             onLoadStop: (controller, url) async {
+              print(url);
               if (url.toString() == TEST_URL_EXAMPLE.toString()) {
                 pageLoaded.complete();
               }

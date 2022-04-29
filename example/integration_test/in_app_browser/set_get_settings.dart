@@ -6,12 +6,13 @@ import '../constants.dart';
 import '../util.dart';
 
 void setGetSettings() {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   test('set/get settings', () async {
     var inAppBrowser = new MyInAppBrowser();

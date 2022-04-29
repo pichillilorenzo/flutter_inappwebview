@@ -7,20 +7,20 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void setGetSettings() {
-  final shouldSkip = !kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   test('set/get settings', () async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest:
-          URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
       initialSettings: InAppWebViewSettings(javaScriptEnabled: false),
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);

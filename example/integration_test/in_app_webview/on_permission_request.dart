@@ -27,7 +27,7 @@ void onPermissionRequest() {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<List<PermissionResourceType>> onPermissionRequestCompleter =
-        Completer<List<PermissionResourceType>>();
+    Completer<List<PermissionResourceType>>();
 
     await tester.pumpWidget(
       Directionality(
@@ -44,6 +44,8 @@ void onPermissionRequest() {
           onPermissionRequest:
               (controller, PermissionRequest permissionRequest) async {
             onPermissionRequestCompleter.complete(permissionRequest.resources);
+            return PermissionResponse(resources: permissionRequest.resources,
+                action: PermissionResponseAction.GRANT);
           },
         ),
       ),
@@ -53,8 +55,9 @@ void onPermissionRequest() {
     await pageLoaded.future;
     await controller.evaluateJavascript(
         source: "document.querySelector('#camera').click();");
+    await tester.pump();
     final List<PermissionResourceType> resources =
-        await onPermissionRequestCompleter.future;
+    await onPermissionRequestCompleter.future;
 
     expect(listEquals(resources, expectedValue), true);
   }, skip: shouldSkip);

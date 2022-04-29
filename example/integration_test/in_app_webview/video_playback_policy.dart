@@ -190,6 +190,9 @@ void videoPlaybackPolicy() {
       );
 
       await pageLoaded.future;
+
+      await tester.pump();
+
       await expectLater(onEnterFullscreenCompleter.future, completes);
     });
 
@@ -228,6 +231,7 @@ void videoPlaybackPolicy() {
       await pageLoaded.future;
 
       await Future.delayed(Duration(seconds: 2));
+      await tester.pump();
       await controller.evaluateJavascript(source: "exitFullscreen();");
 
       await expectLater(onExitFullscreenCompleter.future, completes);

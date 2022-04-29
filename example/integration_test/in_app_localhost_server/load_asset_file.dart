@@ -6,12 +6,13 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 void loadAssetFile(InAppLocalhostServer localhostServer) {
-  final shouldSkip = kIsWeb ||
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('load asset file', (WidgetTester tester) async {
     expect(localhostServer.isRunning(), true);
@@ -30,8 +31,7 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
         ),
       ),
     );
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     final String? currentUrl = (await controller.getUrl())?.toString();
     expect(currentUrl, 'http://localhost:8080/test_assets/index.html');
   }, skip: shouldSkip);

@@ -21,7 +21,8 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     mediaPlaybackRequiresUserGesture: false,
     allowsInlineMediaPlayback: true,
     iframeAllow: "camera; microphone",
-    iframeAllowFullscreen: true
+    iframeAllowFullscreen: true,
+    javaScriptEnabled: false
   );
 
   PullToRefreshController? pullToRefreshController;
@@ -113,10 +114,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  // initialUrlRequest:
-                  //     URLRequest(url: Uri.parse("https://flutter.dev")),
                   initialUrlRequest:
-                  URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                      URLRequest(url: Uri.parse("https://flutter.dev")),
+                  // initialUrlRequest:
+                  // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
@@ -215,6 +216,12 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 child: Icon(Icons.refresh),
                 onPressed: () {
                   webViewController?.reload();
+                },
+              ),
+              ElevatedButton(
+                child: Icon(Icons.refresh),
+                onPressed: () {
+                  webViewController?.evaluateJavascript(source: "document.title='test';");
                 },
               ),
             ],

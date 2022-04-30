@@ -46,6 +46,7 @@ void onTitleChanged() {
 
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
+    await tester.pump();
     await controller.evaluateJavascript(
         source: "document.title = 'title test';");
     await expectLater(onTitleChangedCompleter.future, completes);

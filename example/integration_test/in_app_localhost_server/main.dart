@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'load_asset_file.dart';
 
 void main() {
+  final shouldSkip = kIsWeb;
+
   group('InAppLocalhostServer', () {
     final InAppLocalhostServer localhostServer = InAppLocalhostServer();
 
@@ -16,5 +19,5 @@ void main() {
     tearDownAll(() async {
       await localhostServer.close();
     });
-  });
+  }, skip: shouldSkip);
 }

@@ -3122,7 +3122,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     }
     
     deinit {
-        print("InAppWebView - dealloc")
+        debugPrint("InAppWebView - dealloc")
     }
     
     // https://stackoverflow.com/a/58001395/4637638

@@ -147,11 +147,12 @@ void webHistory() {
       final InAppWebViewController controller =
           await controllerCompleter.future;
 
+      await tester.pump();
+
       var url = await pageLoads.stream.first;
       expect(url, TEST_WEB_PLATFORM_URL_1.toString());
 
-      await controller.loadUrl(
-          urlRequest: URLRequest(url: TEST_WEB_PLATFORM_URL_2));
+      await controller.evaluateJavascript(source: "document.getElementById('link-page-2').click();");
       url = await pageLoads.stream.first;
       expect(url, TEST_WEB_PLATFORM_URL_2.toString());
 

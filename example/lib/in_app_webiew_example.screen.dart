@@ -21,7 +21,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     mediaPlaybackRequiresUserGesture: false,
     allowsInlineMediaPlayback: true,
     iframeAllow: "camera; microphone",
-    iframeAllowFullscreen: true,
+    iframeAllowFullscreen: true
   );
 
   PullToRefreshController? pullToRefreshController;
@@ -113,16 +113,16 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  initialUrlRequest:
-                      URLRequest(url: Uri.parse("https://flutter.dev")),
                   // initialUrlRequest:
-                  // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                  //     URLRequest(url: Uri.parse("https://flutter.dev")),
+                  initialUrlRequest:
+                  URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,
                   // contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
-                  onWebViewCreated: (controller) {
+                  onWebViewCreated: (controller) async {
                     webViewController = controller;
                   },
                   onLoadStart: (controller, url) async {
@@ -167,7 +167,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
-                    print("getContentHeight: " + (await controller.getContentHeight()).toString());
                   },
                   onLoadError: (controller, url, code, message) {
                     pullToRefreshController?.endRefreshing();
@@ -216,12 +215,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 child: Icon(Icons.refresh),
                 onPressed: () {
                   webViewController?.reload();
-                },
-              ),
-              ElevatedButton(
-                child: Icon(Icons.refresh),
-                onPressed: () {
-                  webViewController?.evaluateJavascript(source: "window.open('https://github.com/flutter');");
                 },
               ),
             ],

@@ -43,9 +43,20 @@ class HeadlessInAppWebViewManager {
     var headlessWebView = HeadlessInAppWebViewWebElement(
         id: id, messenger: _messenger, webView: webView);
     WebPlatformManager.webViews.putIfAbsent(id, () => webView);
+    prepare(webView, params);
+    headlessWebView.onWebViewCreated();
+    webView.makeInitialLoad();
+  }
+
+  void prepare(InAppWebViewWebElement webView, Map<String, dynamic> params) {
     webView.iframe.style.display = 'none';
+    Map<String, num>? initialSize = params["initialSize"]?.cast<String, num>();
+    if (initialSize != null) {
+      webView.iframe.style.width = initialSize["width"].toString() + 'px';
+      webView.iframe.style.height = initialSize["height"].toString() + 'px';
+    }
     Map<String, dynamic> initialSettings =
-        params["initialSettings"].cast<String, dynamic>();
+    params["initialSettings"].cast<String, dynamic>();
     if (initialSettings.isEmpty) {
       webView.initialSettings = InAppWebViewSettings();
     } else {
@@ -58,7 +69,5 @@ class HeadlessInAppWebViewManager {
         params["initialData"]?.cast<String, dynamic>());
     document.body?.append(webView.iframe);
     webView.prepare();
-    headlessWebView.onWebViewCreated();
-    webView.makeInitialLoad();
   }
 }

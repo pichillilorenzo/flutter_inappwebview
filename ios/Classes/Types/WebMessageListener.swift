@@ -221,7 +221,7 @@ public class WebMessageListener : FlutterMethodCallDelegate {
     }
     
     deinit {
-        print("WebMessageListener - dealloc")
+        debugPrint("WebMessageListener - dealloc")
         dispose()
     }
 }

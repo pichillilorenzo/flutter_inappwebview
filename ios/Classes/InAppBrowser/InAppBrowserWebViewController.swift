@@ -181,7 +181,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     deinit {
-        print("InAppBrowserWebViewController - dealloc")
+        debugPrint("InAppBrowserWebViewController - dealloc")
         dispose()
     }
     

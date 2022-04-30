@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'dart:html';
 import 'dart:js' as js;
@@ -87,7 +88,7 @@ class InAppWebViewWebElement {
         await stopLoading();
         break;
       case "getSettings":
-        return await settings.toMap();
+        return await getSettings();
       case "setSettings":
         InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(
             call.arguments["settings"].cast<String, dynamic>());
@@ -183,6 +184,7 @@ class InAppWebViewWebElement {
       iframe.removeAttribute("sandbox");
     } else if (sandbox != Sandbox.values) {
       iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+      settings.iframeSandbox = sandbox;
     }
 
     _callMethod("prepare", [js.JsObject.jsify(settings.toMap())]);
@@ -367,6 +369,11 @@ class InAppWebViewWebElement {
     return values.isEmpty ? Set.from(Sandbox.values) : values;
   }
 
+  Size getSize() {
+    var size = _callMethod("getSize") as js.JsObject;
+    return Size(size["width"]!.toDouble(), size["height"]!.toDouble());
+  }
+
   Future<void> setSettings(InAppWebViewSettings newSettings) async {
     Set<Sandbox> sandbox = getSandbox();
 
@@ -405,10 +412,15 @@ class InAppWebViewWebElement {
     } else if (sandbox != Sandbox.values) {
       iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
     }
+    newSettings.iframeSandbox = sandbox;
 
     _callMethod("setSettings", [js.JsObject.jsify(newSettings.toMap())]);
 
     settings = newSettings;
+  }
+
+  Future<Map<String, dynamic>> getSettings() async {
+    return settings.toMap();
   }
 
   void onLoadStart(String url) async {

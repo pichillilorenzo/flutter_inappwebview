@@ -12,6 +12,7 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black">
   <meta name="apple-mobile-web-app-title" content="flutter_inappwebview_example">
   <link rel="apple-touch-icon" href="icons/Icon-192.png">
+  <meta name="theme-color" content="#0175C2">
 
   <!-- Favicon -->
   <link rel="icon" type="image/png" href="favicon.png"/>
@@ -19,11 +20,11 @@
   <title>page</title>
   <link rel="manifest" href="manifest.json">
 </head>
-<body style="min-height: 3000px;min-width: 3000px;">
+<body style="min-height: 3000px; min-width: 3000px;">
   <h1>Simple Page 1</h1>
-  <a href="/page-2.html">Go to page 2</a>
+  <a href="/page-2.html" id="link-page-2">Go to page 2</a>
   <br>
-  <a href="/heavy-page.html">Go to heavy-page</a>
+  <a href="/heavy-page.html" id="link-heavy-page">Go to heavy-page</a>
   <script>
     window.addEventListener('load', function (event) {
       setTimeout(function () {

@@ -173,7 +173,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
     }
     
     deinit {
-        print("FlutterWebViewController - dealloc")
+        debugPrint("FlutterWebViewController - dealloc")
         dispose()
     }
 }

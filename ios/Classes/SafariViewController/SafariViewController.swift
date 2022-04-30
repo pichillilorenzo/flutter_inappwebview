@@ -21,7 +21,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     }
     
     deinit {
-        print("SafariViewController - dealloc")
+        debugPrint("SafariViewController - dealloc")
         dispose()
     }
     

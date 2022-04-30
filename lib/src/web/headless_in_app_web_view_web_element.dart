@@ -32,11 +32,11 @@ class HeadlessInAppWebViewWebElement {
         dispose();
         break;
       case "setSize":
-        Size size = MapSize.fromMap(call.arguments['size'])!;
+        Size size = MapSize.fromMap(call.arguments['size'].cast<String, dynamic>())!;
         setSize(size);
         break;
       case "getSize":
-        return getSize().toMap();
+        return webView?.getSize().toMap();
       default:
         throw PlatformException(
           code: 'Unimplemented',
@@ -53,13 +53,6 @@ class HeadlessInAppWebViewWebElement {
   void setSize(Size size) {
     webView?.iframe.style.width = size.width.toString() + "px";
     webView?.iframe.style.height = size.height.toString() + "px";
-  }
-
-  Size getSize() {
-    var width = webView?.iframe.getBoundingClientRect().width.toDouble() ?? 0.0;
-    var height =
-        webView?.iframe.getBoundingClientRect().height.toDouble() ?? 0.0;
-    return Size(width, height);
   }
 
   void dispose() {

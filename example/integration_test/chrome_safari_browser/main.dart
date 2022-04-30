@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'custom_action_button.dart';
@@ -7,11 +8,13 @@ import 'open_and_close.dart';
 import 'trusted_web_activity.dart';
 
 void main() {
+  final shouldSkip = kIsWeb;
+
   group('ChromeSafariBrowser', () {
     openAndClose();
     customMenuItem();
     customActionButton();
     customTabs();
     trustedWebActivity();
-  });
+  }, skip: shouldSkip);
 }

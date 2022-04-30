@@ -1033,7 +1033,7 @@ class InAppWebViewSettings
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
-  List<Sandbox>? iframeSandbox;
+  Set<Sandbox>? iframeSandbox;
 
   ///A string that reflects the `referrerpolicy` HTML attribute indicating which referrer to use when fetching the linked resource.
   ///
@@ -1324,7 +1324,7 @@ class InAppWebViewSettings
       "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
       "iframeAllow": iframeAllow,
       "iframeAllowFullscreen": iframeAllowFullscreen,
-      "iframeSandbox": iframeSandbox?.map((e) => e.toValue()),
+      "iframeSandbox": iframeSandbox?.map((e) => e.toValue()).toList(),
       "iframeReferrerPolicy": iframeReferrerPolicy,
       "iframeName": iframeName,
       "iframeCsp": iframeCsp,
@@ -1387,8 +1387,10 @@ class InAppWebViewSettings
     if (kIsWeb) {
       settings.iframeAllow = map["iframeAllow"];
       settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
-      settings.iframeSandbox = (map["iframeSandbox"] as List<String?>?)
-          ?.map((e) => Sandbox.fromValue(e)) as List<Sandbox>?;
+      settings.iframeSandbox = map["iframeSandbox"] != null
+          ? Set.from((map["iframeSandbox"].cast<String>() as List<String>)
+              .map((e) => Sandbox.fromValue(e)))
+          : null;
       settings.iframeReferrerPolicy =
           ReferrerPolicy.fromValue(map["iframeReferrerPolicy"]);
       settings.iframeName = map["iframeName"];

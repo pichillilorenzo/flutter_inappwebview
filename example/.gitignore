@@ -71,4 +71,4 @@ build/
 !**/ios/**/default.perspectivev3
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 
-integration_test/.env.dart
+integration_test/env.dart

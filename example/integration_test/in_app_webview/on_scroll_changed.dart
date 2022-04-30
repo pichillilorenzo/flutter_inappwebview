@@ -46,8 +46,9 @@ void onScrollChanged() {
     final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
+    await tester.pump();
+
     controller.scrollTo(x: 0, y: 500);
-    await tester.pumpAndSettle(Duration(seconds: 1));
 
     await expectLater(onScrollChangedCompleter.future, completes);
   }, skip: shouldSkip);

@@ -94,7 +94,7 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
     }
     
     deinit {
-        print("HeadlessInAppWebView - dealloc")
+        debugPrint("HeadlessInAppWebView - dealloc")
         dispose()
     }
 }

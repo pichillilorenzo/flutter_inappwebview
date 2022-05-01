@@ -46,7 +46,6 @@ import com.pichillilorenzo.flutter_inappwebview.in_app_browser.ActivityResultLis
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
-import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 
 import java.io.ByteArrayOutputStream;
@@ -104,10 +103,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
   @Nullable
-  public InAppWebViewInterface inAppWebView;
+  public InAppWebView inAppWebView;
 
   public InAppWebViewChromeClient(@NonNull final InAppWebViewFlutterPlugin plugin, MethodChannel channel,
-                                  @NonNull InAppWebViewInterface inAppWebView, InAppBrowserDelegate inAppBrowserDelegate) {
+                                  @NonNull InAppWebView inAppWebView, InAppBrowserDelegate inAppBrowserDelegate) {
     super();
     this.plugin = plugin;
     this.channel = channel;

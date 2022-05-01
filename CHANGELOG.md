@@ -6,6 +6,8 @@
 - Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS` WebView settings
 - Added support for `onPermissionRequest` event on iOS 15.0+
 - Updated `getMetaThemeColor` on iOS 15.0+
+- Deprecated `onLoadError` for `onReceivedError`. `onReceivedError` will be called also for subframes.
+- Deprecated `onLoadHttpError` for `onReceivedError`. `onReceivedHttpError` will be called also for subframes.
 
 ### BREAKING CHANGES
 

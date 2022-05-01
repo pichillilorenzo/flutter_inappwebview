@@ -63,8 +63,10 @@ class HeadlessInAppWebView implements WebView {
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
-    this.onLoadError,
-    this.onLoadHttpError,
+    @Deprecated("Use onReceivedError instead") this.onLoadError,
+    this.onReceivedError,
+    @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
+    this.onReceivedHttpError,
     this.onProgressChanged,
     this.onConsoleMessage,
     this.shouldOverrideUrlLoading,
@@ -425,13 +427,26 @@ class HeadlessInAppWebView implements WebView {
           InAppWebViewController controller, JsPromptRequest jsPromptRequest)?
       onJsPrompt;
 
+  ///Use [onReceivedError] instead.
+  @Deprecated("Use onReceivedError instead")
   @override
-  void Function(InAppWebViewController controller, Uri? url, int code,
+  final void Function(InAppWebViewController controller, Uri? url, int code,
       String message)? onLoadError;
 
   @override
+  final void Function(InAppWebViewController controller,
+      WebResourceRequest request, WebResourceError error)? onReceivedError;
+
+  ///Use [onReceivedHttpError] instead.
+  @Deprecated("Use onReceivedHttpError instead")
+  @override
   void Function(InAppWebViewController controller, Uri? url, int statusCode,
       String description)? onLoadHttpError;
+
+  final void Function(
+      InAppWebViewController controller,
+      WebResourceRequest request,
+      WebResourceResponse errorResponse)? onReceivedHttpError;
 
   @override
   void Function(InAppWebViewController controller, LoadedResource resource)?

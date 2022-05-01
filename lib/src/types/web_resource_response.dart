@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import '../in_app_webview/webview.dart';
 
-///Class representing a resource response of the WebView used by the event [WebView.shouldInterceptRequest].
+///Class representing a resource response of the [WebView].
 class WebResourceResponse {
   ///The resource response's MIME type, for example `text/html`.
   String contentType;
@@ -32,11 +32,26 @@ class WebResourceResponse {
 
   WebResourceResponse(
       {this.contentType = "",
-        this.contentEncoding = "utf-8",
-        this.data,
-        this.headers,
-        this.statusCode,
-        this.reasonPhrase});
+      this.contentEncoding = "utf-8",
+      this.data,
+      this.headers,
+      this.statusCode,
+      this.reasonPhrase});
+
+  ///Gets a possible [WebResourceResponse] instance from a [Map] value.
+  static WebResourceResponse? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+
+    return WebResourceResponse(
+        contentType: map["contentType"],
+        contentEncoding: map["contentEncoding"],
+        data: map["data"],
+        headers: map["headers"]?.cast<String, String>(),
+        statusCode: map["statusCode"],
+        reasonPhrase: map["reasonPhrase"]);
+  }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {

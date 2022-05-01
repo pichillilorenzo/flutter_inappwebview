@@ -1,6 +1,6 @@
 import '../in_app_webview/webview.dart';
 
-///Class representing a resource request of the WebView used by the event [WebView.shouldInterceptRequest].
+///Class representing a resource request of the [WebView].
 class WebResourceRequest {
   ///The URL for which the resource request was made.
   Uri url;

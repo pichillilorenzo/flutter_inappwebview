@@ -372,27 +372,34 @@ class InAppBrowser {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   void onLoadStop(Uri? url) {}
 
-  ///Event fired when the [InAppBrowser] encounters an error loading an [url].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20int,%20java.lang.String,%20java.lang.String)))
-  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  ///Use [onReceivedError] instead.
+  @Deprecated("Use onReceivedError instead")
   void onLoadError(Uri? url, int code, String message) {}
 
-  ///Event fired when the [InAppBrowser] main page receives an HTTP error.
+  ///Event fired when the [InAppBrowser] encounters an [error] loading a [request].
   ///
-  ///[url] represents the url of the main page that received the HTTP error.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)))
+  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  void onReceivedError(WebResourceRequest request, WebResourceError error) {}
+
+  ///Use [onReceivedHttpError] instead.
+  @Deprecated("Use onReceivedHttpError instead")
+  void onLoadHttpError(Uri? url, int statusCode, String description) {}
+
+  ///Event fired when the [InAppBrowser] receives an HTTP error.
   ///
-  ///[statusCode] represents the status code of the response. HTTP errors have status codes >= 400.
+  ///[request] represents the originating request.
   ///
-  ///[description] represents the description of the HTTP error. On iOS, it is always an empty string.
+  ///[errorResponse] represents the information about the error occurred.
   ///
   ///**NOTE**: available on Android 23+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
-  void onLoadHttpError(Uri? url, int statusCode, String description) {}
+  void onReceivedHttpError(
+      WebResourceRequest request, WebResourceResponse errorResponse) {}
 
   ///Event fired when the current [progress] (range 0-100) of loading a page is changed.
   ///

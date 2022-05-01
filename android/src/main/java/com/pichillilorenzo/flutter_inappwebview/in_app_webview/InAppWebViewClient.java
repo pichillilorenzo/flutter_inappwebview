@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Message;
@@ -37,6 +38,9 @@ import com.pichillilorenzo.flutter_inappwebview.types.ServerTrustChallenge;
 import com.pichillilorenzo.flutter_inappwebview.types.URLCredential;
 import com.pichillilorenzo.flutter_inappwebview.types.URLProtectionSpace;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
+import com.pichillilorenzo.flutter_inappwebview.types.WebResourceErrorExt;
+import com.pichillilorenzo.flutter_inappwebview.types.WebResourceRequestExt;
+import com.pichillilorenzo.flutter_inappwebview.types.WebResourceResponseExt;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -261,30 +265,27 @@ public class InAppWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
   public void onReceivedError(WebView view, @NonNull WebResourceRequest request, @NonNull WebResourceError error) {
-//    final InAppWebView webView = (InAppWebView) view;
-//
-//    if (request.isForMainFrame()) {
-//      if (webView.options.disableDefaultErrorPage) {
-//        webView.stopLoading();
-//        webView.loadUrl("about:blank");
-//      }
-//
-//      webView.isLoading = false;
-//      previousAuthRequestFailureCount = 0;
-//      credentialsProposed = null;
-//
-//      if (inAppBrowserDelegate != null) {
-//        inAppBrowserDelegate.didFailNavigation(request.getUrl().toString(), error.getErrorCode(), error.getDescription().toString());
-//      }
-//    }
-//
-//    Map<String, Object> obj = new HashMap<>();
-//    obj.put("url", request.getUrl().toString());
-//    obj.put("code", error.getErrorCode());
-//    obj.put("message", error.getDescription());
-//    channel.invokeMethod("onLoadError", obj);
+    final InAppWebView webView = (InAppWebView) view;
 
-    super.onReceivedError(view, request, error);
+    if (request.isForMainFrame()) {
+      if (webView.customSettings.disableDefaultErrorPage) {
+        webView.stopLoading();
+        webView.loadUrl("about:blank");
+      }
+
+      webView.isLoading = false;
+      previousAuthRequestFailureCount = 0;
+      credentialsProposed = null;
+
+      if (inAppBrowserDelegate != null) {
+        inAppBrowserDelegate.didFailNavigation(request.getUrl().toString(), error.getErrorCode(), error.getDescription().toString());
+      }
+    }
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("request", WebResourceRequestExt.fromWebResourceRequest(request).toMap());
+    obj.put("error", WebResourceErrorExt.fromWebResourceError(error).toMap());
+    channel.invokeMethod("onReceivedError", obj);
   }
 
   @Override
@@ -304,26 +305,36 @@ public class InAppWebViewClient extends WebViewClient {
       inAppBrowserDelegate.didFailNavigation(failingUrl, errorCode, description);
     }
 
+    WebResourceRequestExt request = new WebResourceRequestExt(
+            Uri.parse(failingUrl),
+            null,
+            false,
+            false,
+            true,
+            "GET");
+
+    WebResourceErrorExt error = new WebResourceErrorExt(
+            errorCode,
+            description
+    );
+
     Map<String, Object> obj = new HashMap<>();
-    obj.put("url", failingUrl);
-    obj.put("code", errorCode);
-    obj.put("message", description);
-    channel.invokeMethod("onLoadError", obj);
+    obj.put("request", request.toMap());
+    obj.put("error",error.toMap());
+    channel.invokeMethod("onReceivedError", obj);
 
     super.onReceivedError(view, errorCode, description, failingUrl);
   }
 
   @RequiresApi(api = Build.VERSION_CODES.M)
   @Override
-  public void onReceivedHttpError (WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
+  public void onReceivedHttpError(WebView view, WebResourceRequest request, WebResourceResponse errorResponse) {
     super.onReceivedHttpError(view, request, errorResponse);
-    if(request.isForMainFrame()) {
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("url", request.getUrl().toString());
-      obj.put("statusCode", errorResponse.getStatusCode());
-      obj.put("description", errorResponse.getReasonPhrase());
-      channel.invokeMethod("onLoadHttpError", obj);
-    }
+
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("request", WebResourceRequestExt.fromWebResourceRequest(request).toMap());
+    obj.put("errorResponse", WebResourceResponseExt.fromWebResourceResponse(errorResponse).toMap());
+    channel.invokeMethod("onReceivedHttpError", obj);
   }
 
   @Override

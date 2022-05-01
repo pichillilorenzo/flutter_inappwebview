@@ -39,8 +39,8 @@ import 'on_console_message.dart';
 import 'on_download_start_request.dart';
 import 'on_find_result_received.dart';
 import 'on_js_before_unload.dart';
-import 'on_load_error.dart';
-import 'on_load_http_error.dart';
+import 'on_received_error.dart';
+import 'on_received_http_error.dart';
 import 'on_load_resource.dart';
 import 'on_load_resource_custom_scheme.dart';
 import 'on_navigation_response.dart';
@@ -99,7 +99,7 @@ void main() {
     getTitle();
     programmaticScroll();
     shouldOverrideUrlLoading();
-    onLoadError();
+    onReceivedError();
     webViewWindows();
     interceptAjaxRequest();
     interceptFetchRequest();
@@ -109,7 +109,7 @@ void main() {
     onFindResultReceived();
     onDownloadStartRequest();
     javascriptDialogs();
-    onLoadHttpError();
+    onReceivedHttpError();
     onLoadResourceCustomScheme();
     onLoadResource();
     onUpdateVisitedHistory();

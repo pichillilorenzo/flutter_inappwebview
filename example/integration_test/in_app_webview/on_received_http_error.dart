@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../constants.dart';
 
-void onLoadHttpError() {
+void onReceivedHttpError() {
   final shouldSkip = kIsWeb
       ? true
       : ![
@@ -16,7 +16,7 @@ void onLoadHttpError() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onLoadHttpError', (WidgetTester tester) async {
+  testWidgets('onReceivedHttpError', (WidgetTester tester) async {
     final Completer<String> errorUrlCompleter = Completer<String>();
     final Completer<int> statusCodeCompleter = Completer<int>();
 
@@ -26,9 +26,9 @@ void onLoadHttpError() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest: URLRequest(url: TEST_URL_404),
-          onLoadHttpError: (controller, url, statusCode, description) async {
-            errorUrlCompleter.complete(url.toString());
-            statusCodeCompleter.complete(statusCode);
+          onReceivedHttpError: (controller, request, errorResponse) async {
+            errorUrlCompleter.complete(request.url.toString());
+            statusCodeCompleter.complete(errorResponse.statusCode);
           },
         ),
       ),

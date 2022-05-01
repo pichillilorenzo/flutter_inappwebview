@@ -106,12 +106,14 @@ class InAppWebViewController {
   _debugLog(String method, dynamic args) {
     if (WebView.debugLogging) {
       String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
-      String message =
-          (_inAppBrowser == null ? "WebView" : "InAppBrowser")
-             + " ID " + viewId + " calling \"" +
-          method.toString() + "\" using " + args.toString();
-      developer.log(message,
-          name: this.runtimeType.toString());
+      String message = (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
+          " ID " +
+          viewId +
+          " calling \"" +
+          method.toString() +
+          "\" using " +
+          args.toString();
+      developer.log(message, name: this.runtimeType.toString());
     }
   }
 
@@ -144,30 +146,69 @@ class InAppWebViewController {
             _inAppBrowser!.onLoadStop(uri);
         }
         break;
-      case "onLoadError":
-        if ((_webview != null && _webview!.onLoadError != null) ||
+      case "onReceivedError":
+        if ((_webview != null &&
+                (_webview!.onReceivedError != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    _webview!.onLoadError != null)) ||
             _inAppBrowser != null) {
-          String? url = call.arguments["url"];
-          int code = call.arguments["code"];
-          String message = call.arguments["message"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
-          if (_webview != null && _webview!.onLoadError != null)
-            _webview!.onLoadError!(this, uri, code, message);
-          else
-            _inAppBrowser!.onLoadError(uri, code, message);
+          WebResourceRequest request = WebResourceRequest.fromMap(
+              call.arguments["request"].cast<String, dynamic>())!;
+          WebResourceError error = WebResourceError.fromMap(
+              call.arguments["error"].cast<String, dynamic>())!;
+          var isForMainFrame = request.isForMainFrame ?? false;
+
+          if (_webview != null) {
+            if (_webview!.onReceivedError != null)
+              _webview!.onReceivedError!(this, request, error);
+            else if (isForMainFrame) {
+              // ignore: deprecated_member_use_from_same_package
+              _webview!.onLoadError!(this, request.url, error.type.toIntValue(),
+                  error.description);
+            }
+          } else {
+            if (isForMainFrame) {
+              _inAppBrowser!
+              // ignore: deprecated_member_use_from_same_package
+                  .onLoadError(
+                  request.url, error.type.toIntValue(), error.description);
+            }
+            _inAppBrowser!.onReceivedError(request, error);
+          }
         }
         break;
-      case "onLoadHttpError":
-        if ((_webview != null && _webview!.onLoadHttpError != null) ||
+      case "onReceivedHttpError":
+        if ((_webview != null &&
+                (_webview!.onReceivedHttpError != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    _webview!.onLoadHttpError != null)) ||
             _inAppBrowser != null) {
-          String? url = call.arguments["url"];
-          int statusCode = call.arguments["statusCode"];
-          String description = call.arguments["description"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
-          if (_webview != null && _webview!.onLoadHttpError != null)
-            _webview!.onLoadHttpError!(this, uri, statusCode, description);
-          else
-            _inAppBrowser!.onLoadHttpError(uri, statusCode, description);
+          WebResourceRequest request = WebResourceRequest.fromMap(
+              call.arguments["request"].cast<String, dynamic>())!;
+          WebResourceResponse errorResponse = WebResourceResponse.fromMap(
+              call.arguments["errorResponse"].cast<String, dynamic>())!;
+          var isForMainFrame = request.isForMainFrame ?? false;
+
+          if (_webview != null) {
+            if (_webview!.onReceivedHttpError != null)
+              _webview!.onReceivedHttpError!(this, request, errorResponse);
+            else if (isForMainFrame) {
+              // ignore: deprecated_member_use_from_same_package
+              _webview!.onLoadHttpError!(
+                  this,
+                  request.url,
+                  errorResponse.statusCode ?? -1,
+                  errorResponse.reasonPhrase ?? '');
+            }
+          } else {
+            if (isForMainFrame) {
+              _inAppBrowser!
+              // ignore: deprecated_member_use_from_same_package
+                  .onLoadHttpError(request.url, errorResponse.statusCode ?? -1,
+                  errorResponse.reasonPhrase ?? '');
+            }
+            _inAppBrowser!.onReceivedHttpError(request, errorResponse);
+          }
         }
         break;
       case "onProgressChanged":
@@ -2200,7 +2241,8 @@ class InAppWebViewController {
     var height = await _channel.invokeMethod('getContentHeight', args);
     if (height == null || height == 0) {
       // try to use javascript
-      var scrollHeight = await evaluateJavascript(source: "document.documentElement.scrollHeight;");
+      var scrollHeight = await evaluateJavascript(
+          source: "document.documentElement.scrollHeight;");
       if (scrollHeight != null && scrollHeight is num) {
         height = scrollHeight.toInt();
       }
@@ -3111,12 +3153,12 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   Future<Uint8List?> createPdf(
       {@Deprecated("Use pdfConfiguration instead")
-      // ignore: deprecated_member_use_from_same_package
-      IOSWKPDFConfiguration? iosWKPdfConfiguration,
-        PDFConfiguration? pdfConfiguration}) async {
+          // ignore: deprecated_member_use_from_same_package
+          IOSWKPDFConfiguration? iosWKPdfConfiguration,
+      PDFConfiguration? pdfConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('pdfConfiguration',
-            () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
+        () => pdfConfiguration?.toMap() ?? iosWKPdfConfiguration?.toMap());
     return await _channel.invokeMethod('createPdf', args);
   }
 
@@ -3332,7 +3374,7 @@ class InAppWebViewController {
   ///- Android native WebView
   ///- iOS
   static Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
-        'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
+      'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
 
   ///Gets the css of the Chromium's t-rex runner game. Used in combination with [tRexRunnerHtml].
   ///

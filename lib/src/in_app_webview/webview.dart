@@ -56,29 +56,39 @@ abstract class WebView {
   ///- Web ([Official API - Window.onload](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event))
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
 
-  ///Event fired when the [WebView] encounters an error loading an [url].
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20int,%20java.lang.String,%20java.lang.String)))
-  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  ///Use [onReceivedError] instead.
+  @Deprecated("Use onReceivedError instead")
   final void Function(InAppWebViewController controller, Uri? url, int code,
       String message)? onLoadError;
 
-  ///Event fired when the [WebView] main page receives an HTTP error.
+  ///Event fired when the [WebView] encounters an [error] loading a [request].
   ///
-  ///[url] represents the url of the main page that received the HTTP error.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)))
+  ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  final void Function(InAppWebViewController controller,
+      WebResourceRequest request, WebResourceError error)? onReceivedError;
+
+  ///Use [onReceivedHttpError] instead.
+  @Deprecated("Use onReceivedHttpError instead")
+  final void Function(InAppWebViewController controller, Uri? url,
+      int statusCode, String description)? onLoadHttpError;
+
+  ///Event fired when the [WebView] receives an HTTP error.
   ///
-  ///[statusCode] represents the status code of the response. HTTP errors have status codes >= 400.
+  ///[request] represents the originating request.
   ///
-  ///[description] represents the description of the HTTP error. On iOS, it is always an empty string.
+  ///[errorResponse] represents the information about the error occurred.
   ///
   ///**NOTE**: available on Android 23+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
-  final void Function(InAppWebViewController controller, Uri? url,
-      int statusCode, String description)? onLoadHttpError;
+  final void Function(
+      InAppWebViewController controller,
+      WebResourceRequest request,
+      WebResourceResponse errorResponse)? onReceivedHttpError;
 
   ///Event fired when the current [progress] of loading a page is changed.
   ///
@@ -914,8 +924,11 @@ abstract class WebView {
       this.onWebViewCreated,
       this.onLoadStart,
       this.onLoadStop,
-      this.onLoadError,
-      this.onLoadHttpError,
+      @Deprecated('Use onReceivedError instead')
+          this.onLoadError,
+      this.onReceivedError,
+      @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
+      this.onReceivedHttpError,
       this.onProgressChanged,
       this.onConsoleMessage,
       this.shouldOverrideUrlLoading,

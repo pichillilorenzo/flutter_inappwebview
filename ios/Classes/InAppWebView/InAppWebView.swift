@@ -1684,10 +1684,17 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     public func webView(_ webView: WKWebView,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
-        if navigationResponse.isForMainFrame, let response = navigationResponse.response as? HTTPURLResponse {
-            if response.statusCode >= 400 {
-                onLoadHttpError(url: response.url?.absoluteString, statusCode: response.statusCode, description: "")
-            }
+        if let response = navigationResponse.response as? HTTPURLResponse, response.statusCode >= 400 {
+            let request = WebResourceRequest(url: response.url ?? URL(string: "about:blank")!,
+                                                        headers: response.allHeaderFields,
+                                                        isForMainFrame: navigationResponse.isForMainFrame)
+            let errorResponse = WebResourceResponse(contentType: response.mimeType ?? "",
+                                                          contentEncoding: response.textEncodingName ?? "",
+                                                          data: nil,
+                                                          headers: response.allHeaderFields,
+                                                          statusCode: response.statusCode,
+                                                          reasonPhrase: nil)
+            onReceivedHttpError(request: request, errorResponse: errorResponse)
         }
         
         let useOnNavigationResponse = settings?.useOnNavigationResponse
@@ -1793,17 +1800,31 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     public func webView(_ webView: WKWebView, didFail navigation: WKNavigation!, withError error: Error) {
         InAppWebView.credentialsProposed = []
         
-        var urlError = url?.absoluteString
-        if let info = error._userInfo as? [String: Any] {
-            if let failingUrl = info[NSURLErrorFailingURLErrorKey] as? URL {
-                urlError = failingUrl.absoluteString
+        var urlError: URL = url ?? URL(string: "about:blank")!
+        var errorCode = error._code
+        var errorDescription = error.localizedDescription
+        
+        if let info = error as? URLError {
+            if let failingURL = info.failingURL {
+                urlError = failingURL
             }
-            if let failingUrlString = info[NSURLErrorFailingURLStringErrorKey] as? String {
-                urlError = failingUrlString
+            errorCode = info.code.rawValue
+            errorDescription = info.localizedDescription
+        }
+        else if let info = error._userInfo as? [String: Any] {
+            if let failingUrl = info[NSURLErrorFailingURLErrorKey] as? URL {
+                urlError = failingUrl
+            }
+            if let failingUrlString = info[NSURLErrorFailingURLStringErrorKey] as? String,
+               let failingUrl = URL(string: failingUrlString) {
+                urlError = failingUrl
             }
         }
         
-        onLoadError(url: urlError, error: error)
+        let webResourceRequest = WebResourceRequest(url: urlError, headers: nil)
+        let webResourceError = WebResourceError(errorCode: errorCode, errorDescription: errorDescription)
+        
+        onReceivedError(request: webResourceRequest, error: webResourceError)
         
         inAppBrowserDelegate?.didFailNavigation(url: url, error: error)
     }
@@ -2514,14 +2535,20 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         channel?.invokeMethod("onLoadStop", arguments: arguments)
     }
     
-    public func onLoadError(url: String?, error: Error) {
-        let arguments: [String: Any?] = ["url": url, "code": error._code, "message": error.localizedDescription]
-        channel?.invokeMethod("onLoadError", arguments: arguments)
+    public func onReceivedError(request: WebResourceRequest, error: WebResourceError) {
+        let arguments: [String: Any?] = [
+            "request": request.toMap(),
+            "error": error.toMap()
+        ]
+        channel?.invokeMethod("onReceivedError", arguments: arguments)
     }
     
-    public func onLoadHttpError(url: String?, statusCode: Int, description: String) {
-        let arguments: [String: Any?] = ["url": url, "statusCode": statusCode, "description": description]
-        channel?.invokeMethod("onLoadHttpError", arguments: arguments)
+    public func onReceivedHttpError(request: WebResourceRequest, errorResponse: WebResourceResponse) {
+        let arguments: [String: Any?] = [
+            "request": request.toMap(),
+            "errorResponse": errorResponse.toMap()
+        ]
+        channel?.invokeMethod("onReceivedHttpError", arguments: arguments)
     }
     
     public func onProgressChanged(progress: Int) {

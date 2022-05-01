@@ -54,8 +54,10 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onWebViewCreated,
     this.onLoadStart,
     this.onLoadStop,
-    this.onLoadError,
-    this.onLoadHttpError,
+    @Deprecated("Use onReceivedError instead") this.onLoadError,
+    this.onReceivedError,
+    @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
+    this.onReceivedHttpError,
     this.onConsoleMessage,
     this.onProgressChanged,
     this.shouldOverrideUrlLoading,
@@ -305,13 +307,27 @@ class InAppWebView extends StatefulWidget implements WebView {
           InAppWebViewController controller, JsPromptRequest jsPromptRequest)?
       onJsPrompt;
 
+  ///Use [onReceivedError] instead.
+  @Deprecated("Use onReceivedError instead")
   @override
   final void Function(InAppWebViewController controller, Uri? url, int code,
       String message)? onLoadError;
 
   @override
+  final void Function(InAppWebViewController controller,
+      WebResourceRequest request, WebResourceError error)? onReceivedError;
+
+  ///Use [onReceivedHttpError] instead.
+  @Deprecated("Use onReceivedHttpError instead")
+  @override
   final void Function(InAppWebViewController controller, Uri? url,
       int statusCode, String description)? onLoadHttpError;
+
+  @override
+  final void Function(
+      InAppWebViewController controller,
+      WebResourceRequest request,
+      WebResourceResponse errorResponse)? onReceivedHttpError;
 
   @override
   final void Function(

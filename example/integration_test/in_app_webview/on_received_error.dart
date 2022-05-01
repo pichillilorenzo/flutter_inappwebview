@@ -7,7 +7,7 @@ import 'package:flutter_test/flutter_test.dart';
 
 import '../constants.dart';
 
-void onLoadError() {
+void onReceivedError() {
   final shouldSkip = kIsWeb
       ? true
       : ![
@@ -16,10 +16,10 @@ void onLoadError() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  group('onLoadError', () {
+  group('onReceivedError', () {
     testWidgets('invalid url', (WidgetTester tester) async {
       final Completer<String> errorUrlCompleter = Completer<String>();
-      final Completer<int> errorCodeCompleter = Completer<int>();
+      final Completer<WebResourceErrorType> errorCodeCompleter = Completer<WebResourceErrorType>();
 
       await tester.pumpWidget(
         Directionality(
@@ -27,31 +27,45 @@ void onLoadError() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(url: TEST_NOT_A_WEBSITE_URL),
-            onLoadError: (controller, url, code, message) {
-              errorUrlCompleter.complete(url.toString());
-              errorCodeCompleter.complete(code);
+            onReceivedError: (controller, request, error) {
+              errorUrlCompleter.complete(request.url.toString());
+              errorCodeCompleter.complete(error.type);
             },
           ),
         ),
       );
 
       final String url = await errorUrlCompleter.future;
-      final int code = await errorCodeCompleter.future;
+      final WebResourceErrorType errorType = await errorCodeCompleter.future;
 
-      if (defaultTargetPlatform == TargetPlatform.android) {
-        expect(code, -2);
-      } else if (defaultTargetPlatform == TargetPlatform.iOS ||
-          defaultTargetPlatform == TargetPlatform.macOS) {
-        expect(code, -1003);
-      }
+      expect(errorType, WebResourceErrorType.HOST_LOOKUP);
       expect(url, TEST_NOT_A_WEBSITE_URL.toString());
+    });
+
+    testWidgets('file not found', (WidgetTester tester) async {
+      final Completer<WebResourceErrorType> errorCodeCompleter = Completer<WebResourceErrorType>();
+
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrlRequest: URLRequest(url: Uri.parse('file:flutter.dev')),
+            onReceivedError: (controller, request, error) {
+              errorCodeCompleter.complete(error.type);
+            },
+          ),
+        ),
+      );
+
+      final WebResourceErrorType errorType = await errorCodeCompleter.future;
+
+      expect(errorType, WebResourceErrorType.FILE_NOT_FOUND);
     });
 
     testWidgets('event is not called with valid url',
         (WidgetTester tester) async {
-      final Completer<String> errorUrlCompleter = Completer<String>();
-      final Completer<int> errorCodeCompleter = Completer<int>();
-      final Completer<String> errorMessageCompleter = Completer<String>();
+      final Completer<void> onReceivedErrorCompleter = Completer<void>();
 
       await tester.pumpWidget(
         Directionality(
@@ -61,18 +75,14 @@ void onLoadError() {
             initialUrlRequest: URLRequest(
                 url: Uri.parse(
                     'data:text/html;charset=utf-8;base64,PCFET0NUWVBFIGh0bWw+')),
-            onLoadError: (controller, url, code, message) {
-              errorUrlCompleter.complete(url.toString());
-              errorCodeCompleter.complete(code);
-              errorMessageCompleter.complete(message);
+            onReceivedError: (controller, request, error) {
+              onReceivedErrorCompleter.complete();
             },
           ),
         ),
       );
 
-      expect(errorUrlCompleter.future, doesNotComplete);
-      expect(errorCodeCompleter.future, doesNotComplete);
-      expect(errorMessageCompleter.future, doesNotComplete);
+      expect(onReceivedErrorCompleter.future, doesNotComplete);
     });
   }, skip: shouldSkip);
 }

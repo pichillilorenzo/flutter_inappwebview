@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.Inet6Address;
@@ -320,5 +321,44 @@ public class Util {
 
   public static Object getOrDefault(Map map, String key, Object defaultValue) {
     return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
+
+  @Nullable
+  public static byte[] readAllBytes(@Nullable InputStream inputStream) {
+    if (inputStream == null) {
+      return null;
+    }
+
+    final int bufLen = 4 * 0x400; // 4KB
+    byte[] buf = new byte[bufLen];
+    int readLen;
+    IOException exception = null;
+    ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+    byte[] data = null;
+
+    try {
+      while ((readLen = inputStream.read(buf, 0, bufLen)) != -1)
+        outputStream.write(buf, 0, readLen);
+
+      data = outputStream.toByteArray();
+    } catch (IOException e) {
+      exception = e;
+    } finally {
+      try {
+        inputStream.close();
+      } catch (IOException e) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && exception != null) {
+          exception.addSuppressed(e);
+        }
+      }
+      try {
+        outputStream.close();
+      } catch (IOException e) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT && exception != null) {
+          exception.addSuppressed(e);
+        }
+      }
+    }
+    return data;
   }
 }

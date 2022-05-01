@@ -29,7 +29,7 @@ class PermissionRequest {
     List<PermissionResourceType> resources = [];
     if (map["resources"] != null) {
       (map["resources"].cast<dynamic>() as List<dynamic>).forEach((element) {
-        var resource = PermissionResourceType.fromValue(element);
+        var resource = PermissionResourceType.fromNativeValue(element);
         if (resource != null) {
           resources.add(resource);
         }

@@ -24,7 +24,7 @@ class SslError {
         this.message}) {
     this.code = this.code ??
         // ignore: deprecated_member_use_from_same_package
-        SslErrorType.fromValue(this.androidError?.toValue() ??
+        SslErrorType.fromNativeValue(this.androidError?.toValue() ??
             // ignore: deprecated_member_use_from_same_package
             this.iosError?.toValue());
   }
@@ -39,7 +39,7 @@ class SslError {
         androidError: AndroidSslError.fromValue(map["code"]),
         // ignore: deprecated_member_use_from_same_package
         iosError: IOSSslError.fromValue(map["code"]),
-        code: SslErrorType.fromValue(map["code"]),
+        code: SslErrorType.fromNativeValue(map["code"]),
         message: map["message"]);
   }
 

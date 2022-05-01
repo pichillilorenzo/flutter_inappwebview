@@ -17,7 +17,7 @@ class WebResourceError {
     }
 
     return WebResourceError(
-        type: WebResourceErrorType.fromIntValue(map["errorCode"])!,
+        type: WebResourceErrorType.fromNativeValue(map["errorCode"])!,
         description: map["description"]
     );
   }

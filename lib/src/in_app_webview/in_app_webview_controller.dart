@@ -163,7 +163,7 @@ class InAppWebViewController {
               _webview!.onReceivedError!(this, request, error);
             else if (isForMainFrame) {
               // ignore: deprecated_member_use_from_same_package
-              _webview!.onLoadError!(this, request.url, error.type.toIntValue(),
+              _webview!.onLoadError!(this, request.url, error.type.toNativeValue(),
                   error.description);
             }
           } else {
@@ -171,7 +171,7 @@ class InAppWebViewController {
               _inAppBrowser!
               // ignore: deprecated_member_use_from_same_package
                   .onLoadError(
-                  request.url, error.type.toIntValue(), error.description);
+                  request.url, error.type.toNativeValue(), error.description);
             }
             _inAppBrowser!.onReceivedError(request, error);
           }

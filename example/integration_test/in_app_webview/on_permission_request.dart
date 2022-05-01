@@ -17,12 +17,7 @@ void onPermissionRequest() {
         ].contains(defaultTargetPlatform);
 
   var expectedValue = [];
-  if (defaultTargetPlatform == TargetPlatform.android) {
-    expectedValue = [PermissionResourceType.RESOURCE_VIDEO_CAPTURE];
-  } else if (defaultTargetPlatform == TargetPlatform.iOS ||
-      defaultTargetPlatform == TargetPlatform.macOS) {
-    expectedValue = [PermissionResourceType.CAMERA];
-  }
+  expectedValue = [PermissionResourceType.CAMERA];
 
   testWidgets('onPermissionRequest', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();

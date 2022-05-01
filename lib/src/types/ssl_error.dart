@@ -47,11 +47,11 @@ class SslError {
   Map<String, dynamic> toMap() {
     return {
       // ignore: deprecated_member_use_from_same_package
-      "androidError": code?.toValue() ?? androidError?.toValue(),
+      "androidError": code?.toNativeValue() ?? androidError?.toValue(),
       // ignore: deprecated_member_use_from_same_package
-      "iosError": code?.toValue() ?? iosError?.toValue(),
+      "iosError": code?.toNativeValue() ?? iosError?.toValue(),
       // ignore: deprecated_member_use_from_same_package
-      "code": code?.toValue() ?? androidError?.toValue() ?? iosError?.toValue(),
+      "code": code?.toNativeValue() ?? androidError?.toValue() ?? iosError?.toValue(),
       "message": message,
     };
   }

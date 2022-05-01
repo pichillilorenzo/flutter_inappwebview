@@ -144,3 +144,4 @@ export 'webview_render_process_action.dart';
 export 'window_features.dart';
 export 'web_resource_error.dart';
 export 'web_resource_error_type.dart';
+export 'media_capture_state.dart';

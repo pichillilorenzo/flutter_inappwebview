@@ -18,7 +18,7 @@ class PermissionResponse {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "resources": resources.map((e) => e.toValue()).toList(),
+      "resources": resources.map((e) => e.toNativeValue()).toList(),
       "action": action?.toValue()
     };
   }

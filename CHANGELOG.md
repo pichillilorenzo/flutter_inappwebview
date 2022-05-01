@@ -2,7 +2,7 @@
 
 - Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.
 - Added Web support
-- Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen` WebView controller methods
+- Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState` WebView controller methods
 - Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS` WebView settings
 - Added support for `onPermissionRequest` event on iOS 15.0+
 - Updated `getMetaThemeColor` on iOS 15.0+

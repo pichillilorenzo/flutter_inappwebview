@@ -46,7 +46,7 @@ class PermissionRequest {
   Map<String, dynamic> toMap() {
     return {
       "origin": origin.toString(),
-      "resources": resources.map((e) => e.toValue()).toList(),
+      "resources": resources.map((e) => e.toNativeValue()).toList(),
       "frame": frame?.toMap()
     };
   }

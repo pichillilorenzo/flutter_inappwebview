@@ -3244,6 +3244,56 @@ class InAppWebViewController {
     return await _channel.invokeMethod('isInFullscreen', args);
   }
 
+  ///Returns a [MediaCaptureState] that indicates whether the webpage is using the camera to capture images or video.
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate)).
+  Future<MediaCaptureState?> getCameraCaptureState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return MediaCaptureState.fromValue(
+        await _channel.invokeMethod('getCameraCaptureState', args));
+  }
+
+  ///Changes whether the webpage is using the camera to capture images or video.
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate)).
+  Future<void> setCameraCaptureState(
+      {required MediaCaptureState state}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state.toValue());
+    await _channel.invokeMethod('setCameraCaptureState', args);
+  }
+
+  ///Returns a [MediaCaptureState] that indicates whether the webpage is using the microphone to capture audio.
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate)).
+  Future<MediaCaptureState?> getMicrophoneCaptureState() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return MediaCaptureState.fromValue(
+        await _channel.invokeMethod('getMicrophoneCaptureState', args));
+  }
+
+  ///Changes whether the webpage is using the microphone to capture audio.
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.setMicrophoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763098-setmicrophonecapturestate)).
+  Future<void> setMicrophoneCaptureState(
+      {required MediaCaptureState state}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('state', () => state.toValue());
+    await _channel.invokeMethod('setMicrophoneCaptureState', args);
+  }
+
   ///Returns the iframe `id` attribute used on the Web platform.
   ///
   ///**Supported Platforms/Implementations**:

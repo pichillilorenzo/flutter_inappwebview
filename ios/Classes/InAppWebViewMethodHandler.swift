@@ -603,6 +603,40 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(false)
                 }
                 break
+            case "getCameraCaptureState":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    result(webView.cameraCaptureState.rawValue)
+                } else {
+                    result(nil)
+                }
+                break
+            case "setCameraCaptureState":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    let state = WKMediaCaptureState.init(rawValue: arguments!["state"] as! Int) ?? WKMediaCaptureState.none
+                    webView.setCameraCaptureState(state) {
+                        result(true)
+                    }
+                } else {
+                    result(false)
+                }
+                break
+            case "getMicrophoneCaptureState":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    result(webView.microphoneCaptureState.rawValue)
+                } else {
+                    result(nil)
+                }
+                break
+            case "setMicrophoneCaptureState":
+                if let webView = webView, #available(iOS 15.0, *) {
+                    let state = WKMediaCaptureState.init(rawValue: arguments!["state"] as! Int) ?? WKMediaCaptureState.none
+                    webView.setMicrophoneCaptureState(state) {
+                        result(true)
+                    }
+                } else {
+                    result(false)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

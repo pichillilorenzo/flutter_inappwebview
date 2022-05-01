@@ -592,6 +592,17 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(nil)
                 }
                 break
+            case "isInFullscreen":
+//                if let webView = webView, #available(iOS 15.0, *) {
+//                    result(webView.fullscreenState == .inFullscreen)
+//                }
+                if let webView = webView {
+                    result(webView.inFullscreen)
+                }
+                else {
+                    result(false)
+                }
+                break
             default:
                 result(FlutterMethodNotImplemented)
                 break

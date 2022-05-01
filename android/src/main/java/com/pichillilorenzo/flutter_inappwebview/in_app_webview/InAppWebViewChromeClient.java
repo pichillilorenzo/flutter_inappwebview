@@ -34,6 +34,7 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AlertDialog;
@@ -45,6 +46,7 @@ import com.pichillilorenzo.flutter_inappwebview.in_app_browser.ActivityResultLis
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 
 import java.io.ByteArrayOutputStream;
@@ -101,11 +103,15 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private int mOriginalSystemUiVisibility;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
+  @Nullable
+  public InAppWebViewInterface inAppWebView;
 
-  public InAppWebViewChromeClient(final InAppWebViewFlutterPlugin plugin, MethodChannel channel, InAppBrowserDelegate inAppBrowserDelegate) {
+  public InAppWebViewChromeClient(@NonNull final InAppWebViewFlutterPlugin plugin, MethodChannel channel,
+                                  @NonNull InAppWebViewInterface inAppWebView, InAppBrowserDelegate inAppBrowserDelegate) {
     super();
     this.plugin = plugin;
     this.channel = channel;
+    this.inAppWebView = inAppWebView;
     this.inAppBrowserDelegate = inAppBrowserDelegate;
     if (this.inAppBrowserDelegate != null) {
       this.inAppBrowserDelegate.getActivityResultListeners().add(this);
@@ -142,6 +148,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     Map<String, Object> obj = new HashMap<>();
     channel.invokeMethod("onExitFullscreen", obj);
+
+    if (inAppWebView != null) {
+      inAppWebView.setInFullscreen(false);
+    }
   }
 
   @Override
@@ -173,9 +183,13 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
     activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     ((FrameLayout) decorView).addView(this.mCustomView, FULLSCREEN_LAYOUT_PARAMS);
-
+    
     Map<String, Object> obj = new HashMap<>();
     channel.invokeMethod("onEnterFullscreen", obj);
+    
+    if (inAppWebView != null) {
+      inAppWebView.setInFullscreen(true);
+    }
   }
 
   @Override
@@ -1221,5 +1235,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       inAppBrowserDelegate = null;
     }
     plugin = null;
+    inAppWebView = null;
   }
 }

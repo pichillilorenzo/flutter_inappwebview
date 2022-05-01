@@ -598,6 +598,13 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           result.success(false);
         }
         break;
+      case "isInFullscreen":
+        if (webView != null) {
+          result.success(webView.isInFullscreen());
+        } else {
+          result.success(false);
+        }
+        break;
       default:
         result.notImplemented();
     }

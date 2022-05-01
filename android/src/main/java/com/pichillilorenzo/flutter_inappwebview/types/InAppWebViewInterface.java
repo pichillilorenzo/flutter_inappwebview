@@ -100,4 +100,6 @@ public interface InAppWebViewInterface {
   void disposeWebMessageChannels();
   void disposeWebMessageListeners();
   Looper getWebViewLooper();
+  boolean isInFullscreen();
+  void setInFullscreen(boolean inFullscreen);
 }

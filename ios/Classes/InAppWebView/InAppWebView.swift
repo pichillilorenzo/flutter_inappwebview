@@ -23,6 +23,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
     var currentOriginalUrl: URL?
+    var inFullscreen = false
     
     static var sslCertificatesMap: [String: SslCertificate] = [:] // [URL host name : SslCertificate]
     static var credentialsProposed: [URLCredential] = []
@@ -320,17 +321,24 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         name: UIMenuController.didHideMenuNotification,
                         object: nil)
         
-        // listen for videos playing in fullscreen
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onEnterFullscreen(_:)),
-                                               name: UIWindow.didBecomeVisibleNotification,
-                                               object: window)
+//        if #available(iOS 15.0, *) {
+//            addObserver(self,
+//                        forKeyPath: #keyPath(WKWebView.fullscreenState),
+//                        options: .new,
+//                context: nil)
+//        } else {
+            // listen for videos playing in fullscreen
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(onEnterFullscreen(_:)),
+                                                   name: UIWindow.didBecomeVisibleNotification,
+                                                   object: window)
 
-        // listen for videos stopping to play in fullscreen
-        NotificationCenter.default.addObserver(self,
-                                               selector: #selector(onExitFullscreen(_:)),
-                                               name: UIWindow.didBecomeHiddenNotification,
-                                               object: window)
+            // listen for videos stopping to play in fullscreen
+            NotificationCenter.default.addObserver(self,
+                                                   selector: #selector(onExitFullscreen(_:)),
+                                                   name: UIWindow.didBecomeHiddenNotification,
+                                                   object: window)
+//        }
         
         if let settings = settings {
             if settings.transparentBackground {
@@ -639,6 +647,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
             }
         }
+//        else if #available(iOS 15.0, *) {
+//            if keyPath == #keyPath(WKWebView.fullscreenState) {
+//                if fullscreenState == .enteringFullscreen {
+//                    onEnterFullscreen()
+//                } else if fullscreenState == .exitingFullscreen {
+//                    onExitFullscreen()
+//                }
+//            }
+//        }
         replaceGestureHandlerIfNeeded()
     }
     
@@ -2676,7 +2693,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     public func isVideoPlayerWindow(_ notificationObject: AnyObject?) -> Bool {
         let nonVideoClasses = ["_UIAlertControllerShimPresenterWindow",
                                "UITextEffectsWindow",
-                               "UIRemoteKeyboardWindow"]
+                               "UIRemoteKeyboardWindow",
+                               "PGHostedWindow"]
+        
         var isVideo = true
         if let obj = notificationObject {
             for nonVideoClass in nonVideoClasses {
@@ -2690,14 +2709,24 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     
     @objc func onEnterFullscreen(_ notification: Notification) {
         if (isVideoPlayerWindow(notification.object as AnyObject?)) {
-            channel?.invokeMethod("onEnterFullscreen", arguments: [])
+            onEnterFullscreen()
+            inFullscreen = true
         }
+    }
+    
+    public func onEnterFullscreen() {
+        channel?.invokeMethod("onEnterFullscreen", arguments: [])
     }
     
     @objc func onExitFullscreen(_ notification: Notification) {
         if (isVideoPlayerWindow(notification.object as AnyObject?)) {
-            channel?.invokeMethod("onExitFullscreen", arguments: [])
+            onExitFullscreen()
+            inFullscreen = false
         }
+    }
+    
+    public func onExitFullscreen() {
+        channel?.invokeMethod("onExitFullscreen", arguments: [])
     }
     
 //    public func onContextMenuConfigurationForElement(linkURL: String?, result: FlutterResult?) {
@@ -3074,6 +3103,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
+//        if #available(iOS 15.0, *) {
+//            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
+//        }
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
         resumeTimers()

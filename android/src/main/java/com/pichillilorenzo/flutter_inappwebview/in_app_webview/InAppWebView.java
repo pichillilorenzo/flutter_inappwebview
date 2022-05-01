@@ -121,6 +121,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public JavaScriptBridgeInterface javaScriptBridgeInterface;
   public InAppWebViewSettings customSettings;
   public boolean isLoading = false;
+  private boolean inFullscreen = false;
   public OkHttpClient httpClient;
   public float zoomScale = 1.0f;
   int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
@@ -187,7 +188,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
     addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
 
-    inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, channel, inAppBrowserDelegate);
+    inAppWebViewChromeClient = new InAppWebViewChromeClient(plugin, channel, this, inAppBrowserDelegate);
     setWebChromeClient(inAppWebViewChromeClient);
 
     inAppWebViewClient = new InAppWebViewClient(channel, inAppBrowserDelegate);
@@ -1689,6 +1690,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       return super.getWebViewLooper();
     }
     return Looper.getMainLooper();
+  }
+
+  @Override
+  public boolean isInFullscreen() {
+    return inFullscreen;
+  }
+
+  @Override
+  public void setInFullscreen(boolean inFullscreen) {
+    this.inFullscreen = inFullscreen;
   }
 
   @Override

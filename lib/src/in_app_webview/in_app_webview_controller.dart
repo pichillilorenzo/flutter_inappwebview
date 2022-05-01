@@ -3192,6 +3192,16 @@ class InAppWebViewController {
         await _channel.invokeMethod('requestMediaPlaybackState', args));
   }
 
+  ///Returns `true` if the [WebView] is in fullscreen mode, otherwise `false`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  Future<bool> isInFullscreen() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('isInFullscreen', args);
+  }
+
   ///Returns the iframe `id` attribute used on the Web platform.
   ///
   ///**Supported Platforms/Implementations**:

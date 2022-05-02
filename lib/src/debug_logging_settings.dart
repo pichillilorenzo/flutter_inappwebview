@@ -2,8 +2,8 @@ import 'package:flutter/foundation.dart';
 import 'in_app_webview/webview.dart';
 import 'chrome_safari_browser/chrome_safari_browser.dart';
 
-///Class that represents the debug settings used by [WebView] and [ChromeSafariBrowser].
-class DebugSettings {
+///Class that represents the debug logging settings used by [WebView] and [ChromeSafariBrowser].
+class DebugLoggingSettings {
   ///Enables debug logging info.
   ///
   ///The default value is the same value of [kDebugMode],
@@ -20,7 +20,7 @@ class DebugSettings {
   ///The default value is `-1`.
   int maxLogMessageLength;
 
-  DebugSettings({
+  DebugLoggingSettings({
     this.enabled = kDebugMode,
     this.excludeFilter = const [],
     this.maxLogMessageLength = -1

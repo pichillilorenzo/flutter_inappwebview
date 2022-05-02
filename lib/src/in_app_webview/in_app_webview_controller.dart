@@ -104,11 +104,11 @@ class InAppWebViewController {
   }
 
   _debugLog(String method, dynamic args) {
-    if (WebView.debugSettings.enabled) {
-      for (var regExp in WebView.debugSettings.excludeFilter) {
+    if (WebView.debugLoggingSettings.enabled) {
+      for (var regExp in WebView.debugLoggingSettings.excludeFilter) {
         if (regExp.hasMatch(method)) return;
       }
-      var maxLogMessageLength = WebView.debugSettings.maxLogMessageLength;
+      var maxLogMessageLength = WebView.debugLoggingSettings.maxLogMessageLength;
       String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
       String message = (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
           " ID " +
@@ -125,7 +125,7 @@ class InAppWebViewController {
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
-    if (WebView.debugSettings.enabled && call.method != "onCallJsHandler") {
+    if (WebView.debugLoggingSettings.enabled && call.method != "onCallJsHandler") {
       _debugLog(call.method, call.arguments);
     }
 

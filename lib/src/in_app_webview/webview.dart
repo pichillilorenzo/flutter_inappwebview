@@ -10,16 +10,14 @@ import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import 'headless_in_app_webview.dart';
 
-import '../debug_settings.dart';
+import '../debug_logging_settings.dart';
 
 ///Abstract class that represents a WebView. Used by [InAppWebView], [HeadlessInAppWebView] and the WebView of [InAppBrowser].
 abstract class WebView {
   ///Debug settings used by [InAppWebView], [HeadlessInAppWebView] and [InAppBrowser].
   ///The default value excludes the [WebView.onScrollChanged] and [WebView.onOverScrolled] events.
-  static DebugSettings debugSettings = DebugSettings(excludeFilter: [
-    RegExp(r"onScrollChanged"),
-    RegExp(r"onOverScrolled")
-  ]);
+  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
+      excludeFilter: [RegExp(r"onScrollChanged"), RegExp(r"onOverScrolled")]);
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;

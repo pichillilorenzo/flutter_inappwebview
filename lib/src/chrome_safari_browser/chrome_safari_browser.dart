@@ -6,7 +6,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../util.dart';
-import '../debug_settings.dart';
+import '../debug_logging_settings.dart';
 
 import 'chrome_safari_browser_settings.dart';
 
@@ -46,7 +46,7 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///- iOS
 class ChromeSafariBrowser {
   ///Debug settings.
-  static DebugSettings debugSettings = DebugSettings();
+  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
   ///View ID used internally.
   late final String id;
@@ -67,12 +67,13 @@ class ChromeSafariBrowser {
   }
 
   _debugLog(String method, dynamic args) {
-    if (ChromeSafariBrowser.debugSettings.enabled) {
-      for (var regExp in ChromeSafariBrowser.debugSettings.excludeFilter) {
+    if (ChromeSafariBrowser.debugLoggingSettings.enabled) {
+      for (var regExp
+          in ChromeSafariBrowser.debugLoggingSettings.excludeFilter) {
         if (regExp.hasMatch(method)) return;
       }
       var maxLogMessageLength =
-          ChromeSafariBrowser.debugSettings.maxLogMessageLength;
+          ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength;
       String message = "ChromeSafariBrowser ID " +
           id +
           " calling \"" +

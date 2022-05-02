@@ -14,4 +14,4 @@ export 'http_auth_credentials_database.dart';
 export 'context_menu.dart';
 export 'pull_to_refresh/main.dart';
 export 'web_message/main.dart';
-export 'debug_settings.dart';
+export 'debug_logging_settings.dart';

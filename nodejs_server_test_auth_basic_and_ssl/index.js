@@ -22,7 +22,7 @@ var options = {
   rejectUnauthorized: false
 };
 
-appHttps.use('/', proxy('www.google.com'));
+//appHttps.use('/', proxy('www.google.com'));
 appHttps.get('/', (req, res) => {
   console.log(JSON.stringify(req.headers))
 	const cert = req.connection.getPeerCertificate()
@@ -201,6 +201,6 @@ app.get("/test-download-file", (req, res) => {
 
 app.listen(8082)
 
-appProxy.use(cors());
-appProxy.use('/', proxy('www.google.com'));
-appProxy.listen(8083);
+//appProxy.use(cors());
+//appProxy.use('/', proxy('www.google.com'));
+//appProxy.listen(8083);

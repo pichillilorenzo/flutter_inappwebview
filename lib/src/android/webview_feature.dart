@@ -2,6 +2,9 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
+import 'proxy_controller.dart';
+import 'service_worker_controller.dart';
+import '../web_message/main.dart';
 
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
 class WebViewFeature {
@@ -83,7 +86,7 @@ class WebViewFeature {
   ///This feature covers [InAppWebViewSettings.forceDark].
   static const FORCE_DARK = const WebViewFeature._internal("FORCE_DARK");
 
-  ///
+  ///This feature covers [InAppWebViewSettings.forceDarkStrategy].
   static const FORCE_DARK_STRATEGY =
       const WebViewFeature._internal("FORCE_DARK_STRATEGY");
 
@@ -102,15 +105,15 @@ class WebViewFeature {
   ///
   static const MULTI_PROCESS = const WebViewFeature._internal("MULTI_PROCESS");
 
-  ///
+  ///This feature covers [InAppWebViewSettings.offscreenPreRaster].
   static const OFF_SCREEN_PRERASTER =
       const WebViewFeature._internal("OFF_SCREEN_PRERASTER");
 
-  ///
+  ///This feature covers [InAppWebViewController.postWebMessage].
   static const POST_WEB_MESSAGE =
       const WebViewFeature._internal("POST_WEB_MESSAGE");
 
-  ///
+  ///This feature covers [ProxyController.setProxyOverride] and [ProxyController.clearProxyOverride].
   static const PROXY_OVERRIDE =
       const WebViewFeature._internal("PROXY_OVERRIDE");
 
@@ -122,11 +125,11 @@ class WebViewFeature {
   static const RECEIVE_WEB_RESOURCE_ERROR =
       const WebViewFeature._internal("RECEIVE_WEB_RESOURCE_ERROR");
 
-  ///
+  ///This feature covers [InAppWebViewController.setSafeBrowsingAllowlist].
   static const SAFE_BROWSING_ALLOWLIST =
       const WebViewFeature._internal("SAFE_BROWSING_ALLOWLIST");
 
-  ///
+  ///This feature covers [InAppWebViewSettings.safeBrowsingEnabled].
   static const SAFE_BROWSING_ENABLE =
       const WebViewFeature._internal("SAFE_BROWSING_ENABLE");
 
@@ -134,7 +137,7 @@ class WebViewFeature {
   static const SAFE_BROWSING_HIT =
       const WebViewFeature._internal("SAFE_BROWSING_HIT");
 
-  ///
+  ///This feature covers [InAppWebViewController.getSafeBrowsingPrivacyPolicyUrl].
   static const SAFE_BROWSING_PRIVACY_POLICY_URL =
       const WebViewFeature._internal("SAFE_BROWSING_PRIVACY_POLICY_URL");
 
@@ -156,27 +159,27 @@ class WebViewFeature {
   static const SAFE_BROWSING_WHITELIST =
       const WebViewFeature._internal("SAFE_BROWSING_WHITELIST");
 
-  ///
+  ///This feature covers [ServiceWorkerController].
   static const SERVICE_WORKER_BASIC_USAGE =
       const WebViewFeature._internal("SERVICE_WORKER_BASIC_USAGE");
 
-  ///
+  ///This feature covers [ServiceWorkerController.setBlockNetworkLoads] and [ServiceWorkerController.getBlockNetworkLoads].
   static const SERVICE_WORKER_BLOCK_NETWORK_LOADS =
       const WebViewFeature._internal("SERVICE_WORKER_BLOCK_NETWORK_LOADS");
 
-  ///
+  ///This feature covers [ServiceWorkerController.setCacheMode] and [ServiceWorkerController.getCacheMode].
   static const SERVICE_WORKER_CACHE_MODE =
       const WebViewFeature._internal("SERVICE_WORKER_CACHE_MODE");
 
-  ///
+  ///This feature covers [ServiceWorkerController.setAllowContentAccess] and [ServiceWorkerController.getAllowContentAccess].
   static const SERVICE_WORKER_CONTENT_ACCESS =
       const WebViewFeature._internal("SERVICE_WORKER_CONTENT_ACCESS");
 
-  ///
+  ///This feature covers [ServiceWorkerController.setAllowFileAccess] and [ServiceWorkerController.getAllowFileAccess].
   static const SERVICE_WORKER_FILE_ACCESS =
       const WebViewFeature._internal("SERVICE_WORKER_FILE_ACCESS");
 
-  ///
+  ///This feature covers [ServiceWorkerClient.shouldInterceptRequest].
   static const SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST =
       const WebViewFeature._internal("SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
 
@@ -184,7 +187,7 @@ class WebViewFeature {
   static const SHOULD_OVERRIDE_WITH_REDIRECTS =
       const WebViewFeature._internal("SHOULD_OVERRIDE_WITH_REDIRECTS");
 
-  ///
+  ///This feature covers [InAppWebViewController.startSafeBrowsing].
   static const START_SAFE_BROWSING =
       const WebViewFeature._internal("START_SAFE_BROWSING");
 
@@ -200,7 +203,7 @@ class WebViewFeature {
   static const WEB_MESSAGE_CALLBACK_ON_MESSAGE =
       const WebViewFeature._internal("WEB_MESSAGE_CALLBACK_ON_MESSAGE");
 
-  ///
+  ///This feature covers [WebMessageListener].
   static const WEB_MESSAGE_LISTENER =
       const WebViewFeature._internal("WEB_MESSAGE_LISTENER");
 

@@ -25,6 +25,9 @@ import android.webkit.WebViewClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.WebResourceRequestCompat;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabase;
@@ -74,7 +77,9 @@ public class InAppWebViewClient extends WebViewClient {
     InAppWebView webView = (InAppWebView) view;
     if (webView.customSettings.useShouldOverrideUrlLoading) {
       boolean isRedirect = false;
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT)) {
+        isRedirect = WebResourceRequestCompat.isRedirect(request);
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         isRedirect = request.isRedirect();
       }
       onShouldOverrideUrlLoading(
@@ -705,7 +710,9 @@ public class InAppWebViewClient extends WebViewClient {
       headers = webResourceRequest.getRequestHeaders();
       hasGesture = webResourceRequest.hasGesture();
       isForMainFrame = webResourceRequest.isForMainFrame();
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT)) {
+        isRedirect = WebResourceRequestCompat.isRedirect(webResourceRequest);
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         isRedirect = webResourceRequest.isRedirect();
       }
     }

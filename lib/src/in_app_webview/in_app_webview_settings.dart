@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
@@ -418,13 +419,22 @@ class InAppWebViewSettings
   ///- Android native WebView
   String fixedFontFamily;
 
-  ///Set the force dark mode for this WebView. The default value is [ForceDark.FORCE_DARK_OFF].
+  ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
   ///
   ///**NOTE**: available on Android 29+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ForceDark? forceDark;
+
+  ///Set how WebView content should be darkened.
+  ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
+  ///
+  ///**NOTE on Android**: it will take effect only if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.FORCE_DARK_STRATEGY].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ForceDarkStrategy? forceDarkStrategy;
 
   ///Sets whether Geolocation API is enabled. The default value is `true`.
   ///
@@ -1102,7 +1112,8 @@ class InAppWebViewSettings
     this.disabledActionModeMenuItems,
     this.fantasyFontFamily = "fantasy",
     this.fixedFontFamily = "monospace",
-    this.forceDark = ForceDark.FORCE_DARK_OFF,
+    this.forceDark = ForceDark.OFF,
+    this.forceDarkStrategy = ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
     this.geolocationEnabled = true,
     this.layoutAlgorithm,
     this.loadWithOverviewMode = true,
@@ -1250,6 +1261,7 @@ class InAppWebViewSettings
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
       "forceDark": forceDark?.toValue(),
+      "forceDarkStrategy": forceDarkStrategy?.toValue(),
       "geolocationEnabled": geolocationEnabled,
       "layoutAlgorithm": layoutAlgorithm?.toValue(),
       "loadWithOverviewMode": loadWithOverviewMode,
@@ -1422,6 +1434,7 @@ class InAppWebViewSettings
       settings.fantasyFontFamily = map["fantasyFontFamily"];
       settings.fixedFontFamily = map["fixedFontFamily"];
       settings.forceDark = ForceDark.fromValue(map["forceDark"]);
+      settings.forceDarkStrategy = ForceDarkStrategy.fromValue(map["forceDarkStrategy"]);
       settings.geolocationEnabled = map["geolocationEnabled"];
       settings.layoutAlgorithm =
           LayoutAlgorithm.fromValue(map["layoutAlgorithm"]);

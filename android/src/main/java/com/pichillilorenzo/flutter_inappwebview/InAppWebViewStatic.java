@@ -57,7 +57,7 @@ public class InAppWebViewStatic implements MethodChannel.MethodCallHandler {
         } else
           result.success(null);
         break;
-      case "setSafeBrowsingWhitelist":
+      case "setSafeBrowsingAllowlist":
         if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ALLOWLIST)) {
           Set<String> hosts = new HashSet<>((List<String>) call.argument("hosts"));
           WebViewCompat.setSafeBrowsingAllowlist(hosts, new ValueCallback<Boolean>() {

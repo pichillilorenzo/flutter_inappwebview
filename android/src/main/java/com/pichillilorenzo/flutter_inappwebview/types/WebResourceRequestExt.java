@@ -6,6 +6,8 @@ import android.webkit.WebResourceRequest;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.webkit.WebResourceRequestCompat;
+import androidx.webkit.WebViewFeature;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -29,10 +31,16 @@ public class WebResourceRequestExt {
   }
 
   @RequiresApi(Build.VERSION_CODES.LOLLIPOP)
-  static public WebResourceRequestExt fromWebResourceRequest(@NonNull WebResourceRequest request) {
+  static public WebResourceRequestExt fromWebResourceRequest(@NonNull WebResourceRequest request) { 
+      boolean isRedirect = false;
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT)) {
+        isRedirect = WebResourceRequestCompat.isRedirect(request);
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+        isRedirect = request.isRedirect();
+      }
       return new WebResourceRequestExt(request.getUrl(),
               request.getRequestHeaders(),
-              Build.VERSION.SDK_INT >= Build.VERSION_CODES.N && request.isRedirect(),
+              isRedirect,
               request.hasGesture(),
               request.isForMainFrame(),
               request.getMethod()

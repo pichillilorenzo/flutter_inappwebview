@@ -5,6 +5,8 @@ import android.view.View;
 import android.webkit.WebSettings;
 
 import androidx.annotation.Nullable;
+import androidx.webkit.WebSettingsCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
 import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
@@ -71,7 +73,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Integer disabledActionModeMenuItems;
   public String fantasyFontFamily = "fantasy";
   public String fixedFontFamily = "monospace";
-  public Integer forceDark = 0; // WebSettings.FORCE_DARK_OFF
+  public Integer forceDark = 0; // WebSettingsCompat.FORCE_DARK_OFF
+  public Integer forceDarkStrategy = WebSettingsCompat.DARK_STRATEGY_PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING;
   public Boolean geolocationEnabled = true;
   public WebSettings.LayoutAlgorithm layoutAlgorithm;
   public Boolean loadWithOverviewMode = true;
@@ -266,6 +269,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "forceDark":
           forceDark = (Integer) value;
           break;
+        case "forceDarkStrategy":
+          forceDarkStrategy = (Integer) value;
+          break;
         case "geolocationEnabled":
           geolocationEnabled = (Boolean) value;
           break;
@@ -420,6 +426,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("fantasyFontFamily", fantasyFontFamily);
     settings.put("fixedFontFamily", fixedFontFamily);
     settings.put("forceDark", forceDark);
+    settings.put("forceDarkStrategy", forceDarkStrategy);
     settings.put("geolocationEnabled", geolocationEnabled);
     settings.put("layoutAlgorithm", getLayoutAlgorithm());
     settings.put("loadWithOverviewMode", loadWithOverviewMode);
@@ -475,7 +482,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       realSettings.put("databaseEnabled", settings.getDatabaseEnabled());
       realSettings.put("domStorageEnabled", settings.getDomStorageEnabled());
       realSettings.put("useWideViewPort", settings.getUseWideViewPort());
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.SAFE_BROWSING_ENABLE)) {
+        realSettings.put("safeBrowsingEnabled", WebSettingsCompat.getSafeBrowsingEnabled(settings));
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
         realSettings.put("safeBrowsingEnabled", settings.getSafeBrowsingEnabled());
       }
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -492,19 +501,28 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       realSettings.put("defaultFixedFontSize", settings.getDefaultFixedFontSize());
       realSettings.put("defaultFontSize", settings.getDefaultFontSize());
       realSettings.put("defaultTextEncodingName", settings.getDefaultTextEncodingName());
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.DISABLED_ACTION_MODE_MENU_ITEMS)) {
+        realSettings.put("disabledActionModeMenuItems", WebSettingsCompat.getDisabledActionModeMenuItems(settings));
+      } if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         realSettings.put("disabledActionModeMenuItems", settings.getDisabledActionModeMenuItems());
       }
       realSettings.put("fantasyFontFamily", settings.getFantasyFontFamily());
       realSettings.put("fixedFontFamily", settings.getFixedFontFamily());
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK)) {
+        realSettings.put("forceDark", WebSettingsCompat.getForceDark(settings));
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         realSettings.put("forceDark", settings.getForceDark());
+      }
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.FORCE_DARK_STRATEGY)) {
+        realSettings.put("forceDarkStrategy", WebSettingsCompat.getForceDarkStrategy(settings));
       }
       realSettings.put("layoutAlgorithm", settings.getLayoutAlgorithm().name());
       realSettings.put("loadWithOverviewMode", settings.getLoadWithOverviewMode());
       realSettings.put("loadsImagesAutomatically", settings.getLoadsImagesAutomatically());
       realSettings.put("minimumLogicalFontSize", settings.getMinimumLogicalFontSize());
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.OFF_SCREEN_PRERASTER)) {
+        realSettings.put("offscreenPreRaster", WebSettingsCompat.getOffscreenPreRaster(settings));
+      } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
         realSettings.put("offscreenPreRaster", settings.getOffscreenPreRaster());
       }
       realSettings.put("sansSerifFontFamily", settings.getSansSerifFontFamily());

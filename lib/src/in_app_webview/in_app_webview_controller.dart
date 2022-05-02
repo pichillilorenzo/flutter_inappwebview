@@ -3341,6 +3341,13 @@ class InAppWebViewController {
     return url != null ? Uri.parse(url) : null;
   }
 
+  ///Use [setSafeBrowsingAllowlist] instead.
+  @Deprecated("Use setSafeBrowsingAllowlist instead")
+  static Future<bool> setSafeBrowsingWhitelist(
+      {required List<String> hosts}) async {
+    return await InAppWebViewController.setSafeBrowsingAllowlist(hosts: hosts);
+  }
+
   ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.
   ///
   /// Each rule should take one of these:
@@ -3359,11 +3366,11 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.setSafeBrowsingAllowlist](https://developer.android.com/reference/androidx/webkit/WebViewCompat#setSafeBrowsingAllowlist(java.util.Set%3Cjava.lang.String%3E,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
-  static Future<bool> setSafeBrowsingWhitelist(
+  static Future<bool> setSafeBrowsingAllowlist(
       {required List<String> hosts}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('hosts', () => hosts);
-    return await _staticChannel.invokeMethod('setSafeBrowsingWhitelist', args);
+    return await _staticChannel.invokeMethod('setSafeBrowsingAllowlist', args);
   }
 
   ///If WebView has already been loaded into the current process this method will return the package that was used to load it.

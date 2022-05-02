@@ -13,6 +13,7 @@
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
     "express": "latest",
+    "express-http-proxy": "^1.6.3",
     "https": "latest",
     "multiparty": "^4.2.2"
   }

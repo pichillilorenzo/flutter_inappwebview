@@ -15,6 +15,8 @@ class ServiceWorkerController {
       'com.pichillilorenzo/flutter_inappwebview_serviceworkercontroller');
 
   ///Gets the [ServiceWorkerController] shared instance.
+  ///
+  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_BASIC_USAGE].
   static ServiceWorkerController instance() {
     return (_instance != null) ? _instance! : _init();
   }
@@ -23,7 +25,8 @@ class ServiceWorkerController {
 
   ServiceWorkerClient? get serviceWorkerClient => _serviceWorkerClient;
 
-  ///Sets the service worker client.
+  ///Sets the client to capture service worker related callbacks.
+  ///A [ServiceWorkerClient] should be set before any service workers are active, e.g. a safe place is before any WebView instances are created or pages loaded.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - ServiceWorkerControllerCompat.setServiceWorkerClient](https://developer.android.com/reference/androidx/webkit/ServiceWorkerControllerCompat#setServiceWorkerClient(androidx.webkit.ServiceWorkerClientCompat)))

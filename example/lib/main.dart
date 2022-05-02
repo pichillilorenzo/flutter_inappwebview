@@ -40,6 +40,16 @@ Future main() async {
         },
       ));
     }
+
+    // var proxyAvailable = await WebViewFeature.isFeatureSupported(
+    //     WebViewFeature.PROXY_OVERRIDE);
+    // if (proxyAvailable) {
+    //   ProxyController proxyController = ProxyController.instance();
+    //   await proxyController.clearProxyOverride();
+    //   await proxyController.setProxyOverride(settings: ProxySettings(
+    //     proxyRules: [ProxyRule(url: "https://192.168.1.102:4433")],
+    //   ));
+    // }
   }
 
   runApp(MyApp());

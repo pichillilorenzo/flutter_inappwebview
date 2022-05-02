@@ -60,11 +60,6 @@ class InAppBrowserClassSettings {
     return options;
   }
 
-  static Map<String, dynamic> instanceToMap(
-      InAppBrowserClassSettings settings) {
-    return settings.toMap();
-  }
-
   Map<String, dynamic> toJson() {
     return this.toMap();
   }

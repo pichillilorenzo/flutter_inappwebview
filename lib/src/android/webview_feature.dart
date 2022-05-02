@@ -1,5 +1,7 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
+import '../in_app_webview/in_app_webview_controller.dart';
+import '../in_app_webview/in_app_webview_settings.dart';
 
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
 class WebViewFeature {
@@ -70,15 +72,15 @@ class WebViewFeature {
   @override
   String toString() => _value;
 
-  ///
+  ///This feature covers [InAppWebViewController.createWebMessageChannel].
   static const CREATE_WEB_MESSAGE_CHANNEL =
       const WebViewFeature._internal("CREATE_WEB_MESSAGE_CHANNEL");
 
-  ///
+  ///This feature covers [InAppWebViewSettings.disabledActionModeMenuItems].
   static const DISABLED_ACTION_MODE_MENU_ITEMS =
       const WebViewFeature._internal("DISABLED_ACTION_MODE_MENU_ITEMS");
 
-  ///
+  ///This feature covers [InAppWebViewSettings.forceDark].
   static const FORCE_DARK = const WebViewFeature._internal("FORCE_DARK");
 
   ///

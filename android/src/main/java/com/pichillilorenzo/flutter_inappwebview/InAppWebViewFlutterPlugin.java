@@ -12,6 +12,7 @@ import com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeSafariB
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabaseHandler;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
+import com.pichillilorenzo.flutter_inappwebview.proxy.ProxyManager;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -35,6 +36,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public MyWebStorage myWebStorage;
   public ServiceWorkerManager serviceWorkerManager;
   public WebViewFeatureManager webViewFeatureManager;
+  public ProxyManager proxyManager;
   public FlutterWebViewFactory flutterWebViewFactory;
   public static ValueCallback<Uri> filePathCallbackLegacy;
   public static ValueCallback<Uri[]> filePathCallback;
@@ -97,6 +99,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
       credentialDatabaseHandler = new CredentialDatabaseHandler(this);
     }
     webViewFeatureManager = new WebViewFeatureManager(this);
+    proxyManager = new ProxyManager(this);
   }
 
   @Override
@@ -140,6 +143,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (webViewFeatureManager != null) {
       webViewFeatureManager.dispose();
       webViewFeatureManager = null;
+    }
+    if (proxyManager != null) {
+      proxyManager.dispose();
+      proxyManager = null;
     }
     filePathCallbackLegacy = null;
     filePathCallback = null;

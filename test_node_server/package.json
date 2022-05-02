@@ -1,20 +1,19 @@
 {
-  "name": "node_auth_basic",
+  "name": "test_node_server",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "private": true,
   "author": "",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
-    "basic-auth": "latest",
+    "basic-auth": "^2.0.1",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
-    "express": "latest",
-    "express-http-proxy": "^1.6.3",
-    "https": "latest",
+    "express": "^4.18.1",
     "multiparty": "^4.2.2"
   }
 }

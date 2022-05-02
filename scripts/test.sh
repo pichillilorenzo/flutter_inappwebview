@@ -31,7 +31,7 @@ fi
 
 dart $PROJECT_DIR/tool/env.dart
 
-cd $PROJECT_DIR/nodejs_server_test_auth_basic_and_ssl
+cd $PROJECT_DIR/test_node_server
 node index.js &
 
 flutter --version

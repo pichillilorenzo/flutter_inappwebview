@@ -23,33 +23,6 @@ Future main() async {
 
   if (defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
-
-    var swAvailable = await WebViewFeature.isFeatureSupported(
-        WebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-    var swInterceptAvailable = await WebViewFeature.isFeatureSupported(
-        WebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
-
-    if (swAvailable && swInterceptAvailable) {
-      ServiceWorkerController serviceWorkerController =
-          ServiceWorkerController.instance();
-
-      await serviceWorkerController.setServiceWorkerClient(ServiceWorkerClient(
-        shouldInterceptRequest: (request) async {
-          print(request);
-          return null;
-        },
-      ));
-    }
-
-    // var proxyAvailable = await WebViewFeature.isFeatureSupported(
-    //     WebViewFeature.PROXY_OVERRIDE);
-    // if (proxyAvailable) {
-    //   ProxyController proxyController = ProxyController.instance();
-    //   await proxyController.clearProxyOverride();
-    //   await proxyController.setProxyOverride(settings: ProxySettings(
-    //     proxyRules: [ProxyRule(url: "https://192.168.1.102:4433")],
-    //   ));
-    // }
   }
 
   runApp(MyApp());

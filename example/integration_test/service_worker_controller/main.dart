@@ -7,7 +7,7 @@ import 'should_intercept_request.dart';
 void main() {
   final shouldSkip = kIsWeb;
 
-  group('Service Worker', () {
+  group('Service Worker Controller', () {
     shouldInterceptRequest();
     setServiceWorkerClient();
   }, skip: shouldSkip);

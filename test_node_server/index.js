@@ -1,14 +1,13 @@
 // Example of the server https is taken from here: https://engineering.circle.com/https-authorized-certs-with-node-js-315e548354a2
 // Conversion of client1-crt.pem to certificate.pfx: https://stackoverflow.com/a/38408666/4637638
 const express = require('express');
-const proxy = require('express-http-proxy');
+const http = require('http');
 const https = require('https');
 const cors = require('cors');
 const auth = require('basic-auth');
 const app = express();
 const appHttps = express();
 const appAuthBasic = express();
-const appProxy = express();
 const fs = require('fs')
 const path = require('path')
 const bodyParser = require('body-parser');
@@ -22,7 +21,6 @@ var options = {
   rejectUnauthorized: false
 };
 
-//appHttps.use('/', proxy('www.google.com'));
 appHttps.get('/', (req, res) => {
   console.log(JSON.stringify(req.headers))
 	const cert = req.connection.getPeerCertificate()
@@ -201,6 +199,20 @@ app.get("/test-download-file", (req, res) => {
 
 app.listen(8082)
 
-//appProxy.use(cors());
-//appProxy.use('/', proxy('www.google.com'));
-//appProxy.listen(8083);
+// Proxy server
+http.createServer(function (req, res) {
+    res.setHeader('Content-type', 'text/html');
+    res.write(`
+        <html>
+          <head>
+          </head>
+          <body>
+            <h1>Proxy Works</h1>
+            <p id="url">${req.url}</p>
+            <p id="method">${req.method}</p>
+            <p id="headers">${JSON.stringify(req.headers)}</p>
+          </body>
+        </html>
+      `);
+    res.end();
+}).listen(8083);

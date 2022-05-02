@@ -1047,6 +1047,28 @@ class InAppBrowser {
   Future<ShouldAllowDeprecatedTLSAction?>? shouldAllowDeprecatedTLS(
       URLAuthenticationChallenge challenge) {}
 
+  ///Event fired when a change in the camera capture state occurred.
+  ///
+  ///**NOTE**: available only on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  void onCameraCaptureStateChanged(
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  ) {}
+
+  ///Event fired when a change in the microphone capture state occurred.
+  ///
+  ///**NOTE**: available only on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  void onMicrophoneCaptureStateChanged(
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  ) {}
+
   void throwIfAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {
       throw InAppBrowserAlreadyOpenedException([

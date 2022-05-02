@@ -139,6 +139,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     @Deprecated('Use shouldAllowDeprecatedTLS instead')
         this.iosShouldAllowDeprecatedTLS,
     this.shouldAllowDeprecatedTLS,
+    this.onCameraCaptureStateChanged,
+    this.onMicrophoneCaptureStateChanged,
     this.gestureRecognizers,
   }) : super(key: key);
 
@@ -542,6 +544,20 @@ class InAppWebView extends StatefulWidget implements WebView {
   final Future<WebResourceResponse?> Function(
           InAppWebViewController controller, WebResourceRequest request)?
       shouldInterceptRequest;
+
+  @override
+  final Future<void> Function(
+    InAppWebViewController controller,
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  )? onCameraCaptureStateChanged;
+
+  @override
+  final Future<void> Function(
+    InAppWebViewController controller,
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  )? onMicrophoneCaptureStateChanged;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {
@@ -680,7 +696,9 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   void dispose() {
     dynamic viewId = _controller?.getViewId();
-    if (viewId != null && kIsWeb && WebPlatformManager.webViews.containsKey(viewId)) {
+    if (viewId != null &&
+        kIsWeb &&
+        WebPlatformManager.webViews.containsKey(viewId)) {
       WebPlatformManager.webViews.remove(viewId);
     }
     super.dispose();

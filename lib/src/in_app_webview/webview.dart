@@ -848,6 +848,30 @@ abstract class WebView {
       InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? shouldAllowDeprecatedTLS;
 
+  ///Event fired when a change in the camera capture state occurred.
+  ///
+  ///**NOTE**: available only on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  final Future<void> Function(
+    InAppWebViewController controller,
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  )? onCameraCaptureStateChanged;
+
+  ///Event fired when a change in the microphone capture state occurred.
+  ///
+  ///**NOTE**: available only on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  final Future<void> Function(
+    InAppWebViewController controller,
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  )? onMicrophoneCaptureStateChanged;
+
   ///Initial url request that will be loaded.
   ///
   ///**NOTE for Android**: when loading an URL Request using "POST" method, headers are ignored.
@@ -927,7 +951,8 @@ abstract class WebView {
       @Deprecated('Use onReceivedError instead')
           this.onLoadError,
       this.onReceivedError,
-      @Deprecated("Use onReceivedHttpError instead") this.onLoadHttpError,
+      @Deprecated("Use onReceivedHttpError instead")
+          this.onLoadHttpError,
       this.onReceivedHttpError,
       this.onProgressChanged,
       this.onConsoleMessage,
@@ -1015,6 +1040,8 @@ abstract class WebView {
       @Deprecated('Use shouldAllowDeprecatedTLS instead')
           this.iosShouldAllowDeprecatedTLS,
       this.shouldAllowDeprecatedTLS,
+      this.onCameraCaptureStateChanged,
+      this.onMicrophoneCaptureStateChanged,
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,

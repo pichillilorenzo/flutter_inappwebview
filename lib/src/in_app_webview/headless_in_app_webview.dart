@@ -147,6 +147,8 @@ class HeadlessInAppWebView implements WebView {
     @Deprecated('Use shouldAllowDeprecatedTLS instead')
         this.iosShouldAllowDeprecatedTLS,
     this.shouldAllowDeprecatedTLS,
+    this.onCameraCaptureStateChanged,
+    this.onMicrophoneCaptureStateChanged,
   }) {
     id = IdGenerator.generate();
     webViewController = new InAppWebViewController(id, this);
@@ -401,11 +403,10 @@ class HeadlessInAppWebView implements WebView {
   ///Use [onDownloadStartRequest] instead
   @Deprecated('Use onDownloadStartRequest instead')
   @override
-  final void Function(InAppWebViewController controller, Uri url)?
-      onDownloadStart;
+  void Function(InAppWebViewController controller, Uri url)? onDownloadStart;
 
   @override
-  final void Function(InAppWebViewController controller,
+  void Function(InAppWebViewController controller,
       DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
   @override
@@ -430,12 +431,12 @@ class HeadlessInAppWebView implements WebView {
   ///Use [onReceivedError] instead.
   @Deprecated("Use onReceivedError instead")
   @override
-  final void Function(InAppWebViewController controller, Uri? url, int code,
+  void Function(InAppWebViewController controller, Uri? url, int code,
       String message)? onLoadError;
 
   @override
-  final void Function(InAppWebViewController controller,
-      WebResourceRequest request, WebResourceError error)? onReceivedError;
+  void Function(InAppWebViewController controller, WebResourceRequest request,
+      WebResourceError error)? onReceivedError;
 
   ///Use [onReceivedHttpError] instead.
   @Deprecated("Use onReceivedHttpError instead")
@@ -443,9 +444,7 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller, Uri? url, int statusCode,
       String description)? onLoadHttpError;
 
-  final void Function(
-      InAppWebViewController controller,
-      WebResourceRequest request,
+  void Function(InAppWebViewController controller, WebResourceRequest request,
       WebResourceResponse errorResponse)? onReceivedHttpError;
 
   @override
@@ -662,4 +661,18 @@ class HeadlessInAppWebView implements WebView {
   Future<WebResourceResponse?> Function(
           InAppWebViewController controller, WebResourceRequest request)?
       shouldInterceptRequest;
+
+  @override
+  Future<void> Function(
+    InAppWebViewController controller,
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  )? onCameraCaptureStateChanged;
+
+  @override
+  Future<void> Function(
+    InAppWebViewController controller,
+    MediaCaptureState? oldState,
+    MediaCaptureState? newState,
+  )? onMicrophoneCaptureStateChanged;
 }

@@ -1081,7 +1081,7 @@ class InAppWebViewController {
             onLoadCallback != null) {
           onLoadCallback();
         }
-        return null;
+        break;
       case "onInjectedScriptError":
         String id = call.arguments[0];
         var onErrorCallback = _injectedScriptsFromURL[id]?.onError;
@@ -1089,7 +1089,31 @@ class InAppWebViewController {
             onErrorCallback != null) {
           onErrorCallback();
         }
-        return null;
+        break;
+      case "onCameraCaptureStateChanged":
+        if ((_webview != null && _webview!.onCameraCaptureStateChanged != null) ||
+            _inAppBrowser != null) {
+          var oldState = MediaCaptureState.fromValue(call.arguments["oldState"]);
+          var newState = MediaCaptureState.fromValue(call.arguments["newState"]);
+
+          if (_webview != null && _webview!.onCameraCaptureStateChanged != null)
+            _webview!.onCameraCaptureStateChanged!(this, oldState, newState);
+          else
+            _inAppBrowser!.onCameraCaptureStateChanged(oldState, newState);
+        }
+        break;
+      case "onMicrophoneCaptureStateChanged":
+        if ((_webview != null && _webview!.onMicrophoneCaptureStateChanged != null) ||
+            _inAppBrowser != null) {
+          var oldState = MediaCaptureState.fromValue(call.arguments["oldState"]);
+          var newState = MediaCaptureState.fromValue(call.arguments["newState"]);
+
+          if (_webview != null && _webview!.onMicrophoneCaptureStateChanged != null)
+            _webview!.onMicrophoneCaptureStateChanged!(this, oldState, newState);
+          else
+            _inAppBrowser!.onMicrophoneCaptureStateChanged(oldState, newState);
+        }
+        break;
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json

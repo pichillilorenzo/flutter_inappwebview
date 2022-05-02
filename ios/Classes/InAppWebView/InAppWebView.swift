@@ -309,6 +309,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             options: [.new, .old],
             context: nil)
         
+        if #available(iOS 15.0, *) {
+            addObserver(self,
+                forKeyPath: #keyPath(WKWebView.cameraCaptureState),
+                options: [.new, .old],
+                context: nil)
+            
+            addObserver(self,
+                forKeyPath: #keyPath(WKWebView.microphoneCaptureState),
+                options: [.new, .old],
+                context: nil)
+        }
+        
         NotificationCenter.default.addObserver(
                         self,
                         selector: #selector(onCreateContextMenu),
@@ -628,18 +640,18 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             let progress = Int(estimatedProgress * 100)
             onProgressChanged(progress: progress)
             inAppBrowserDelegate?.didChangeProgress(progress: estimatedProgress)
-        } else if keyPath == #keyPath(WKWebView.url) && change?[NSKeyValueChangeKey.newKey] is URL {
+        } else if keyPath == #keyPath(WKWebView.url) && change?[.newKey] is URL {
             initializeWindowIdJS()
             let newUrl = change?[NSKeyValueChangeKey.newKey] as? URL
             onUpdateVisitedHistory(url: newUrl?.absoluteString)
             inAppBrowserDelegate?.didUpdateVisitedHistory(url: newUrl)
-        } else if keyPath == #keyPath(WKWebView.title) && change?[NSKeyValueChangeKey.newKey] is String {
-            let newTitle = change?[NSKeyValueChangeKey.newKey] as? String
+        } else if keyPath == #keyPath(WKWebView.title) && change?[.newKey] is String {
+            let newTitle = change?[.newKey] as? String
             onTitleChanged(title: newTitle)
             inAppBrowserDelegate?.didChangeTitle(title: newTitle)
         } else if keyPath == #keyPath(UIScrollView.contentOffset) {
-            let newContentOffset = change?[NSKeyValueChangeKey.newKey] as? CGPoint
-            let oldContentOffset = change?[NSKeyValueChangeKey.oldKey] as? CGPoint
+            let newContentOffset = change?[.newKey] as? CGPoint
+            let oldContentOffset = change?[.oldKey] as? CGPoint
             let startedByUser = scrollView.isDragging || scrollView.isDecelerating
             if newContentOffset != oldContentOffset {
                 DispatchQueue.main.async {
@@ -647,15 +659,30 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
             }
         }
-//        else if #available(iOS 15.0, *) {
-//            if keyPath == #keyPath(WKWebView.fullscreenState) {
+        else if #available(iOS 15.0, *) {
+            if keyPath == #keyPath(WKWebView.cameraCaptureState) || keyPath == #keyPath(WKWebView.microphoneCaptureState) {
+                var oldState: WKMediaCaptureState? = nil
+                if let oldValue = change?[.oldKey] as? Int {
+                    oldState = WKMediaCaptureState.init(rawValue: oldValue)
+                }
+                var newState: WKMediaCaptureState? = nil
+                if let newValue = change?[.newKey] as? Int {
+                    newState = WKMediaCaptureState.init(rawValue: newValue)
+                }
+                if keyPath == #keyPath(WKWebView.cameraCaptureState) {
+                    onCameraCaptureStateChanged(oldState: oldState, newState: newState)
+                } else {
+                    onMicrophoneCaptureStateChanged(oldState: oldState, newState: newState)
+                }
+            }
+//            else if keyPath == #keyPath(WKWebView.fullscreenState) {
 //                if fullscreenState == .enteringFullscreen {
 //                    onEnterFullscreen()
 //                } else if fullscreenState == .exitingFullscreen {
 //                    onExitFullscreen()
 //                }
 //            }
-//        }
+        }
         replaceGestureHandlerIfNeeded()
     }
     
@@ -2756,6 +2783,18 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         channel?.invokeMethod("onExitFullscreen", arguments: [])
     }
     
+    @available(iOS 15.0, *)
+    public func onCameraCaptureStateChanged(oldState: WKMediaCaptureState?, newState: WKMediaCaptureState?) {
+        let arguments = ["oldState": oldState?.rawValue, "newState": newState?.rawValue]
+        channel?.invokeMethod("onCameraCaptureStateChanged", arguments: arguments)
+    }
+    
+    @available(iOS 15.0, *)
+    public func onMicrophoneCaptureStateChanged(oldState: WKMediaCaptureState?, newState: WKMediaCaptureState?) {
+        let arguments = ["oldState": oldState?.rawValue, "newState": newState?.rawValue]
+        channel?.invokeMethod("onMicrophoneCaptureStateChanged", arguments: arguments)
+    }
+    
 //    public func onContextMenuConfigurationForElement(linkURL: String?, result: FlutterResult?) {
 //        let arguments: [String: Any?] = ["linkURL": linkURL]
 //        channel?.invokeMethod("onContextMenuConfigurationForElement", arguments: arguments, result: result)
@@ -3130,9 +3169,11 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.url))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.title))
-//        if #available(iOS 15.0, *) {
+        if #available(iOS 15.0, *) {
+            removeObserver(self, forKeyPath: #keyPath(WKWebView.cameraCaptureState))
+            removeObserver(self, forKeyPath: #keyPath(WKWebView.microphoneCaptureState))
 //            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
-//        }
+        }
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
         resumeTimers()

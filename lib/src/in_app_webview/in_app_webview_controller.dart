@@ -104,7 +104,11 @@ class InAppWebViewController {
   }
 
   _debugLog(String method, dynamic args) {
-    if (WebView.debugLogging) {
+    if (WebView.debugSettings.enabled) {
+      for (var regExp in WebView.debugSettings.excludeFilter) {
+        if (regExp.hasMatch(method)) return;
+      }
+      var maxLogMessageLength = WebView.debugSettings.maxLogMessageLength;
       String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
       String message = (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
           " ID " +
@@ -113,12 +117,15 @@ class InAppWebViewController {
           method.toString() +
           "\" using " +
           args.toString();
+      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
+        message = message.substring(0, maxLogMessageLength) + "...";
+      }
       developer.log(message, name: this.runtimeType.toString());
     }
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
-    if (WebView.debugLogging && call.method != "onCallJsHandler") {
+    if (WebView.debugSettings.enabled && call.method != "onCallJsHandler") {
       _debugLog(call.method, call.arguments);
     }
 
@@ -163,15 +170,15 @@ class InAppWebViewController {
               _webview!.onReceivedError!(this, request, error);
             else if (isForMainFrame) {
               // ignore: deprecated_member_use_from_same_package
-              _webview!.onLoadError!(this, request.url, error.type.toNativeValue(),
-                  error.description);
+              _webview!.onLoadError!(this, request.url,
+                  error.type.toNativeValue(), error.description);
             }
           } else {
             if (isForMainFrame) {
               _inAppBrowser!
-              // ignore: deprecated_member_use_from_same_package
-                  .onLoadError(
-                  request.url, error.type.toNativeValue(), error.description);
+                  // ignore: deprecated_member_use_from_same_package
+                  .onLoadError(request.url, error.type.toNativeValue(),
+                      error.description);
             }
             _inAppBrowser!.onReceivedError(request, error);
           }
@@ -203,9 +210,9 @@ class InAppWebViewController {
           } else {
             if (isForMainFrame) {
               _inAppBrowser!
-              // ignore: deprecated_member_use_from_same_package
+                  // ignore: deprecated_member_use_from_same_package
                   .onLoadHttpError(request.url, errorResponse.statusCode ?? -1,
-                  errorResponse.reasonPhrase ?? '');
+                      errorResponse.reasonPhrase ?? '');
             }
             _inAppBrowser!.onReceivedHttpError(request, errorResponse);
           }
@@ -1091,10 +1098,13 @@ class InAppWebViewController {
         }
         break;
       case "onCameraCaptureStateChanged":
-        if ((_webview != null && _webview!.onCameraCaptureStateChanged != null) ||
+        if ((_webview != null &&
+                _webview!.onCameraCaptureStateChanged != null) ||
             _inAppBrowser != null) {
-          var oldState = MediaCaptureState.fromValue(call.arguments["oldState"]);
-          var newState = MediaCaptureState.fromValue(call.arguments["newState"]);
+          var oldState =
+              MediaCaptureState.fromValue(call.arguments["oldState"]);
+          var newState =
+              MediaCaptureState.fromValue(call.arguments["newState"]);
 
           if (_webview != null && _webview!.onCameraCaptureStateChanged != null)
             _webview!.onCameraCaptureStateChanged!(this, oldState, newState);
@@ -1103,13 +1113,18 @@ class InAppWebViewController {
         }
         break;
       case "onMicrophoneCaptureStateChanged":
-        if ((_webview != null && _webview!.onMicrophoneCaptureStateChanged != null) ||
+        if ((_webview != null &&
+                _webview!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowser != null) {
-          var oldState = MediaCaptureState.fromValue(call.arguments["oldState"]);
-          var newState = MediaCaptureState.fromValue(call.arguments["newState"]);
+          var oldState =
+              MediaCaptureState.fromValue(call.arguments["oldState"]);
+          var newState =
+              MediaCaptureState.fromValue(call.arguments["newState"]);
 
-          if (_webview != null && _webview!.onMicrophoneCaptureStateChanged != null)
-            _webview!.onMicrophoneCaptureStateChanged!(this, oldState, newState);
+          if (_webview != null &&
+              _webview!.onMicrophoneCaptureStateChanged != null)
+            _webview!.onMicrophoneCaptureStateChanged!(
+                this, oldState, newState);
           else
             _inAppBrowser!.onMicrophoneCaptureStateChanged(oldState, newState);
         }
@@ -3286,8 +3301,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate)).
-  Future<void> setCameraCaptureState(
-      {required MediaCaptureState state}) async {
+  Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state.toValue());
     await _channel.invokeMethod('setCameraCaptureState', args);

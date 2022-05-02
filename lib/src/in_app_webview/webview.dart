@@ -1,8 +1,6 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
-import 'package:flutter/foundation.dart';
-
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 import '../context_menu.dart';
@@ -12,14 +10,16 @@ import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import 'headless_in_app_webview.dart';
 
+import '../debug_settings.dart';
+
 ///Abstract class that represents a WebView. Used by [InAppWebView], [HeadlessInAppWebView] and the WebView of [InAppBrowser].
 abstract class WebView {
-  ///Enables [WebView] debug logging info.
-  ///
-  ///The default value is the same value of [kDebugMode],
-  ///so it is enabled by default when the application is compiled in debug mode
-  ///and disabled when it is not.
-  static bool debugLogging = kDebugMode;
+  ///Debug settings used by [InAppWebView], [HeadlessInAppWebView] and [InAppBrowser].
+  ///The default value excludes the [WebView.onScrollChanged] and [WebView.onOverScrolled] events.
+  static DebugSettings debugSettings = DebugSettings(excludeFilter: [
+    RegExp(r"onScrollChanged"),
+    RegExp(r"onOverScrolled")
+  ]);
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
@@ -567,10 +567,13 @@ abstract class WebView {
   ///
   ///[resources] represents the array of resources the web content wants to access.
   ///
-  ///**NOTE**: available only on Android 23+.
+  ///**NOTE for Android**: available only on Android 23+.
+  ///
+  ///**NOTE for iOS**: available only on iOS 15.0+. The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
+  ///- iOS
   final Future<PermissionResponse?> Function(InAppWebViewController controller,
       PermissionRequest permissionRequest)? onPermissionRequest;
 

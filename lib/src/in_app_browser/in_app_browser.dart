@@ -804,10 +804,13 @@ class InAppBrowser {
   ///
   ///[resources] represents the array of resources the web content wants to access.
   ///
-  ///**NOTE**: available only on Android 23+.
+  ///**NOTE for Android**: available only on Android 23+.
+  ///
+  ///**NOTE for iOS**: available only on iOS 15.0+. The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
+  ///- iOS
   Future<PermissionResponse?>? onPermissionRequest(
       PermissionRequest permissionRequest) {}
 

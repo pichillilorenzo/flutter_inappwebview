@@ -96,7 +96,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
           TextField(
             decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
             controller: urlController,
-            keyboardType: TextInputType.url,
+            keyboardType: TextInputType.text,
             onSubmitted: (value) {
               var url = Uri.parse(value);
               if (url.scheme.isEmpty) {

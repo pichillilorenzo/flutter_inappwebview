@@ -669,10 +669,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 if let newValue = change?[.newKey] as? Int {
                     newState = WKMediaCaptureState.init(rawValue: newValue)
                 }
-                if keyPath == #keyPath(WKWebView.cameraCaptureState) {
-                    onCameraCaptureStateChanged(oldState: oldState, newState: newState)
-                } else {
-                    onMicrophoneCaptureStateChanged(oldState: oldState, newState: newState)
+                if oldState != newState {
+                    if keyPath == #keyPath(WKWebView.cameraCaptureState) {
+                        onCameraCaptureStateChanged(oldState: oldState, newState: newState)
+                    } else {
+                        onMicrophoneCaptureStateChanged(oldState: oldState, newState: newState)
+                    }
                 }
             }
 //            else if keyPath == #keyPath(WKWebView.fullscreenState) {
@@ -1552,10 +1554,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         onPermissionRequest(request: permissionRequest, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message ?? "")
-                decisionHandler(.deny)
+                decisionHandler(.prompt)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
-                decisionHandler(.deny)
+                decisionHandler(.prompt)
             }
             else {
                 var response: [String: Any]
@@ -1575,7 +1577,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     }
                     return;
                 }
-                decisionHandler(.deny)
+                decisionHandler(.prompt)
             }
         })
     }
@@ -1593,10 +1595,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         onPermissionRequest(request: permissionRequest, result: {(result) -> Void in
             if result is FlutterError {
                 print((result as! FlutterError).message ?? "")
-                decisionHandler(.deny)
+                decisionHandler(.prompt)
             }
             else if (result as? NSObject) == FlutterMethodNotImplemented {
-                decisionHandler(.deny)
+                decisionHandler(.prompt)
             }
             else {
                 var response: [String: Any]
@@ -1616,7 +1618,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     }
                     return;
                 }
-                decisionHandler(.deny)
+                decisionHandler(.prompt)
             }
         })
     }

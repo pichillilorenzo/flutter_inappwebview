@@ -19,7 +19,7 @@ Future main() async {
   // await Permission.microphone.request();
   // await Permission.storage.request();
 
-  WebView.debugLogging = false;
+  WebView.debugSettings.maxLogMessageLength = 500;
 
   if (defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);

@@ -6,6 +6,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../util.dart';
+import '../debug_settings.dart';
 
 import 'chrome_safari_browser_settings.dart';
 
@@ -44,12 +45,8 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///- Android native WebView
 ///- iOS
 class ChromeSafariBrowser {
-  ///Enables [ChromeSafariBrowser] debug logging info.
-  ///
-  ///The default value is the same value of [kDebugMode],
-  ///so it is enabled by default when the application is compiled in debug mode
-  ///and disabled when it is not.
-  static bool debugLogging = kDebugMode;
+  ///Debug settings.
+  static DebugSettings debugSettings = DebugSettings();
 
   ///View ID used internally.
   late final String id;
@@ -70,12 +67,22 @@ class ChromeSafariBrowser {
   }
 
   _debugLog(String method, dynamic args) {
-    if (ChromeSafariBrowser.debugLogging) {
-      String message =
-          "ChromeSafariBrowser ID " + id + " calling \"" +
-          method.toString() + "\" using " + args.toString();
-      developer.log(message,
-          name: this.runtimeType.toString());
+    if (ChromeSafariBrowser.debugSettings.enabled) {
+      for (var regExp in ChromeSafariBrowser.debugSettings.excludeFilter) {
+        if (regExp.hasMatch(method)) return;
+      }
+      var maxLogMessageLength =
+          ChromeSafariBrowser.debugSettings.maxLogMessageLength;
+      String message = "ChromeSafariBrowser ID " +
+          id +
+          " calling \"" +
+          method.toString() +
+          "\" using " +
+          args.toString();
+      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
+        message = message.substring(0, maxLogMessageLength) + "...";
+      }
+      developer.log(message, name: this.runtimeType.toString());
     }
   }
 

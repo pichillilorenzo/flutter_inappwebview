@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.types;
+package com.pichillilorenzo.flutter_inappwebview.webview;
 
 import android.content.Context;
 import android.net.Uri;
@@ -12,8 +12,13 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewSettings;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.EventChannelDelegate;
+import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
+import com.pichillilorenzo.flutter_inappwebview.types.HitTestResult;
+import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
+import com.pichillilorenzo.flutter_inappwebview.types.UserContentController;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebViewSettings;
+import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageChannel;
+import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageListener;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -106,6 +111,6 @@ public interface InAppWebViewInterface {
   boolean isInFullscreen();
   void setInFullscreen(boolean inFullscreen);
   @Nullable
-  EventChannelDelegate getEventChannelDelegate();
-  void setEventChannelDelegate(@Nullable EventChannelDelegate eventChannelDelegate);
+  WebViewChannelDelegate getChannelDelegate();
+  void setChannelDelegate(@Nullable WebViewChannelDelegate eventWebViewChannelDelegate);
 }

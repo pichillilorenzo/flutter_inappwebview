@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
@@ -47,6 +47,7 @@ import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceErrorExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceRequestExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceResponseExt;
+import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
 
 import java.io.ByteArrayInputStream;
 import java.net.URI;
@@ -133,7 +134,7 @@ public class InAppWebViewClient extends WebViewClient {
             isRedirect
     );
 
-    final EventChannelDelegate.ShouldOverrideUrlLoadingCallback callback = new EventChannelDelegate.ShouldOverrideUrlLoadingCallback() {
+    final WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback callback = new WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull NavigationActionPolicy result) {
         switch (result) {
@@ -159,8 +160,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     };
     
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.shouldOverrideUrlLoading(navigationAction, callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.shouldOverrideUrlLoading(navigationAction, callback);
     } else {
       callback.defaultBehaviour(null);
     }
@@ -204,12 +205,11 @@ public class InAppWebViewClient extends WebViewClient {
       inAppBrowserDelegate.didStartNavigation(url);
     }
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onLoadStart(url);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onLoadStart(url);
     }
   }
-
-
+  
   public void onPageFinished(WebView view, String url) {
     final InAppWebView webView = (InAppWebView) view;
     webView.isLoading = false;
@@ -238,8 +238,8 @@ public class InAppWebViewClient extends WebViewClient {
       webView.loadUrl("javascript:" + js.replaceAll("[\r\n]+", ""));
     }
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onLoadStop(url);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onLoadStop(url);
     }
   }
 
@@ -255,8 +255,8 @@ public class InAppWebViewClient extends WebViewClient {
     }
     
     final InAppWebView webView = (InAppWebView) view;
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onUpdateVisitedHistory(url, isReload);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onUpdateVisitedHistory(url, isReload);
     }
   }
   
@@ -280,8 +280,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     }
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedError(
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedError(
               WebResourceRequestExt.fromWebResourceRequest(request),
               WebResourceErrorExt.fromWebResourceError(error));
     }
@@ -317,8 +317,8 @@ public class InAppWebViewClient extends WebViewClient {
             description
     );
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedError(
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedError(
               request,
               error);
     }
@@ -332,8 +332,8 @@ public class InAppWebViewClient extends WebViewClient {
     super.onReceivedHttpError(view, request, errorResponse);
 
     final InAppWebView webView = (InAppWebView) view;
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedHttpError(
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedHttpError(
               WebResourceRequestExt.fromWebResourceRequest(request),
               WebResourceResponseExt.fromWebResourceResponse(errorResponse));
     }
@@ -371,7 +371,7 @@ public class InAppWebViewClient extends WebViewClient {
     HttpAuthenticationChallenge challenge = new HttpAuthenticationChallenge(protectionSpace, previousAuthRequestFailureCount, credentialProposed);
 
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.ReceivedHttpAuthRequestCallback callback = new EventChannelDelegate.ReceivedHttpAuthRequestCallback() {
+    final WebViewChannelDelegate.ReceivedHttpAuthRequestCallback callback = new WebViewChannelDelegate.ReceivedHttpAuthRequestCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull HttpAuthResponse response) {
         Integer action = response.getAction();
@@ -422,8 +422,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     };
     
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedHttpAuthRequest(challenge, callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedHttpAuthRequest(challenge, callback);
     } else {
       callback.defaultBehaviour(null);
     }
@@ -449,7 +449,7 @@ public class InAppWebViewClient extends WebViewClient {
     ServerTrustChallenge challenge = new ServerTrustChallenge(protectionSpace);
 
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.ReceivedServerTrustAuthRequestCallback callback = new EventChannelDelegate.ReceivedServerTrustAuthRequestCallback() {
+    final WebViewChannelDelegate.ReceivedServerTrustAuthRequestCallback callback = new WebViewChannelDelegate.ReceivedServerTrustAuthRequestCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull ServerTrustAuthResponse response) {
         Integer action = response.getAction();
@@ -481,8 +481,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     };
     
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedServerTrustAuthRequest(challenge, callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedServerTrustAuthRequest(challenge, callback);
     } else {
       callback.defaultBehaviour(null);
     }
@@ -509,7 +509,7 @@ public class InAppWebViewClient extends WebViewClient {
     ClientCertChallenge challenge = new ClientCertChallenge(protectionSpace, request.getPrincipals(), request.getKeyTypes());
 
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.ReceivedClientCertRequestCallback callback = new EventChannelDelegate.ReceivedClientCertRequestCallback() {
+    final WebViewChannelDelegate.ReceivedClientCertRequestCallback callback = new WebViewChannelDelegate.ReceivedClientCertRequestCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull ClientCertResponse response) {
         Integer action = response.getAction();
@@ -555,8 +555,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     };
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedClientCertRequest(challenge, callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedClientCertRequest(challenge, callback);
     } else {
       callback.defaultBehaviour(null);
     }
@@ -568,8 +568,8 @@ public class InAppWebViewClient extends WebViewClient {
     final InAppWebView webView = (InAppWebView) view;
     webView.zoomScale = newScale / Util.getPixelDensity(webView.getContext());
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onZoomScaleChanged(oldScale, newScale);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onZoomScaleChanged(oldScale, newScale);
     }
   }
 
@@ -577,7 +577,7 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onSafeBrowsingHit(final WebView view, final WebResourceRequest request, final int threatType, final SafeBrowsingResponse callback) {
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.SafeBrowsingHitCallback resultCallback = new EventChannelDelegate.SafeBrowsingHitCallback() {
+    final WebViewChannelDelegate.SafeBrowsingHitCallback resultCallback = new WebViewChannelDelegate.SafeBrowsingHitCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull com.pichillilorenzo.flutter_inappwebview.types.SafeBrowsingResponse response) {
         Integer action = response.getAction();
@@ -613,8 +613,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     };
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onSafeBrowsingHit(request.getUrl().toString(), threatType, resultCallback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onSafeBrowsingHit(request.getUrl().toString(), threatType, resultCallback);
     } else {
       resultCallback.defaultBehaviour(null);
     }
@@ -647,9 +647,9 @@ public class InAppWebViewClient extends WebViewClient {
 
     if (webView.customSettings.resourceCustomSchemes != null && webView.customSettings.resourceCustomSchemes.contains(scheme)) {
       CustomSchemeResponse customSchemeResponse = null;
-      if (webView.eventChannelDelegate != null) {
+      if (webView.channelDelegate != null) {
         try {
-          customSchemeResponse = webView.eventChannelDelegate.onLoadResourceCustomScheme(url);
+          customSchemeResponse = webView.channelDelegate.onLoadResourceCustomScheme(url);
         } catch (InterruptedException e) {
           e.printStackTrace();
           return null;
@@ -711,9 +711,9 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     WebResourceResponseExt response = null;
-    if (webView.eventChannelDelegate != null) {
+    if (webView.channelDelegate != null) {
       try {
-        response = webView.eventChannelDelegate.shouldInterceptRequest(requestExt);
+        response = webView.channelDelegate.shouldInterceptRequest(requestExt);
       } catch (InterruptedException e) {
         e.printStackTrace();
         return null;
@@ -743,7 +743,7 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onFormResubmission(final WebView view, final Message dontResend, final Message resend) {
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.FormResubmissionCallback callback = new EventChannelDelegate.FormResubmissionCallback() {
+    final WebViewChannelDelegate.FormResubmissionCallback callback = new WebViewChannelDelegate.FormResubmissionCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull Integer action) {
         switch (action) {
@@ -769,8 +769,8 @@ public class InAppWebViewClient extends WebViewClient {
       }
     };
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onFormResubmission(webView.getUrl(), callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onFormResubmission(webView.getUrl(), callback);
     } else {
       callback.defaultBehaviour(null);
     }
@@ -781,8 +781,8 @@ public class InAppWebViewClient extends WebViewClient {
     super.onPageCommitVisible(view, url);
 
     final InAppWebView webView = (InAppWebView) view;
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onPageCommitVisible(url);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onPageCommitVisible(url);
     }
   }
 
@@ -791,10 +791,10 @@ public class InAppWebViewClient extends WebViewClient {
   public boolean onRenderProcessGone(WebView view, RenderProcessGoneDetail detail) {
     final InAppWebView webView = (InAppWebView) view;
 
-    if (webView.customSettings.useOnRenderProcessGone && webView.eventChannelDelegate != null) {
+    if (webView.customSettings.useOnRenderProcessGone && webView.channelDelegate != null) {
       boolean didCrash = detail.didCrash();
       int rendererPriorityAtExit = detail.rendererPriorityAtExit();
-      webView.eventChannelDelegate.onRenderProcessGone(didCrash, rendererPriorityAtExit);
+      webView.channelDelegate.onRenderProcessGone(didCrash, rendererPriorityAtExit);
       return true;
     }
 
@@ -804,8 +804,8 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public void onReceivedLoginRequest(WebView view, String realm, String account, String args) {
     final InAppWebView webView = (InAppWebView) view;
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onReceivedLoginRequest(realm, account, args);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onReceivedLoginRequest(realm, account, args);
     }
   }
 

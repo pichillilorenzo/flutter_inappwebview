@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.Util;
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -18,20 +20,19 @@ import java.util.UUID;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandler {
-
+public class ChromeSafariBrowserManager extends ChannelDelegateImpl implements Disposable {
   protected static final String LOG_TAG = "ChromeBrowserManager";
-  public MethodChannel channel;
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_chromesafaribrowser";
+  
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
   public String id;
   public static final Map<String, ChromeSafariBrowserManager> shared = new HashMap<>();
 
   public ChromeSafariBrowserManager(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.id = UUID.randomUUID().toString();
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser");
-    channel.setMethodCallHandler(this);
     shared.put(this.id, this);
   }
 
@@ -96,8 +97,9 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     result.error(LOG_TAG, "ChromeCustomTabs is not available!", null);
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     shared.remove(this.id);
     plugin = null;
   }

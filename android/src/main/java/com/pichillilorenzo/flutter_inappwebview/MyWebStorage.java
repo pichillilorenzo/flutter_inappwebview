@@ -3,7 +3,11 @@ package com.pichillilorenzo.flutter_inappwebview;
 import android.webkit.ValueCallback;
 import android.webkit.WebStorage;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -13,24 +17,22 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MyWebStorage implements MethodChannel.MethodCallHandler {
+public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
+  protected static final String LOG_TAG = "MyWebStorage";
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webstoragemanager";
 
-  static final String LOG_TAG = "MyWebStorage";
-
-  public MethodChannel channel;
   public static WebStorage webStorageManager;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
   public MyWebStorage(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_webstoragemanager");
-    channel.setMethodCallHandler(this);
     webStorageManager = WebStorage.getInstance();
   }
 
   @Override
-  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     switch (call.method) {
       case "getOrigins":
         getOrigins(result);
@@ -101,8 +103,9 @@ public class MyWebStorage implements MethodChannel.MethodCallHandler {
     });
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     plugin = null;
   }
 }

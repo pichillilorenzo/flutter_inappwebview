@@ -3,7 +3,12 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 import android.text.TextUtils;
 import android.webkit.ValueCallback;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+
 import com.pichillilorenzo.flutter_inappwebview.Util;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
+import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageChannel;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 
 import java.util.ArrayList;
@@ -11,12 +16,13 @@ import java.util.List;
 
 public class WebMessagePort {
   public String name;
+  @Nullable
   public WebMessageChannel webMessageChannel;
   public boolean isClosed = false;
   public boolean isTransferred = false;
   public boolean isStarted = false;
 
-  public WebMessagePort(String name, WebMessageChannel webMessageChannel) {
+  public WebMessagePort(String name, @NonNull WebMessageChannel webMessageChannel) {
     this.name = name;
     this.webMessageChannel = webMessageChannel;
   }

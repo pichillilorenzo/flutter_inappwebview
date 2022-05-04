@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.content.Context;
 import android.hardware.display.DisplayManager;
@@ -14,15 +14,15 @@ import android.webkit.WebViewClient;
 import android.widget.FrameLayout;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.InAppWebViewMethodHandler;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshSettings;
-import com.pichillilorenzo.flutter_inappwebview.types.PlatformWebView;
+import com.pichillilorenzo.flutter_inappwebview.webview.PlatformWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
 
@@ -32,21 +32,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.MethodChannel;
-
 public class FlutterWebView implements PlatformWebView {
 
   static final String LOG_TAG = "IAWFlutterWebView";
 
+  @Nullable
   public InAppWebView webView;
-  public final MethodChannel channel;
-  public InAppWebViewMethodHandler methodCallDelegate;
+  @Nullable
   public PullToRefreshLayout pullToRefreshLayout;
 
   public FlutterWebView(final InAppWebViewFlutterPlugin plugin, final Context context, Object id,
                         HashMap<String, Object> params) {
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_" + id);
-
     DisplayListenerProxy displayListenerProxy = new DisplayListenerProxy();
     DisplayManager displayManager = (DisplayManager) context.getSystemService(Context.DISPLAY_SERVICE);
     displayListenerProxy.onPreWebViewInitialization(displayManager);
@@ -57,8 +53,8 @@ public class FlutterWebView implements PlatformWebView {
     List<Map<String, Object>> initialUserScripts = (List<Map<String, Object>>) params.get("initialUserScripts");
     Map<String, Object> pullToRefreshInitialSettings = (Map<String, Object>) params.get("pullToRefreshSettings");
 
-    InAppWebViewSettings options = new InAppWebViewSettings();
-    options.parse(initialSettings);
+    InAppWebViewSettings customSettings = new InAppWebViewSettings();
+    customSettings.parse(initialSettings);
 
     if (plugin == null || plugin.activity == null) {
       Log.e(LOG_TAG, "\n\n\nERROR: You need to upgrade your Flutter project to use the new Java Embedding API:\n\n" +
@@ -74,22 +70,19 @@ public class FlutterWebView implements PlatformWebView {
       }
     }
 
-    webView = new InAppWebView(context, plugin, channel, id, windowId, options, contextMenu, options.useHybridComposition ? null : plugin.flutterView, userScripts);
+    webView = new InAppWebView(context, plugin, id, windowId, customSettings, contextMenu, 
+            customSettings.useHybridComposition ? null : plugin.flutterView, userScripts);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
-    if (options.useHybridComposition) {
+    if (customSettings.useHybridComposition) {
       // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
       webView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      MethodChannel pullToRefreshLayoutChannel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + id);
       PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();
       pullToRefreshSettings.parse(pullToRefreshInitialSettings);
-      pullToRefreshLayout = new PullToRefreshLayout(context, pullToRefreshLayoutChannel, pullToRefreshSettings);
+      pullToRefreshLayout = new PullToRefreshLayout(context, plugin, id, pullToRefreshSettings);
       pullToRefreshLayout.addView(webView);
       pullToRefreshLayout.prepare();
     }
-
-    methodCallDelegate = new InAppWebViewMethodHandler(webView);
-    channel.setMethodCallHandler(methodCallDelegate);
 
     webView.prepare();
   }
@@ -130,19 +123,19 @@ public class FlutterWebView implements PlatformWebView {
       }
       else if (initialUrlRequest != null) {
         URLRequest urlRequest = URLRequest.fromMap(initialUrlRequest);
-        webView.loadUrl(urlRequest);
+        if (urlRequest != null) {
+          webView.loadUrl(urlRequest);
+        }
       }
     }
   }
 
   @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
-    if (methodCallDelegate != null) {
-      methodCallDelegate.dispose();
-      methodCallDelegate = null;
-    }
     if (webView != null) {
+      if (webView.channelDelegate != null) {
+        webView.channelDelegate.dispose();
+      }
       webView.removeJavascriptInterface(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE)) {
         WebViewCompat.setWebViewRenderProcessClient(webView, null);
@@ -154,13 +147,20 @@ public class FlutterWebView implements PlatformWebView {
           if (webView.inAppWebViewRenderProcessClient != null) {
             webView.inAppWebViewRenderProcessClient.dispose();
           }
-          webView.eventChannelDelegate.dispose();
-          webView.inAppWebViewChromeClient.dispose();
-          webView.inAppWebViewClient.dispose();
-          webView.javaScriptBridgeInterface.dispose();
-          webView.dispose();
-          webView.destroy();
-          webView = null;
+          if (webView.inAppWebViewChromeClient != null) {
+            webView.inAppWebViewChromeClient.dispose();
+          }
+          if (webView.inAppWebViewClient != null) {
+            webView.inAppWebViewClient.dispose();
+          }
+          if (webView.javaScriptBridgeInterface != null) {
+            webView.javaScriptBridgeInterface.dispose();
+          }
+          if (webView != null) {
+            webView.dispose();
+            webView.destroy();
+            webView = null;
+          }
           
           if (pullToRefreshLayout != null) {
             pullToRefreshLayout.dispose();

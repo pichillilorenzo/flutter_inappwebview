@@ -36,6 +36,8 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -51,20 +53,19 @@ import io.flutter.plugin.common.MethodChannel.Result;
 /**
  * InAppBrowserManager
  */
-public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
-
+public class InAppBrowserManager extends ChannelDelegateImpl implements Disposable {
   protected static final String LOG_TAG = "InAppBrowserManager";
-  public MethodChannel channel;
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappbrowser";
+  
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
   public String id;
   public static final Map<String, InAppBrowserManager> shared = new HashMap<>();
 
   public InAppBrowserManager(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.id = UUID.randomUUID().toString();
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappbrowser");
-    channel.setMethodCallHandler(this);
     shared.put(this.id, this);
   }
 
@@ -208,8 +209,9 @@ public class InAppBrowserManager implements MethodChannel.MethodCallHandler {
     activity.startActivity(intent);
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     shared.remove(this.id);
     plugin = null;
   }

@@ -13,6 +13,7 @@ import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDa
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
 import com.pichillilorenzo.flutter_inappwebview.proxy.ProxyManager;
+import com.pichillilorenzo.flutter_inappwebview.service_worker.ServiceWorkerManager;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;

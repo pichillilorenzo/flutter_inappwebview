@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.types.URLCredential;
 import com.pichillilorenzo.flutter_inappwebview.types.URLProtectionSpace;
 
@@ -20,24 +22,22 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 @RequiresApi(api = Build.VERSION_CODES.O)
-public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandler {
+public class CredentialDatabaseHandler extends ChannelDelegateImpl implements Disposable {
+  protected static final String LOG_TAG = "CredentialDatabaseHandler";
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_credential_database";
 
-  static final String LOG_TAG = "CredentialDatabaseHandler";
-
-  public MethodChannel channel;
   public static CredentialDatabase credentialDatabase;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
   public CredentialDatabaseHandler(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_credential_database");
-    channel.setMethodCallHandler(this);
     credentialDatabase = CredentialDatabase.getInstance(plugin.applicationContext);
   }
 
   @Override
-  public void onMethodCall(MethodCall call, @NonNull MethodChannel.Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     switch (call.method) {
       case "getAllAuthCredentials":
         {
@@ -122,9 +122,9 @@ public class CredentialDatabaseHandler implements MethodChannel.MethodCallHandle
     }
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     plugin = null;
   }
-
 }

@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.os.Build;
 import android.view.View;
@@ -9,7 +9,7 @@ import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
-import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 
 import java.util.ArrayList;

@@ -7,29 +7,28 @@ import androidx.webkit.ProxyController;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.types.ProxyRuleExt;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.Executor;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class ProxyManager implements MethodChannel.MethodCallHandler {
+public class ProxyManager extends ChannelDelegateImpl implements Disposable {
+  protected static final String LOG_TAG = "ProxyManager";
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_proxycontroller";
 
-  static final String LOG_TAG = "ProxyManager";
-
-  public MethodChannel channel;
   @Nullable
   public static ProxyController proxyController;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
   public ProxyManager(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_proxycontroller");
-    channel.setMethodCallHandler(this);
     if (WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE)) {
       proxyController = ProxyController.getInstance();
     } else {
@@ -116,8 +115,9 @@ public class ProxyManager implements MethodChannel.MethodCallHandler {
     }
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     if (proxyController != null) {
       // Clears the proxy settings
       proxyController.clearProxyOverride(new Executor() {

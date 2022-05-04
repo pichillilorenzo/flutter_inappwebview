@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.os.Handler;
 import android.os.IBinder;
@@ -9,7 +9,7 @@ import android.view.inputmethod.InputConnection;
 /**
  * A fake View only exposed to InputMethodManager.
  *
- * https://github.com/flutter/plugins/blob/master/packages/webview_flutter/android/src/main/java/io/flutter/plugins/webviewflutter/ThreadedInputConnectionProxyAdapterView.java
+ * https://github.com/flutter/plugins/blob/main/packages/webview_flutter/webview_flutter_android/android/src/main/java/io/flutter/plugins/webviewflutter/ThreadedInputConnectionProxyAdapterView.java
  */
 final class ThreadedInputConnectionProxyAdapterView extends View {
     final Handler imeHandler;

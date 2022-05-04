@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
@@ -55,7 +55,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.JavaScriptBridgeInterface;
+import com.pichillilorenzo.flutter_inappwebview.webview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlocker;
@@ -76,14 +76,16 @@ import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PromisePolyfil
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.types.DownloadStartRequest;
-import com.pichillilorenzo.flutter_inappwebview.types.InAppWebViewInterface;
+import com.pichillilorenzo.flutter_inappwebview.webview.ContextMenuSettings;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserContentController;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
-import com.pichillilorenzo.flutter_inappwebview.types.WebMessageChannel;
-import com.pichillilorenzo.flutter_inappwebview.types.WebMessageListener;
+import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
+import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageChannel;
+import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageListener;
 
 import org.json.JSONObject;
 
@@ -104,14 +106,13 @@ import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType.fromValue;
 
 final public class InAppWebView extends InputAwareWebView implements InAppWebViewInterface {
-
-  static final String LOG_TAG = "InAppWebView";
+  protected static final String LOG_TAG = "InAppWebView";
+  public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_";
 
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
   @Nullable
   public InAppBrowserDelegate inAppBrowserDelegate;
-  public MethodChannel channel;
   public Object id;
   @Nullable
   public Integer windowId;
@@ -122,10 +123,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Nullable
   public InAppWebViewRenderProcessClient inAppWebViewRenderProcessClient;
   @Nullable
-  public EventChannelDelegate eventChannelDelegate;
+  public WebViewChannelDelegate channelDelegate;
   @Nullable
   public JavaScriptBridgeInterface javaScriptBridgeInterface;
-  public InAppWebViewSettings customSettings;
+  public InAppWebViewSettings customSettings = new InAppWebViewSettings();
   public boolean isLoading = false;
   private boolean inFullscreen = false;
   public OkHttpClient httpClient;
@@ -169,15 +170,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     super(context, attrs, defaultStyle);
   }
 
-  public InAppWebView(Context context, InAppWebViewFlutterPlugin plugin,
-                      MethodChannel channel, Object id,
-                      @Nullable Integer windowId, InAppWebViewSettings customSettings,
+  public InAppWebView(Context context, @NonNull InAppWebViewFlutterPlugin plugin,
+                      @NonNull Object id, @Nullable Integer windowId, InAppWebViewSettings customSettings,
                       @Nullable Map<String, Object> contextMenu, View containerView,
                       List<UserScript> userScripts) {
     super(context, containerView, customSettings.useHybridComposition);
     this.plugin = plugin;
-    this.channel = channel;
     this.id = id;
+    final MethodChannel channel = new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
+    this.channelDelegate = new WebViewChannelDelegate(this, channel);
     this.windowId = windowId;
     this.customSettings = customSettings;
     this.contextMenu = contextMenu;
@@ -189,8 +190,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   public void prepare() {
     httpClient = new OkHttpClient().newBuilder().build();
-
-    eventChannelDelegate =  new EventChannelDelegate(channel);
 
     javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
     addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
@@ -397,7 +396,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     setFindListener(new FindListener() {
       @Override
       public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
-        if (eventChannelDelegate != null) eventChannelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        if (channelDelegate != null) channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
       }
     });
 
@@ -493,7 +492,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       public boolean onLongClick(View v) {
         com.pichillilorenzo.flutter_inappwebview.types.HitTestResult hitTestResult =
                 com.pichillilorenzo.flutter_inappwebview.types.HitTestResult.fromWebViewHitTestResult(getHitTestResult());
-        if (eventChannelDelegate != null) eventChannelDelegate.onLongPressHitTestResult(hitTestResult);
+        if (channelDelegate != null) channelDelegate.onLongPressHitTestResult(hitTestResult);
         return false;
       }
     });
@@ -1194,7 +1193,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       floatingContextMenu.setVisibility(View.GONE);
     }
 
-    if (eventChannelDelegate != null) eventChannelDelegate.onScrollChanged(x, y);
+    if (channelDelegate != null) channelDelegate.onScrollChanged(x, y);
   }
 
   public void scrollTo(Integer x, Integer y, Boolean animated) {
@@ -1231,7 +1230,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         URLUtil.guessFileName(url, contentDisposition, mimeType),
         null
       );
-      if (eventChannelDelegate != null) eventChannelDelegate.onDownloadStartRequest(downloadStartRequest);
+      if (channelDelegate != null) channelDelegate.onDownloadStartRequest(downloadStartRequest);
     }
   }
 
@@ -1282,7 +1281,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   private void sendOnCreateContextMenuEvent() {
     com.pichillilorenzo.flutter_inappwebview.types.HitTestResult hitTestResult =
             com.pichillilorenzo.flutter_inappwebview.types.HitTestResult.fromWebViewHitTestResult(getHitTestResult());
-    if (eventChannelDelegate != null) eventChannelDelegate.onCreateContextMenu(hitTestResult);
+    if (channelDelegate != null) channelDelegate.onCreateContextMenu(hitTestResult);
   }
 
   private Point contextMenuPoint = new Point(0, 0);
@@ -1315,13 +1314,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       PullToRefreshLayout pullToRefreshLayout = (PullToRefreshLayout) parent;
       // change over scroll mode to OVER_SCROLL_NEVER in order to disable temporarily the glow effect
       setOverScrollMode(OVER_SCROLL_NEVER);
-      pullToRefreshLayout.setEnabled(pullToRefreshLayout.options.enabled);
+      pullToRefreshLayout.setEnabled(pullToRefreshLayout.settings.enabled);
       // reset over scroll mode
       setOverScrollMode(customSettings.overScrollMode);
     }
 
     if (overScrolledHorizontally || overScrolledVertically) {
-      if (eventChannelDelegate != null) eventChannelDelegate.onOverScrolled(scrollX, scrollY, overScrolledHorizontally, overScrolledVertically);
+      if (channelDelegate != null) channelDelegate.onOverScrolled(scrollX, scrollY, overScrolledHorizontally, overScrolledVertically);
     }
   }
 
@@ -1428,13 +1427,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         TextView text = (TextView) LayoutInflater.from(this.getContext())
                 .inflate(R.layout.floating_action_mode_item, this, false);
         text.setText(itemTitle);
-        text.setOnClickListener(new OnClickListener() {
+        text.setOnClickListener(new View.OnClickListener() {
           @Override
           public void onClick(View v) {
             hideContextMenu();
             callback.onActionItemClicked(actionMode, menuItem);
 
-            if (eventChannelDelegate != null) eventChannelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
+            if (channelDelegate != null) channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
           }
         });
         if (floatingContextMenu != null) {
@@ -1454,12 +1453,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         public void onClick(View v) {
           hideContextMenu();
 
-          if (eventChannelDelegate != null) eventChannelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
+          if (channelDelegate != null) channelDelegate.onContextMenuActionItemClicked(itemId, itemTitle);
         }
       });
       if (floatingContextMenu != null) {
         menuItemListLayout.addView(text);
-
       }
     }
 
@@ -1531,7 +1529,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     removeView(floatingContextMenu);
     floatingContextMenu = null;
     
-    if (eventChannelDelegate != null) eventChannelDelegate.onHideContextMenu();
+    if (channelDelegate != null) channelDelegate.onHideContextMenu();
   }
 
   public void onScrollStopped() {
@@ -1794,13 +1792,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Nullable
   @Override
-  public EventChannelDelegate getEventChannelDelegate() {
-    return eventChannelDelegate;
+  public WebViewChannelDelegate getChannelDelegate() {
+    return channelDelegate;
   }
   
   @Override
-  public void setEventChannelDelegate(@Nullable EventChannelDelegate eventChannelDelegate) {
-    this.eventChannelDelegate = eventChannelDelegate;
+  public void setChannelDelegate(@Nullable WebViewChannelDelegate channelDelegate) {
+    this.channelDelegate = channelDelegate;
   }
 
   @Override
@@ -1824,7 +1822,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     inAppWebViewClient = null;
     javaScriptBridgeInterface = null;
     inAppWebViewRenderProcessClient = null;
-    eventChannelDelegate = null;
+    channelDelegate = null;
     plugin = null;
     super.dispose();
   }

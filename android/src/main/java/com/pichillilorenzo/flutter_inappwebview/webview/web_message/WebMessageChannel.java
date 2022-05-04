@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.types;
+package com.pichillilorenzo.flutter_inappwebview.webview.web_message;
 
 import android.webkit.ValueCallback;
 
@@ -9,8 +9,11 @@ import androidx.webkit.WebMessagePortCompat;
 import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
+import com.pichillilorenzo.flutter_inappwebview.types.WebMessagePort;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -21,19 +24,22 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class WebMessageChannel implements MethodChannel.MethodCallHandler {
-  static final String LOG_TAG = "WebMessageChannel";
+public class WebMessageChannel implements Disposable {
+  protected static final String LOG_TAG = "WebMessageChannel";
+  public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_channel_";
 
   public String id;
-  public MethodChannel channel;
+  @Nullable
+  public WebMessageChannelChannelDelegate channelDelegate;
   public final List<WebMessagePortCompat> compatPorts;
   public final List<WebMessagePort> ports;
+  @Nullable
   public InAppWebViewInterface webView;
 
   public WebMessageChannel(@NonNull String id, @NonNull InAppWebViewInterface webView) {
     this.id = id;
-    this.channel = new MethodChannel(webView.getPlugin().messenger, "com.pichillilorenzo/flutter_inappwebview_web_message_channel_" + id);
-    this.channel.setMethodCallHandler(this);
+    final MethodChannel channel = new MethodChannel(webView.getPlugin().messenger, METHOD_CHANNEL_NAME_PREFIX + id);
+    this.channelDelegate = new WebMessageChannelChannelDelegate(this, channel);
     if (webView instanceof InAppWebView) {
       this.compatPorts = new ArrayList<>(Arrays.asList(WebViewCompat.createWebMessageChannel((InAppWebView) webView)));
       this.ports = new ArrayList<>();
@@ -59,54 +65,18 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
       callback.onReceiveValue(this);
     }
   }
-
-  @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
-    switch (call.method) {
-      case "setWebMessageCallback":
-        if (webView instanceof InAppWebView) {
-          final Integer index = (Integer) call.argument("index");
-          setWebMessageCallbackForInAppWebView(index, result);
-        } else {
-          result.success(true);
-        }
-        break;
-      case "postMessage":
-        if (webView instanceof InAppWebView) {
-          final Integer index = (Integer) call.argument("index");
-          Map<String, Object> message = (Map<String, Object>) call.argument("message");
-          postMessageForInAppWebView(index, message, result);
-        } else {
-          result.success(true);
-        }
-        break;
-      case "close":
-        if (webView instanceof InAppWebView) {
-          Integer index = (Integer) call.argument("index");
-          closeForInAppWebView(index, result);
-        } else {
-          result.success(true);
-        }
-        break;
-      default:
-        result.notImplemented();
-    }
-  }
   
-  private void setWebMessageCallbackForInAppWebView(final Integer index, @NonNull MethodChannel.Result result) {
+  public void setWebMessageCallbackForInAppWebView(final int index, @NonNull MethodChannel.Result result) {
     if (webView != null && compatPorts.size() > 0 &&
             WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_PORT_SET_MESSAGE_CALLBACK)) {
       final WebMessagePortCompat webMessagePort = compatPorts.get(index);
+      final WebMessageChannel webMessageChannel = this;
       try {
         webMessagePort.setWebMessageCallback(new WebMessagePortCompat.WebMessageCallbackCompat() {
           @Override
           public void onMessage(@NonNull WebMessagePortCompat port, @Nullable WebMessageCompat message) {
             super.onMessage(port, message);
-
-            Map<String, Object> obj = new HashMap<>();
-            obj.put("index", index);
-            obj.put("message", message != null ? message.getData() : null);
-            channel.invokeMethod("onMessage", obj);
+            webMessageChannel.onMessage(index, message != null ? message.getData() : null);
           }
         });
         result.success(true);
@@ -118,7 +88,7 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
     }
   }
 
-  private void postMessageForInAppWebView(final Integer index, Map<String, Object> message, @NonNull MethodChannel.Result result) {
+  public void postMessageForInAppWebView(final Integer index, Map<String, Object> message, @NonNull MethodChannel.Result result) {
     if (webView != null && compatPorts.size() > 0 &&
             WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_PORT_POST_MESSAGE)) {
       WebMessagePortCompat port = compatPorts.get(index);
@@ -146,7 +116,7 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
     }
   }
 
-  private void closeForInAppWebView(Integer index, @NonNull MethodChannel.Result result) {
+  public void closeForInAppWebView(Integer index, @NonNull MethodChannel.Result result) {
     if (webView != null && compatPorts.size() > 0 &&
             WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_PORT_CLOSE)) {
       WebMessagePortCompat port = compatPorts.get(index);
@@ -161,11 +131,10 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
     }
   }
 
-  public void onMessage(Integer index, String message) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("index", index);
-    obj.put("message", message );
-    channel.invokeMethod("onMessage", obj);
+  public void onMessage(int index, String message) {
+    if (channelDelegate != null) {
+      channelDelegate.onMessage(index, message);
+    }
   }
 
   public Map<String, Object> toMap() {
@@ -182,8 +151,11 @@ public class WebMessageChannel implements MethodChannel.MethodCallHandler {
         } catch (Exception ignored) {}
       }
     }
-    this.channel.setMethodCallHandler(null);
-    this.compatPorts.clear();
-    this.webView = null;
+    if (channelDelegate != null) {
+      channelDelegate.dispose();
+      channelDelegate = null;
+    }
+    compatPorts.clear();
+    webView = null;
   }
 }

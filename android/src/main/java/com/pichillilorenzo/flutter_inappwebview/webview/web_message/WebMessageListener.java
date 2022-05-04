@@ -1,8 +1,7 @@
-package com.pichillilorenzo.flutter_inappwebview.types;
+package com.pichillilorenzo.flutter_inappwebview.webview.web_message;
 
 import android.net.Uri;
 import android.text.TextUtils;
-import android.webkit.ValueCallback;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -13,11 +12,14 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
+import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
+import com.pichillilorenzo.flutter_inappwebview.types.UserScriptInjectionTime;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -27,29 +29,38 @@ import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class WebMessageListener implements MethodChannel.MethodCallHandler {
-  static final String LOG_TAG = "WebMessageListener";
+public class WebMessageListener implements Disposable {
+  protected static final String LOG_TAG = "WebMessageListener";
+  public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_listener_";
 
   public String jsObjectName;
   public Set<String> allowedOriginRules;
   public WebViewCompat.WebMessageListener listener;
   public JavaScriptReplyProxy replyProxy;
-  public MethodChannel channel;
+  @Nullable
   public InAppWebViewInterface webView;
+  @Nullable
+  public WebMessageListenerChannelDelegate channelDelegate;
 
-  public WebMessageListener(@NonNull InAppWebViewInterface webView, @NonNull BinaryMessenger messenger, @NonNull String jsObjectName, @NonNull Set<String> allowedOriginRules) {
+  public WebMessageListener(@NonNull InAppWebViewInterface webView, @NonNull BinaryMessenger messenger,
+                            @NonNull String jsObjectName, @NonNull Set<String> allowedOriginRules) {
     this.webView = webView;
     this.jsObjectName = jsObjectName;
     this.allowedOriginRules = allowedOriginRules;
-    this.channel = new MethodChannel(messenger, "com.pichillilorenzo/flutter_inappwebview_web_message_listener_" + this.jsObjectName);
-    this.channel.setMethodCallHandler(this);
+    final MethodChannel channel = new MethodChannel(messenger, METHOD_CHANNEL_NAME_PREFIX + this.jsObjectName);
+    this.channelDelegate = new WebMessageListenerChannelDelegate(this, channel);
+
     if (this.webView instanceof InAppWebView) {
-      final WebMessageListener self = this;
       this.listener = new WebViewCompat.WebMessageListener() {
         @Override
-        public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin, boolean isMainFrame, @NonNull JavaScriptReplyProxy javaScriptReplyProxy) {
+        public void onPostMessage(@NonNull WebView view, @NonNull WebMessageCompat message, @NonNull Uri sourceOrigin,
+                                  boolean isMainFrame, @NonNull JavaScriptReplyProxy javaScriptReplyProxy) {
           replyProxy = javaScriptReplyProxy;
-          self.onPostMessage(message.getData(), sourceOrigin, isMainFrame);
+          if (channelDelegate != null) {
+            channelDelegate.onPostMessage(message.getData(),
+                    sourceOrigin.toString().equals("null") ? null : sourceOrigin.toString(),
+                    isMainFrame);
+          }
         }
       };
     }
@@ -103,22 +114,6 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
     return new WebMessageListener(webView, messenger, jsObjectName, allowedOriginRules);
   }
 
-  @Override
-  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
-    switch (call.method) {
-      case "postMessage":
-        if (webView instanceof InAppWebView) {
-          String message = (String) call.argument("message");
-          postMessageForInAppWebView(message, result);
-        } else {
-          result.success(true);
-        }
-        break;
-      default:
-        result.notImplemented();
-    }
-  }
-
   public void assertOriginRulesValid() throws Exception {
     int index = 0;
     for (String originRule : allowedOriginRules) {
@@ -170,7 +165,7 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
     }
   }
 
-  private void postMessageForInAppWebView(String message, @NonNull MethodChannel.Result result) {
+  public void postMessageForInAppWebView(String message, @NonNull MethodChannel.Result result) {
     if (replyProxy != null && WebViewFeature.isFeatureSupported(WebViewFeature.WEB_MESSAGE_LISTENER)) {
       replyProxy.postMessage(message);
     }
@@ -218,19 +213,14 @@ public class WebMessageListener implements MethodChannel.MethodCallHandler {
     }
     return false;
   }
-  
-  public void onPostMessage(String message, Uri sourceOrigin, boolean isMainFrame) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("message", message);
-    obj.put("sourceOrigin", sourceOrigin.toString().equals("null") ? null : sourceOrigin.toString());
-    obj.put("isMainFrame", isMainFrame);
-    channel.invokeMethod("onPostMessage", obj);
-  }
 
   public void dispose() {
-    this.channel.setMethodCallHandler(null);
-    this.listener = null;
-    this.replyProxy = null;
-    this.webView = null;
+    if (channelDelegate != null) {
+      channelDelegate.dispose();
+      channelDelegate = null;
+    }
+    listener = null;
+    replyProxy = null;
+    webView = null;
   }
 }

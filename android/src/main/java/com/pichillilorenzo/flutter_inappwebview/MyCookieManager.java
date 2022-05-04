@@ -5,7 +5,11 @@ import android.webkit.CookieManager;
 import android.webkit.CookieSyncManager;
 import android.webkit.ValueCallback;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -19,24 +23,22 @@ import java.util.TimeZone;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MyCookieManager implements MethodChannel.MethodCallHandler {
+public class MyCookieManager extends ChannelDelegateImpl implements Disposable {
+  protected static final String LOG_TAG = "MyCookieManager";
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_cookiemanager";
 
-  static final String LOG_TAG = "MyCookieManager";
-
-  public MethodChannel channel;
   public static CookieManager cookieManager;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
   public MyCookieManager(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_inappwebview_cookiemanager");
-    channel.setMethodCallHandler(this);
     cookieManager = getCookieManager();
   }
 
   @Override
-  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     switch (call.method) {
       case "setCookie":
         {
@@ -299,8 +301,9 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     return sdf.format(new Date(timestamp));
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     plugin = null;
   }
 }

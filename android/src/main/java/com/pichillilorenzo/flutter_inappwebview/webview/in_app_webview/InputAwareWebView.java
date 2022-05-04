@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 
@@ -20,7 +20,7 @@ import androidx.annotation.Nullable;
  *
  * These hacks are only needed in Android versions below N and exist to create an InputConnection
  * on the WebView's dedicated input, or IME, thread. The majority of this proxying logic is in
- * https://github.com/flutter/plugins/blob/master/packages/webview_flutter/android/src/main/java/io/flutter/plugins/webviewflutter/InputAwareWebView.java
+ * https://github.com/flutter/plugins/blob/main/packages/webview_flutter/webview_flutter_android/android/src/main/java/io/flutter/plugins/webviewflutter/InputAwareWebView.java
  */
 public class InputAwareWebView extends WebView {
   private static final String LOG_TAG = "InputAwareWebView";
@@ -196,6 +196,13 @@ public class InputAwareWebView extends WebView {
       new Runnable() {
         @Override
         public void run() {
+          if (containerView == null) {
+            Log.e(
+                    LOG_TAG,
+                    "Can't set the input connection target because there is no containerView to use as a handler.");
+            return;
+          }
+
           InputMethodManager imm =
                   (InputMethodManager) getContext().getSystemService(INPUT_METHOD_SERVICE);
           // This is a hack to make InputMethodManager believe that the target view now has focus.

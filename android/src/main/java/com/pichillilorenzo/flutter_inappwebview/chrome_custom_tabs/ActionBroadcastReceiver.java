@@ -29,7 +29,7 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
       String managerId = b.getString(CHROME_MANAGER_ID);
       ChromeSafariBrowserManager manager = (ChromeSafariBrowserManager) ChromeSafariBrowserManager.shared.get(managerId);
 
-      MethodChannel channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId);
+      MethodChannel channel = new MethodChannel(manager.plugin.messenger, ChromeCustomTabsActivity.METHOD_CHANNEL_NAME_PREFIX + viewId);
       Map<String, Object> obj = new HashMap<>();
       obj.put("url", url);
       obj.put("title", title);

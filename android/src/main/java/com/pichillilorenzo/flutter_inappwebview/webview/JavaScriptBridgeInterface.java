@@ -1,32 +1,27 @@
-package com.pichillilorenzo.flutter_inappwebview;
+package com.pichillilorenzo.flutter_inappwebview.webview;
 
 import android.os.Build;
 import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
+import androidx.annotation.Nullable;
+
+import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.flutter.plugin.common.MethodChannel;
-
 public class JavaScriptBridgeInterface {
   private static final String LOG_TAG = "JSBridgeInterface";
   private InAppWebView inAppWebView;
-  private final MethodChannel channel;
   
   public JavaScriptBridgeInterface(InAppWebView inAppWebView) {
     this.inAppWebView = inAppWebView;
-    this.channel = this.inAppWebView.channel;
   }
 
   @JavascriptInterface
@@ -51,10 +46,6 @@ public class JavaScriptBridgeInterface {
     if (inAppWebView == null) {
       return;
     }
-
-    final Map<String, Object> obj = new HashMap<>();
-    obj.put("handlerName", handlerName);
-    obj.put("args", args);
 
     // java.lang.RuntimeException: Methods marked with @UiThread must be executed on the main thread.
     // https://github.com/pichillilorenzo/flutter_inappwebview/issues/98
@@ -99,32 +90,33 @@ public class JavaScriptBridgeInterface {
           return;
         }
 
-        // invoke flutter javascript handler and send back flutter data as a JSON Object to javascript
-        channel.invokeMethod("onCallJsHandler", obj, new MethodChannel.Result() {
-          @Override
-          public void success(Object json) {
-            if (inAppWebView == null) {
-              // The webview has already been disposed, ignore.
-              return;
+        if (inAppWebView.channelDelegate != null) {
+          // invoke flutter javascript handler and send back flutter data as a JSON Object to javascript
+          inAppWebView.channelDelegate.onCallJsHandler(handlerName, args, new WebViewChannelDelegate.CallJsHandlerCallback() {
+            @Override
+            public void defaultBehaviour(@Nullable Object json) {
+              if (inAppWebView == null) {
+                // The webview has already been disposed, ignore.
+                return;
+              }
+              String sourceCode = "if (window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) { " +
+                "window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "](" + json + "); " +
+                "delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "]; " +
+              "}";
+              if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                inAppWebView.evaluateJavascript(sourceCode, (ValueCallback<String>) null);
+              }
+              else {
+                inAppWebView.loadUrl("javascript:" + sourceCode);
+              }
             }
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-              inAppWebView.evaluateJavascript("if(window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) {window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "](" + json + "); delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "];}", (ValueCallback<String>) null);
+
+            @Override
+            public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+              Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
             }
-            else {
-              inAppWebView.loadUrl("javascript:if(window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "] != null) {window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "](" + json + "); delete window." + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "[" + _callHandlerID + "];}");
-            }
-          }
-
-          @Override
-          public void error(String s, String s1, Object o) {
-            Log.d(LOG_TAG, "ERROR: " + s + " " + s1);
-          }
-
-          @Override
-          public void notImplemented() {
-
-          }
-        });
+          });
+        }
       }
     });
   }

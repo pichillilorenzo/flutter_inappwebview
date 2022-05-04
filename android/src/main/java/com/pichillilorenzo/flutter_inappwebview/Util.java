@@ -92,44 +92,6 @@ public class Util {
     return mg.open(key);
   }
 
-  public static WaitFlutterResult invokeMethodAndWait(final MethodChannel channel, final String method, final Object arguments) throws InterruptedException {
-    final CountDownLatch latch = new CountDownLatch(1);
-
-    final Map<String, Object> flutterResultMap = new HashMap<>();
-    flutterResultMap.put("result", null);
-    flutterResultMap.put("error", null);
-
-    Handler handler = new Handler(Looper.getMainLooper());
-    handler.post(new Runnable() {
-      @Override
-      public void run() {
-        channel.invokeMethod(method, arguments, new MethodChannel.Result() {
-          @Override
-          public void success(Object result) {
-            flutterResultMap.put("result", result);
-            latch.countDown();
-          }
-
-          @Override
-          public void error(String s, String s1, Object o) {
-            flutterResultMap.put("error", "ERROR: " + s + " " + s1);
-            flutterResultMap.put("result", o);
-            latch.countDown();
-          }
-
-          @Override
-          public void notImplemented() {
-            latch.countDown();
-          }
-        });
-      }
-    });
-
-    latch.await();
-
-    return new WaitFlutterResult(flutterResultMap.get("result"), (String) flutterResultMap.get("error"));
-  }
-
   public static <T> T invokeMethodAndWaitResult(final @NonNull MethodChannel channel,
                                                 final @NonNull String method, final @Nullable Object arguments,
                                                 final @NonNull SyncBaseCallbackResultImpl<T> callback) throws InterruptedException {
@@ -142,16 +104,6 @@ public class Util {
     });
     callback.latch.await();
     return callback.result;
-  }
-
-  public static class WaitFlutterResult {
-    public Object result;
-    public String error;
-
-    public WaitFlutterResult(Object r, String e) {
-      result = r;
-      error = e;
-    }
   }
 
   @Nullable

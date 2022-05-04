@@ -1,4 +1,4 @@
-package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
+package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.util.Log;
 import android.webkit.WebView;
@@ -8,6 +8,8 @@ import androidx.annotation.Nullable;
 import androidx.webkit.WebViewFeature;
 import androidx.webkit.WebViewRenderProcess;
 import androidx.webkit.WebViewRenderProcessClient;
+
+import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
 
 public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient {
 
@@ -20,7 +22,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
   @Override
   public void onRenderProcessUnresponsive(@NonNull WebView view, @Nullable final WebViewRenderProcess renderer) {
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.RenderProcessUnresponsiveCallback callback = new EventChannelDelegate.RenderProcessUnresponsiveCallback() {
+    final WebViewChannelDelegate.RenderProcessUnresponsiveCallback callback = new WebViewChannelDelegate.RenderProcessUnresponsiveCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull Integer action) {
         if (renderer != null) {
@@ -47,8 +49,8 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
       }
     };
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onRenderProcessUnresponsive(webView.getUrl(), callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onRenderProcessUnresponsive(webView.getUrl(), callback);
     } else {
       callback.defaultBehaviour(null);
     }
@@ -57,7 +59,7 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
   @Override
   public void onRenderProcessResponsive(@NonNull WebView view, @Nullable final WebViewRenderProcess renderer) {
     final InAppWebView webView = (InAppWebView) view;
-    final EventChannelDelegate.RenderProcessResponsiveCallback callback = new EventChannelDelegate.RenderProcessResponsiveCallback() {
+    final WebViewChannelDelegate.RenderProcessResponsiveCallback callback = new WebViewChannelDelegate.RenderProcessResponsiveCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull Integer action) {
         if (renderer != null) {
@@ -84,8 +86,8 @@ public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient 
       }
     };
 
-    if (webView.eventChannelDelegate != null) {
-      webView.eventChannelDelegate.onRenderProcessResponsive(webView.getUrl(), callback);
+    if (webView.channelDelegate != null) {
+      webView.channelDelegate.onRenderProcessResponsive(webView.getUrl(), callback);
     } else {
       callback.defaultBehaviour(null);
     }

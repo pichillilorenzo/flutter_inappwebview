@@ -22,8 +22,8 @@ public class PullToRefreshSettings implements ISettings<PullToRefreshLayout> {
   @Nullable
   public Integer size;
 
-  public PullToRefreshSettings parse(Map<String, Object> options) {
-    for (Map.Entry<String, Object> pair : options.entrySet()) {
+  public PullToRefreshSettings parse(Map<String, Object> settings) {
+    for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
       if (value == null) {

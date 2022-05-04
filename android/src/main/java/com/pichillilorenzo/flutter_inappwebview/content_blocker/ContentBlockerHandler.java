@@ -7,7 +7,7 @@ import android.webkit.WebResourceResponse;
 
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayInputStream;

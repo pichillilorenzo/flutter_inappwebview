@@ -42,27 +42,6 @@ void onReceivedError() {
       expect(url, TEST_NOT_A_WEBSITE_URL.toString());
     });
 
-    testWidgets('file not found', (WidgetTester tester) async {
-      final Completer<WebResourceErrorType> errorCodeCompleter = Completer<WebResourceErrorType>();
-
-      await tester.pumpWidget(
-        Directionality(
-          textDirection: TextDirection.ltr,
-          child: InAppWebView(
-            key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse('file:flutter.dev')),
-            onReceivedError: (controller, request, error) {
-              errorCodeCompleter.complete(error.type);
-            },
-          ),
-        ),
-      );
-
-      final WebResourceErrorType errorType = await errorCodeCompleter.future;
-
-      expect(errorType, WebResourceErrorType.FILE_NOT_FOUND);
-    });
-
     testWidgets('event is not called with valid url',
         (WidgetTester tester) async {
       final Completer<void> onReceivedErrorCompleter = Completer<void>();

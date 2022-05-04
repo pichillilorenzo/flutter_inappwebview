@@ -154,6 +154,7 @@ public class FlutterWebView implements PlatformWebView {
           if (webView.inAppWebViewRenderProcessClient != null) {
             webView.inAppWebViewRenderProcessClient.dispose();
           }
+          webView.eventChannelDelegate.dispose();
           webView.inAppWebViewChromeClient.dispose();
           webView.inAppWebViewClient.dispose();
           webView.javaScriptBridgeInterface.dispose();

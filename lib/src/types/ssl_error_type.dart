@@ -65,35 +65,35 @@ class SslErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_NOTYETVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID))
   static final NOT_YET_VALID = SslErrorType._internal('NOT_YET_VALID',
-      (defaultTargetPlatform != TargetPlatform.android) ? 0 : -1);
+      (defaultTargetPlatform == TargetPlatform.android) ? 0 : -1);
 
   ///The certificate has expired.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_EXPIRED](https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED))
   static final EXPIRED = SslErrorType._internal(
-      'EXPIRED', (defaultTargetPlatform != TargetPlatform.android) ? 1 : -1);
+      'EXPIRED', (defaultTargetPlatform == TargetPlatform.android) ? 1 : -1);
 
   ///Hostname mismatch.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_IDMISMATCH](https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH))
   static final IDMISMATCH = SslErrorType._internal(
-      'IDMISMATCH', (defaultTargetPlatform != TargetPlatform.android) ? 2 : -1);
+      'IDMISMATCH', (defaultTargetPlatform == TargetPlatform.android) ? 2 : -1);
 
   ///The certificate authority is not trusted.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_UNTRUSTED](https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED))
   static final UNTRUSTED = SslErrorType._internal(
-      'UNTRUSTED', (defaultTargetPlatform != TargetPlatform.android) ? 3 : -1);
+      'UNTRUSTED', (defaultTargetPlatform == TargetPlatform.android) ? 3 : -1);
 
   ///The date of the certificate is invalid.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_DATE_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID))
   static final DATE_INVALID = SslErrorType._internal('DATE_INVALID',
-      (defaultTargetPlatform != TargetPlatform.android) ? 4 : -1);
+      (defaultTargetPlatform == TargetPlatform.android) ? 4 : -1);
 
   ///Indicates an invalid setting or result. A generic error occurred.
   ///
@@ -102,10 +102,10 @@ class SslErrorType {
   ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
   static final INVALID = SslErrorType._internal(
       'INVALID',
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? 5
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? 0
               : -1));
 
@@ -120,8 +120,8 @@ class SslErrorType {
   ///- iOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
   static final DENY = SslErrorType._internal(
       'DENY',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 3
           : -1);
 
@@ -138,8 +138,8 @@ class SslErrorType {
   ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   static final UNSPECIFIED = SslErrorType._internal(
       'UNSPECIFIED',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 4
           : -1);
 
@@ -157,8 +157,8 @@ class SslErrorType {
   ///- iOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   static final RECOVERABLE_TRUST_FAILURE = SslErrorType._internal(
       'RECOVERABLE_TRUST_FAILURE',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 5
           : -1);
 
@@ -173,8 +173,8 @@ class SslErrorType {
   ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   static final FATAL_TRUST_FAILURE = SslErrorType._internal(
       'FATAL_TRUST_FAILURE',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 6
           : -1);
 
@@ -187,8 +187,8 @@ class SslErrorType {
   ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
   static final OTHER_ERROR = SslErrorType._internal(
       'OTHER_ERROR',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 7
           : -1);
 

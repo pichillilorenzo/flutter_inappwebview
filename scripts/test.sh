@@ -36,6 +36,7 @@ node index.js &
 
 flutter --version
 flutter clean
+flutter pub get
 cd $PROJECT_DIR/example
 flutter clean
 if [ ! -z "$2" ] && [ $PLATFORM = "web" ]; then

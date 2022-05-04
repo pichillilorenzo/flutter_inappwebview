@@ -45,7 +45,7 @@ class ServiceWorkerController {
 
   static Future<dynamic> _handleMethod(MethodCall call) async {
     ServiceWorkerController controller = ServiceWorkerController.instance();
-    ServiceWorkerClient? serviceWorkerClient = controller.serviceWorkerClient;
+    ServiceWorkerClient? serviceWorkerClient = controller._serviceWorkerClient;
 
     switch (call.method) {
       case "shouldInterceptRequest":

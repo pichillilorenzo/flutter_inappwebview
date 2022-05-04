@@ -13,11 +13,12 @@ import androidx.webkit.ServiceWorkerControllerCompat;
 import androidx.webkit.ServiceWorkerWebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
+import com.pichillilorenzo.flutter_inappwebview.types.WebResourceRequestExt;
+import com.pichillilorenzo.flutter_inappwebview.types.WebResourceResponseExt;
+
 import java.io.ByteArrayInputStream;
-import java.util.HashMap;
 import java.util.Map;
 
-import io.flutter.plugin.common.BinaryMessenger;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
@@ -44,7 +45,7 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
   }
 
   @Override
-  public void onMethodCall(MethodCall call, MethodChannel.Result result) {
+  public void onMethodCall(@NonNull MethodCall call, @NonNull MethodChannel.Result result) {
     ServiceWorkerWebSettingsCompat serviceWorkerWebSettings = (serviceWorkerController != null) ? serviceWorkerController.getServiceWorkerWebSettings() : null;
 
     switch (call.method) {
@@ -124,17 +125,11 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
         @Nullable
         @Override
         public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
-          final Map<String, Object> obj = new HashMap<>();
-          obj.put("url", request.getUrl().toString());
-          obj.put("method", request.getMethod());
-          obj.put("headers", request.getRequestHeaders());
-          obj.put("isForMainFrame", request.isForMainFrame());
-          obj.put("hasGesture", request.hasGesture());
-          obj.put("isRedirect", request.isRedirect());
-
+          WebResourceRequestExt requestExt = WebResourceRequestExt.fromWebResourceRequest(request);
+          
           Util.WaitFlutterResult flutterResult;
           try {
-            flutterResult = Util.invokeMethodAndWait(channel, "shouldInterceptRequest", obj);
+            flutterResult = Util.invokeMethodAndWait(channel, "shouldInterceptRequest", requestExt.toMap());
           } catch (InterruptedException e) {
             e.printStackTrace();
             return null;
@@ -144,20 +139,22 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
             Log.e(LOG_TAG, flutterResult.error);
           }
           else if (flutterResult.result != null) {
-            Map<String, Object> res = (Map<String, Object>) flutterResult.result;
-            String contentType = (String) res.get("contentType");
-            String contentEncoding = (String) res.get("contentEncoding");
-            byte[] data = (byte[]) res.get("data");
-            Map<String, String> responseHeaders = (Map<String, String>) res.get("headers");
-            Integer statusCode = (Integer) res.get("statusCode");
-            String reasonPhrase = (String) res.get("reasonPhrase");
+            WebResourceResponseExt response = WebResourceResponseExt.fromMap((Map<String, Object>) flutterResult.result);
+            if (response != null) {
+              String contentType = response.getContentType();
+              String contentEncoding = response.getContentEncoding();
+              byte[] data = response.getData();
+              Map<String, String> responseHeaders = response.getHeaders();
+              Integer statusCode = response.getStatusCode();
+              String reasonPhrase = response.getReasonPhrase();
 
-            ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
+              ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
 
-            if ((responseHeaders == null && statusCode == null && reasonPhrase == null) || Build.VERSION.SDK_INT < Build.VERSION_CODES.LOLLIPOP) {
-              return new WebResourceResponse(contentType, contentEncoding, inputStream);
-            } else {
-              return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
+              if (statusCode != null && reasonPhrase != null) {
+                return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
+              } else {
+                return new WebResourceResponse(contentType, contentEncoding, inputStream);
+              }
             }
           }
 

@@ -9,88 +9,86 @@ import androidx.webkit.WebViewFeature;
 import androidx.webkit.WebViewRenderProcess;
 import androidx.webkit.WebViewRenderProcessClient;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.flutter.plugin.common.MethodChannel;
-
 public class InAppWebViewRenderProcessClient extends WebViewRenderProcessClient {
 
   protected static final String LOG_TAG = "IAWRenderProcessClient";
-  private final MethodChannel channel;
 
-  public InAppWebViewRenderProcessClient(MethodChannel channel) {
+  public InAppWebViewRenderProcessClient() {
     super();
-
-    this.channel = channel;
   }
 
   @Override
   public void onRenderProcessUnresponsive(@NonNull WebView view, @Nullable final WebViewRenderProcess renderer) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", view.getUrl());
-    channel.invokeMethod("onRenderProcessUnresponsive", obj, new MethodChannel.Result() {
+    final InAppWebView webView = (InAppWebView) view;
+    final EventChannelDelegate.RenderProcessUnresponsiveCallback callback = new EventChannelDelegate.RenderProcessUnresponsiveCallback() {
+      @Override
+      public boolean nonNullSuccess(@NonNull Integer action) {
+        if (renderer != null) {
+          switch (action) {
+            case 0:
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
+                renderer.terminate();
+              break;
+          }
+          return false;
+        }
+        return true;
+      }
 
       @Override
-      public void success(@Nullable Object response) {
-        if (response != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) response;
-          Integer action = (Integer) responseMap.get("action");
-          if (action != null && renderer != null) {
-            switch (action) {
-              case 0:
-                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
-                  renderer.terminate();
-                break;
-            }
-          }
-        }
+      public void defaultBehaviour(@Nullable Integer result) {
+        
       }
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
         Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+        defaultBehaviour(null);
       }
+    };
 
-      @Override
-      public void notImplemented() {
-
-      }
-    });
+    if (webView.eventChannelDelegate != null) {
+      webView.eventChannelDelegate.onRenderProcessUnresponsive(webView.getUrl(), callback);
+    } else {
+      callback.defaultBehaviour(null);
+    }
   }
 
   @Override
   public void onRenderProcessResponsive(@NonNull WebView view, @Nullable final WebViewRenderProcess renderer) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", view.getUrl());
-    channel.invokeMethod("onRenderProcessResponsive", obj, new MethodChannel.Result() {
+    final InAppWebView webView = (InAppWebView) view;
+    final EventChannelDelegate.RenderProcessResponsiveCallback callback = new EventChannelDelegate.RenderProcessResponsiveCallback() {
+      @Override
+      public boolean nonNullSuccess(@NonNull Integer action) {
+        if (renderer != null) {
+          switch (action) {
+            case 0:
+              if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
+                renderer.terminate();
+              break;
+          }
+          return false;
+        }
+        return true;
+      }
 
       @Override
-      public void success(@Nullable Object response) {
-        if (response != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) response;
-          Integer action = (Integer) responseMap.get("action");
-          if (action != null && renderer != null) {
-            switch (action) {
-              case 0:
-                if (WebViewFeature.isFeatureSupported(WebViewFeature.WEB_VIEW_RENDERER_TERMINATE))
-                  renderer.terminate();
-                break;
-            }
-          }
-        }
+      public void defaultBehaviour(@Nullable Integer result) {
+
       }
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
         Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+        defaultBehaviour(null);
       }
+    };
 
-      @Override
-      public void notImplemented() {
-
-      }
-    });
+    if (webView.eventChannelDelegate != null) {
+      webView.eventChannelDelegate.onRenderProcessResponsive(webView.getUrl(), callback);
+    } else {
+      callback.defaultBehaviour(null);
+    }
   }
 
   void dispose() {

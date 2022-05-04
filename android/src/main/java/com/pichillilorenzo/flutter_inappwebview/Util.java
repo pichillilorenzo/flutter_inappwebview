@@ -10,8 +10,11 @@ import android.os.Looper;
 import android.text.TextUtils;
 import android.util.Log;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
+
+import com.pichillilorenzo.flutter_inappwebview.types.SyncBaseCallbackResultImpl;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -127,6 +130,20 @@ public class Util {
     return new WaitFlutterResult(flutterResultMap.get("result"), (String) flutterResultMap.get("error"));
   }
 
+  public static <T> T invokeMethodAndWaitResult(final @NonNull MethodChannel channel,
+                                                final @NonNull String method, final @Nullable Object arguments,
+                                                final @NonNull SyncBaseCallbackResultImpl<T> callback) throws InterruptedException {
+    Handler handler = new Handler(Looper.getMainLooper());
+    handler.post(new Runnable() {
+      @Override
+      public void run() {
+        channel.invokeMethod(method, arguments, callback);
+      }
+    });
+    callback.latch.await();
+    return callback.result;
+  }
+
   public static class WaitFlutterResult {
     public Object result;
     public String error;
@@ -137,8 +154,11 @@ public class Util {
     }
   }
 
-  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(InAppWebViewFlutterPlugin plugin, String certificatePath, String certificatePassword, String keyStoreType) {
-
+  @Nullable
+  public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(@NonNull InAppWebViewFlutterPlugin plugin,
+                                                                       @NonNull String certificatePath, 
+                                                                       @Nullable String certificatePassword,
+                                                                       @NonNull String keyStoreType) {
     PrivateKeyAndCertificates privateKeyAndCertificates = null;
 
     try {
@@ -150,7 +170,7 @@ public class Util {
       Enumeration<String> aliases = keyStore.aliases();
       String alias = aliases.nextElement();
 
-      Key key = keyStore.getKey(alias, certificatePassword.toCharArray());
+      Key key = keyStore.getKey(alias, certificatePassword != null ? certificatePassword.toCharArray() : null);
       if (key instanceof PrivateKey) {
         PrivateKey privateKey = (PrivateKey)key;
         Certificate cert = keyStore.getCertificate(alias);
@@ -319,8 +339,8 @@ public class Util {
     return InetAddress.getByName(address).getCanonicalHostName();
   }
 
-  public static Object getOrDefault(Map map, String key, Object defaultValue) {
-    return map.containsKey(key) ? map.get(key) : defaultValue;
+  public static <T> T getOrDefault(Map<String, Object> map, String key, T defaultValue) {
+    return map.containsKey(key) ? (T) map.get(key) : defaultValue;
   }
 
   @Nullable

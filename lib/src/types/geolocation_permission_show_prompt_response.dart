@@ -3,16 +3,17 @@ import '../in_app_webview/webview.dart';
 ///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.onGeolocationPermissionsShowPrompt] event.
 class GeolocationPermissionShowPromptResponse {
   ///The origin for which permissions are set.
-  String? origin;
+  String origin;
 
   ///Whether or not the origin should be allowed to use the Geolocation API.
-  bool? allow;
+  bool allow;
 
   ///Whether the permission should be retained beyond the lifetime of a page currently being displayed by a WebView
-  bool? retain;
+  ///The default value is `false`.
+  bool retain;
 
   GeolocationPermissionShowPromptResponse(
-      {this.origin, this.allow, this.retain});
+      {required this.origin, required this.allow, this.retain = false});
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {

@@ -48,6 +48,6 @@ void shouldInterceptRequest() {
       ),
     );
 
-    expect(completer.future, completes);
+    await expectLater(completer.future, completes);
   }, skip: shouldSkip);
 }

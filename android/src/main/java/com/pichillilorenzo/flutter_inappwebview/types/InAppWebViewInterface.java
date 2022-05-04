@@ -8,9 +8,12 @@ import android.webkit.ValueCallback;
 import android.webkit.WebMessage;
 import android.webkit.WebView;
 
+import androidx.annotation.Nullable;
+
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebViewSettings;
+import com.pichillilorenzo.flutter_inappwebview.in_app_webview.EventChannelDelegate;
 
 import java.io.IOException;
 import java.util.HashMap;
@@ -102,4 +105,7 @@ public interface InAppWebViewInterface {
   Looper getWebViewLooper();
   boolean isInFullscreen();
   void setInFullscreen(boolean inFullscreen);
+  @Nullable
+  EventChannelDelegate getEventChannelDelegate();
+  void setEventChannelDelegate(@Nullable EventChannelDelegate eventChannelDelegate);
 }

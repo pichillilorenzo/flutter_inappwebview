@@ -77,14 +77,14 @@ public class ChromeSafariBrowserManager implements MethodChannel.MethodCallHandl
     extras.putSerializable("actionButton", (Serializable) actionButton);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 
-    Boolean isSingleInstance = (Boolean) Util.getOrDefault(settings, "isSingleInstance", false);
-    Boolean isTrustedWebActivity = (Boolean) Util.getOrDefault(settings, "isTrustedWebActivity", false);
+    Boolean isSingleInstance = Util.<Boolean>getOrDefault(settings, "isSingleInstance", false);
+    Boolean isTrustedWebActivity = Util.<Boolean>getOrDefault(settings, "isTrustedWebActivity", false);
     if (CustomTabActivityHelper.isAvailable(activity)) {
       intent = new Intent(activity, !isSingleInstance ? 
               (!isTrustedWebActivity ? ChromeCustomTabsActivity.class : TrustedWebActivity.class) :
               (!isTrustedWebActivity ? ChromeCustomTabsActivitySingleInstance.class : TrustedWebActivitySingleInstance.class));
       intent.putExtras(extras);
-      Boolean noHistory = (Boolean) Util.getOrDefault(settings, "noHistory", false);
+      Boolean noHistory = Util.<Boolean>getOrDefault(settings, "noHistory", false);
       if (noHistory) {
         intent.addFlags(Intent.FLAG_ACTIVITY_NO_HISTORY);
       }

@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+
 import '../in_app_webview/webview.dart';
 
 import 'client_cert_response_action.dart';
@@ -29,8 +31,12 @@ class ClientCertResponse {
         this.action = ClientCertResponseAction.CANCEL}) {
     if (this.action == ClientCertResponseAction.PROCEED)
       assert(certificatePath.isNotEmpty);
+
     // ignore: deprecated_member_use_from_same_package
     this.keyStoreType = this.keyStoreType ?? this.androidKeyStoreType;
+
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
+      assert(this.keyStoreType != null);
   }
 
   ///Converts instance to a map.

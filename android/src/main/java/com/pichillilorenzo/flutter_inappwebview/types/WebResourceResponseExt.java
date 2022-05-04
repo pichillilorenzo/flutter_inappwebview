@@ -24,7 +24,8 @@ public class WebResourceResponseExt {
   @Nullable
   private byte[] data;
 
-  public WebResourceResponseExt(String contentType, String contentEncoding, @Nullable Integer statusCode, @Nullable String reasonPhrase, @Nullable Map<String, String> headers, @Nullable byte[] data) {
+  public WebResourceResponseExt(String contentType, String contentEncoding, @Nullable Integer statusCode, 
+                                @Nullable String reasonPhrase, @Nullable Map<String, String> headers, @Nullable byte[] data) {
     this.contentType = contentType;
     this.contentEncoding = contentEncoding;
     this.statusCode = statusCode;
@@ -49,6 +50,20 @@ public class WebResourceResponseExt {
             headers,
             Util.readAllBytes(response.getData())
     );
+  }
+
+  @Nullable
+  public static WebResourceResponseExt fromMap(@Nullable Map<String, Object> map) {
+    if (map == null) {
+      return null;
+    }
+    String contentType = (String) map.get("contentType");
+    String contentEncoding = (String) map.get("contentEncoding");
+    Integer statusCode = (Integer) map.get("statusCode");
+    String reasonPhrase = (String) map.get("reasonPhrase");
+    Map<String, String> headers = (Map<String, String>) map.get("headers");
+    byte[] data = (byte[]) map.get("data");
+    return new WebResourceResponseExt(contentType, contentEncoding, statusCode, reasonPhrase, headers, data);
   }
 
   public Map<String, Object> toMap() {

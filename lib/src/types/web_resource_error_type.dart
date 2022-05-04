@@ -107,7 +107,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_AUTHENTICATION))
   static final USER_AUTHENTICATION_FAILED = WebResourceErrorType._internal(
       "USER_AUTHENTICATION_FAILED",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -4
           : UNKNOWN._nativeValue);
 
@@ -118,10 +118,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
   static final BAD_URL = WebResourceErrorType._internal(
       "BAD_URL",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -12
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1000
               : UNKNOWN._nativeValue));
 
@@ -132,10 +132,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
   static final CANNOT_CONNECT_TO_HOST = WebResourceErrorType._internal(
       "CANNOT_CONNECT_TO_HOST",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -6
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1004
               : UNKNOWN._nativeValue));
 
@@ -145,7 +145,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_FAILED_SSL_HANDSHAKE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FAILED_SSL_HANDSHAKE))
   static final FAILED_SSL_HANDSHAKE = WebResourceErrorType._internal(
       "FAILED_SSL_HANDSHAKE",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -11
           : UNKNOWN._nativeValue);
 
@@ -155,7 +155,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_FILE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE))
   static final GENERIC_FILE_ERROR = WebResourceErrorType._internal(
       "GENERIC_FILE_ERROR",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -13
           : UNKNOWN._nativeValue);
 
@@ -166,10 +166,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
   static final FILE_NOT_FOUND = WebResourceErrorType._internal(
       "FILE_NOT_FOUND",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -14
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1100
               : UNKNOWN._nativeValue));
 
@@ -180,10 +180,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
   static final HOST_LOOKUP = WebResourceErrorType._internal(
       "HOST_LOOKUP",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -2
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1003
               : UNKNOWN._nativeValue));
 
@@ -193,7 +193,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_IO](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_IO))
   static final IO = WebResourceErrorType._internal(
       "IO",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -7
           : UNKNOWN._nativeValue);
 
@@ -203,7 +203,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_PROXY_AUTHENTICATION](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_PROXY_AUTHENTICATION))
   static final PROXY_AUTHENTICATION = WebResourceErrorType._internal(
       "PROXY_AUTHENTICATION",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -5
           : UNKNOWN._nativeValue);
 
@@ -214,10 +214,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
   static final TOO_MANY_REDIRECTS = WebResourceErrorType._internal(
       "TOO_MANY_REDIRECTS",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -9
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1007
               : UNKNOWN._nativeValue));
 
@@ -228,10 +228,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
   static final TIMEOUT = WebResourceErrorType._internal(
       "TIMEOUT",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -8
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1001
               : UNKNOWN._nativeValue));
 
@@ -241,7 +241,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_TOO_MANY_REQUESTS](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TOO_MANY_REQUESTS))
   static final TOO_MANY_REQUESTS = WebResourceErrorType._internal(
       "TOO_MANY_REQUESTS",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -15
           : UNKNOWN._nativeValue);
 
@@ -258,7 +258,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_UNSAFE_RESOURCE](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSAFE_RESOURCE))
   static final UNSAFE_RESOURCE = WebResourceErrorType._internal(
       "UNSAFE_RESOURCE",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -16
           : UNKNOWN._nativeValue);
 
@@ -268,7 +268,7 @@ class WebResourceErrorType {
   ///- Android native WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_AUTH_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_AUTH_SCHEME))
   static final UNSUPPORTED_AUTH_SCHEME = WebResourceErrorType._internal(
       "UNSUPPORTED_AUTH_SCHEME",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -3
           : UNKNOWN._nativeValue);
 
@@ -280,10 +280,10 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
   static final UNSUPPORTED_SCHEME = WebResourceErrorType._internal(
       "UNSUPPORTED_SCHEME",
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? -10
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1002
               : UNKNOWN._nativeValue));
 
@@ -293,8 +293,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
   static final CANCELLED = WebResourceErrorType._internal(
       "CANCELLED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -999
           : UNKNOWN._nativeValue);
 
@@ -304,8 +304,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
   static final NETWORK_CONNECTION_LOST = WebResourceErrorType._internal(
       "NETWORK_CONNECTION_LOST",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1005
           : UNKNOWN._nativeValue);
 
@@ -316,8 +316,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
   static final RESOURCE_UNAVAILABLE = WebResourceErrorType._internal(
       "RESOURCE_UNAVAILABLE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1008
           : UNKNOWN._nativeValue);
 
@@ -327,8 +327,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
   static final NOT_CONNECTED_TO_INTERNET = WebResourceErrorType._internal(
       "NOT_CONNECTED_TO_INTERNET",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1009
           : UNKNOWN._nativeValue);
 
@@ -339,8 +339,8 @@ class WebResourceErrorType {
   static final REDIRECT_TO_NON_EXISTENT_LOCATION =
       WebResourceErrorType._internal(
           "REDIRECT_TO_NON_EXISTENT_LOCATION",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1010
               : UNKNOWN._nativeValue);
 
@@ -350,8 +350,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
   static final BAD_SERVER_RESPONSE = WebResourceErrorType._internal(
       "BAD_SERVER_RESPONSE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1011
           : UNKNOWN._nativeValue);
 
@@ -362,8 +362,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
   static final USER_CANCELLED_AUTHENTICATION = WebResourceErrorType._internal(
       "USER_CANCELLED_AUTHENTICATION",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1012
           : UNKNOWN._nativeValue);
 
@@ -373,8 +373,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
   static final USER_AUTHENTICATION_REQUIRED = WebResourceErrorType._internal(
       "USER_AUTHENTICATION_REQUIRED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1013
           : UNKNOWN._nativeValue);
 
@@ -384,8 +384,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
   static final ZERO_BYTE_RESOURCE = WebResourceErrorType._internal(
       "ZERO_BYTE_RESOURCE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1014
           : UNKNOWN._nativeValue);
 
@@ -395,8 +395,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
   static final CANNOT_DECODE_RAW_DATA = WebResourceErrorType._internal(
       "CANNOT_DECODE_RAW_DATA",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1015
           : UNKNOWN._nativeValue);
 
@@ -406,8 +406,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
   static final CANNOT_DECODE_CONTENT_DATA = WebResourceErrorType._internal(
       "CANNOT_DECODE_CONTENT_DATA",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1016
           : UNKNOWN._nativeValue);
 
@@ -417,8 +417,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
   static final CANNOT_PARSE_RESPONSE = WebResourceErrorType._internal(
       "CANNOT_PARSE_RESPONSE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1017
           : UNKNOWN._nativeValue);
 
@@ -429,8 +429,8 @@ class WebResourceErrorType {
   static final APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
       WebResourceErrorType._internal(
           "APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1022
               : UNKNOWN._nativeValue);
 
@@ -440,8 +440,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
   static final FILE_IS_DIRECTORY = WebResourceErrorType._internal(
       "FILE_IS_DIRECTORY",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1101
           : UNKNOWN._nativeValue);
 
@@ -451,8 +451,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
   static final NO_PERMISSIONS_TO_READ_FILE = WebResourceErrorType._internal(
       "NO_PERMISSIONS_TO_READ_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1102
           : UNKNOWN._nativeValue);
 
@@ -462,8 +462,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
   static final DATA_LENGTH_EXCEEDS_MAXIMUM = WebResourceErrorType._internal(
       "DATA_LENGTH_EXCEEDS_MAXIMUM",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1103
           : UNKNOWN._nativeValue);
 
@@ -473,8 +473,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
   static final SECURE_CONNECTION_FAILED = WebResourceErrorType._internal(
       "SECURE_CONNECTION_FAILED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1200
           : UNKNOWN._nativeValue);
 
@@ -484,8 +484,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
   static final SERVER_CERTIFICATE_HAS_BAD_DATE = WebResourceErrorType._internal(
       "SERVER_CERTIFICATE_HAS_BAD_DATE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1201
           : UNKNOWN._nativeValue);
 
@@ -495,8 +495,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
   static final SERVER_CERTIFICATE_UNTRUSTED = WebResourceErrorType._internal(
       "SERVER_CERTIFICATE_UNTRUSTED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1202
           : UNKNOWN._nativeValue);
 
@@ -507,8 +507,8 @@ class WebResourceErrorType {
   static final SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
       WebResourceErrorType._internal(
           "SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1203
               : UNKNOWN._nativeValue);
 
@@ -519,8 +519,8 @@ class WebResourceErrorType {
   static final SERVER_CERTIFICATE_NOT_YET_VALID =
       WebResourceErrorType._internal(
           "SERVER_CERTIFICATE_NOT_YET_VALID",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -1204
               : UNKNOWN._nativeValue);
 
@@ -530,8 +530,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
   static final CLIENT_CERTIFICATE_REJECTED = WebResourceErrorType._internal(
       "CLIENT_CERTIFICATE_REJECTED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1205
           : UNKNOWN._nativeValue);
 
@@ -541,8 +541,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
   static final CLIENT_CERTIFICATE_REQUIRED = WebResourceErrorType._internal(
       "CLIENT_CERTIFICATE_REQUIRED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1206
           : UNKNOWN._nativeValue);
 
@@ -552,8 +552,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
   static final CANNOT_LOAD_FROM_NETWORK = WebResourceErrorType._internal(
       "CANNOT_LOAD_FROM_NETWORK",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -2000
           : UNKNOWN._nativeValue);
 
@@ -563,8 +563,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
   static final CANNOT_CREATE_FILE = WebResourceErrorType._internal(
       "CANNOT_CREATE_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -3000
           : UNKNOWN._nativeValue);
 
@@ -574,8 +574,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
   static final CANNOT_OPEN_FILE = WebResourceErrorType._internal(
       "CANNOT_OPEN_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -3001
           : UNKNOWN._nativeValue);
 
@@ -585,8 +585,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
   static final CANNOT_CLOSE_FILE = WebResourceErrorType._internal(
       "CANNOT_CLOSE_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -3002
           : UNKNOWN._nativeValue);
 
@@ -596,8 +596,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
   static final CANNOT_WRITE_TO_FILE = WebResourceErrorType._internal(
       "CANNOT_WRITE_TO_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -3003
           : UNKNOWN._nativeValue);
 
@@ -607,8 +607,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
   static final CANNOT_REMOVE_FILE = WebResourceErrorType._internal(
       "CANNOT_REMOVE_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -3004
           : UNKNOWN._nativeValue);
 
@@ -618,8 +618,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
   static final CANNOT_MOVE_FILE = WebResourceErrorType._internal(
       "CANNOT_MOVE_FILE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -3005
           : UNKNOWN._nativeValue);
 
@@ -630,8 +630,8 @@ class WebResourceErrorType {
   static final DOWNLOAD_DECODING_FAILED_MID_STREAM =
       WebResourceErrorType._internal(
           "DOWNLOAD_DECODING_FAILED_MID_STREAM",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -3006
               : UNKNOWN._nativeValue);
 
@@ -642,8 +642,8 @@ class WebResourceErrorType {
   static final DOWNLOAD_DECODING_FAILED_TO_COMPLETE =
       WebResourceErrorType._internal(
           "DOWNLOAD_DECODING_FAILED_TO_COMPLETE",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -3007
               : UNKNOWN._nativeValue);
 
@@ -653,8 +653,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
   static final INTERNATIONAL_ROAMING_OFF = WebResourceErrorType._internal(
       "INTERNATIONAL_ROAMING_OFF",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1018
           : UNKNOWN._nativeValue);
 
@@ -664,8 +664,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
   static final CALL_IS_ACTIVE = WebResourceErrorType._internal(
       "CALL_IS_ACTIVE",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1019
           : UNKNOWN._nativeValue);
 
@@ -675,8 +675,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
   static final DATA_NOT_ALLOWED = WebResourceErrorType._internal(
       "DATA_NOT_ALLOWED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1020
           : UNKNOWN._nativeValue);
 
@@ -686,8 +686,8 @@ class WebResourceErrorType {
   ///- iOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
   static final REQUEST_BODY_STREAM_EXHAUSTED = WebResourceErrorType._internal(
       "REQUEST_BODY_STREAM_EXHAUSTED",
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? -1021
           : UNKNOWN._nativeValue);
 
@@ -698,8 +698,8 @@ class WebResourceErrorType {
   static final BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER =
       WebResourceErrorType._internal(
           "BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -995
               : UNKNOWN._nativeValue);
 
@@ -710,8 +710,8 @@ class WebResourceErrorType {
   static final BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
       WebResourceErrorType._internal(
           "BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -996
               : UNKNOWN._nativeValue);
 
@@ -722,8 +722,8 @@ class WebResourceErrorType {
   static final BACKGROUND_SESSION_WAS_DISCONNECTED =
       WebResourceErrorType._internal(
           "BACKGROUND_SESSION_WAS_DISCONNECTED",
-          (defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? -997
               : UNKNOWN._nativeValue);
 

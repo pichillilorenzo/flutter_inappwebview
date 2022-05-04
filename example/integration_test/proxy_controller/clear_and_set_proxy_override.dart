@@ -53,8 +53,8 @@ void clearAndSetProxyOverride() {
     final String url = await pageLoaded.future;
     expect(url, TEST_URL_HTTP_EXAMPLE.toString());
 
-    expect(await controller.evaluateJavascript(source: "document.getElementById('url')"), TEST_URL_HTTP_EXAMPLE.toString());
-    expect(await controller.evaluateJavascript(source: "document.getElementById('method')"), "GET");
-    expect(await controller.evaluateJavascript(source: "document.getElementById('headers')"), isNotNull);
+    expect(await controller.evaluateJavascript(source: "document.getElementById('url').innerHTML;"), TEST_URL_HTTP_EXAMPLE.toString());
+    expect(await controller.evaluateJavascript(source: "document.getElementById('method').innerHTML;"), "GET");
+    expect(await controller.evaluateJavascript(source: "document.getElementById('headers').innerHTML;"), isNotNull);
   }, skip: shouldSkip);
 }

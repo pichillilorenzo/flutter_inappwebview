@@ -47,6 +47,7 @@ void onFindResultReceived() {
     await pageLoaded.future;
 
     await tester.pump();
+    await Future.delayed(Duration(seconds: 1));
 
     await controller.findAllAsync(find: "InAppWebViewInitialFileTest");
     final int numberOfMatches = await numberOfMatchesCompleter.future;

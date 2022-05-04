@@ -46,6 +46,12 @@ import com.pichillilorenzo.flutter_inappwebview.in_app_browser.ActivityResultLis
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.types.GeolocationPermissionShowPromptResponse;
+import com.pichillilorenzo.flutter_inappwebview.types.JsAlertResponse;
+import com.pichillilorenzo.flutter_inappwebview.types.JsBeforeUnloadResponse;
+import com.pichillilorenzo.flutter_inappwebview.types.JsConfirmResponse;
+import com.pichillilorenzo.flutter_inappwebview.types.JsPromptResponse;
+import com.pichillilorenzo.flutter_inappwebview.types.PermissionResponse;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 
 import java.io.ByteArrayOutputStream;
@@ -54,7 +60,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -66,7 +71,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   protected static final String LOG_TAG = "IABWebChromeClient";
   private InAppBrowserDelegate inAppBrowserDelegate;
-  private final MethodChannel channel;
   public static Map<Integer, Message> windowWebViewMessages = new HashMap<>();
   private static int windowAutoincrementId = 0;
 
@@ -105,11 +109,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Nullable
   public InAppWebView inAppWebView;
 
-  public InAppWebViewChromeClient(@NonNull final InAppWebViewFlutterPlugin plugin, MethodChannel channel,
+  public InAppWebViewChromeClient(@NonNull final InAppWebViewFlutterPlugin plugin,
                                   @NonNull InAppWebView inAppWebView, InAppBrowserDelegate inAppBrowserDelegate) {
     super();
     this.plugin = plugin;
-    this.channel = channel;
     this.inAppWebView = inAppWebView;
     this.inAppBrowserDelegate = inAppBrowserDelegate;
     if (this.inAppBrowserDelegate != null) {
@@ -145,10 +148,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     this.mCustomViewCallback.onCustomViewHidden();
     this.mCustomViewCallback = null;
     activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
-    Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onExitFullscreen", obj);
 
     if (inAppWebView != null) {
+      EventChannelDelegate eventChannelDelegate = inAppWebView.eventChannelDelegate;
+      if (eventChannelDelegate != null)
+        eventChannelDelegate.onExitFullscreen();
       inAppWebView.setInFullscreen(false);
     }
   }
@@ -183,10 +187,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     ((FrameLayout) decorView).addView(this.mCustomView, FULLSCREEN_LAYOUT_PARAMS);
     
-    Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onEnterFullscreen", obj);
-    
     if (inAppWebView != null) {
+      EventChannelDelegate eventChannelDelegate = inAppWebView.eventChannelDelegate;
+      if (eventChannelDelegate != null)
+        eventChannelDelegate.onEnterFullscreen();
       inAppWebView.setInFullscreen(true);
     }
   }
@@ -194,24 +198,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public boolean onJsAlert(final WebView view, String url, final String message,
                            final JsResult result) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    obj.put("message", message);
-    obj.put("isMainFrame", null);
-
-    channel.invokeMethod("onJsAlert", obj, new MethodChannel.Result() {
-      @Override
-      public void success(@Nullable Object response) {
-        String responseMessage = null;
-        String confirmButtonTitle = null;
-
-        if (response != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) response;
-          responseMessage = (String) responseMap.get("message");
-          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
-          if (handledByClient != null && handledByClient) {
-            Integer action = (Integer) responseMap.get("action");
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onJsAlert(url, message, null, new EventChannelDelegate.JsAlertCallback() {
+        @Override
+        public boolean nonNullSuccess(@NonNull JsAlertResponse response) {
+          if (response.isHandledByClient()) {
+            Integer action = response.getAction();
             action = action != null ? action : 1;
             switch (action) {
               case 0:
@@ -221,26 +213,33 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               default:
                 result.cancel();
             }
-            return;
+            return false;
           }
+          return true;
         }
 
-        createAlertDialog(view, message, result, responseMessage, confirmButtonTitle);
-      }
+        @Override
+        public void defaultBehaviour(@Nullable JsAlertResponse response) {
+          String responseMessage = null;
+          String confirmButtonTitle = null;
+          if (response != null) {
+            responseMessage = response.getMessage();
+            confirmButtonTitle = response.getConfirmButtonTitle();
+          }
+          createAlertDialog(view, message, result, responseMessage, confirmButtonTitle);
+        }
 
-      @Override
-      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-        result.cancel();
-      }
+        @Override
+        public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+          result.cancel();
+        }
+      });
 
-      @Override
-      public void notImplemented() {
-        createAlertDialog(view, message, result, null, null);
-      }
-    });
+      return true;
+    }
 
-    return true;
+    return false;
   }
 
   public void createAlertDialog(WebView view, String message, final JsResult result, String responseMessage, String confirmButtonTitle) {
@@ -282,26 +281,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public boolean onJsConfirm(final WebView view, String url, final String message,
                              final JsResult result) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    obj.put("message", message);
-    obj.put("isMainFrame", null);
-
-    channel.invokeMethod("onJsConfirm", obj, new MethodChannel.Result() {
-      @Override
-      public void success(Object response) {
-        String responseMessage = null;
-        String confirmButtonTitle = null;
-        String cancelButtonTitle = null;
-
-        if (response != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) response;
-          responseMessage = (String) responseMap.get("message");
-          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-          cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
-          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
-          if (handledByClient != null && handledByClient) {
-            Integer action = (Integer) responseMap.get("action");
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onJsConfirm(url, message, null, new EventChannelDelegate.JsConfirmCallback() {
+        @Override
+        public boolean nonNullSuccess(@NonNull JsConfirmResponse response) {
+          if (response.isHandledByClient()) {
+            Integer action = response.getAction();
             action = action != null ? action : 1;
             switch (action) {
               case 0:
@@ -311,26 +296,35 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               default:
                 result.cancel();
             }
-            return;
+            return false;
           }
+          return true;
         }
 
-        createConfirmDialog(view, message, result, responseMessage, confirmButtonTitle, cancelButtonTitle);
-      }
+        @Override
+        public void defaultBehaviour(@Nullable JsConfirmResponse response) {
+          String responseMessage = null;
+          String confirmButtonTitle = null;
+          String cancelButtonTitle = null;
+          if (response != null) {
+            responseMessage = response.getMessage();
+            confirmButtonTitle = response.getConfirmButtonTitle();
+            cancelButtonTitle = response.getCancelButtonTitle();
+          }
+          createConfirmDialog(view, message, result, responseMessage, confirmButtonTitle, cancelButtonTitle);
+        }
 
-      @Override
-      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-        result.cancel();
-      }
+        @Override
+        public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+          result.cancel();
+        }
+      });
 
-      @Override
-      public void notImplemented() {
-        createConfirmDialog(view, message, result, null, null, null);
-      }
-    });
+      return true;
+    }
 
-    return true;
+    return false;
   }
 
   public void createConfirmDialog(WebView view, String message, final JsResult result, String responseMessage, String confirmButtonTitle, String cancelButtonTitle) {
@@ -383,60 +377,54 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public boolean onJsPrompt(final WebView view, String url, final String message,
                             final String defaultValue, final JsPromptResult result) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    obj.put("message", message);
-    obj.put("defaultValue", defaultValue);
-    obj.put("isMainFrame", null);
-
-    channel.invokeMethod("onJsPrompt", obj, new MethodChannel.Result() {
-      @Override
-      public void success(Object response) {
-        String responseMessage = null;
-        String responseDefaultValue = null;
-        String confirmButtonTitle = null;
-        String cancelButtonTitle = null;
-        String value = null;
-
-        if (response != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) response;
-          responseMessage = (String) responseMap.get("message");
-          responseDefaultValue = (String) responseMap.get("defaultValue");
-          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-          cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
-          value = (String) responseMap.get("value");
-          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
-          if (handledByClient != null && handledByClient) {
-            Integer action = (Integer) responseMap.get("action");
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onJsPrompt(url, message, defaultValue, null, new EventChannelDelegate.JsPromptCallback() {
+        @Override
+        public boolean nonNullSuccess(@NonNull JsPromptResponse response) {
+          if (response.isHandledByClient()) {
+            Integer action = response.getAction();
             action = action != null ? action : 1;
             switch (action) {
               case 0:
-                result.confirm(value);
+                result.confirm(response.getValue());
                 break;
               case 1:
               default:
                 result.cancel();
             }
-            return;
+            return false;
           }
+          return true;
         }
 
-        createPromptDialog(view, message, defaultValue, result, responseMessage, responseDefaultValue, value, cancelButtonTitle, confirmButtonTitle);
-      }
+        @Override
+        public void defaultBehaviour(@Nullable JsPromptResponse response) {
+          String responseMessage = null;
+          String responseDefaultValue = null;
+          String value = null;
+          String confirmButtonTitle = null;
+          String cancelButtonTitle = null;
+          if (response != null) {
+            responseMessage = response.getMessage();
+            responseDefaultValue = response.getDefaultValue();
+            value = response.getValue();
+            confirmButtonTitle = response.getConfirmButtonTitle();
+            cancelButtonTitle = response.getCancelButtonTitle();
+          }
+          createPromptDialog(view, message, defaultValue, result, responseMessage, responseDefaultValue, value, cancelButtonTitle, confirmButtonTitle);
+        }
 
-      @Override
-      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-        result.cancel();
-      }
+        @Override
+        public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+          result.cancel();
+        }
+      });
 
-      @Override
-      public void notImplemented() {
-        createPromptDialog(view, message, defaultValue, result, null, null, null, null, null);
-      }
-    });
+      return true;
+    }
 
-    return true;
+    return false;
   }
 
   public void createPromptDialog(WebView view, String message, String defaultValue, final JsPromptResult result, String responseMessage, String responseDefaultValue, String value, String cancelButtonTitle, String confirmButtonTitle) {
@@ -506,25 +494,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public boolean onJsBeforeUnload(final WebView view, String url, final String message,
                            final JsResult result) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    obj.put("message", message);
-
-    channel.invokeMethod("onJsBeforeUnload", obj, new MethodChannel.Result() {
-      @Override
-      public void success(Object response) {
-        String responseMessage = null;
-        String confirmButtonTitle = null;
-        String cancelButtonTitle = null;
-
-        if (response != null) {
-          Map<String, Object> responseMap = (Map<String, Object>) response;
-          responseMessage = (String) responseMap.get("message");
-          confirmButtonTitle = (String) responseMap.get("confirmButtonTitle");
-          cancelButtonTitle = (String) responseMap.get("cancelButtonTitle");
-          Boolean handledByClient = (Boolean) responseMap.get("handledByClient");
-          if (handledByClient != null && handledByClient) {
-            Integer action = (Integer) responseMap.get("action");
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onJsBeforeUnload(url, message, new EventChannelDelegate.JsBeforeUnloadCallback() {
+        @Override
+        public boolean nonNullSuccess(@NonNull JsBeforeUnloadResponse response) {
+          if (response.isHandledByClient()) {
+            Integer action = response.getAction();
             action = action != null ? action : 1;
             switch (action) {
               case 0:
@@ -534,26 +509,35 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
               default:
                 result.cancel();
             }
-            return;
+            return false;
           }
+          return true;
         }
 
-        createBeforeUnloadDialog(view, message, result, responseMessage, confirmButtonTitle, cancelButtonTitle);
-      }
+        @Override
+        public void defaultBehaviour(@Nullable JsBeforeUnloadResponse response) {
+          String responseMessage = null;
+          String confirmButtonTitle = null;
+          String cancelButtonTitle = null;
+          if (response != null) {
+            responseMessage = response.getMessage();
+            confirmButtonTitle = response.getConfirmButtonTitle();
+            cancelButtonTitle = response.getCancelButtonTitle();
+          }
+          createBeforeUnloadDialog(view, message, result, responseMessage, confirmButtonTitle, cancelButtonTitle);
+        }
 
-      @Override
-      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-        result.cancel();
-      }
+        @Override
+        public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+          result.cancel();
+        }
+      });
 
-      @Override
-      public void notImplemented() {
-        createConfirmDialog(view, message, result, null, null, null);
-      }
-    });
+      return true;
+    }
 
-    return true;
+    return false;
   }
 
   public void createBeforeUnloadDialog(WebView view, String message, final JsResult result, String responseMessage, String confirmButtonTitle, String cancelButtonTitle) {
@@ -636,84 +620,82 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
     windowWebViewMessages.put(windowId, resultMsg);
 
-    channel.invokeMethod("onCreateWindow", createWindowAction.toMap(), new MethodChannel.Result() {
-      @Override
-      public void success(@Nullable Object result) {
-        boolean handledByClient = false;
-        if (result instanceof Boolean) {
-          handledByClient = (boolean) result;
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onCreateWindow(createWindowAction, new EventChannelDelegate.CreateWindowCallback() {
+        @Override
+        public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
+          return !handledByClient;
         }
-        if (!handledByClient && InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
+
+        @Override
+        public void defaultBehaviour(@Nullable Boolean handledByClient) {
           InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
         }
-      }
 
-      @Override
-      public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
-        Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-        if (InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
-          InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
+        @Override
+        public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+          Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+          defaultBehaviour(null);
         }
-      }
+      });
 
-      @Override
-      public void notImplemented() {
-        if (InAppWebViewChromeClient.windowWebViewMessages.containsKey(windowId)) {
-          InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
-        }
-      }
-    });
+      return true;
+    }
 
-    return true;
+    return false;
   }
 
   @Override
   public void onCloseWindow(WebView window) {
-    final Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onCloseWindow", obj);
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onCloseWindow();
+    }
 
     super.onCloseWindow(window);
   }
 
   @Override
   public void onGeolocationPermissionsShowPrompt(final String origin, final GeolocationPermissions.Callback callback) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("origin", origin);
-    channel.invokeMethod("onGeolocationPermissionsShowPrompt", obj, new MethodChannel.Result() {
+    final EventChannelDelegate.GeolocationPermissionsShowPromptCallback resultCallback = new EventChannelDelegate.GeolocationPermissionsShowPromptCallback() {
       @Override
-      public void success(Object o) {
-        Map<String, Object> response = (Map<String, Object>) o;
-        if (response != null)
-          callback.invoke((String) response.get("origin"), (Boolean) response.get("allow"), (Boolean) response.get("retain"));
-        else
-          callback.invoke(origin, false, false);
+      public boolean nonNullSuccess(@NonNull GeolocationPermissionShowPromptResponse response) {
+        callback.invoke(response.getOrigin(), response.isAllow(), response.isRetain());
+        return false;
+      }
+
+      @Override
+      public void defaultBehaviour(@Nullable GeolocationPermissionShowPromptResponse response) {
+        callback.invoke(origin, false, false);
       }
 
       @Override
       public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
         Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-        callback.invoke(origin, false, false);
+        defaultBehaviour(null);
       }
-
-      @Override
-      public void notImplemented() {
-        callback.invoke(origin, false, false);
-      }
-    });
+    };
+    
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onGeolocationPermissionsShowPrompt(origin, resultCallback);
+    } else {
+      resultCallback.defaultBehaviour(null);
+    }
   }
 
   @Override
   public void onGeolocationPermissionsHidePrompt() {
-    Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onGeolocationPermissionsHidePrompt", obj);
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onGeolocationPermissionsHidePrompt();
+    }
   }
 
   @Override
   public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("message", consoleMessage.message());
-    obj.put("messageLevel", consoleMessage.messageLevel().ordinal());
-    channel.invokeMethod("onConsoleMessage", obj);
+    if (inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+      inAppWebView.eventChannelDelegate.onConsoleMessage(
+              consoleMessage.message(), 
+              consoleMessage.messageLevel().ordinal());
+    }
     return true;
   }
 
@@ -721,19 +703,20 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public void onProgressChanged(WebView view, int progress) {
     super.onProgressChanged(view, progress);
 
-    InAppWebView webView = (InAppWebView) view;
-
     if (inAppBrowserDelegate != null) {
       inAppBrowserDelegate.didChangeProgress(progress);
     }
+
+
+    InAppWebView webView = (InAppWebView) view;
 
     if (webView.inAppWebViewClient != null) {
       webView.inAppWebViewClient.loadCustomJavaScriptOnPageStarted(view);
     }
 
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("progress", progress);
-    channel.invokeMethod("onProgressChanged", obj);
+    if (webView.eventChannelDelegate != null) {
+      webView.eventChannelDelegate.onProgressChanged(progress);
+    }
   }
 
   @Override
@@ -743,10 +726,12 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (inAppBrowserDelegate != null) {
       inAppBrowserDelegate.didChangeTitle(title);
     }
+    
+    InAppWebView webView = (InAppWebView) view;
 
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("title", title);
-    channel.invokeMethod("onTitleChanged", obj);
+    if (webView.eventChannelDelegate != null) {
+      webView.eventChannelDelegate.onTitleChanged(title);
+    }
   }
 
   @Override
@@ -766,9 +751,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
     icon.recycle();
 
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("icon", byteArrayOutputStream.toByteArray());
-    channel.invokeMethod("onReceivedIcon", obj);
+    InAppWebView webView = (InAppWebView) view;
+    if (webView.eventChannelDelegate != null) {
+      webView.eventChannelDelegate.onReceivedIcon(byteArrayOutputStream.toByteArray());
+    }
   }
 
   @Override
@@ -777,10 +763,10 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
                                       boolean precomposed) {
     super.onReceivedTouchIconUrl(view, url, precomposed);
 
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    obj.put("precomposed", precomposed);
-    channel.invokeMethod("onReceivedTouchIconUrl", obj);
+    InAppWebView webView = (InAppWebView) view;
+    if (webView.eventChannelDelegate != null) {
+      webView.eventChannelDelegate.onReceivedTouchIconUrl(url, precomposed);
+    }
   }
 
   @Nullable
@@ -1171,47 +1157,44 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   @Override
   public void onPermissionRequest(final PermissionRequest request) {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("origin", request.getOrigin().toString());
-      obj.put("resources", Arrays.asList(request.getResources()));
-      obj.put("frame", null);
-      channel.invokeMethod("onPermissionRequest", obj, new MethodChannel.Result() {
+      final EventChannelDelegate.PermissionRequestCallback callback = new EventChannelDelegate.PermissionRequestCallback() {
         @Override
-        public void success(Object response) {
-          if (response != null) {
-            Map<String, Object> responseMap = (Map<String, Object>) response;
-            Integer action = (Integer) responseMap.get("action");
-            List<String> resourceList = (List<String>) responseMap.get("resources");
-            if (resourceList == null)
-              resourceList = new ArrayList<String>();
-            String[] resources = new String[resourceList.size()];
-            resources = resourceList.toArray(resources);
-            if (action != null) {
-              switch (action) {
-                case 1:
-                  request.grant(resources);
-                  return;
-                case 0:
-                default:
-                  request.deny();
-                  return;
-              }
+        public boolean nonNullSuccess(@NonNull PermissionResponse response) {
+          Integer action = response.getAction();
+          if (action != null) {
+            switch (action) {
+              case 1:
+                String[] resources = new String[response.getResources().size()];
+                resources = response.getResources().toArray(resources);
+                request.grant(resources);
+                break;
+              case 0:
+              default:
+                request.deny();
             }
+            return false;
           }
+          return true;
+        }
+
+        @Override
+        public void defaultBehaviour(@Nullable PermissionResponse response) {
           request.deny();
         }
 
         @Override
         public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
           Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
-          request.deny();
+          defaultBehaviour(null);
         }
-
-        @Override
-        public void notImplemented() {
-          request.deny();
-        }
-      });
+      };
+      
+      if(inAppWebView != null && inAppWebView.eventChannelDelegate != null) {
+        inAppWebView.eventChannelDelegate.onPermissionRequest(request.getOrigin().toString(),
+                Arrays.asList(request.getResources()), null, callback);
+      } else {
+        callback.defaultBehaviour(null);
+      }
     }
   }
 

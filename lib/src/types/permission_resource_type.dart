@@ -59,10 +59,10 @@ class PermissionResourceType {
   ///- iOS ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
   static final MICROPHONE = PermissionResourceType._internal(
       'MICROPHONE',
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? 'android.webkit.resource.AUDIO_CAPTURE'
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? 1
               : null));
 
@@ -74,7 +74,7 @@ class PermissionResourceType {
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_MIDI_SYSEX](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_MIDI_SYSEX))
   static final MIDI_SYSEX = PermissionResourceType._internal(
       'MIDI_SYSEX',
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? 'android.webkit.resource.MIDI_SYSEX'
           : null);
 
@@ -84,7 +84,7 @@ class PermissionResourceType {
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_PROTECTED_MEDIA_ID](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_PROTECTED_MEDIA_ID))
   static final PROTECTED_MEDIA_ID = PermissionResourceType._internal(
       'PROTECTED_MEDIA_ID',
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? 'android.webkit.resource.PROTECTED_MEDIA_ID'
           : null);
 
@@ -95,10 +95,10 @@ class PermissionResourceType {
   ///- iOS ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
   static final CAMERA = PermissionResourceType._internal(
       'CAMERA',
-      (defaultTargetPlatform != TargetPlatform.android)
+      (defaultTargetPlatform == TargetPlatform.android)
           ? 'android.webkit.resource.VIDEO_CAPTURE'
-          : ((defaultTargetPlatform != TargetPlatform.iOS ||
-                  defaultTargetPlatform != TargetPlatform.macOS)
+          : ((defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS)
               ? 0
               : null));
 
@@ -108,8 +108,8 @@ class PermissionResourceType {
   ///- iOS ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   static final CAMERA_AND_MICROPHONE = PermissionResourceType._internal(
       'CAMERA_AND_MICROPHONE',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 2
           : null);
 
@@ -119,8 +119,8 @@ class PermissionResourceType {
   ///- iOS
   static final DEVICE_ORIENTATION_AND_MOTION = PermissionResourceType._internal(
       'DEVICE_ORIENTATION_AND_MOTION',
-      (defaultTargetPlatform != TargetPlatform.iOS ||
-              defaultTargetPlatform != TargetPlatform.macOS)
+      (defaultTargetPlatform == TargetPlatform.iOS ||
+              defaultTargetPlatform == TargetPlatform.macOS)
           ? 'deviceOrientationAndMotion'
           : null);
 

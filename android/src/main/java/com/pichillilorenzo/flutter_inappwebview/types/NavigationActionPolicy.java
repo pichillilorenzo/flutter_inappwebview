@@ -15,7 +15,7 @@ public enum NavigationActionPolicy {
   }
 
   public static NavigationActionPolicy fromValue(int value) {
-    for( NavigationActionPolicy type : NavigationActionPolicy.values()) {
+    for(NavigationActionPolicy type : NavigationActionPolicy.values()) {
       if(value == type.value)
         return type;
     }

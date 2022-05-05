@@ -6328,7 +6328,7 @@ class IOSShouldAllowDeprecatedTLSAction {
 
 ///A URL load request that is independent of protocol or URL scheme.
 class URLRequest {
-  ///The URL of the request.
+  ///The URL of the request. Setting this to `null` will load `about:blank`.
   Uri? url;
 
   ///The HTTP request method.

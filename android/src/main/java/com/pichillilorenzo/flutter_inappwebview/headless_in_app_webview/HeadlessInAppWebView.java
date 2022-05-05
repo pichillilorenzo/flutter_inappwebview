@@ -74,18 +74,20 @@ public class HeadlessInAppWebView implements MethodChannel.MethodCallHandler {
       // Add the headless WebView to the view hierarchy.
       // This way is also possible to take screenshots.
       ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
-      ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
-      if (mainView != null && flutterWebView != null) {
-        View view = flutterWebView.getView();
-        final Map<String, Object> initialSize = (Map<String, Object>) params.get("initialSize");
-        Size2D size = Size2D.fromMap(initialSize);
-        if (size != null) {
-          setSize(size);
-        } else {
-          view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+      if (contentView != null) {
+        ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
+        if (mainView != null && flutterWebView != null) {
+          View view = flutterWebView.getView();
+          final Map<String, Object> initialSize = (Map<String, Object>) params.get("initialSize");
+          Size2D size = Size2D.fromMap(initialSize);
+          if (size != null) {
+            setSize(size);
+          } else {
+            view.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+          }
+          mainView.addView(view, 0);
+          view.setVisibility(View.INVISIBLE);
         }
-        mainView.addView(view, 0);
-        view.setVisibility(View.INVISIBLE);
       }
     }
   }

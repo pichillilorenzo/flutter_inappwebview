@@ -1,3 +1,8 @@
+## 5.4.3+5
+
+- Fixed possible java.lang.NullPointerException in `Runnable` of `InputAwareWebView.setInputConnectionTarget` method
+- Fixed "Android Crash in latest 5.4.3+4 - java.lang.NullPointerException: Attempt to invoke virtual method java.lang.String android.webkit.WebView.getUrl()" [#1168](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1168)
+
 ## 5.4.3+4
 
 - Updated docs for `ChromeSafariBrowser.open` and throw error on iOS if the `url` parameter use a different scheme then `http` or `https`

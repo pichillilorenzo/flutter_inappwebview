@@ -49,18 +49,26 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public MethodChannel channel;
   public Integer windowId;
   public String id;
+  @Nullable
   public InAppWebView webView;
+  @Nullable
   public PullToRefreshLayout pullToRefreshLayout;
   @Nullable
   public ActionBar actionBar;
+  @Nullable
   public Menu menu;
+  @Nullable
   public SearchView searchView;
   public InAppBrowserOptions options = new InAppBrowserOptions();
+  @Nullable
   public ProgressBar progressBar;
   public boolean isHidden = false;
+  @Nullable
   public String fromActivity;
   private List<ActivityResultListener> activityResultListeners = new ArrayList<>();
+  @Nullable
   public InAppWebViewMethodHandler methodCallDelegate;
+  @Nullable
   public InAppBrowserManager manager;
   
   @Override
@@ -199,58 +207,69 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public boolean onCreateOptionsMenu(Menu m) {
     menu = m;
 
+    if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty()))
+      actionBar.setTitle(webView.getTitle());
+
+    if (menu == null)
+      return super.onCreateOptionsMenu(m);
+
     MenuInflater inflater = getMenuInflater();
     // Inflate menu to add items to action bar if it is present.
     inflater.inflate(R.menu.menu_main, menu);
 
-    searchView = (SearchView) menu.findItem(R.id.menu_search).getActionView();
-    searchView.setFocusable(true);
+    MenuItem menuItem = menu.findItem(R.id.menu_search);
+    if (menuItem != null) {
+      if (options.hideUrlBar)
+        menuItem.setVisible(false);
 
-    if (options.hideUrlBar)
-      menu.findItem(R.id.menu_search).setVisible(false);
+      searchView = (SearchView) menuItem.getActionView();
+      if (searchView != null) {
+        searchView.setFocusable(true);
 
-    searchView.setQuery(webView.getUrl(), false);
+        searchView.setQuery(webView != null ? webView.getUrl() : "", false);
 
-    if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty()))
-      actionBar.setTitle(webView.getTitle());
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+          @Override
+          public boolean onQueryTextSubmit(String query) {
+            if (!query.isEmpty()) {
+              if (webView != null)
+                webView.loadUrl(query);
+              if (searchView != null) {
+                searchView.setQuery("", false);
+                searchView.setIconified(true);
+              }
+              return true;
+            }
+            return false;
+          }
 
-    searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-      @Override
-      public boolean onQueryTextSubmit(String query) {
-        if (!query.isEmpty()) {
-          webView.loadUrl(query);
-          searchView.setQuery("", false);
-          searchView.setIconified(true);
-          return true;
-        }
-        return false;
-      }
+          @Override
+          public boolean onQueryTextChange(String newText) {
+            return false;
+          }
 
-      @Override
-      public boolean onQueryTextChange(String newText) {
-        return false;
-      }
+        });
 
-    });
+        searchView.setOnCloseListener(new SearchView.OnCloseListener() {
+          @Override
+          public boolean onClose() {
+            if (searchView != null && searchView.getQuery().toString().isEmpty())
+              searchView.setQuery(webView != null ? webView.getUrl() : "", false);
+            return false;
+          }
+        });
 
-    searchView.setOnCloseListener(new SearchView.OnCloseListener() {
-      @Override
-      public boolean onClose() {
-        if (searchView.getQuery().toString().isEmpty())
-          searchView.setQuery(webView.getUrl(), false);
-        return false;
-      }
-    });
-
-    searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
-      @Override
-      public void onFocusChange(View view, boolean b) {
-        if (!b) {
-          searchView.setQuery("", false);
-          searchView.setIconified(true);
-        }
-      }
-    });
+        searchView.setOnQueryTextFocusChangeListener(new View.OnFocusChangeListener() {
+          @Override
+          public void onFocusChange(View view, boolean b) {
+            if (!b && searchView != null) {
+              searchView.setQuery("", false);
+              searchView.setIconified(true);
+            }
+          }
+        });
+      } 
+    }
 
     return true;
   }

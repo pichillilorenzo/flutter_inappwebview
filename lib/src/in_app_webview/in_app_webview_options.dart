@@ -99,7 +99,7 @@ class InAppWebViewOptions
   ///Set to `true` to be able to listen at the [WebView.onLoadResource] event. The default value is `false`.
   bool useOnLoadResource;
 
-  ///Set to `true` to be able to listen at the [WebView.onDownloadStart] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onDownloadStartRequest] event. The default value is `false`.
   bool useOnDownloadStart;
 
   ///Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.

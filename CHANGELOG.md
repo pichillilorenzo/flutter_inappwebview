@@ -17,6 +17,10 @@
 - On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`;
 
+## 5.4.3+7
+
+- Fixed possible Android java.lang.NullPointerException in "InAppBrowserActivity.onCreateOptionsMenu" about "webView.getTitle()"
+
 ## 5.4.3+6
 
 - Fixed "iOS flutter_inappwebview/URLRequest.swift:13: Fatal error: Unexpectedly found nil while unwrapping an Optional value" [#1173](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1173)

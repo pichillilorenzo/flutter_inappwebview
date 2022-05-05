@@ -7,7 +7,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -17,10 +16,11 @@ import java.util.Map;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
+public class MyWebStorage extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "MyWebStorage";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webstoragemanager";
 
+  @Nullable
   public static WebStorage webStorageManager;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
@@ -38,15 +38,23 @@ public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
         getOrigins(result);
         break;
       case "deleteAllData":
-        webStorageManager.deleteAllData();
-        result.success(true);
+        if (webStorageManager == null) {
+          webStorageManager.deleteAllData();
+          result.success(true);
+        } else {
+          result.success(false);
+        }
         break;
       case "deleteOrigin":
         {
-          String origin = (String) call.argument("origin");
-          webStorageManager.deleteOrigin(origin);
+          if (webStorageManager == null) {
+            String origin = (String) call.argument("origin");
+            webStorageManager.deleteOrigin(origin);
+            result.success(true);
+          } else {
+            result.success(false);
+          }
         }
-        result.success(true);
         break;
       case "getQuotaForOrigin":
         {
@@ -57,7 +65,7 @@ public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
       case "getUsageForOrigin":
        {
           String origin = (String) call.argument("origin");
-         getUsageForOrigin(origin, result);
+          getUsageForOrigin(origin, result);
        }
        break;
       default:
@@ -66,6 +74,10 @@ public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
   }
 
   public void getOrigins(final MethodChannel.Result result) {
+    if (webStorageManager == null) {
+      result.success(new ArrayList<>());
+      return;
+    }
     webStorageManager.getOrigins(new ValueCallback<Map>() {
       @Override
       public void onReceiveValue(Map value) {
@@ -86,6 +98,10 @@ public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
   }
 
   public void getQuotaForOrigin(String origin, final MethodChannel.Result result) {
+    if (webStorageManager == null) {
+      result.success(0);
+      return;
+    }
     webStorageManager.getQuotaForOrigin(origin, new ValueCallback<Long>() {
       @Override
       public void onReceiveValue(Long value) {
@@ -95,6 +111,10 @@ public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
   }
 
   public void getUsageForOrigin(String origin, final MethodChannel.Result result) {
+    if (webStorageManager == null) {
+      result.success(0);
+      return;
+    }
     webStorageManager.getUsageForOrigin(origin, new ValueCallback<Long>() {
       @Override
       public void onReceiveValue(Long value) {
@@ -107,5 +127,6 @@ public class MyWebStorage extends ChannelDelegateImpl implements Disposable {
   public void dispose() {
     super.dispose();
     plugin = null;
+    webStorageManager = null;
   }
 }

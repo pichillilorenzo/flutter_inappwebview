@@ -9,7 +9,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -23,10 +22,10 @@ import java.util.TimeZone;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class MyCookieManager extends ChannelDelegateImpl implements Disposable {
+public class MyCookieManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "MyCookieManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_cookiemanager";
-
+  @Nullable
   public static CookieManager cookieManager;
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
@@ -305,5 +304,6 @@ public class MyCookieManager extends ChannelDelegateImpl implements Disposable {
   public void dispose() {
     super.dispose();
     plugin = null;
+    cookieManager = null;
   }
 }

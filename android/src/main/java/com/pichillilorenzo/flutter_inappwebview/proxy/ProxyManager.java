@@ -8,7 +8,6 @@ import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.types.ProxyRuleExt;
 
 import java.util.HashMap;
@@ -17,7 +16,7 @@ import java.util.concurrent.Executor;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class ProxyManager extends ChannelDelegateImpl implements Disposable {
+public class ProxyManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "ProxyManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_proxycontroller";
 

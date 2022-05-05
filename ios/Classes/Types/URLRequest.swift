@@ -9,8 +9,11 @@ import Foundation
 
 extension URLRequest {
     public init(fromPluginMap: [String:Any?]) {
-        let url = fromPluginMap["url"] as! String
-        self.init(url: URL(string: url)!)
+        if let urlString = fromPluginMap["url"] as? String, let url = URL(string: urlString) {
+            self.init(url: url)
+        } else {
+            self.init(url: URL(string: "about:blank")!)
+        }
         
         if let method = fromPluginMap["method"] as? String {
             httpMethod = method

@@ -13,6 +13,7 @@ import io.flutter.plugin.platform.PlatformView;
 import io.flutter.plugin.platform.PlatformViewFactory;
 
 public class FlutterWebViewFactory extends PlatformViewFactory {
+  public static final String VIEW_TYPE_ID = "com.pichillilorenzo/flutter_inappwebview";
   private final InAppWebViewFlutterPlugin plugin;
 
   public FlutterWebViewFactory(final InAppWebViewFlutterPlugin plugin) {

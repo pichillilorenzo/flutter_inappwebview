@@ -11,28 +11,21 @@ import WebKit
 import Foundation
 import AVFoundation
 
-let WEBVIEW_STORYBOARD = "WebView"
-let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
-let NAV_STORYBOARD_CONTROLLER_ID = "navController"
-
-public class InAppBrowserManager: NSObject, FlutterPlugin {
+public class InAppBrowserManager: ChannelDelegate {
+    static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappbrowser"
+    static let WEBVIEW_STORYBOARD = "WebView"
+    static let WEBVIEW_STORYBOARD_CONTROLLER_ID = "viewController"
+    static let NAV_STORYBOARD_CONTROLLER_ID = "navController"
     static var registrar: FlutterPluginRegistrar?
-    static var channel: FlutterMethodChannel?
     
     private var previousStatusBarStyle = -1
     
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        
-    }
-    
     init(registrar: FlutterPluginRegistrar) {
-        super.init()
+        super.init(channel: FlutterMethodChannel(name: InAppBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
         InAppBrowserManager.registrar = registrar
-        InAppBrowserManager.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser", binaryMessenger: registrar.messenger())
-        registrar.addMethodCallDelegate(self, channel: InAppBrowserManager.channel!)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
 
         switch call.method {
@@ -100,8 +93,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
     }
     
     public func presentViewController(webViewController: InAppBrowserWebViewController) {
-        let storyboard = UIStoryboard(name: WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
-        let navController = storyboard.instantiateViewController(withIdentifier: NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
+        let storyboard = UIStoryboard(name: InAppBrowserManager.WEBVIEW_STORYBOARD, bundle: Bundle(for: InAppWebViewFlutterPlugin.self))
+        let navController = storyboard.instantiateViewController(withIdentifier: InAppBrowserManager.NAV_STORYBOARD_CONTROLLER_ID) as! InAppBrowserNavigationController
         webViewController.edgesForExtendedLayout = []
         navController.pushViewController(webViewController, animated: false)
         webViewController.prepareNavigationControllerBeforeViewWillAppear()
@@ -141,9 +134,8 @@ public class InAppBrowserManager: NSObject, FlutterPlugin {
         result(true)
     }
     
-    public func dispose() {
-        InAppBrowserManager.channel?.setMethodCallHandler(nil)
-        InAppBrowserManager.channel = nil
+    public override func dispose() {
+        super.dispose()
         InAppBrowserManager.registrar = nil
     }
 }

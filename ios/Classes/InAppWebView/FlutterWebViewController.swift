@@ -63,11 +63,9 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView {
         methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
         channel!.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
         
-        let pullToRefreshLayoutChannel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_" + String(describing: viewId),
-                                                              binaryMessenger: registrar.messenger())
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
-        let pullToRefreshControl = PullToRefreshControl(channel: pullToRefreshLayoutChannel, settings: pullToRefreshSettings)
+        let pullToRefreshControl = PullToRefreshControl(registrar: registrar, id: viewId, settings: pullToRefreshSettings)
         webView!.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView!
         pullToRefreshControl.prepare()

@@ -5,12 +5,11 @@ import androidx.annotation.Nullable;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class WebViewFeatureManager extends ChannelDelegateImpl implements Disposable {
+public class WebViewFeatureManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "WebViewFeatureManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webviewfeature";
 

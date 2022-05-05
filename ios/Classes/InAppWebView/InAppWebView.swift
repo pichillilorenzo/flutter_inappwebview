@@ -565,7 +565,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             
             if #available(iOS 11.0, *) {
                 for scheme in settings.resourceCustomSchemes {
-                    configuration.setURLSchemeHandler(CustomeSchemeHandler(), forURLScheme: scheme)
+                    configuration.setURLSchemeHandler(CustomSchemeHandler(), forURLScheme: scheme)
                 }
                 if settings.sharedCookiesEnabled {
                     // More info to sending cookies with WKWebView

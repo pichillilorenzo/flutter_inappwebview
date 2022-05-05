@@ -27,7 +27,6 @@ import androidx.annotation.NonNull;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.FlutterWebView;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -37,7 +36,7 @@ import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class HeadlessInAppWebViewManager extends ChannelDelegateImpl implements Disposable {
+public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "HeadlessInAppWebViewManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_headless_inappwebview";
   

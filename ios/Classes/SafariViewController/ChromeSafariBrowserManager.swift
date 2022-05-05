@@ -12,22 +12,16 @@ import Foundation
 import AVFoundation
 import SafariServices
 
-public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
+public class ChromeSafariBrowserManager: ChannelDelegate {
+    static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_chromesafaribrowser"
     static var registrar: FlutterPluginRegistrar?
-    static var channel: FlutterMethodChannel?
-    
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        
-    }
     
     init(registrar: FlutterPluginRegistrar) {
-        super.init()
+        super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
         ChromeSafariBrowserManager.registrar = registrar
-        ChromeSafariBrowserManager.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser", binaryMessenger: registrar.messenger())
-        registrar.addMethodCallDelegate(self, channel: ChromeSafariBrowserManager.channel!)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
 
         switch call.method {
@@ -92,9 +86,8 @@ public class ChromeSafariBrowserManager: NSObject, FlutterPlugin {
         result(FlutterError.init(code: "ChromeSafariBrowserManager", message: "SafariViewController is not available!", details: nil))
     }
     
-    public func dispose() {
-        ChromeSafariBrowserManager.channel?.setMethodCallHandler(nil)
-        ChromeSafariBrowserManager.channel = nil
+    public override func dispose() {
+        super.dispose()
         ChromeSafariBrowserManager.registrar = nil
     }
 }

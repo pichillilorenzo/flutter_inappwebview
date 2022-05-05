@@ -87,7 +87,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     chromeSafariBrowserManager = new ChromeSafariBrowserManager(this);
     flutterWebViewFactory = new FlutterWebViewFactory(this);
     platformViewRegistry.registerViewFactory(
-                    "com.pichillilorenzo/flutter_inappwebview", flutterWebViewFactory);
+            FlutterWebViewFactory.VIEW_TYPE_ID, flutterWebViewFactory);
 
     platformUtil = new PlatformUtil(this);
     inAppWebViewStatic = new InAppWebViewStatic(this);

@@ -9,7 +9,6 @@ import androidx.annotation.Nullable;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.io.Serializable;
 import java.util.HashMap;
@@ -20,7 +19,7 @@ import java.util.UUID;
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class ChromeSafariBrowserManager extends ChannelDelegateImpl implements Disposable {
+public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "ChromeBrowserManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_chromesafaribrowser";
   

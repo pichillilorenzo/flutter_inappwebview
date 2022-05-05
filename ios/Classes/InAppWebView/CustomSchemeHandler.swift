@@ -10,7 +10,7 @@ import Foundation
 import WebKit
 
 @available(iOS 11.0, *)
-class CustomeSchemeHandler : NSObject, WKURLSchemeHandler {
+class CustomSchemeHandler : NSObject, WKURLSchemeHandler {
     var schemeHandlers: [Int:WKURLSchemeTask] = [:]
     
     func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {

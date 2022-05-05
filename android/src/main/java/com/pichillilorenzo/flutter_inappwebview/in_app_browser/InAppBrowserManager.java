@@ -37,7 +37,6 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -53,7 +52,7 @@ import io.flutter.plugin.common.MethodChannel.Result;
 /**
  * InAppBrowserManager
  */
-public class InAppBrowserManager extends ChannelDelegateImpl implements Disposable {
+public class InAppBrowserManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "InAppBrowserManager";
   public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappbrowser";
   

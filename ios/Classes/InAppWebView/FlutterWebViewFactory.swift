@@ -9,6 +9,7 @@ import Flutter
 import Foundation
 
 public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
+    static let VIEW_TYPE_ID = "com.pichillilorenzo/flutter_inappwebview"
     private var registrar: FlutterPluginRegistrar?
     
     init(registrar: FlutterPluginRegistrar?) {

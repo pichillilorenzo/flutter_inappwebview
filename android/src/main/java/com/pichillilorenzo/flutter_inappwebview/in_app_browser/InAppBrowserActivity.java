@@ -208,7 +208,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     menu = m;
 
     if (actionBar != null && (options.toolbarTopFixedTitle == null || options.toolbarTopFixedTitle.isEmpty()))
-      actionBar.setTitle(webView.getTitle());
+      actionBar.setTitle(webView != null ? webView.getTitle() : "");
 
     if (menu == null)
       return super.onCreateOptionsMenu(m);

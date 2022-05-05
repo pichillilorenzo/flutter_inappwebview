@@ -1,3 +1,7 @@
+## 5.4.3+7
+
+- Fixed possible Android java.lang.NullPointerException in InAppBrowserActivity.onCreateOptionsMenu about webView.getTitle()
+
 ## 5.4.3+6
 
 - Fixed "iOS flutter_inappwebview/URLRequest.swift:13: Fatal error: Unexpectedly found nil while unwrapping an Optional value" [#1173](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1173)

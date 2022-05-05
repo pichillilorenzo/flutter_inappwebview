@@ -1,6 +1,6 @@
 ## 5.4.3+7
 
-- Fixed possible Android java.lang.NullPointerException in InAppBrowserActivity.onCreateOptionsMenu about webView.getTitle()
+- Fixed possible Android java.lang.NullPointerException in "InAppBrowserActivity.onCreateOptionsMenu" about "webView.getTitle()"
 
 ## 5.4.3+6
 

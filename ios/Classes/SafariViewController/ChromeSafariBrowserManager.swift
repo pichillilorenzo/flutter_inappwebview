@@ -15,6 +15,7 @@ import SafariServices
 public class ChromeSafariBrowserManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_chromesafaribrowser"
     static var registrar: FlutterPluginRegistrar?
+    static var browsers: [String: SafariViewController?] = [:]
     
     init(registrar: FlutterPluginRegistrar) {
         super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
@@ -63,17 +64,14 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                     config.entersReaderIfAvailable = safariSettings.entersReaderIfAvailable
                     config.barCollapsingEnabled = safariSettings.barCollapsingEnabled
                     
-                    safari = SafariViewController(url: absoluteUrl, configuration: config)
+                    safari = SafariViewController(id: id, url: absoluteUrl, configuration: config,
+                                                  menuItemList: menuItemList, safariSettings: safariSettings)
                 } else {
                     // Fallback on earlier versions
-                    safari = SafariViewController(url: absoluteUrl)
+                    safari = SafariViewController(id: id, url: absoluteUrl, entersReaderIfAvailable: safariSettings.entersReaderIfAvailable,
+                                                  menuItemList: menuItemList, safariSettings: safariSettings)
                 }
                 
-                safari.id = id
-                safari.menuItemList = menuItemList
-                safari.prepareMethodChannel()
-                safari.delegate = safari
-                safari.safariSettings = safariSettings
                 safari.prepareSafariBrowser()
                 
                 flutterViewController.present(safari, animated: true) {
@@ -89,5 +87,11 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
     public override func dispose() {
         super.dispose()
         ChromeSafariBrowserManager.registrar = nil
+        let browsers = ChromeSafariBrowserManager.browsers.values
+        browsers.forEach { (browser: SafariViewController?) in
+            browser?.close(result: nil)
+            browser?.dispose()
+        }
+        ChromeSafariBrowserManager.browsers.removeAll()
     }
 }

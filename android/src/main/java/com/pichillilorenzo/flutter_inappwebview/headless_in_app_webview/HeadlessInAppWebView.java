@@ -96,7 +96,7 @@ public class HeadlessInAppWebView implements Disposable {
       HeadlessInAppWebViewManager.webViews.put(id, null);
     }
     if (plugin != null && plugin.activity != null) {
-      ViewGroup contentView = (ViewGroup) plugin.activity.findViewById(android.R.id.content);
+      ViewGroup contentView = plugin.activity.findViewById(android.R.id.content);
       if (contentView != null) {
         ViewGroup mainView = (ViewGroup) (contentView).getChildAt(0);
         if (mainView != null && flutterWebView != null) {

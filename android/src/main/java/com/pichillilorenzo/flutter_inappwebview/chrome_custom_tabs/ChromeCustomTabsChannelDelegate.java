@@ -75,6 +75,16 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onChromeSafariBrowserClosed", obj);
   }
 
+  public void onChromeSafariBrowserItemActionPerform(int id, String url, String title) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("id", id);
+    obj.put("url", url);
+    obj.put("title", title);
+    channel.invokeMethod("onChromeSafariBrowserItemActionPerform", obj);
+  }
+
   @Override
   public void dispose() {
     super.dispose();

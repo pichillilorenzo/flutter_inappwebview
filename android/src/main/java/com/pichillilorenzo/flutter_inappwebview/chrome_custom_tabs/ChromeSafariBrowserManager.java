@@ -8,9 +8,11 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.Util;
+import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 
 import java.io.Serializable;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -27,6 +29,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
   public InAppWebViewFlutterPlugin plugin;
   public String id;
   public static final Map<String, ChromeSafariBrowserManager> shared = new HashMap<>();
+  public static final Map<String, ChromeCustomTabsActivity> browsers = new HashMap<>();
 
   public ChromeSafariBrowserManager(final InAppWebViewFlutterPlugin plugin) {
     super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
@@ -37,7 +40,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
 
   @Override
   public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
-    final String id = (String) call.argument("id");
+    final String viewId = (String) call.argument("id");
 
     switch (call.method) {
       case "open":
@@ -46,7 +49,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
           HashMap<String, Object> settings = (HashMap<String, Object>) call.argument("settings");
           HashMap<String, Object> actionButton = (HashMap<String, Object>) call.argument("actionButton");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(plugin.activity, id, url, settings, actionButton, menuItemList, result);
+          open(plugin.activity, viewId, url, settings, actionButton, menuItemList, result);
         } else {
           result.success(false);
         }
@@ -63,7 +66,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
     }
   }
 
-  public void open(Activity activity, String id, String url, HashMap<String, Object> settings,
+  public void open(Activity activity, String viewId, String url, HashMap<String, Object> settings,
                    HashMap<String, Object> actionButton,
                    List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
 
@@ -71,7 +74,7 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
     Bundle extras = new Bundle();
     extras.putString("url", url);
     extras.putBoolean("isData", false);
-    extras.putString("id", id);
+    extras.putString("id", viewId);
     extras.putString("managerId", this.id);
     extras.putSerializable("settings", settings);
     extras.putSerializable("actionButton", (Serializable) actionButton);
@@ -99,6 +102,14 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
   @Override
   public void dispose() {
     super.dispose();
+    Collection<ChromeCustomTabsActivity> browserList = browsers.values();
+    for (ChromeCustomTabsActivity browser : browserList) {
+      if (browser != null) {
+        browser.close();
+        browser.dispose();
+      }
+    }
+    browsers.clear();
     shared.remove(this.id);
     plugin = null;
   }

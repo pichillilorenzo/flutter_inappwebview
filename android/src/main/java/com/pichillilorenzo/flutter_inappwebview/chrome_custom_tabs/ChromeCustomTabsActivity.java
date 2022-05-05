@@ -9,8 +9,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
-import androidx.annotation.NonNull;
+import androidx.annotation.CallSuper;
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
@@ -19,6 +20,7 @@ import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsMenuItem;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
@@ -28,7 +30,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
 public class ChromeCustomTabsActivity extends Activity implements Disposable {
@@ -54,6 +55,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   @Nullable
   public ChromeCustomTabsChannelDelegate channelDelegate;
 
+  @CallSuper
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -68,6 +70,8 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     String managerId = b.getString("managerId");
     manager = ChromeSafariBrowserManager.shared.get(managerId);
     if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
+
+    ChromeSafariBrowserManager.browsers.put(id, this);
 
     MethodChannel channel = new MethodChannel(manager.plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
     channelDelegate = new ChromeCustomTabsChannelDelegate(this, channel);
@@ -230,7 +234,6 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     Bundle extras = new Bundle();
     extras.putInt(ActionBroadcastReceiver.KEY_ACTION_ID, actionSourceId);
     extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
-    extras.putString(ActionBroadcastReceiver.CHROME_MANAGER_ID, manager.id);
     actionIntent.putExtras(extras);
 
     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -244,14 +247,21 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
   @Override
   public void dispose() {
+    onStop();
+    onDestroy();
     if (channelDelegate != null) {
       channelDelegate.dispose();
       channelDelegate = null;
+    }
+    if (ChromeSafariBrowserManager.browsers.containsKey(id)) {
+      ChromeSafariBrowserManager.browsers.put(id, null);
     }
     manager = null;
   }
 
   public void close() {
+    onStop();
+    onDestroy();
     customTabsSession = null;
     finish();
     if (channelDelegate != null) {

@@ -9,12 +9,12 @@ import Foundation
 
 public class HeadlessWebViewChannelDelegate : ChannelDelegate {
     private var headlessWebView: HeadlessInAppWebView?
-
+    
     public init(headlessWebView: HeadlessInAppWebView, channel: FlutterMethodChannel) {
         super.init(channel: channel)
         self.headlessWebView = headlessWebView
     }
-
+    
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         
@@ -46,14 +46,14 @@ public class HeadlessWebViewChannelDelegate : ChannelDelegate {
             break
         }
     }
-
+    
     public func onWebViewCreated() {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onWebViewCreated", arguments: arguments)
     }
-
+    
     public override func dispose() {
         super.dispose()
         headlessWebView = nil
     }
-  }
+}

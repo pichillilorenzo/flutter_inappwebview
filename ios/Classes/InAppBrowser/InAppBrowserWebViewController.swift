@@ -10,7 +10,8 @@ import UIKit
 import WebKit
 import Foundation
 
-public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelegate, UIScrollViewDelegate, WKUIDelegate, UISearchBarDelegate {
+public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelegate, UIScrollViewDelegate, UISearchBarDelegate, Disposable {
+    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappbrowser_";
     
     var closeButton: UIBarButtonItem!
     var reloadButton: UIBarButtonItem!
@@ -24,7 +25,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var id: String = ""
     var windowId: Int64?
     var webView: InAppWebView!
-    var channel: FlutterMethodChannel?
+    var channelDelegate: InAppBrowserChannelDelegate?
     var initialUrlRequest: URLRequest?
     var initialFile: String?
     var contextMenu: [String: Any]?
@@ -40,7 +41,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var methodCallDelegate: InAppWebViewMethodHandler?
 
     public override func loadView() {
-        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappbrowser_" + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        channelDelegate = InAppBrowserChannelDelegate(channel: channel)
         
         var userScripts: [UserScript] = []
         for intialUserScript in initialUserScripts {
@@ -51,19 +53,19 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
             webView.contextMenu = contextMenu
-            webView.channel = channel!
+            webView.channel = channel
             webView.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(frame: .zero,
                                         configuration: preWebviewConfiguration,
                                         contextMenu: contextMenu,
-                                        channel: channel!,
+                                        channel: channel,
                                         userScripts: userScripts)
         }
         webView.inAppBrowserDelegate = self
         
         methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
-        channel!.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
+        channel.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
         
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
@@ -175,7 +177,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
             webView.loadUrl(urlRequest: initialUrlRequest, allowingReadAccessTo: allowingReadAccessToURL)
         }
-        onBrowserCreated()
+        
+        channelDelegate?.onBrowserCreated()
     }
     
     deinit {
@@ -549,9 +552,9 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func dispose() {
-        onExit()
-        channel?.setMethodCallHandler(nil)
-        channel = nil
+        channelDelegate?.onExit()
+        channelDelegate?.dispose()
+        channelDelegate = nil
         webView?.dispose()
         webView = nil
         view = nil
@@ -567,13 +570,5 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         shareButton.target = nil
         methodCallDelegate?.webView = nil
         methodCallDelegate = nil
-    }
-    
-    public func onBrowserCreated() {
-        channel?.invokeMethod("onBrowserCreated", arguments: [])
-    }
-    
-    public func onExit() {
-        channel?.invokeMethod("onExit", arguments: [])
     }
 }

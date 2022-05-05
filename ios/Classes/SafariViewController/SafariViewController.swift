@@ -9,15 +9,34 @@ import Foundation
 import SafariServices
 
 @available(iOS 9.0, *)
-public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafariViewControllerDelegate {
-    
-    var channel: FlutterMethodChannel?
-    var safariSettings: SafariBrowserSettings?
-    var id: String = ""
+public class SafariViewController: SFSafariViewController, SFSafariViewControllerDelegate, Disposable {
+    static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_chromesafaribrowser_"
+    var channelDelegate: SafariViewControllerChannelDelegate?
+    var safariSettings: SafariBrowserSettings
+    var id: String
     var menuItemList: [[String: Any]] = []
     
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        
+    @available(iOS 11.0, *)
+    public init(id: String, url: URL, configuration: SFSafariViewController.Configuration, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
+        self.id = id
+        self.menuItemList = menuItemList
+        self.safariSettings = safariSettings
+        super.init(url: url, configuration: configuration)
+        let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
+                                           binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
+        self.delegate = self
+    }
+    
+    public init(id: String, url: URL, entersReaderIfAvailable: Bool, menuItemList: [[String: Any]] = [], safariSettings: SafariBrowserSettings) {
+        self.id = id
+        self.menuItemList = menuItemList
+        self.safariSettings = safariSettings
+        super.init(url: url, entersReaderIfAvailable: entersReaderIfAvailable)
+        let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
+                                           binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
+        self.channelDelegate = SafariViewControllerChannelDelegate(safariViewController: self, channel: channel)
+        self.delegate = self
     }
     
     deinit {
@@ -25,41 +44,20 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
         dispose()
     }
     
-    public func prepareMethodChannel() {
-        channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        SwiftFlutterPlugin.instance!.registrar!.addMethodCallDelegate(self, channel: channel!)
-    }
-    
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        // let arguments = call.arguments as? NSDictionary
-        switch call.method {
-            case "close":
-                close(result: result)
-                break
-            default:
-                result(FlutterMethodNotImplemented)
-                break
-        }
-    }
-    
     public override func viewWillAppear(_ animated: Bool) {
         // prepareSafariBrowser()
         super.viewWillAppear(animated)
-        onChromeSafariBrowserOpened()
+        channelDelegate?.onChromeSafariBrowserOpened()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        self.onChromeSafariBrowserClosed()
+        channelDelegate?.onChromeSafariBrowserClosed()
         self.dispose()
     }
     
     
     func prepareSafariBrowser() {
-        guard let safariSettings = safariSettings else {
-            return
-        }
-        
         if #available(iOS 11.0, *) {
             self.dismissButtonStyle = SFSafariViewController.DismissButtonStyle(rawValue: safariSettings.dismissButtonStyle)!
         }
@@ -82,8 +80,8 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
         
         // wait for the animation
         DispatchQueue.main.asyncAfter(deadline: .now() + .milliseconds(400), execute: {() -> Void in
-            if result != nil {
-               result!(true)
+            if let result = result {
+               result(true)
             }
         })
     }
@@ -95,7 +93,7 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
     public func safariViewController(_ controller: SFSafariViewController,
                               didCompleteInitialLoad didLoadSuccessfully: Bool) {
         if didLoadSuccessfully {
-            onChromeSafariBrowserCompletedInitialLoad()
+            channelDelegate?.onChromeSafariBrowserCompletedInitialLoad()
         }
         else {
             print("Cant load successfully the 'SafariViewController'.")
@@ -123,22 +121,11 @@ public class SafariViewController: SFSafariViewController, FlutterPlugin, SFSafa
 //        print(URL)
 //    }
     
-    public func onChromeSafariBrowserOpened() {
-        channel?.invokeMethod("onChromeSafariBrowserOpened", arguments: [])
-    }
-    
-    public func onChromeSafariBrowserCompletedInitialLoad() {
-        channel?.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", arguments: [])
-    }
-    
-    public func onChromeSafariBrowserClosed() {
-        channel?.invokeMethod("onChromeSafariBrowserClosed", arguments: [])
-    }
-    
     public func dispose() {
-        channel?.setMethodCallHandler(nil)
-        channel = nil
+        channelDelegate?.dispose()
+        channelDelegate = nil
         delegate = nil
+        ChromeSafariBrowserManager.browsers[id] = nil
     }
 }
 
@@ -182,18 +169,7 @@ class CustomUIActivity : UIActivity {
     }
 
     override func perform() {
-        guard let registrar = SwiftFlutterPlugin.instance?.registrar else {
-            return
-        }
-        
-        let channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId,
-                                           binaryMessenger: registrar.messenger())
-        
-        let arguments: [String: Any?] = [
-            "url": url.absoluteString,
-            "title": title,
-            "id": id,
-        ]
-        channel.invokeMethod("onChromeSafariBrowserMenuItemActionPerform", arguments: arguments)
+        let browser = ChromeSafariBrowserManager.browsers[viewId]
+        browser??.channelDelegate?.onChromeSafariBrowserMenuItemActionPerform(id: id, url: url, title: title)
     }
 }

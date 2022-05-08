@@ -40,7 +40,7 @@ class PullToRefreshController {
     this.settings = settings ?? PullToRefreshSettings();
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onRefresh":
         if (onRefresh != null) onRefresh!();
@@ -166,6 +166,6 @@ class PullToRefreshController {
   void initMethodChannel(dynamic id) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
-    this._channel?.setMethodCallHandler(handleMethod);
+    this._channel?.setMethodCallHandler(_handleMethod);
   }
 }

@@ -3,6 +3,7 @@
 - Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.
 - Added Web support
 - Added `ProxyController` for Android
+- Added `WebAuthenticationSession` for iOS
 - Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState` WebView controller methods
 - Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS`, `forceDarkStrategy` WebView settings
 - Added `onCameraCaptureStateChanged`, `onMicrophoneCaptureStateChanged` WebView events
@@ -11,7 +12,6 @@
 - Updated `getMetaThemeColor` on iOS 15.0+
 - Deprecated `onLoadError` for `onReceivedError`. `onReceivedError` will be called also for subframes
 - Deprecated `onLoadHttpError` for `onReceivedError`. `onReceivedHttpError` will be called also for subframes
-- Deprecated `onLoadResourceCustomScheme` for `onLoadResourceWithCustomScheme`
 
 ### BREAKING CHANGES
 

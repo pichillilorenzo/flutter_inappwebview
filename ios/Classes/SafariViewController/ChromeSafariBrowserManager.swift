@@ -27,7 +27,7 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
 
         switch call.method {
             case "open":
-                let id: String = arguments!["id"] as! String
+                let id = arguments!["id"] as! String
                 let url = arguments!["url"] as! String
                 let settings = arguments!["settings"] as! [String: Any?]
                 let menuItemList = arguments!["menuItemList"] as! [[String: Any]]
@@ -77,6 +77,8 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                 flutterViewController.present(safari, animated: true) {
                     result(true)
                 }
+                
+                ChromeSafariBrowserManager.browsers[id] = safari
             }
             return
         }

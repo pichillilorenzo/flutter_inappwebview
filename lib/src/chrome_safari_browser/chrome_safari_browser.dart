@@ -62,7 +62,7 @@ class ChromeSafariBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler(_handleMethod);
     _isOpened = false;
   }
 
@@ -87,7 +87,7 @@ class ChromeSafariBrowser {
     }
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     _debugLog(call.method, call.arguments);
 
     switch (call.method) {
@@ -131,7 +131,9 @@ class ChromeSafariBrowser {
       ChromeSafariBrowserSettings? settings}) async {
     assert(url.toString().isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.macOS)) {
       assert(['http', 'https'].contains(url.scheme),
           'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
     }

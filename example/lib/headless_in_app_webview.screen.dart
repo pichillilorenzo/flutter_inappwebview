@@ -1,6 +1,5 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'main.dart';
@@ -86,12 +85,14 @@ class _HeadlessInAppWebViewExampleScreenState
           Center(
             child: ElevatedButton(
                 onPressed: () async {
-                  try {
+                  if (headlessWebView?.isRunning() ?? false) {
                     await headlessWebView?.webViewController.evaluateJavascript(
                         source: """console.log('Here is the message!');""");
-                  } on MissingPluginException {
-                    print(
-                        "HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(
+                          'HeadlessInAppWebView is not running. Click on "Run HeadlessInAppWebView"!'),
+                    ));
                   }
                 },
                 child: Text("Send console.log message")),

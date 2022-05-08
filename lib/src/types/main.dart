@@ -149,3 +149,4 @@ export 'proxy_rule.dart';
 export 'proxy_scheme_filter.dart';
 export 'force_dark_strategy.dart';
 export 'url_request_attribution.dart';
+export 'web_authentication_session_error.dart';

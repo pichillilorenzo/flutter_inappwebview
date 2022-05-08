@@ -17,7 +17,7 @@ import '../util.dart';
 ///Class that represents a WebView in headless mode.
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
 ///
-///Remember to dispose it when you don't need it anymore.
+///**NOTE**: Remember to dispose it when you don't need it anymore.
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
@@ -455,11 +455,11 @@ class HeadlessInAppWebView implements WebView {
   ///Use [onLoadResourceWithCustomScheme] instead.
   @Deprecated('Use onLoadResourceWithCustomScheme instead')
   @override
-  final Future<CustomSchemeResponse?> Function(
+  Future<CustomSchemeResponse?> Function(
       InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
 
   @override
-  final Future<CustomSchemeResponse?> Function(
+  Future<CustomSchemeResponse?> Function(
       InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
 
   @override

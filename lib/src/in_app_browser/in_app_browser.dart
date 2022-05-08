@@ -72,7 +72,6 @@ class InAppBrowser {
   ///The default value is [WebViewImplementation.NATIVE].
   final WebViewImplementation implementation;
 
-  ///
   InAppBrowser(
       {this.windowId,
       this.initialUserScripts,
@@ -80,13 +79,13 @@ class InAppBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler(_handleMethod);
     _isOpened = false;
     webViewController = new InAppWebViewController.fromInAppBrowser(
         this._channel, this, this.initialUserScripts);
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onBrowserCreated":
         this._isOpened = true;

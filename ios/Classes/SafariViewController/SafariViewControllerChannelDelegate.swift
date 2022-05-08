@@ -18,16 +18,16 @@ public class SafariViewControllerChannelDelegate : ChannelDelegate {
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         // let arguments = call.arguments as? NSDictionary
         switch call.method {
-        case "close":
-            if let safariViewController = safariViewController {
-                safariViewController.close(result: result)
-            } else {
-                result(false)
-            }
-            break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
+            case "close":
+                if let safariViewController = safariViewController {
+                    safariViewController.close(result: result)
+                } else {
+                    result(false)
+                }
+                break
+            default:
+                result(FlutterMethodNotImplemented)
+                break
         }
     }
     

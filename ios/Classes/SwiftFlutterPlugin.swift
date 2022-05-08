@@ -34,6 +34,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var inAppBrowserManager: InAppBrowserManager?
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var chromeSafariBrowserManager: ChromeSafariBrowserManager?
+    var webAuthenticationSessionManager: WebAuthenticationSessionManager?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -56,6 +57,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         if #available(iOS 9.0, *) {
             myWebStorageManager = MyWebStorageManager(registrar: registrar)
         }
+        webAuthenticationSessionManager = WebAuthenticationSessionManager(registrar: registrar)
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -83,5 +85,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             (myWebStorageManager as! MyWebStorageManager?)?.dispose()
             myWebStorageManager = nil
         }
+        webAuthenticationSessionManager?.dispose()
+        webAuthenticationSessionManager = nil
     }
 }

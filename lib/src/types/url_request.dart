@@ -1,4 +1,6 @@
 import 'dart:typed_data';
+import 'package:flutter_inappwebview/src/types/url_request_attribution.dart';
+
 import 'url_request_cache_policy.dart';
 import 'url_request_network_service_type.dart';
 
@@ -100,6 +102,20 @@ class URLRequest {
   ///**NOTE**: available only on iOS.
   Uri? mainDocumentURL;
 
+  ///`true` if server endpoint is known to support HTTP/3. Enables QUIC racing
+  ///without HTTP/3 service discovery. Defaults to `false`.
+  ///The default may be `true` in a future OS update.
+  ///
+  ///**NOTE**: available only on iOS 14.5+.
+  bool? assumesHTTP3Capable;
+
+  ///The entities that can make a network request.
+  ///
+  ///If you don’t set a value, the system assumes [URLRequestAttribution.DEVELOPER].
+  ///
+  ///**NOTE**: available only on iOS 15.0+.
+  URLRequestAttribution? attribution;
+
   URLRequest({
     required this.url,
     this.method,
@@ -128,6 +144,8 @@ class URLRequest {
     this.timeoutInterval,
     @Deprecated("Use mainDocumentURL instead") this.iosMainDocumentURL,
     this.mainDocumentURL,
+    this.assumesHTTP3Capable,
+    this.attribution
   }) {
     this.allowsCellularAccess =
     // ignore: deprecated_member_use_from_same_package
@@ -201,6 +219,8 @@ class URLRequest {
       mainDocumentURL: map["mainDocumentURL"] != null
           ? Uri.parse(map["mainDocumentURL"])
           : null,
+      assumesHTTP3Capable: map["assumesHTTP3Capable"],
+      attribution: URLRequestAttribution.fromValue(map["attribution"])
     );
   }
 
@@ -258,6 +278,8 @@ class URLRequest {
       "iosMainDocumentURL": (mainDocumentURL ?? iosMainDocumentURL)?.toString(),
       // ignore: deprecated_member_use_from_same_package
       "mainDocumentURL": (mainDocumentURL ?? iosMainDocumentURL)?.toString(),
+      "assumesHTTP3Capable": assumesHTTP3Capable,
+      "attribution": attribution?.toValue(),
     };
   }
 

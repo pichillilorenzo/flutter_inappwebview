@@ -148,3 +148,4 @@ export 'media_capture_state.dart';
 export 'proxy_rule.dart';
 export 'proxy_scheme_filter.dart';
 export 'force_dark_strategy.dart';
+export 'url_request_attribution.dart';

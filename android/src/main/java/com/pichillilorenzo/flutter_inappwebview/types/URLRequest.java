@@ -53,6 +53,8 @@ public class URLRequest {
     urlRequestMap.put("networkServiceType", null);
     urlRequestMap.put("timeoutInterval", null);
     urlRequestMap.put("mainDocumentURL", null);
+    urlRequestMap.put("assumesHTTP3Capable", null);
+    urlRequestMap.put("attribution", null);
     return urlRequestMap;
   }
 

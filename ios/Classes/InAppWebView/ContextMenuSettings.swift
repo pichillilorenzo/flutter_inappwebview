@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ContextMenuSettings: ISettings<NSObject> {
+public class ContextMenuSettings: ISettings<NSObject> {
     
     var hideDefaultSystemContextMenuItems = false;
 

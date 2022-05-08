@@ -8,7 +8,7 @@
 import Foundation
 import WebKit
 
-class InAppWebViewStatic: ChannelDelegate {
+public class InAppWebViewStatic: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_static"
     static var registrar: FlutterPluginRegistrar?
     static var webViewForUserAgent: WKWebView?
@@ -72,5 +72,9 @@ class InAppWebViewStatic: ChannelDelegate {
         InAppWebViewStatic.registrar = nil
         InAppWebViewStatic.webViewForUserAgent = nil
         InAppWebViewStatic.defaultUserAgent = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

@@ -7,7 +7,7 @@
 
 import Foundation
 
-class PlatformUtil: ChannelDelegate {
+public class PlatformUtil: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_platformutil"
     static var registrar: FlutterPluginRegistrar?
     
@@ -58,5 +58,9 @@ class PlatformUtil: ChannelDelegate {
     public override func dispose() {
         super.dispose()
         PlatformUtil.registrar = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

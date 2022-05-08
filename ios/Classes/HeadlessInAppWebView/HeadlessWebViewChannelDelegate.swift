@@ -8,7 +8,7 @@
 import Foundation
 
 public class HeadlessWebViewChannelDelegate : ChannelDelegate {
-    private var headlessWebView: HeadlessInAppWebView?
+    private weak var headlessWebView: HeadlessInAppWebView?
     
     public init(headlessWebView: HeadlessInAppWebView, channel: FlutterMethodChannel) {
         super.init(channel: channel)
@@ -55,5 +55,9 @@ public class HeadlessWebViewChannelDelegate : ChannelDelegate {
     public override func dispose() {
         super.dispose()
         headlessWebView = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

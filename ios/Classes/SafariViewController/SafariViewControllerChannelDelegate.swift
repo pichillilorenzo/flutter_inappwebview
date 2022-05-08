@@ -8,8 +8,7 @@
 import Foundation
 
 public class SafariViewControllerChannelDelegate : ChannelDelegate {
-    
-    private var safariViewController: SafariViewController?
+    private weak var safariViewController: SafariViewController?
     
     public init(safariViewController: SafariViewController, channel: FlutterMethodChannel) {
         super.init(channel: channel)
@@ -59,5 +58,9 @@ public class SafariViewControllerChannelDelegate : ChannelDelegate {
     public override func dispose() {
         super.dispose()
         safariViewController = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

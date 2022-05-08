@@ -8,9 +8,9 @@
 import Foundation
 
 public class PullToRefreshChannelDelegate : ChannelDelegate {
-    private var pullToRefreshControl: PullToRefreshControl?
+    private weak var pullToRefreshControl: PullToRefreshControl?
     
-    public init(pullToRefreshControl: PullToRefreshControl , channel: FlutterMethodChannel) {
+    public init(pullToRefreshControl: PullToRefreshControl, channel: FlutterMethodChannel) {
         super.init(channel: channel)
         self.pullToRefreshControl = pullToRefreshControl
     }
@@ -86,5 +86,9 @@ public class PullToRefreshChannelDelegate : ChannelDelegate {
     public override func dispose() {
         super.dispose()
         pullToRefreshControl = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

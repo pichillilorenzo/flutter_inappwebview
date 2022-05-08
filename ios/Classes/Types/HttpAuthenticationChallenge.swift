@@ -7,7 +7,7 @@
 
 import Foundation
 
-class HttpAuthenticationChallenge: NSObject {
+public class HttpAuthenticationChallenge: NSObject {
     var protectionSpace: URLProtectionSpace!
     var previousFailureCount: Int = 0
     var failureResponse: URLResponse?

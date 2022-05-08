@@ -1112,7 +1112,10 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   public void onLoadResourceCustomScheme(String url, @NonNull LoadResourceCustomSchemeCallback callback) {
     MethodChannel channel = getChannel();
-    if (channel == null) return;
+    if (channel == null) {
+      callback.defaultBehaviour(null);
+      return;
+    }
     Map<String, Object> obj = new HashMap<>();
     obj.put("url", url);
     channel.invokeMethod("onLoadResourceCustomScheme", obj, callback);
@@ -1146,7 +1149,10 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   public void shouldInterceptRequest(WebResourceRequestExt request, @NonNull ShouldInterceptRequestCallback callback) {
     MethodChannel channel = getChannel();
-    if (channel == null) return;
+    if (channel == null) {
+      callback.defaultBehaviour(null);
+      return;
+    }
     channel.invokeMethod("shouldInterceptRequest", request.toMap(), callback);
   }
 

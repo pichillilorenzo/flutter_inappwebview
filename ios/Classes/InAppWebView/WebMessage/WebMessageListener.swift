@@ -9,19 +9,19 @@ import Foundation
 import WebKit
 
 public class WebMessageListener : FlutterMethodCallDelegate {
-
+    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_listener_"
     var jsObjectName: String
     var allowedOriginRules: Set<String>
-    var channel: FlutterMethodChannel?
-    var webView: InAppWebView?
+    var channelDelegate: WebMessageListenerChannelDelegate?
+    weak var webView: InAppWebView?
     
     public init(jsObjectName: String, allowedOriginRules: Set<String>) {
         self.jsObjectName = jsObjectName
         self.allowedOriginRules = allowedOriginRules
         super.init()
-        self.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_web_message_listener_" + self.jsObjectName,
+        let channel = FlutterMethodChannel(name: WebMessageListener.METHOD_CHANNEL_NAME_PREFIX + self.jsObjectName,
                                        binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        self.channel?.setMethodCallHandler(self.handle)
+        self.channelDelegate = WebMessageListenerChannelDelegate(webMessageListener: self, channel: channel)
     }
     
     public func assertOriginRulesValid() throws {
@@ -122,41 +122,6 @@ public class WebMessageListener : FlutterMethodCallDelegate {
         )
     }
     
-    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let arguments = call.arguments as? NSDictionary
-        
-        switch call.method {
-        case "postMessage":
-            if let webView = webView {
-                let jsObjectNameEscaped = jsObjectName.replacingOccurrences(of: "\'", with: "\\'")
-                let messageEscaped = (arguments!["message"] as! String).replacingOccurrences(of: "\'", with: "\\'")
-                let source = """
-                (function() {
-                    var webMessageListener = window['\(jsObjectNameEscaped)'];
-                    if (webMessageListener != null) {
-                        var event = {data: '\(messageEscaped)'};
-                        if (webMessageListener.onmessage != null) {
-                            webMessageListener.onmessage(event);
-                        }
-                        for (var listener of webMessageListener.listeners) {
-                            listener(event);
-                        }
-                    }
-                })();
-                """
-                webView.evaluateJavascript(source: source) { (_) in
-                    result(true)
-                }
-            } else {
-               result(true)
-            }
-            break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
-        }
-    }
-    
     public func isOriginAllowed(scheme: String?, host: String?, port: Int?) -> Bool {
         for allowedOriginRule in allowedOriginRules {
             if allowedOriginRule == "*" {
@@ -204,19 +169,10 @@ public class WebMessageListener : FlutterMethodCallDelegate {
         }
         return false
     }
-    
-    public func onPostMessage(message: String?, sourceOrigin: URL?, isMainFrame: Bool) {
-        let arguments: [String:Any?] = [
-            "message": message,
-            "sourceOrigin": sourceOrigin?.absoluteString,
-            "isMainFrame": isMainFrame
-        ]
-        channel?.invokeMethod("onPostMessage", arguments: arguments)
-    }
 
     public func dispose() {
-        channel?.setMethodCallHandler(nil)
-        channel = nil
+        channelDelegate?.dispose()
+        channelDelegate = nil
         webView = nil
     }
     

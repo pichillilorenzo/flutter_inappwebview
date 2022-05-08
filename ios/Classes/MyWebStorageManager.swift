@@ -9,7 +9,7 @@ import Foundation
 import WebKit
 
 @available(iOS 9.0, *)
-class MyWebStorageManager: ChannelDelegate {
+public class MyWebStorageManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webstoragemanager"
     static var registrar: FlutterPluginRegistrar?
     static var websiteDataStore: WKWebsiteDataStore?
@@ -104,5 +104,9 @@ class MyWebStorageManager: ChannelDelegate {
         super.dispose()
         MyWebStorageManager.registrar = nil
         MyWebStorageManager.websiteDataStore = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

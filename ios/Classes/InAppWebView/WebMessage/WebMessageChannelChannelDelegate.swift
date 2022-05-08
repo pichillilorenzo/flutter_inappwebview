@@ -1,43 +1,18 @@
 //
-//  WebMessageChannel.swift
+//  WebMessageChannelChannelDelegate.swift
 //  flutter_inappwebview
 //
-//  Created by Lorenzo Pichilli on 10/03/21.
+//  Created by Lorenzo Pichilli on 07/05/22.
 //
 
 import Foundation
 
-public class WebMessageChannel : FlutterMethodCallDelegate {
-    var id: String
-    var channel: FlutterMethodChannel?
-    var webView: InAppWebView?
-    var ports: [WebMessagePort] = []
+public class WebMessageChannelChannelDelegate : ChannelDelegate {
+    private weak var webMessageChannel: WebMessageChannel?
     
-    public init(id: String) {
-        self.id = id
-        super.init()
-        self.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_web_message_channel_" + id,
-                                       binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        self.channel?.setMethodCallHandler(self.handle)
-        self.ports = [
-            WebMessagePort(name: "port1", webMessageChannel: self),
-            WebMessagePort(name: "port2", webMessageChannel: self)
-        ]
-    }
-    
-    public func initJsInstance(webView: InAppWebView, completionHandler: ((WebMessageChannel) -> Void)? = nil) {
-        self.webView = webView
-        if let webView = self.webView {
-            webView.evaluateJavascript(source: """
-            (function() {
-                \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(id)"] = new MessageChannel();
-            })();
-            """) { (_) in
-                completionHandler?(self)
-            }
-        } else {
-            completionHandler?(self)
-        }
+    public init(webMessageChannel: WebMessageChannel, channel: FlutterMethodChannel) {
+        super.init(channel: channel)
+        self.webMessageChannel = webMessageChannel
     }
     
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
@@ -45,7 +20,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
         
         switch call.method {
         case "setWebMessageCallback":
-            if let _ = webView, ports.count > 0 {
+            if let _ = webMessageChannel?.webView, let ports = webMessageChannel?.ports, ports.count > 0 {
                 let index = arguments!["index"] as! Int
                 let port = ports[index]
                 do {
@@ -57,11 +32,11 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
                 }
                 
             } else {
-               result(true)
+                result(true)
             }
             break
         case "postMessage":
-            if let webView = webView, ports.count > 0 {
+            if let webView = webMessageChannel?.webView, let ports = webMessageChannel?.ports, ports.count > 0 {
                 let index = arguments!["index"] as! Int
                 let port = ports[index]
                 let message = arguments!["message"] as! [String: Any?]
@@ -90,7 +65,7 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
             }
             break
         case "close":
-            if let _ = webView, ports.count > 0 {
+            if let _ = webMessageChannel?.webView, let ports = webMessageChannel?.ports, ports.count > 0 {
                 let index = arguments!["index"] as! Int
                 let port = ports[index]
                 do {
@@ -118,34 +93,12 @@ public class WebMessageChannel : FlutterMethodCallDelegate {
         channel?.invokeMethod("onMessage", arguments: arguments)
     }
     
-    public func toMap () -> [String:Any?] {
-        return [
-            "id": id
-        ]
-    }
-    
-    public func dispose() {
-        channel?.setMethodCallHandler(nil)
-        channel = nil
-        for port in ports {
-            port.dispose()
-        }
-        ports.removeAll()
-        webView?.evaluateJavascript(source: """
-        (function() {
-            var webMessageChannel = \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(id)"];
-            if (webMessageChannel != null) {
-                webMessageChannel.port1.close();
-                webMessageChannel.port2.close();
-                delete \(WEB_MESSAGE_CHANNELS_VARIABLE_NAME)["\(id)"];
-            }
-        })();
-        """)
-        webView = nil
+    public override func dispose() {
+        super.dispose()
+        webMessageChannel = nil
     }
     
     deinit {
-        debugPrint("WebMessageChannel - dealloc")
         dispose()
     }
 }

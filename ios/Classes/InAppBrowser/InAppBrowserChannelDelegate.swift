@@ -21,4 +21,8 @@ public class InAppBrowserChannelDelegate : ChannelDelegate {
         let arguments: [String: Any?] = [:]
         channel?.invokeMethod("onExit", arguments: arguments)
     }
+    
+    deinit {
+        dispose()
+    }
 }

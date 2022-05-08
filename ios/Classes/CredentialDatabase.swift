@@ -7,7 +7,7 @@
 
 import Foundation
 
-class CredentialDatabase: ChannelDelegate {
+public class CredentialDatabase: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_credential_database"
     static var registrar: FlutterPluginRegistrar?
     static var credentialStore: URLCredentialStorage?
@@ -192,5 +192,9 @@ class CredentialDatabase: ChannelDelegate {
         super.dispose()
         CredentialDatabase.registrar = nil
         CredentialDatabase.credentialStore = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

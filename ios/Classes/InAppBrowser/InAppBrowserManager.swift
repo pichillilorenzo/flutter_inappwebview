@@ -138,4 +138,8 @@ public class InAppBrowserManager: ChannelDelegate {
         super.dispose()
         InAppBrowserManager.registrar = nil
     }
+    
+    deinit {
+        dispose()
+    }
 }

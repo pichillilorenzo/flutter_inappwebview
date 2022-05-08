@@ -61,4 +61,8 @@ public class HeadlessInAppWebViewManager: ChannelDelegate {
         }
         HeadlessInAppWebViewManager.webViews.removeAll()
     }
+    
+    deinit {
+        dispose()
+    }
 }

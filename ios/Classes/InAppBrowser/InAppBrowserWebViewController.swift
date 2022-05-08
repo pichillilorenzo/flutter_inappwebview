@@ -24,7 +24,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var tmpWindow: UIWindow?
     var id: String = ""
     var windowId: Int64?
-    var webView: InAppWebView!
+    var webView: InAppWebView?
     var channelDelegate: InAppBrowserChannelDelegate?
     var initialUrlRequest: URLRequest?
     var initialFile: String?
@@ -38,7 +38,6 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     var previousStatusBarStyle = -1
     var initialUserScripts: [[String: Any]] = []
     var pullToRefreshInitialSettings: [String: Any?] = [:]
-    var methodCallDelegate: InAppWebViewMethodHandler?
 
     public override func loadView() {
         let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
@@ -52,20 +51,24 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
-            webView.contextMenu = contextMenu
-            webView.channel = channel
-            webView.initialUserScripts = userScripts
+            webView!.contextMenu = contextMenu
+            webView!.initialUserScripts = userScripts
         } else {
-            webView = InAppWebView(frame: .zero,
-                                        configuration: preWebviewConfiguration,
-                                        contextMenu: contextMenu,
-                                        channel: channel,
-                                        userScripts: userScripts)
+            webView = InAppWebView(id: nil,
+                                   registrar: nil,
+                                   frame: .zero,
+                                   configuration: preWebviewConfiguration,
+                                   contextMenu: contextMenu,
+                                   userScripts: userScripts)
         }
-        webView.inAppBrowserDelegate = self
         
-        methodCallDelegate = InAppWebViewMethodHandler(webView: webView!)
-        channel.setMethodCallHandler(LeakAvoider(delegate: methodCallDelegate!).handle)
+        guard let webView = webView else {
+            return
+        }
+        
+        webView.inAppBrowserDelegate = self
+        webView.id = id
+        webView.channelDelegate = WebViewChannelDelegate(webView: webView, channel: channel)
         
         let pullToRefreshSettings = PullToRefreshSettings()
         let _ = pullToRefreshSettings.parse(settings: pullToRefreshInitialSettings)
@@ -87,38 +90,41 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     public override func viewDidLoad() {
         super.viewDidLoad()
         
-        webView.translatesAutoresizingMaskIntoConstraints = false
+        webView?.translatesAutoresizingMaskIntoConstraints = false
         progressBar.translatesAutoresizingMaskIntoConstraints = false
         
         if #available(iOS 9.0, *) {
-            webView.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
-            webView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0.0).isActive = true
-            webView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
-            webView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
+            webView?.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
+            webView?.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: 0.0).isActive = true
+            webView?.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
+            webView?.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
 
             progressBar.topAnchor.constraint(equalTo: self.view.topAnchor, constant: 0.0).isActive = true
             progressBar.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 0.0).isActive = true
             progressBar.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: 0.0).isActive = true
         } else {
-            view.addConstraints([
-                NSLayoutConstraint(item: webView!, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-                NSLayoutConstraint(item: webView!, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
-                NSLayoutConstraint(item: webView!, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
-                NSLayoutConstraint(item: webView!, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
-            ])
-            
-            view.addConstraints([
-                NSLayoutConstraint(item: progressBar!, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
-                NSLayoutConstraint(item: progressBar!, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
-                NSLayoutConstraint(item: progressBar!, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
-            ])
+            if let webView = webView {
+                view.addConstraints([
+                    NSLayoutConstraint(item: webView, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
+                    NSLayoutConstraint(item: webView, attribute: .bottom, relatedBy: .equal, toItem: view, attribute: .bottom, multiplier: 1, constant: 0),
+                    NSLayoutConstraint(item: webView, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
+                    NSLayoutConstraint(item: webView, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
+                ])
+            }
+            if let progressBar = progressBar {
+                view.addConstraints([
+                    NSLayoutConstraint(item: progressBar, attribute: .top, relatedBy: .equal, toItem: view, attribute: .top, multiplier: 1, constant: 0),
+                    NSLayoutConstraint(item: progressBar, attribute: .left, relatedBy: .equal, toItem: view, attribute: .left, multiplier: 1, constant: 0),
+                    NSLayoutConstraint(item: progressBar, attribute: .right, relatedBy: .equal, toItem: view, attribute: .right, multiplier: 1, constant: 0)
+                ])
+            }
         }
         
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
-            webView.load(webViewTransport.request)
+            webView?.load(webViewTransport.request)
         } else {
             if #available(iOS 11.0, *) {
-                if let contentBlockers = webView.settings?.contentBlockers, contentBlockers.count > 0 {
+                if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {
                     do {
                         let jsonData = try JSONSerialization.data(withJSONObject: contentBlockers, options: [])
                         let blockRules = String(data: jsonData, encoding: String.Encoding.utf8)
@@ -165,25 +171,20 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                     allowingReadAccessToURL = nil
                 }
             }
-            webView.loadData(data: initialData, mimeType: initialMimeType!, encoding: initialEncoding!, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
+            webView?.loadData(data: initialData, mimeType: initialMimeType!, encoding: initialEncoding!, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
         }
         else if let initialUrlRequest = initialUrlRequest {
             var allowingReadAccessToURL: URL? = nil
-            if let allowingReadAccessTo = webView.settings?.allowingReadAccessTo, let url = initialUrlRequest.url, url.scheme == "file" {
+            if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo, let url = initialUrlRequest.url, url.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
                 if allowingReadAccessToURL?.scheme != "file" {
                     allowingReadAccessToURL = nil
                 }
             }
-            webView.loadUrl(urlRequest: initialUrlRequest, allowingReadAccessTo: allowingReadAccessToURL)
+            webView?.loadUrl(urlRequest: initialUrlRequest, allowingReadAccessTo: allowingReadAccessToURL)
         }
         
         channelDelegate?.onBrowserCreated()
-    }
-    
-    deinit {
-        debugPrint("InAppBrowserWebViewController - dealloc")
-        dispose()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
@@ -203,8 +204,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func prepareWebView() {
-        webView.settings = webViewSettings
-        webView.prepare()
+        webView?.settings = webViewSettings
+        webView?.prepare()
               
         searchBar = UISearchBar()
         searchBar.keyboardType = .URL
@@ -305,8 +306,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func didStartNavigation(url: URL?) {
-        forwardButton.isEnabled = webView.canGoForward
-        backButton.isEnabled = webView.canGoBack
+        forwardButton.isEnabled = webView?.canGoForward ?? false
+        backButton.isEnabled = webView?.canGoBack ?? false
         progressBar.setProgress(0.0, animated: false)
         guard let url = url else {
             return
@@ -315,8 +316,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func didUpdateVisitedHistory(url: URL?) {
-        forwardButton.isEnabled = webView.canGoForward
-        backButton.isEnabled = webView.canGoBack
+        forwardButton.isEnabled = webView?.canGoForward ?? false
+        backButton.isEnabled = webView?.canGoBack ?? false
         guard let url = url else {
             return
         }
@@ -324,8 +325,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func didFinishNavigation(url: URL?) {
-        forwardButton.isEnabled = webView.canGoForward
-        backButton.isEnabled = webView.canGoBack
+        forwardButton.isEnabled = webView?.canGoForward ?? false
+        backButton.isEnabled = webView?.canGoBack ?? false
         progressBar.setProgress(0.0, animated: false)
         guard let url = url else {
             return
@@ -334,8 +335,8 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     public func didFailNavigation(url: URL?, error: Error) {
-        forwardButton.isEnabled = webView.canGoForward
-        backButton.isEnabled = webView.canGoBack
+        forwardButton.isEnabled = webView?.canGoForward ?? false
+        backButton.isEnabled = webView?.canGoBack ?? false
         progressBar.setProgress(0.0, animated: false)
     }
     
@@ -350,7 +351,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             return
         }
         let request = URLRequest(url: url)
-        webView.load(request)
+        webView?.load(request)
     }
     
     public func show(completion: (() -> Void)? = nil) {
@@ -381,12 +382,12 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     @objc public func reload() {
-        webView.reload()
-        didUpdateVisitedHistory(url: webView.url)
+        webView?.reload()
+        didUpdateVisitedHistory(url: webView?.url)
     }
     
     @objc public func share() {
-        let vc = UIActivityViewController(activityItems: [webView.url?.absoluteString ?? ""], applicationActivities: [])
+        let vc = UIActivityViewController(activityItems: [webView?.url?.absoluteString ?? ""], applicationActivities: [])
         present(vc, animated: true, completion: nil)
     }
     
@@ -413,26 +414,25 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
     }
     
     @objc public func goBack() {
-        if webView.canGoBack {
+        if let webView = webView, webView.canGoBack {
             webView.goBack()
         }
     }
     
     @objc public func goForward() {
-        if webView.canGoForward {
+        if let webView = webView, webView.canGoForward {
             webView.goForward()
         }
     }
     
     @objc public func goBackOrForward(steps: Int) {
-        webView.goBackOrForward(steps: steps)
+        webView?.goBackOrForward(steps: steps)
     }
 
     public func setSettings(newSettings: InAppBrowserSettings, newSettingsMap: [String: Any]) {
-        
-        let newInAppWebViewOptions = InAppWebViewSettings()
-        let _ = newInAppWebViewOptions.parse(settings: newSettingsMap)
-        self.webView.setSettings(newSettings: newInAppWebViewOptions, newSettingsMap: newSettingsMap)
+        let newInAppWebViewSettings = InAppWebViewSettings()
+        let _ = newInAppWebViewSettings.parse(settings: newSettingsMap)
+        webView?.setSettings(newSettings: newInAppWebViewSettings, newSettingsMap: newSettingsMap)
         
         if newSettingsMap["hidden"] != nil, browserSettings?.hidden != newSettings.hidden {
             if newSettings.hidden {
@@ -537,12 +537,12 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             progressBar.isHidden = newSettings.hideProgressBar
         }
         
-        self.browserSettings = newSettings
-        self.webViewSettings = newInAppWebViewOptions
+        browserSettings = newSettings
+        webViewSettings = newInAppWebViewSettings
     }
     
     public func getSettings() -> [String: Any?]? {
-        let webViewSettingsMap = self.webView.getSettings()
+        let webViewSettingsMap = webView?.getSettings()
         if (self.browserSettings == nil || webViewSettingsMap == nil) {
             return nil
         }
@@ -568,7 +568,10 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         backButton.target = nil
         reloadButton.target = nil
         shareButton.target = nil
-        methodCallDelegate?.webView = nil
-        methodCallDelegate = nil
+    }
+    
+    deinit {
+        debugPrint("InAppBrowserWebViewController - dealloc")
+        dispose()
     }
 }

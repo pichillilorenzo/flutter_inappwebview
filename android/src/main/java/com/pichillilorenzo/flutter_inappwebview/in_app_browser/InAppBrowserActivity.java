@@ -104,6 +104,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     pullToRefreshLayout.prepare();
     
     webView = findViewById(R.id.webView);
+    webView.id = id;
     webView.windowId = windowId;
     webView.inAppBrowserDelegate = this;
     webView.plugin = manager.plugin;

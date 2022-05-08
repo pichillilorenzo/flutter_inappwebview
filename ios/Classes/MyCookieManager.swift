@@ -9,7 +9,7 @@ import Foundation
 import WebKit
 
 @available(iOS 11.0, *)
-class MyCookieManager: ChannelDelegate {
+public class MyCookieManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_cookiemanager"
     static var registrar: FlutterPluginRegistrar?
     static var httpCookieStore: WKHTTPCookieStore?
@@ -294,5 +294,9 @@ class MyCookieManager: ChannelDelegate {
         super.dispose()
         MyCookieManager.registrar = nil
         MyCookieManager.httpCookieStore = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

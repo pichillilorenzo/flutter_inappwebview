@@ -94,4 +94,8 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
         }
         ChromeSafariBrowserManager.browsers.removeAll()
     }
+    
+    deinit {
+        dispose()
+    }
 }

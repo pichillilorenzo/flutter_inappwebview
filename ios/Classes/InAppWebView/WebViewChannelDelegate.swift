@@ -947,7 +947,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onPageCommitVisible", arguments: arguments)
     }
     
-    public class LoadResourceCustomSchemeCallback : BaseCallbackResult<CustomSchemeResponse> {
+    public class LoadResourceWithCustomSchemeCallback : BaseCallbackResult<CustomSchemeResponse> {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
@@ -956,13 +956,13 @@ public class WebViewChannelDelegate : ChannelDelegate {
         }
     }
     
-    public func onLoadResourceCustomScheme(url: URL, callback: LoadResourceCustomSchemeCallback) {
+    public func onLoadResourceWithCustomScheme(request: WebResourceRequest, callback: LoadResourceWithCustomSchemeCallback) {
         guard let channel = channel else {
             callback.defaultBehaviour(nil)
             return
         }
-        let arguments: [String: Any?] = ["url": url.absoluteString]
-        channel.invokeMethod("onLoadResourceCustomScheme", arguments: arguments, callback: callback)
+        let arguments: [String: Any?] = ["request": request.toMap()]
+        channel.invokeMethod("onLoadResourceWithCustomScheme", arguments: arguments, callback: callback)
     }
     
     public class CallJsHandlerCallback : BaseCallbackResult<Any> {

@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import WebKit
 
 public class WebResourceResponse: NSObject {
     var contentType: String
@@ -23,6 +24,14 @@ public class WebResourceResponse: NSObject {
         self.headers = headers
         self.statusCode = statusCode
         self.reasonPhrase = reasonPhrase
+    }
+    
+    public init(fromWKNavigationResponse: WKNavigationResponse) {
+        let response = fromWKNavigationResponse.response as? HTTPURLResponse
+        self.contentType = response?.mimeType ?? ""
+        self.contentEncoding = response?.textEncodingName ?? ""
+        self.headers = response?.allHeaderFields
+        self.statusCode = response?.statusCode
     }
     
     public func toMap () -> [String:Any?] {

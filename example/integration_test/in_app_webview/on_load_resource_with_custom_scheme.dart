@@ -6,7 +6,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-void onLoadResourceCustomScheme() {
+void onLoadResourceWithCustomScheme() {
   final shouldSkip = kIsWeb
       ? true
       : ![
@@ -15,7 +15,7 @@ void onLoadResourceCustomScheme() {
           TargetPlatform.macOS,
         ].contains(defaultTargetPlatform);
 
-  testWidgets('onLoadResourceCustomScheme', (WidgetTester tester) async {
+  testWidgets('onLoadResourceWithCustomScheme', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> imageLoaded = Completer<void>();
 
@@ -38,10 +38,10 @@ void onLoadResourceCustomScheme() {
                   imageLoaded.complete();
                 });
           },
-          onLoadResourceCustomScheme: (controller, url) async {
-            if (url.scheme == "my-special-custom-scheme") {
+          onLoadResourceWithCustomScheme: (controller, request) async {
+            if (request.url.scheme == "my-special-custom-scheme") {
               var bytes = await rootBundle.load("test_assets/" +
-                  url
+                  request.url
                       .toString()
                       .replaceFirst("my-special-custom-scheme://", "", 0));
               var response = CustomSchemeResponse(

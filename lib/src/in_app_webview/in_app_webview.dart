@@ -65,7 +65,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onScrollChanged,
     @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
     this.onDownloadStartRequest,
-    this.onLoadResourceCustomScheme,
+    @Deprecated('Use onLoadResourceWithCustomScheme instead') this.onLoadResourceCustomScheme,
+    this.onLoadResourceWithCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
     this.onJsAlert,
@@ -336,9 +337,15 @@ class InAppWebView extends StatefulWidget implements WebView {
           InAppWebViewController controller, LoadedResource resource)?
       onLoadResource;
 
+  ///Use [onLoadResourceWithCustomScheme] instead.
+  @Deprecated('Use onLoadResourceWithCustomScheme instead')
   @override
   final Future<CustomSchemeResponse?> Function(
       InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
+
+  @override
+  final Future<CustomSchemeResponse?> Function(
+      InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
 
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;

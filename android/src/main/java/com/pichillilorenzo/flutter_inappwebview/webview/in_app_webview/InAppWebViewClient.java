@@ -52,7 +52,6 @@ import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
 import java.io.ByteArrayInputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -442,10 +441,9 @@ public class InAppWebViewClient extends WebViewClient {
 
     final String host = uri.getHost();
     final String protocol = uri.getScheme();
-    final String realm = null;
     final int port = uri.getPort();
 
-    URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, realm, port, sslError.getCertificate(), sslError);
+    URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, null, port, sslError.getCertificate(), sslError);
     ServerTrustChallenge challenge = new ServerTrustChallenge(protectionSpace);
 
     final InAppWebView webView = (InAppWebView) view;
@@ -502,10 +500,9 @@ public class InAppWebViewClient extends WebViewClient {
 
     final String host = request.getHost();
     final String protocol = uri.getScheme();
-    final String realm = null;
     final int port = request.getPort();
 
-    URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, realm, port, view.getCertificate(), null);
+    URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, null, port, view.getCertificate(), null);
     ClientCertChallenge challenge = new ClientCertChallenge(protectionSpace, request.getPrincipals(), request.getKeyTypes());
 
     final InAppWebView webView = (InAppWebView) view;
@@ -620,36 +617,48 @@ public class InAppWebViewClient extends WebViewClient {
     }
   }
 
-  @Override
-  public WebResourceResponse shouldInterceptRequest(WebView view, final String url) {
+  public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequestExt request) {
     final InAppWebView webView = (InAppWebView) view;
 
     if (webView.customSettings.useShouldInterceptRequest) {
-      return onShouldInterceptRequest(view, url);
-    }
-
-    URI uri;
-    try {
-      uri = new URI(url);
-    } catch (URISyntaxException uriExpection) {
-      String[] urlSplitted = url.split(":");
-      String scheme = urlSplitted[0];
-      try {
-        URL tempUrl = new URL(url.replace(scheme, "https"));
-        uri = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
-      } catch (Exception e) {
-        e.printStackTrace();
-        return null;
+      WebResourceResponseExt response = null;
+      if (webView.channelDelegate != null) {
+        try {
+          response = webView.channelDelegate.shouldInterceptRequest(request);
+        } catch (InterruptedException e) {
+          e.printStackTrace();
+          return null;
+        }
       }
+
+      if (response != null) {
+        String contentType = response.getContentType();
+        String contentEncoding = response.getContentEncoding();
+        byte[] data = response.getData();
+        Map<String, String> responseHeaders = response.getHeaders();
+        Integer statusCode = response.getStatusCode();
+        String reasonPhrase = response.getReasonPhrase();
+
+        ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && statusCode != null && reasonPhrase != null) {
+          return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
+        } else {
+          return new WebResourceResponse(contentType, contentEncoding, inputStream);
+        }
+      }
+
+      return null;
     }
 
-    String scheme = uri.getScheme();
+    final String url = request.getUrl().toString();
+    String scheme = request.getUrl().getScheme();
 
     if (webView.customSettings.resourceCustomSchemes != null && webView.customSettings.resourceCustomSchemes.contains(scheme)) {
       CustomSchemeResponse customSchemeResponse = null;
       if (webView.channelDelegate != null) {
         try {
-          customSchemeResponse = webView.channelDelegate.onLoadResourceCustomScheme(url);
+          customSchemeResponse = webView.channelDelegate.onLoadResourceWithCustomScheme(request);
         } catch (InterruptedException e) {
           e.printStackTrace();
           return null;
@@ -665,8 +674,8 @@ public class InAppWebViewClient extends WebViewClient {
         }
         if (response != null)
           return response;
-        return new WebResourceResponse(customSchemeResponse.getContentType(), 
-                customSchemeResponse.getContentType(), 
+        return new WebResourceResponse(customSchemeResponse.getContentType(),
+                customSchemeResponse.getContentType(),
                 new ByteArrayInputStream(customSchemeResponse.getData()));
       }
     }
@@ -682,62 +691,20 @@ public class InAppWebViewClient extends WebViewClient {
     return response;
   }
 
+  @Override
+  public WebResourceResponse shouldInterceptRequest(WebView view, final String url) {
+    WebResourceRequestExt requestExt = new WebResourceRequestExt(
+            Uri.parse(url), null, false,
+            false, true, "GET"
+    );
+    return shouldInterceptRequest(view, requestExt);
+  }
+
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   @Override
   public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequest request) {
-    final InAppWebView webView = (InAppWebView) view;
-
-    String url = request.getUrl().toString();
-
-    if (webView.customSettings.useShouldInterceptRequest) {
-      return onShouldInterceptRequest(view, request);
-    }
-
-    return shouldInterceptRequest(view, url);
-  }
-
-  public WebResourceResponse onShouldInterceptRequest(WebView view, Object request) {
-    final InAppWebView webView = (InAppWebView) view;
-    
-    WebResourceRequestExt requestExt;
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && request instanceof WebResourceRequest) {
-      WebResourceRequest webResourceRequest = (WebResourceRequest) request;
-      requestExt = WebResourceRequestExt.fromWebResourceRequest(webResourceRequest);
-    } else {
-      requestExt = new WebResourceRequestExt(
-              Uri.parse((String) request), null, false,
-              false, true, "GET"
-      );
-    }
-
-    WebResourceResponseExt response = null;
-    if (webView.channelDelegate != null) {
-      try {
-        response = webView.channelDelegate.shouldInterceptRequest(requestExt);
-      } catch (InterruptedException e) {
-        e.printStackTrace();
-        return null;
-      }
-    }
-
-    if (response != null) {
-      String contentType = response.getContentType();
-      String contentEncoding = response.getContentEncoding();
-      byte[] data = response.getData();
-      Map<String, String> responseHeaders = response.getHeaders();
-      Integer statusCode = response.getStatusCode();
-      String reasonPhrase = response.getReasonPhrase();
-
-      ByteArrayInputStream inputStream = (data != null) ? new ByteArrayInputStream(data) : null;
-      
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP && statusCode != null && reasonPhrase != null) {
-        return new WebResourceResponse(contentType, contentEncoding, statusCode, reasonPhrase, responseHeaders, inputStream);
-      } else {
-        return new WebResourceResponse(contentType, contentEncoding, inputStream);
-      }
-    }
-
-    return null;
+    WebResourceRequestExt requestExt = WebResourceRequestExt.fromWebResourceRequest(request);
+    return shouldInterceptRequest(view, requestExt);
   }
 
   @Override

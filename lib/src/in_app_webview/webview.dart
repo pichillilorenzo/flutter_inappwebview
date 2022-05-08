@@ -172,15 +172,19 @@ abstract class WebView {
   final void Function(InAppWebViewController controller,
       DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
-  ///Event fired when the [WebView] finds the `custom-scheme` while loading a resource. Here you can handle the url request and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
-  ///
-  ///[url] represents the url of the request.
+  ///Use [onLoadResourceWithCustomScheme] instead.
+  @Deprecated('Use onLoadResourceWithCustomScheme instead')
+  final Future<CustomSchemeResponse?> Function(
+      InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
+
+  ///Event fired when the [WebView] finds the `custom-scheme` while loading a resource.
+  ///Here you can handle the url [request] and return a [CustomSchemeResponse] to load a specific resource encoded to `base64`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   final Future<CustomSchemeResponse?> Function(
-      InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
+      InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
 
   ///Event fired when the [WebView] requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
@@ -963,7 +967,8 @@ abstract class WebView {
       @Deprecated('Use onDownloadStartRequest instead')
           this.onDownloadStart,
       this.onDownloadStartRequest,
-      this.onLoadResourceCustomScheme,
+        @Deprecated('Use onLoadResourceWithCustomScheme instead') this.onLoadResourceCustomScheme,
+      this.onLoadResourceWithCustomScheme,
       this.onCreateWindow,
       this.onCloseWindow,
       this.onJsAlert,

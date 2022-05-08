@@ -1102,7 +1102,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onReceivedLoginRequest", obj);
   }
 
-  public static class LoadResourceCustomSchemeCallback extends BaseCallbackResultImpl<CustomSchemeResponse> {
+  public static class LoadResourceWithCustomSchemeCallback extends BaseCallbackResultImpl<CustomSchemeResponse> {
     @Nullable
     @Override
     public CustomSchemeResponse decodeResult(@Nullable Object obj) {
@@ -1110,33 +1110,33 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onLoadResourceCustomScheme(String url, @NonNull LoadResourceCustomSchemeCallback callback) {
+  public void onLoadResourceWithCustomScheme(WebResourceRequestExt request, @NonNull LoadResourceWithCustomSchemeCallback callback) {
     MethodChannel channel = getChannel();
     if (channel == null) {
       callback.defaultBehaviour(null);
       return;
     }
     Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    channel.invokeMethod("onLoadResourceCustomScheme", obj, callback);
+    obj.put("request", request.toMap());
+    channel.invokeMethod("onLoadResourceWithCustomScheme", obj, callback);
   }
 
-  public static class SyncLoadResourceCustomSchemeCallback extends SyncBaseCallbackResultImpl<CustomSchemeResponse> {
+  public static class SyncLoadResourceWithCustomSchemeCallback extends SyncBaseCallbackResultImpl<CustomSchemeResponse> {
     @Nullable
     @Override
     public CustomSchemeResponse decodeResult(@Nullable Object obj) {
-      return (new LoadResourceCustomSchemeCallback()).decodeResult(obj);
+      return (new LoadResourceWithCustomSchemeCallback()).decodeResult(obj);
     }
   }
   
   @Nullable
-  public CustomSchemeResponse onLoadResourceCustomScheme(String url) throws InterruptedException {
+  public CustomSchemeResponse onLoadResourceWithCustomScheme(WebResourceRequestExt request) throws InterruptedException {
     MethodChannel channel = getChannel();
     if (channel == null) return null;
     final Map<String, Object> obj = new HashMap<>();
-    obj.put("url", url);
-    final SyncLoadResourceCustomSchemeCallback callback = new SyncLoadResourceCustomSchemeCallback();
-    return Util.invokeMethodAndWaitResult(channel, "onLoadResourceCustomScheme", obj, callback);
+    obj.put("request", request.toMap());
+    final SyncLoadResourceWithCustomSchemeCallback callback = new SyncLoadResourceWithCustomSchemeCallback();
+    return Util.invokeMethodAndWaitResult(channel, "onLoadResourceWithCustomScheme", obj, callback);
   }
 
   public static class ShouldInterceptRequestCallback extends BaseCallbackResultImpl<WebResourceResponseExt> {

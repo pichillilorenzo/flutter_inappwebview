@@ -74,7 +74,8 @@ class HeadlessInAppWebView implements WebView {
     this.onScrollChanged,
     @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
     this.onDownloadStartRequest,
-    this.onLoadResourceCustomScheme,
+    @Deprecated('Use onLoadResourceWithCustomScheme instead') this.onLoadResourceCustomScheme,
+    this.onLoadResourceWithCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
     this.onJsAlert,
@@ -451,9 +452,15 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller, LoadedResource resource)?
       onLoadResource;
 
+  ///Use [onLoadResourceWithCustomScheme] instead.
+  @Deprecated('Use onLoadResourceWithCustomScheme instead')
   @override
-  Future<CustomSchemeResponse?> Function(
+  final Future<CustomSchemeResponse?> Function(
       InAppWebViewController controller, Uri url)? onLoadResourceCustomScheme;
+
+  @override
+  final Future<CustomSchemeResponse?> Function(
+      InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
 
   @override
   void Function(InAppWebViewController controller, Uri? url)? onLoadStart;

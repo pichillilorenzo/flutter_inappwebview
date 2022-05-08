@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import WebKit
 
 public class WebResourceRequest: NSObject {
     var url: URL
@@ -24,6 +25,19 @@ public class WebResourceRequest: NSObject {
         self.url = url
         self.headers = headers
         self.isForMainFrame = isForMainFrame
+    }
+    
+    public init(fromURLRequest: URLRequest) {
+        self.url = fromURLRequest.url ?? URL(string: "about:blank")!
+        self.headers = fromURLRequest.allHTTPHeaderFields
+        self.method = fromURLRequest.httpMethod ?? "GET"
+    }
+    
+    public init(fromWKNavigationResponse: WKNavigationResponse) {
+        let response = fromWKNavigationResponse.response as? HTTPURLResponse
+        self.url = response?.url ?? URL(string: "about:blank")!
+        self.headers = response?.allHeaderFields
+        self.isForMainFrame = fromWKNavigationResponse.isForMainFrame
     }
     
     public func toMap () -> [String:Any?] {

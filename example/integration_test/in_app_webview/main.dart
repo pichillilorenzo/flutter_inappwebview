@@ -42,7 +42,7 @@ import 'on_js_before_unload.dart';
 import 'on_received_error.dart';
 import 'on_received_http_error.dart';
 import 'on_load_resource.dart';
-import 'on_load_resource_custom_scheme.dart';
+import 'on_load_resource_with_custom_scheme.dart';
 import 'on_navigation_response.dart';
 import 'on_page_commit_visible.dart';
 import 'on_permission_request.dart';
@@ -110,7 +110,7 @@ void main() {
     onDownloadStartRequest();
     javascriptDialogs();
     onReceivedHttpError();
-    onLoadResourceCustomScheme();
+    onLoadResourceWithCustomScheme();
     onLoadResource();
     onUpdateVisitedHistory();
     onProgressChanged();

@@ -16,27 +16,26 @@ public class CustomSchemeHandler : NSObject, WKURLSchemeHandler {
     public func webView(_ webView: WKWebView, start urlSchemeTask: WKURLSchemeTask) {
         schemeHandlers[urlSchemeTask.hash] = urlSchemeTask
         let inAppWebView = webView as! InAppWebView
-        if let url = urlSchemeTask.request.url {
-            let callback = WebViewChannelDelegate.LoadResourceCustomSchemeCallback()
-            callback.nonNullSuccess = { (response: CustomSchemeResponse) in
-                if (self.schemeHandlers[urlSchemeTask.hash] != nil) {
-                    let urlResponse = URLResponse(url: url, mimeType: response.contentType, expectedContentLength: -1, textEncodingName: response.contentEncoding)
-                    urlSchemeTask.didReceive(urlResponse)
-                    urlSchemeTask.didReceive(response.data)
-                    urlSchemeTask.didFinish()
-                    self.schemeHandlers.removeValue(forKey: urlSchemeTask.hash)
-                }
-                return false
+        let request = WebResourceRequest.init(fromURLRequest: urlSchemeTask.request)
+        let callback = WebViewChannelDelegate.LoadResourceWithCustomSchemeCallback()
+        callback.nonNullSuccess = { (response: CustomSchemeResponse) in
+            if (self.schemeHandlers[urlSchemeTask.hash] != nil) {
+                let urlResponse = URLResponse(url: request.url, mimeType: response.contentType, expectedContentLength: -1, textEncodingName: response.contentEncoding)
+                urlSchemeTask.didReceive(urlResponse)
+                urlSchemeTask.didReceive(response.data)
+                urlSchemeTask.didFinish()
+                self.schemeHandlers.removeValue(forKey: urlSchemeTask.hash)
             }
-            callback.error = { (code: String, message: String?, details: Any?) in
-                print(code + ", " + (message ?? ""))
-            }
-            
-            if let channelDelegate = inAppWebView.channelDelegate {
-                channelDelegate.onLoadResourceCustomScheme(url: url, callback: callback)
-            } else {
-                callback.defaultBehaviour(nil)
-            }
+            return false
+        }
+        callback.error = { (code: String, message: String?, details: Any?) in
+            print(code + ", " + (message ?? ""))
+        }
+        
+        if let channelDelegate = inAppWebView.channelDelegate {
+            channelDelegate.onLoadResourceWithCustomScheme(request: request, callback: callback)
+        } else {
+            callback.defaultBehaviour(nil)
         }
     }
     

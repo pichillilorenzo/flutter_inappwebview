@@ -108,7 +108,8 @@ class InAppWebViewController {
       for (var regExp in WebView.debugLoggingSettings.excludeFilter) {
         if (regExp.hasMatch(method)) return;
       }
-      var maxLogMessageLength = WebView.debugLoggingSettings.maxLogMessageLength;
+      var maxLogMessageLength =
+          WebView.debugLoggingSettings.maxLogMessageLength;
       String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
       String message = (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
           " ID " +
@@ -125,7 +126,8 @@ class InAppWebViewController {
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {
-    if (WebView.debugLoggingSettings.enabled && call.method != "onCallJsHandler") {
+    if (WebView.debugLoggingSettings.enabled &&
+        call.method != "onCallJsHandler") {
       _debugLog(call.method, call.arguments);
     }
 
@@ -293,18 +295,35 @@ class InAppWebViewController {
           }
         }
         break;
-      case "onLoadResourceCustomScheme":
+      case "onLoadResourceWithCustomScheme":
         if ((_webview != null &&
-                _webview!.onLoadResourceCustomScheme != null) ||
+                (_webview!.onLoadResourceWithCustomScheme != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    _webview!.onLoadResourceCustomScheme != null)) ||
             _inAppBrowser != null) {
-          String url = call.arguments["url"];
-          Uri uri = Uri.parse(url);
-          if (_webview != null && _webview!.onLoadResourceCustomScheme != null)
-            return (await _webview!.onLoadResourceCustomScheme!(this, uri))
+          Map<String, dynamic> requestMap =
+              call.arguments["request"].cast<String, dynamic>();
+          WebResourceRequest request = WebResourceRequest.fromMap(requestMap)!;
+
+          if (_webview != null) {
+            if (_webview!.onLoadResourceWithCustomScheme != null)
+              return (await _webview!.onLoadResourceWithCustomScheme!(
+                      this, request))
+                  ?.toMap();
+            else {
+              return (await _webview!
+                      // ignore: deprecated_member_use_from_same_package
+                      .onLoadResourceCustomScheme!(this, request.url))
+                  ?.toMap();
+            }
+          } else {
+            return ((await _inAppBrowser!
+                        .onLoadResourceWithCustomScheme(request)) ??
+                    (await _inAppBrowser!
+                        // ignore: deprecated_member_use_from_same_package
+                        .onLoadResourceCustomScheme(request.url)))
                 ?.toMap();
-          else
-            return (await _inAppBrowser!.onLoadResourceCustomScheme(uri))
-                ?.toMap();
+          }
         }
         break;
       case "onCreateWindow":

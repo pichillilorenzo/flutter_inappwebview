@@ -1695,15 +1695,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                  decidePolicyFor navigationResponse: WKNavigationResponse,
                  decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
         if let response = navigationResponse.response as? HTTPURLResponse, response.statusCode >= 400 {
-            let request = WebResourceRequest(url: response.url ?? URL(string: "about:blank")!,
-                                                        headers: response.allHeaderFields,
-                                                        isForMainFrame: navigationResponse.isForMainFrame)
-            let errorResponse = WebResourceResponse(contentType: response.mimeType ?? "",
-                                                          contentEncoding: response.textEncodingName ?? "",
-                                                          data: nil,
-                                                          headers: response.allHeaderFields,
-                                                          statusCode: response.statusCode,
-                                                          reasonPhrase: nil)
+            let request = WebResourceRequest.init(fromWKNavigationResponse: navigationResponse)
+            let errorResponse = WebResourceResponse.init(fromWKNavigationResponse: navigationResponse)
             channelDelegate?.onReceivedHttpError(request: request, errorResponse: errorResponse)
         }
         

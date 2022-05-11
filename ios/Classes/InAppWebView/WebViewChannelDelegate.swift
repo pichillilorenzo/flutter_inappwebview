@@ -273,16 +273,13 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case "printCurrentPage":
             if let webView = webView {
-                webView.printCurrentPage(printCompletionHandler: {(completed, error) in
-                    if !completed, let err = error {
-                        print(err.localizedDescription)
-                        result(false)
-                        return
-                    }
-                    result(true)
-                })
+                let settings = PrintJobSettings()
+                if let settingsMap = arguments!["settings"] as? [String: Any?] {
+                    let _ = settings.parse(settings: settingsMap)
+                }
+                result(webView.printCurrentPage(settings: settings))
             } else {
-                result(false)
+                result(nil)
             }
             break
         case "getContentHeight":
@@ -1052,6 +1049,27 @@ public class WebViewChannelDelegate : ChannelDelegate {
             "newState": newState?.rawValue
         ]
         channel?.invokeMethod("onMicrophoneCaptureStateChanged", arguments: arguments)
+    }
+    
+    public class PrintRequestCallback : BaseCallbackResult<Bool> {
+        override init() {
+            super.init()
+            self.decodeResult = { (obj: Any?) in
+                return obj is Bool && obj as! Bool
+            }
+        }
+    }
+    
+    public func onPrintRequest(url: URL?, printJobId: String?, callback: PrintRequestCallback) {
+        guard let channel = channel else {
+            callback.defaultBehaviour(nil)
+            return
+        }
+        let arguments = [
+            "url": url?.absoluteString,
+            "printJobId": printJobId,
+        ]
+        channel.invokeMethod("onPrintRequest", arguments: arguments, callback: callback)
     }
     
     public override func dispose() {

@@ -55,6 +55,9 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
 import com.pichillilorenzo.flutter_inappwebview.webview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -1251,25 +1254,75 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     webSettings.setBuiltInZoomControls(enabled);
   }
 
-  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-  public void printCurrentPage() {
+  @RequiresApi(api = Build.VERSION_CODES.KITKAT)
+  @Nullable
+  public String printCurrentPage(@Nullable PrintJobSettings settings) {
     if (plugin != null && plugin.activity != null) {
       // Get a PrintManager instance
       PrintManager printManager = (PrintManager) plugin.activity.getSystemService(Context.PRINT_SERVICE);
 
       if (printManager != null) {
-        String jobName = getTitle() + " Document";
+        PrintAttributes.Builder builder = new PrintAttributes.Builder();
+        
+        String jobName = (getTitle() != null ? getTitle() : getUrl()) + " Document";
+        
+        if (settings != null) {
+          if (settings.jobName != null && !settings.jobName.isEmpty()) {
+            jobName = settings.jobName;
+          }
+          if (settings.orientation != null) {
+            int orientation = settings.orientation;
+            switch (orientation) {
+              case 0:
+                // PORTRAIT
+                builder.setMediaSize(PrintAttributes.MediaSize.UNKNOWN_PORTRAIT);
+                break;
+              case 1:
+                // LANDSCAPE
+                builder.setMediaSize(PrintAttributes.MediaSize.UNKNOWN_LANDSCAPE);
+                break;
+            }
+          }
+//          if (settings.margins != null) {
+//            // for some reason, Android doesn't set the margins
+//            builder.setMinMargins(settings.margins.toMargins());
+//          }
+          if (settings.mediaSize != null) {
+            builder.setMediaSize(settings.mediaSize.toMediaSize());
+          }
+          if (settings.colorMode != null) {
+            builder.setColorMode(settings.colorMode);
+          }
+          if (settings.duplexMode != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            builder.setDuplexMode(settings.duplexMode);
+          }
+          if (settings.resolution != null) {
+            builder.setResolution(settings.resolution.toResolution());
+          }
+        }
 
         // Get a printCurrentPage adapter instance
-        PrintDocumentAdapter printAdapter = createPrintDocumentAdapter(jobName);
+        PrintDocumentAdapter printAdapter;
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          printAdapter = createPrintDocumentAdapter(jobName);
+        } else {
+          printAdapter = createPrintDocumentAdapter();
+        }
 
         // Create a printCurrentPage job with name and adapter instance
-        printManager.print(jobName, printAdapter,
-                new PrintAttributes.Builder().build());
+        android.print.PrintJob job = printManager.print(jobName, printAdapter, builder.build());
+
+        if (settings != null && settings.handledByClient) {
+          String id = UUID.randomUUID().toString();
+          PrintJobController printJobController = new PrintJobController(id, job, settings, plugin);
+          PrintJobManager.jobs.put(printJobController.id, printJobController);
+          return id; 
+        }
       } else {
         Log.e(LOG_TAG, "No PrintManager available");
       }
     }
+    return null;
   }
 
   @Override

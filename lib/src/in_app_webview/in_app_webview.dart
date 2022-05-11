@@ -13,6 +13,7 @@ import '../web/web_platform_manager.dart';
 
 import '../context_menu.dart';
 import '../types/main.dart';
+import '../print_job/main.dart';
 
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
@@ -65,7 +66,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onScrollChanged,
     @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
     this.onDownloadStartRequest,
-    @Deprecated('Use onLoadResourceWithCustomScheme instead') this.onLoadResourceCustomScheme,
+    @Deprecated('Use onLoadResourceWithCustomScheme instead')
+        this.onLoadResourceCustomScheme,
     this.onLoadResourceWithCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
@@ -81,7 +83,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
     this.onUpdateVisitedHistory,
-    this.onPrint,
+    @Deprecated("Use onPrintRequest instead") this.onPrint,
+    this.onPrintRequest,
     this.onLongPressHitTestResult,
     this.onEnterFullscreen,
     this.onExitFullscreen,
@@ -345,7 +348,8 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<CustomSchemeResponse?> Function(
-      InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
+          InAppWebViewController controller, WebResourceRequest request)?
+      onLoadResourceWithCustomScheme;
 
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
@@ -357,8 +361,14 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult)? onLongPressHitTestResult;
 
+  ///Use [onPrintRequest] instead
+  @Deprecated("Use onPrintRequest instead")
   @override
   final void Function(InAppWebViewController controller, Uri? url)? onPrint;
+
+  @override
+  final Future<bool?> Function(InAppWebViewController controller, Uri? url,
+      PrintJobController? printJobController)? onPrintRequest;
 
   @override
   final void Function(InAppWebViewController controller, int progress)?

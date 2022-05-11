@@ -157,6 +157,7 @@ class InAppWebViewWebElement {
               'flutter_inappwebview for web doesn\'t implement \'${call.method}\'',
         );
     }
+    return null;
   }
 
   void prepare() {
@@ -502,10 +503,13 @@ class InAppWebViewWebElement {
     await _channel?.invokeMethod("onWindowBlur");
   }
 
-  void onPrint(String? url) async {
-    var obj = {"url": url};
+  void onPrintRequest(String? url) async {
+    var obj = {
+      "url": url,
+      "printJobId": null
+    };
 
-    await _channel?.invokeMethod("onPrint", obj);
+    await _channel?.invokeMethod("onPrintRequest", obj);
   }
 
   void onEnterFullscreen() async {

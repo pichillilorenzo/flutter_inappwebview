@@ -9,15 +9,20 @@ import '../types/main.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import 'headless_in_app_webview.dart';
+import '../print_job/main.dart';
 
 import '../debug_logging_settings.dart';
 
 ///Abstract class that represents a WebView. Used by [InAppWebView], [HeadlessInAppWebView] and the WebView of [InAppBrowser].
 abstract class WebView {
   ///Debug settings used by [InAppWebView], [HeadlessInAppWebView] and [InAppBrowser].
-  ///The default value excludes the [WebView.onScrollChanged] and [WebView.onOverScrolled] events.
+  ///The default value excludes the [WebView.onScrollChanged], [WebView.onOverScrolled] and [WebView.onReceivedIcon] events.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
-      excludeFilter: [RegExp(r"onScrollChanged"), RegExp(r"onOverScrolled")]);
+      excludeFilter: [
+        RegExp(r"onScrollChanged"),
+        RegExp(r"onOverScrolled"),
+        RegExp(r"onReceivedIcon")
+      ]);
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
@@ -184,7 +189,8 @@ abstract class WebView {
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   final Future<CustomSchemeResponse?> Function(
-      InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
+          InAppWebViewController controller, WebResourceRequest request)?
+      onLoadResourceWithCustomScheme;
 
   ///Event fired when the [WebView] requests the host application to create a new window,
   ///for example when trying to open a link with `target="_blank"` or when `window.open()` is called by JavaScript side.
@@ -433,9 +439,18 @@ abstract class WebView {
           InAppWebViewController controller, Uri? url, bool? isReload)?
       onUpdateVisitedHistory;
 
+  ///Use [onPrintRequest] instead
+  @Deprecated("Use onPrintRequest instead")
+  final void Function(InAppWebViewController controller, Uri? url)? onPrint;
+
   ///Event fired when `window.print()` is called from JavaScript side.
+  ///Return `true` if you want to handle the print job.
+  ///Otherwise return `false`, so the [PrintJobController] will be handled and disposed automatically by the system.
   ///
   ///[url] represents the url on which is called.
+  ///
+  ///[printJobController] represents the controller of the print job created.
+  ///**NOTE**: on Web, it is always `null`
   ///
   ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
   ///
@@ -443,7 +458,8 @@ abstract class WebView {
   ///- Android native WebView
   ///- iOS
   ///- Web
-  final void Function(InAppWebViewController controller, Uri? url)? onPrint;
+  final Future<bool?> Function(InAppWebViewController controller, Uri? url,
+      PrintJobController? printJobController)? onPrintRequest;
 
   ///Event fired when an HTML element of the webview has been clicked and held.
   ///
@@ -967,7 +983,8 @@ abstract class WebView {
       @Deprecated('Use onDownloadStartRequest instead')
           this.onDownloadStart,
       this.onDownloadStartRequest,
-        @Deprecated('Use onLoadResourceWithCustomScheme instead') this.onLoadResourceCustomScheme,
+      @Deprecated('Use onLoadResourceWithCustomScheme instead')
+          this.onLoadResourceCustomScheme,
       this.onLoadResourceWithCustomScheme,
       this.onCreateWindow,
       this.onCloseWindow,
@@ -983,7 +1000,9 @@ abstract class WebView {
       this.onAjaxProgress,
       this.shouldInterceptFetchRequest,
       this.onUpdateVisitedHistory,
-      this.onPrint,
+      @Deprecated("Use onPrintRequest instead")
+          this.onPrint,
+      this.onPrintRequest,
       this.onLongPressHitTestResult,
       this.onEnterFullscreen,
       this.onExitFullscreen,

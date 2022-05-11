@@ -82,9 +82,9 @@ Future<dynamic> _dartNativeCommunication(String method, dynamic viewId,
       case 'onWindowBlur':
         webViewHtmlElement.onWindowBlur();
         break;
-      case 'onPrint':
+      case 'onPrintRequest':
         String? url = args![0];
-        webViewHtmlElement.onPrint(url);
+        webViewHtmlElement.onPrintRequest(url);
         break;
       case 'onEnterFullscreen':
         webViewHtmlElement.onEnterFullscreen();

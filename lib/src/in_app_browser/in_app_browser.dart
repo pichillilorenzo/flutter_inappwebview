@@ -12,6 +12,7 @@ import '../in_app_webview/in_app_webview_controller.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 
 import '../util.dart';
+import '../print_job/main.dart';
 import 'in_app_browser_settings.dart';
 
 class InAppBrowserAlreadyOpenedException implements Exception {
@@ -724,14 +725,24 @@ class InAppBrowser {
   ///- iOS
   void onUpdateVisitedHistory(Uri? url, bool? isReload) {}
 
+  ///Use [onPrintRequest] instead
+  @Deprecated("Use onPrintRequest instead")
+  void onPrint(Uri? url) {}
+
   ///Event fired when `window.print()` is called from JavaScript side.
+  ///Return `true` if you want to handle the print job.
+  ///Otherwise return `false`, so the [PrintJobController] will be handled and disposed automatically by the system.
   ///
   ///[url] represents the url on which is called.
+  ///
+  ///[printJobController] represents the controller of the print job created.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  void onPrint(Uri? url) {}
+  Future<bool?>? onPrintRequest(Uri? url, PrintJobController? printJobController) {
+    return null;
+  }
 
   ///Event fired when an HTML element of the webview has been clicked and held.
   ///

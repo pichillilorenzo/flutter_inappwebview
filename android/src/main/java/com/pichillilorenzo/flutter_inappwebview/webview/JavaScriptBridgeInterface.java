@@ -6,11 +6,16 @@ import android.util.Log;
 import android.webkit.JavascriptInterface;
 import android.webkit.ValueCallback;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
 import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebViewChromeClient;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -58,8 +63,33 @@ public class JavaScriptBridgeInterface {
           return;
         }
 
-        if (handlerName.equals("onPrint") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          inAppWebView.printCurrentPage();
+        if (handlerName.equals("onPrintRequest") && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+          PrintJobSettings settings = new PrintJobSettings();
+          settings.handledByClient = true;
+          final String printJobId = inAppWebView.printCurrentPage(settings);
+          if (inAppWebView != null && inAppWebView.channelDelegate != null) {
+            inAppWebView.channelDelegate.onPrintRequest(inAppWebView.getUrl(), printJobId, new WebViewChannelDelegate.PrintRequestCallback() {
+              @Override
+              public boolean nonNullSuccess(@NonNull Boolean handledByClient) {
+                return !handledByClient;
+              }
+
+              @Override
+              public void defaultBehaviour(@Nullable Boolean handledByClient) {
+                PrintJobController printJobController = PrintJobManager.jobs.get(printJobId);
+                if (printJobController != null) {
+                  printJobController.disposeNoCancel();
+                }
+              }
+
+              @Override
+              public void error(String errorCode, @Nullable String errorMessage, @Nullable Object errorDetails) {
+                Log.e(LOG_TAG, errorCode + ", " + ((errorMessage != null) ? errorMessage : ""));
+                defaultBehaviour(null);
+              }
+            });
+          }
+          return;
         } else if (handlerName.equals("callAsyncJavaScript")) {
           try {
             JSONArray arguments = new JSONArray(args);

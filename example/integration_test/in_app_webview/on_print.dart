@@ -29,8 +29,9 @@ void onPrint() {
           onLoadStop: (controller, url) async {
             await controller.evaluateJavascript(source: "window.print();");
           },
-          onPrint: (controller, url) {
+          onPrintRequest: (controller, url, printJob) async {
             onPrintCompleter.complete(url?.toString());
+            return false;
           },
         ),
       ),

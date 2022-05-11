@@ -1,9 +1,11 @@
 package com.pichillilorenzo.flutter_inappwebview;
 
+import androidx.annotation.NonNull;
+
 import java.util.Map;
 
 public interface ISettings<T> {
-  public ISettings parse(Map<String, Object> settings);
-  public Map<String, Object> toMap();
-  public Map<String, Object> getRealSettings(T obj);
+  @NonNull ISettings<T> parse(@NonNull Map<String, Object> settings);
+  @NonNull Map<String, Object> toMap();
+  @NonNull Map<String, Object> getRealSettings(@NonNull T obj);
 }

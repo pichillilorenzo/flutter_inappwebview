@@ -3,6 +3,7 @@
 - Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.
 - Added Web support
 - Added `ProxyController` for Android
+- Added `PrintJobController` to manage print jobs
 - Added `WebAuthenticationSession` for iOS
 - Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState` WebView controller methods
 - Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS`, `forceDarkStrategy` WebView settings

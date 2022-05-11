@@ -6,12 +6,14 @@ import android.net.Uri;
 import android.os.Build;
 import android.webkit.ValueCallback;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs.ChromeSafariBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.credential_database.CredentialDatabaseHandler;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserManager;
 import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview.proxy.ProxyManager;
 import com.pichillilorenzo.flutter_inappwebview.service_worker.ServiceWorkerManager;
 
@@ -27,21 +29,36 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
 
   protected static final String LOG_TAG = "InAppWebViewFlutterPL";
 
+  @Nullable
   public PlatformUtil platformUtil;
+  @Nullable
   public InAppBrowserManager inAppBrowserManager;
+  @Nullable
   public HeadlessInAppWebViewManager headlessInAppWebViewManager;
+  @Nullable
   public ChromeSafariBrowserManager chromeSafariBrowserManager;
+  @Nullable
   public InAppWebViewStatic inAppWebViewStatic;
+  @Nullable
   public MyCookieManager myCookieManager;
+  @Nullable
   public CredentialDatabaseHandler credentialDatabaseHandler;
+  @Nullable
   public MyWebStorage myWebStorage;
+  @Nullable
   public ServiceWorkerManager serviceWorkerManager;
+  @Nullable
   public WebViewFeatureManager webViewFeatureManager;
+  @Nullable
   public ProxyManager proxyManager;
-  public FlutterWebViewFactory flutterWebViewFactory;
+  @Nullable
+  public PrintJobManager printJobManager;
+  @Nullable
   public static ValueCallback<Uri> filePathCallbackLegacy;
+  @Nullable
   public static ValueCallback<Uri[]> filePathCallback;
 
+  public FlutterWebViewFactory flutterWebViewFactory;
   public Context applicationContext;
   public PluginRegistry.Registrar registrar;
   public BinaryMessenger messenger;
@@ -101,10 +118,13 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     }
     webViewFeatureManager = new WebViewFeatureManager(this);
     proxyManager = new ProxyManager(this);
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      printJobManager = new PrintJobManager();
+    }
   }
 
   @Override
-  public void onDetachedFromEngine(FlutterPluginBinding binding) {
+  public void onDetachedFromEngine(@NonNull FlutterPluginBinding binding) {
     if (platformUtil != null) {
       platformUtil.dispose();
       platformUtil = null;
@@ -148,6 +168,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (proxyManager != null) {
       proxyManager.dispose();
       proxyManager = null;
+    }
+    if (printJobManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      printJobManager.dispose();
+      printJobManager = null;
     }
     filePathCallbackLegacy = null;
     filePathCallback = null;

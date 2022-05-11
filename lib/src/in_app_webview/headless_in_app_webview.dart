@@ -7,6 +7,7 @@ import 'package:flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
 import '../types/main.dart';
+import '../print_job/main.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
@@ -74,7 +75,8 @@ class HeadlessInAppWebView implements WebView {
     this.onScrollChanged,
     @Deprecated('Use onDownloadStartRequest instead') this.onDownloadStart,
     this.onDownloadStartRequest,
-    @Deprecated('Use onLoadResourceWithCustomScheme instead') this.onLoadResourceCustomScheme,
+    @Deprecated('Use onLoadResourceWithCustomScheme instead')
+        this.onLoadResourceCustomScheme,
     this.onLoadResourceWithCustomScheme,
     this.onCreateWindow,
     this.onCloseWindow,
@@ -90,7 +92,8 @@ class HeadlessInAppWebView implements WebView {
     this.onAjaxProgress,
     this.shouldInterceptFetchRequest,
     this.onUpdateVisitedHistory,
-    this.onPrint,
+    @Deprecated("Use onPrintRequest instead") this.onPrint,
+    this.onPrintRequest,
     this.onLongPressHitTestResult,
     this.onEnterFullscreen,
     this.onExitFullscreen,
@@ -460,7 +463,8 @@ class HeadlessInAppWebView implements WebView {
 
   @override
   Future<CustomSchemeResponse?> Function(
-      InAppWebViewController controller, WebResourceRequest request)? onLoadResourceWithCustomScheme;
+          InAppWebViewController controller, WebResourceRequest request)?
+      onLoadResourceWithCustomScheme;
 
   @override
   void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
@@ -472,8 +476,14 @@ class HeadlessInAppWebView implements WebView {
   void Function(InAppWebViewController controller,
       InAppWebViewHitTestResult hitTestResult)? onLongPressHitTestResult;
 
+  ///Use [onPrintRequest] instead
+  @Deprecated("Use onPrintRequest instead")
   @override
   void Function(InAppWebViewController controller, Uri? url)? onPrint;
+
+  @override
+  Future<bool?> Function(InAppWebViewController controller, Uri? url,
+      PrintJobController? printJobController)? onPrintRequest;
 
   @override
   void Function(InAppWebViewController controller, int progress)?

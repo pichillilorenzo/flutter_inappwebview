@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.proxy;
 
+import androidx.annotation.NonNull;
 import androidx.webkit.ProxyConfig;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
@@ -17,8 +18,9 @@ public class ProxySettings implements ISettings<ProxyConfig> {
   Boolean bypassSimpleHostnames = null;
   Boolean removeImplicitRules = null;
 
+  @NonNull
   @Override
-  public ProxySettings parse(Map<String, Object> settings) {
+  public ProxySettings parse(@NonNull Map<String, Object> settings) {
     for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -55,6 +57,7 @@ public class ProxySettings implements ISettings<ProxyConfig> {
     return this;
   }
 
+  @NonNull
   @Override
   public Map<String, Object> toMap() {
     List<Map<String, String>> proxyRuleMapList = new ArrayList<>();
@@ -70,8 +73,9 @@ public class ProxySettings implements ISettings<ProxyConfig> {
     return settings;
   }
 
+  @NonNull
   @Override
-  public Map<String, Object> getRealSettings(ProxyConfig proxyConfig) {
+  public Map<String, Object> getRealSettings(@NonNull ProxyConfig proxyConfig) {
     Map<String, Object> realSettings = toMap();
     List<Map<String, String>> proxyRuleMapList = new ArrayList<>();
     List<ProxyConfig.ProxyRule> proxyRules = proxyConfig.getProxyRules();

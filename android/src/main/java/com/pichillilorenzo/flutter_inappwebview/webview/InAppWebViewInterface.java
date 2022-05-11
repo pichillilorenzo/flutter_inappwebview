@@ -12,6 +12,7 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
@@ -64,7 +65,8 @@ public interface InAppWebViewInterface {
   void onResume();
   void pauseTimers();
   void resumeTimers();
-  void printCurrentPage();
+  @Nullable
+  String printCurrentPage(@Nullable PrintJobSettings settings);
   int getContentHeight();
   void getContentHeight(ValueCallback<Integer> callback);
   void zoomBy(float zoomFactor);

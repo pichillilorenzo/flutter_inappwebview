@@ -15,6 +15,7 @@ import androidx.webkit.WebViewFeature;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserSettings;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
 import com.pichillilorenzo.flutter_inappwebview.types.BaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.ClientCertChallenge;
@@ -344,9 +345,15 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         break;
       case "printCurrentPage":
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-          webView.printCurrentPage();
+          PrintJobSettings settings = new PrintJobSettings();
+          Map<String, Object> settingsMap = (Map<String, Object>) call.argument("settings");
+          if (settingsMap != null) {
+            settings.parse(settingsMap);
+          }
+          result.success(webView.printCurrentPage(settings));
+        } else {
+          result.success(null);
         }
-        result.success(true);
         break;
       case "getContentHeight":
         if (webView instanceof InAppWebView) {
@@ -1228,6 +1235,26 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     obj.put("handlerName", handlerName);
     obj.put("args", args);
     channel.invokeMethod("onCallJsHandler", obj, callback);
+  }
+
+  public static class PrintRequestCallback extends BaseCallbackResultImpl<Boolean> {
+    @Nullable
+    @Override
+    public Boolean decodeResult(@Nullable Object obj) {
+      return (obj instanceof Boolean) && (boolean) obj;
+    }
+  }
+
+  public void onPrintRequest(String url, String printJobId, @NonNull PrintRequestCallback callback) {
+    MethodChannel channel = getChannel();
+    if (channel == null) {
+      callback.defaultBehaviour(null);
+      return;
+    }
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("url", url);
+    obj.put("printJobId", printJobId);
+    channel.invokeMethod("onPrintRequest", obj, callback);
   }
 
   @Override

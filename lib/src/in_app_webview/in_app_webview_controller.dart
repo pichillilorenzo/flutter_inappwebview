@@ -28,6 +28,8 @@ import 'in_app_webview_settings.dart';
 import 'webview.dart';
 import '_static_channel.dart';
 
+import '../print_job/main.dart';
+
 ///List of forbidden names for JavaScript handlers.
 // ignore: non_constant_identifier_names
 final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
@@ -36,7 +38,7 @@ final _JAVASCRIPT_HANDLER_FORBIDDEN_NAMES = UnmodifiableListView<String>([
   "onAjaxReadyStateChange",
   "onAjaxProgress",
   "shouldInterceptFetchRequest",
-  "onPrint",
+  "onPrintRequest",
   "onWindowFocus",
   "onWindowBlur",
   "callAsyncJavaScript",
@@ -1089,15 +1091,31 @@ class InAppWebViewController {
           _webview!.onWindowBlur!(this);
         else if (_inAppBrowser != null) _inAppBrowser!.onWindowBlur();
         break;
-      case "onPrint":
-        if ((_webview != null && _webview!.onPrint != null) ||
+      case "onPrintRequest":
+        if ((_webview != null &&
+                (_webview!.onPrintRequest != null ||
+                    // ignore: deprecated_member_use_from_same_package
+                    _webview!.onPrint != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
+          String? printJobId = call.arguments["printJobId"];
           Uri? uri = url != null ? Uri.parse(url) : null;
-          if (_webview != null && _webview!.onPrint != null)
-            _webview!.onPrint!(this, uri);
-          else
+          PrintJobController? printJob =
+              printJobId != null ? PrintJobController(id: printJobId) : null;
+
+          if (_webview != null) {
+            if (_webview!.onPrintRequest != null)
+              return await _webview!.onPrintRequest!(this, uri, printJob);
+            else {
+              // ignore: deprecated_member_use_from_same_package
+              _webview!.onPrint!(this, uri);
+              return false;
+            }
+          } else {
+            // ignore: deprecated_member_use_from_same_package
             _inAppBrowser!.onPrint(uri);
+            return await _inAppBrowser!.onPrintRequest(uri, printJob);
+          }
         }
         break;
       case "onInjectedScriptLoaded":
@@ -1233,17 +1251,6 @@ class InAppWebViewController {
               else
                 return jsonEncode(
                     await _inAppBrowser!.shouldInterceptFetchRequest(request));
-            }
-            return null;
-          case "onPrint":
-            if ((_webview != null && _webview!.onPrint != null) ||
-                _inAppBrowser != null) {
-              String? url = args[0];
-              Uri? uri = url != null ? Uri.parse(url) : null;
-              if (_webview != null && _webview!.onPrint != null)
-                _webview!.onPrint!(this, uri);
-              else
-                _inAppBrowser!.onPrint(uri);
             }
             return null;
           case "onWindowFocus":
@@ -2273,17 +2280,25 @@ class InAppWebViewController {
 
   ///Prints the current page.
   ///
-  ///**NOTE**: available on Android 21+.
+  ///To obtain the [PrintJobController], use [settings] argument with [PrintJobSettings.handledByClient] to `true`.
+  ///Otherwise this method will return `null` and the [PrintJobController] will be handled and disposed automatically by the system.
   ///
-  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///**NOTE**: available on Android 19+.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin. Also, [PrintJobController] is always `null`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - PrintManager](https://developer.android.com/reference/android/print/PrintManager))
-  ///- iOS ([Official API - UIPrintInteractionController](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller))
+  ///- Android native WebView ([Official API - PrintManager.print](https://developer.android.com/reference/android/print/PrintManager#print(java.lang.String,%20android.print.PrintDocumentAdapter,%20android.print.PrintAttributes)))
+  ///- iOS ([Official API - UIPrintInteractionController.present](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/1618149-present))
   ///- Web ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print))
-  Future<void> printCurrentPage() async {
+  Future<PrintJobController?> printCurrentPage({PrintJobSettings? settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    await _channel.invokeMethod('printCurrentPage', args);
+    args.putIfAbsent("settings", () => settings?.toMap());
+    String? jobId = await _channel.invokeMethod('printCurrentPage', args);
+    if (jobId != null) {
+      return PrintJobController(id: jobId);
+    }
+    return null;
   }
 
   ///Gets the height of the HTML content.
@@ -3205,7 +3220,7 @@ class InAppWebViewController {
   ///
   ///[pdfConfiguration] represents the object that specifies the portion of the web view to capture as PDF data.
   ///
-  ///**NOTE**: available only on iOS 14.0+.
+  ///**NOTE for iOS**: available only on iOS 14.0+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
@@ -3223,7 +3238,7 @@ class InAppWebViewController {
   ///Creates a web archive of the web view’s current contents asynchronously.
   ///Returns `null` if a problem occurred.
   ///
-  ///**NOTE**: available only on iOS 14.0+.
+  ///**NOTE for iOS**: available only on iOS 14.0+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.createWebArchiveData](https://developer.apple.com/documentation/webkit/wkwebview/3650491-createwebarchivedata))
@@ -3472,7 +3487,7 @@ class InAppWebViewController {
   ///
   ///[urlScheme] represents the URL scheme associated with the resource.
   ///
-  ///**NOTE**: available only on iOS 11.0+.
+  ///**NOTE for iOS**: available only on iOS 11.0+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.handlesURLScheme](https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme))

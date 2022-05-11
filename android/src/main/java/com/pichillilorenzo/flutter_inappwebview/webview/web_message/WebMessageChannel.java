@@ -27,7 +27,8 @@ import io.flutter.plugin.common.MethodChannel;
 public class WebMessageChannel implements Disposable {
   protected static final String LOG_TAG = "WebMessageChannel";
   public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_web_message_channel_";
-
+  
+  @NonNull
   public String id;
   @Nullable
   public WebMessageChannelChannelDelegate channelDelegate;

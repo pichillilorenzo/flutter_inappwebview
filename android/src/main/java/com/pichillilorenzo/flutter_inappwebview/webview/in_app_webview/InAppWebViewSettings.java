@@ -4,6 +4,7 @@ import android.os.Build;
 import android.view.View;
 import android.webkit.WebSettings;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
@@ -112,8 +113,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public String horizontalScrollbarTrackColor;
 
+  @NonNull
   @Override
-  public InAppWebViewSettings parse(Map<String, Object> settings) {
+  public InAppWebViewSettings parse(@NonNull Map<String, Object> settings) {
     for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -374,6 +376,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     return this;
   }
 
+  @NonNull
   @Override
   public Map<String, Object> toMap() {
     Map<String, Object> settings = new HashMap<>();
@@ -462,8 +465,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     return settings;
   }
 
+  @NonNull
   @Override
-  public Map<String, Object> getRealSettings(InAppWebViewInterface inAppWebView) {
+  public Map<String, Object> getRealSettings(@NonNull InAppWebViewInterface inAppWebView) {
     Map<String, Object> realSettings = toMap();
     if (inAppWebView instanceof InAppWebView) {
       InAppWebView webView = (InAppWebView) inAppWebView;

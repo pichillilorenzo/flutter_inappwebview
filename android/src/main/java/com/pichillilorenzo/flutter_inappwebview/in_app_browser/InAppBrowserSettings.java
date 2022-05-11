@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.in_app_browser;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
@@ -26,8 +27,9 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
   public Boolean allowGoBackWithBackButton = true;
   public Boolean shouldCloseOnBackButtonPressed = false;
 
+  @NonNull
   @Override
-  public InAppBrowserSettings parse(Map<String, Object> settings) {
+  public InAppBrowserSettings parse(@NonNull Map<String, Object> settings) {
     for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -72,6 +74,7 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
     return this;
   }
 
+  @NonNull
   @Override
   public Map<String, Object> toMap() {
     Map<String, Object> settings = new HashMap<>();
@@ -88,12 +91,13 @@ public class InAppBrowserSettings implements ISettings<InAppBrowserActivity> {
     return settings;
   }
 
+  @NonNull
   @Override
-  public Map<String, Object> getRealSettings(InAppBrowserActivity inAppBrowserActivity) {
+  public Map<String, Object> getRealSettings(@NonNull InAppBrowserActivity inAppBrowserActivity) {
     Map<String, Object> realSettings = toMap();
-    realSettings.put("hideToolbarTop", !inAppBrowserActivity.actionBar.isShowing());
-    realSettings.put("hideUrlBar", !inAppBrowserActivity.menu.findItem(R.id.menu_search).isVisible());
-    realSettings.put("hideProgressBar", inAppBrowserActivity.progressBar.getMax() == 0);
+    realSettings.put("hideToolbarTop", inAppBrowserActivity.actionBar == null || !inAppBrowserActivity.actionBar.isShowing());
+    realSettings.put("hideUrlBar", inAppBrowserActivity.menu == null || !inAppBrowserActivity.menu.findItem(R.id.menu_search).isVisible());
+    realSettings.put("hideProgressBar", inAppBrowserActivity.progressBar == null || inAppBrowserActivity.progressBar.getMax() == 0);
     return realSettings;
   }
 }

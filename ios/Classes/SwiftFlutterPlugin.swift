@@ -35,6 +35,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
     var headlessInAppWebViewManager: HeadlessInAppWebViewManager?
     var chromeSafariBrowserManager: ChromeSafariBrowserManager?
     var webAuthenticationSessionManager: WebAuthenticationSessionManager?
+    var printJobManager: PrintJobManager?
     
     var webViewControllers: [String: InAppBrowserWebViewController?] = [:]
     var safariViewControllers: [String: Any?] = [:]
@@ -58,6 +59,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
             myWebStorageManager = MyWebStorageManager(registrar: registrar)
         }
         webAuthenticationSessionManager = WebAuthenticationSessionManager(registrar: registrar)
+        printJobManager = PrintJobManager()
     }
     
     public static func register(with registrar: FlutterPluginRegistrar) {
@@ -87,5 +89,7 @@ public class SwiftFlutterPlugin: NSObject, FlutterPlugin {
         }
         webAuthenticationSessionManager?.dispose()
         webAuthenticationSessionManager = nil
+        printJobManager?.dispose()
+        printJobManager = nil
     }
 }

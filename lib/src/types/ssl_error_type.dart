@@ -38,7 +38,7 @@ class SslErrorType {
     return null;
   }
 
-  ///Gets a possible [SslErrorType] instance from a value.
+  ///Gets a possible [SslErrorType] instance from a native value.
   static SslErrorType? fromNativeValue(int? value) {
     if (value != null) {
       try {

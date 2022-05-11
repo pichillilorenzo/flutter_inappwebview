@@ -30,7 +30,7 @@ public class WebMessageChannelChannelDelegate extends ChannelDelegateImpl {
           final Integer index = (Integer) call.argument("index");
           webMessageChannel.setWebMessageCallbackForInAppWebView(index, result);
         } else {
-          result.success(true);
+          result.success(false);
         }
         break;
       case "postMessage":
@@ -39,7 +39,7 @@ public class WebMessageChannelChannelDelegate extends ChannelDelegateImpl {
           Map<String, Object> message = (Map<String, Object>) call.argument("message");
           webMessageChannel.postMessageForInAppWebView(index, message, result);
         } else {
-          result.success(true);
+          result.success(false);
         }
         break;
       case "close":
@@ -47,7 +47,7 @@ public class WebMessageChannelChannelDelegate extends ChannelDelegateImpl {
           Integer index = (Integer) call.argument("index");
           webMessageChannel.closeForInAppWebView(index, result);
         } else {
-          result.success(true);
+          result.success(false);
         }
         break;
       default:

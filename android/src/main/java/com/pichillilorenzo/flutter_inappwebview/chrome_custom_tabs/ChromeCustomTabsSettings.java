@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 
 import android.content.Intent;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.trusted.ScreenOrientation;
@@ -35,8 +36,9 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
   public TrustedWebActivityDisplayMode displayMode = null;
   public Integer screenOrientation = ScreenOrientation.DEFAULT;
 
+  @NonNull
   @Override
-  public ChromeCustomTabsSettings parse(Map<String, Object> options) {
+  public ChromeCustomTabsSettings parse(@NonNull Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -104,6 +106,7 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
     return this;
   }
 
+  @NonNull
   @Override
   public Map<String, Object> toMap() {
     Map<String, Object> options = new HashMap<>();
@@ -122,8 +125,9 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
     return options;
   }
 
+  @NonNull
   @Override
-  public Map<String, Object> getRealSettings(ChromeCustomTabsActivity chromeCustomTabsActivity) {
+  public Map<String, Object> getRealSettings(@NonNull ChromeCustomTabsActivity chromeCustomTabsActivity) {
     Map<String, Object> realOptions = toMap();
     if (chromeCustomTabsActivity != null) {
       Intent intent = chromeCustomTabsActivity.getIntent();

@@ -502,3 +502,21 @@ extension MapSize on Size {
     return {'width': width, 'height': height};
   }
 }
+
+extension MapEdgeInsets on EdgeInsets {
+  static EdgeInsets? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    return EdgeInsets.fromLTRB(
+        map['left'], map['top'], map['right'], map['bottom']);
+  }
+
+  Map<String, double> toJson() {
+    return toMap();
+  }
+
+  Map<String, double> toMap() {
+    return {'top': top, 'right': right, 'bottom': bottom, 'left': left};
+  }
+}

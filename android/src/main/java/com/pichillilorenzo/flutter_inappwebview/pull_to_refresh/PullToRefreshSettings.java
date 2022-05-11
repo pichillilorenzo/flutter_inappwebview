@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.pull_to_refresh;
 
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
@@ -22,7 +23,9 @@ public class PullToRefreshSettings implements ISettings<PullToRefreshLayout> {
   @Nullable
   public Integer size;
 
-  public PullToRefreshSettings parse(Map<String, Object> settings) {
+  @NonNull
+  @Override
+  public PullToRefreshSettings parse(@NonNull Map<String, Object> settings) {
     for (Map.Entry<String, Object> pair : settings.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -55,6 +58,7 @@ public class PullToRefreshSettings implements ISettings<PullToRefreshLayout> {
     return this;
   }
 
+  @NonNull
   public Map<String, Object> toMap() {
     Map<String, Object> settings = new HashMap<>();
     settings.put("enabled", enabled);
@@ -66,8 +70,9 @@ public class PullToRefreshSettings implements ISettings<PullToRefreshLayout> {
     return settings;
   }
 
+  @NonNull
   @Override
-  public Map<String, Object> getRealSettings(PullToRefreshLayout pullToRefreshLayout) {
+  public Map<String, Object> getRealSettings(@NonNull PullToRefreshLayout pullToRefreshLayout) {
     Map<String, Object> realSettings = toMap();
     return realSettings;
   }

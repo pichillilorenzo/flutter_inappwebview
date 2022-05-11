@@ -30,7 +30,7 @@ class PermissionResourceType {
     return null;
   }
 
-  ///Gets a possible [PermissionResourceType] instance from a value.
+  ///Gets a possible [PermissionResourceType] instance from a native value.
   static PermissionResourceType? fromNativeValue(dynamic value) {
     if (value != null) {
       try {

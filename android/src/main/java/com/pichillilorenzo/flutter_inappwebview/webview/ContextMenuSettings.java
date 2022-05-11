@@ -1,5 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.webview;
 
+import androidx.annotation.NonNull;
+
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
 
 import java.util.HashMap;
@@ -10,7 +12,9 @@ public class ContextMenuSettings implements ISettings<Object> {
 
   public Boolean hideDefaultSystemContextMenuItems = false;
 
-  public ContextMenuSettings parse(Map<String, Object> options) {
+  @NonNull
+  @Override
+  public ContextMenuSettings parse(@NonNull Map<String, Object> options) {
     for (Map.Entry<String, Object> pair : options.entrySet()) {
       String key = pair.getKey();
       Object value = pair.getValue();
@@ -28,14 +32,16 @@ public class ContextMenuSettings implements ISettings<Object> {
     return this;
   }
 
+  @NonNull
   public Map<String, Object> toMap() {
     Map<String, Object> options = new HashMap<>();
     options.put("hideDefaultSystemContextMenuItems", hideDefaultSystemContextMenuItems);
     return options;
   }
 
+  @NonNull
   @Override
-  public Map<String, Object> getRealSettings(Object obj) {
+  public Map<String, Object> getRealSettings(@NonNull Object obj) {
     Map<String, Object> realOptions = toMap();
     return realOptions;
   }

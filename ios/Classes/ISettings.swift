@@ -14,10 +14,14 @@ public class ISettings<T>: NSObject {
         super.init()
     }
     
-    func parse(settings: [String: Any?]) -> ISettings {
+    func parse(settings: [String: Any?]) -> ISettings<T> {
         for (key, value) in settings {
-            if !(value is NSNull), value != nil, self.responds(to: Selector(key)) {
-                self.setValue(value, forKey: key)
+            if !(value is NSNull), value != nil {
+                if self.responds(to: Selector(key)) {
+                    self.setValue(value, forKey: key)
+                } else if self.responds(to: Selector("_" + key)) {
+                    self.setValue(value, forKey: "_" + key)
+                }
             }
         }
         return self
@@ -25,15 +29,15 @@ public class ISettings<T>: NSObject {
     
     func toMap() -> [String: Any?] {
         var settings: [String: Any?] = [:]
-        var counts = UInt32();
-        let properties = class_copyPropertyList(object_getClass(self), &counts);
+        var counts = UInt32()
+        let properties = class_copyPropertyList(object_getClass(self), &counts)
         for i in 0..<counts {
-            let property = properties?.advanced(by: Int(i)).pointee;
-            
-            let cName = property_getName(property!);
-            let name = String(cString: cName)
-            
-            settings[name] = self.value(forKey: name)
+            if let property = properties?.advanced(by: Int(i)).pointee {
+                let cName = property_getName(property)
+                let name = String(cString: cName)
+                let key = !name.hasPrefix("_") ? name : String(name.suffix(from: name.index(name.startIndex, offsetBy: 1)))
+                settings[key] = self.value(forKey: key)
+            }
         }
         free(properties)
         return settings

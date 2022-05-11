@@ -79,7 +79,7 @@ class WebResourceErrorType {
     return null;
   }
 
-  ///Gets a possible [WebResourceErrorType] instance from an [int] value.
+  ///Gets a possible [WebResourceErrorType] instance from an [int] native value.
   static WebResourceErrorType? fromNativeValue(int? value) {
     if (value != null) {
       try {

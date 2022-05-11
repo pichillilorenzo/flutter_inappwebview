@@ -46,8 +46,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var ignoresViewportScaleLimits = false
     var allowsInlineMediaPlayback = false
     var allowsPictureInPictureMediaPlayback = true
-    var isFraudulentWebsiteWarningEnabled = true;
-    var selectionGranularity = 0;
+    var isFraudulentWebsiteWarningEnabled = true
+    var selectionGranularity = 0
     var dataDetectorTypes: [String] = ["NONE"] // WKDataDetectorTypeNone
     var preferredContentMode = 0
     var sharedCookiesEnabled = false

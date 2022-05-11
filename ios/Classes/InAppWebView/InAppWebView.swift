@@ -724,7 +724,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         if let with = with {
             snapshotConfiguration = WKSnapshotConfiguration()
             if let rect = with["rect"] as? [String: Double] {
-                snapshotConfiguration!.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
+                snapshotConfiguration!.rect = CGRect.fromMap(map: rect)
             }
             if let snapshotWidth = with["snapshotWidth"] as? Double {
                 snapshotConfiguration!.snapshotWidth = NSNumber(value: snapshotWidth)
@@ -762,7 +762,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         let pdfConfiguration: WKPDFConfiguration = .init()
         if let configuration = configuration {
             if let rect = configuration["rect"] as? [String: Double] {
-                pdfConfiguration.rect = CGRect(x: rect["x"]!, y: rect["y"]!, width: rect["width"]!, height: rect["height"]!)
+                pdfConfiguration.rect = CGRect.fromMap(map: rect)
             }
         }
         createPDF(configuration: pdfConfiguration) { (result) in
@@ -2584,9 +2584,29 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         } else if message.name == "callHandler" {
             let body = message.body as! [String: Any?]
             let handlerName = body["handlerName"] as! String
-            if handlerName == "onPrint" {
-                printCurrentPage(printCompletionHandler: nil)
+            
+            if handlerName == "onPrintRequest" {
+                let settings = PrintJobSettings()
+                settings.handledByClient = true
+                if let printJobId = printCurrentPage(settings: settings) {
+                    let callback = WebViewChannelDelegate.PrintRequestCallback()
+                    callback.nonNullSuccess = { (handledByClient: Bool) in
+                        return !handledByClient
+                    }
+                    callback.defaultBehaviour = { (handledByClient: Bool?) in
+                        if let printJob = PrintJobManager.jobs[printJobId] {
+                            printJob?.disposeNoDismiss()
+                        }
+                    }
+                    callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
+                        print(code + ", " + (message ?? ""))
+                        callback?.defaultBehaviour(nil)
+                    }
+                    channelDelegate?.onPrintRequest(url: url, printJobId: printJobId, callback: callback)
+                }
+                return
             }
+            
             let _callHandlerID = body["_callHandlerID"] as! Int64
             let args = body["args"] as! String
             
@@ -2724,25 +2744,79 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
-    public func printCurrentPage(printCompletionHandler: ((_ completed: Bool, _ error: Error?) -> Void)?) {
+    public func printCurrentPage(settings: PrintJobSettings? = nil,
+                                 completionHandler: UIPrintInteractionController.CompletionHandler? = nil) -> String? {
+        var printJobId: String? = nil
+        if let settings = settings, settings.handledByClient {
+            printJobId = NSUUID().uuidString
+        }
+        
         let printController = UIPrintInteractionController.shared
         let printFormatter = self.viewPrintFormatter()
+        if let settings = settings {
+            if let margins = settings.margins {
+                printFormatter.perPageContentInsets = margins
+            }
+            if let maximumContentHeight = settings.maximumContentHeight {
+                printFormatter.maximumContentHeight = maximumContentHeight
+            }
+            if let maximumContentWidth = settings.maximumContentWidth {
+                printFormatter.maximumContentWidth = maximumContentWidth
+            }
+        }
         printController.printFormatter = printFormatter
         
-        let completionHandler: UIPrintInteractionController.CompletionHandler = { (printController, completed, error) in
-            if !completed {
-                if let e = error {
-                    print("[PRINT] Failed: \(e.localizedDescription)")
-                } else {
-                    print("[PRINT] Canceled")
+        printController.printInfo = UIPrintInfo(dictionary: nil)
+        if let printInfo = printController.printInfo {
+            printInfo.jobName = settings?.jobName ?? (title ?? url?.absoluteString ?? "") + " Document"
+            if let settings = settings {
+                if let orientationValue = settings.orientation,
+                    let orientation = UIPrintInfo.Orientation.init(rawValue: orientationValue) {
+                    printInfo.orientation = orientation
                 }
-            }
-            if let callback = printCompletionHandler {
-                callback(completed, error)
+                if let duplexModeValue = settings.duplexMode,
+                    let duplexMode = UIPrintInfo.Duplex.init(rawValue: duplexModeValue) {
+                    printInfo.duplex = duplexMode
+                }
+                if let outputTypeValue = settings.outputType,
+                    let outputType = UIPrintInfo.OutputType.init(rawValue: outputTypeValue) {
+                    printInfo.outputType = outputType
+                }
             }
         }
         
-        printController.present(animated: true, completionHandler: completionHandler)
+        // initialize print renderer and set its formatter
+        let printRenderer = CustomUIPrintPageRenderer(numberOfPage: settings?.numberOfPages,
+                                                      forceRenderingQuality: settings?.forceRenderingQuality)
+        printRenderer.addPrintFormatter(printFormatter, startingAtPageAt: 0)
+        if let settings = settings {
+            if let footerHeight = settings.footerHeight {
+                printRenderer.footerHeight = footerHeight
+            }
+            if let headerHeight = settings.headerHeight {
+                printRenderer.headerHeight = headerHeight
+            }
+        }
+        printController.printPageRenderer = printRenderer
+        
+        if let settings = settings {
+            printController.showsNumberOfCopies = settings.showsNumberOfCopies
+            printController.showsPaperSelectionForLoadedPapers = settings.showsPaperSelectionForLoadedPapers
+            if #available(iOS 15.0, *) {
+                printController.showsPaperOrientation = settings.showsPaperOrientation
+            }
+        }
+        
+        let animated = settings?.animated ?? true
+        if let id = printJobId {
+            let printJob = PrintJobController(id: id, job: printController, settings: settings)
+            PrintJobManager.jobs[id] = printJob
+            printJob.present(animated: animated, completionHandler: completionHandler)
+        } else {
+            printController.present(animated: animated, completionHandler: completionHandler)
+        }
+        
+        return printJobId
     }
     
     public func getContentHeight() -> Int64 {

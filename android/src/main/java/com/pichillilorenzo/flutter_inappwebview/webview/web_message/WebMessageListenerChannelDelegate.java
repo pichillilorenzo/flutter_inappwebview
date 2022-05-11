@@ -31,7 +31,7 @@ public class WebMessageListenerChannelDelegate extends ChannelDelegateImpl {
           String message = (String) call.argument("message");
           webMessageListener.postMessageForInAppWebView(message, result);
         } else {
-          result.success(true);
+          result.success(false); 
         }
         break;
       default:

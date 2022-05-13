@@ -13,6 +13,53 @@ import '../in_app_webview/android/in_app_webview_options.dart';
 import 'apple/in_app_browser_options.dart';
 import '../in_app_webview/apple/in_app_webview_options.dart';
 
+///Class that represents the settings that can be used for an [InAppBrowser] instance.
+class InAppBrowserClassSettings {
+  ///Browser settings.
+  late InAppBrowserSettings browserSettings;
+
+  ///WebView settings.
+  late InAppWebViewSettings webViewSettings;
+
+  InAppBrowserClassSettings(
+      {InAppBrowserSettings? browserSettings,
+      InAppWebViewSettings? webViewSettings}) {
+    this.browserSettings = browserSettings ?? InAppBrowserSettings();
+    this.webViewSettings = webViewSettings ?? InAppWebViewSettings();
+  }
+
+  Map<String, dynamic> toMap() {
+    Map<String, dynamic> options = {};
+
+    options.addAll(browserSettings.toMap());
+    options.addAll(webViewSettings.toMap());
+
+    return options;
+  }
+
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
+  String toString() {
+    return toMap().toString();
+  }
+
+  factory InAppBrowserClassSettings.fromMap(Map<String, dynamic> options,
+      {InAppBrowserClassSettings? instance}) {
+    if (instance == null) {
+      instance = InAppBrowserClassSettings();
+    }
+    instance.browserSettings = InAppBrowserSettings.fromMap(options);
+    instance.webViewSettings = InAppWebViewSettings.fromMap(options);
+    return instance;
+  }
+
+  InAppBrowserClassSettings copy() {
+    return InAppBrowserClassSettings.fromMap(toMap());
+  }
+}
+
 class BrowserOptions {
   Map<String, dynamic> toMap() {
     return {};
@@ -33,54 +80,6 @@ class BrowserOptions {
   @override
   String toString() {
     return toMap().toString();
-  }
-}
-
-///Class that represents the settings that can be used for an [InAppBrowser] instance.
-class InAppBrowserClassSettings {
-  ///Browser settings.
-  late InAppBrowserSettings browserSettings;
-
-  ///WebView settings.
-  late InAppWebViewSettings webViewSettings;
-
-  InAppBrowserClassSettings(
-      {InAppBrowserSettings? browserSettings,
-      InAppWebViewSettings? webViewSettings}) {
-    this.browserSettings = browserSettings ?? InAppBrowserSettings();
-    this.webViewSettings = webViewSettings ?? InAppWebViewSettings();
-  }
-
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> options = {};
-
-    options.addAll(this.browserSettings.toMap());
-    options.addAll(this.webViewSettings.toMap());
-
-    return options;
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-
-  static InAppBrowserClassSettings fromMap(Map<String, dynamic> options,
-      {InAppBrowserClassSettings? instance}) {
-    if (instance == null) {
-      instance = InAppBrowserClassSettings();
-    }
-    instance.browserSettings = InAppBrowserSettings.fromMap(options);
-    instance.webViewSettings = InAppWebViewSettings.fromMap(options);
-    return instance;
-  }
-
-  InAppBrowserClassSettings copy() {
-    return InAppBrowserClassSettings.fromMap(this.toMap());
   }
 }
 

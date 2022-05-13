@@ -1,5 +1,4 @@
 import 'package:flutter/cupertino.dart';
-import 'package:flutter_inappwebview/src/types/print_job_media_size.dart';
 
 import '../types/main.dart';
 import '../util.dart';
@@ -178,37 +177,36 @@ class PrintJobSettings {
       this.footerHeight,
       this.headerHeight});
 
-  ///Gets a possible [PrintJobSettings] instance from a [Map] value.
-  static PrintJobSettings fromMap(Map<String, dynamic> map) {
-    var settings = PrintJobSettings();
-    settings.handledByClient = map["handledByClient"];
-    settings.jobName = map["jobName"];
-    settings.animated = map["animated"];
-    settings.orientation = PrintJobOrientation.fromValue(map["orientation"]);
-    settings.numberOfPages = map["numberOfPages"];
-    settings.forceRenderingQuality =
-        PrintJobRenderingQuality.fromValue(map["forceRenderingQuality"]);
-    settings.margins =
-        MapEdgeInsets.fromMap(map["margins"]?.cast<String, dynamic>());
-    settings.mediaSize =
-        PrintJobMediaSize.fromMap(map["mediaSize"]?.cast<String, dynamic>());
-    settings.colorMode = PrintJobColorMode.fromValue(map["colorMode"]);
-    settings.duplexMode = PrintJobDuplexMode.fromNativeValue(map["duplexMode"]);
-    settings.outputType = PrintJobOutputType.fromValue(map["outputType"]);
-    settings.resolution =
-        PrintJobResolution.fromMap(map["resolution"]?.cast<String, dynamic>());
-    settings.showsNumberOfCopies = map["showsNumberOfCopies"];
-    settings.showsPaperSelectionForLoadedPapers =
-        map["showsPaperSelectionForLoadedPapers"];
-    settings.showsPaperOrientation = map["showsPaperOrientation"];
-    settings.maximumContentHeight = map["maximumContentHeight"];
-    settings.maximumContentWidth = map["maximumContentWidth"];
-    settings.footerHeight = map["footerHeight"];
-    settings.headerHeight = map["headerHeight"];
-    return settings;
+  ///Gets a [PrintJobSettings] instance from a [Map] value.
+  factory PrintJobSettings.fromMap(Map<String, dynamic> map) {
+    return PrintJobSettings(
+        handledByClient: map["handledByClient"],
+        jobName: map["jobName"],
+        animated: map["animated"],
+        orientation: PrintJobOrientation.fromValue(map["orientation"]),
+        numberOfPages: map["numberOfPages"],
+        forceRenderingQuality:
+            PrintJobRenderingQuality.fromValue(map["forceRenderingQuality"]),
+        margins:
+            MapEdgeInsets.fromMap(map["margins"]?.cast<String, dynamic>()),
+        mediaSize:
+            PrintJobMediaSize.fromMap(map["mediaSize"]?.cast<String, dynamic>()),
+        colorMode: PrintJobColorMode.fromValue(map["colorMode"]),
+        duplexMode: PrintJobDuplexMode.fromNativeValue(map["duplexMode"]),
+        outputType: PrintJobOutputType.fromValue(map["outputType"]),
+        resolution:
+            PrintJobResolution.fromMap(map["resolution"]?.cast<String, dynamic>()),
+        showsNumberOfCopies: map["showsNumberOfCopies"],
+        showsPaperSelectionForLoadedPapers:
+        map["showsPaperSelectionForLoadedPapers"],
+        showsPaperOrientation: map["showsPaperOrientation"],
+        maximumContentHeight: map["maximumContentHeight"],
+        maximumContentWidth: map["maximumContentWidth"],
+        footerHeight: map["footerHeight"],
+        headerHeight: map["headerHeight"],
+    );
   }
 
-  ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
       "handledByClient": handledByClient,
@@ -233,17 +231,14 @@ class PrintJobSettings {
     };
   }
 
-  ///Gets a copy of the current instance.
   PrintJobSettings copy() {
-    return PrintJobSettings.fromMap(this.toMap());
+    return PrintJobSettings.fromMap(toMap());
   }
 
-  ///Converts instance to a map.
   Map<String, dynamic> toJson() {
-    return this.toMap();
+    return toMap();
   }
 
-  @override
   String toString() {
     return toMap().toString();
   }

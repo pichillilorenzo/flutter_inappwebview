@@ -1,12 +1,13 @@
 import 'package:flutter/services.dart';
 import '../types/print_job_info.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
+import '../types/disposable.dart';
 
 ///A completion handler for the [PrintJobController].
 typedef PrintJobCompletionHandler = Future<void> Function(bool completed, String? error)?;
 
 ///Class representing a print job eventually returned by [InAppWebViewController.printCurrentPage].
-class PrintJobController {
+class PrintJobController implements Disposable {
   ///Print job ID.
   final String id;
 
@@ -96,6 +97,7 @@ class PrintJobController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('dispose', args);

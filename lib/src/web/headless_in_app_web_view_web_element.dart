@@ -4,8 +4,9 @@ import 'package:flutter/widgets.dart';
 
 import 'in_app_web_view_web_element.dart';
 import '../util.dart';
+import '../types/disposable.dart';
 
-class HeadlessInAppWebViewWebElement {
+class HeadlessInAppWebViewWebElement implements Disposable {
   String id;
   late BinaryMessenger _messenger;
   InAppWebViewWebElement? webView;
@@ -55,6 +56,7 @@ class HeadlessInAppWebViewWebElement {
     webView?.iframe.style.height = size.height.toString() + "px";
   }
 
+  @override
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;

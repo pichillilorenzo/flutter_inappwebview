@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import '../util.dart';
 import '../debug_logging_settings.dart';
 import '../types/main.dart';
+import '../types/disposable.dart';
 
 import 'web_authenticate_session_settings.dart';
 
@@ -32,7 +33,7 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(Uri? u
 ///
 ///**Supported Platforms/Implementations**:
 ///- iOS
-class WebAuthenticationSession {
+class WebAuthenticationSession implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
 
@@ -175,6 +176,7 @@ class WebAuthenticationSession {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod("dispose", args);

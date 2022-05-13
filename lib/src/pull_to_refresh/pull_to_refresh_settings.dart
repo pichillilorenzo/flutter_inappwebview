@@ -55,7 +55,7 @@ class PullToRefreshSettings {
   }
 
   Map<String, dynamic> toJson() {
-    return this.toMap();
+    return toMap();
   }
 
   @override

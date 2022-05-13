@@ -4,8 +4,9 @@ import 'package:flutter/services.dart';
 import 'dart:js' as js;
 
 import 'web_platform_manager.dart';
+import '../types/disposable.dart';
 
-class PlatformUtil {
+class PlatformUtil implements Disposable {
   late BinaryMessenger _messenger;
   late MethodChannel? _channel;
 
@@ -41,6 +42,7 @@ class PlatformUtil {
     return bridgeJsObject.callMethod("getCookieExpirationDate", [timestamp]);
   }
 
+  @override
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;

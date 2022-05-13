@@ -8,8 +8,9 @@ import 'dart:js' as js;
 import 'web_platform_manager.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import '../types/main.dart';
+import '../types/disposable.dart';
 
-class InAppWebViewWebElement {
+class InAppWebViewWebElement implements Disposable {
   late dynamic _viewId;
   late BinaryMessenger _messenger;
   late IFrameElement iframe;
@@ -540,6 +541,7 @@ class InAppWebViewWebElement {
     await _channel?.invokeMethod("onInjectedScriptError", [id]);
   }
 
+  @override
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;

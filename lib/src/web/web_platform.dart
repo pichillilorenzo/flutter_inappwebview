@@ -24,8 +24,11 @@ class FlutterInAppWebViewWebPlatform {
   }
 
   static void registerWith(Registrar registrar) {
+    // ignore: unused_local_variable
     final pluginInstance = FlutterInAppWebViewWebPlatform(registrar);
+    // ignore: unused_local_variable
     final platformUtil = PlatformUtil(messenger: registrar);
+    // ignore: unused_local_variable
     final headlessManager = HeadlessInAppWebViewManager(messenger: registrar);
     _nativeCommunication = allowInterop(_dartNativeCommunication);
   }

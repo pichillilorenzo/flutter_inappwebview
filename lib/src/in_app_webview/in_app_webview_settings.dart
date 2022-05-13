@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
@@ -11,32 +10,8 @@ import '../util.dart';
 import '../in_app_browser/in_app_browser_settings.dart';
 import 'webview.dart';
 
-class WebViewOptions {
-  Map<String, dynamic> toMap() {
-    return {};
-  }
-
-  static WebViewOptions fromMap(Map<String, dynamic> map) {
-    return WebViewOptions();
-  }
-
-  WebViewOptions copy() {
-    return WebViewOptions.fromMap(this.toMap());
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
 ///This class represents all the WebView settings available.
-class InAppWebViewSettings
-    implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
+class InAppWebViewSettings {
   ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
@@ -139,7 +114,7 @@ class InAppWebViewSettings
   ///- Web
   bool horizontalScrollBarEnabled;
 
-  ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
+  ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceWithCustomScheme] event to intercept resource requests with custom scheme.
   ///
   ///**NOTE**: available on iOS 11.0+.
   ///
@@ -949,7 +924,7 @@ class InAppWebViewSettings
   ///- [WebView.onAjaxProgress]
   ///- [WebView.shouldInterceptFetchRequest]
   ///- [WebView.onConsoleMessage]
-  ///- [WebView.onPrint]
+  ///- [WebView.onPrintRequest]
   ///- [WebView.onWindowFocus]
   ///- [WebView.onWindowBlur]
   ///- [WebView.onFindResultReceived]
@@ -1200,7 +1175,6 @@ class InAppWebViewSettings
         allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
   }
 
-  @override
   Map<String, dynamic> toMap() {
     List<Map<String, Map<String, dynamic>>> contentBlockersMapList = [];
     contentBlockers.forEach((contentBlocker) {
@@ -1343,7 +1317,8 @@ class InAppWebViewSettings
     };
   }
 
-  static InAppWebViewSettings fromMap(Map<String, dynamic> map) {
+  ///Gets a [InAppWebViewSettings] instance from a [Map] value.
+  factory InAppWebViewSettings.fromMap(Map<String, dynamic> map) {
     List<ContentBlocker> contentBlockers = [];
     List<dynamic>? contentBlockersMapList = map["contentBlockers"];
     if (contentBlockersMapList != null) {
@@ -1537,19 +1512,16 @@ class InAppWebViewSettings
     return settings;
   }
 
-  @override
-  Map<String, dynamic> toJson() {
-    return this.toMap();
+  InAppWebViewSettings copy() {
+    return InAppWebViewSettings.fromMap(toMap());
   }
 
-  @override
+  Map<String, dynamic> toJson() {
+    return toMap();
+  }
+
   String toString() {
     return toMap().toString();
-  }
-
-  @override
-  InAppWebViewSettings copy() {
-    return InAppWebViewSettings.fromMap(this.toMap());
   }
 }
 
@@ -1612,6 +1584,29 @@ class InAppWebViewGroupOptions {
 
   InAppWebViewGroupOptions copy() {
     return InAppWebViewGroupOptions.fromMap(this.toMap());
+  }
+}
+
+class WebViewOptions {
+  Map<String, dynamic> toMap() {
+    return {};
+  }
+
+  static WebViewOptions fromMap(Map<String, dynamic> map) {
+    return WebViewOptions();
+  }
+
+  WebViewOptions copy() {
+    return WebViewOptions.fromMap(this.toMap());
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
   }
 }
 

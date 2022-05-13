@@ -2,7 +2,7 @@ import 'dart:typed_data';
 
 import '../in_app_webview/webview.dart';
 
-///Class representing the response returned by the [WebView.onLoadResourceCustomScheme] event.
+///Class representing the response returned by the [WebView.onLoadResourceWithCustomScheme] event.
 ///It allows to load a specific resource. The resource data must be encoded to `base64`.
 class CustomSchemeResponse {
   ///Data enconded to 'base64'.

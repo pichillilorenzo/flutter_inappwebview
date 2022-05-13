@@ -14,6 +14,7 @@ import 'in_app_webview_settings.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_settings.dart';
 import '../util.dart';
+import '../types/disposable.dart';
 
 ///Class that represents a WebView in headless mode.
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.
@@ -24,7 +25,7 @@ import '../util.dart';
 ///- Android native WebView
 ///- iOS
 ///- Web
-class HeadlessInAppWebView implements WebView {
+class HeadlessInAppWebView implements WebView, Disposable {
   ///View ID.
   late final String id;
 
@@ -227,6 +228,7 @@ class HeadlessInAppWebView implements WebView {
   ///- Android native WebView
   ///- iOS
   ///- Web
+  @override
   Future<void> dispose() async {
     if (!_running) {
       return;

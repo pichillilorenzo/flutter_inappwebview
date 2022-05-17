@@ -1,0 +1,21 @@
+targets:
+  $default:
+    builders:
+      generators|flutter_inappwebview_internal_annotations:
+        enabled: true
+
+builders:
+  generators:
+    target: ":generators"
+    # 1
+    import: "package:generators/builder.dart"
+    # 2
+    builder_factories: ["generateExchangeableObject", "generateExchangeableEnum"]
+    # 3
+    build_extensions: { ".dart": [".g.dart"] }
+    auto_apply: dependents
+    build_to: cache
+    applies_builders: ["source_gen|combining_builder"]
+    defaults:
+      generate_for:
+        - lib/src/**.dart

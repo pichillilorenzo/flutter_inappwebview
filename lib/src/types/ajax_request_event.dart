@@ -1,10 +1,15 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'ajax_request.dart';
 import 'ajax_request_event_type.dart';
 
+part 'ajax_request_event.g.dart';
+
 ///Class used by [AjaxRequest] class. It represents events measuring progress of an [AjaxRequest].
-class AjaxRequestEvent {
+@ExchangeableObject()
+class AjaxRequestEvent_ {
   ///Event type.
-  AjaxRequestEventType? type;
+  AjaxRequestEventType_? type;
 
   ///Is a Boolean flag indicating if the total work to be done, and the amount of work already done, by the underlying process is calculable.
   ///In other words, it tells if the progress is measurable or not.
@@ -19,38 +24,5 @@ class AjaxRequestEvent {
   ///When downloading a resource using HTTP, this only represent the content itself, not headers and other overhead.
   int? total;
 
-  AjaxRequestEvent({this.type, this.lengthComputable, this.loaded, this.total});
-
-  ///Gets a possible [AjaxRequestEvent] instance from a [Map] value.
-  static AjaxRequestEvent? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    return AjaxRequestEvent(
-        type: AjaxRequestEventType.fromValue(map["type"]),
-        lengthComputable: map["lengthComputable"],
-        loaded: map["loaded"],
-        total: map["total"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "type": type?.toValue(),
-      "lengthComputable": lengthComputable,
-      "loaded": loaded,
-      "total": total,
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  AjaxRequestEvent_({this.type, this.lengthComputable, this.loaded, this.total});
 }

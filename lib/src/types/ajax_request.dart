@@ -1,10 +1,15 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'ajax_request_headers.dart';
 import 'ajax_request_ready_state.dart';
 import 'ajax_request_event.dart';
 import 'ajax_request_action.dart';
 
+part 'ajax_request.g.dart';
+
 ///Class that represents a JavaScript [XMLHttpRequest](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) object.
-class AjaxRequest {
+@ExchangeableObject()
+class AjaxRequest_ {
   ///Data passed as a parameter to the `XMLHttpRequest.send()` method.
   dynamic data;
 
@@ -30,10 +35,10 @@ class AjaxRequest {
   bool? withCredentials;
 
   ///The HTTP request headers.
-  AjaxRequestHeaders? headers;
+  AjaxRequestHeaders_? headers;
 
   ///The state of the `XMLHttpRequest` request.
-  AjaxRequestReadyState? readyState;
+  AjaxRequestReadyState_? readyState;
 
   ///The numerical HTTP [status code](https://developer.mozilla.org/en-US/docs/Web/HTTP/Status) of the `XMLHttpRequest`'s response.
   int? status;
@@ -67,12 +72,12 @@ class AjaxRequest {
   Map<String, dynamic>? responseHeaders;
 
   ///Event type of the `XMLHttpRequest` request.
-  AjaxRequestEvent? event;
+  AjaxRequestEvent_? event;
 
   ///Indicates the [AjaxRequestAction] that can be used to control the `XMLHttpRequest` request.
-  AjaxRequestAction? action;
+  AjaxRequestAction_? action;
 
-  AjaxRequest(
+  AjaxRequest_(
       {this.data,
         this.method,
         this.url,
@@ -91,68 +96,6 @@ class AjaxRequest {
         this.statusText,
         this.responseHeaders,
         this.event,
-        this.action = AjaxRequestAction.PROCEED});
+        this.action = AjaxRequestAction_.PROCEED});
 
-  ///Gets a possible [AjaxRequest] instance from a [Map] value.
-  static AjaxRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    return AjaxRequest(
-        data: map["data"],
-        method: map["method"],
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
-        isAsync: map["isAsync"],
-        user: map["user"],
-        password: map["password"],
-        withCredentials: map["withCredentials"],
-        headers:
-        AjaxRequestHeaders.fromMap(map["headers"]?.cast<String, dynamic>()),
-        readyState: AjaxRequestReadyState.fromValue(map["readyState"]),
-        status: map["status"],
-        responseURL:
-        map["responseURL"] != null ? Uri.parse(map["responseURL"]) : null,
-        responseType: map["responseType"],
-        response: map["response"],
-        responseText: map["responseText"],
-        responseXML: map["responseXML"],
-        statusText: map["statusText"],
-        responseHeaders: map["responseHeaders"]?.cast<String, dynamic>(),
-        event: AjaxRequestEvent.fromMap(map["event"]?.cast<String, dynamic>()));
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "data": data,
-      "method": method,
-      "url": url?.toString(),
-      "isAsync": isAsync,
-      "user": user,
-      "password": password,
-      "withCredentials": withCredentials,
-      "headers": headers?.toMap(),
-      "readyState": readyState?.toValue(),
-      "status": status,
-      "responseURL": responseURL?.toString(),
-      "responseType": responseType,
-      "response": response,
-      "responseText": responseText,
-      "responseXML": responseXML,
-      "statusText": statusText,
-      "responseHeaders": responseHeaders,
-      "action": action?.toValue()
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

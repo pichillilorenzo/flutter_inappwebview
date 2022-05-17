@@ -1,13 +1,35 @@
 import 'dart:typed_data';
 
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../x509_certificate/x509_certificate.dart';
 import 'url_protection_space_proxy_type.dart';
 import 'url_protection_space_authentication_method.dart';
 import 'ssl_error.dart';
 import 'ssl_certificate.dart';
 
+part 'url_protection_space.g.dart';
+
+List<X509Certificate>? _distinguishedNamesDeserializer(dynamic value) {
+  List<X509Certificate>? distinguishedNames;
+  if (value != null) {
+    distinguishedNames = <X509Certificate>[];
+    (value.cast<Uint8List>() as List<Uint8List>)
+        .forEach((data) {
+      try {
+        distinguishedNames!.add(X509Certificate.fromData(data: data));
+      } catch (e, stacktrace) {
+        print(e);
+        print(stacktrace);
+      }
+    });
+  }
+  return distinguishedNames;
+}
+
 ///Class that represents a protection space requiring authentication.
-class URLProtectionSpace {
+@ExchangeableObject()
+class URLProtectionSpace_ {
   ///The hostname of the server.
   String host;
 
@@ -23,22 +45,25 @@ class URLProtectionSpace {
   int? port;
 
   ///The SSL certificate used.
-  SslCertificate? sslCertificate;
+  SslCertificate_? sslCertificate;
 
   ///The SSL Error associated.
   SslError? sslError;
 
   ///Use [authenticationMethod] instead.
   @Deprecated("Use authenticationMethod instead")
-  IOSNSURLProtectionSpaceAuthenticationMethod? iosAuthenticationMethod;
+  IOSNSURLProtectionSpaceAuthenticationMethod_? iosAuthenticationMethod;
 
   ///The authentication method used by the receiver.
   ///
   ///**NOTE**: available only on iOS.
-  URLProtectionSpaceAuthenticationMethod? authenticationMethod;
+  URLProtectionSpaceAuthenticationMethod_? authenticationMethod;
 
   ///Use [distinguishedNames] instead.
   @Deprecated("Use distinguishedNames instead")
+  @ExchangeableObjectProperty(
+      deserializer: _distinguishedNamesDeserializer
+  )
   List<X509Certificate>? iosDistinguishedNames;
 
   ///The acceptable certificate-issuing authorities for client certificate authentication.
@@ -46,6 +71,9 @@ class URLProtectionSpace {
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
   ///
   ///**NOTE**: available only on iOS.
+  @ExchangeableObjectProperty(
+      deserializer: _distinguishedNamesDeserializer
+  )
   List<X509Certificate>? distinguishedNames;
 
   ///Use [receivesCredentialSecurely] instead.
@@ -78,7 +106,7 @@ class URLProtectionSpace {
   ///**NOTE**: available only on iOS.
   URLProtectionSpaceProxyType? proxyType;
 
-  URLProtectionSpace(
+  URLProtectionSpace_(
       {required this.host,
         this.protocol,
         this.realm,
@@ -99,121 +127,5 @@ class URLProtectionSpace {
         this.isProxy,
         @Deprecated("Use proxyType instead")
         this.iosProxyType,
-        this.proxyType}) {
-    this.authenticationMethod = this.authenticationMethod ??
-        URLProtectionSpaceAuthenticationMethod.fromValue(
-          // ignore: deprecated_member_use_from_same_package
-            this.iosAuthenticationMethod?.toValue());
-    this.distinguishedNames =
-    // ignore: deprecated_member_use_from_same_package
-    this.distinguishedNames ?? this.iosDistinguishedNames;
-    this.receivesCredentialSecurely =
-    // ignore: deprecated_member_use_from_same_package
-    this.receivesCredentialSecurely ?? this.iosReceivesCredentialSecurely;
-    // ignore: deprecated_member_use_from_same_package
-    this.isProxy = this.isProxy ?? this.iosIsProxy;
-    this.proxyType = this.proxyType ??
-        // ignore: deprecated_member_use_from_same_package
-        URLProtectionSpaceProxyType.fromValue(this.iosProxyType?.toValue());
-  }
-
-  ///Gets a possible [URLProtectionSpace] instance from a [Map] value.
-  static URLProtectionSpace? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    List<X509Certificate>? distinguishedNames;
-    if (map["distinguishedNames"] != null) {
-      distinguishedNames = <X509Certificate>[];
-      (map["distinguishedNames"].cast<Uint8List>() as List<Uint8List>)
-          .forEach((data) {
-        try {
-          distinguishedNames!.add(X509Certificate.fromData(data: data));
-        } catch (e, stacktrace) {
-          print(e);
-          print(stacktrace);
-        }
-      });
-    }
-
-    return URLProtectionSpace(
-      host: map["host"],
-      protocol: map["protocol"],
-      realm: map["realm"],
-      port: map["port"],
-      sslCertificate: SslCertificate.fromMap(
-          map["sslCertificate"]?.cast<String, dynamic>()),
-      sslError: SslError.fromMap(map["sslError"]?.cast<String, dynamic>()),
-      // ignore: deprecated_member_use_from_same_package
-      iosAuthenticationMethod:
-      // ignore: deprecated_member_use_from_same_package
-      IOSNSURLProtectionSpaceAuthenticationMethod.fromValue(
-          map["authenticationMethod"]),
-      authenticationMethod: URLProtectionSpaceAuthenticationMethod.fromValue(
-          map["authenticationMethod"]),
-      // ignore: deprecated_member_use_from_same_package
-      iosDistinguishedNames: distinguishedNames,
-      distinguishedNames: distinguishedNames,
-      // ignore: deprecated_member_use_from_same_package
-      iosReceivesCredentialSecurely: map["receivesCredentialSecurely"],
-      receivesCredentialSecurely: map["receivesCredentialSecurely"],
-      // ignore: deprecated_member_use_from_same_package
-      iosIsProxy: map["isProxy"],
-      isProxy: map["isProxy"],
-      // ignore: deprecated_member_use_from_same_package
-      iosProxyType:
-      // ignore: deprecated_member_use_from_same_package
-      IOSNSURLProtectionSpaceProxyType.fromValue(map["proxyType"]),
-      proxyType: URLProtectionSpaceProxyType.fromValue(map["proxyType"]),
-    );
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "host": host,
-      "protocol": protocol,
-      "realm": realm,
-      "port": port,
-      "sslCertificate": sslCertificate?.toMap(),
-      "sslError": sslError?.toMap(),
-      "iosAuthenticationMethod":
-      // ignore: deprecated_member_use_from_same_package
-      authenticationMethod ?? iosAuthenticationMethod,
-      // ignore: deprecated_member_use_from_same_package
-      "authenticationMethod": authenticationMethod ?? iosAuthenticationMethod,
-      // ignore: deprecated_member_use_from_same_package
-      "iosDistinguishedNames": (distinguishedNames ?? iosDistinguishedNames)
-          ?.map((e) => e.toMap())
-          .toList(),
-      // ignore: deprecated_member_use_from_same_package
-      "distinguishedNames": (distinguishedNames ?? iosDistinguishedNames)
-          ?.map((e) => e.toMap())
-          .toList(),
-      "iosReceivesCredentialSecurely":
-      // ignore: deprecated_member_use_from_same_package
-      receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
-      "receivesCredentialSecurely":
-      // ignore: deprecated_member_use_from_same_package
-      receivesCredentialSecurely ?? iosReceivesCredentialSecurely,
-      // ignore: deprecated_member_use_from_same_package
-      "iosIsProxy": isProxy ?? iosIsProxy,
-      // ignore: deprecated_member_use_from_same_package
-      "isProxy": isProxy ?? iosIsProxy,
-      // ignore: deprecated_member_use_from_same_package
-      "iosProxyType": proxyType?.toValue() ?? iosProxyType?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "proxyType": proxyType?.toValue() ?? iosProxyType?.toValue(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.proxyType});
 }

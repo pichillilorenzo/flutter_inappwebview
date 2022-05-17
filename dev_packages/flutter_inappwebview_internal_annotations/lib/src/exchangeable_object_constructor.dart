@@ -1,0 +1,3 @@
+class ExchangeableObjectConstructor {
+  const ExchangeableObjectConstructor();
+}

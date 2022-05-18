@@ -26,7 +26,7 @@ class URLProtectionSpace {
   SslCertificate? sslCertificate;
 
   ///The SSL Error associated.
-  SslError? sslError;
+  dynamic sslError;
 
   ///Use [authenticationMethod] instead.
   @Deprecated('Use authenticationMethod instead')
@@ -34,7 +34,8 @@ class URLProtectionSpace {
 
   ///The authentication method used by the receiver.
   ///
-  ///**NOTE**: available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
   URLProtectionSpaceAuthenticationMethod? authenticationMethod;
 
   ///Use [distinguishedNames] instead.
@@ -45,7 +46,8 @@ class URLProtectionSpace {
   ///This value is `null` if the authentication method of the protection space is not client certificate.
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
   ///
-  ///**NOTE**: available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
   List<X509Certificate>? distinguishedNames;
 
   ///Use [receivesCredentialSecurely] instead.
@@ -55,28 +57,21 @@ class URLProtectionSpace {
   ///A Boolean value that indicates whether the credentials for the protection space can be sent securely.
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
   ///
-  ///**NOTE**: available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
   bool? receivesCredentialSecurely;
-
-  ///Use [isProxy] instead.
-  @Deprecated('Use isProxy instead')
-  bool? iosIsProxy;
-
-  ///Returns a Boolean value that indicates whether the receiver does not descend from `NSObject`.
-  ///
-  ///**NOTE**: available only on iOS.
-  bool? isProxy;
 
   ///Use [proxyType] instead.
   @Deprecated('Use proxyType instead')
-  IOSNSURLProtectionSpaceProxyType? iosProxyType;
+  dynamic iosProxyType;
 
   ///The receiver's proxy type.
   ///This value is `null` if the receiver does not represent a proxy protection space.
   ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
   ///
-  ///**NOTE**: available only on iOS.
-  URLProtectionSpaceProxyType? proxyType;
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
+  dynamic proxyType;
   URLProtectionSpace(
       {required this.host,
       this.protocol,
@@ -93,9 +88,6 @@ class URLProtectionSpace {
       @Deprecated('Use receivesCredentialSecurely instead')
           this.iosReceivesCredentialSecurely,
       this.receivesCredentialSecurely,
-      @Deprecated('Use isProxy instead')
-          this.iosIsProxy,
-      this.isProxy,
       @Deprecated('Use proxyType instead')
           this.iosProxyType,
       this.proxyType}) {
@@ -105,9 +97,7 @@ class URLProtectionSpace {
     distinguishedNames = distinguishedNames ?? iosDistinguishedNames;
     receivesCredentialSecurely =
         receivesCredentialSecurely ?? iosReceivesCredentialSecurely;
-    isProxy = isProxy ?? iosIsProxy;
-    proxyType = proxyType ??
-        URLProtectionSpaceProxyType.fromValue(iosProxyType?.toValue());
+    proxyType = proxyType ?? iosProxyType;
   }
 
   ///Gets a possible [URLProtectionSpace] instance from a [Map] value.
@@ -123,8 +113,7 @@ class URLProtectionSpace {
     instance.port = map['port'];
     instance.sslCertificate =
         SslCertificate.fromMap(map['sslCertificate']?.cast<String, dynamic>());
-    instance.sslError =
-        SslError.fromMap(map['sslError']?.cast<String, dynamic>());
+    instance.sslError = map['sslError'];
     instance.iosAuthenticationMethod =
         IOSNSURLProtectionSpaceAuthenticationMethod.fromNativeValue(
             map['authenticationMethod']);
@@ -137,12 +126,8 @@ class URLProtectionSpace {
         _distinguishedNamesDeserializer(map['distinguishedNames']);
     instance.iosReceivesCredentialSecurely = map['receivesCredentialSecurely'];
     instance.receivesCredentialSecurely = map['receivesCredentialSecurely'];
-    instance.iosIsProxy = map['isProxy'];
-    instance.isProxy = map['isProxy'];
-    instance.iosProxyType =
-        IOSNSURLProtectionSpaceProxyType.fromValue(map['proxyType']);
-    instance.proxyType =
-        URLProtectionSpaceProxyType.fromValue(map['proxyType']);
+    instance.iosProxyType = map['proxyType'];
+    instance.proxyType = map['proxyType'];
     return instance;
   }
 
@@ -154,12 +139,11 @@ class URLProtectionSpace {
       "realm": realm,
       "port": port,
       "sslCertificate": sslCertificate?.toMap(),
-      "sslError": sslError?.toMap(),
+      "sslError": sslError,
       "authenticationMethod": authenticationMethod?.toNativeValue(),
       "distinguishedNames": distinguishedNames?.map((e) => e.toMap()).toList(),
       "receivesCredentialSecurely": receivesCredentialSecurely,
-      "isProxy": isProxy,
-      "proxyType": proxyType?.toValue(),
+      "proxyType": proxyType,
     };
   }
 
@@ -170,6 +154,6 @@ class URLProtectionSpace {
 
   @override
   String toString() {
-    return 'URLProtectionSpace{host: $host, protocol: $protocol, realm: $realm, port: $port, sslCertificate: $sslCertificate, sslError: $sslError, authenticationMethod: $authenticationMethod, distinguishedNames: $distinguishedNames, receivesCredentialSecurely: $receivesCredentialSecurely, isProxy: $isProxy, proxyType: $proxyType}';
+    return 'URLProtectionSpace{host: $host, protocol: $protocol, realm: $realm, port: $port, sslCertificate: $sslCertificate, sslError: $sslError, authenticationMethod: $authenticationMethod, distinguishedNames: $distinguishedNames, receivesCredentialSecurely: $receivesCredentialSecurely, proxyType: $proxyType}';
   }
 }

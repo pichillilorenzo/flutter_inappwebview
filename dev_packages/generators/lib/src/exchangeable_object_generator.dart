@@ -119,7 +119,7 @@ class ExchangeableObjectGenerator
         var defaultValueCode =
             parameter.defaultValueCode?.replaceFirst("_.", ".");
         var constructorField =
-            '${!isNullable && defaultValueCode == null ? 'required ' : ''}$parameterType $parameterName${defaultValueCode != null ? ' = $defaultValueCode' : ''}';
+            '${!isNullable && defaultValueCode == null ? 'required ' : ''}${parameterType.toString().replaceFirst("_", "")} $parameterName${defaultValueCode != null ? ' = $defaultValueCode' : ''}';
         if (parameter.hasDeprecated) {
           deprecatedFields.add(parameter);
           constructorField =
@@ -157,6 +157,7 @@ class ExchangeableObjectGenerator
         classBuffer.writeln(constructorBody
             .toString()
             .replaceAll(className, extClassName)
+            .replaceAll("_.", ".")
             .replaceAll("@ExchangeableObjectConstructor()", ""));
       }
     } else if (constructorFields.length > 0) {
@@ -192,37 +193,39 @@ class ExchangeableObjectGenerator
             .replaceFirst("Use ", "")
             .replaceFirst(" instead", "")
             .trim();
-        final fieldElement = visitor.fields[fieldName]!;
-        final fieldTypeElement = fieldElement.type.element;
-        final deprecatedFieldTypeElement = deprecatedField.type.element;
+        final fieldElement = visitor.fields[fieldName];
+        if (fieldElement != null) {
+          final fieldTypeElement = fieldElement.type.element;
+          final deprecatedFieldTypeElement = deprecatedField.type.element;
 
-        classBuffer.write('$fieldName = $fieldName ?? ');
-        if (fieldTypeElement != null && deprecatedFieldTypeElement != null) {
-          final isNullable = Util.typeIsNullable(fieldElement.type);
-          final deprecatedIsNullable = Util.typeIsNullable(deprecatedField.type);
-          final hasFromMap = hasFromMapMethod(fieldTypeElement);
-          final hasFromNativeValue = hasFromNativeValueMethod(fieldTypeElement);
-          final hasFromValue = hasFromValueMethod(fieldTypeElement);
-          final deprecatedHasToMap = hasFromMapMethod(deprecatedFieldTypeElement);
-          final deprecatedHasToNativeValue = hasToNativeValueMethod(deprecatedFieldTypeElement);
-          final deprecatedHasToValue = hasToValueMethod(deprecatedFieldTypeElement);
-          if (hasFromMap && deprecatedHasToMap) {
-            final hasNullableFromMap = hasNullableFromMapFactory(fieldTypeElement);
-            classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
-                ".fromMap($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toMap())${!isNullable && hasNullableFromMap ? '!' : ''}");
-          } else if (hasFromNativeValue && deprecatedHasToNativeValue) {
-            classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
-                '.fromNativeValue($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toNativeValue())${!isNullable ? '!' : ''}');
-          } else if (hasFromValue && deprecatedHasToValue) {
-            classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
-                '.fromValue($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toValue())${!isNullable ? '!' : ''}');
+          classBuffer.write('$fieldName = $fieldName ?? ');
+          if (fieldTypeElement != null && deprecatedFieldTypeElement != null) {
+            final isNullable = Util.typeIsNullable(fieldElement.type);
+            final deprecatedIsNullable = Util.typeIsNullable(deprecatedField.type);
+            final hasFromMap = hasFromMapMethod(fieldTypeElement);
+            final hasFromNativeValue = hasFromNativeValueMethod(fieldTypeElement);
+            final hasFromValue = hasFromValueMethod(fieldTypeElement);
+            final deprecatedHasToMap = hasFromMapMethod(deprecatedFieldTypeElement);
+            final deprecatedHasToNativeValue = hasToNativeValueMethod(deprecatedFieldTypeElement);
+            final deprecatedHasToValue = hasToValueMethod(deprecatedFieldTypeElement);
+            if (hasFromMap && deprecatedHasToMap) {
+              final hasNullableFromMap = hasNullableFromMapFactory(fieldTypeElement);
+              classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
+                  ".fromMap($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toMap())${!isNullable && hasNullableFromMap ? '!' : ''}");
+            } else if (hasFromNativeValue && deprecatedHasToNativeValue) {
+              classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
+                  '.fromNativeValue($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toNativeValue())${!isNullable ? '!' : ''}');
+            } else if (hasFromValue && deprecatedHasToValue) {
+              classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
+                  '.fromValue($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toValue())${!isNullable ? '!' : ''}');
+            } else {
+              classBuffer.write(deprecatedFieldName);
+            }
           } else {
             classBuffer.write(deprecatedFieldName);
           }
-        } else {
-          classBuffer.write(deprecatedFieldName);
+          classBuffer.writeln(';');
         }
-        classBuffer.writeln(';');
       }
       classBuffer.writeln('}');
     } else if (!hasCustomConstructor) {

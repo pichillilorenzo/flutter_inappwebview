@@ -48,15 +48,19 @@ class URLProtectionSpace_ {
   SslCertificate_? sslCertificate;
 
   ///The SSL Error associated.
-  SslError? sslError;
+  SslError_? sslError;
 
   ///Use [authenticationMethod] instead.
   @Deprecated("Use authenticationMethod instead")
   IOSNSURLProtectionSpaceAuthenticationMethod_? iosAuthenticationMethod;
 
   ///The authentication method used by the receiver.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLProtectionSpace.authenticationMethod",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod"
+    )
+  ])
   URLProtectionSpaceAuthenticationMethod_? authenticationMethod;
 
   ///Use [distinguishedNames] instead.
@@ -69,11 +73,15 @@ class URLProtectionSpace_ {
   ///The acceptable certificate-issuing authorities for client certificate authentication.
   ///This value is `null` if the authentication method of the protection space is not client certificate.
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
-  ///
-  ///**NOTE**: available only on iOS.
   @ExchangeableObjectProperty(
       deserializer: _distinguishedNamesDeserializer
   )
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLProtectionSpace.distinguishedNames",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames"
+    )
+  ])
   List<X509Certificate>? distinguishedNames;
 
   ///Use [receivesCredentialSecurely] instead.
@@ -82,29 +90,28 @@ class URLProtectionSpace_ {
 
   ///A Boolean value that indicates whether the credentials for the protection space can be sent securely.
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLProtectionSpace.receivesCredentialSecurely",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely"
+    )
+  ])
   bool? receivesCredentialSecurely;
-
-  ///Use [isProxy] instead.
-  @Deprecated("Use isProxy instead")
-  bool? iosIsProxy;
-
-  ///Returns a Boolean value that indicates whether the receiver does not descend from `NSObject`.
-  ///
-  ///**NOTE**: available only on iOS.
-  bool? isProxy;
 
   ///Use [proxyType] instead.
   @Deprecated("Use proxyType instead")
-  IOSNSURLProtectionSpaceProxyType? iosProxyType;
+  IOSNSURLProtectionSpaceProxyType_? iosProxyType;
 
   ///The receiver's proxy type.
   ///This value is `null` if the receiver does not represent a proxy protection space.
   ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
-  ///
-  ///**NOTE**: available only on iOS.
-  URLProtectionSpaceProxyType? proxyType;
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLProtectionSpace.proxyType",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype"
+    )
+  ])
+  URLProtectionSpaceProxyType_? proxyType;
 
   URLProtectionSpace_(
       {required this.host,
@@ -122,9 +129,6 @@ class URLProtectionSpace_ {
         @Deprecated("Use receivesCredentialSecurely instead")
         this.iosReceivesCredentialSecurely,
         this.receivesCredentialSecurely,
-        @Deprecated("Use isProxy instead")
-        this.iosIsProxy,
-        this.isProxy,
         @Deprecated("Use proxyType instead")
         this.iosProxyType,
         this.proxyType});

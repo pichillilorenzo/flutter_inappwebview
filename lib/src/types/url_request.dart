@@ -1,11 +1,15 @@
 import 'dart:typed_data';
-import 'package:flutter_inappwebview/src/types/url_request_attribution.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'url_request_cache_policy.dart';
 import 'url_request_network_service_type.dart';
+import 'url_request_attribution.dart';
+
+part 'url_request.g.dart';
 
 ///A URL load request that is independent of protocol or URL scheme.
-class URLRequest {
+@ExchangeableObject()
+class URLRequest_ {
   ///The URL of the request. Setting this to `null` will load `about:blank`.
   Uri? url;
 
@@ -25,8 +29,12 @@ class URLRequest {
   bool? iosAllowsCellularAccess;
 
   ///A Boolean value indicating whether the request is allowed to use the built-in cellular radios to satisfy the request.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+      apiName: "URLRequest.allowsCellularAccess",
+      apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/"
+    )
+  ])
   bool? allowsCellularAccess;
 
   ///Use [allowsConstrainedNetworkAccess] instead.
@@ -34,8 +42,13 @@ class URLRequest {
   bool? iosAllowsConstrainedNetworkAccess;
 
   ///A Boolean value that indicates whether the request may use the network when the user has specified Low Data Mode.
-  ///
-  ///**NOTE**: available only on iOS 13.0+.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        available: "13.0",
+        apiName: "URLRequest.allowsConstrainedNetworkAccess",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/3358304-allowsconstrainednetworkaccess"
+    )
+  ])
   bool? allowsConstrainedNetworkAccess;
 
   ///Use [allowsExpensiveNetworkAccess] instead.
@@ -43,26 +56,39 @@ class URLRequest {
   bool? iosAllowsExpensiveNetworkAccess;
 
   ///A Boolean value that indicates whether connections may use a network interface that the system considers expensive.
-  ///
-  ///**NOTE**: available only on iOS 13.0+.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        available: "13.0",
+        apiName: "URLRequest.allowsExpensiveNetworkAccess",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess"
+    )
+  ])
   bool? allowsExpensiveNetworkAccess;
 
   ///Use [cachePolicy] instead.
   @Deprecated("Use cachePolicy instead")
-  IOSURLRequestCachePolicy? iosCachePolicy;
+  IOSURLRequestCachePolicy_? iosCachePolicy;
 
   ///The request’s cache policy.
-  ///
-  ///**NOTE**: available only on iOS.
-  URLRequestCachePolicy? cachePolicy;
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLRequest.cachePolicy",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy"
+    )
+  ])
+  URLRequestCachePolicy_? cachePolicy;
 
   ///Use [httpShouldHandleCookies] instead.
   @Deprecated("Use httpShouldHandleCookies instead")
   bool? iosHttpShouldHandleCookies;
 
   ///A Boolean value indicating whether cookies will be sent with and set for this request.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLRequest.httpShouldHandleCookies",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies"
+    )
+  ])
   bool? httpShouldHandleCookies;
 
   ///Use [httpShouldUsePipelining] instead.
@@ -70,26 +96,38 @@ class URLRequest {
   bool? iosHttpShouldUsePipelining;
 
   ///A Boolean value indicating whether the request should transmit before the previous response is received.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLRequest.httpShouldUsePipelining",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining"
+    )
+  ])
   bool? httpShouldUsePipelining;
 
   ///Use [networkServiceType] instead.
   @Deprecated("Use networkServiceType instead")
-  IOSURLRequestNetworkServiceType? iosNetworkServiceType;
+  IOSURLRequestNetworkServiceType_? iosNetworkServiceType;
 
   ///The service type associated with this request.
-  ///
-  ///**NOTE**: available only on iOS.
-  URLRequestNetworkServiceType? networkServiceType;
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLRequest.networkServiceType",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype"
+    )
+  ])
+  URLRequestNetworkServiceType_? networkServiceType;
 
   ///Use [timeoutInterval] instead.
   @Deprecated("Use timeoutInterval instead")
   double? iosTimeoutInterval;
 
   ///The timeout interval of the request.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLRequest.timeoutInterval",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval"
+    )
+  ])
   double? timeoutInterval;
 
   ///Use [mainDocumentURL] instead.
@@ -98,25 +136,39 @@ class URLRequest {
 
   ///The main document URL associated with this request.
   ///This URL is used for the cookie “same domain as main document” policy.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        apiName: "URLRequest.mainDocumentURL",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl"
+    )
+  ])
   Uri? mainDocumentURL;
 
   ///`true` if server endpoint is known to support HTTP/3. Enables QUIC racing
   ///without HTTP/3 service discovery. Defaults to `false`.
   ///The default may be `true` in a future OS update.
-  ///
-  ///**NOTE**: available only on iOS 14.5+.
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        available: "14.5",
+        apiName: "URLRequest.assumesHTTP3Capable",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/3738175-assumeshttp3capable"
+    )
+  ])
   bool? assumesHTTP3Capable;
 
   ///The entities that can make a network request.
   ///
   ///If you don’t set a value, the system assumes [URLRequestAttribution.DEVELOPER].
-  ///
-  ///**NOTE**: available only on iOS 15.0+.
-  URLRequestAttribution? attribution;
+  @SupportedPlatforms(platforms: [
+    IOSPlatform(
+        available: "15.0",
+        apiName: "URLRequest.attribution",
+        apiUrl: "https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution"
+    )
+  ])
+  URLRequestAttribution_? attribution;
 
-  URLRequest({
+  URLRequest_({
     required this.url,
     this.method,
     this.headers,
@@ -146,150 +198,5 @@ class URLRequest {
     this.mainDocumentURL,
     this.assumesHTTP3Capable,
     this.attribution
-  }) {
-    this.allowsCellularAccess =
-    // ignore: deprecated_member_use_from_same_package
-    this.allowsCellularAccess ?? this.iosAllowsCellularAccess;
-    this.allowsConstrainedNetworkAccess = this.allowsConstrainedNetworkAccess ??
-        // ignore: deprecated_member_use_from_same_package
-        this.iosAllowsConstrainedNetworkAccess;
-    this.allowsExpensiveNetworkAccess = this.allowsExpensiveNetworkAccess ??
-        // ignore: deprecated_member_use_from_same_package
-        this.iosAllowsExpensiveNetworkAccess;
-    this.cachePolicy = this.cachePolicy ??
-        // ignore: deprecated_member_use_from_same_package
-        URLRequestCachePolicy.fromValue(this.iosCachePolicy?.toValue());
-    this.httpShouldHandleCookies =
-    // ignore: deprecated_member_use_from_same_package
-    this.httpShouldHandleCookies ?? this.iosHttpShouldHandleCookies;
-    this.httpShouldUsePipelining =
-    // ignore: deprecated_member_use_from_same_package
-    this.httpShouldUsePipelining ?? this.iosHttpShouldUsePipelining;
-    this.networkServiceType =
-        this.networkServiceType ?? URLRequestNetworkServiceType.fromValue(
-          // ignore: deprecated_member_use_from_same_package
-            this.iosNetworkServiceType?.toValue());
-    // ignore: deprecated_member_use_from_same_package
-    this.timeoutInterval = this.timeoutInterval ?? this.iosTimeoutInterval;
-    // ignore: deprecated_member_use_from_same_package
-    this.mainDocumentURL = this.mainDocumentURL ?? this.iosMainDocumentURL;
-  }
-
-  ///Gets a possible [URLRequest] instance from a [Map] value.
-  static URLRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return URLRequest(
-      url: map["url"] != null ? Uri.parse(map["url"]) : null,
-      headers: map["headers"]?.cast<String, String>(),
-      method: map["method"],
-      body: map["body"],
-      // ignore: deprecated_member_use_from_same_package
-      iosAllowsCellularAccess: map["allowsCellularAccess"],
-      allowsCellularAccess: map["allowsCellularAccess"],
-      // ignore: deprecated_member_use_from_same_package
-      iosAllowsConstrainedNetworkAccess: map["allowsConstrainedNetworkAccess"],
-      allowsConstrainedNetworkAccess: map["allowsConstrainedNetworkAccess"],
-      // ignore: deprecated_member_use_from_same_package
-      iosAllowsExpensiveNetworkAccess: map["allowsExpensiveNetworkAccess"],
-      allowsExpensiveNetworkAccess: map["allowsExpensiveNetworkAccess"],
-      // ignore: deprecated_member_use_from_same_package
-      iosCachePolicy: IOSURLRequestCachePolicy.fromValue(map["cachePolicy"]),
-      cachePolicy: URLRequestCachePolicy.fromValue(map["cachePolicy"]),
-      // ignore: deprecated_member_use_from_same_package
-      iosHttpShouldHandleCookies: map["httpShouldHandleCookies"],
-      httpShouldHandleCookies: map["httpShouldHandleCookies"],
-      // ignore: deprecated_member_use_from_same_package
-      iosHttpShouldUsePipelining: map["httpShouldUsePipelining"],
-      httpShouldUsePipelining: map["httpShouldUsePipelining"],
-      // ignore: deprecated_member_use_from_same_package
-      iosNetworkServiceType:
-      // ignore: deprecated_member_use_from_same_package
-      IOSURLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
-      networkServiceType:
-      URLRequestNetworkServiceType.fromValue(map["networkServiceType"]),
-      // ignore: deprecated_member_use_from_same_package
-      iosTimeoutInterval: map["timeoutInterval"],
-      timeoutInterval: map["timeoutInterval"],
-      // ignore: deprecated_member_use_from_same_package
-      iosMainDocumentURL: map["mainDocumentURL"] != null
-          ? Uri.parse(map["mainDocumentURL"])
-          : null,
-      mainDocumentURL: map["mainDocumentURL"] != null
-          ? Uri.parse(map["mainDocumentURL"])
-          : null,
-      assumesHTTP3Capable: map["assumesHTTP3Capable"],
-      attribution: URLRequestAttribution.fromValue(map["attribution"])
-    );
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-      "headers": headers,
-      "method": method,
-      "body": body,
-      "iosAllowsCellularAccess":
-      // ignore: deprecated_member_use_from_same_package
-      allowsCellularAccess ?? iosAllowsCellularAccess,
-      // ignore: deprecated_member_use_from_same_package
-      "allowsCellularAccess": allowsCellularAccess ?? iosAllowsCellularAccess,
-      "iosAllowsConstrainedNetworkAccess":
-      // ignore: deprecated_member_use_from_same_package
-      allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
-      "allowsConstrainedNetworkAccess":
-      // ignore: deprecated_member_use_from_same_package
-      allowsConstrainedNetworkAccess ?? iosAllowsConstrainedNetworkAccess,
-      "iosAllowsExpensiveNetworkAccess":
-      // ignore: deprecated_member_use_from_same_package
-      allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
-      "allowsExpensiveNetworkAccess":
-      // ignore: deprecated_member_use_from_same_package
-      allowsExpensiveNetworkAccess ?? iosAllowsExpensiveNetworkAccess,
-      // ignore: deprecated_member_use_from_same_package
-      "iosCachePolicy": cachePolicy?.toValue() ?? iosCachePolicy?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "cachePolicy": cachePolicy?.toValue() ?? iosCachePolicy?.toValue(),
-      "iosHttpShouldHandleCookies":
-      // ignore: deprecated_member_use_from_same_package
-      httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
-      "httpShouldHandleCookies":
-      // ignore: deprecated_member_use_from_same_package
-      httpShouldHandleCookies ?? iosHttpShouldHandleCookies,
-      "iosHttpShouldUsePipelining":
-      // ignore: deprecated_member_use_from_same_package
-      httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
-      "httpShouldUsePipelining":
-      // ignore: deprecated_member_use_from_same_package
-      httpShouldUsePipelining ?? iosHttpShouldUsePipelining,
-      "iosNetworkServiceType":
-      // ignore: deprecated_member_use_from_same_package
-      networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
-      "networkServiceType":
-      // ignore: deprecated_member_use_from_same_package
-      networkServiceType?.toValue() ?? iosNetworkServiceType?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosTimeoutInterval": timeoutInterval ?? iosTimeoutInterval,
-      // ignore: deprecated_member_use_from_same_package
-      "timeoutInterval": timeoutInterval ?? iosTimeoutInterval,
-      // ignore: deprecated_member_use_from_same_package
-      "iosMainDocumentURL": (mainDocumentURL ?? iosMainDocumentURL)?.toString(),
-      // ignore: deprecated_member_use_from_same_package
-      "mainDocumentURL": (mainDocumentURL ?? iosMainDocumentURL)?.toString(),
-      "assumesHTTP3Capable": assumesHTTP3Capable,
-      "attribution": attribution?.toValue(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  });
 }

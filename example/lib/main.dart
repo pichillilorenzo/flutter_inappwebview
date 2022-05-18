@@ -1,6 +1,6 @@
 import 'dart:async';
-import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -8,10 +8,11 @@ import 'package:flutter_inappwebview_example/chrome_safari_browser_example.scree
 import 'package:flutter_inappwebview_example/headless_in_app_webview.screen.dart';
 import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart';
+import 'package:flutter_inappwebview_example/web_authentication_session_example.screen.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
-// InAppLocalhostServer localhostServer = new InAppLocalhostServer();
+InAppLocalhostServer localhostServer = new InAppLocalhostServer();
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,27 +20,13 @@ Future main() async {
   // await Permission.microphone.request();
   // await Permission.storage.request();
 
-  if (Platform.isAndroid) {
-    await AndroidInAppWebViewController.setWebContentsDebuggingEnabled(true);
+  WebView.debugLoggingSettings.maxLogMessageLength = 500;
 
-    var swAvailable = await AndroidWebViewFeature.isFeatureSupported(
-        AndroidWebViewFeature.SERVICE_WORKER_BASIC_USAGE);
-    var swInterceptAvailable = await AndroidWebViewFeature.isFeatureSupported(
-        AndroidWebViewFeature.SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST);
-
-    if (swAvailable && swInterceptAvailable) {
-      AndroidServiceWorkerController serviceWorkerController =
-          AndroidServiceWorkerController.instance();
-
-      await serviceWorkerController
-          .setServiceWorkerClient(AndroidServiceWorkerClient(
-        shouldInterceptRequest: (request) async {
-          print(request);
-          return null;
-        },
-      ));
-    }
+  if (defaultTargetPlatform == TargetPlatform.android) {
+    await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
+
+  await localhostServer.start();
 
   runApp(MyApp());
 }
@@ -65,6 +52,12 @@ Drawer myDrawer({required BuildContext context}) {
           title: Text('ChromeSafariBrowser'),
           onTap: () {
             Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+          },
+        ),
+        ListTile(
+          title: Text('WebAuthenticationSession'),
+          onTap: () {
+            Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
           },
         ),
         ListTile(
@@ -107,6 +100,7 @@ class _MyAppState extends State<MyApp> {
       '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
       '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
       '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
+      '/WebAuthenticationSession': (context) => WebAuthenticationSessionExampleScreen(),
     });
   }
 }

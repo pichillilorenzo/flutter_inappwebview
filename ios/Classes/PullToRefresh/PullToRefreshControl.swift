@@ -8,30 +8,27 @@
 import Foundation
 import Flutter
 
-public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
-    
-    var channel: FlutterMethodChannel?
-    var options: PullToRefreshOptions?
+public class PullToRefreshControl : UIRefreshControl, Disposable {
+    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_";
+    var channelDelegate: PullToRefreshChannelDelegate?
+    var settings: PullToRefreshSettings?
     var shouldCallOnRefresh = false
     var delegate: PullToRefreshDelegate?
     
-    public init(channel: FlutterMethodChannel?, options: PullToRefreshOptions?) {
+    public init(registrar: FlutterPluginRegistrar, id: Any, settings: PullToRefreshSettings?) {
         super.init()
-        self.channel = channel
-        self.options = options
+        self.settings = settings
+        let channel = FlutterMethodChannel(name: PullToRefreshControl.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                                           binaryMessenger: registrar.messenger())
+        self.channelDelegate = PullToRefreshChannelDelegate(pullToRefreshControl: self, channel: channel)
     }
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
     
-    public static func register(with registrar: FlutterPluginRegistrar) {
-        
-    }
-    
     public func prepare() {
-        self.channel?.setMethodCallHandler(self.handle)
-        if let options = options {
+        if let options = settings {
             if options.enabled {
                 delegate?.enablePullToRefresh()
             }
@@ -48,53 +45,9 @@ public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
         addTarget(self, action: #selector(updateShouldCallOnRefresh), for: .valueChanged)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let arguments = call.arguments as? NSDictionary
-        
-        switch call.method {
-        case "setEnabled":
-            let enabled = arguments!["enabled"] as! Bool
-            if enabled {
-                delegate?.enablePullToRefresh()
-            } else {
-                delegate?.disablePullToRefresh()
-            }
-            result(true)
-            break
-        case "setRefreshing":
-            let refreshing = arguments!["refreshing"] as! Bool
-            if refreshing {
-                self.beginRefreshing()
-            } else {
-                self.endRefreshing()
-            }
-            result(true)
-            break
-        case "setColor":
-            let color = arguments!["color"] as! String
-            tintColor = UIColor(hexString: color)
-            result(true)
-            break
-        case "setBackgroundColor":
-            let color = arguments!["color"] as! String
-            backgroundColor = UIColor(hexString: color)
-            result(true)
-            break
-        case "setAttributedTitle":
-            let attributedTitleMap = arguments!["attributedTitle"] as! [String: Any?]
-            attributedTitle = NSAttributedString.fromMap(map: attributedTitleMap)
-            result(true)
-            break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
-        }
-    }
-    
     public func onRefresh() {
         shouldCallOnRefresh = false
-        let arguments: [String: Any?] = [:]
-        self.channel?.invokeMethod("onRefresh", arguments: arguments)
+        channelDelegate?.onRefresh()
     }
     
     @objc public func updateShouldCallOnRefresh() {
@@ -102,13 +55,14 @@ public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
     }
     
     public func dispose() {
-        channel?.setMethodCallHandler(nil)
+        channelDelegate?.dispose()
+        channelDelegate = nil
         removeTarget(self, action: #selector(updateShouldCallOnRefresh), for: .valueChanged)
         delegate = nil
     }
     
     deinit {
-        print("PullToRefreshControl - dealloc")
+        debugPrint("PullToRefreshControl - dealloc")
         dispose()
     }
 }

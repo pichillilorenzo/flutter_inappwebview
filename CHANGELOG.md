@@ -1,3 +1,24 @@
+## 6.0.0-beta.1
+
+- Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.
+- Added Web support
+- Added `ProxyController` for Android
+- Added `PrintJobController` to manage print jobs
+- Added `WebAuthenticationSession` for iOS
+- Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState` WebView controller methods
+- Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS`, `forceDarkStrategy` WebView settings
+- Added `onCameraCaptureStateChanged`, `onMicrophoneCaptureStateChanged` WebView events
+- Added support for `onPermissionRequest` event on iOS 15.0+
+- Added `debugLoggingSettings` static property for WebView and ChromeSafariBrowser
+- Updated `getMetaThemeColor` on iOS 15.0+
+- Deprecated `onLoadError` for `onReceivedError`. `onReceivedError` will be called also for subframes
+- Deprecated `onLoadHttpError` for `onReceivedError`. `onReceivedHttpError` will be called also for subframes
+
+### BREAKING CHANGES
+
+- On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
+- All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`;
+
 ## 5.4.3+7
 
 - Fixed possible Android java.lang.NullPointerException in "InAppBrowserActivity.onCreateOptionsMenu" about "webView.getTitle()"

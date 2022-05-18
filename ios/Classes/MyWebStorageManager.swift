@@ -9,26 +9,18 @@ import Foundation
 import WebKit
 
 @available(iOS 9.0, *)
-class MyWebStorageManager: NSObject, FlutterPlugin {
-
+public class MyWebStorageManager: ChannelDelegate {
+    static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_webstoragemanager"
     static var registrar: FlutterPluginRegistrar?
-    static var channel: FlutterMethodChannel?
     static var websiteDataStore: WKWebsiteDataStore?
     
-    static func register(with registrar: FlutterPluginRegistrar) {
-        
-    }
-    
     init(registrar: FlutterPluginRegistrar) {
-        super.init()
+        super.init(channel: FlutterMethodChannel(name: MyWebStorageManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
         MyWebStorageManager.registrar = registrar
         MyWebStorageManager.websiteDataStore = WKWebsiteDataStore.default()
-        
-        MyWebStorageManager.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_webstoragemanager", binaryMessenger: registrar.messenger())
-        registrar.addMethodCallDelegate(self, channel: MyWebStorageManager.channel!)
     }
     
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         switch call.method {
             case "fetchDataRecords":
@@ -108,10 +100,13 @@ class MyWebStorageManager: NSObject, FlutterPlugin {
         }
     }
     
-    public func dispose() {
-        MyWebStorageManager.channel?.setMethodCallHandler(nil)
-        MyWebStorageManager.channel = nil
+    public override func dispose() {
+        super.dispose()
         MyWebStorageManager.registrar = nil
         MyWebStorageManager.websiteDataStore = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

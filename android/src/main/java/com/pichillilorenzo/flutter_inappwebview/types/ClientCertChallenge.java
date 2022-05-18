@@ -31,8 +31,8 @@ public class ClientCertChallenge extends URLAuthenticationChallenge {
     }
 
     Map<String, Object> challengeMap = super.toMap();
-    challengeMap.put("androidPrincipals", principalList);
-    challengeMap.put("androidKeyTypes", keyTypes != null ? Arrays.asList(keyTypes) : null);
+    challengeMap.put("principals", principalList);
+    challengeMap.put("keyTypes", keyTypes != null ? Arrays.asList(keyTypes) : null);
     return challengeMap;
   }
 

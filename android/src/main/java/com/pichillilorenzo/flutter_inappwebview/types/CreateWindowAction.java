@@ -15,7 +15,8 @@ public class CreateWindowAction extends NavigationAction {
   public Map<String, Object> toMap() {
     Map<String, Object> createWindowActionMap = super.toMap();
     createWindowActionMap.put("windowId", windowId);
-    createWindowActionMap.put("androidIsDialog", isDialog);
+    createWindowActionMap.put("isDialog", isDialog);
+    createWindowActionMap.put("windowFeatures", null);
     return createWindowActionMap;
   }
 

@@ -47,7 +47,7 @@ public class UserScript : WKUserScript {
                 groupName: map["groupName"] as? String,
                 source: map["source"] as! String,
                 injectionTime: WKUserScriptInjectionTime.init(rawValue: map["injectionTime"] as! Int) ?? .atDocumentStart,
-                forMainFrameOnly: map["iosForMainFrameOnly"] as! Bool,
+                forMainFrameOnly: map["forMainFrameOnly"] as! Bool,
                 in: contentWorld
             )
         }
@@ -55,7 +55,7 @@ public class UserScript : WKUserScript {
             groupName: map["groupName"] as? String,
             source: map["source"] as! String,
             injectionTime: WKUserScriptInjectionTime.init(rawValue: map["injectionTime"] as! Int) ?? .atDocumentStart,
-            forMainFrameOnly: map["iosForMainFrameOnly"] as! Bool
+            forMainFrameOnly: map["forMainFrameOnly"] as! Bool
         )
     }
 }

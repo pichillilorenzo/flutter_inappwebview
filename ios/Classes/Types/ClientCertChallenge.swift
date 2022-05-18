@@ -7,7 +7,7 @@
 
 import Foundation
 
-class ClientCertChallenge: NSObject {
+public class ClientCertChallenge: NSObject {
     var protectionSpace: URLProtectionSpace!
     
     public init(fromChallenge: URLAuthenticationChallenge) {

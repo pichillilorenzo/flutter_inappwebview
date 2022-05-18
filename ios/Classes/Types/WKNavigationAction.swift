@@ -10,12 +10,19 @@ import WebKit
 
 extension WKNavigationAction {
     public func toMap () -> [String:Any?] {
+        var shouldPerformDownload: Bool? = nil
+        if #available(iOS 14.5, *) {
+            shouldPerformDownload = self.shouldPerformDownload
+        }
         return [
             "request": request.toMap(),
             "isForMainFrame": targetFrame?.isMainFrame ?? false,
-            "iosWKNavigationType": navigationType.rawValue,
-            "iosSourceFrame": sourceFrame.toMap(),
-            "iosTargetFrame": targetFrame?.toMap()
+            "hasGesture": nil,
+            "isRedirect": nil,
+            "navigationType": navigationType.rawValue,
+            "sourceFrame": sourceFrame.toMap(),
+            "targetFrame": targetFrame?.toMap(),
+            "shouldPerformDownload": shouldPerformDownload
         ]
     }
 }

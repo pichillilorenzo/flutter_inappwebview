@@ -19,19 +19,17 @@ class MyInAppBrowser extends InAppBrowser {
 
   @override
   Future onLoadStart(url) async {
-    print("\n\nStarted $url\n\n");
+
   }
 
   @override
   Future onLoadStop(url) async {
     pullToRefreshController?.endRefreshing();
-    print("\n\nStopped $url\n\n");
   }
 
   @override
   void onLoadError(url, code, message) {
     pullToRefreshController?.endRefreshing();
-    print("Can't load $url.. Error: $message");
   }
 
   @override
@@ -39,7 +37,6 @@ class MyInAppBrowser extends InAppBrowser {
     if (progress == 100) {
       pullToRefreshController?.endRefreshing();
     }
-    print("Progress: $progress");
   }
 
   @override
@@ -52,25 +49,6 @@ class MyInAppBrowser extends InAppBrowser {
       navigationAction) async {
     print("\n\nOverride ${navigationAction.request.url}\n\n");
     return NavigationActionPolicy.ALLOW;
-  }
-
-  @override
-  void onLoadResource(response) {
-    print("Started at: " +
-        response.startTime.toString() +
-        "ms ---> duration: " +
-        response.duration.toString() +
-        "ms " +
-        (response.url ?? '').toString());
-  }
-
-  @override
-  void onConsoleMessage(consoleMessage) {
-    print("""
-    console output:
-      message: ${consoleMessage.message}
-      messageLevel: ${consoleMessage.messageLevel.toValue()}
-   """);
   }
 }
 
@@ -90,7 +68,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
     super.initState();
 
     pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
+      settings: PullToRefreshSettings(
         color: Colors.black,
       ),
       onRefresh: () async {
@@ -121,14 +99,15 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
               ElevatedButton(
                   onPressed: () async {
                     await widget.browser.openUrlRequest(
-                        urlRequest:
-                            URLRequest(url: Uri.parse("https://flutter.dev")),
-                        options: InAppBrowserClassOptions(
-                            inAppWebViewGroupOptions: InAppWebViewGroupOptions(
-                                crossPlatform: InAppWebViewOptions(
+                      urlRequest:
+                          URLRequest(url: Uri.parse("https://flutter.dev")),
+                      settings: InAppBrowserClassSettings(
+                        webViewSettings: InAppWebViewSettings(
                           useShouldOverrideUrlLoading: true,
                           useOnLoadResource: true,
-                        ))));
+                        ),
+                      ),
+                    );
                   },
                   child: Text("Open In-App Browser")),
               Container(height: 40),

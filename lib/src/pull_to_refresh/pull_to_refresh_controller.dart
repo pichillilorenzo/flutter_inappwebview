@@ -4,9 +4,9 @@ import 'package:flutter/services.dart';
 import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';
 import '../util.dart';
-import '../types.dart';
-import '../in_app_webview/android/in_app_webview_options.dart';
-import 'pull_to_refresh_options.dart';
+import '../types/main.dart';
+import '../in_app_webview/in_app_webview_settings.dart';
+import 'pull_to_refresh_settings.dart';
 
 ///A standard controller that can initiate the refreshing of a scroll view’s contents.
 ///This should be used whenever the user can refresh the contents of a WebView via a vertical swipe gesture.
@@ -14,19 +14,33 @@ import 'pull_to_refresh_options.dart';
 ///All the methods should be called only when the WebView has been created or is already running
 ///(for example [WebView.onWebViewCreated] or [InAppBrowser.onBrowserCreated]).
 ///
-///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [AndroidInAppWebViewOptions.useHybridComposition] must be `true`.
+///**NOTE for Android**: to be able to use the "pull-to-refresh" feature, [InAppWebViewSettings.useHybridComposition] must be `true`.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class PullToRefreshController {
+  @Deprecated("Use settings instead")
+  // ignore: deprecated_member_use_from_same_package
   late PullToRefreshOptions options;
+  late PullToRefreshSettings settings;
   MethodChannel? _channel;
 
   ///Event called when a swipe gesture triggers a refresh.
   final void Function()? onRefresh;
 
-  PullToRefreshController({PullToRefreshOptions? options, this.onRefresh}) {
+  PullToRefreshController(
+      {
+      // ignore: deprecated_member_use_from_same_package
+      @Deprecated("Use settings instead") PullToRefreshOptions? options,
+      PullToRefreshSettings? settings,
+      this.onRefresh}) {
+    // ignore: deprecated_member_use_from_same_package
     this.options = options ?? PullToRefreshOptions();
+    this.settings = settings ?? PullToRefreshSettings();
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onRefresh":
         if (onRefresh != null) onRefresh!();
@@ -115,27 +129,43 @@ class PullToRefreshController {
     return await _channel?.invokeMethod('getDefaultSlingshotDistance', args);
   }
 
-  ///Sets the size of the refresh indicator. One of [AndroidPullToRefreshSize.DEFAULT], or [AndroidPullToRefreshSize.LARGE].
-  ///
-  ///**NOTE**: Available only on Android.
+  ///Use [setIndicatorSize] instead.
+  @Deprecated("Use setIndicatorSize instead")
   Future<void> setSize(AndroidPullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toValue());
     await _channel?.invokeMethod('setSize', args);
   }
 
-  ///Sets the styled title text to display in the refresh control.
+  ///Sets the size of the refresh indicator. One of [PullToRefreshSize.DEFAULT], or [PullToRefreshSize.LARGE].
   ///
-  ///**NOTE**: Available only on iOS.
+  ///**NOTE**: Available only on Android.
+  Future<void> setIndicatorSize(PullToRefreshSize size) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('size', () => size.toValue());
+    await _channel?.invokeMethod('setSize', args);
+  }
+
+  ///Use [setStyledTitle] instead.
+  @Deprecated("Use setStyledTitle instead")
   Future<void> setAttributedTitle(IOSNSAttributedString attributedTitle) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
-    await _channel?.invokeMethod('setAttributedTitle', args);
+    await _channel?.invokeMethod('setStyledTitle', args);
+  }
+
+  ///Sets the styled title text to display in the refresh control.
+  ///
+  ///**NOTE**: Available only on iOS.
+  Future<void> setStyledTitle(AttributedString attributedTitle) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
+    await _channel?.invokeMethod('setStyledTitle', args);
   }
 
   void initMethodChannel(dynamic id) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
-    this._channel?.setMethodCallHandler(handleMethod);
+    this._channel?.setMethodCallHandler(_handleMethod);
   }
 }

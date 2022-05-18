@@ -1,11 +1,7 @@
 import 'dart:collection';
-// import 'dart:convert';
-import 'dart:io';
-// import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-// import 'package:path_provider/path_provider.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import 'main.dart';
@@ -20,18 +16,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   final GlobalKey webViewKey = GlobalKey();
 
   InAppWebViewController? webViewController;
-  InAppWebViewGroupOptions options = InAppWebViewGroupOptions(
-      crossPlatform: InAppWebViewOptions(
-          useShouldOverrideUrlLoading: true,
-          mediaPlaybackRequiresUserGesture: false),
-      android: AndroidInAppWebViewOptions(
-        useHybridComposition: true,
-      ),
-      ios: IOSInAppWebViewOptions(
-        allowsInlineMediaPlayback: true,
-      ));
+  InAppWebViewSettings settings = InAppWebViewSettings(
+    useShouldOverrideUrlLoading: true,
+    mediaPlaybackRequiresUserGesture: false,
+    allowsInlineMediaPlayback: true,
+    iframeAllow: "camera; microphone",
+    iframeAllowFullscreen: true
+  );
 
-  late PullToRefreshController pullToRefreshController;
+  PullToRefreshController? pullToRefreshController;
   late ContextMenu contextMenu;
   String url = "";
   double progress = 0;
@@ -44,8 +37,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
     contextMenu = ContextMenu(
         menuItems: [
           ContextMenuItem(
-              androidId: 1,
-              iosId: "1",
+              id: 1,
               title: "Special",
               action: () async {
                 print("Menu item Special clicked!");
@@ -53,7 +45,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 await webViewController?.clearFocus();
               })
         ],
-        options: ContextMenuOptions(hideDefaultSystemContextMenuItems: false),
+        settings: ContextMenuSettings(hideDefaultSystemContextMenuItems: false),
         onCreateContextMenu: (hitTestResult) async {
           print("onCreateContextMenu");
           print(hitTestResult.extra);
@@ -63,28 +55,30 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
           print("onHideContextMenu");
         },
         onContextMenuActionItemClicked: (contextMenuItemClicked) async {
-          var id = (Platform.isAndroid)
-              ? contextMenuItemClicked.androidId
-              : contextMenuItemClicked.iosId;
+          var id = contextMenuItemClicked.id;
           print("onContextMenuActionItemClicked: " +
               id.toString() +
               " " +
               contextMenuItemClicked.title);
         });
 
-    pullToRefreshController = PullToRefreshController(
-      options: PullToRefreshOptions(
-        color: Colors.blue,
-      ),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          webViewController?.reload();
-        } else if (Platform.isIOS) {
-          webViewController?.loadUrl(
-              urlRequest: URLRequest(url: await webViewController?.getUrl()));
-        }
-      },
-    );
+    pullToRefreshController = kIsWeb
+        ? null
+        : PullToRefreshController(
+            settings: PullToRefreshSettings(
+              color: Colors.blue,
+            ),
+            onRefresh: () async {
+              if (defaultTargetPlatform == TargetPlatform.android) {
+                webViewController?.reload();
+              } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+                  defaultTargetPlatform == TargetPlatform.macOS) {
+                webViewController?.loadUrl(
+                    urlRequest:
+                        URLRequest(url: await webViewController?.getUrl()));
+              }
+            },
+          );
   }
 
   @override
@@ -102,11 +96,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
           TextField(
             decoration: InputDecoration(prefixIcon: Icon(Icons.search)),
             controller: urlController,
-            keyboardType: TextInputType.url,
+            keyboardType: TextInputType.text,
             onSubmitted: (value) {
               var url = Uri.parse(value);
               if (url.scheme.isEmpty) {
-                url = Uri.parse("https://www.google.com/search?q=" + value);
+                url = Uri.parse((!kIsWeb
+                        ? "https://www.google.com/search?q="
+                        : "https://www.bing.com/search?q=") +
+                    value);
               }
               webViewController?.loadUrl(urlRequest: URLRequest(url: url));
             },
@@ -116,27 +113,28 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
-                  // contextMenu: contextMenu,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse("https://github.com/flutter")),
+                      URLRequest(url: Uri.parse('https://github.com/flutter/')),
+                  // initialUrlRequest:
+                  // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
-                  initialOptions: options,
+                  initialSettings: settings,
+                  // contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
-                  onWebViewCreated: (controller) {
+                  onWebViewCreated: (controller) async {
                     webViewController = controller;
                   },
-                  onLoadStart: (controller, url) {
+                  onLoadStart: (controller, url) async {
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
                   },
-                  androidOnPermissionRequest:
-                      (controller, origin, resources) async {
-                    return PermissionRequestResponse(
-                        resources: resources,
-                        action: PermissionRequestResponseAction.GRANT);
+                  onPermissionRequest: (controller, request) async {
+                    return PermissionResponse(
+                        resources: request.resources,
+                        action: PermissionResponseAction.GRANT);
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
@@ -151,10 +149,10 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       "javascript",
                       "about"
                     ].contains(uri.scheme)) {
-                      if (await canLaunch(url)) {
+                      if (await canLaunchUrl(uri)) {
                         // Launch the App
-                        await launch(
-                          url,
+                        await launchUrl(
+                          uri,
                         );
                         // and cancel the request
                         return NavigationActionPolicy.CANCEL;
@@ -164,18 +162,18 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                     return NavigationActionPolicy.ALLOW;
                   },
                   onLoadStop: (controller, url) async {
-                    pullToRefreshController.endRefreshing();
+                    pullToRefreshController?.endRefreshing();
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
                   },
-                  onLoadError: (controller, url, code, message) {
-                    pullToRefreshController.endRefreshing();
+                  onReceivedError: (controller, request, error) {
+                    pullToRefreshController?.endRefreshing();
                   },
                   onProgressChanged: (controller, progress) {
                     if (progress == 100) {
-                      pullToRefreshController.endRefreshing();
+                      pullToRefreshController?.endRefreshing();
                     }
                     setState(() {
                       this.progress = progress / 100;

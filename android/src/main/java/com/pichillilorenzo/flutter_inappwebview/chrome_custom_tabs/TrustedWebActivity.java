@@ -33,32 +33,32 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
   }
 
   private void prepareCustomTabs() {
-    if (options.toolbarBackgroundColor != null && !options.toolbarBackgroundColor.isEmpty()) {
+    if (customSettings.toolbarBackgroundColor != null && !customSettings.toolbarBackgroundColor.isEmpty()) {
       CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
       builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder
-              .setToolbarColor(Color.parseColor(options.toolbarBackgroundColor))
+              .setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor))
               .build());
     }
 
-    if (options.additionalTrustedOrigins != null && !options.additionalTrustedOrigins.isEmpty()) {
-      builder.setAdditionalTrustedOrigins(options.additionalTrustedOrigins);
+    if (customSettings.additionalTrustedOrigins != null && !customSettings.additionalTrustedOrigins.isEmpty()) {
+      builder.setAdditionalTrustedOrigins(customSettings.additionalTrustedOrigins);
     }
 
-    if (options.displayMode != null) {
-      builder.setDisplayMode(options.displayMode);
+    if (customSettings.displayMode != null) {
+      builder.setDisplayMode(customSettings.displayMode);
     }
     
-    builder.setScreenOrientation(options.screenOrientation);
+    builder.setScreenOrientation(customSettings.screenOrientation);
   }
 
   private void prepareCustomTabsIntent(TrustedWebActivityIntent trustedWebActivityIntent) {
     Intent intent = trustedWebActivityIntent.getIntent();
-    if (options.packageName != null)
-      intent.setPackage(options.packageName);
+    if (customSettings.packageName != null)
+      intent.setPackage(customSettings.packageName);
     else
       intent.setPackage(CustomTabsHelper.getPackageNameToUse(this));
 
-    if (options.keepAliveEnabled)
+    if (customSettings.keepAliveEnabled)
       CustomTabsHelper.addKeepAliveExtra(this, intent);
   }
 }

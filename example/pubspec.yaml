@@ -56,29 +56,14 @@ flutter:
   uses-material-design: true
 
   assets:
-    - assets/index.html
-    - assets/page-1.html
-    - assets/page-2.html
+    - assets/
     - assets/js/
     - assets/css/
     - assets/images/
-    - assets/favicon.ico
-    - assets/sample_audio.ogg
-    - assets/sample_video.mp4
-    - test_assets/certificate.pfx
-    - test_assets/in_app_webview_initial_file_test.html
-    - test_assets/in_app_webview_on_load_resource_test.html
-    - test_assets/in_app_webview_javascript_handler_test.html
-    - test_assets/in_app_webview_on_load_resource_custom_scheme_test.html
-    - test_assets/in_app_webview_on_console_message_test.html
-    - test_assets/in_app_webview_on_create_window_test.html
-    - test_assets/in_app_webview_on_js_dialog_test.html
+    - test_assets/
     - test_assets/js/
     - test_assets/css/
     - test_assets/images/
-    - test_assets/favicon.ico
-    - test_assets/sample_audio.ogg
-    - test_assets/sample_video.mp4
 
   # To add assets to your application, add an assets section, like this:
   # assets:

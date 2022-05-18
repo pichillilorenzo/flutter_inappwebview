@@ -43,7 +43,7 @@ public class SslError: NSObject {
     
     public func toMap () -> [String:Any?] {
         return [
-            "iosError": errorType?.rawValue,
+            "code": errorType?.rawValue,
             "message": message
         ]
     }

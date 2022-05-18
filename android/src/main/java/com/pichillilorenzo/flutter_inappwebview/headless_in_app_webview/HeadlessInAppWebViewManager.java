@@ -22,35 +22,35 @@
 package com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview;
 
 import androidx.annotation.Nullable;
+import androidx.annotation.NonNull;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.in_app_webview.FlutterWebView;
+import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.FlutterWebView;
 
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 import io.flutter.plugin.common.MethodChannel.Result;
 
-public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHandler {
-
+public class HeadlessInAppWebViewManager extends ChannelDelegateImpl {
   protected static final String LOG_TAG = "HeadlessInAppWebViewManager";
-  public MethodChannel channel;
+  public static final String METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_headless_inappwebview";
+  
   public static final Map<String, HeadlessInAppWebView> webViews = new HashMap<>();
   @Nullable
   public InAppWebViewFlutterPlugin plugin;
 
   public HeadlessInAppWebViewManager(final InAppWebViewFlutterPlugin plugin) {
+    super(new MethodChannel(plugin.messenger, METHOD_CHANNEL_NAME));
     this.plugin = plugin;
-    channel = new MethodChannel(plugin.messenger, "com.pichillilorenzo/flutter_headless_inappwebview");
-    channel.setMethodCallHandler(this);
   }
 
   @Override
-  public void onMethodCall(final MethodCall call, final Result result) {
+  public void onMethodCall(final MethodCall call, @NonNull final Result result) {
     final String id = (String) call.argument("id");
 
     switch (call.method) {
@@ -78,8 +78,9 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
     flutterWebView.makeInitialLoad(params);
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    super.dispose();
     Collection<HeadlessInAppWebView> headlessInAppWebViews = webViews.values();
     for (HeadlessInAppWebView headlessInAppWebView : headlessInAppWebViews) {
       if (headlessInAppWebView != null) {

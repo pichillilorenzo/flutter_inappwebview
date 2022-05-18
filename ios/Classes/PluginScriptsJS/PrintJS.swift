@@ -19,6 +19,6 @@ let PRINT_JS_PLUGIN_SCRIPT = PluginScript(
 
 let PRINT_JS_SOURCE = """
 window.print = function() {
-    window.\(JAVASCRIPT_BRIDGE_NAME).callHandler("onPrint", window.location.href);
+    window.\(JAVASCRIPT_BRIDGE_NAME).callHandler("onPrintRequest", window.location.href);
 }
 """

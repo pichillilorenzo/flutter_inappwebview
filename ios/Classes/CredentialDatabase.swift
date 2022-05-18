@@ -7,26 +7,18 @@
 
 import Foundation
 
-class CredentialDatabase: NSObject, FlutterPlugin {
-
+public class CredentialDatabase: ChannelDelegate {
+    static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_inappwebview_credential_database"
     static var registrar: FlutterPluginRegistrar?
-    static var channel: FlutterMethodChannel?
     static var credentialStore: URLCredentialStorage?
 
-    static func register(with registrar: FlutterPluginRegistrar) {
-        
-    }
-
     init(registrar: FlutterPluginRegistrar) {
-        super.init()
+        super.init(channel: FlutterMethodChannel(name: CredentialDatabase.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
         CredentialDatabase.registrar = registrar
         CredentialDatabase.credentialStore = URLCredentialStorage.shared
-        
-        CredentialDatabase.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_inappwebview_credential_database", binaryMessenger: registrar.messenger())
-        registrar.addMethodCallDelegate(self, channel: CredentialDatabase.channel!)
     }
 
-    public func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
+    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         switch call.method {
             case "getAllAuthCredentials":
@@ -196,10 +188,13 @@ class CredentialDatabase: NSObject, FlutterPlugin {
         }
     }
     
-    public func dispose() {
-        CredentialDatabase.channel?.setMethodCallHandler(nil)
-        CredentialDatabase.channel = nil
+    public override func dispose() {
+        super.dispose()
         CredentialDatabase.registrar = nil
         CredentialDatabase.credentialStore = nil
+    }
+    
+    deinit {
+        dispose()
     }
 }

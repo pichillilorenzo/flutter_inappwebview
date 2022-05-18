@@ -26,56 +26,73 @@ extension URLRequest {
                 setValue(value, forHTTPHeaderField: key)
             }
         }
-        if let iosAllowsCellularAccess = fromPluginMap["iosAllowsCellularAccess"] as? Bool {
-            allowsCellularAccess = iosAllowsCellularAccess
+        if let _allowsCellularAccess = fromPluginMap["allowsCellularAccess"] as? Bool {
+            allowsCellularAccess = _allowsCellularAccess
         }
-        if #available(iOS 13.0, *), let iosAllowsConstrainedNetworkAccess = fromPluginMap["iosAllowsConstrainedNetworkAccess"] as? Bool {
-            allowsConstrainedNetworkAccess = iosAllowsConstrainedNetworkAccess
+        if #available(iOS 13.0, *), let _allowsConstrainedNetworkAccess = fromPluginMap["allowsConstrainedNetworkAccess"] as? Bool {
+            allowsConstrainedNetworkAccess = _allowsConstrainedNetworkAccess
         }
-        if #available(iOS 13.0, *), let iosAllowsExpensiveNetworkAccess = fromPluginMap["iosAllowsExpensiveNetworkAccess"] as? Bool {
-            allowsExpensiveNetworkAccess = iosAllowsExpensiveNetworkAccess
+        if #available(iOS 13.0, *), let _allowsExpensiveNetworkAccess = fromPluginMap["allowsExpensiveNetworkAccess"] as? Bool {
+            allowsExpensiveNetworkAccess = _allowsExpensiveNetworkAccess
         }
-        if let iosCachePolicy = fromPluginMap["iosCachePolicy"] as? Int {
-            cachePolicy = CachePolicy.init(rawValue: UInt(iosCachePolicy)) ?? .useProtocolCachePolicy
+        if let _cachePolicy = fromPluginMap["cachePolicy"] as? Int {
+            cachePolicy = CachePolicy.init(rawValue: UInt(_cachePolicy)) ?? .useProtocolCachePolicy
         }
-        if let iosHttpShouldHandleCookies = fromPluginMap["iosHttpShouldHandleCookies"] as? Bool {
-            httpShouldHandleCookies = iosHttpShouldHandleCookies
+        if let _httpShouldHandleCookies = fromPluginMap["httpShouldHandleCookies"] as? Bool {
+            httpShouldHandleCookies = _httpShouldHandleCookies
         }
-        if let iosHttpShouldUsePipelining = fromPluginMap["iosHttpShouldUsePipelining"] as? Bool {
-            httpShouldUsePipelining = iosHttpShouldUsePipelining
+        if let _httpShouldUsePipelining = fromPluginMap["httpShouldUsePipelining"] as? Bool {
+            httpShouldUsePipelining = _httpShouldUsePipelining
         }
-        if let iosNetworkServiceType = fromPluginMap["iosNetworkServiceType"] as? Int {
-            networkServiceType = NetworkServiceType.init(rawValue: UInt(iosNetworkServiceType)) ?? .default
+        if let _networkServiceType = fromPluginMap["networkServiceType"] as? Int {
+            networkServiceType = NetworkServiceType.init(rawValue: UInt(_networkServiceType)) ?? .default
         }
-        if let iosTimeoutInterval = fromPluginMap["iosTimeoutInterval"] as? Double {
-            timeoutInterval = iosTimeoutInterval
+        if let _timeoutInterval = fromPluginMap["timeoutInterval"] as? Double {
+            timeoutInterval = _timeoutInterval
         }
-        if let iosMainDocumentURL = fromPluginMap["iosMainDocumentURL"] as? String {
-            mainDocumentURL = URL(string: iosMainDocumentURL)!
+        if let _mainDocumentURL = fromPluginMap["mainDocumentURL"] as? String {
+            mainDocumentURL = URL(string: _mainDocumentURL)!
+        }
+        if #available(iOS 14.5, *), let _assumesHTTP3Capable = fromPluginMap["assumesHTTP3Capable"] as? Bool {
+            assumesHTTP3Capable = _assumesHTTP3Capable
+        }
+        if #available(iOS 15.0, *), let attributionRawValue = fromPluginMap["attribution"] as? UInt,
+            let _attribution = URLRequest.Attribution(rawValue: attributionRawValue) {
+            attribution = _attribution
         }
     }
     
     public func toMap () -> [String:Any?] {
-        var iosAllowsConstrainedNetworkAccess: Bool? = nil
-        var iosAllowsExpensiveNetworkAccess: Bool? = nil
+        var _allowsConstrainedNetworkAccess: Bool? = nil
+        var _allowsExpensiveNetworkAccess: Bool? = nil
         if #available(iOS 13.0, *) {
-            iosAllowsConstrainedNetworkAccess = allowsConstrainedNetworkAccess
-            iosAllowsExpensiveNetworkAccess = allowsExpensiveNetworkAccess
+            _allowsConstrainedNetworkAccess = allowsConstrainedNetworkAccess
+            _allowsExpensiveNetworkAccess = allowsExpensiveNetworkAccess
+        }
+        var _assumesHTTP3Capable: Bool? = nil
+        if #available(iOS 14.5, *) {
+            _assumesHTTP3Capable = assumesHTTP3Capable
+        }
+        var _attribution: UInt? = nil
+        if #available(iOS 15.0, *) {
+            _attribution = attribution.rawValue
         }
         return [
             "url": url?.absoluteString,
             "method": httpMethod,
             "headers": allHTTPHeaderFields,
             "body": httpBody.map(FlutterStandardTypedData.init(bytes:)),
-            "iosAllowsCellularAccess": allowsCellularAccess,
-            "iosAllowsConstrainedNetworkAccess": iosAllowsConstrainedNetworkAccess,
-            "iosAllowsExpensiveNetworkAccess": iosAllowsExpensiveNetworkAccess,
-            "iosCachePolicy": cachePolicy.rawValue,
-            "iosHttpShouldHandleCookies": httpShouldHandleCookies,
-            "iosHttpShouldUsePipelining": httpShouldUsePipelining,
-            "iosNetworkServiceType": networkServiceType.rawValue,
-            "iosTimeoutInterval": timeoutInterval,
-            "iosMainDocumentURL": mainDocumentURL?.absoluteString
+            "allowsCellularAccess": allowsCellularAccess,
+            "allowsConstrainedNetworkAccess": _allowsConstrainedNetworkAccess,
+            "allowsExpensiveNetworkAccess": _allowsExpensiveNetworkAccess,
+            "cachePolicy": cachePolicy.rawValue,
+            "httpShouldHandleCookies": httpShouldHandleCookies,
+            "httpShouldUsePipelining": httpShouldUsePipelining,
+            "networkServiceType": networkServiceType.rawValue,
+            "timeoutInterval": timeoutInterval,
+            "mainDocumentURL": mainDocumentURL?.absoluteString,
+            "assumesHTTP3Capable": _assumesHTTP3Capable,
+            "attribution": _attribution
         ]
     }
 }

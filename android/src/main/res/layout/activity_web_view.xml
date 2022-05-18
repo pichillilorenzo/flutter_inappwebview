@@ -14,7 +14,7 @@
         android:id="@+id/pullToRefresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
-        <com.pichillilorenzo.flutter_inappwebview.in_app_webview.InAppWebView
+        <com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView
             android:id="@+id/webView"
             android:layout_width="match_parent"
             android:layout_height="match_parent" />

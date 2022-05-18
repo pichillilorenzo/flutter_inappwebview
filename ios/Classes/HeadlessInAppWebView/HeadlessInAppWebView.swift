@@ -7,47 +7,22 @@
 
 import Foundation
 
-public class HeadlessInAppWebView : FlutterMethodCallDelegate {
+public class HeadlessInAppWebView : Disposable {
+    static let METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_headless_inappwebview_"
     var id: String
-    var channel: FlutterMethodChannel?
+    var channelDelegate: HeadlessWebViewChannelDelegate?
     var flutterWebView: FlutterWebViewController?
     
     public init(id: String, flutterWebView: FlutterWebViewController) {
         self.id = id
-        super.init()
         self.flutterWebView = flutterWebView
-        self.channel = FlutterMethodChannel(name: "com.pichillilorenzo/flutter_headless_inappwebview_" + id,
+        let channel = FlutterMethodChannel(name: HeadlessInAppWebView.METHOD_CHANNEL_NAME_PREFIX + id,
                                        binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
-        self.channel?.setMethodCallHandler(self.handle)
-    }
-    
-    public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
-        let arguments = call.arguments as? NSDictionary
-        
-        switch call.method {
-        case "dispose":
-            dispose()
-            result(true)
-            break
-        case "setSize":
-            let sizeMap = arguments!["size"] as? [String: Any?]
-            if let size = Size2D.fromMap(map: sizeMap) {
-                setSize(size: size)
-            }
-            result(true)
-            break
-        case "getSize":
-            result(getSize()?.toMap())
-            break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
-        }
+        self.channelDelegate = HeadlessWebViewChannelDelegate(headlessWebView: self, channel: channel)
     }
     
     public func onWebViewCreated() {
-        let arguments: [String: Any?] = [:]
-        channel?.invokeMethod("onWebViewCreated", arguments: arguments)
+        channelDelegate?.onWebViewCreated();
     }
     
     public func prepare(params: NSDictionary) {
@@ -87,14 +62,14 @@ public class HeadlessInAppWebView : FlutterMethodCallDelegate {
     }
     
     public func dispose() {
-        channel?.setMethodCallHandler(nil)
-        channel = nil
+        channelDelegate?.dispose()
+        channelDelegate = nil
         HeadlessInAppWebViewManager.webViews[id] = nil
         flutterWebView = nil
     }
     
     deinit {
-        print("HeadlessInAppWebView - dealloc")
+        debugPrint("HeadlessInAppWebView - dealloc")
         dispose()
     }
 }

@@ -9,7 +9,9 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Log;
 
+import androidx.annotation.CallSuper;
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
@@ -18,24 +20,26 @@ import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsMenuItem;
+import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import io.flutter.plugin.common.MethodCall;
 import io.flutter.plugin.common.MethodChannel;
 
-public class ChromeCustomTabsActivity extends Activity implements MethodChannel.MethodCallHandler {
-
+public class ChromeCustomTabsActivity extends Activity implements Disposable {
   protected static final String LOG_TAG = "CustomTabsActivity";
-  public MethodChannel channel;
+  public static final String METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_chromesafaribrowser_";
+  
   public String id;
+  @Nullable
   public CustomTabsIntent.Builder builder;
-  public ChromeCustomTabsOptions options;
+  public ChromeCustomTabsSettings customSettings = new ChromeCustomTabsSettings();
   public CustomTabActivityHelper customTabActivityHelper = new CustomTabActivityHelper();
   @Nullable
   public CustomTabsSession customTabsSession;
@@ -48,7 +52,10 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   public List<CustomTabsMenuItem> menuItems = new ArrayList<>();
   @Nullable
   public CustomTabsActionButton actionButton;
+  @Nullable
+  public ChromeCustomTabsChannelDelegate channelDelegate;
 
+  @CallSuper
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -64,19 +71,21 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     manager = ChromeSafariBrowserManager.shared.get(managerId);
     if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
 
-    channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + id);
-    channel.setMethodCallHandler(this);
+    ChromeSafariBrowserManager.browsers.put(id, this);
+
+    MethodChannel channel = new MethodChannel(manager.plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
+    channelDelegate = new ChromeCustomTabsChannelDelegate(this, channel);
 
     initialUrl = b.getString("url");
 
-    options = new ChromeCustomTabsOptions();
-    options.parse((Map<String, Object>) b.getSerializable("options"));
+    customSettings = new ChromeCustomTabsSettings();
+    customSettings.parse((HashMap<String, Object>) b.getSerializable("settings"));
     actionButton = CustomTabsActionButton.fromMap((Map<String, Object>) b.getSerializable("actionButton"));
     List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItemList");
     for (Map<String, Object> menuItem : menuItemList) {
       menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
     }
-    
+
     final ChromeCustomTabsActivity chromeCustomTabsActivity = this;
 
     customTabActivityHelper.setConnectionCallback(new CustomTabActivityHelper.ConnectionCallback() {
@@ -97,14 +106,16 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
       public void onNavigationEvent(int navigationEvent, Bundle extras) {
         if (navigationEvent == TAB_SHOWN && !onChromeSafariBrowserOpened) {
           onChromeSafariBrowserOpened = true;
-          Map<String, Object> obj = new HashMap<>();
-          channel.invokeMethod("onChromeSafariBrowserOpened", obj);
+          if (channelDelegate != null) {
+            channelDelegate.onChromeSafariBrowserOpened();
+          }
         }
 
         if (navigationEvent == NAVIGATION_FINISHED && !onChromeSafariBrowserCompletedInitialLoad) {
           onChromeSafariBrowserCompletedInitialLoad = true;
-          Map<String, Object> obj = new HashMap<>();
-          channel.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", obj);
+          if (channelDelegate != null) {
+            channelDelegate.onChromeSafariBrowserCompletedInitialLoad();
+          }
         }
       }
 
@@ -131,31 +142,6 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     });
   }
 
-  @Override
-  public void onMethodCall(final MethodCall call, final MethodChannel.Result result) {
-    switch (call.method) {
-      case "close":
-        this.onStop();
-        this.onDestroy();
-        this.close();
-
-        if (manager != null && manager.plugin != null && manager.plugin.activity != null) {
-          // https://stackoverflow.com/a/41596629/4637638
-          Intent myIntent = new Intent(manager.plugin.activity, manager.plugin.activity.getClass());
-          myIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-          myIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
-          manager.plugin.activity.startActivity(myIntent);
-        }
-
-        dispose();
-        
-        result.success(true);
-        break;
-      default:
-        result.notImplemented();
-    }
-  }
-
   public void customTabsConnected() {
     customTabsSession = customTabActivityHelper.getSession();
     Uri uri = Uri.parse(initialUrl);
@@ -171,23 +157,23 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   private void prepareCustomTabs() {
-    if (options.addDefaultShareMenuItem != null) {
-      builder.setShareState(options.addDefaultShareMenuItem ?
+    if (customSettings.addDefaultShareMenuItem != null) {
+      builder.setShareState(customSettings.addDefaultShareMenuItem ?
               CustomTabsIntent.SHARE_STATE_ON : CustomTabsIntent.SHARE_STATE_OFF);
     } else {
-      builder.setShareState(options.shareState);
+      builder.setShareState(customSettings.shareState);
     }
 
-    if (options.toolbarBackgroundColor != null && !options.toolbarBackgroundColor.isEmpty()) {
+    if (customSettings.toolbarBackgroundColor != null && !customSettings.toolbarBackgroundColor.isEmpty()) {
       CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
       builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder
-              .setToolbarColor(Color.parseColor(options.toolbarBackgroundColor))
+              .setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor))
               .build());
     }
 
-    builder.setShowTitle(options.showTitle);
-    builder.setUrlBarHidingEnabled(options.enableUrlBarHiding);
-    builder.setInstantAppsEnabled(options.instantAppsEnabled);
+    builder.setShowTitle(customSettings.showTitle);
+    builder.setUrlBarHidingEnabled(customSettings.enableUrlBarHiding);
+    builder.setInstantAppsEnabled(customSettings.instantAppsEnabled);
 
     for (CustomTabsMenuItem menuItem : menuItems) {
       builder.addMenuItem(menuItem.getLabel(), 
@@ -208,12 +194,12 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   private void prepareCustomTabsIntent(CustomTabsIntent customTabsIntent) {
-    if (options.packageName != null)
-      customTabsIntent.intent.setPackage(options.packageName);
+    if (customSettings.packageName != null)
+      customTabsIntent.intent.setPackage(customSettings.packageName);
     else
       customTabsIntent.intent.setPackage(CustomTabsHelper.getPackageNameToUse(this));
 
-    if (options.keepAliveEnabled)
+    if (customSettings.keepAliveEnabled)
       CustomTabsHelper.addKeepAliveExtra(this, customTabsIntent.intent);
   }
 
@@ -230,6 +216,11 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   @Override
+  public void onDestroy() {
+    super.onDestroy();
+  }
+
+  @Override
   protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     if (requestCode == CHROME_CUSTOM_TAB_REQUEST_CODE) {
       close();
@@ -243,7 +234,6 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     Bundle extras = new Bundle();
     extras.putInt(ActionBroadcastReceiver.KEY_ACTION_ID, actionSourceId);
     extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
-    extras.putString(ActionBroadcastReceiver.CHROME_MANAGER_ID, manager.id);
     actionIntent.putExtras(extras);
 
     if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
@@ -255,15 +245,27 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     }
   }
 
+  @Override
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    onStop();
+    onDestroy();
+    if (channelDelegate != null) {
+      channelDelegate.dispose();
+      channelDelegate = null;
+    }
+    if (ChromeSafariBrowserManager.browsers.containsKey(id)) {
+      ChromeSafariBrowserManager.browsers.put(id, null);
+    }
     manager = null;
   }
 
   public void close() {
+    onStop();
+    onDestroy();
     customTabsSession = null;
     finish();
-    Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+    if (channelDelegate != null) {
+      channelDelegate.onChromeSafariBrowserClosed();
+    }
   }
 }

@@ -1,9 +1,11 @@
 import '../../in_app_webview/android/in_app_webview_options.dart';
 
-import '../in_app_browser_options.dart';
+import '../in_app_browser_settings.dart';
 import '../in_app_browser.dart';
 
 ///This class represents all the Android-only [InAppBrowser] options available.
+///Use [InAppBrowserSettings] instead.
+@Deprecated('Use InAppBrowserSettings instead')
 class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   ///Set to `true` if you want the title should be displayed. The default value is `false`.
   bool hideTitleBar;
@@ -39,14 +41,14 @@ class AndroidInAppBrowserOptions implements BrowserOptions, AndroidOptions {
   }
 
   static AndroidInAppBrowserOptions fromMap(Map<String, dynamic> map) {
-    AndroidInAppBrowserOptions options = AndroidInAppBrowserOptions();
-    options.hideTitleBar = map["hideTitleBar"];
-    options.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
-    options.closeOnCannotGoBack = map["closeOnCannotGoBack"];
-    options.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
-    options.shouldCloseOnBackButtonPressed =
+    var instance = AndroidInAppBrowserOptions();
+    instance.hideTitleBar = map["hideTitleBar"];
+    instance.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
+    instance.closeOnCannotGoBack = map["closeOnCannotGoBack"];
+    instance.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
+    instance.shouldCloseOnBackButtonPressed =
         map["shouldCloseOnBackButtonPressed"];
-    return options;
+    return instance;
   }
 
   @override

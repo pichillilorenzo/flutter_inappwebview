@@ -1,12 +1,14 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
+import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_inappwebview/src/util.dart';
+import '../util.dart';
+import '../debug_logging_settings.dart';
 
-import 'chrome_safari_browser_options.dart';
+import 'chrome_safari_browser_settings.dart';
 
 class ChromeSafariBrowserAlreadyOpenedException implements Exception {
   final dynamic message;
@@ -38,7 +40,14 @@ class ChromeSafariBrowserNotOpenedException implements Exception {
 ///**NOTE**: If you want to use the `ChromeSafariBrowser` class on Android 11+ you need to specify your app querying for
 ///`android.support.customtabs.action.CustomTabsService` in your `AndroidManifest.xml`
 ///(you can read more about it here: https://developers.google.com/web/android/custom-tabs/best-practices#applications_targeting_android_11_api_level_30_or_above).
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class ChromeSafariBrowser {
+  ///Debug settings.
+  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
+
   ///View ID used internally.
   late final String id;
 
@@ -53,11 +62,34 @@ class ChromeSafariBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler(_handleMethod);
     _isOpened = false;
   }
 
-  Future<dynamic> handleMethod(MethodCall call) async {
+  _debugLog(String method, dynamic args) {
+    if (ChromeSafariBrowser.debugLoggingSettings.enabled) {
+      for (var regExp
+          in ChromeSafariBrowser.debugLoggingSettings.excludeFilter) {
+        if (regExp.hasMatch(method)) return;
+      }
+      var maxLogMessageLength =
+          ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength;
+      String message = "ChromeSafariBrowser ID " +
+          id +
+          " calling \"" +
+          method.toString() +
+          "\" using " +
+          args.toString();
+      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
+        message = message.substring(0, maxLogMessageLength) + "...";
+      }
+      developer.log(message, name: this.runtimeType.toString());
+    }
+  }
+
+  Future<dynamic> _handleMethod(MethodCall call) async {
+    _debugLog(call.method, call.arguments);
+
     switch (call.method) {
       case "onChromeSafariBrowserOpened":
         onOpened();
@@ -89,11 +121,19 @@ class ChromeSafariBrowser {
   ///[url]: The [url] to load. On iOS, the [url] must use the `http` or `https` scheme.
   ///
   ///[options]: Options for the [ChromeSafariBrowser].
+  ///
+  ///[settings]: Settings for the [ChromeSafariBrowser].
   Future<void> open(
-      {required Uri url, ChromeSafariBrowserClassOptions? options}) async {
+      {required Uri url,
+      @Deprecated('Use settings instead')
+          // ignore: deprecated_member_use_from_same_package
+          ChromeSafariBrowserClassOptions? options,
+      ChromeSafariBrowserSettings? settings}) async {
     assert(url.toString().isNotEmpty);
     this.throwIsAlreadyOpened(message: 'Cannot open $url!');
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    if (!kIsWeb &&
+        (defaultTargetPlatform == TargetPlatform.iOS ||
+            defaultTargetPlatform == TargetPlatform.macOS)) {
       assert(['http', 'https'].contains(url.scheme),
           'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
     }
@@ -103,10 +143,14 @@ class ChromeSafariBrowser {
       menuItemList.add(value.toMap());
     });
 
+    var initialSettings = settings?.toMap() ??
+        options?.toMap() ??
+        ChromeSafariBrowserSettings().toMap();
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('id', () => id);
     args.putIfAbsent('url', () => url.toString());
-    args.putIfAbsent('options', () => options?.toMap() ?? {});
+    args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('actionButton', () => _actionButton?.toMap());
     args.putIfAbsent('menuItemList', () => menuItemList);
     await _sharedChannel.invokeMethod('open', args);

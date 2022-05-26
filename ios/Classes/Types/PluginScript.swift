@@ -48,7 +48,7 @@ public class PluginScript : UserScript {
                            forMainFrameOnly: Bool? = nil,
                            requiredInAllContentWorlds: Bool? = nil,
                            messageHandlerNames: [String]? = nil) -> PluginScript {
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.3, *) {
             return PluginScript(
                 groupName: groupName ?? self.groupName!,
                 source: source ?? self.source,

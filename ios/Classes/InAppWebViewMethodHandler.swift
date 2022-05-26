@@ -76,7 +76,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 if let webView = webView {
                     let source = arguments!["source"] as! String
                     let contentWorldMap = arguments!["contentWorld"] as? [String:Any?]
-                    if #available(iOS 14.0, *), let contentWorldMap = contentWorldMap {
+                    if #available(iOS 14.3, *), let contentWorldMap = contentWorldMap {
                         let contentWorld = WKContentWorld.fromMap(map: contentWorldMap, windowId: webView.windowId)!
                         webView.evaluateJavascript(source: source, contentWorld: contentWorld) { (value) in
                             result(value)
@@ -414,7 +414,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "callAsyncJavaScript":
                 if let webView = webView, #available(iOS 10.3, *) {
-                    if #available(iOS 14.0, *) {
+                    if #available(iOS 14.3, *) {
                         let functionBody = arguments!["functionBody"] as! String
                         let functionArguments = arguments!["arguments"] as! [String:Any]
                         var contentWorld = WKContentWorld.page

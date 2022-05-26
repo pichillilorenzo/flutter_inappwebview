@@ -378,7 +378,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             scrollView.maximumZoomScale = CGFloat(options.maximumZoomScale)
             scrollView.minimumZoomScale = CGFloat(options.minimumZoomScale)
             
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.3, *) {
                 mediaType = options.mediaType
                 pageZoom = CGFloat(options.pageZoom)
             }
@@ -419,7 +419,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             }
             
             configuration.preferences.javaScriptEnabled = options.javaScriptEnabled
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.3, *) {
                 configuration.defaultWebpagePreferences.allowsContentJavaScript = options.javaScriptEnabled
             }
         }
@@ -536,7 +536,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
             }
             
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.3, *) {
                 configuration.limitsNavigationsToAppBoundDomains = options.limitsNavigationsToAppBoundDomains
             }
         }
@@ -614,7 +614,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     
     public func initializeWindowIdJS() {
         if let windowId = windowId {
-            if #available(iOS 14.0, *) {
+            if #available(iOS 14.3, *) {
                 let contentWorlds = configuration.userContentController.getContentWorlds(with: windowId)
                 for contentWorld in contentWorlds {
                     let source = WINDOW_ID_INITIALIZE_JS_SOURCE.replacingOccurrences(of: PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, with: String(windowId))
@@ -1054,7 +1054,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
             configuration.preferences.javaScriptEnabled = newOptions.javaScriptEnabled
         }
         
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.3, *) {
             if options?.mediaType != newOptions.mediaType {
                 mediaType = newOptions.mediaType
             }
@@ -1110,7 +1110,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         evaluateJavascript(source: flagVariable) { (alreadyLoaded) in
             if let alreadyLoaded = alreadyLoaded as? Bool, alreadyLoaded {
                 let enableSource = "\(flagVariable) = \(enable);"
-                if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
+                if #available(iOS 14.3, *), pluginScript.requiredInAllContentWorlds {
                     for contentWorld in self.configuration.userContentController.contentWorlds {
                         self.evaluateJavaScript(enableSource, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                     }
@@ -1122,7 +1122,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                 }
             }
             else if enable {
-                if #available(iOS 14.0, *), pluginScript.requiredInAllContentWorlds {
+                if #available(iOS 14.3, *), pluginScript.requiredInAllContentWorlds {
                     for contentWorld in self.configuration.userContentController.contentWorlds {
                         self.evaluateJavaScript(pluginScript.source, frame: nil, contentWorld: contentWorld, completionHandler: nil)
                         self.configuration.userContentController.addPluginScript(pluginScript)
@@ -1185,7 +1185,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         }
     }
     
-    @available(iOS 14.0, *)
+    @available(iOS 14.3, *)
     public func injectDeferredObject(source: String, contentWorld: WKContentWorld, withWrapper jsWrapper: String?, completionHandler: ((Any?) -> Void)? = nil) {
         var jsToInject = source
         if let wrapper = jsWrapper {
@@ -1229,7 +1229,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         super.evaluateJavaScript(javaScriptString, completionHandler: completionHandler)
     }
     
-    @available(iOS 14.0, *)
+    @available(iOS 14.3, *)
     public func evaluateJavaScript(_ javaScript: String, frame: WKFrameInfo? = nil, contentWorld: WKContentWorld, completionHandler: ((Result<Any, Error>) -> Void)? = nil) {
         if let applePayAPIEnabled = options?.applePayAPIEnabled, applePayAPIEnabled {
             return
@@ -1241,7 +1241,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         injectDeferredObject(source: source, withWrapper: nil, completionHandler: completionHandler)
     }
     
-    @available(iOS 14.0, *)
+    @available(iOS 14.3, *)
     public func evaluateJavascript(source: String, contentWorld: WKContentWorld, completionHandler: ((Any?) -> Void)? = nil) {
         injectDeferredObject(source: source, contentWorld: contentWorld, withWrapper: nil, completionHandler: completionHandler)
     }
@@ -1560,7 +1560,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
         disposeWebMessageChannels()
         initializeWindowIdJS()
         
-        if #available(iOS 14.0, *) {
+        if #available(iOS 14.3, *) {
             configuration.userContentController.resetContentWorlds(windowId: windowId)
         }
         

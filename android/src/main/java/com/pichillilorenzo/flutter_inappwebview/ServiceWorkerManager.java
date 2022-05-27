@@ -168,13 +168,7 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
   }
 
   private ServiceWorkerClientCompat dummyServiceWorkerClientCompat() {
-    return new ServiceWorkerClientCompat() {
-      @Nullable
-      @Override
-      public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
-        return null;
-      }
-    };
+    return DummyServiceWorkerClientCompat.INSTANCE;
   }
 
   public void dispose() {
@@ -184,5 +178,15 @@ public class ServiceWorkerManager implements MethodChannel.MethodCallHandler {
       serviceWorkerController = null; 
     }
     plugin = null;
+  }
+
+  private static final class DummyServiceWorkerClientCompat extends ServiceWorkerClientCompat {
+    static final ServiceWorkerClientCompat INSTANCE = new DummyServiceWorkerClientCompat();
+
+    @Nullable
+    @Override
+    public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
+      return null;
+    }
   }
 }

@@ -175,7 +175,9 @@ let UTIL_JS_SOURCE = """
         });
     },
     arrayBufferToString: function(arrayBuffer) {
-        return String.fromCharCode.apply(String, arrayBuffer);
+        const uint8Array = new Uint8Array(arrayBuffer);
+        const data = uint8Array.reduce((acc, i) => acc += String.fromCharCode.apply(null, [i]), '');
+        return data;
     },
     isBodyFormData: function(bodyString) {
         return bodyString.indexOf('------WebKitFormBoundary') >= 0;

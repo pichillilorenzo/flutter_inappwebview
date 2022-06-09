@@ -1,12 +1,17 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 import 'url_credential.dart';
 import 'url_response.dart';
 import 'url_authentication_challenge.dart';
 import 'url_protection_space.dart';
 
+part 'http_authentication_challenge.g.dart';
+
 ///Class that represents the challenge of the [WebView.onReceivedHttpAuthRequest] event.
 ///It provides all the information about the challenge.
-class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
+@ExchangeableObject()
+class HttpAuthenticationChallenge_ extends URLAuthenticationChallenge_ {
   ///A count of previous failed authentication attempts.
   int previousFailureCount;
 
@@ -16,17 +21,17 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///If the proposed credential is not nil and returns true when you call its hasPassword method, then the credential is ready to use as-is.
   ///If the proposed credential’s hasPassword method returns false, then the credential provides a default user name,
   ///and the client must prompt the user for a corresponding password.
-  URLCredential? proposedCredential;
+  URLCredential_? proposedCredential;
 
   ///Use [failureResponse] instead.
   @Deprecated("Use failureResponse instead")
-  IOSURLResponse? iosFailureResponse;
+  IOSURLResponse_? iosFailureResponse;
 
   ///The URL response object representing the last authentication failure.
   ///This value is `null` if the protocol doesn’t use responses to indicate an authentication failure.
   ///
   ///**NOTE**: available only on iOS.
-  URLResponse? failureResponse;
+  URLResponse_? failureResponse;
 
   ///Use [error] instead.
   @Deprecated("Use error instead")
@@ -38,62 +43,13 @@ class HttpAuthenticationChallenge extends URLAuthenticationChallenge {
   ///**NOTE**: available only on iOS.
   String? error;
 
-  HttpAuthenticationChallenge(
+  HttpAuthenticationChallenge_(
       {required this.previousFailureCount,
-        required URLProtectionSpace protectionSpace,
+        required URLProtectionSpace_ protectionSpace,
         @Deprecated("Use failureResponse instead") this.iosFailureResponse,
         this.failureResponse,
         this.proposedCredential,
         @Deprecated("Use error instead") this.iosError,
         this.error})
-      : super(protectionSpace: protectionSpace) {
-    this.failureResponse = this.failureResponse ??
-        // ignore: deprecated_member_use_from_same_package
-        URLResponse.fromMap(this.iosFailureResponse?.toMap());
-    // ignore: deprecated_member_use_from_same_package
-    this.error = this.error ?? this.iosError;
-  }
-
-  ///Gets a possible [HttpAuthenticationChallenge] instance from a [Map] value.
-  static HttpAuthenticationChallenge? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return HttpAuthenticationChallenge(
-      previousFailureCount: map["previousFailureCount"],
-      protectionSpace: URLProtectionSpace.fromMap(
-          map["protectionSpace"].cast<String, dynamic>())!,
-      proposedCredential: URLCredential.fromMap(
-          map["proposedCredential"]?.cast<String, dynamic>()),
-      // ignore: deprecated_member_use_from_same_package
-      iosFailureResponse: IOSURLResponse.fromMap(
-          map["failureResponse"]?.cast<String, dynamic>()),
-      failureResponse:
-      URLResponse.fromMap(map["failureResponse"]?.cast<String, dynamic>()),
-      // ignore: deprecated_member_use_from_same_package
-      iosError: map["error"],
-      error: map["error"],
-    );
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    var map = super.toMap();
-    map.addAll({
-      "previousFailureCount": previousFailureCount,
-      "protectionSpace": protectionSpace.toMap(),
-      "proposedCredential": proposedCredential?.toMap(),
-      "iosFailureResponse":
-      // ignore: deprecated_member_use_from_same_package
-      failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
-      "failureResponse":
-      // ignore: deprecated_member_use_from_same_package
-      failureResponse?.toMap() ?? iosFailureResponse?.toMap(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosError": error ?? iosError,
-      // ignore: deprecated_member_use_from_same_package
-      "error": error ?? iosError,
-    });
-    return map;
-  }
+      : super(protectionSpace: protectionSpace);
 }

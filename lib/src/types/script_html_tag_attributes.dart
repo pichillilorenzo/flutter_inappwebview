@@ -1,9 +1,14 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/in_app_webview_controller.dart';
 import 'cross_origin.dart';
 import 'referrer_policy.dart';
 
+part 'script_html_tag_attributes.g.dart';
+
 ///Class that represents the possible the `<script>` HTML attributes to be set used by [InAppWebViewController.injectJavascriptFileFromUrl].
-class ScriptHtmlTagAttributes {
+@ExchangeableObject()
+class ScriptHtmlTagAttributes_ {
   ///This attribute indicates the type of script represented. The value of this attribute will be in one of the following categories.
   ///The default value is `text/javascript`.
   String type;
@@ -37,7 +42,7 @@ class ScriptHtmlTagAttributes {
 
   ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
   ///To allow error logging for sites which use a separate domain for static media, use this attribute.
-  CrossOrigin? crossOrigin;
+  CrossOrigin_? crossOrigin;
 
   ///This attribute contains inline metadata that a user agent can use to verify that a fetched resource has been delivered free of unexpected manipulation.
   String? integrity;
@@ -52,19 +57,20 @@ class ScriptHtmlTagAttributes {
   String? nonce;
 
   ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
-  ReferrerPolicy? referrerPolicy;
+  ReferrerPolicy_? referrerPolicy;
 
   ///Represents a callback function that will be called as soon as the script has been loaded successfully.
   ///
   ///**NOTE**: This callback requires the [id] property to be set.
-  Function()? onLoad;
+  Function? onLoad;
 
   ///Represents a callback function that will be called if an error occurred while trying to load the script.
   ///
   ///**NOTE**: This callback requires the [id] property to be set.
-  Function()? onError;
+  Function? onError;
 
-  ScriptHtmlTagAttributes(
+  @ExchangeableObjectConstructor()
+  ScriptHtmlTagAttributes_(
       {this.type = "text/javascript",
         this.id,
         this.async,
@@ -80,30 +86,5 @@ class ScriptHtmlTagAttributes {
       assert(this.id != null,
       'onLoad and onError callbacks require the id property to be set.');
     }
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "type": this.type,
-      "id": this.id,
-      "async": this.async,
-      "defer": this.defer,
-      "crossOrigin": this.crossOrigin?.toValue(),
-      "integrity": this.integrity,
-      "noModule": this.noModule,
-      "nonce": this.nonce,
-      "referrerPolicy": this.referrerPolicy?.toValue(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
   }
 }

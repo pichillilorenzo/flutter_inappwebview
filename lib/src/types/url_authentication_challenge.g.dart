@@ -10,8 +10,8 @@ part of 'url_authentication_challenge.dart';
 ///It provides all the information about the challenge.
 class URLAuthenticationChallenge {
   ///The protection space requiring authentication.
-  dynamic protectionSpace;
-  URLAuthenticationChallenge({this.protectionSpace});
+  URLProtectionSpace protectionSpace;
+  URLAuthenticationChallenge({required this.protectionSpace});
 
   ///Gets a possible [URLAuthenticationChallenge] instance from a [Map] value.
   static URLAuthenticationChallenge? fromMap(Map<String, dynamic>? map) {
@@ -19,7 +19,8 @@ class URLAuthenticationChallenge {
       return null;
     }
     final instance = URLAuthenticationChallenge(
-      protectionSpace: map['protectionSpace'],
+      protectionSpace: URLProtectionSpace.fromMap(
+          map['protectionSpace']?.cast<String, dynamic>())!,
     );
     return instance;
   }
@@ -27,7 +28,7 @@ class URLAuthenticationChallenge {
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "protectionSpace": protectionSpace,
+      "protectionSpace": protectionSpace.toMap(),
     };
   }
 

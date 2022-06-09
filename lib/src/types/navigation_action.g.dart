@@ -115,24 +115,23 @@ class NavigationAction {
     final instance = NavigationAction(
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>())!,
       isForMainFrame: map['isForMainFrame'],
+      androidHasGesture: map['hasGesture'],
+      hasGesture: map['hasGesture'],
+      androidIsRedirect: map['isRedirect'],
+      isRedirect: map['isRedirect'],
+      iosWKNavigationType:
+          IOSWKNavigationType.fromNativeValue(map['navigationType']),
+      navigationType: NavigationType.fromNativeValue(map['navigationType']),
+      iosSourceFrame:
+          IOSWKFrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>()),
+      sourceFrame:
+          FrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>()),
+      iosTargetFrame:
+          IOSWKFrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>()),
+      targetFrame:
+          FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>()),
+      shouldPerformDownload: map['shouldPerformDownload'],
     );
-    instance.androidHasGesture = map['hasGesture'];
-    instance.hasGesture = map['hasGesture'];
-    instance.androidIsRedirect = map['isRedirect'];
-    instance.isRedirect = map['isRedirect'];
-    instance.iosWKNavigationType =
-        IOSWKNavigationType.fromNativeValue(map['navigationType']);
-    instance.navigationType =
-        NavigationType.fromNativeValue(map['navigationType']);
-    instance.iosSourceFrame =
-        IOSWKFrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>());
-    instance.sourceFrame =
-        FrameInfo.fromMap(map['sourceFrame']?.cast<String, dynamic>());
-    instance.iosTargetFrame =
-        IOSWKFrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>());
-    instance.targetFrame =
-        FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>());
-    instance.shouldPerformDownload = map['shouldPerformDownload'];
     return instance;
   }
 

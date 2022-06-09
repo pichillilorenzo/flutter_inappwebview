@@ -1,7 +1,12 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
+part 'geolocation_permission_show_prompt_response.g.dart';
+
 ///Class used by the host application to set the Geolocation permission state for an origin during the [WebView.onGeolocationPermissionsShowPrompt] event.
-class GeolocationPermissionShowPromptResponse {
+@ExchangeableObject()
+class GeolocationPermissionShowPromptResponse_ {
   ///The origin for which permissions are set.
   String origin;
 
@@ -12,21 +17,6 @@ class GeolocationPermissionShowPromptResponse {
   ///The default value is `false`.
   bool retain;
 
-  GeolocationPermissionShowPromptResponse(
+  GeolocationPermissionShowPromptResponse_(
       {required this.origin, required this.allow, this.retain = false});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"origin": origin, "allow": allow, "retain": retain};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

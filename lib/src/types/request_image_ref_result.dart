@@ -1,26 +1,14 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/in_app_webview_controller.dart';
 
+part 'request_image_ref_result.g.dart';
+
 ///Class that represents the result used by the [InAppWebViewController.requestImageRef] method.
-class RequestImageRefResult {
+@ExchangeableObject()
+class RequestImageRefResult_ {
   ///The image's url.
   Uri? url;
 
-  RequestImageRefResult({this.url});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  RequestImageRefResult_({this.url});
 }

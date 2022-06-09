@@ -1,5 +1,14 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+part 'url_response.g.dart';
+
+Map<String, String>? _headersDeserializer(dynamic value) {
+  return value?.cast<String, String>();
+}
+
 ///The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
-class URLResponse {
+@ExchangeableObject()
+class URLResponse_ {
   ///The URL for the response.
   Uri? url;
 
@@ -16,12 +25,13 @@ class URLResponse {
   String? textEncodingName;
 
   ///All HTTP header fields of the response.
+  @ExchangeableObjectProperty(deserializer: _headersDeserializer)
   Map<String, String>? headers;
 
   ///The response’s HTTP status code.
   int? statusCode;
 
-  URLResponse(
+  URLResponse_(
       {this.url,
         required this.expectedContentLength,
         this.mimeType,
@@ -29,49 +39,12 @@ class URLResponse {
         this.textEncodingName,
         this.headers,
         this.statusCode});
-
-  ///Gets a possible [URLResponse] instance from a [Map] value.
-  static URLResponse? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return URLResponse(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
-        expectedContentLength: map["expectedContentLength"],
-        mimeType: map["mimeType"],
-        suggestedFilename: map["suggestedFilename"],
-        textEncodingName: map["textEncodingName"],
-        headers: map["headers"]?.cast<String, String>(),
-        statusCode: map["statusCode"]);
-  }
-
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-      "expectedContentLength": expectedContentLength,
-      "mimeType": mimeType,
-      "suggestedFilename": suggestedFilename,
-      "textEncodingName": textEncodingName,
-      "headers": headers,
-      "statusCode": statusCode
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  ///Converts instance to a map.
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }
 
 ///Use [URLResponse] instead.
 @Deprecated("Use URLResponse instead")
-class IOSURLResponse {
+@ExchangeableObject()
+class IOSURLResponse_ {
   ///The URL for the response.
   Uri? url;
 
@@ -88,12 +61,13 @@ class IOSURLResponse {
   String? textEncodingName;
 
   ///All HTTP header fields of the response.
+  @ExchangeableObjectProperty(deserializer: _headersDeserializer)
   Map<String, String>? headers;
 
   ///The response’s HTTP status code.
   int? statusCode;
 
-  IOSURLResponse(
+  IOSURLResponse_(
       {this.url,
         required this.expectedContentLength,
         this.mimeType,
@@ -101,42 +75,4 @@ class IOSURLResponse {
         this.textEncodingName,
         this.headers,
         this.statusCode});
-
-  ///Gets a possible [IOSURLResponse] instance from a [Map] value.
-  static IOSURLResponse? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return IOSURLResponse(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
-        expectedContentLength: map["expectedContentLength"],
-        mimeType: map["mimeType"],
-        suggestedFilename: map["suggestedFilename"],
-        textEncodingName: map["textEncodingName"],
-        headers: map["headers"]?.cast<String, String>(),
-        statusCode: map["statusCode"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-      "expectedContentLength": expectedContentLength,
-      "mimeType": mimeType,
-      "suggestedFilename": suggestedFilename,
-      "textEncodingName": textEncodingName,
-      "headers": headers,
-      "statusCode": statusCode
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

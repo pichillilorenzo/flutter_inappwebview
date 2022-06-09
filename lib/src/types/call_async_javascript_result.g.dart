@@ -20,9 +20,10 @@ class CallAsyncJavaScriptResult {
     if (map == null) {
       return null;
     }
-    final instance = CallAsyncJavaScriptResult();
-    instance.value = map['value'];
-    instance.error = map['error'];
+    final instance = CallAsyncJavaScriptResult(
+      value: map['value'],
+      error: map['error'],
+    );
     return instance;
   }
 

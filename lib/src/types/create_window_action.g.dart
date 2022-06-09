@@ -84,6 +84,12 @@ class CreateWindowAction extends NavigationAction {
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>())!,
       isForMainFrame: map['isForMainFrame'],
       windowId: map['windowId'],
+      androidIsDialog: map['isDialog'],
+      isDialog: map['isDialog'],
+      iosWindowFeatures: IOSWKWindowFeatures.fromMap(
+          map['windowFeatures']?.cast<String, dynamic>()),
+      windowFeatures: WindowFeatures.fromMap(
+          map['windowFeatures']?.cast<String, dynamic>()),
     );
     instance.androidHasGesture = map['hasGesture'];
     instance.hasGesture = map['hasGesture'];
@@ -102,12 +108,6 @@ class CreateWindowAction extends NavigationAction {
     instance.targetFrame =
         FrameInfo.fromMap(map['targetFrame']?.cast<String, dynamic>());
     instance.shouldPerformDownload = map['shouldPerformDownload'];
-    instance.androidIsDialog = map['isDialog'];
-    instance.isDialog = map['isDialog'];
-    instance.iosWindowFeatures = IOSWKWindowFeatures.fromMap(
-        map['windowFeatures']?.cast<String, dynamic>());
-    instance.windowFeatures =
-        WindowFeatures.fromMap(map['windowFeatures']?.cast<String, dynamic>());
     return instance;
   }
 

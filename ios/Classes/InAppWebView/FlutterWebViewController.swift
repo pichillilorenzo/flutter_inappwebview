@@ -148,7 +148,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
             let data = initialData["data"]!
             let mimeType = initialData["mimeType"]!
             let encoding = initialData["encoding"]!
-            let baseUrl = URL(string: initialData["baseUrl"]!)!
+            let baseUrl = URL(string: initialData["baseUrl"] ?? "about:blank")!
             var allowingReadAccessToURL: URL? = nil
             if let allowingReadAccessTo = webView.settings?.allowingReadAccessTo, baseUrl.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)

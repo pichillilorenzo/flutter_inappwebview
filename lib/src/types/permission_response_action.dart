@@ -1,50 +1,46 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'permission_response.dart';
 
+part 'permission_response_action.g.dart';
+
 ///Class used by [PermissionResponse] class.
-class PermissionResponseAction {
+@ExchangeableEnum()
+class PermissionResponseAction_ {
+  // ignore: unused_field
   final int _value;
-
-  const PermissionResponseAction._internal(this._value);
-
-  ///Gets [int] value.
-  int toValue() => _value;
+  const PermissionResponseAction_._internal(this._value);
 
   ///Denies the request.
-  static const DENY = const PermissionResponseAction._internal(0);
+  static const DENY = const PermissionResponseAction_._internal(0);
 
   ///Grants origin the permission to access the given resources.
-  static const GRANT = const PermissionResponseAction._internal(1);
+  static const GRANT = const PermissionResponseAction_._internal(1);
 
   ///Prompt the user for permission for the requested resource.
-  ///
-  ///**NOTE**: available only on iOS 15.0+. It will fallback to [DENY].
-  static const PROMPT = const PermissionResponseAction._internal(2);
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  @EnumSupportedPlatforms(platforms: [
+    EnumIOSPlatform(
+      available: "15.0",
+      note: "On iOS < 15.0, it will fallback to [DENY]",
+      value: 2
+    )
+  ])
+  static const PROMPT = const PermissionResponseAction_._internal(2);
 }
 
 ///Class used by [PermissionRequestResponse] class.
 ///Use [PermissionResponseAction] instead.
 @Deprecated("Use PermissionResponseAction instead")
-class PermissionRequestResponseAction {
+@ExchangeableEnum()
+class PermissionRequestResponseAction_ {
+  // ignore: unused_field
   final int _value;
-
-  const PermissionRequestResponseAction._internal(this._value);
-
-  ///Gets [int] value.
-  int toValue() => _value;
+  const PermissionRequestResponseAction_._internal(this._value);
 
   ///Denies the request.
-  static const DENY = const PermissionRequestResponseAction._internal(0);
+  static const DENY = const PermissionRequestResponseAction_._internal(0);
 
   ///Grants origin the permission to access the given resources.
-  static const GRANT = const PermissionRequestResponseAction._internal(1);
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  static const GRANT = const PermissionRequestResponseAction_._internal(1);
 }

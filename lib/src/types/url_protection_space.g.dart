@@ -107,27 +107,27 @@ class URLProtectionSpace {
     }
     final instance = URLProtectionSpace(
       host: map['host'],
+      protocol: map['protocol'],
+      realm: map['realm'],
+      port: map['port'],
+      sslCertificate: SslCertificate.fromMap(
+          map['sslCertificate']?.cast<String, dynamic>()),
+      sslError: map['sslError'],
+      iosAuthenticationMethod:
+          IOSNSURLProtectionSpaceAuthenticationMethod.fromNativeValue(
+              map['authenticationMethod']),
+      authenticationMethod:
+          URLProtectionSpaceAuthenticationMethod.fromNativeValue(
+              map['authenticationMethod']),
+      iosDistinguishedNames:
+          _distinguishedNamesDeserializer(map['distinguishedNames']),
+      distinguishedNames:
+          _distinguishedNamesDeserializer(map['distinguishedNames']),
+      iosReceivesCredentialSecurely: map['receivesCredentialSecurely'],
+      receivesCredentialSecurely: map['receivesCredentialSecurely'],
+      iosProxyType: map['proxyType'],
+      proxyType: map['proxyType'],
     );
-    instance.protocol = map['protocol'];
-    instance.realm = map['realm'];
-    instance.port = map['port'];
-    instance.sslCertificate =
-        SslCertificate.fromMap(map['sslCertificate']?.cast<String, dynamic>());
-    instance.sslError = map['sslError'];
-    instance.iosAuthenticationMethod =
-        IOSNSURLProtectionSpaceAuthenticationMethod.fromNativeValue(
-            map['authenticationMethod']);
-    instance.authenticationMethod =
-        URLProtectionSpaceAuthenticationMethod.fromNativeValue(
-            map['authenticationMethod']);
-    instance.iosDistinguishedNames =
-        _distinguishedNamesDeserializer(map['distinguishedNames']);
-    instance.distinguishedNames =
-        _distinguishedNamesDeserializer(map['distinguishedNames']);
-    instance.iosReceivesCredentialSecurely = map['receivesCredentialSecurely'];
-    instance.receivesCredentialSecurely = map['receivesCredentialSecurely'];
-    instance.iosProxyType = map['proxyType'];
-    instance.proxyType = map['proxyType'];
     return instance;
   }
 

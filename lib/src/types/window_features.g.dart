@@ -46,15 +46,16 @@ class WindowFeatures {
     if (map == null) {
       return null;
     }
-    final instance = WindowFeatures();
-    instance.allowsResizing = map['allowsResizing'];
-    instance.height = map['height'];
-    instance.menuBarVisibility = map['menuBarVisibility'];
-    instance.statusBarVisibility = map['statusBarVisibility'];
-    instance.toolbarsVisibility = map['toolbarsVisibility'];
-    instance.width = map['width'];
-    instance.x = map['x'];
-    instance.y = map['y'];
+    final instance = WindowFeatures(
+      allowsResizing: map['allowsResizing'],
+      height: map['height'],
+      menuBarVisibility: map['menuBarVisibility'],
+      statusBarVisibility: map['statusBarVisibility'],
+      toolbarsVisibility: map['toolbarsVisibility'],
+      width: map['width'],
+      x: map['x'],
+      y: map['y'],
+    );
     return instance;
   }
 
@@ -125,15 +126,16 @@ class IOSWKWindowFeatures {
     if (map == null) {
       return null;
     }
-    final instance = IOSWKWindowFeatures();
-    instance.allowsResizing = map['allowsResizing'];
-    instance.height = map['height'];
-    instance.menuBarVisibility = map['menuBarVisibility'];
-    instance.statusBarVisibility = map['statusBarVisibility'];
-    instance.toolbarsVisibility = map['toolbarsVisibility'];
-    instance.width = map['width'];
-    instance.x = map['x'];
-    instance.y = map['y'];
+    final instance = IOSWKWindowFeatures(
+      allowsResizing: map['allowsResizing'],
+      height: map['height'],
+      menuBarVisibility: map['menuBarVisibility'],
+      statusBarVisibility: map['statusBarVisibility'],
+      toolbarsVisibility: map['toolbarsVisibility'],
+      width: map['width'],
+      x: map['x'],
+      y: map['y'],
+    );
     return instance;
   }
 

@@ -19,6 +19,7 @@
 - On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`)
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
+- `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
 
 ## 5.4.3+7
 

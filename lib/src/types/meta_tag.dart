@@ -1,8 +1,13 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/in_app_webview_controller.dart';
 import 'meta_tag_attribute.dart';
 
+part 'meta_tag.g.dart';
+
 ///Class that represents a `<meta>` HTML tag. It is used by the [InAppWebViewController.getMetaTags] method.
-class MetaTag {
+@ExchangeableObject()
+class MetaTag_ {
   ///The meta tag name value.
   String? name;
 
@@ -10,22 +15,7 @@ class MetaTag {
   String? content;
 
   ///The meta tag attributes list.
-  List<MetaTagAttribute>? attrs;
+  List<MetaTagAttribute_>? attrs;
 
-  MetaTag({this.name, this.content, this.attrs});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"name": name, "content": content, "attrs": attrs};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  MetaTag_({this.name, this.content, this.attrs});
 }

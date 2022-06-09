@@ -925,8 +925,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     @Nullable
     @Override
     public NavigationActionPolicy decodeResult(@Nullable Object obj) {
-      Integer action = Util.<Integer>getOrDefault((Map<String, Object>) obj, 
-              "action", NavigationActionPolicy.CANCEL.rawValue());
+      Integer action = obj instanceof Integer ? (Integer) obj : NavigationActionPolicy.CANCEL.rawValue();
       return NavigationActionPolicy.fromValue(action);
     }
   }
@@ -1067,7 +1066,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     @Nullable
     @Override
     public Integer decodeResult(@Nullable Object obj) {
-      return obj != null ? (Integer) ((Map<String, Object>) obj).get("action") : null;
+      return obj instanceof Integer ? (Integer) obj : null;
     }
   }
 

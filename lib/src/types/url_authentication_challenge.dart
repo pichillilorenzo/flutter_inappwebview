@@ -9,7 +9,7 @@ part 'url_authentication_challenge.g.dart';
 @ExchangeableObject()
 class URLAuthenticationChallenge_ {
   ///The protection space requiring authentication.
-  URLProtectionSpace protectionSpace;
+  URLProtectionSpace_ protectionSpace;
 
   URLAuthenticationChallenge_({
     required this.protectionSpace,

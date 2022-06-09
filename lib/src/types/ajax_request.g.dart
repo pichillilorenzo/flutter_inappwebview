@@ -100,29 +100,28 @@ class AjaxRequest {
     if (map == null) {
       return null;
     }
-    final instance = AjaxRequest();
-    instance.data = map['data'];
-    instance.method = map['method'];
-    instance.url = map['url'] != null ? Uri.parse(map['url']) : null;
-    instance.isAsync = map['isAsync'];
-    instance.user = map['user'];
-    instance.password = map['password'];
-    instance.withCredentials = map['withCredentials'];
-    instance.headers =
-        AjaxRequestHeaders.fromMap(map['headers']?.cast<String, dynamic>());
-    instance.readyState =
-        AjaxRequestReadyState.fromNativeValue(map['readyState']);
-    instance.status = map['status'];
-    instance.responseURL =
-        map['responseURL'] != null ? Uri.parse(map['responseURL']) : null;
-    instance.responseType = map['responseType'];
-    instance.response = map['response'];
-    instance.responseText = map['responseText'];
-    instance.responseXML = map['responseXML'];
-    instance.statusText = map['statusText'];
-    instance.responseHeaders = map['responseHeaders'];
-    instance.event =
-        AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>());
+    final instance = AjaxRequest(
+      data: map['data'],
+      method: map['method'],
+      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      isAsync: map['isAsync'],
+      user: map['user'],
+      password: map['password'],
+      withCredentials: map['withCredentials'],
+      headers:
+          AjaxRequestHeaders.fromMap(map['headers']?.cast<String, dynamic>()),
+      readyState: AjaxRequestReadyState.fromNativeValue(map['readyState']),
+      status: map['status'],
+      responseURL:
+          map['responseURL'] != null ? Uri.parse(map['responseURL']) : null,
+      responseType: map['responseType'],
+      response: map['response'],
+      responseText: map['responseText'],
+      responseXML: map['responseXML'],
+      statusText: map['statusText'],
+      responseHeaders: map['responseHeaders'],
+      event: AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>()),
+    );
     instance.action = AjaxRequestAction.fromNativeValue(map['action']);
     return instance;
   }

@@ -1,9 +1,14 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
 import 'js_prompt_response_action.dart';
 
+part 'js_prompt_response.g.dart';
+
 ///Class that represents the response used by the [WebView.onJsPrompt] event to control a JavaScript prompt dialog.
-class JsPromptResponse {
+@ExchangeableObject()
+class JsPromptResponse_ {
   ///Message to be displayed in the window.
   String message;
 
@@ -23,37 +28,14 @@ class JsPromptResponse {
   String? value;
 
   ///Action used to confirm that the user hit confirm or cancel button.
-  JsPromptResponseAction? action;
+  JsPromptResponseAction_? action;
 
-  JsPromptResponse(
+  JsPromptResponse_(
       {this.message = "",
         this.defaultValue = "",
         this.handledByClient = false,
         this.confirmButtonTitle = "",
         this.cancelButtonTitle = "",
         this.value,
-        this.action = JsPromptResponseAction.CANCEL});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "message": message,
-      "defaultValue": defaultValue,
-      "confirmButtonTitle": confirmButtonTitle,
-      "cancelButtonTitle": cancelButtonTitle,
-      "handledByClient": handledByClient,
-      "value": value,
-      "action": action?.toValue()
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.action = JsPromptResponseAction_.CANCEL});
 }

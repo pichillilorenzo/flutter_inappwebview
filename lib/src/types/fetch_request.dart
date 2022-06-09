@@ -1,3 +1,5 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'fetch_request_action.dart';
 import 'fetch_request_credential.dart';
 import 'fetch_request_credential_default.dart';
@@ -5,8 +7,26 @@ import 'fetch_request_federated_credential.dart';
 import 'fetch_request_password_credential.dart';
 import 'referrer_policy.dart';
 
+part 'fetch_request.g.dart';
+
+FetchRequestCredential? _fetchRequestCredentialDeserializer(dynamic value) {
+  Map<String, dynamic>? credentialMap = value?.cast<String, dynamic>();
+  FetchRequestCredential? credentials;
+  if (credentialMap != null) {
+    if (credentialMap["type"] == "default") {
+      credentials = FetchRequestCredentialDefault.fromMap(credentialMap);
+    } else if (credentialMap["type"] == "federated") {
+      credentials = FetchRequestFederatedCredential.fromMap(credentialMap);
+    } else if (credentialMap["type"] == "password") {
+      credentials = FetchRequestPasswordCredential.fromMap(credentialMap);
+    }
+  }
+  return credentials;
+}
+
 ///Class that represents a HTTP request created with JavaScript using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
-class FetchRequest {
+@ExchangeableObject()
+class FetchRequest_ {
   ///The URL of the request.
   Uri? url;
 
@@ -23,7 +43,10 @@ class FetchRequest {
   String? mode;
 
   ///The request credentials used by the request.
-  FetchRequestCredential? credentials;
+  @ExchangeableObjectProperty(
+    deserializer: _fetchRequestCredentialDeserializer
+  )
+  FetchRequestCredential_? credentials;
 
   ///The cache mode used by the request.
   String? cache;
@@ -35,7 +58,7 @@ class FetchRequest {
   String? referrer;
 
   ///The value of the referer HTTP header.
-  ReferrerPolicy? referrerPolicy;
+  ReferrerPolicy_? referrerPolicy;
 
   ///Contains the subresource integrity value of the request.
   String? integrity;
@@ -44,9 +67,9 @@ class FetchRequest {
   bool? keepalive;
 
   ///Indicates the [FetchRequestAction] that can be used to control the request.
-  FetchRequestAction? action;
+  FetchRequestAction_? action;
 
-  FetchRequest(
+  FetchRequest_(
       {this.url,
         this.method,
         this.headers,
@@ -59,68 +82,5 @@ class FetchRequest {
         this.referrerPolicy,
         this.integrity,
         this.keepalive,
-        this.action = FetchRequestAction.PROCEED});
-
-  ///Gets a possible [FetchRequest] instance from a [Map] value.
-  static FetchRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    Map<String, dynamic>? credentialMap =
-    map["credentials"]?.cast<String, dynamic>();
-    FetchRequestCredential? credentials;
-    if (credentialMap != null) {
-      if (credentialMap["type"] == "default") {
-        credentials = FetchRequestCredentialDefault.fromMap(credentialMap);
-      } else if (credentialMap["type"] == "federated") {
-        credentials = FetchRequestFederatedCredential.fromMap(credentialMap);
-      } else if (credentialMap["type"] == "password") {
-        credentials = FetchRequestPasswordCredential.fromMap(credentialMap);
-      }
-    }
-
-    return FetchRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
-        method: map["method"],
-        headers: map["headers"]?.cast<String, dynamic>(),
-        body: map["body"],
-        mode: map["mode"],
-        credentials: credentials,
-        cache: map["cache"],
-        redirect: map["redirect"],
-        referrer: map["referrer"],
-        referrerPolicy: ReferrerPolicy.fromValue(map["referrerPolicy"]),
-        integrity: map["integrity"],
-        keepalive: map["keepalive"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-      "method": method,
-      "headers": headers,
-      "body": body,
-      "mode": mode,
-      "credentials": credentials?.toMap(),
-      "cache": cache,
-      "redirect": redirect,
-      "referrer": referrer,
-      "referrerPolicy": referrerPolicy?.toValue(),
-      "integrity": integrity,
-      "keepalive": keepalive,
-      "action": action?.toValue()
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.action = FetchRequestAction_.PROCEED});
 }

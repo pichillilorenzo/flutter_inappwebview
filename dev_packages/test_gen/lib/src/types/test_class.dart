@@ -28,6 +28,8 @@ class TestClass_ extends TestClass3_ {
 
   List<Color?>? colors;
 
+  Function? onLoad;
+
   ///Docs 3
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
@@ -55,6 +57,7 @@ class TestClass_ extends TestClass3_ {
 class TestClass3_ {
   String asd;
 
+  Function? onLoad;
   TestClass3_({required this.asd});
 }
 

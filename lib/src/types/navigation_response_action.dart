@@ -1,64 +1,42 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
+
+part 'navigation_response_action.g.dart';
 
 ///Class that is used by [WebView.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
-class NavigationResponseAction {
+@ExchangeableEnum()
+class NavigationResponseAction_ {
+  // ignore: unused_field
   final int _value;
-
-  const NavigationResponseAction._internal(this._value);
-
-  ///Gets [int] value.
-  int toValue() => _value;
+  const NavigationResponseAction_._internal(this._value);
 
   ///Cancel the navigation.
-  static const CANCEL = const NavigationResponseAction._internal(0);
+  static const CANCEL = const NavigationResponseAction_._internal(0);
 
   ///Allow the navigation to continue.
-  static const ALLOW = const NavigationResponseAction._internal(1);
+  static const ALLOW = const NavigationResponseAction_._internal(1);
 
   ///Turn the navigation into a download.
   ///
   ///**NOTE**: available only on iOS 14.5+. It will fallback to [CANCEL].
-  static const DOWNLOAD = const NavigationResponseAction._internal(2);
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
-
-  Map<String, dynamic> toMap() {
-    return {
-      "action": _value,
-    };
-  }
+  static const DOWNLOAD = const NavigationResponseAction_._internal(2);
 }
 
 ///Class that is used by [WebView.onNavigationResponse] event.
 ///It represents the policy to pass back to the decision handler.
 ///Use [NavigationResponseAction] instead.
 @Deprecated("Use NavigationResponseAction instead")
-class IOSNavigationResponseAction {
+@ExchangeableEnum()
+class IOSNavigationResponseAction_ {
+  // ignore: unused_field
   final int _value;
-
-  const IOSNavigationResponseAction._internal(this._value);
-
-  ///Gets [int] value.
-  int toValue() => _value;
+  const IOSNavigationResponseAction_._internal(this._value);
 
   ///Cancel the navigation.
-  static const CANCEL = const IOSNavigationResponseAction._internal(0);
+  static const CANCEL = const IOSNavigationResponseAction_._internal(0);
 
   ///Allow the navigation to continue.
-  static const ALLOW = const IOSNavigationResponseAction._internal(1);
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
-
-  Map<String, dynamic> toMap() {
-    return {
-      "action": _value,
-    };
-  }
+  static const ALLOW = const IOSNavigationResponseAction_._internal(1);
 }

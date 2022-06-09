@@ -1,90 +1,34 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../print_job/main.dart';
 
+part 'print_job_duplex_mode.g.dart';
+
 ///Class representing the orientation of a [PrintJobController].
-class PrintJobDuplexMode {
+@ExchangeableEnum()
+class PrintJobDuplexMode_ {
+  // ignore: unused_field
   final String _value;
-  final int _nativeValue;
+  // ignore: unused_field
+  final int _nativeValue = 0;
 
-  const PrintJobDuplexMode._internal(this._value, this._nativeValue);
-
-  ///Set of all values of [PrintJobDuplexMode].
-  static final Set<PrintJobDuplexMode> values = [
-    PrintJobDuplexMode.NONE,
-    PrintJobDuplexMode.LONG_EDGE,
-    PrintJobDuplexMode.SHORT_EDGE,
-  ].toSet();
-
-  ///Gets a possible [PrintJobDuplexMode] instance from a [String] value.
-  static PrintJobDuplexMode? fromValue(String? value) {
-    if (value != null) {
-      try {
-        return PrintJobDuplexMode.values
-            .firstWhere((element) => element.toValue() == value);
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  ///Gets a possible [PrintJobDuplexMode] instance from an [int] native value.
-  static PrintJobDuplexMode? fromNativeValue(int? value) {
-    if (value != null) {
-      try {
-        return PrintJobDuplexMode.values
-            .firstWhere((element) => element.toNativeValue() == value);
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  ///Gets [String] value.
-  String toValue() => _value;
-
-  ///Gets native value.
-  int toNativeValue() => _nativeValue;
-
-  @override
-  String toString() => _value;
+  const PrintJobDuplexMode_._internal(this._value);
 
   ///No double-sided (duplex) printing; single-sided printing only.
-  static final NONE = PrintJobDuplexMode._internal(
-      'NONE',
-      (defaultTargetPlatform == TargetPlatform.android)
-          ? 1
-          : ((defaultTargetPlatform == TargetPlatform.iOS ||
-                  defaultTargetPlatform == TargetPlatform.macOS)
-              ? 0
-              : 0));
+  @EnumSupportedPlatforms(
+      platforms: [EnumAndroidPlatform(value: 1), EnumIOSPlatform(value: 0)])
+  static const NONE = PrintJobDuplexMode_._internal('NONE');
 
   ///Duplex printing that flips the back page along the long edge of the paper.
   ///Pages are turned sideways along the long edge - like a book.
-  static final LONG_EDGE = PrintJobDuplexMode._internal(
-      'LONG_EDGE',
-      (defaultTargetPlatform == TargetPlatform.android)
-          ? 2
-          : ((defaultTargetPlatform == TargetPlatform.iOS ||
-                  defaultTargetPlatform == TargetPlatform.macOS)
-              ? 1
-              : 0));
+  @EnumSupportedPlatforms(
+      platforms: [EnumAndroidPlatform(value: 2), EnumIOSPlatform(value: 1)])
+  static const LONG_EDGE = PrintJobDuplexMode_._internal('LONG_EDGE');
 
   ///Duplex print that flips the back page along the short edge of the paper.
   ///Pages are turned upwards along the short edge - like a notepad.
-  static final SHORT_EDGE = PrintJobDuplexMode._internal(
-      'SHORT_EDGE',
-      (defaultTargetPlatform == TargetPlatform.android)
-          ? 4
-          : ((defaultTargetPlatform == TargetPlatform.iOS ||
-                  defaultTargetPlatform == TargetPlatform.macOS)
-              ? 2
-              : 0));
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  @EnumSupportedPlatforms(
+      platforms: [EnumAndroidPlatform(value: 4), EnumIOSPlatform(value: 2)])
+  static const SHORT_EDGE = PrintJobDuplexMode_._internal('SHORT_EDGE');
 }

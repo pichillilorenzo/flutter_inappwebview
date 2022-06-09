@@ -67,15 +67,14 @@ class Cookie {
     final instance = Cookie(
       name: map['name'],
       value: map['value'],
+      expiresDate: map['expiresDate'],
+      isSessionOnly: map['isSessionOnly'],
+      domain: map['domain'],
+      sameSite: HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']),
+      isSecure: map['isSecure'],
+      isHttpOnly: map['isHttpOnly'],
+      path: map['path'],
     );
-    instance.expiresDate = map['expiresDate'];
-    instance.isSessionOnly = map['isSessionOnly'];
-    instance.domain = map['domain'];
-    instance.sameSite =
-        HTTPCookieSameSitePolicy.fromNativeValue(map['sameSite']);
-    instance.isSecure = map['isSecure'];
-    instance.isHttpOnly = map['isHttpOnly'];
-    instance.path = map['path'];
     return instance;
   }
 

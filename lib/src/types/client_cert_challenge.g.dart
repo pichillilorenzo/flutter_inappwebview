@@ -33,7 +33,7 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
       this.principals,
       @Deprecated('Use keyTypes instead') this.androidKeyTypes,
       this.keyTypes,
-      dynamic protectionSpace})
+      required URLProtectionSpace protectionSpace})
       : super(protectionSpace: protectionSpace) {
     principals = principals ?? androidPrincipals;
     keyTypes = keyTypes ?? androidKeyTypes;
@@ -45,19 +45,20 @@ class ClientCertChallenge extends URLAuthenticationChallenge {
       return null;
     }
     final instance = ClientCertChallenge(
-      protectionSpace: map['protectionSpace'],
+      protectionSpace: URLProtectionSpace.fromMap(
+          map['protectionSpace']?.cast<String, dynamic>())!,
+      androidPrincipals: map['principals'],
+      principals: map['principals'],
+      androidKeyTypes: map['keyTypes'],
+      keyTypes: map['keyTypes'],
     );
-    instance.androidPrincipals = map['principals'];
-    instance.principals = map['principals'];
-    instance.androidKeyTypes = map['keyTypes'];
-    instance.keyTypes = map['keyTypes'];
     return instance;
   }
 
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {
-      "protectionSpace": protectionSpace,
+      "protectionSpace": protectionSpace.toMap(),
       "principals": principals,
       "keyTypes": keyTypes,
     };

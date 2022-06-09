@@ -187,43 +187,37 @@ class URLRequest {
     }
     final instance = URLRequest(
       url: map['url'] != null ? Uri.parse(map['url']) : null,
+      method: map['method'],
+      body: map['body'],
+      headers: map['headers'],
+      iosAllowsCellularAccess: map['allowsCellularAccess'],
+      allowsCellularAccess: map['allowsCellularAccess'],
+      iosAllowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],
+      allowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],
+      iosAllowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
+      allowsExpensiveNetworkAccess: map['allowsExpensiveNetworkAccess'],
+      iosCachePolicy:
+          IOSURLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
+      cachePolicy: URLRequestCachePolicy.fromNativeValue(map['cachePolicy']),
+      iosHttpShouldHandleCookies: map['httpShouldHandleCookies'],
+      httpShouldHandleCookies: map['httpShouldHandleCookies'],
+      iosHttpShouldUsePipelining: map['httpShouldUsePipelining'],
+      httpShouldUsePipelining: map['httpShouldUsePipelining'],
+      iosNetworkServiceType: IOSURLRequestNetworkServiceType.fromNativeValue(
+          map['networkServiceType']),
+      networkServiceType: URLRequestNetworkServiceType.fromNativeValue(
+          map['networkServiceType']),
+      iosTimeoutInterval: map['timeoutInterval'],
+      timeoutInterval: map['timeoutInterval'],
+      iosMainDocumentURL: map['mainDocumentURL'] != null
+          ? Uri.parse(map['mainDocumentURL'])
+          : null,
+      mainDocumentURL: map['mainDocumentURL'] != null
+          ? Uri.parse(map['mainDocumentURL'])
+          : null,
+      assumesHTTP3Capable: map['assumesHTTP3Capable'],
+      attribution: URLRequestAttribution.fromNativeValue(map['attribution']),
     );
-    instance.method = map['method'];
-    instance.body = map['body'];
-    instance.headers = map['headers'];
-    instance.iosAllowsCellularAccess = map['allowsCellularAccess'];
-    instance.allowsCellularAccess = map['allowsCellularAccess'];
-    instance.iosAllowsConstrainedNetworkAccess =
-        map['allowsConstrainedNetworkAccess'];
-    instance.allowsConstrainedNetworkAccess =
-        map['allowsConstrainedNetworkAccess'];
-    instance.iosAllowsExpensiveNetworkAccess =
-        map['allowsExpensiveNetworkAccess'];
-    instance.allowsExpensiveNetworkAccess = map['allowsExpensiveNetworkAccess'];
-    instance.iosCachePolicy =
-        IOSURLRequestCachePolicy.fromNativeValue(map['cachePolicy']);
-    instance.cachePolicy =
-        URLRequestCachePolicy.fromNativeValue(map['cachePolicy']);
-    instance.iosHttpShouldHandleCookies = map['httpShouldHandleCookies'];
-    instance.httpShouldHandleCookies = map['httpShouldHandleCookies'];
-    instance.iosHttpShouldUsePipelining = map['httpShouldUsePipelining'];
-    instance.httpShouldUsePipelining = map['httpShouldUsePipelining'];
-    instance.iosNetworkServiceType =
-        IOSURLRequestNetworkServiceType.fromNativeValue(
-            map['networkServiceType']);
-    instance.networkServiceType =
-        URLRequestNetworkServiceType.fromNativeValue(map['networkServiceType']);
-    instance.iosTimeoutInterval = map['timeoutInterval'];
-    instance.timeoutInterval = map['timeoutInterval'];
-    instance.iosMainDocumentURL = map['mainDocumentURL'] != null
-        ? Uri.parse(map['mainDocumentURL'])
-        : null;
-    instance.mainDocumentURL = map['mainDocumentURL'] != null
-        ? Uri.parse(map['mainDocumentURL'])
-        : null;
-    instance.assumesHTTP3Capable = map['assumesHTTP3Capable'];
-    instance.attribution =
-        URLRequestAttribution.fromNativeValue(map['attribution']);
     return instance;
   }
 

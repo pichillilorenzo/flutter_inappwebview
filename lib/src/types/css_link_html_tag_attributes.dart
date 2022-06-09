@@ -1,9 +1,14 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/in_app_webview_controller.dart';
 import 'cross_origin.dart';
 import 'referrer_policy.dart';
 
+part 'css_link_html_tag_attributes.g.dart';
+
 ///Class that represents the possible CSS stylesheet `<link>` HTML attributes to be set used by [InAppWebViewController.injectCSSFileFromUrl].
-class CSSLinkHtmlTagAttributes {
+@ExchangeableObject()
+class CSSLinkHtmlTagAttributes_ {
   ///The HTML [id] attribute is used to specify a unique id for the `<link>` HTML element.
   String? id;
 
@@ -13,13 +18,13 @@ class CSSLinkHtmlTagAttributes {
 
   ///Normal script elements pass minimal information to the `window.onerror` for scripts which do not pass the standard CORS checks.
   ///To allow error logging for sites which use a separate domain for static media, use this attribute.
-  CrossOrigin? crossOrigin;
+  CrossOrigin_? crossOrigin;
 
   ///This attribute contains inline metadata that a user agent can use to verify that a fetched resource has been delivered free of unexpected manipulation.
   String? integrity;
 
   ///Indicates which referrer to send when fetching the script, or resources fetched by the script.
-  ReferrerPolicy? referrerPolicy;
+  ReferrerPolicy_? referrerPolicy;
 
   ///The [disabled] Boolean attribute indicates whether or not the described stylesheet should be loaded and applied to the document.
   ///If [disabled] is specified in the HTML when it is loaded, the stylesheet will not be loaded during page load.
@@ -36,7 +41,7 @@ class CSSLinkHtmlTagAttributes {
   ///Incorrectly using it may cause the stylesheet to be ignored.
   String? title;
 
-  CSSLinkHtmlTagAttributes(
+  CSSLinkHtmlTagAttributes_(
       {this.id,
         this.media,
         this.crossOrigin,
@@ -45,28 +50,4 @@ class CSSLinkHtmlTagAttributes {
         this.disabled,
         this.alternate,
         this.title});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "id": this.id,
-      "media": this.media,
-      "crossOrigin": this.crossOrigin?.toValue(),
-      "integrity": this.integrity,
-      "referrerPolicy": this.referrerPolicy?.toValue(),
-      "disabled": this.disabled,
-      "alternate": this.alternate,
-      "title": this.title,
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

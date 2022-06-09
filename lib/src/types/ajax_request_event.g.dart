@@ -30,11 +30,12 @@ class AjaxRequestEvent {
     if (map == null) {
       return null;
     }
-    final instance = AjaxRequestEvent();
-    instance.type = AjaxRequestEventType.fromNativeValue(map['type']);
-    instance.lengthComputable = map['lengthComputable'];
-    instance.loaded = map['loaded'];
-    instance.total = map['total'];
+    final instance = AjaxRequestEvent(
+      type: AjaxRequestEventType.fromNativeValue(map['type']),
+      lengthComputable: map['lengthComputable'],
+      loaded: map['loaded'],
+      total: map['total'],
+    );
     return instance;
   }
 

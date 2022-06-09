@@ -1,15 +1,21 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../print_job/main.dart';
-import '../types/main.dart';
+import 'print_job_attributes.dart';
+import 'print_job_state.dart';
+
+part 'print_job_info.g.dart';
 
 ///Class representing the description of a [PrintJobController].
 ///Note that the print jobs state may change over time and this class represents a snapshot of this state.
-class PrintJobInfo {
+@ExchangeableObject()
+class PrintJobInfo_ {
   ///The state of the print job.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  PrintJobState? state;
+  PrintJobState_? state;
 
   ///How many copies to print.
   ///
@@ -50,9 +56,9 @@ class PrintJobInfo {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  PrintJobAttributes? attributes;
+  PrintJobAttributes_? attributes;
 
-  PrintJobInfo(
+  PrintJobInfo_(
       {this.state,
       this.copies,
       this.numberOfPages,
@@ -60,44 +66,4 @@ class PrintJobInfo {
       this.label,
       this.printerId,
       this.attributes});
-
-  ///Gets a possible [PrintJobInfo] instance from a [Map] value.
-  static PrintJobInfo? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    return PrintJobInfo(
-        state: PrintJobState.fromValue(map["state"]),
-        copies: map["copies"],
-        numberOfPages: map["numberOfPages"],
-        creationTime: map["creationTime"],
-        label: map["label"],
-        printerId: map["printerId"],
-        attributes: PrintJobAttributes.fromMap(
-            map["attributes"]?.cast<String, dynamic>()));
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "state": state?.toValue(),
-      "copies": copies,
-      "numberOfPages": numberOfPages,
-      "creationTime": creationTime,
-      "label": label,
-      "printerId": printerId,
-      "attributes": attributes?.toMap()
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

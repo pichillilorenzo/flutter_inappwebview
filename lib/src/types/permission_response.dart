@@ -1,65 +1,38 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 import 'permission_resource_type.dart';
 import 'permission_response_action.dart';
 
+part 'permission_response.g.dart';
+
 ///Class that represents the response used by the [WebView.onPermissionRequest] event.
-class PermissionResponse {
+@ExchangeableObject()
+class PermissionResponse_ {
   ///Resources granted to be accessed by origin.
   ///
   ///**NOTE for iOS**: not used. The [action] taken is based on the [PermissionRequest.resources].
-  List<PermissionResourceType> resources;
+  List<PermissionResourceType_> resources;
 
   ///Indicate the [PermissionResponseAction] to take in response of a permission request.
-  PermissionResponseAction? action;
+  PermissionResponseAction_? action;
 
-  PermissionResponse(
-      {this.resources = const [], this.action = PermissionResponseAction.DENY});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "resources": resources.map((e) => e.toNativeValue()).toList(),
-      "action": action?.toValue()
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  PermissionResponse_(
+      {this.resources = const [], this.action = PermissionResponseAction_.DENY});
 }
 
 ///Class that represents the response used by the [WebView.androidOnPermissionRequest] event.
 ///Use [PermissionResponse] instead.
 @Deprecated("Use PermissionResponse instead")
-class PermissionRequestResponse {
+@ExchangeableObject()
+class PermissionRequestResponse_ {
   ///Resources granted to be accessed by origin.
   List<String> resources;
 
   ///Indicate the [PermissionRequestResponseAction] to take in response of a permission request.
-  PermissionRequestResponseAction? action;
+  PermissionRequestResponseAction_? action;
 
-  PermissionRequestResponse(
+  PermissionRequestResponse_(
       {this.resources = const [],
-        this.action = PermissionRequestResponseAction.DENY});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"resources": resources, "action": action?.toValue()};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.action = PermissionRequestResponseAction_.DENY});
 }

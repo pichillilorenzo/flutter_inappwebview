@@ -1,22 +1,19 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'js_confirm_response.dart';
 
+part 'js_confirm_response_action.g.dart';
+
 ///Class used by [JsConfirmResponse] class.
-class JsConfirmResponseAction {
+@ExchangeableEnum()
+class JsConfirmResponseAction_ {
+  // ignore: unused_field
   final int _value;
-
-  const JsConfirmResponseAction._internal(this._value);
-
-  ///Gets [int] value.
-  int toValue() => _value;
+  const JsConfirmResponseAction_._internal(this._value);
 
   ///Confirm that the user hit confirm button.
-  static const CONFIRM = const JsConfirmResponseAction._internal(0);
+  static const CONFIRM = const JsConfirmResponseAction_._internal(0);
 
   ///Confirm that the user hit cancel button.
-  static const CANCEL = const JsConfirmResponseAction._internal(1);
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  static const CANCEL = const JsConfirmResponseAction_._internal(1);
 }

@@ -828,7 +828,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
-                if let obj = obj as? [String: Any?], let action = obj["action"] as? Int {
+                if let action = obj as? Int {
                     return WKNavigationActionPolicy.init(rawValue: action) ?? WKNavigationActionPolicy.cancel
                 }
                 return WKNavigationActionPolicy.cancel
@@ -987,7 +987,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
-                if let obj = obj as? [String: Any?], let action = obj["action"] as? Int {
+                if let action = obj as? Int {
                     return WKNavigationResponsePolicy.init(rawValue: action) ?? WKNavigationResponsePolicy.cancel
                 }
                 return WKNavigationResponsePolicy.cancel

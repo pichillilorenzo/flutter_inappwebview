@@ -130,34 +130,33 @@ class AttributedString {
     }
     final instance = AttributedString(
       string: map['string'],
+      backgroundColor: map['backgroundColor'] != null
+          ? UtilColor.fromStringRepresentation(map['backgroundColor'])
+          : null,
+      baselineOffset: map['baselineOffset'],
+      expansion: map['expansion'],
+      foregroundColor: map['foregroundColor'] != null
+          ? UtilColor.fromStringRepresentation(map['foregroundColor'])
+          : null,
+      kern: map['kern'],
+      ligature: map['ligature'],
+      obliqueness: map['obliqueness'],
+      strikethroughColor: map['strikethroughColor'] != null
+          ? UtilColor.fromStringRepresentation(map['strikethroughColor'])
+          : null,
+      strikethroughStyle:
+          UnderlineStyle.fromNativeValue(map['strikethroughStyle']),
+      strokeColor: map['strokeColor'] != null
+          ? UtilColor.fromStringRepresentation(map['strokeColor'])
+          : null,
+      strokeWidth: map['strokeWidth'],
+      textEffect:
+          AttributedStringTextEffectStyle.fromNativeValue(map['textEffect']),
+      underlineColor: map['underlineColor'] != null
+          ? UtilColor.fromStringRepresentation(map['underlineColor'])
+          : null,
+      underlineStyle: UnderlineStyle.fromNativeValue(map['underlineStyle']),
     );
-    instance.backgroundColor = map['backgroundColor'] != null
-        ? UtilColor.fromStringRepresentation(map['backgroundColor'])
-        : null;
-    instance.baselineOffset = map['baselineOffset'];
-    instance.expansion = map['expansion'];
-    instance.foregroundColor = map['foregroundColor'] != null
-        ? UtilColor.fromStringRepresentation(map['foregroundColor'])
-        : null;
-    instance.kern = map['kern'];
-    instance.ligature = map['ligature'];
-    instance.obliqueness = map['obliqueness'];
-    instance.strikethroughColor = map['strikethroughColor'] != null
-        ? UtilColor.fromStringRepresentation(map['strikethroughColor'])
-        : null;
-    instance.strikethroughStyle =
-        UnderlineStyle.fromNativeValue(map['strikethroughStyle']);
-    instance.strokeColor = map['strokeColor'] != null
-        ? UtilColor.fromStringRepresentation(map['strokeColor'])
-        : null;
-    instance.strokeWidth = map['strokeWidth'];
-    instance.textEffect =
-        AttributedStringTextEffectStyle.fromNativeValue(map['textEffect']);
-    instance.underlineColor = map['underlineColor'] != null
-        ? UtilColor.fromStringRepresentation(map['underlineColor'])
-        : null;
-    instance.underlineStyle =
-        UnderlineStyle.fromNativeValue(map['underlineStyle']);
     return instance;
   }
 
@@ -319,34 +318,34 @@ class IOSNSAttributedString {
     }
     final instance = IOSNSAttributedString(
       string: map['string'],
+      backgroundColor: map['backgroundColor'] != null
+          ? UtilColor.fromStringRepresentation(map['backgroundColor'])
+          : null,
+      baselineOffset: map['baselineOffset'],
+      expansion: map['expansion'],
+      foregroundColor: map['foregroundColor'] != null
+          ? UtilColor.fromStringRepresentation(map['foregroundColor'])
+          : null,
+      kern: map['kern'],
+      ligature: map['ligature'],
+      obliqueness: map['obliqueness'],
+      strikethroughColor: map['strikethroughColor'] != null
+          ? UtilColor.fromStringRepresentation(map['strikethroughColor'])
+          : null,
+      strikethroughStyle:
+          IOSNSUnderlineStyle.fromNativeValue(map['strikethroughStyle']),
+      strokeColor: map['strokeColor'] != null
+          ? UtilColor.fromStringRepresentation(map['strokeColor'])
+          : null,
+      strokeWidth: map['strokeWidth'],
+      textEffect: IOSNSAttributedStringTextEffectStyle.fromNativeValue(
+          map['textEffect']),
+      underlineColor: map['underlineColor'] != null
+          ? UtilColor.fromStringRepresentation(map['underlineColor'])
+          : null,
+      underlineStyle:
+          IOSNSUnderlineStyle.fromNativeValue(map['underlineStyle']),
     );
-    instance.backgroundColor = map['backgroundColor'] != null
-        ? UtilColor.fromStringRepresentation(map['backgroundColor'])
-        : null;
-    instance.baselineOffset = map['baselineOffset'];
-    instance.expansion = map['expansion'];
-    instance.foregroundColor = map['foregroundColor'] != null
-        ? UtilColor.fromStringRepresentation(map['foregroundColor'])
-        : null;
-    instance.kern = map['kern'];
-    instance.ligature = map['ligature'];
-    instance.obliqueness = map['obliqueness'];
-    instance.strikethroughColor = map['strikethroughColor'] != null
-        ? UtilColor.fromStringRepresentation(map['strikethroughColor'])
-        : null;
-    instance.strikethroughStyle =
-        IOSNSUnderlineStyle.fromNativeValue(map['strikethroughStyle']);
-    instance.strokeColor = map['strokeColor'] != null
-        ? UtilColor.fromStringRepresentation(map['strokeColor'])
-        : null;
-    instance.strokeWidth = map['strokeWidth'];
-    instance.textEffect =
-        IOSNSAttributedStringTextEffectStyle.fromNativeValue(map['textEffect']);
-    instance.underlineColor = map['underlineColor'] != null
-        ? UtilColor.fromStringRepresentation(map['underlineColor'])
-        : null;
-    instance.underlineStyle =
-        IOSNSUnderlineStyle.fromNativeValue(map['underlineStyle']);
     return instance;
   }
 

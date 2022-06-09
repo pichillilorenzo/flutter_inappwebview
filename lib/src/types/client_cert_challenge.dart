@@ -39,7 +39,7 @@ class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
   List<String>? keyTypes;
 
   ClientCertChallenge_(
-      {required URLProtectionSpace protectionSpace,
+      {required URLProtectionSpace_ protectionSpace,
         @Deprecated('Use principals instead') this.androidPrincipals,
         this.principals,
         @Deprecated('Use keyTypes instead') this.androidKeyTypes,

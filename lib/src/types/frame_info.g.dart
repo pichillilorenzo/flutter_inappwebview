@@ -15,7 +15,7 @@ class FrameInfo {
   URLRequest? request;
 
   ///The frame’s security origin.
-  dynamic securityOrigin;
+  SecurityOrigin? securityOrigin;
   FrameInfo({required this.isMainFrame, this.request, this.securityOrigin});
 
   ///Gets a possible [FrameInfo] instance from a [Map] value.
@@ -26,8 +26,9 @@ class FrameInfo {
     final instance = FrameInfo(
       isMainFrame: map['isMainFrame'],
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>()),
+      securityOrigin: SecurityOrigin.fromMap(
+          map['securityOrigin']?.cast<String, dynamic>()),
     );
-    instance.securityOrigin = map['securityOrigin'];
     return instance;
   }
 
@@ -36,7 +37,7 @@ class FrameInfo {
     return {
       "isMainFrame": isMainFrame,
       "request": request?.toMap(),
-      "securityOrigin": securityOrigin,
+      "securityOrigin": securityOrigin?.toMap(),
     };
   }
 
@@ -65,7 +66,7 @@ class IOSWKFrameInfo {
   URLRequest? request;
 
   ///The frame’s security origin.
-  dynamic securityOrigin;
+  IOSWKSecurityOrigin? securityOrigin;
   IOSWKFrameInfo(
       {required this.isMainFrame, this.request, this.securityOrigin});
 
@@ -77,8 +78,9 @@ class IOSWKFrameInfo {
     final instance = IOSWKFrameInfo(
       isMainFrame: map['isMainFrame'],
       request: URLRequest.fromMap(map['request']?.cast<String, dynamic>()),
+      securityOrigin: IOSWKSecurityOrigin.fromMap(
+          map['securityOrigin']?.cast<String, dynamic>()),
     );
-    instance.securityOrigin = map['securityOrigin'];
     return instance;
   }
 
@@ -87,7 +89,7 @@ class IOSWKFrameInfo {
     return {
       "isMainFrame": isMainFrame,
       "request": request?.toMap(),
-      "securityOrigin": securityOrigin,
+      "securityOrigin": securityOrigin?.toMap(),
     };
   }
 

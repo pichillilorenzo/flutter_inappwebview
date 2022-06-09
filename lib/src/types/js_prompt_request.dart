@@ -1,7 +1,12 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
+part 'js_prompt_request.g.dart';
+
 ///Class that represents the request of the [WebView.onJsPrompt] event.
-class JsPromptRequest {
+@ExchangeableObject()
+class JsPromptRequest_ {
   ///The url of the page requesting the dialog.
   Uri? url;
 
@@ -16,54 +21,13 @@ class JsPromptRequest {
   bool? iosIsMainFrame;
 
   ///Indicates whether the request was made for the main frame.
-  ///
-  ///**NOTE**: available only on iOS.
+  @SupportedPlatforms(platforms: [IOSPlatform()])
   bool? isMainFrame;
 
-  JsPromptRequest(
+  JsPromptRequest_(
       {this.url,
         this.message,
         this.defaultValue,
         @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-        this.isMainFrame}) {
-    // ignore: deprecated_member_use_from_same_package
-    this.isMainFrame = this.isMainFrame ?? this.iosIsMainFrame;
-  }
-
-  ///Gets a possible [JsPromptRequest] instance from a [Map] value.
-  static JsPromptRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return JsPromptRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
-        message: map["message"],
-        defaultValue: map["defaultValue"],
-        // ignore: deprecated_member_use_from_same_package
-        iosIsMainFrame: map["isMainFrame"],
-        isMainFrame: map["isMainFrame"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url?.toString(),
-      "message": message,
-      "defaultValue": defaultValue,
-      // ignore: deprecated_member_use_from_same_package
-      "iosIsMainFrame": isMainFrame ?? iosIsMainFrame,
-      // ignore: deprecated_member_use_from_same_package
-      "isMainFrame": isMainFrame ?? iosIsMainFrame
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.isMainFrame});
 }

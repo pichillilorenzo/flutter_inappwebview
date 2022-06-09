@@ -362,7 +362,7 @@ class InAppWebViewWebElement implements Disposable {
     Set<Sandbox> values = Set();
     if (sandbox != null) {
       for (int i = 0; i < sandbox.length; i++) {
-        var token = Sandbox.fromValue(sandbox.item(i));
+        var token = Sandbox.fromNativeValue(sandbox.item(i));
         if (token != null) {
           values.add(token);
         }

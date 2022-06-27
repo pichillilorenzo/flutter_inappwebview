@@ -331,7 +331,9 @@ public class InAppWebViewClient extends WebViewClient {
 
     URI uri;
     try {
-      uri = new URI(view.getUrl());
+      String url = view.getUrl();
+      if (url == null) return;
+      uri = new URI(url);
     } catch (URISyntaxException e) {
       e.printStackTrace();
 

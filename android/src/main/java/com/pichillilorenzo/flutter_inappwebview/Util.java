@@ -19,6 +19,7 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.FileInputStream;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -141,7 +142,13 @@ public class Util {
     PrivateKeyAndCertificates privateKeyAndCertificates = null;
 
     try {
-      InputStream certificateFileStream = getFileAsset(plugin, certificatePath);
+      InputStream certificateFileStream = null;
+      if(certificatePath.startsWith("/") == true) {
+        certificateFileStream = new FileInputStream(certificatePath);
+      }
+      else {
+        certificateFileStream = getFileAsset(plugin, certificatePath);
+      }
 
       KeyStore keyStore = KeyStore.getInstance(keyStoreType);
       keyStore.load(certificateFileStream, certificatePassword != null ? certificatePassword.toCharArray() : null);

@@ -1,23 +1,22 @@
 import 'dart:collection';
-import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:typed_data';
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
-import 'x509_certificate/x509_certificate.dart';
-import 'x509_certificate/asn1_distinguished_names.dart';
-
-import 'in_app_webview/webview.dart';
-import 'in_app_webview/in_app_webview_controller.dart';
-import 'http_auth_credentials_database.dart';
 import 'cookie_manager.dart';
-import 'web_storage/web_storage.dart';
+import 'http_auth_credentials_database.dart';
+import 'in_app_webview/in_app_webview_controller.dart';
+import 'in_app_webview/webview.dart';
 import 'pull_to_refresh/pull_to_refresh_controller.dart';
 import 'pull_to_refresh/pull_to_refresh_options.dart';
 import 'util.dart';
-import 'web_message/web_message_listener.dart';
 import 'web_message/web_message_channel.dart';
+import 'web_message/web_message_listener.dart';
+import 'web_storage/web_storage.dart';
+import 'x509_certificate/asn1_distinguished_names.dart';
+import 'x509_certificate/x509_certificate.dart';
 
 ///This type represents a callback, added with [InAppWebViewController.addJavaScriptHandler], that listens to post messages sent from JavaScript.
 ///
@@ -200,7 +199,9 @@ class InAppWebViewInitialData {
 ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebResourceRequest
 class WebResourceRequest {
   ///The URL for which the resource request was made.
-  Uri url;
+  Uri? url;
+
+  String? stringUrl;
 
   ///The headers associated with the request.
   ///
@@ -231,7 +232,8 @@ class WebResourceRequest {
   bool? isRedirect;
 
   WebResourceRequest(
-      {required this.url,
+      {this.url,
+      this.stringUrl,
       this.headers,
       required this.method,
       required this.hasGesture,
@@ -243,8 +245,17 @@ class WebResourceRequest {
       return null;
     }
 
+    Uri? uri;
+    String? stringUrl;
+    if (map["url"].toString().startsWith('intent')) {
+      stringUrl = map["url"];
+    } else {
+      uri = Uri.parse(map["url"]);
+    }
+
     return WebResourceRequest(
-        url: Uri.parse(map["url"]),
+        url: uri,
+        stringUrl: stringUrl,
         headers: map["headers"]?.cast<String, String>(),
         method: map["method"],
         hasGesture: map["hasGesture"],
@@ -254,7 +265,8 @@ class WebResourceRequest {
 
   Map<String, dynamic> toMap() {
     return {
-      "url": url.toString(),
+      "url": url?.toString(),
+      "stringUrl": stringUrl?.toString(),
       "headers": headers,
       "method": method,
       "hasGesture": hasGesture,
@@ -6331,6 +6343,9 @@ class URLRequest {
   ///The URL of the request. Setting this to `null` will load `about:blank`.
   Uri? url;
 
+  ///This URL is returned for intent strings, certain formats are not supported by [Uri.parse]
+  String? intentData;
+
   ///The HTTP request method.
   ///
   ///**NOTE for Android**: it supports only "GET" and "POST" methods.
@@ -6390,6 +6405,7 @@ class URLRequest {
 
   URLRequest(
       {required this.url,
+      this.intentData,
       this.method,
       this.headers,
       this.body,
@@ -6409,6 +6425,7 @@ class URLRequest {
     }
     return URLRequest(
       url: map["url"] != null ? Uri.parse(map["url"]) : null,
+      intentData: map["intentData"],
       headers: map["headers"]?.cast<String, String>(),
       method: map["method"],
       body: map["body"],
@@ -6431,6 +6448,7 @@ class URLRequest {
   Map<String, dynamic> toMap() {
     return {
       "url": url?.toString(),
+      "intentData": intentData,
       "headers": headers,
       "method": method,
       "body": body,

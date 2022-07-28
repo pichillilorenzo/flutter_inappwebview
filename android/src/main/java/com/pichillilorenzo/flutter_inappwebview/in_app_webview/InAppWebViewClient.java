@@ -1,7 +1,9 @@
 package com.pichillilorenzo.flutter_inappwebview.in_app_webview;
 
 import android.annotation.TargetApi;
+import android.content.Intent;
 import android.graphics.Bitmap;
+import android.net.Uri;
 import android.net.http.SslError;
 import android.os.Build;
 import android.os.Message;
@@ -69,6 +71,17 @@ public class InAppWebViewClient extends WebViewClient {
   public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
     InAppWebView webView = (InAppWebView) view;
     if (webView.options.useShouldOverrideUrlLoading) {
+      String intentData = null;
+      try {
+        if (request.getUrl().toString().startsWith("intent")) {
+          final String intentUrl = Uri.decode(request.getUrl().toString());
+          // Attempt parsing to validate intent scheme
+          Intent.parseUri(intentUrl, Intent.URI_INTENT_SCHEME);
+          intentData = request.getUrl().toString();
+        }
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
       boolean isRedirect = false;
       if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         isRedirect = request.isRedirect();
@@ -76,6 +89,7 @@ public class InAppWebViewClient extends WebViewClient {
       onShouldOverrideUrlLoading(
               webView,
               request.getUrl().toString(),
+              intentData,
               request.getMethod(),
               request.getRequestHeaders(),
               request.isForMainFrame(),
@@ -101,7 +115,7 @@ public class InAppWebViewClient extends WebViewClient {
   public boolean shouldOverrideUrlLoading(WebView webView, String url) {
     InAppWebView inAppWebView = (InAppWebView) webView;
     if (inAppWebView.options.useShouldOverrideUrlLoading) {
-      onShouldOverrideUrlLoading(inAppWebView, url, "GET", null,true, false, false);
+      onShouldOverrideUrlLoading(inAppWebView, url, null,"GET", null,true, false, false);
       return true;
     }
     return false;
@@ -117,9 +131,9 @@ public class InAppWebViewClient extends WebViewClient {
         webView.loadUrl(url);
     }
   }
-  public void onShouldOverrideUrlLoading(final InAppWebView webView, final String url, final String method, final Map<String, String> headers,
+  public void onShouldOverrideUrlLoading(final InAppWebView webView, final String url, final String intentData, final String method, final Map<String, String> headers,
                                          final boolean isForMainFrame, boolean hasGesture, boolean isRedirect) {
-    URLRequest request = new URLRequest(url, method, null, headers);
+    URLRequest request = new URLRequest(url, intentData, method, null, headers);
     NavigationAction navigationAction = new NavigationAction(
             request,
             isForMainFrame,
@@ -607,22 +621,41 @@ public class InAppWebViewClient extends WebViewClient {
       return onShouldInterceptResponse;
     }
 
-    URI uri;
+    URI uri = null;
     try {
       uri = new URI(url);
     } catch (URISyntaxException uriExpection) {
+      uriExpection.printStackTrace();
       String[] urlSplitted = url.split(":");
       String scheme = urlSplitted[0];
-      try {
-        URL tempUrl = new URL(url.replace(scheme, "https"));
-        uri = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
-      } catch (Exception e) {
-        e.printStackTrace();
-        return null;
+      if (scheme.equals("intent")) {
+        try {
+          final String intentUrl = Uri.decode(url);
+          Intent.parseUri(intentUrl, Intent.URI_INTENT_SCHEME);
+        } catch (URISyntaxException e) {
+          e.printStackTrace();
+        }
+      } else {
+        try {
+          URL tempUrl = new URL(url.replace(scheme, "https"));
+          uri = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
+        } catch (Exception e) {
+          e.printStackTrace();
+          return null;
+        }
       }
     }
 
-    String scheme = uri.getScheme();
+    String scheme;
+    if (url.startsWith("intent")) {
+      scheme = "intent";
+    } else {
+      if (uri != null) {
+        scheme = uri.getScheme();
+      } else {
+        return null;
+      }
+    }
 
     if (webView.options.resourceCustomSchemes != null && webView.options.resourceCustomSchemes.contains(scheme)) {
       final Map<String, Object> obj = new HashMap<>();

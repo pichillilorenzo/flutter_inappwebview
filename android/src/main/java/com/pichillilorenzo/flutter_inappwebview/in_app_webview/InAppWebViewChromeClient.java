@@ -611,7 +611,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       }
     }
 
-    URLRequest request = new URLRequest(url, "GET", null, null);
+    URLRequest request = new URLRequest(url, null, "GET", null, null);
     CreateWindowAction createWindowAction = new CreateWindowAction(
             request,
             true,

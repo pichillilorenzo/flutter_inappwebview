@@ -10,14 +10,17 @@ public class URLRequest {
   @Nullable
   private String url;
   @Nullable
+  private String intentData;
+  @Nullable
   private String method;
   @Nullable
   private byte[] body;
   @Nullable
   private Map<String, String> headers;
 
-  public URLRequest(@Nullable String url, @Nullable String method, @Nullable byte[] body, @Nullable Map<String, String> headers) {
+  public URLRequest(@Nullable String url, @Nullable String intentData, @Nullable String method, @Nullable byte[] body, @Nullable Map<String, String> headers) {
     this.url = url;
+    this.intentData = intentData;
     this.method = method;
     this.body = body;
     this.headers = headers;
@@ -32,15 +35,20 @@ public class URLRequest {
     if (url == null) {
       url = "about:blank";
     }
+    String intentData = (String) map.get("intentData");
     String method = (String) map.get("method");
     byte[] body = (byte[]) map.get("body");
     Map<String, String> headers = (Map<String, String>) map.get("headers");
-    return new URLRequest(url, method, body, headers);
+    return new URLRequest(url, intentData, method, body, headers);
   }
 
   public Map<String, Object> toMap() {
+    if (intentData != null) {
+      url = "about:blank";
+    }
     Map<String, Object> urlRequestMap = new HashMap<>();
     urlRequestMap.put("url", url);
+    urlRequestMap.put("intentData", intentData);
     urlRequestMap.put("method", method);
     urlRequestMap.put("body", body);
     return urlRequestMap;
@@ -53,6 +61,15 @@ public class URLRequest {
 
   public void setUrl(@Nullable String url) {
     this.url = url;
+  }
+
+  @Nullable
+  public String getIntentData() {
+    return intentData;
+  }
+
+  public void setIntentData(@Nullable String intentData) {
+    this.intentData = intentData;
   }
 
   @Nullable
@@ -90,6 +107,7 @@ public class URLRequest {
     URLRequest that = (URLRequest) o;
 
     if (url != null ? !url.equals(that.url) : that.url != null) return false;
+    if (intentData != null ? !intentData.equals(that.intentData) : that.intentData != null) return false;
     if (method != null ? !method.equals(that.method) : that.method != null) return false;
     if (!Arrays.equals(body, that.body)) return false;
     return headers != null ? headers.equals(that.headers) : that.headers == null;
@@ -98,6 +116,7 @@ public class URLRequest {
   @Override
   public int hashCode() {
     int result = url != null ? url.hashCode() : 0;
+    result = 31 * result + (intentData != null ? intentData.hashCode() : 0);
     result = 31 * result + (method != null ? method.hashCode() : 0);
     result = 31 * result + Arrays.hashCode(body);
     result = 31 * result + (headers != null ? headers.hashCode() : 0);
@@ -108,6 +127,7 @@ public class URLRequest {
   public String toString() {
     return "URLRequest{" +
             "url='" + url + '\'' +
+            ", intentData='" + intentData + '\'' +
             ", method='" + method + '\'' +
             ", body=" + Arrays.toString(body) +
             ", headers=" + headers +

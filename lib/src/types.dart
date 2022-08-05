@@ -2232,6 +2232,60 @@ class IOSWKSelectionGranularity {
   int get hashCode => _value.hashCode;
 }
 
+
+///An iOS-15+ specific class used to set possible permission decisions for device resource access in the web view.
+///Based on https://developer.apple.com/documentation/webkit/wkpermissiondecision
+class IOSWKPermissionDecision {
+  final int _value;
+
+  const IOSWKPermissionDecision._internal(this._value);
+
+  static final Set<IOSWKPermissionDecision> values = [
+    IOSWKPermissionDecision.DENY,
+    IOSWKPermissionDecision.GRANT,
+    IOSWKPermissionDecision.PROMPT,
+  ].toSet();
+
+  static IOSWKPermissionDecision? fromValue(int? value) {
+    if (value != null) {
+      try {
+        return IOSWKPermissionDecision.values
+            .firstWhere((element) => element.toValue() == value);
+      } catch (e) {
+        return null;
+      }
+    }
+    return null;
+  }
+
+  int toValue() => _value;
+
+  @override
+  String toString() {
+    switch (_value) {
+      case 1:
+        return "CHARACTER";
+      case 0:
+      default:
+        return "DYNAMIC";
+    }
+  }
+
+  ///Deny resource access
+  static const DENY = const IOSWKPermissionDecision._internal(0);
+
+  ///Grant resource access
+  static const GRANT = const IOSWKPermissionDecision._internal(1);
+
+  ///Prompt to grant resource access
+  static const PROMPT = const IOSWKPermissionDecision._internal(2);
+
+  bool operator ==(value) => value == _value;
+
+  @override
+  int get hashCode => _value.hashCode;
+}
+
 ///An iOS-specific class used to specify a `dataDetectoryTypes` value that adds interactivity to web content that matches the value.
 ///
 ///**NOTE**: available on iOS 10.0+.

@@ -55,6 +55,16 @@ class IOSInAppWebViewOptions
   ///The default value is [IOSWKSelectionGranularity.DYNAMIC]
   IOSWKSelectionGranularity selectionGranularity;
 
+  ///The permission decisions for device orientation and motion access in the web view.
+  ///The default value is [IOSWKPermissionDecision.PROMPT]
+  ///
+  ///The website still needs to request the permission in javascipt via
+  ///`DeviceMotionEvent.requestPermission()` - alternativly this can be done manually
+  ///in the [InAppWebView.onLoadStop] callback.
+  ///
+  ///**NOTE**: available on iOS 15.0+.
+  IOSWKPermissionDecision deviceOrientationAndMotionPermission;
+
   ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
   ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [IOSWKDataDetectorTypes.LINK].
   ///The default value is [IOSWKDataDetectorTypes.NONE].
@@ -239,6 +249,7 @@ class IOSInAppWebViewOptions
       this.allowsPictureInPictureMediaPlayback = true,
       this.isFraudulentWebsiteWarningEnabled = true,
       this.selectionGranularity = IOSWKSelectionGranularity.DYNAMIC,
+      this.deviceOrientationAndMotionPermission = IOSWKPermissionDecision.PROMPT,
       this.dataDetectorTypes = const [IOSWKDataDetectorTypes.NONE],
       this.sharedCookiesEnabled = false,
       this.automaticallyAdjustsScrollIndicatorInsets = false,
@@ -286,6 +297,7 @@ class IOSInAppWebViewOptions
           allowsPictureInPictureMediaPlayback,
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
       "selectionGranularity": selectionGranularity.toValue(),
+      "deviceOrientationAndMotionPermission": deviceOrientationAndMotionPermission.toValue(),
       "dataDetectorTypes": dataDetectorTypesList,
       "sharedCookiesEnabled": sharedCookiesEnabled,
       "automaticallyAdjustsScrollIndicatorInsets":
@@ -342,6 +354,8 @@ class IOSInAppWebViewOptions
         map["isFraudulentWebsiteWarningEnabled"];
     options.selectionGranularity =
         IOSWKSelectionGranularity.fromValue(map["selectionGranularity"])!;
+    options.deviceOrientationAndMotionPermission =
+        IOSWKPermissionDecision.fromValue(map["deviceOrientationAndMotionPermission"])!;
     options.dataDetectorTypes = dataDetectorTypes;
     options.sharedCookiesEnabled = map["sharedCookiesEnabled"];
     options.automaticallyAdjustsScrollIndicatorInsets =

@@ -2218,7 +2218,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         didReceiveServerRedirectForProvisionalNavigation navigation: WKNavigation!) {
         onDidReceiveServerRedirectForProvisionalNavigation()
     }
-    
+
+    @available(iOS 15.0, *)
+    public func webView(_ webView: WKWebView,
+                        requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
+                        initiatedByFrame frame: WKFrameInfo,
+                        decisionHandler: @escaping (WKPermissionDecision) -> Void) {
+         decisionHandler(WKPermissionDecision.init(rawValue: self.options!.deviceOrientationAndMotionPermission)!)
+     }
+
 //    @available(iOS 13.0, *)
 //    public func webView(_ webView: WKWebView,
 //                        contextMenuConfigurationForElement elementInfo: WKContextMenuElementInfo,

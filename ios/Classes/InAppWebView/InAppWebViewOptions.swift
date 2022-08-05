@@ -48,6 +48,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
     var allowsPictureInPictureMediaPlayback = true
     var isFraudulentWebsiteWarningEnabled = true;
     var selectionGranularity = 0;
+    var deviceOrientationAndMotionPermission = 2;
     var dataDetectorTypes: [String] = ["NONE"] // WKDataDetectorTypeNone
     var preferredContentMode = 0
     var sharedCookiesEnabled = false
@@ -112,6 +113,7 @@ public class InAppWebViewOptions: Options<InAppWebView> {
                 realOptions["automaticallyAdjustsScrollIndicatorInsets"] = webView.scrollView.automaticallyAdjustsScrollIndicatorInsets
             }
             realOptions["selectionGranularity"] = configuration.selectionGranularity.rawValue
+            realOptions["deviceOrientationAndMotionPermission"] = webView.options!.deviceOrientationAndMotionPermission
             if #available(iOS 11.0, *) {
                 realOptions["accessibilityIgnoresInvertColors"] = webView.accessibilityIgnoresInvertColors
                 realOptions["contentInsetAdjustmentBehavior"] = webView.scrollView.contentInsetAdjustmentBehavior.rawValue

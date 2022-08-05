@@ -54,7 +54,7 @@ class InAppWebViewStatic: NSObject, FlutterPlugin {
             InAppWebViewStatic.webViewForUserAgent?.evaluateJavaScript("navigator.userAgent") { (value, error) in
 
                 if error != nil {
-                    print("Error occured to get userAgent")
+                    print("Error occurred to get userAgent")
                     self.webViewForUserAgent = nil
                     completionHandler(nil)
                     return

@@ -797,7 +797,30 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     String[] acceptTypes = fileChooserParams.getAcceptTypes();
     boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
     Intent intent = fileChooserParams.createIntent();
+
+    String url = webView.getUrl();
+    Uri uri = Uri.parse(url);
+    String path = uri.getPath();
+
+    if (acceptsImages(acceptTypes) && fileChooserParams.isCaptureEnabled()){
+      return startDirectCameraIntent(filePathCallback);
+    }
     return startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
+  public boolean startDirectCameraIntent(final ValueCallback<Uri[]> callback) {
+    InAppWebViewFlutterPlugin.filePathCallback = callback;
+    if (!needsCameraPermission()) {
+      Intent photoSelectionIntent =  getPhotoIntent();
+      Activity activity = inAppBrowserDelegate != null ? inAppBrowserDelegate.getActivity() : plugin.activity;
+      if (photoSelectionIntent.resolveActivity(activity.getPackageManager()) != null) {
+        activity.startActivityForResult(photoSelectionIntent, PICKER);
+      } else {
+        Log.d(LOG_TAG, "there is no Activity to handle this Intent");
+      }
+    }
+    return true;
   }
 
   @Override

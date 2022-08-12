@@ -4,25 +4,25 @@ version '1.0-SNAPSHOT'
 buildscript {
     repositories {
         google()
-        mavenCentral()
+        jcenter()
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:4.1.0'
+        classpath 'com.android.tools.build:gradle:3.6.3'
     }
 }
 
 rootProject.allprojects {
     repositories {
         google()
-        mavenCentral()
+        jcenter()
     }
 }
 
 apply plugin: 'com.android.library'
 
 android {
-    compileSdkVersion 31
+    compileSdkVersion 30
 
     defaultConfig {
         minSdkVersion 17
@@ -45,10 +45,9 @@ android {
         }
     }
     dependencies {
-        implementation 'androidx.webkit:webkit:1.4.0'
-        implementation 'androidx.browser:browser:1.4.0'
-        implementation 'androidx.appcompat:appcompat:1.4.1'
-        implementation 'com.squareup.okhttp3:okhttp:3.14.9'
-        implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.1.0'
+        implementation 'androidx.webkit:webkit:1.2.0'
+        implementation 'androidx.browser:browser:1.2.0'
+        implementation 'androidx.appcompat:appcompat:1.0.0'
+        implementation 'com.squareup.okhttp3:mockwebserver:3.11.0'
     }
 }

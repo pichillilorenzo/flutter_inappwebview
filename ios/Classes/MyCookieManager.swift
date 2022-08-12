@@ -64,9 +64,6 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 let url = arguments!["url"] as! String
                 MyCookieManager.getCookies(url: url, result: result)
                 break
-            case "getAllCookies":
-                MyCookieManager.getAllCookies(result: result)
-                break
             case "deleteCookie":
                 let url = arguments!["url"] as! String
                 let name = arguments!["name"] as! String
@@ -100,11 +97,6 @@ class MyCookieManager: NSObject, FlutterPlugin {
                           isHttpOnly: Bool?,
                           sameSite: String?,
                           result: @escaping FlutterResult) {
-        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
-            result(false)
-            return
-        }
-        
         var properties: [HTTPCookiePropertyKey: Any] = [:]
         properties[.originURL] = url
         properties[.name] = name
@@ -143,105 +135,48 @@ class MyCookieManager: NSObject, FlutterPlugin {
         
         let cookie = HTTPCookie(properties: properties)!
         
-        httpCookieStore.setCookie(cookie, completionHandler: {() in
+        MyCookieManager.httpCookieStore!.setCookie(cookie, completionHandler: {() in
             result(true)
         })
     }
     
     public static func getCookies(url: String, result: @escaping FlutterResult) {
         var cookieList: [[String: Any?]] = []
-        
-        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
-            result(cookieList)
-            return
-        }
-        
-        if let urlHost = URL(string: url)?.host {
-            httpCookieStore.getAllCookies { (cookies) in
-                for cookie in cookies {
-                    if urlHost.hasSuffix(cookie.domain) || ".\(urlHost)".hasSuffix(cookie.domain) {
-                        var sameSite: String? = nil
-                        if #available(iOS 13.0, *) {
-                            if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
-                                sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
-                            }
-                        }
-                        
-                        var expiresDateTimestamp: Int64 = -1
-                        if let expiresDate = cookie.expiresDate?.timeIntervalSince1970 {
-                            // convert to milliseconds
-                            expiresDateTimestamp = Int64(expiresDate * 1000)
-                        }
-                        
-                        cookieList.append([
-                            "name": cookie.name,
-                            "value": cookie.value,
-                            "expiresDate": expiresDateTimestamp != -1 ? expiresDateTimestamp : nil,
-                            "isSessionOnly": cookie.isSessionOnly,
-                            "domain": cookie.domain,
-                            "sameSite": sameSite,
-                            "isSecure": cookie.isSecure,
-                            "isHttpOnly": cookie.isHTTPOnly,
-                            "path": cookie.path,
-                        ])
-                    }
-                }
-                result(cookieList)
-            }
-            return
-        } else {
-            print("Cannot get WebView cookies. No HOST found for URL: \(url)")
-        }
-        
-        result(cookieList)
-    }
-    
-    public static func getAllCookies(result: @escaping FlutterResult) {
-        var cookieList: [[String: Any?]] = []
-        
-        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
-            result(cookieList)
-            return
-        }
-        
-        httpCookieStore.getAllCookies { (cookies) in
+        MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
             for cookie in cookies {
-                var sameSite: String? = nil
-                if #available(iOS 13.0, *) {
-                    if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
-                        sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
+                if cookie.domain.contains(URL(string: url)!.host!) {
+                    var sameSite: String? = nil
+                    if #available(iOS 13.0, *) {
+                        if let sameSiteValue = cookie.sameSitePolicy?.rawValue {
+                            sameSite = sameSiteValue.prefix(1).capitalized + sameSiteValue.dropFirst()
+                        }
                     }
+                    
+                    var expiresDateTimestamp: Int64 = -1
+                    if let expiresDate = cookie.expiresDate?.timeIntervalSince1970 {
+                        // convert to milliseconds
+                        expiresDateTimestamp = Int64(expiresDate * 1000)
+                    }
+                    
+                    cookieList.append([
+                        "name": cookie.name,
+                        "value": cookie.value,
+                        "expiresDate": expiresDateTimestamp != -1 ? expiresDateTimestamp : nil,
+                        "isSessionOnly": cookie.isSessionOnly,
+                        "domain": cookie.domain,
+                        "sameSite": sameSite,
+                        "isSecure": cookie.isSecure,
+                        "isHttpOnly": cookie.isHTTPOnly,
+                        "path": cookie.path,
+                    ])
                 }
-                
-                var expiresDateTimestamp: Int64 = -1
-                if let expiresDate = cookie.expiresDate?.timeIntervalSince1970 {
-                    // convert to milliseconds
-                    expiresDateTimestamp = Int64(expiresDate * 1000)
-                }
-                
-                cookieList.append([
-                    "name": cookie.name,
-                    "value": cookie.value,
-                    "expiresDate": expiresDateTimestamp != -1 ? expiresDateTimestamp : nil,
-                    "isSessionOnly": cookie.isSessionOnly,
-                    "domain": cookie.domain,
-                    "sameSite": sameSite,
-                    "isSecure": cookie.isSecure,
-                    "isHttpOnly": cookie.isHTTPOnly,
-                    "path": cookie.path,
-                ])
             }
             result(cookieList)
         }
     }
     
     public static func deleteCookie(url: String, name: String, domain: String, path: String, result: @escaping FlutterResult) {
-        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
-            result(false)
-            return
-        }
-    
-        httpCookieStore.getAllCookies { (cookies) in
+        MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
             for cookie in cookies {
                 var originURL = ""
                 if cookie.properties![.originURL] is String {
@@ -253,8 +188,8 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 if (!originURL.isEmpty && originURL != url) {
                     continue
                 }
-                if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.name == name && cookie.path == path {
-                    httpCookieStore.delete(cookie, completionHandler: {
+                if cookie.domain.contains(domain) && cookie.name == name && cookie.path == path {
+                    MyCookieManager.httpCookieStore!.delete(cookie, completionHandler: {
                         result(true)
                     })
                     return
@@ -265,12 +200,7 @@ class MyCookieManager: NSObject, FlutterPlugin {
     }
     
     public static func deleteCookies(url: String, domain: String, path: String, result: @escaping FlutterResult) {
-        guard let httpCookieStore = MyCookieManager.httpCookieStore else {
-            result(false)
-            return
-        }
-        
-        httpCookieStore.getAllCookies { (cookies) in
+        MyCookieManager.httpCookieStore!.getAllCookies { (cookies) in
             for cookie in cookies {
                 var originURL = ""
                 if cookie.properties![.originURL] is String {
@@ -282,8 +212,8 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 if (!originURL.isEmpty && originURL != url) {
                     continue
                 }
-                if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.path == path {
-                    httpCookieStore.delete(cookie, completionHandler: nil)
+                if cookie.domain.contains(domain) && cookie.path == path {
+                    MyCookieManager.httpCookieStore!.delete(cookie, completionHandler: nil)
                 }
             }
             result(true)
@@ -296,12 +226,5 @@ class MyCookieManager: NSObject, FlutterPlugin {
         WKWebsiteDataStore.default().removeData(ofTypes: websiteDataTypes as! Set<String>, modifiedSince: date as Date, completionHandler:{
             result(true)
         })
-    }
-    
-    public func dispose() {
-        MyCookieManager.channel?.setMethodCallHandler(nil)
-        MyCookieManager.channel = nil
-        MyCookieManager.registrar = nil
-        MyCookieManager.httpCookieStore = nil
     }
 }

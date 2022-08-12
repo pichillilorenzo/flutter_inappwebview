@@ -10,9 +10,8 @@ class HeadlessInAppWebViewExampleScreen extends StatefulWidget {
       new _HeadlessInAppWebViewExampleScreenState();
 }
 
-class _HeadlessInAppWebViewExampleScreenState
-    extends State<HeadlessInAppWebViewExampleScreen> {
-  HeadlessInAppWebView? headlessWebView;
+class _HeadlessInAppWebViewExampleScreenState extends State<HeadlessInAppWebViewExampleScreen> {
+  HeadlessInAppWebView headlessWebView;
   String url = "";
 
   @override
@@ -20,9 +19,11 @@ class _HeadlessInAppWebViewExampleScreenState
     super.initState();
 
     headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest: URLRequest(url: Uri.parse("https://flutter.dev")),
+      initialUrl: "https://flutter.dev/",
       initialOptions: InAppWebViewGroupOptions(
-        crossPlatform: InAppWebViewOptions(),
+        crossPlatform: InAppWebViewOptions(
+          debuggingEnabled: true,
+        ),
       ),
       onWebViewCreated: (controller) {
         print('HeadlessInAppWebView created!');
@@ -33,19 +34,19 @@ class _HeadlessInAppWebViewExampleScreenState
       onLoadStart: (controller, url) async {
         print("onLoadStart $url");
         setState(() {
-          this.url = url.toString();
+          this.url = url;
         });
       },
       onLoadStop: (controller, url) async {
         print("onLoadStop $url");
         setState(() {
-          this.url = url.toString();
+          this.url = url;
         });
       },
-      onUpdateVisitedHistory: (controller, url, androidIsReload) {
+      onUpdateVisitedHistory: (InAppWebViewController controller, String url, bool androidIsReload) {
         print("onUpdateVisitedHistory $url");
         setState(() {
-          this.url = url.toString();
+          this.url = url;
         });
       },
     );
@@ -54,7 +55,7 @@ class _HeadlessInAppWebViewExampleScreenState
   @override
   void dispose() {
     super.dispose();
-    headlessWebView?.dispose();
+    headlessWebView.dispose();
   }
 
   @override
@@ -66,40 +67,40 @@ class _HeadlessInAppWebViewExampleScreenState
         )),
         drawer: myDrawer(context: context),
         body: SafeArea(
-            child: Column(children: <Widget>[
-          Container(
+          child: Column(children: <Widget>[
+            Container(
             padding: EdgeInsets.all(20.0),
             child: Text(
                 "CURRENT URL\n${(url.length > 50) ? url.substring(0, 50) + "..." : url}"),
           ),
           Center(
-            child: ElevatedButton(
-                onPressed: () async {
-                  await headlessWebView?.dispose();
-                  await headlessWebView?.run();
-                },
-                child: Text("Run HeadlessInAppWebView")),
+            child: RaisedButton(
+              onPressed: () async {
+                await headlessWebView.dispose();
+                await headlessWebView.run();
+              },
+              child: Text("Run HeadlessInAppWebView")),
           ),
           Center(
-            child: ElevatedButton(
-                onPressed: () async {
-                  try {
-                    await headlessWebView?.webViewController.evaluateJavascript(
-                        source: """console.log('Here is the message!');""");
-                  } on MissingPluginException {
-                    print(
-                        "HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
-                  }
-                },
-                child: Text("Send console.log message")),
+            child: RaisedButton(
+              onPressed: () async {
+                try {
+                  await headlessWebView.webViewController.evaluateJavascript(source: """console.log('Here is the message!');""");
+                } on MissingPluginException catch(e) {
+                  print("HeadlessInAppWebView is not running. Click on \"Run HeadlessInAppWebView\"!");
+                }
+              },
+              child: Text("Send console.log message")),
           ),
           Center(
-            child: ElevatedButton(
-                onPressed: () {
-                  headlessWebView?.dispose();
-                },
-                child: Text("Dispose HeadlessInAppWebView")),
+            child: RaisedButton(
+              onPressed: () {
+                headlessWebView.dispose();
+              },
+              child: Text("Dispose HeadlessInAppWebView")),
           )
-        ])));
+        ])
+      )
+    );
   }
 }

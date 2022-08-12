@@ -30,7 +30,7 @@ android {
         targetCompatibility 1.8
     }
 
-    compileSdkVersion 31
+    compileSdkVersion 30
 
     lintOptions {
         disable 'InvalidPackage'
@@ -40,11 +40,10 @@ android {
         // TODO: Specify your own unique Application ID (https://developer.android.com/studio/build/application-id.html).
         applicationId "com.pichillilorenzo.flutter_inappwebviewexample"
         minSdkVersion 17
-        targetSdkVersion 31
+        targetSdkVersion 30
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        multiDexEnabled true
     }
 
     buildTypes {
@@ -61,9 +60,7 @@ flutter {
 }
 
 dependencies {
-    testImplementation 'junit:junit:4.13'
-    androidTestImplementation 'androidx.test:runner:1.2.0'
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.2.0'
-    implementation 'com.google.android.material:material:1.3.0'
-    implementation 'com.android.support:multidex:1.0.3'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'androidx.test:runner:1.1.1'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.1.1'
 }

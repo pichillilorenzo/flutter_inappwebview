@@ -623,7 +623,11 @@ public class InAppWebViewClient extends WebViewClient {
 
     URI uri = null;
     try {
-      uri = new URI(url);
+      final String encodeUrl =  url.replace("{", "%7B").replace("}", "%7D");
+      if(encodeUrl.startsWith("intent://%7B")) {
+        uri = new URI(encodeUrl.replace("intent://%7B", "intent:///%7B"));
+      }
+      uri = new URI(encodeUrl);
     } catch (URISyntaxException uriExpection) {
       uriExpection.printStackTrace();
       String[] urlSplitted = url.split(":");
@@ -637,7 +641,7 @@ public class InAppWebViewClient extends WebViewClient {
         }
       } else {
         try {
-          URL tempUrl = new URL(url.replace(scheme, "https"));
+          URL tempUrl = new URL(url.replace(scheme, "https").replace("{", "%7B").replace("}", "%7D"));
           uri = new URI(scheme, tempUrl.getUserInfo(), tempUrl.getHost(), tempUrl.getPort(), tempUrl.getPath(), tempUrl.getQuery(), tempUrl.getRef());
         } catch (Exception e) {
           e.printStackTrace();

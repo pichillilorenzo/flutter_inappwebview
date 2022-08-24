@@ -11,7 +11,7 @@ import WebKit
 public class UserScript : WKUserScript {
     var groupName: String?
 
-    var contentWorldWrapper: Any?
+    private var contentWorldWrapper: Any?
     @available(iOS 14.0, *)
     var contentWorld: WKContentWorld {
       get {

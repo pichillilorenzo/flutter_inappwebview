@@ -140,7 +140,10 @@ public class MyCookieManager implements MethodChannel.MethodCallHandler {
     cookieManager = getCookieManager();
     if (cookieManager == null) return;
 
-    String cookieValue = name + "=" + value + "; Domain=" + domain + "; Path=" + path;
+    String cookieValue = name + "=" + value + "; Path=" + path;
+
+    if (domain != null)
+      cookieValue += "; Domain=" + domain;
 
     if (expiresDate != null)
       cookieValue += "; Expires=" + getCookieExpirationDate(expiresDate);

@@ -63,12 +63,9 @@ class CookieManager {
       bool? isHttpOnly,
       HTTPCookieSameSitePolicy? sameSite,
       InAppWebViewController? iosBelow11WebViewController}) async {
-    if (domain == null) domain = _getDomainName(url);
-
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
     assert(value.isNotEmpty);
-    assert(domain.isNotEmpty);
     assert(path.isNotEmpty);
 
     if (defaultTargetPlatform == TargetPlatform.iOS) {
@@ -109,15 +106,16 @@ class CookieManager {
       {required Uri url,
       required String name,
       required String value,
-      required String domain,
       String path = "/",
+      String? domain,
       int? expiresDate,
       int? maxAge,
       bool? isSecure,
       HTTPCookieSameSitePolicy? sameSite,
       InAppWebViewController? webViewController}) async {
-    var cookieValue =
-        name + "=" + value + "; Domain=" + domain + "; Path=" + path;
+    var cookieValue = name + "=" + value + "; Path=" + path;
+
+    if (domain != null) cookieValue += "; Domain=" + domain;
 
     if (expiresDate != null)
       cookieValue += "; Expires=" + await _getCookieExpirationDate(expiresDate);

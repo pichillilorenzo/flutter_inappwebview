@@ -2,10 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter_inappwebview/src/util.dart';
 
-import '../../types.dart';
-
 import '../../in_app_browser/in_app_browser_options.dart';
-
+import '../../types.dart';
 import '../in_app_webview_options.dart';
 import '../webview.dart';
 
@@ -55,10 +53,6 @@ class AndroidInAppWebViewOptions
   ///Enables or disables file access within WebView. Note that this enables or disables file system access only.
   ///Assets and resources are still accessible using `file:///android_asset` and `file:///android_res`. The default value is `true`.
   bool allowFileAccess;
-
-  ///Sets the path to the Application Caches files. In order for the Application Caches API to be enabled, this option must be set a path to which the application can write.
-  ///This option is used one time: repeated calls are ignored.
-  String? appCachePath;
 
   ///Sets whether the WebView should not load image resources from the network (resources accessed via http and https URI schemes). The default value is `false`.
   bool blockNetworkImage;
@@ -251,7 +245,6 @@ class AndroidInAppWebViewOptions
     this.mixedContentMode,
     this.allowContentAccess = true,
     this.allowFileAccess = true,
-    this.appCachePath,
     this.blockNetworkImage = false,
     this.blockNetworkLoads = false,
     this.cacheMode = AndroidCacheMode.LOAD_DEFAULT,
@@ -312,7 +305,6 @@ class AndroidInAppWebViewOptions
       "mixedContentMode": mixedContentMode?.toValue(),
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
-      "appCachePath": appCachePath,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
       "cacheMode": cacheMode?.toValue(),
@@ -373,7 +365,6 @@ class AndroidInAppWebViewOptions
         AndroidMixedContentMode.fromValue(map["mixedContentMode"]);
     options.allowContentAccess = map["allowContentAccess"];
     options.allowFileAccess = map["allowFileAccess"];
-    options.appCachePath = map["appCachePath"];
     options.blockNetworkImage = map["blockNetworkImage"];
     options.blockNetworkLoads = map["blockNetworkLoads"];
     options.cacheMode = AndroidCacheMode.fromValue(map["cacheMode"]);

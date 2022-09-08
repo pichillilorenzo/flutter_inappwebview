@@ -40,7 +40,6 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
   public Boolean useShouldInterceptAjaxRequest = false;
   public Boolean useShouldInterceptFetchRequest = false;
   public Boolean incognito = false;
-  public Boolean cacheEnabled = true;
   public Boolean transparentBackground = false;
   public Boolean disableVerticalScroll = false;
   public Boolean disableHorizontalScroll = false;
@@ -60,7 +59,6 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
   public Integer mixedContentMode;
   public Boolean allowContentAccess = true;
   public Boolean allowFileAccess = true;
-  public String appCachePath;
   public Boolean blockNetworkImage = false;
   public Boolean blockNetworkLoads = false;
   public Integer cacheMode = WebSettings.LOAD_DEFAULT;
@@ -173,9 +171,6 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
         case "incognito":
           incognito = (Boolean) value;
           break;
-        case "cacheEnabled":
-          cacheEnabled = (Boolean) value;
-          break;
         case "transparentBackground":
           transparentBackground = (Boolean) value;
           break;
@@ -229,9 +224,6 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
           break;
         case "allowUniversalAccessFromFileURLs":
           allowUniversalAccessFromFileURLs = (Boolean) value;
-          break;
-        case "appCachePath":
-          appCachePath = (String) value;
           break;
         case "blockNetworkImage":
           blockNetworkImage = (Boolean) value;
@@ -389,7 +381,6 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
     options.put("useShouldInterceptAjaxRequest", useShouldInterceptAjaxRequest);
     options.put("useShouldInterceptFetchRequest", useShouldInterceptFetchRequest);
     options.put("incognito", incognito);
-    options.put("cacheEnabled", cacheEnabled);
     options.put("transparentBackground", transparentBackground);
     options.put("disableVerticalScroll", disableVerticalScroll);
     options.put("disableHorizontalScroll", disableHorizontalScroll);
@@ -408,7 +399,6 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
     options.put("allowFileAccess", allowFileAccess);
     options.put("allowFileAccessFromFileURLs", allowFileAccessFromFileURLs);
     options.put("allowUniversalAccessFromFileURLs", allowUniversalAccessFromFileURLs);
-    options.put("appCachePath", appCachePath);
     options.put("blockNetworkImage", blockNetworkImage);
     options.put("blockNetworkLoads", blockNetworkLoads);
     options.put("cacheMode", cacheMode);

@@ -11,7 +11,14 @@ import WebKit
 public class UserScript : WKUserScript {
     var groupName: String?
     @available(iOS 14.0, *)
-    lazy var contentWorld: WKContentWorld = WKContentWorld.page
+    var contentWorld: WKContentWorld {
+        get {
+            return (_contentWorld as? WKContentWorld) ?? WKContentWorld.page
+        }
+        set {
+            _contentWorld = newValue
+        }
+    }
     
     public override init(source: String, injectionTime: WKUserScriptInjectionTime, forMainFrameOnly: Bool) {
         super.init(source: source, injectionTime: injectionTime, forMainFrameOnly: forMainFrameOnly)

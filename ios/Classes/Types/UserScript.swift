@@ -10,14 +10,14 @@ import WebKit
 
 public class UserScript : WKUserScript {
     var groupName: String?
-    private var _contentWorld: Any? = nil
+    private var contentWorld: Any? = nil
     @available(iOS 14.0, *)
     var contentWorld: WKContentWorld {
         get {
-            return (_contentWorld as? WKContentWorld) ?? WKContentWorld.page
+            return (contentWorld as? WKContentWorld) ?? WKContentWorld.page
         }
         set {
-            _contentWorld = newValue
+            contentWorld = newValue
         }
     }
     

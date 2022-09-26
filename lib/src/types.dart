@@ -4595,7 +4595,7 @@ class RendererPriorityPolicy {
         ? RendererPriorityPolicy(
             rendererRequestedPriority:
                 RendererPriority.fromValue(map["rendererRequestedPriority"]),
-            waivedWhenNotVisible: map["waivedWhenNotVisible"])
+            waivedWhenNotVisible: map["waivedWhenNotVisible"] ?? false)
         : null;
   }
 }

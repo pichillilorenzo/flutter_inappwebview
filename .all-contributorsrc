@@ -450,6 +450,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "cinos1",
+      "name": "cinos",
+      "avatar_url": "https://avatars.githubusercontent.com/u/19343437?v=4",
+      "profile": "https://github.com/cinos1",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

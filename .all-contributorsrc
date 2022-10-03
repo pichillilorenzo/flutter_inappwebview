@@ -423,6 +423,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "klydra",
+      "name": "Jan Klinge",
+      "avatar_url": "https://avatars.githubusercontent.com/u/40038209?v=4",
+      "profile": "https://github.com/klydra",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

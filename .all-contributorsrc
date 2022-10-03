@@ -72,6 +72,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "CodeEagle",
+      "name": "CodeEagle",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2311352?v=4",
+      "profile": "https://codeeagle.github.io/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

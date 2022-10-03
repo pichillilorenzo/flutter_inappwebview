@@ -288,6 +288,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "arneke",
+      "name": "Arne Kepp",
+      "avatar_url": "https://avatars.githubusercontent.com/u/425235?v=4",
+      "profile": "https://github.com/arneke",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

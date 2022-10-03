@@ -1,6 +1,6 @@
 # Flutter InAppWebView Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-31-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-32-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappwebview.svg)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -113,6 +113,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://github.com/tranductam2802"><img src="https://avatars.githubusercontent.com/u/4957579?v=4?s=100" width="100px;" alt="Trần Đức Tâm"/><br /><sub><b>Trần Đức Tâm</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=tranductam2802" title="Code">💻</a></td>
       <td align="center"><a href="http://pcqpcq.me/"><img src="https://avatars.githubusercontent.com/u/1411571?v=4?s=100" width="100px;" alt="Joker"/><br /><sub><b>Joker</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=pcqpcq" title="Code">💻</a></td>
       <td align="center"><a href="https://www.linkedin.com/in/ycv005/"><img src="https://avatars.githubusercontent.com/u/26734819?v=4?s=100" width="100px;" alt="Yash Chandra Verma"/><br /><sub><b>Yash Chandra Verma</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ycv005" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/arneke"><img src="https://avatars.githubusercontent.com/u/425235?v=4?s=100" width="100px;" alt="Arne Kepp"/><br /><sub><b>Arne Kepp</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=arneke" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>

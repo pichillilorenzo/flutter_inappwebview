@@ -1,3 +1,8 @@
+## 5.4.3+8
+
+- Merged "Xcode 14 build error: Stored properties cannot be marked potentially unavailable with '@available'" [#1216](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1216) (thanks to [chreck](https://github.com/SethuSenthil))
+- Fixed example for iOS
+
 ## 5.4.3+7
 
 - Fixed possible Android java.lang.NullPointerException in "InAppBrowserActivity.onCreateOptionsMenu" about "webView.getTitle()"

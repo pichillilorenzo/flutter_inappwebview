@@ -171,6 +171,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "chownation",
+      "name": "Michael Chow",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1755207?v=4",
+      "profile": "https://dart.art/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

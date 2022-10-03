@@ -1,6 +1,6 @@
 # Flutter InAppWebView Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-23-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-24-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappwebview.svg)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -103,6 +103,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <tr>
       <td align="center"><a href="https://github.com/hoanglm4"><img src="https://avatars.githubusercontent.com/u/7067757?v=4?s=100" width="100px;" alt="Le Minh Hoang"/><br /><sub><b>Le Minh Hoang</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=hoanglm4" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/Miiha"><img src="https://avatars.githubusercontent.com/u/3897167?v=4?s=100" width="100px;" alt="Michael Kao"/><br /><sub><b>Michael Kao</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Miiha" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/cloudygeek"><img src="https://avatars.githubusercontent.com/u/6059542?v=4?s=100" width="100px;" alt="cloudygeek"/><br /><sub><b>cloudygeek</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=cloudygeek" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>

@@ -207,6 +207,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Miiha",
+      "name": "Michael Kao",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3897167?v=4",
+      "profile": "https://github.com/Miiha",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

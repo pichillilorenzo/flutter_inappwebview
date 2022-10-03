@@ -1,6 +1,6 @@
 # Flutter InAppWebView Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-43-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-44-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappwebview.svg)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -129,6 +129,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     </tr>
     <tr>
       <td align="center"><a href="https://bieker.ninja/"><img src="https://avatars.githubusercontent.com/u/818880?v=4?s=100" width="100px;" alt="Ben Bieker"/><br /><sub><b>Ben Bieker</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=wwwdata" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/phamnhuvu-dev"><img src="https://avatars.githubusercontent.com/u/22906656?v=4?s=100" width="100px;" alt="Phạm Như Vũ"/><br /><sub><b>Phạm Như Vũ</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=phamnhuvu-dev" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>

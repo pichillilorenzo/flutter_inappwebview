@@ -63,6 +63,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ryanhz",
+      "name": "Ryan",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1142612?v=4",
+      "profile": "https://github.com/ryanhz",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

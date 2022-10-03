@@ -243,6 +243,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "ItsCalebJones",
+      "name": "Caleb Jones",
+      "avatar_url": "https://avatars.githubusercontent.com/u/4519230?v=4",
+      "profile": "https://spacelaunchnow.me/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -387,6 +387,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "wwwdata",
+      "name": "Ben Bieker",
+      "avatar_url": "https://avatars.githubusercontent.com/u/818880?v=4",
+      "profile": "https://bieker.ninja/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

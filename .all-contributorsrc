@@ -333,6 +333,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "AAkira",
+      "name": "Akira Aratani",
+      "avatar_url": "https://avatars.githubusercontent.com/u/3386962?v=4",
+      "profile": "https://aakira.app/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

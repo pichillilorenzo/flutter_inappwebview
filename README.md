@@ -1,6 +1,6 @@
 # Flutter InAppWebView Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-40-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-41-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Pub](https://img.shields.io/pub/v/flutter_inappwebview.svg)](https://pub.dartlang.org/packages/flutter_inappwebview)
@@ -124,6 +124,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://github.com/Doflatango"><img src="https://avatars.githubusercontent.com/u/3091033?v=4?s=100" width="100px;" alt="Doflatango"/><br /><sub><b>Doflatango</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Doflatango" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/Eddayy"><img src="https://avatars.githubusercontent.com/u/17043852?v=4?s=100" width="100px;" alt="Edmund Tay"/><br /><sub><b>Edmund Tay</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Eddayy" title="Code">💻</a></td>
       <td align="center"><a href="http://andreidiaconu.com/"><img src="https://avatars.githubusercontent.com/u/1402046?v=4?s=100" width="100px;" alt="Andrei Diaconu"/><br /><sub><b>Andrei Diaconu</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=andreidiaconu" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/plateaukao"><img src="https://avatars.githubusercontent.com/u/4084738?v=4?s=100" width="100px;" alt="Daniel Kao"/><br /><sub><b>Daniel Kao</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=plateaukao" title="Code">💻</a></td>
     </tr>
   </tbody>
   <tfoot>

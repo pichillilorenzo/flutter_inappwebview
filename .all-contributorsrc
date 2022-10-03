@@ -270,6 +270,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "pcqpcq",
+      "name": "Joker",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1411571?v=4",
+      "profile": "http://pcqpcq.me/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

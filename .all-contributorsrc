@@ -477,6 +477,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "igtm",
+      "name": "Iguchi Tomokatsu",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6331737?v=4",
+      "profile": "https://github.com/igtm",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

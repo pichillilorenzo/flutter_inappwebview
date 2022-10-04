@@ -288,8 +288,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     settings.setAllowFileAccessFromFileURLs(customSettings.allowFileAccessFromFileURLs);
     settings.setAllowUniversalAccessFromFileURLs(customSettings.allowUniversalAccessFromFileURLs);
     setCacheEnabled(customSettings.cacheEnabled);
-    if (customSettings.appCachePath != null && !customSettings.appCachePath.isEmpty() && customSettings.cacheEnabled)
-      settings.setAppCachePath(customSettings.appCachePath);
+    if (customSettings.appCachePath != null && !customSettings.appCachePath.isEmpty() && customSettings.cacheEnabled) {
+      // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+      // settings.setAppCachePath(customSettings.appCachePath);
+      Util.invokeMethodIfExists(settings, "setAppCachePath", customSettings.appCachePath);
+    }
     settings.setBlockNetworkImage(customSettings.blockNetworkImage);
     settings.setBlockNetworkLoads(customSettings.blockNetworkLoads);
     if (customSettings.cacheMode != null)
@@ -512,7 +515,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
       // Disable caching
       settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-      settings.setAppCacheEnabled(false);
+
+      // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+      // settings.setAppCacheEnabled(false);
+      Util.invokeMethodIfExists(settings, "setAppCacheEnabled", false);
+
       clearHistory();
       clearCache(true);
 
@@ -522,7 +529,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       settings.setSaveFormData(false);
     } else {
       settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-      settings.setAppCacheEnabled(true);
+
+      // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+      // settings.setAppCacheEnabled(true);
+      Util.invokeMethodIfExists(settings, "setAppCacheEnabled", true);
+
       settings.setSavePassword(true);
       settings.setSaveFormData(true);
     }
@@ -533,13 +544,22 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (enabled) {
       Context ctx = getContext();
       if (ctx != null) {
-        settings.setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+        // settings.setAppCachePath(ctx.getCacheDir().getAbsolutePath());
+        Util.invokeMethodIfExists(settings, "setAppCachePath", ctx.getCacheDir().getAbsolutePath());
+
         settings.setCacheMode(WebSettings.LOAD_DEFAULT);
-        settings.setAppCacheEnabled(true);
+
+        // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+        // settings.setAppCacheEnabled(true);
+        Util.invokeMethodIfExists(settings, "setAppCacheEnabled", true);
       }
     } else {
       settings.setCacheMode(WebSettings.LOAD_NO_CACHE);
-      settings.setAppCacheEnabled(false);
+
+      // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+      // settings.setAppCacheEnabled(false);
+      Util.invokeMethodIfExists(settings, "setAppCacheEnabled", false);
     }
   }
 
@@ -788,8 +808,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newSettingsMap.get("cacheEnabled") != null && customSettings.cacheEnabled != newCustomSettings.cacheEnabled)
       setCacheEnabled(newCustomSettings.cacheEnabled);
 
-    if (newSettingsMap.get("appCachePath") != null && (customSettings.appCachePath == null || !customSettings.appCachePath.equals(newCustomSettings.appCachePath)))
-      settings.setAppCachePath(newCustomSettings.appCachePath);
+    if (newSettingsMap.get("appCachePath") != null && (customSettings.appCachePath == null || !customSettings.appCachePath.equals(newCustomSettings.appCachePath))) {
+      // removed from Android API 33+ (https://developer.android.com/sdk/api_diff/33/changes)
+      // settings.setAppCachePath(newCustomSettings.appCachePath);
+      Util.invokeMethodIfExists(settings, "setAppCachePath", newCustomSettings.appCachePath);
+    }
 
     if (newSettingsMap.get("blockNetworkImage") != null && customSettings.blockNetworkImage != newCustomSettings.blockNetworkImage)
       settings.setBlockNetworkImage(newCustomSettings.blockNetworkImage);

@@ -16,8 +16,13 @@
 
 ### BREAKING CHANGES
 
-- On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
+- On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`;
+
+## 5.4.4
+
+- Added support for Android 33
+- Fixed possible null pointer exception in Android `ChromeCustomTabsActivity.java`
 
 ## 5.4.3+8
 

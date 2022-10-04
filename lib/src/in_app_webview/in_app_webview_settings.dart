@@ -985,7 +985,7 @@ class InAppWebViewSettings {
   ///to improve compatibility with certain known websites. You can disable site-specific quirks
   ///to help test your website without these workarounds. The default value is `true`.
   ///
-  ///**NOTE**: available on iOS 15.0+.
+  ///**NOTE**: available on iOS 15.4+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS

@@ -454,10 +454,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
             }
             
-            if #available(iOS 15.0, *) {
-                if (configuration.preferences.responds(to: #selector(getter: InAppWebViewSettings.isSiteSpecificQuirksModeEnabled))) {
-                    configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
-                }
+            if #available(iOS 15.4, *) {
+                configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
             }
         }
     }
@@ -1178,8 +1176,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                let underPageBackgroundColor = newSettings.underPageBackgroundColor, !underPageBackgroundColor.isEmpty {
                 self.underPageBackgroundColor = UIColor(hexString: underPageBackgroundColor)
             }
-            if configuration.preferences.responds(to: #selector(getter: InAppWebViewSettings.isSiteSpecificQuirksModeEnabled)),
-               newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil &&
+        }
+        if #available(iOS 15.4, *) {
+            if newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil &&
                 settings?.isSiteSpecificQuirksModeEnabled != newSettings.isSiteSpecificQuirksModeEnabled {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = newSettings.isSiteSpecificQuirksModeEnabled
             }

@@ -15,4 +15,4 @@ final TEST_WEB_PLATFORM_URL_3 = Uri.parse(TEST_WEB_PLATFORM_BASE_URL.toString() 
 final TEST_NOT_A_WEBSITE_URL = Uri.parse('https://www.notawebsite..com/');
 final TEST_CHROME_SAFE_BROWSING_MALWARE = Uri.parse('chrome://safe-browsing/match?type=malware');
 final TEST_PERMISSION_SITE = Uri.parse('https://permission.site/');
-final TEST_SERVICE_WORKER_URL = Uri.parse('https://mdn.github.io/sw-test/');
+final TEST_SERVICE_WORKER_URL = Uri.parse('https://mdn.github.io/dom-examples/service-worker/simple-service-worker/');

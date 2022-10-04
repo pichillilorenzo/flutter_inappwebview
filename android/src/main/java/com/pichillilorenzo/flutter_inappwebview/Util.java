@@ -328,7 +328,7 @@ public class Util {
     for (Method method : methods) {
       if (method.getName().equals(methodName)) {
         try {
-          method.invoke(o, args);
+          return method.invoke(o, args);
         } catch (IllegalAccessException e) {
           return null;
         } catch (InvocationTargetException e) {

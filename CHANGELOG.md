@@ -1,3 +1,7 @@
+## 5.4.4+2
+
+- Fixed LICENSE
+
 ## 5.4.4+1
 
 - Fixed README

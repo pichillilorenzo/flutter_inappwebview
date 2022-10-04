@@ -190,8 +190,10 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     builder.setInstantAppsEnabled(options.instantAppsEnabled);
 
     for (CustomTabsMenuItem menuItem : menuItems) {
-      builder.addMenuItem(menuItem.getLabel(), 
-              createPendingIntent(menuItem.getId()));
+      PendingIntent pendingIntent = createPendingIntent(menuItem.getId());
+      if (pendingIntent != null) {
+        builder.addMenuItem(menuItem.getLabel(), pendingIntent);
+      }
     }
 
     if (actionButton != null) {
@@ -201,9 +203,12 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
       Bitmap bmp = BitmapFactory.decodeByteArray(
               data, 0, data.length, bitmapOptions
       );
-      builder.setActionButton(bmp, actionButton.getDescription(),
-              createPendingIntent(actionButton.getId()),
-              actionButton.isShouldTint());
+      PendingIntent pendingIntent = createPendingIntent(actionButton.getId());
+      if (pendingIntent != null) {
+        builder.setActionButton(bmp, actionButton.getDescription(),
+                pendingIntent,
+                actionButton.isShouldTint());
+      }
     }
   }
 
@@ -237,7 +242,9 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
     }
   }
 
+  @Nullable
   private PendingIntent createPendingIntent(int actionSourceId) {
+    if (manager == null) return null;
     Intent actionIntent = new Intent(this, ActionBroadcastReceiver.class);
 
     Bundle extras = new Bundle();
@@ -256,11 +263,15 @@ public class ChromeCustomTabsActivity extends Activity implements MethodChannel.
   }
 
   public void dispose() {
+    onStop();
+    onDestroy();
     channel.setMethodCallHandler(null);
     manager = null;
   }
 
   public void close() {
+    onStop();
+    onDestroy();
     customTabsSession = null;
     finish();
     Map<String, Object> obj = new HashMap<>();

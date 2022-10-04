@@ -19,6 +19,8 @@ import org.json.JSONObject;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -29,7 +31,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
@@ -320,5 +320,22 @@ public class Util {
 
   public static Object getOrDefault(Map map, String key, Object defaultValue) {
     return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
+
+  @Nullable
+  public static <O> Object invokeMethodIfExists(final O o, final String methodName, Object... args) {
+    Method[] methods = o.getClass().getMethods();
+    for (Method method : methods) {
+      if (method.getName().equals(methodName)) {
+        try {
+          method.invoke(o, args);
+        } catch (IllegalAccessException e) {
+          return null;
+        } catch (InvocationTargetException e) {
+          return null;
+        }
+      }
+    }
+    return null;
   }
 }

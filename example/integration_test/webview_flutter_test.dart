@@ -5495,7 +5495,7 @@ setTimeout(function() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest:
-                URLRequest(url: Uri.parse('https://mdn.github.io/sw-test/')),
+                URLRequest(url: Uri.parse('https://mdn.github.io/dom-examples/service-worker/simple-service-worker/')),
           ),
         ),
       );
@@ -5524,7 +5524,7 @@ setTimeout(function() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest:
-                URLRequest(url: Uri.parse('https://mdn.github.io/sw-test/')),
+                URLRequest(url: Uri.parse('https://mdn.github.io/dom-examples/service-worker/simple-service-worker/')),
             onLoadStop: (controller, url) {
               pageLoaded.complete(url!.toString());
             },
@@ -5533,7 +5533,7 @@ setTimeout(function() {
       );
 
       final String url = await pageLoaded.future;
-      expect(url, "https://mdn.github.io/sw-test/");
+      expect(url, "https://mdn.github.io/dom-examples/service-worker/simple-service-worker/");
     }, skip: !Platform.isAndroid);
   });
 

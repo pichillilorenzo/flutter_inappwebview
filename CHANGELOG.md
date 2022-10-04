@@ -19,6 +19,10 @@
 - On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`;
 
+## 5.4.4+1
+
+- Fixed README
+
 ## 5.4.4
 
 - Added support for Android 33

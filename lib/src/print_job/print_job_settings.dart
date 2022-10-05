@@ -6,7 +6,7 @@ import 'print_job_controller.dart';
 
 ///Class that represents the settings of a [PrintJobController].
 class PrintJobSettings {
-  ///Set this to `true` to handle the [PrintJobController].
+  ///Set this to `true` to handle the [PrintJobController].
   ///Otherwise, it will be handled and disposed automatically by the system.
   ///The default value is `false`.
   ///

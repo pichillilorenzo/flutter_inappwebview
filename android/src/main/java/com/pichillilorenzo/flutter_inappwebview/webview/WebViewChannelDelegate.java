@@ -1182,7 +1182,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     @Nullable
     @Override
     public Integer decodeResult(@Nullable Object obj) {
-      return obj != null ? (Integer) ((Map<String, Object>) obj).get("action") : null;
+      return obj instanceof Integer ? (Integer) obj : null;
     }
   }
 
@@ -1201,7 +1201,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     @Nullable
     @Override
     public Integer decodeResult(@Nullable Object obj) {
-      return obj != null ? (Integer) ((Map<String, Object>) obj).get("action") : null;
+      return obj instanceof Integer ? (Integer) obj : null;
     }
   }
 

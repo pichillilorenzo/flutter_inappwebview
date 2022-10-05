@@ -1,9 +1,14 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 import 'user_script_injection_time.dart';
 import 'content_world.dart';
 
+part 'user_script.g.dart';
+
 ///Class that represents a script that the [WebView] injects into the web page.
-class UserScript {
+@ExchangeableObject()
+class UserScript_ {
   ///The script’s group name.
   String? groupName;
 
@@ -11,7 +16,7 @@ class UserScript {
   String source;
 
   ///The time at which to inject the script into the [WebView].
-  UserScriptInjectionTime injectionTime;
+  UserScriptInjectionTime_ injectionTime;
 
   ///Use [forMainFrameOnly] instead.
   @Deprecated("Use forMainFrameOnly instead")
@@ -28,7 +33,8 @@ class UserScript {
   ///For more information about content worlds, see [ContentWorld].
   late ContentWorld contentWorld;
 
-  UserScript(
+  @ExchangeableObjectConstructor()
+  UserScript_(
       {this.groupName,
         required this.source,
         required this.injectionTime,
@@ -41,27 +47,5 @@ class UserScript {
     // ignore: deprecated_member_use_from_same_package
         ? this.iosForMainFrameOnly!
         : this.forMainFrameOnly;
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "groupName": groupName,
-      "source": source,
-      "injectionTime": injectionTime.toValue(),
-      "iosForMainFrameOnly": forMainFrameOnly,
-      "forMainFrameOnly": forMainFrameOnly,
-      "contentWorld": contentWorld.toMap()
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
   }
 }

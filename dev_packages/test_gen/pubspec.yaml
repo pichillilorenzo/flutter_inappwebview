@@ -14,7 +14,7 @@ dependencies:
     path: ../flutter_inappwebview_internal_annotations/
 
 dev_dependencies:
-  build_runner:
+  build_runner: ^2.2.1
   generators:
     path: ../generators/
   lints: ^1.0.1

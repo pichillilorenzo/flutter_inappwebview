@@ -26,8 +26,8 @@ class MetaTag {
     final instance = MetaTag(
       name: map['name'],
       content: map['content'],
-      attrs: map['attrs']?.forEach(
-          (e) => MetaTagAttribute.fromMap(e?.cast<String, dynamic>())!),
+      attrs: map['attrs']
+          ?.map((e) => MetaTagAttribute.fromMap(e?.cast<String, dynamic>())!),
     );
     return instance;
   }

@@ -916,8 +916,8 @@ class InAppWebViewSettings {
   ///- [InAppWebViewSettings.enableViewportScale]
   ///
   ///Events affected:
-  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
-  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
+  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
+  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
   ///- [WebView.onLoadResource]
   ///- [WebView.shouldInterceptAjaxRequest]
   ///- [WebView.onAjaxReadyStateChange]
@@ -937,7 +937,7 @@ class InAppWebViewSettings {
 
   ///Used in combination with [WebView.initialUrlRequest] or [WebView.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
   ///This URL must be a file-based URL (using the `file://` scheme).
-  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
+  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
   ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [WebView.initialData] parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
   ///
@@ -1108,7 +1108,7 @@ class InAppWebViewSettings {
     this.useHybridComposition = true,
     this.useShouldInterceptRequest = false,
     this.useOnRenderProcessGone = false,
-    this.overScrollMode = OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,
+    this.overScrollMode = OverScrollMode.IF_CONTENT_SCROLLS,
     this.networkAvailable,
     this.scrollBarStyle = ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
     this.verticalScrollbarPosition =

@@ -24,8 +24,8 @@ class PermissionResponse {
       return null;
     }
     final instance = PermissionResponse();
-    instance.resources = map['resources']
-        .forEach((e) => PermissionResourceType.fromNativeValue(e)!);
+    instance.resources =
+        map['resources'].map((e) => PermissionResourceType.fromNativeValue(e)!);
     instance.action = PermissionResponseAction.fromNativeValue(map['action']);
     return instance;
   }

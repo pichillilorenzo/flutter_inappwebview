@@ -26,7 +26,7 @@ class URLProtectionSpace {
   SslCertificate? sslCertificate;
 
   ///The SSL Error associated.
-  dynamic sslError;
+  SslError? sslError;
 
   ///Use [authenticationMethod] instead.
   @Deprecated('Use authenticationMethod instead')
@@ -63,7 +63,7 @@ class URLProtectionSpace {
 
   ///Use [proxyType] instead.
   @Deprecated('Use proxyType instead')
-  dynamic iosProxyType;
+  IOSNSURLProtectionSpaceProxyType? iosProxyType;
 
   ///The receiver's proxy type.
   ///This value is `null` if the receiver does not represent a proxy protection space.
@@ -71,7 +71,7 @@ class URLProtectionSpace {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
-  dynamic proxyType;
+  URLProtectionSpaceProxyType? proxyType;
   URLProtectionSpace(
       {required this.host,
       this.protocol,
@@ -97,7 +97,9 @@ class URLProtectionSpace {
     distinguishedNames = distinguishedNames ?? iosDistinguishedNames;
     receivesCredentialSecurely =
         receivesCredentialSecurely ?? iosReceivesCredentialSecurely;
-    proxyType = proxyType ?? iosProxyType;
+    proxyType = proxyType ??
+        URLProtectionSpaceProxyType.fromNativeValue(
+            iosProxyType?.toNativeValue());
   }
 
   ///Gets a possible [URLProtectionSpace] instance from a [Map] value.
@@ -112,7 +114,7 @@ class URLProtectionSpace {
       port: map['port'],
       sslCertificate: SslCertificate.fromMap(
           map['sslCertificate']?.cast<String, dynamic>()),
-      sslError: map['sslError'],
+      sslError: SslError.fromMap(map['sslError']?.cast<String, dynamic>()),
       iosAuthenticationMethod:
           IOSNSURLProtectionSpaceAuthenticationMethod.fromNativeValue(
               map['authenticationMethod']),
@@ -125,8 +127,9 @@ class URLProtectionSpace {
           _distinguishedNamesDeserializer(map['distinguishedNames']),
       iosReceivesCredentialSecurely: map['receivesCredentialSecurely'],
       receivesCredentialSecurely: map['receivesCredentialSecurely'],
-      iosProxyType: map['proxyType'],
-      proxyType: map['proxyType'],
+      iosProxyType:
+          IOSNSURLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
+      proxyType: URLProtectionSpaceProxyType.fromNativeValue(map['proxyType']),
     );
     return instance;
   }
@@ -139,11 +142,11 @@ class URLProtectionSpace {
       "realm": realm,
       "port": port,
       "sslCertificate": sslCertificate?.toMap(),
-      "sslError": sslError,
+      "sslError": sslError?.toMap(),
       "authenticationMethod": authenticationMethod?.toNativeValue(),
       "distinguishedNames": distinguishedNames?.map((e) => e.toMap()).toList(),
       "receivesCredentialSecurely": receivesCredentialSecurely,
-      "proxyType": proxyType,
+      "proxyType": proxyType?.toNativeValue(),
     };
   }
 

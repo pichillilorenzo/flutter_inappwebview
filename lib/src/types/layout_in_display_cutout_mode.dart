@@ -28,6 +28,9 @@ class LayoutInDisplayCutoutMode_ {
   ///
   ///**NOTE**: available on Android 30+.
   static const ALWAYS = const LayoutInDisplayCutoutMode_._internal(3);
+
+  @ExchangeableObjectMethod(ignore: true)
+  static LayoutInDisplayCutoutMode_? fromNativeValue(int? value) {return null;}
 }
 
 ///Android-specific class representing the share state that should be applied to the custom tab.
@@ -62,4 +65,7 @@ class AndroidLayoutInDisplayCutoutMode_ {
   ///
   ///**NOTE**: available on Android 30+.
   static const ALWAYS = const AndroidLayoutInDisplayCutoutMode_._internal(3);
+
+  @ExchangeableObjectMethod(ignore: true)
+  int toNativeValue() => 0;
 }

@@ -10,12 +10,12 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-  build:
-  source_gen:
+  build: ^2.3.1
+  source_gen: ^1.2.5
   flutter_inappwebview_internal_annotations:
     path: ../flutter_inappwebview_internal_annotations/
 
 dev_dependencies:
-  build_runner:
-  build_test:
+  build_runner: ^2.2.1
+  build_test: ^2.1.5
   test: ^1.21.1

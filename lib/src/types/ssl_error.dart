@@ -1,68 +1,30 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'ssl_error_type.dart';
 
+part 'ssl_error.g.dart';
+
 ///Class that represents an SSL Error.
-class SslError {
+@ExchangeableObject()
+class SslError_ {
   ///Use [code] instead.
   @Deprecated('Use code instead')
-  AndroidSslError? androidError;
+  AndroidSslError_? androidError;
 
   ///Use [code] instead.
   @Deprecated('Use code instead')
-  IOSSslError? iosError;
+  IOSSslError_? iosError;
 
   ///Primary code error associated to the server SSL certificate.
   ///It represents the most severe SSL error.
-  SslErrorType? code;
+  SslErrorType_? code;
 
   ///The message associated to the [code].
   String? message;
 
-  SslError(
+  SslError_(
       {@Deprecated('Use code instead') this.androidError,
         @Deprecated('Use code instead') this.iosError,
         this.code,
-        this.message}) {
-    this.code = this.code ??
-        // ignore: deprecated_member_use_from_same_package
-        SslErrorType.fromNativeValue(this.androidError?.toValue() ??
-            // ignore: deprecated_member_use_from_same_package
-            this.iosError?.toValue());
-  }
-
-  ///Gets a possible [SslError] instance from a [Map] value.
-  static SslError? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return SslError(
-      // ignore: deprecated_member_use_from_same_package
-        androidError: AndroidSslError.fromValue(map["code"]),
-        // ignore: deprecated_member_use_from_same_package
-        iosError: IOSSslError.fromValue(map["code"]),
-        code: SslErrorType.fromNativeValue(map["code"]),
-        message: map["message"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      // ignore: deprecated_member_use_from_same_package
-      "androidError": code?.toNativeValue() ?? androidError?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "iosError": code?.toNativeValue() ?? iosError?.toValue(),
-      // ignore: deprecated_member_use_from_same_package
-      "code": code?.toNativeValue() ?? androidError?.toValue() ?? iosError?.toValue(),
-      "message": message,
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.message}) {}
 }

@@ -445,19 +445,19 @@ class InAppWebViewController {
           if (_webview != null) {
             if (_webview!.onRenderProcessUnresponsive != null)
               return (await _webview!.onRenderProcessUnresponsive!(this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.androidOnRenderProcessUnresponsive!(
                       this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return ((await _inAppBrowser!.onRenderProcessUnresponsive(uri)) ??
                     (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
                         .androidOnRenderProcessUnresponsive(uri)))
-                ?.toMap();
+                ?.toNativeValue();
           }
         }
         break;
@@ -473,19 +473,19 @@ class InAppWebViewController {
           if (_webview != null) {
             if (_webview!.onRenderProcessResponsive != null)
               return (await _webview!.onRenderProcessResponsive!(this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.androidOnRenderProcessResponsive!(
                       this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return ((await _inAppBrowser!.onRenderProcessResponsive(uri)) ??
                     (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
                         .androidOnRenderProcessResponsive(uri)))
-                ?.toMap();
+                ?.toNativeValue();
           }
         }
         break;
@@ -957,19 +957,19 @@ class InAppWebViewController {
             if (_webview!.shouldAllowDeprecatedTLS != null)
               return (await _webview!.shouldAllowDeprecatedTLS!(
                       this, challenge))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.iosShouldAllowDeprecatedTLS!(
                       this, challenge))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return (await _inAppBrowser!.shouldAllowDeprecatedTLS(challenge))
-                    ?.toMap() ??
+                    ?.toNativeValue() ??
                 // ignore: deprecated_member_use_from_same_package
                 (await _inAppBrowser!.iosShouldAllowDeprecatedTLS(challenge))
-                    ?.toMap();
+                    ?.toNativeValue();
           }
         }
         break;
@@ -2281,7 +2281,7 @@ class InAppWebViewController {
   ///Prints the current page.
   ///
   ///To obtain the [PrintJobController], use [settings] argument with [PrintJobSettings.handledByClient] to `true`.
-  ///Otherwise this method will return `null` and the [PrintJobController] will be handled and disposed automatically by the system.
+  ///Otherwise this method will return `null` and the [PrintJobController] will be handled and disposed automatically by the system.
   ///
   ///**NOTE**: available on Android 19+.
   ///
@@ -2823,9 +2823,9 @@ class InAppWebViewController {
   ///[autoname] if `false`, takes [filePath] to be a file.
   ///If `true`, [filePath] is assumed to be a directory in which a filename will be chosen according to the URL of the current page.
   ///
-  ///**NOTE for iOS**: Available on iOS 14.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
+  ///**NOTE for iOS**: Available on iOS 14.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///
-  ///**NOTE for Android**: if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
+  ///**NOTE for Android**: if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.saveWebArchive](https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
@@ -2834,9 +2834,9 @@ class InAppWebViewController {
       {required String filePath, bool autoname = false}) async {
     if (!autoname) {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        assert(filePath.endsWith("." + WebArchiveFormat.MHT.toValue()));
+        assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toValue()));
+        assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
       }
     }
 

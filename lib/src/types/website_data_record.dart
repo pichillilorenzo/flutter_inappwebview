@@ -1,36 +1,19 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'website_data_type.dart';
 
+part 'website_data_record.g.dart';
+
 ///Class that represents website data, grouped by domain name using the public suffix list.
-class WebsiteDataRecord {
+@ExchangeableObject()
+class WebsiteDataRecord_ {
   ///The display name for the data record. This is usually the domain name.
   String? displayName;
 
   ///The various types of website data that exist for this data record.
-  Set<WebsiteDataType>? dataTypes;
+  Set<WebsiteDataType_>? dataTypes;
 
-  WebsiteDataRecord({this.displayName, this.dataTypes});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    List<String> dataTypesString = [];
-    if (dataTypes != null) {
-      for (var dataType in dataTypes!) {
-        dataTypesString.add(dataType.toValue());
-      }
-    }
-
-    return {"displayName": displayName, "dataTypes": dataTypesString};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  WebsiteDataRecord_({this.displayName, this.dataTypes});
 }
 
 ///Class that represents website data, grouped by domain name using the public suffix list.
@@ -39,34 +22,13 @@ class WebsiteDataRecord {
 ///
 ///Use [WebsiteDataRecord] instead.
 @Deprecated("Use WebsiteDataRecord instead")
-class IOSWKWebsiteDataRecord {
+@ExchangeableObject()
+class IOSWKWebsiteDataRecord_ {
   ///The display name for the data record. This is usually the domain name.
   String? displayName;
 
   ///The various types of website data that exist for this data record.
-  Set<IOSWKWebsiteDataType>? dataTypes;
+  Set<IOSWKWebsiteDataType_>? dataTypes;
 
-  IOSWKWebsiteDataRecord({this.displayName, this.dataTypes});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    List<String> dataTypesString = [];
-    if (dataTypes != null) {
-      for (var dataType in dataTypes!) {
-        dataTypesString.add(dataType.toValue());
-      }
-    }
-
-    return {"displayName": displayName, "dataTypes": dataTypesString};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  IOSWKWebsiteDataRecord_({this.displayName, this.dataTypes});
 }

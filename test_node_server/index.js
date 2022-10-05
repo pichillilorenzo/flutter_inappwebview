@@ -1,13 +1,22 @@
 // Example of the server https is taken from here: https://engineering.circle.com/https-authorized-certs-with-node-js-315e548354a2
+// Renew certificates:
+// - openssl x509 -req -extfile server.cnf -days 9999 -passin "pass:password" -in server-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out server-crt.pem
+// - openssl x509 -req -extfile client1.cnf -days 9999 -passin "pass:password" -in client1-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out client1-crt.pem
+// - openssl x509 -req -extfile client2.cnf -days 9999 -passin "pass:password" -in client2-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out client2-crt.pem
+// Verify certificates:
+// - openssl verify -CAfile ca-crt.pem server-crt.pem
+// - openssl verify -CAfile ca-crt.pem client1-crt.pem
+// - openssl verify -CAfile ca-crt.pem client2-crt.pem
 // Conversion of client1-crt.pem to certificate.pfx: https://stackoverflow.com/a/38408666/4637638
-const express = require('express');
-const http = require('http');
-const https = require('https');
-const cors = require('cors');
-const auth = require('basic-auth');
-const app = express();
-const appHttps = express();
-const appAuthBasic = express();
+// - openssl pkcs12 -export -out certificate.pfx -inkey client1-key.pem -in client1-crt.pem -certfile ca-crt.pem
+// - Overwrite certificate.pfx to example/test_assets/certificate.pfx
+const express = require('express')
+const https = require('https')
+const cors = require('cors')
+const auth = require('basic-auth')
+const app = express()
+const appHttps = express()
+const appAuthBasic = express()
 const fs = require('fs')
 const path = require('path')
 const bodyParser = require('body-parser');
@@ -198,21 +207,3 @@ app.get("/test-download-file", (req, res) => {
 })
 
 app.listen(8082)
-
-// Proxy server
-http.createServer(function (req, res) {
-    res.setHeader('Content-type', 'text/html');
-    res.write(`
-        <html>
-          <head>
-          </head>
-          <body>
-            <h1>Proxy Works</h1>
-            <p id="url">${req.url}</p>
-            <p id="method">${req.method}</p>
-            <p id="headers">${JSON.stringify(req.headers)}</p>
-          </body>
-        </html>
-      `);
-    res.end();
-}).listen(8083);

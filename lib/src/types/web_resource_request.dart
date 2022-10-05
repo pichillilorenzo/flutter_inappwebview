@@ -1,7 +1,12 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
+part 'web_resource_request.g.dart';
+
 ///Class representing a resource request of the [WebView].
-class WebResourceRequest {
+@ExchangeableObject()
+class WebResourceRequest_ {
   ///The URL for which the resource request was made.
   Uri url;
 
@@ -33,48 +38,11 @@ class WebResourceRequest {
   ///**NOTE**: available on Android 21+. For Android < 21 it will be always `false`.
   bool? isRedirect;
 
-  WebResourceRequest(
+  WebResourceRequest_(
       {required this.url,
         this.headers,
-        required this.method,
-        required this.hasGesture,
-        required this.isForMainFrame,
-        required this.isRedirect});
-
-  ///Gets a possible [WebResourceRequest] instance from a [Map] value.
-  static WebResourceRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    return WebResourceRequest(
-        url: Uri.parse(map["url"]),
-        headers: map["headers"]?.cast<String, String>(),
-        method: map["method"],
-        hasGesture: map["hasGesture"],
-        isForMainFrame: map["isForMainFrame"],
-        isRedirect: map["isRedirect"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url.toString(),
-      "headers": headers,
-      "method": method,
-      "hasGesture": hasGesture,
-      "isForMainFrame": isForMainFrame,
-      "isRedirect": isRedirect
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+        this.method,
+        this.hasGesture,
+        this.isForMainFrame,
+        this.isRedirect});
 }

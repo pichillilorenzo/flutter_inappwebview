@@ -1007,7 +1007,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
-                if let obj = obj as? [String: Any?], let action = obj["action"] as? Int {
+                if let action = obj as? Int {
                     return action == 1
                 }
                 return false

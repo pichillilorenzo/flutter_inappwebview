@@ -13,6 +13,8 @@ final _coreCheckerObjectConstructor =
     const TypeChecker.fromRuntime(ExchangeableObjectConstructor);
 final _coreCheckerObjectProperty =
     const TypeChecker.fromRuntime(ExchangeableObjectProperty);
+final _coreCheckerObjectMethod =
+    const TypeChecker.fromRuntime(ExchangeableObjectMethod);
 final _coreCheckerEnum = const TypeChecker.fromRuntime(ExchangeableEnum);
 final _coreCheckerDeprecated = const TypeChecker.fromRuntime(Deprecated);
 final _coreCheckerSupportedPlatforms =
@@ -27,32 +29,36 @@ class ExchangeableObjectGenerator
     // Visits all the children of element in no particular order.
     element.visitChildren(visitor);
 
-    final className = visitor.constructor.returnType.element.name;
+    final className = visitor.constructor.returnType.element2.name;
     final superClass =
-        visitor.constructor.returnType.superclass?.element.name != 'Object'
+        visitor.constructor.returnType.superclass?.element2.name != 'Object'
             ? visitor.constructor.returnType.superclass
             : null;
-    final superClassName = superClass?.element.name.replaceFirst("_", "");
+    final interfaces = visitor.constructor.returnType.interfaces;
+    final superClassName = superClass?.element2.name.replaceFirst("_", "");
     // remove "_" to generate the correct class name
     final extClassName = className.replaceFirst("_", "");
 
     final classBuffer = StringBuffer();
     final classDocs =
-        visitor.constructor.returnType.element.documentationComment;
+        visitor.constructor.returnType.element2.documentationComment;
     if (classDocs != null) {
       classBuffer.writeln(classDocs);
     }
     final classSupportedDocs = Util.getSupportedDocs(
-        _coreCheckerSupportedPlatforms, visitor.constructor.returnType.element);
+        _coreCheckerSupportedPlatforms, visitor.constructor.returnType.element2);
     if (classSupportedDocs != null) {
       classBuffer.writeln(classSupportedDocs);
     }
-    if (visitor.constructor.returnType.element.hasDeprecated) {
+    if (visitor.constructor.returnType.element2.hasDeprecated) {
       classBuffer.writeln(
-          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element)?.getField("message")?.toStringValue()}')");
+          "@Deprecated('${_coreCheckerDeprecated.firstAnnotationOfExact(visitor.constructor.returnType.element2)?.getField("message")?.toStringValue()}')");
     }
 
-    classBuffer.write('class $extClassName');
+    classBuffer.write('${(visitor.constructor.enclosingElement3 as ClassElement).isAbstract ? 'abstract ' : ''}class $extClassName');
+    if (interfaces.isNotEmpty) {
+      classBuffer.writeln(' implements ${interfaces.map((i) => i.element2.name.replaceFirst("_", "")).join(', ')}');
+    }
     if (superClass != null) {
       classBuffer.writeln(' extends ${superClassName}');
     }
@@ -97,6 +103,9 @@ class ExchangeableObjectGenerator
       }
       if (fieldElement.isStatic) {
         classBuffer.write("static ");
+      }
+      if (fieldElement.isLate) {
+        classBuffer.write("late ");
       }
       if (fieldElement.isFinal) {
         classBuffer.write("final ");
@@ -155,7 +164,7 @@ class ExchangeableObjectGenerator
     if (constructorSupportedDocs == null) {
       constructorSupportedDocs = Util.getSupportedDocs(
           _coreCheckerSupportedPlatforms,
-          visitor.constructor.returnType.element);
+          visitor.constructor.returnType.element2);
     }
     if (constructorSupportedDocs != null) {
       classBuffer.writeln(constructorSupportedDocs);
@@ -214,12 +223,17 @@ class ExchangeableObjectGenerator
             .trim();
         final fieldElement = visitor.fields[fieldName];
         if (fieldElement != null) {
-          final fieldTypeElement = fieldElement.type.element;
-          final deprecatedFieldTypeElement = deprecatedField.type.element;
+          final fieldTypeElement = fieldElement.type.element2;
+          final deprecatedFieldTypeElement = deprecatedField.type.element2;
+
+          final isNullable = Util.typeIsNullable(fieldElement.type);
+          var hasDefaultValue = (fieldElement is ParameterElement) ? (fieldElement as ParameterElement).hasDefaultValue : false;
+          if (!isNullable && hasDefaultValue) {
+            continue;
+          }
 
           classBuffer.write('$fieldName = $fieldName ?? ');
           if (fieldTypeElement != null && deprecatedFieldTypeElement != null) {
-            final isNullable = Util.typeIsNullable(fieldElement.type);
             final deprecatedIsNullable =
                 Util.typeIsNullable(deprecatedField.type);
             final hasFromMap = hasFromMapMethod(fieldTypeElement);
@@ -257,8 +271,8 @@ class ExchangeableObjectGenerator
       classBuffer.writeln(';');
     }
 
-    if (annotation.read("fromMapFactory").boolValue &&
-        !visitor.methods.containsKey("fromMap")) {
+    if (annotation.read("fromMapFactory").boolValue && (!visitor.methods.containsKey("fromMap") ||
+        Util.methodHasIgnore(visitor.methods['fromMap']!))) {
       classBuffer.writeln(
           '///Gets a possible [$extClassName] instance from a [Map] value.');
       final nullable = annotation.read("nullableFromMapFactory").boolValue;
@@ -272,7 +286,7 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('final instance = $extClassName(');
       final fieldElements = <FieldElement>[];
       if (superClass != null) {
-        fieldElements.addAll(superClass.element.fields);
+        fieldElements.addAll(superClass.element2.fields);
       }
       fieldElements.addAll(visitor.fields.values);
       final nonRequiredFields = <String>[];
@@ -301,7 +315,7 @@ class ExchangeableObjectGenerator
               ?.toFunctionValue();
           if (customDeserializer != null) {
             final deserializerClassName =
-                customDeserializer.enclosingElement.name;
+                customDeserializer.enclosingElement3.name;
             if (deserializerClassName != null) {
               value =
                   "$deserializerClassName.${customDeserializer.name}($value)";
@@ -334,6 +348,9 @@ class ExchangeableObjectGenerator
 
     for (final entry in visitor.methods.entries) {
       final methodElement = entry.value;
+      if (Util.methodHasIgnore(methodElement)) {
+        continue;
+      }
       ParsedLibraryResult parsed = methodElement.session
               ?.getParsedLibraryByElement(methodElement.library)
           as ParsedLibraryResult;
@@ -353,14 +370,24 @@ class ExchangeableObjectGenerator
       }
     }
 
-    if (annotation.read("toMapMethod").boolValue &&
-        !visitor.methods.containsKey("toMap")) {
+    if (annotation.read("toMapMethod").boolValue && (!visitor.methods.containsKey("toMap") ||
+        Util.methodHasIgnore(visitor.methods['toMap']!))) {
       classBuffer.writeln('///Converts instance to a map.');
       classBuffer.writeln('Map<String, dynamic> toMap() {');
       classBuffer.writeln('return {');
+      for (final entry in visitor.methods.entries) {
+        final methodElement = entry.value;
+        final toMapMergeWith = _coreCheckerObjectMethod
+            .firstAnnotationOf(methodElement)
+            ?.getField("toMapMergeWith")
+            ?.toBoolValue();
+        if (toMapMergeWith == true) {
+          classBuffer.writeln('...${methodElement.name}(),');
+        }
+      }
       final fieldElements = <FieldElement>[];
       if (superClass != null) {
-        for (final fieldElement in superClass.element.fields) {
+        for (final fieldElement in superClass.element2.fields) {
           if (!fieldElement.isPrivate &&
               !fieldElement.hasDeprecated &&
               !fieldElement.isStatic &&
@@ -390,7 +417,7 @@ class ExchangeableObjectGenerator
               ?.getField("serializer")
               ?.toFunctionValue();
           if (customSerializer != null) {
-            final serializerClassName = customSerializer.enclosingElement.name;
+            final serializerClassName = customSerializer.enclosingElement3.name;
             if (serializerClassName != null) {
               mapValue =
                   "$serializerClassName.${customSerializer.name}($mapValue)";
@@ -408,22 +435,22 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('}');
     }
 
-    if (annotation.read("toJsonMethod").boolValue &&
-        !visitor.methods.containsKey("toJson")) {
+    if (annotation.read("toJsonMethod").boolValue && (!visitor.methods.containsKey("toJson") ||
+        Util.methodHasIgnore(visitor.methods['toJson']!))) {
       classBuffer.writeln('///Converts instance to a map.');
       classBuffer.writeln('Map<String, dynamic> toJson() {');
       classBuffer.writeln('return toMap();');
       classBuffer.writeln('}');
     }
 
-    if (annotation.read("toStringMethod").boolValue &&
-        !visitor.methods.containsKey("toString")) {
+    if (annotation.read("toStringMethod").boolValue && (!visitor.methods.containsKey("toString") ||
+        Util.methodHasIgnore(visitor.methods['toString']!))) {
       classBuffer.writeln('@override');
       classBuffer.writeln('String toString() {');
       classBuffer.write('return \'$extClassName{');
       final fieldNames = <String>[];
       if (superClass != null) {
-        for (final fieldElement in superClass.element.fields) {
+        for (final fieldElement in superClass.element2.fields) {
           final fieldName = fieldElement.name;
           if (!fieldElement.isPrivate &&
               !fieldElement.hasDeprecated &&
@@ -453,7 +480,7 @@ class ExchangeableObjectGenerator
   }
 
   String getFromMapValue(String value, DartType elementType) {
-    final fieldTypeElement = elementType.element;
+    final fieldTypeElement = elementType.element2;
     final isNullable = Util.typeIsNullable(elementType);
     if (elementType.getDisplayString(withNullability: false) == "Uri") {
       if (!isNullable) {
@@ -486,9 +513,9 @@ class ExchangeableObjectGenerator
         final genericTypeFieldName = 'e';
         return value +
             (isNullable ? '?' : '') +
-            '.forEach(($genericTypeFieldName) => ' +
+            '.map(($genericTypeFieldName) => ' +
             getFromMapValue('$genericTypeFieldName', genericType) +
-            ')';
+            ')${elementType.isDartCoreSet ? '.toSet()' : ''}';
       } else {
         return value;
       }
@@ -523,7 +550,7 @@ class ExchangeableObjectGenerator
   }
 
   String getToMapValue(String fieldName, DartType elementType) {
-    final fieldTypeElement = elementType.element;
+    final fieldTypeElement = elementType.element2;
     final isNullable = Util.typeIsNullable(elementType);
     if (elementType.getDisplayString(withNullability: false) == "Uri") {
       return fieldName + (isNullable ? '?' : '') + '.toString()';

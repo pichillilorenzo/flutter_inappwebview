@@ -3,11 +3,23 @@ import 'package:source_gen/source_gen.dart';
 import 'package:analyzer/dart/element/type.dart';
 import 'package:analyzer/dart/element/nullability_suffix.dart';
 import 'package:analyzer/dart/constant/value.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+final _coreCheckerObjectMethod =
+    const TypeChecker.fromRuntime(ExchangeableObjectMethod);
 
 abstract class Util {
   static bool typeIsNullable(DartType type) {
     return type.nullabilitySuffix != NullabilitySuffix.none ||
         type.toString() == 'dynamic';
+  }
+
+  static bool methodHasIgnore(MethodElement method) {
+    return _coreCheckerObjectMethod
+            .firstAnnotationOf(method)
+            ?.getField("ignore")
+            ?.toBoolValue() ==
+        true;
   }
 
   static String? getSupportedDocs(TypeChecker checker, Element element) {
@@ -64,7 +76,7 @@ abstract class Util {
   }
 
   static bool canHaveGenerics(DartType type) {
-    final element = type.element;
+    final element = type.element2;
     if (element is ClassElement) {
       return element.typeParameters.isNotEmpty;
     }

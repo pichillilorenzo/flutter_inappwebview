@@ -31,8 +31,8 @@ class PermissionRequest {
       origin: Uri.parse(map['origin']),
       frame: FrameInfo.fromMap(map['frame']?.cast<String, dynamic>()),
     );
-    instance.resources = map['resources']
-        .forEach((e) => PermissionResourceType.fromNativeValue(e)!);
+    instance.resources =
+        map['resources'].map((e) => PermissionResourceType.fromNativeValue(e)!);
     return instance;
   }
 

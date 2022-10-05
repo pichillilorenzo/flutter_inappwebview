@@ -128,7 +128,7 @@ class CookieManager {
     args.putIfAbsent('maxAge', () => maxAge);
     args.putIfAbsent('isSecure', () => isSecure);
     args.putIfAbsent('isHttpOnly', () => isHttpOnly);
-    args.putIfAbsent('sameSite', () => sameSite?.toValue());
+    args.putIfAbsent('sameSite', () => sameSite?.toNativeValue());
 
     await _channel.invokeMethod('setCookie', args);
   }
@@ -154,7 +154,7 @@ class CookieManager {
 
     if (isSecure != null && isSecure) cookieValue += "; Secure";
 
-    if (sameSite != null) cookieValue += "; SameSite=" + sameSite.toValue();
+    if (sameSite != null) cookieValue += "; SameSite=" + sameSite.toNativeValue();
 
     cookieValue += ";";
 
@@ -236,7 +236,7 @@ class CookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));
@@ -358,7 +358,7 @@ class CookieManager {
             isSessionOnly: cookies[i]["isSessionOnly"],
             domain: cookies[i]["domain"],
             sameSite:
-                HTTPCookieSameSitePolicy.fromValue(cookies[i]["sameSite"]),
+                HTTPCookieSameSitePolicy.fromNativeValue(cookies[i]["sameSite"]),
             isSecure: cookies[i]["isSecure"],
             isHttpOnly: cookies[i]["isHttpOnly"],
             path: cookies[i]["path"]);
@@ -526,7 +526,7 @@ class CookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));
@@ -588,7 +588,7 @@ class IOSCookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromValue(cookieMap["sameSite"]),
+          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));

@@ -49,7 +49,7 @@ class PullToRefreshSettings {
       "backgroundColor": backgroundColor?.toHex(),
       "distanceToTriggerSync": distanceToTriggerSync,
       "slingshotDistance": slingshotDistance,
-      "size": size?.toValue(),
+      "size": size?.toNativeValue(),
       "attributedTitle": attributedTitle?.toMap() ?? {}
     };
   }
@@ -112,7 +112,7 @@ class PullToRefreshOptions {
       "backgroundColor": backgroundColor?.toHex(),
       "distanceToTriggerSync": distanceToTriggerSync,
       "slingshotDistance": slingshotDistance,
-      "size": size?.toValue(),
+      "size": size?.toNativeValue(),
       "attributedTitle": attributedTitle?.toMap() ?? {}
     };
   }

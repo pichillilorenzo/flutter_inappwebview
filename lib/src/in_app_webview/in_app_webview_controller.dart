@@ -692,7 +692,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String url = call.arguments["url"];
           SafeBrowsingThreat? threatType =
-              SafeBrowsingThreat.fromValue(call.arguments["threatType"]);
+              SafeBrowsingThreat.fromNativeValue(call.arguments["threatType"]);
           Uri uri = Uri.parse(url);
 
           if (_webview != null) {
@@ -1139,9 +1139,9 @@ class InAppWebViewController {
                 _webview!.onCameraCaptureStateChanged != null) ||
             _inAppBrowser != null) {
           var oldState =
-              MediaCaptureState.fromValue(call.arguments["oldState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["oldState"]);
           var newState =
-              MediaCaptureState.fromValue(call.arguments["newState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["newState"]);
 
           if (_webview != null && _webview!.onCameraCaptureStateChanged != null)
             _webview!.onCameraCaptureStateChanged!(this, oldState, newState);
@@ -1154,9 +1154,9 @@ class InAppWebViewController {
                 _webview!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowser != null) {
           var oldState =
-              MediaCaptureState.fromValue(call.arguments["oldState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["oldState"]);
           var newState =
-              MediaCaptureState.fromValue(call.arguments["newState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["newState"]);
 
           if (_webview != null &&
               _webview!.onMicrophoneCaptureStateChanged != null)
@@ -2418,7 +2418,7 @@ class InAppWebViewController {
     hitTestResultMap = hitTestResultMap.cast<String, dynamic>();
 
     InAppWebViewHitTestResultType? type =
-        InAppWebViewHitTestResultType.fromValue(
+        InAppWebViewHitTestResultType.fromNativeValue(
             hitTestResultMap["type"]?.toInt());
     String? extra = hitTestResultMap["extra"];
     return InAppWebViewHitTestResult(type: type, extra: extra);
@@ -3303,7 +3303,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate)).
   Future<MediaPlaybackState?> requestMediaPlaybackState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaPlaybackState.fromValue(
+    return MediaPlaybackState.fromNativeValue(
         await _channel.invokeMethod('requestMediaPlaybackState', args));
   }
 
@@ -3325,7 +3325,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate)).
   Future<MediaCaptureState?> getCameraCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromValue(
+    return MediaCaptureState.fromNativeValue(
         await _channel.invokeMethod('getCameraCaptureState', args));
   }
 
@@ -3349,7 +3349,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate)).
   Future<MediaCaptureState?> getMicrophoneCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromValue(
+    return MediaCaptureState.fromNativeValue(
         await _channel.invokeMethod('getMicrophoneCaptureState', args));
   }
 

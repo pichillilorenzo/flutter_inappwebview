@@ -107,7 +107,7 @@ class ServiceWorkerController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()
   static Future<CacheMode?> getCacheMode() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return CacheMode.fromValue(
+    return CacheMode.fromNativeValue(
         await _channel.invokeMethod('getCacheMode', args));
   }
 
@@ -155,7 +155,7 @@ class ServiceWorkerController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)
   static Future<void> setCacheMode(CacheMode mode) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("mode", () => mode.toValue());
+    args.putIfAbsent("mode", () => mode.toNativeValue());
     await _channel.invokeMethod('setCacheMode', args);
   }
 }
@@ -293,7 +293,7 @@ class AndroidServiceWorkerController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getCacheMode()
   static Future<AndroidCacheMode?> getCacheMode() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return AndroidCacheMode.fromValue(
+    return AndroidCacheMode.fromNativeValue(
         await _channel.invokeMethod('getCacheMode', args));
   }
 
@@ -341,7 +341,7 @@ class AndroidServiceWorkerController {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setCacheMode(int)
   static Future<void> setCacheMode(AndroidCacheMode mode) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("mode", () => mode.toValue());
+    args.putIfAbsent("mode", () => mode.toNativeValue());
     await _channel.invokeMethod('setCacheMode', args);
   }
 }

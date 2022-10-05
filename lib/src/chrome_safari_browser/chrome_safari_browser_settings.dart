@@ -201,7 +201,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   @override
   Map<String, dynamic> toMap() {
     return {
-      "shareState": shareState.toValue(),
+      "shareState": shareState.toNativeValue(),
       "showTitle": showTitle,
       "toolbarBackgroundColor": toolbarBackgroundColor?.toHex(),
       "enableUrlBarHiding": enableUrlBarHiding,
@@ -213,14 +213,14 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       "isTrustedWebActivity": isTrustedWebActivity,
       "additionalTrustedOrigins": additionalTrustedOrigins,
       "displayMode": displayMode?.toMap(),
-      "screenOrientation": screenOrientation.toValue(),
+      "screenOrientation": screenOrientation.toNativeValue(),
       "entersReaderIfAvailable": entersReaderIfAvailable,
       "barCollapsingEnabled": barCollapsingEnabled,
-      "dismissButtonStyle": dismissButtonStyle.toValue(),
+      "dismissButtonStyle": dismissButtonStyle.toNativeValue(),
       "preferredBarTintColor": preferredBarTintColor?.toHex(),
       "preferredControlTintColor": preferredControlTintColor?.toHex(),
-      "presentationStyle": presentationStyle.toValue(),
-      "transitionStyle": transitionStyle.toValue()
+      "presentationStyle": presentationStyle.toNativeValue(),
+      "transitionStyle": transitionStyle.toNativeValue()
     };
   }
 
@@ -256,15 +256,15 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       settings.entersReaderIfAvailable = map["entersReaderIfAvailable"];
       settings.barCollapsingEnabled = map["barCollapsingEnabled"];
       settings.dismissButtonStyle =
-          DismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
+          DismissButtonStyle.fromNativeValue(map["dismissButtonStyle"])!;
       settings.preferredBarTintColor =
           UtilColor.fromHex(map["preferredBarTintColor"]);
       settings.preferredControlTintColor =
           UtilColor.fromHex(map["preferredControlTintColor"]);
       settings.presentationStyle =
-          ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+          ModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
       settings.transitionStyle =
-          ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+          ModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
     }
     return settings;
   }

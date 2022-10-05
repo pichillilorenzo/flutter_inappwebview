@@ -21,7 +21,7 @@ class WebViewFeature_ {
   const WebViewFeature_._internal(this._value);
 
   @ExchangeableObjectMethod(ignore: true)
-  String toValue() => _value;
+  String toNativeValue() => _value;
 
   ///This feature covers [InAppWebViewController.createWebMessageChannel].
   static const CREATE_WEB_MESSAGE_CHANNEL =
@@ -194,7 +194,7 @@ class WebViewFeature_ {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
   static Future<bool> isFeatureSupported(WebViewFeature_ feature) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("feature", () => feature.toValue());
+    args.putIfAbsent("feature", () => feature.toNativeValue());
     return await _channel.invokeMethod('isFeatureSupported', args);
   }
 }
@@ -213,7 +213,7 @@ class AndroidWebViewFeature_ {
   const AndroidWebViewFeature_._internal(this._value);
 
   @ExchangeableObjectMethod(ignore: true)
-  String toValue() => _value;
+  String toNativeValue() => _value;
 
   ///
   static const CREATE_WEB_MESSAGE_CHANNEL =
@@ -393,7 +393,7 @@ class AndroidWebViewFeature_ {
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
   static Future<bool> isFeatureSupported(AndroidWebViewFeature_ feature) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("feature", () => feature.toValue());
+    args.putIfAbsent("feature", () => feature.toNativeValue());
     return await _channel.invokeMethod('isFeatureSupported', args);
   }
 }

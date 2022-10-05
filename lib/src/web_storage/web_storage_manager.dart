@@ -115,7 +115,7 @@ class WebStorageManager {
     List<WebsiteDataRecord> recordList = [];
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toValue());
+      dataTypesList.add(dataType.toNativeValue());
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("dataTypes", () => dataTypesList);
@@ -126,7 +126,7 @@ class WebStorageManager {
       List<String> dataTypesString = record["dataTypes"].cast<String>();
       Set<WebsiteDataType> dataTypes = Set();
       for (var dataTypeValue in dataTypesString) {
-        var dataType = WebsiteDataType.fromValue(dataTypeValue);
+        var dataType = WebsiteDataType.fromNativeValue(dataTypeValue);
         if (dataType != null) {
           dataTypes.add(dataType);
         }
@@ -150,7 +150,7 @@ class WebStorageManager {
       required List<WebsiteDataRecord> dataRecords}) async {
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toValue());
+      dataTypesList.add(dataType.toNativeValue());
     }
 
     List<Map<String, dynamic>> recordList = [];
@@ -176,7 +176,7 @@ class WebStorageManager {
       {required Set<WebsiteDataType> dataTypes, required DateTime date}) async {
     List<String> dataTypesList = [];
     for (var dataType in dataTypes) {
-      dataTypesList.add(dataType.toValue());
+      dataTypesList.add(dataType.toNativeValue());
     }
 
     var timestamp = date.millisecondsSinceEpoch;

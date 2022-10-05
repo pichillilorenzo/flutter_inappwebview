@@ -265,9 +265,9 @@ class WebViewFeature {
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
-  static Future<bool> isFeatureSupported(WebViewFeature_ feature) async {
+  static Future<bool> isFeatureSupported(WebViewFeature feature) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("feature", () => feature.toValue());
+    args.putIfAbsent("feature", () => feature.toNativeValue());
     return await _channel.invokeMethod('isFeatureSupported', args);
   }
 
@@ -555,9 +555,9 @@ class AndroidWebViewFeature {
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/WebViewFeature#isFeatureSupported(java.lang.String)
-  static Future<bool> isFeatureSupported(AndroidWebViewFeature_ feature) async {
+  static Future<bool> isFeatureSupported(AndroidWebViewFeature feature) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent("feature", () => feature.toValue());
+    args.putIfAbsent("feature", () => feature.toNativeValue());
     return await _channel.invokeMethod('isFeatureSupported', args);
   }
 

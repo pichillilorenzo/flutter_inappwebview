@@ -95,7 +95,7 @@ class AndroidChromeCustomTabsOptions
     return {
       // ignore: deprecated_member_use_from_same_package
       "addDefaultShareMenuItem": addDefaultShareMenuItem,
-      "shareState": shareState.toValue(),
+      "shareState": shareState.toNativeValue(),
       "showTitle": showTitle,
       "toolbarBackgroundColor": toolbarBackgroundColor?.toHex(),
       "enableUrlBarHiding": enableUrlBarHiding,
@@ -107,7 +107,7 @@ class AndroidChromeCustomTabsOptions
       "isTrustedWebActivity": isTrustedWebActivity,
       "additionalTrustedOrigins": additionalTrustedOrigins,
       "displayMode": displayMode?.toMap(),
-      "screenOrientation": screenOrientation.toValue()
+      "screenOrientation": screenOrientation.toNativeValue()
     };
   }
 

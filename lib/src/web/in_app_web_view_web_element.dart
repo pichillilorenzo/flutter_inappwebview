@@ -174,18 +174,18 @@ class InAppWebViewWebElement implements Disposable {
     iframe.allowFullscreen =
         settings.iframeAllowFullscreen ?? iframe.allowFullscreen;
     iframe.referrerPolicy =
-        settings.iframeReferrerPolicy?.toValue() ?? iframe.referrerPolicy;
+        settings.iframeReferrerPolicy?.toNativeValue() ?? iframe.referrerPolicy;
     iframe.name = settings.iframeName ?? iframe.name;
     iframe.csp = settings.iframeCsp ?? iframe.csp;
 
     if (settings.iframeSandbox != null &&
         settings.iframeSandbox != Sandbox.ALLOW_ALL) {
       iframe.setAttribute(
-          "sandbox", settings.iframeSandbox!.map((e) => e.toValue()).join(" "));
+          "sandbox", settings.iframeSandbox!.map((e) => e.toNativeValue()).join(" "));
     } else if (settings.iframeSandbox == Sandbox.ALLOW_ALL) {
       iframe.removeAttribute("sandbox");
     } else if (sandbox != Sandbox.values) {
-      iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+      iframe.setAttribute("sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
       settings.iframeSandbox = sandbox;
     }
 
@@ -394,7 +394,7 @@ class InAppWebViewWebElement implements Disposable {
       iframe.allowFullscreen = newSettings.iframeAllowFullscreen;
     }
     if (settings.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
-      iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toValue();
+      iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toNativeValue();
     }
     if (settings.iframeName != newSettings.iframeName) {
       iframe.name = newSettings.iframeName;
@@ -407,12 +407,12 @@ class InAppWebViewWebElement implements Disposable {
       var sandbox = newSettings.iframeSandbox;
       if (sandbox != null && sandbox != Sandbox.ALLOW_ALL) {
         iframe.setAttribute(
-            "sandbox", sandbox.map((e) => e.toValue()).join(" "));
+            "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
       } else if (sandbox == Sandbox.ALLOW_ALL) {
         iframe.removeAttribute("sandbox");
       }
     } else if (sandbox != Sandbox.values) {
-      iframe.setAttribute("sandbox", sandbox.map((e) => e.toValue()).join(" "));
+      iframe.setAttribute("sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
     }
     newSettings.iframeSandbox = sandbox;
 

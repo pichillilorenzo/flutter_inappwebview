@@ -126,7 +126,7 @@ class WebAuthenticationSession implements Disposable {
       case "onComplete":
         String? url = call.arguments["url"];
         Uri? uri = url != null ? Uri.parse(url) : null;
-        var error = WebAuthenticationSessionError.fromValue(
+        var error = WebAuthenticationSessionError.fromNativeValue(
             call.arguments["errorCode"]);
         if (onComplete != null) {
           onComplete!(uri, error);

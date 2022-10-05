@@ -212,7 +212,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
               'initialSettings': initialSettings,
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
-              'implementation': this.implementation.toValue(),
+              'implementation': this.implementation.toNativeValue(),
               'initialUserScripts':
                   this.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
               'pullToRefreshSettings': pullToRefreshSettings,

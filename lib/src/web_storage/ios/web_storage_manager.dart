@@ -34,7 +34,7 @@ class IOSWebStorageManager {
       List<String> dataTypesString = record["dataTypes"].cast<String>();
       Set<IOSWKWebsiteDataType> dataTypes = Set();
       for (var dataTypeValue in dataTypesString) {
-        var dataType = IOSWKWebsiteDataType.fromValue(dataTypeValue);
+        var dataType = IOSWKWebsiteDataType.fromNativeValue(dataTypeValue);
         if (dataType != null) {
           dataTypes.add(dataType);
         }

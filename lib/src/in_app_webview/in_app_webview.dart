@@ -646,7 +646,7 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialSettings': initialSettings,
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
                 'windowId': widget.windowId,
-                'implementation': widget.implementation.toValue(),
+                'implementation': widget.implementation.toNativeValue(),
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
                         [],
@@ -673,7 +673,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialSettings': initialSettings,
             'contextMenu': widget.contextMenu?.toMap() ?? {},
             'windowId': widget.windowId,
-            'implementation': widget.implementation.toValue(),
+            'implementation': widget.implementation.toNativeValue(),
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
             'pullToRefreshSettings': pullToRefreshSettings
@@ -693,7 +693,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialSettings': initialSettings,
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
-          'implementation': widget.implementation.toValue(),
+          'implementation': widget.implementation.toNativeValue(),
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
           'pullToRefreshSettings': pullToRefreshSettings

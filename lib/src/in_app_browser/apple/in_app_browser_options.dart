@@ -68,8 +68,8 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
       "toolbarBottomTranslucent": toolbarBottomTranslucent,
       "closeButtonCaption": closeButtonCaption,
       "closeButtonColor": closeButtonColor?.toHex(),
-      "presentationStyle": presentationStyle.toValue(),
-      "transitionStyle": transitionStyle.toValue(),
+      "presentationStyle": presentationStyle.toNativeValue(),
+      "transitionStyle": transitionStyle.toNativeValue(),
     };
   }
 
@@ -87,9 +87,9 @@ class IOSInAppBrowserOptions implements BrowserOptions, IosOptions {
     instance.closeButtonCaption = map["closeButtonCaption"];
     instance.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
     instance.presentationStyle =
-        IOSUIModalPresentationStyle.fromValue(map["presentationStyle"])!;
+        IOSUIModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
     instance.transitionStyle =
-        IOSUIModalTransitionStyle.fromValue(map["transitionStyle"])!;
+        IOSUIModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
     return instance;
   }
 

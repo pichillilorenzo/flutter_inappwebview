@@ -133,7 +133,7 @@ class PullToRefreshController {
   @Deprecated("Use setIndicatorSize instead")
   Future<void> setSize(AndroidPullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toValue());
+    args.putIfAbsent('size', () => size.toNativeValue());
     await _channel?.invokeMethod('setSize', args);
   }
 
@@ -142,7 +142,7 @@ class PullToRefreshController {
   ///**NOTE**: Available only on Android.
   Future<void> setIndicatorSize(PullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toValue());
+    args.putIfAbsent('size', () => size.toNativeValue());
     await _channel?.invokeMethod('setSize', args);
   }
 

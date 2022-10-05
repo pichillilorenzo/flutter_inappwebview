@@ -48,7 +48,7 @@ class WebResourceResponse {
     }
     final instance = WebResourceResponse(
       data: map['data'],
-      headers: map['headers'],
+      headers: map['headers']?.cast<String, String>(),
       statusCode: map['statusCode'],
       reasonPhrase: map['reasonPhrase'],
     );

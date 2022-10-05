@@ -9,7 +9,7 @@ part of 'web_resource_error_type.dart';
 ///Class that represents the error types returned by URL loading APIs.
 class WebResourceErrorType {
   final String _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const WebResourceErrorType._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory WebResourceErrorType._internalMultiPlatform(
@@ -1005,8 +1005,8 @@ class WebResourceErrorType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int?] native value.
+  int? toNativeValue() => _nativeValue;
 
   @override
   int get hashCode => _value.hashCode;

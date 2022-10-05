@@ -13,7 +13,7 @@ class SslErrorType_ {
   // ignore: unused_field
   final String _value;
   // ignore: unused_field
-  final int _nativeValue = -1;
+  final int? _nativeValue = null;
   const SslErrorType_._internal(this._value);
 
   ///The certificate is not yet valid.

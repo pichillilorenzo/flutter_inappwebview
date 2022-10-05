@@ -18,6 +18,15 @@ void main() {
     InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
+  WebView.debugLoggingSettings.usePrint = true;
+  WebView.debugLoggingSettings.maxLogMessageLength = -1;
+  InAppBrowser.debugLoggingSettings.usePrint = true;
+  InAppBrowser.debugLoggingSettings.maxLogMessageLength = -1;
+  ChromeSafariBrowser.debugLoggingSettings.usePrint = true;
+  ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength = -1;
+  WebAuthenticationSession.debugLoggingSettings.usePrint = true;
+  WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength = -1;
+
   in_app_webview_tests.main();
   service_worker_controller_tests.main();
   proxy_controller_tests.main();

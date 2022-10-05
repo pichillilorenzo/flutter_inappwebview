@@ -85,7 +85,14 @@ class InAppBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _isOpened = false;
     webViewController = new InAppWebViewController.fromInAppBrowser(
         this._channel, this, this.initialUserScripts);
@@ -108,7 +115,11 @@ class InAppBrowser {
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }
-      developer.log(message, name: this.runtimeType.toString());
+      if (!InAppBrowser.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
     }
   }
 

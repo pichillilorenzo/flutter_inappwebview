@@ -42,7 +42,14 @@ class CookieManager {
   }
 
   static CookieManager _init() {
-    _channel.setMethodCallHandler(_handleMethod);
+    _channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _instance = CookieManager();
     // ignore: deprecated_member_use_from_same_package
     _instance!.ios = IOSCookieManager.instance();

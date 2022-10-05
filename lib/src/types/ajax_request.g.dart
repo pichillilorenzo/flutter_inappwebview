@@ -119,7 +119,7 @@ class AjaxRequest {
       responseText: map['responseText'],
       responseXML: map['responseXML'],
       statusText: map['statusText'],
-      responseHeaders: map['responseHeaders'],
+      responseHeaders: map['responseHeaders']?.cast<String, dynamic>(),
       event: AjaxRequestEvent.fromMap(map['event']?.cast<String, dynamic>()),
     );
     instance.action = AjaxRequestAction.fromNativeValue(map['action']);

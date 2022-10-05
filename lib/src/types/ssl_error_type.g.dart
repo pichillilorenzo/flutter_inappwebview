@@ -10,7 +10,7 @@ part of 'ssl_error_type.dart';
 ///Used by the [ServerTrustChallenge] class.
 class SslErrorType {
   final String _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const SslErrorType._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory SslErrorType._internalMultiPlatform(
@@ -253,8 +253,8 @@ class SslErrorType {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int?] native value.
+  int? toNativeValue() => _nativeValue;
 
   @override
   int get hashCode => _value.hashCode;

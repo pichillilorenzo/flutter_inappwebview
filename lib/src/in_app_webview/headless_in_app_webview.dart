@@ -159,7 +159,14 @@ class HeadlessInAppWebView implements WebView, Disposable {
     webViewController = new InAppWebViewController(id, this);
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_headless_inappwebview_$id');
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {

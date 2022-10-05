@@ -69,7 +69,7 @@ class FetchRequest {
     final instance = FetchRequest(
       url: map['url'] != null ? Uri.parse(map['url']) : null,
       method: map['method'],
-      headers: map['headers'],
+      headers: map['headers']?.cast<String, dynamic>(),
       body: map['body'],
       mode: map['mode'],
       credentials: _fetchRequestCredentialDeserializer(map['credentials']),

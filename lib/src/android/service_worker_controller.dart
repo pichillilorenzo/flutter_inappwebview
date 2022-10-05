@@ -38,7 +38,14 @@ class ServiceWorkerController {
   }
 
   static ServiceWorkerController _init() {
-    _channel.setMethodCallHandler(_handleMethod);
+    _channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _instance = ServiceWorkerController();
     return _instance!;
   }
@@ -222,7 +229,14 @@ class AndroidServiceWorkerController {
   }
 
   static AndroidServiceWorkerController _init() {
-    _channel.setMethodCallHandler(_handleMethod);
+    _channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _instance = AndroidServiceWorkerController();
     return _instance!;
   }

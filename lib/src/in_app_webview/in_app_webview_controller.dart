@@ -78,7 +78,14 @@ class InAppWebViewController {
     this._id = id;
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     this._webview = webview;
     this._userScripts =
         List<UserScript>.from(webview.initialUserScripts ?? <UserScript>[]);
@@ -123,7 +130,11 @@ class InAppWebViewController {
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }
-      developer.log(message, name: this.runtimeType.toString());
+      if (!WebView.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
     }
   }
 
@@ -175,13 +186,13 @@ class InAppWebViewController {
             else if (isForMainFrame) {
               // ignore: deprecated_member_use_from_same_package
               _webview!.onLoadError!(this, request.url,
-                  error.type.toNativeValue(), error.description);
+                  error.type.toNativeValue() ?? -1, error.description);
             }
           } else {
             if (isForMainFrame) {
               _inAppBrowser!
                   // ignore: deprecated_member_use_from_same_package
-                  .onLoadError(request.url, error.type.toNativeValue(),
+                  .onLoadError(request.url, error.type.toNativeValue() ?? -1,
                       error.description);
             }
             _inAppBrowser!.onReceivedError(request, error);

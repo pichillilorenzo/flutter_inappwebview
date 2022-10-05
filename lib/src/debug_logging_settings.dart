@@ -21,9 +21,13 @@ class DebugLoggingSettings {
   ///The default value is `-1`.
   int maxLogMessageLength;
 
+  ///Use [print] instead of `developer.log` to log messages.
+  bool usePrint;
+
   DebugLoggingSettings({
     this.enabled = kDebugMode,
     this.excludeFilter = const [],
-    this.maxLogMessageLength = -1
+    this.maxLogMessageLength = -1,
+    this.usePrint = false
   });
 }

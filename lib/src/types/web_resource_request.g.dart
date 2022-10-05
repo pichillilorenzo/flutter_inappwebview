@@ -53,7 +53,7 @@ class WebResourceRequest {
     }
     final instance = WebResourceRequest(
       url: Uri.parse(map['url']),
-      headers: map['headers'],
+      headers: map['headers']?.cast<String, String>(),
       method: map['method'],
       hasGesture: map['hasGesture'],
       isForMainFrame: map['isForMainFrame'],

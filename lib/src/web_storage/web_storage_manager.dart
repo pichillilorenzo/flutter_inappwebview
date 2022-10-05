@@ -31,7 +31,14 @@ class WebStorageManager {
   }
 
   static WebStorageManager _init() {
-    _staticChannel.setMethodCallHandler(_handleMethod);
+    _staticChannel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _instance = new WebStorageManager();
     return _instance!;
   }

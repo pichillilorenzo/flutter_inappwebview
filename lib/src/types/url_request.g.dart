@@ -189,7 +189,7 @@ class URLRequest {
       url: map['url'] != null ? Uri.parse(map['url']) : null,
       method: map['method'],
       body: map['body'],
-      headers: map['headers'],
+      headers: map['headers']?.cast<String, String>(),
       iosAllowsCellularAccess: map['allowsCellularAccess'],
       allowsCellularAccess: map['allowsCellularAccess'],
       iosAllowsConstrainedNetworkAccess: map['allowsConstrainedNetworkAccess'],

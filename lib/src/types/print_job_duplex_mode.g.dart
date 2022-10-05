@@ -9,7 +9,7 @@ part of 'print_job_duplex_mode.dart';
 ///Class representing the orientation of a [PrintJobController].
 class PrintJobDuplexMode {
   final String _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PrintJobDuplexMode._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory PrintJobDuplexMode._internalMultiPlatform(
@@ -107,8 +107,8 @@ class PrintJobDuplexMode {
   ///Gets [String] value.
   String toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int?] native value.
+  int? toNativeValue() => _nativeValue;
 
   @override
   int get hashCode => _value.hashCode;

@@ -48,7 +48,7 @@ class URLResponse {
       mimeType: map['mimeType'],
       suggestedFilename: map['suggestedFilename'],
       textEncodingName: map['textEncodingName'],
-      headers: _headersDeserializer(map['headers']),
+      headers: map['headers']?.cast<String, String>(),
       statusCode: map['statusCode'],
     );
     return instance;
@@ -121,7 +121,7 @@ class IOSURLResponse {
       mimeType: map['mimeType'],
       suggestedFilename: map['suggestedFilename'],
       textEncodingName: map['textEncodingName'],
-      headers: _headersDeserializer(map['headers']),
+      headers: map['headers']?.cast<String, String>(),
       statusCode: map['statusCode'],
     );
     return instance;

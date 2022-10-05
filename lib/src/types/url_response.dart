@@ -2,10 +2,6 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 part 'url_response.g.dart';
 
-Map<String, String>? _headersDeserializer(dynamic value) {
-  return value?.cast<String, String>();
-}
-
 ///The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
 @ExchangeableObject()
 class URLResponse_ {
@@ -25,7 +21,6 @@ class URLResponse_ {
   String? textEncodingName;
 
   ///All HTTP header fields of the response.
-  @ExchangeableObjectProperty(deserializer: _headersDeserializer)
   Map<String, String>? headers;
 
   ///The response’s HTTP status code.
@@ -61,7 +56,6 @@ class IOSURLResponse_ {
   String? textEncodingName;
 
   ///All HTTP header fields of the response.
-  @ExchangeableObjectProperty(deserializer: _headersDeserializer)
   Map<String, String>? headers;
 
   ///The response’s HTTP status code.

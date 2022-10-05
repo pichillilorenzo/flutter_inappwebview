@@ -11,7 +11,7 @@ class PrintJobDuplexMode_ {
   // ignore: unused_field
   final String _value;
   // ignore: unused_field
-  final int _nativeValue = 0;
+  final int? _nativeValue = null;
 
   const PrintJobDuplexMode_._internal(this._value);
 

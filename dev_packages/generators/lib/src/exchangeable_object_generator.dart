@@ -519,6 +519,9 @@ class ExchangeableObjectGenerator
       } else {
         return value;
       }
+    } else if (elementType.isDartCoreMap) {
+      final genericTypes = Util.getGenericTypes(elementType);
+      return "$value${isNullable ? '?' : ''}.cast<${genericTypes.elementAt(0)}, ${genericTypes.elementAt(1)}>()";
     } else if (fieldTypeElement != null && hasFromMapMethod(fieldTypeElement)) {
       final hasNullableFromMap = hasNullableFromMapFactory(fieldTypeElement);
       // remove class reference terminating with "_"

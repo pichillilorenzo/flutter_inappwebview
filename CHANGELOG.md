@@ -1,3 +1,7 @@
+## 5.4.4+3
+
+- Removed Android unsafe trust manager
+
 ## 5.4.4+2
 
 - Fixed LICENSE

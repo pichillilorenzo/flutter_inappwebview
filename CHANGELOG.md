@@ -21,6 +21,10 @@
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
 
+## 5.4.4+3
+
+- Removed Android unsafe trust manager
+
 ## 5.4.4+2
 
 - Fixed LICENSE

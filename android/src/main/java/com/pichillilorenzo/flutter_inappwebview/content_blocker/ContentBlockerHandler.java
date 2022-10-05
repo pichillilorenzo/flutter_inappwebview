@@ -22,6 +22,8 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.regex.Matcher;
 
+import javax.net.ssl.SSLHandshakeException;
+
 import okhttp3.Request;
 import okhttp3.Response;
 
@@ -183,7 +185,7 @@ public class ContentBlockerHandler {
                             Response response = null;
 
                             try {
-                                response = Util.getUnsafeOkHttpClient().newCall(mRequest).execute();
+                                response = Util.getBasicOkHttpClient().newCall(mRequest).execute();
                                 byte[] dataBytes = response.body().bytes();
                                 InputStream dataStream = new ByteArrayInputStream(dataBytes);
 
@@ -200,12 +202,14 @@ public class ContentBlockerHandler {
                                 return new WebResourceResponse(contentType, encoding, dataStream);
 
                             } catch (Exception e) {
-                                e.printStackTrace();
                                 if (response != null) {
                                     response.body().close();
                                     response.close();
                                 }
-                                Log.e(LOG_TAG, e.getMessage());
+                                if (!(e instanceof SSLHandshakeException)) {
+                                    e.printStackTrace();
+                                    Log.e(LOG_TAG, e.getMessage());
+                                }
                             }
                         }
                         break;
@@ -235,7 +239,7 @@ public class ContentBlockerHandler {
             Request mRequest = new Request.Builder().url(url).head().build();
             Response response = null;
             try {
-                response = Util.getUnsafeOkHttpClient().newCall(mRequest).execute();
+                response = Util.getBasicOkHttpClient().newCall(mRequest).execute();
 
                 if (response.header("content-type") != null) {
                     String[] contentTypeSplitted = response.header("content-type").split(";");
@@ -255,8 +259,10 @@ public class ContentBlockerHandler {
                     response.body().close();
                     response.close();
                 }
-                e.printStackTrace();
-                Log.e(LOG_TAG, e.getMessage());
+                if (!(e instanceof SSLHandshakeException)) {
+                    e.printStackTrace();
+                    Log.e(LOG_TAG, e.getMessage());
+                }
             }
         }
         return responseResourceType;

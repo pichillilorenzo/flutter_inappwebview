@@ -1,5 +1,5 @@
 name: flutter_inappwebview_internal_annotations
-description: A Flutter plugin that allows you to add an inline webview, to use an headless webview, and to open an in-app browser window.
+description: Internal annotations used by the generator of flutter_inappwebview plugin
 version: 1.0.0
 homepage: https://github.com/pichillilorenzo/flutter_inappwebview
 

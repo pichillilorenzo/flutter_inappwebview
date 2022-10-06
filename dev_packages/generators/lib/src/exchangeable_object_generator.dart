@@ -508,16 +508,24 @@ class ExchangeableObjectGenerator
         return "$value != null ? DateTime.fromMillisecondsSinceEpoch($value) : null";
       }
     } else if (elementType.isDartCoreList || elementType.isDartCoreSet) {
-      final genericType = Util.getGenericTypes(elementType).first;
-      if (!Util.isDartCoreType(genericType)) {
+      final genericTypes = Util.getGenericTypes(elementType);
+      final genericType = genericTypes.isNotEmpty ? genericTypes.first : null;
+      final genericTypeReplaced = genericType != null ? genericType.toString().replaceAll("_", "") : null;
+      if (genericType != null && !Util.isDartCoreType(genericType)) {
         final genericTypeFieldName = 'e';
-        return value +
-            (isNullable ? '?' : '') +
+        return (isNullable ? '$value != null ? ' : '') +
+            "${elementType.isDartCoreSet ? 'Set' : 'List'}<$genericTypeReplaced>.from(" +
+            value +
             '.map(($genericTypeFieldName) => ' +
             getFromMapValue('$genericTypeFieldName', genericType) +
-            ')${elementType.isDartCoreSet ? '.toSet()' : ''}';
+            '))' +
+            (isNullable ? ' : null' : '');
       } else {
-        return value;
+        if (genericType != null) {
+          return "$value${isNullable ? '?' : ''}.cast<${genericTypeReplaced}>()";
+        } else {
+          return value;
+        }
       }
     } else if (elementType.isDartCoreMap) {
       final genericTypes = Util.getGenericTypes(elementType);

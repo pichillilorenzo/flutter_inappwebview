@@ -21,8 +21,10 @@ class WebHistory {
       return null;
     }
     final instance = WebHistory(
-      list: map['list']
-          ?.map((e) => WebHistoryItem.fromMap(e?.cast<String, dynamic>())!),
+      list: map['list'] != null
+          ? List<WebHistoryItem>.from(map['list']
+              .map((e) => WebHistoryItem.fromMap(e?.cast<String, dynamic>())!))
+          : null,
       currentIndex: map['currentIndex'],
     );
     return instance;

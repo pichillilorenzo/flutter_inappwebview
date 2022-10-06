@@ -1201,7 +1201,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     HashMap<String, Object> result = new HashMap<>();
 
-    result.put("history", history);
+    result.put("list", history);
     result.put("currentIndex", currentIndex);
 
     return result;

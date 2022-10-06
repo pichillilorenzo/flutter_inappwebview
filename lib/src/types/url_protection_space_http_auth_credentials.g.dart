@@ -26,8 +26,10 @@ class URLProtectionSpaceHttpAuthCredentials {
     final instance = URLProtectionSpaceHttpAuthCredentials(
       protectionSpace: URLProtectionSpace.fromMap(
           map['protectionSpace']?.cast<String, dynamic>()),
-      credentials: map['credentials']
-          ?.map((e) => URLCredential.fromMap(e?.cast<String, dynamic>())!),
+      credentials: map['credentials'] != null
+          ? List<URLCredential>.from(map['credentials']
+              .map((e) => URLCredential.fromMap(e?.cast<String, dynamic>())!))
+          : null,
     );
     return instance;
   }

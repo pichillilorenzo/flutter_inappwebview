@@ -10,13 +10,14 @@
 // Conversion of client1-crt.pem to certificate.pfx: https://stackoverflow.com/a/38408666/4637638
 // - openssl pkcs12 -export -out certificate.pfx -inkey client1-key.pem -in client1-crt.pem -certfile ca-crt.pem
 // - Overwrite certificate.pfx to example/test_assets/certificate.pfx
-const express = require('express')
-const https = require('https')
-const cors = require('cors')
-const auth = require('basic-auth')
-const app = express()
-const appHttps = express()
-const appAuthBasic = express()
+const express = require('express');
+const http = require('http');
+const https = require('https');
+const cors = require('cors');
+const auth = require('basic-auth');
+const app = express();
+const appHttps = express();
+const appAuthBasic = express();
 const fs = require('fs')
 const path = require('path')
 const bodyParser = require('body-parser');
@@ -207,3 +208,21 @@ app.get("/test-download-file", (req, res) => {
 })
 
 app.listen(8082)
+
+// Proxy server
+http.createServer(function (req, res) {
+    res.setHeader('Content-type', 'text/html');
+    res.write(`
+        <html>
+          <head>
+          </head>
+          <body>
+            <h1>Proxy Works</h1>
+            <p id="url">${req.url}</p>
+            <p id="method">${req.method}</p>
+            <p id="headers">${JSON.stringify(req.headers)}</p>
+          </body>
+        </html>
+      `);
+    res.end();
+}).listen(8083);

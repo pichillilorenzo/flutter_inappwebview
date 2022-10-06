@@ -1527,7 +1527,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         
         var result: [String: Any] = [:]
-        result["history"] = history
+        result["list"] = history
         result["currentIndex"] = currentIndex
         
         return result;

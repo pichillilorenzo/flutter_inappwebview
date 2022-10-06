@@ -22,9 +22,10 @@ class WebsiteDataRecord {
     }
     final instance = WebsiteDataRecord(
       displayName: map['displayName'],
-      dataTypes: map['dataTypes']
-          ?.map((e) => WebsiteDataType.fromNativeValue(e)!)
-          .toSet(),
+      dataTypes: map['dataTypes'] != null
+          ? Set<WebsiteDataType>.from(
+              map['dataTypes'].map((e) => WebsiteDataType.fromNativeValue(e)!))
+          : null,
     );
     return instance;
   }
@@ -69,9 +70,10 @@ class IOSWKWebsiteDataRecord {
     }
     final instance = IOSWKWebsiteDataRecord(
       displayName: map['displayName'],
-      dataTypes: map['dataTypes']
-          ?.map((e) => IOSWKWebsiteDataType.fromNativeValue(e)!)
-          .toSet(),
+      dataTypes: map['dataTypes'] != null
+          ? Set<IOSWKWebsiteDataType>.from(map['dataTypes']
+              .map((e) => IOSWKWebsiteDataType.fromNativeValue(e)!))
+          : null,
     );
     return instance;
   }

@@ -28,7 +28,7 @@ void onProgressChanged() {
             clearCache: true,
           ),
           onProgressChanged: (controller, progress) {
-            if (progress == 100) {
+            if (progress == 100 && !onProgressChangedCompleter.isCompleted) {
               onProgressChangedCompleter.complete();
             }
           },

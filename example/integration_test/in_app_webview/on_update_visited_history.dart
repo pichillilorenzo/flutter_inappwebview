@@ -20,8 +20,8 @@ void onUpdateVisitedHistory() {
 
   testWidgets('onUpdateVisitedHistory', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
-    final Completer<void> firstPushCompleter = Completer<void>();
-    final Completer<void> secondPushCompleter = Completer<void>();
+    final Completer<String> firstPushCompleter = Completer<String>();
+    final Completer<String> secondPushCompleter = Completer<String>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(
@@ -39,9 +39,9 @@ void onUpdateVisitedHistory() {
           },
           onUpdateVisitedHistory: (controller, url, androidIsReload) async {
             if (url!.toString().endsWith("second-push")) {
-              secondPushCompleter.complete();
+              secondPushCompleter.complete(url.toString());
             } else if (url.toString().endsWith("first-push")) {
-              firstPushCompleter.complete();
+              firstPushCompleter.complete(url.toString());
             }
           },
         ),
@@ -63,12 +63,12 @@ setTimeout(function() {
 }, 500);
 """);
 
-    await firstPushCompleter.future;
-    expect((await controller.getUrl())?.toString(),
+    var firstPushUrl = await firstPushCompleter.future;
+    expect(firstPushUrl,
         '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}first-push');
 
-    await secondPushCompleter.future;
-    expect((await controller.getUrl())?.toString(),
+    var secondPushUrl = await secondPushCompleter.future;
+    expect(secondPushUrl,
         '${!kIsWeb ? TEST_CROSS_PLATFORM_URL_1 : TEST_WEB_PLATFORM_BASE_URL}second-push');
   }, skip: shouldSkip);
 }

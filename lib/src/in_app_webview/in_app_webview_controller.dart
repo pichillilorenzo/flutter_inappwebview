@@ -1228,11 +1228,9 @@ class InAppWebViewController {
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (_webview != null && _webview!.onAjaxReadyStateChange != null)
-                return jsonEncode(
-                    await _webview!.onAjaxReadyStateChange!(this, request));
+                return (await _webview!.onAjaxReadyStateChange!(this, request))?.toNativeValue();
               else
-                return jsonEncode(
-                    await _inAppBrowser!.onAjaxReadyStateChange(request));
+                return (await _inAppBrowser!.onAjaxReadyStateChange(request))?.toNativeValue();
             }
             return null;
           case "onAjaxProgress":
@@ -1242,10 +1240,9 @@ class InAppWebViewController {
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (_webview != null && _webview!.onAjaxProgress != null)
-                return jsonEncode(
-                    await _webview!.onAjaxProgress!(this, request));
+                return (await _webview!.onAjaxProgress!(this, request))?.toNativeValue();
               else
-                return jsonEncode(await _inAppBrowser!.onAjaxProgress(request));
+                return (await _inAppBrowser!.onAjaxProgress(request))?.toNativeValue();
             }
             return null;
           case "shouldInterceptFetchRequest":

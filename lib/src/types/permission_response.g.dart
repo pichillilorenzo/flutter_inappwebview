@@ -24,8 +24,8 @@ class PermissionResponse {
       return null;
     }
     final instance = PermissionResponse();
-    instance.resources =
-        map['resources'].map((e) => PermissionResourceType.fromNativeValue(e)!);
+    instance.resources = List<PermissionResourceType>.from(map['resources']
+        .map((e) => PermissionResourceType.fromNativeValue(e)!));
     instance.action = PermissionResponseAction.fromNativeValue(map['action']);
     return instance;
   }
@@ -68,7 +68,7 @@ class PermissionRequestResponse {
       return null;
     }
     final instance = PermissionRequestResponse();
-    instance.resources = map['resources'];
+    instance.resources = map['resources'].cast<String>();
     instance.action =
         PermissionRequestResponseAction.fromNativeValue(map['action']);
     return instance;

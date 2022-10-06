@@ -95,7 +95,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         let windowId = params["windowId"] as? Int64
         let initialUrlRequest = params["initialUrlRequest"] as? [String: Any?]
         let initialFile = params["initialFile"] as? String
-        let initialData = params["initialData"] as? [String: String]
+        let initialData = params["initialData"] as? [String: String?]
         
         if windowId == nil {
             if #available(iOS 11.0, *) {
@@ -131,7 +131,7 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         }
     }
     
-    func load(initialUrlRequest: [String:Any?]?, initialFile: String?, initialData: [String: String]?) {
+    func load(initialUrlRequest: [String:Any?]?, initialFile: String?, initialData: [String: String?]?) {
         guard let webView = webView() else {
             return
         }
@@ -144,11 +144,9 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
                 dump(error)
             }
         }
-        else if let initialData = initialData {
-            let data = initialData["data"]!
-            let mimeType = initialData["mimeType"]!
-            let encoding = initialData["encoding"]!
-            let baseUrl = URL(string: initialData["baseUrl"] ?? "about:blank")!
+        else if let initialData = initialData, let data = initialData["data"]!,
+                let mimeType = initialData["mimeType"]!, let encoding = initialData["encoding"]!,
+                let baseUrl = URL(string: initialData["baseUrl"]! ?? "about:blank") {
             var allowingReadAccessToURL: URL? = nil
             if let allowingReadAccessTo = webView.settings?.allowingReadAccessTo, baseUrl.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)
@@ -156,7 +154,11 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
                     allowingReadAccessToURL = nil
                 }
             }
-            webView.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
+            webView.loadData(data: data,
+                             mimeType: mimeType,
+                             encoding: encoding,
+                             baseUrl: baseUrl,
+                             allowingReadAccessTo: allowingReadAccessToURL)
         }
         else if let initialUrlRequest = initialUrlRequest {
             let urlRequest = URLRequest.init(fromPluginMap: initialUrlRequest)

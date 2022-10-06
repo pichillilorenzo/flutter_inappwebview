@@ -760,7 +760,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             "defaultValue": defaultValue,
             "isMainFrame": isMainFrame
         ]
-        channel?.invokeMethod("onJsConfirm", arguments: arguments, callback: callback)
+        channel?.invokeMethod("onJsPrompt", arguments: arguments, callback: callback)
     }
     
     public class CreateWindowCallback : BaseCallbackResult<Bool> {

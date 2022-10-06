@@ -19,13 +19,13 @@ void main() {
   }
 
   WebView.debugLoggingSettings.usePrint = true;
-  WebView.debugLoggingSettings.maxLogMessageLength = -1;
+  WebView.debugLoggingSettings.maxLogMessageLength = 7000;
   InAppBrowser.debugLoggingSettings.usePrint = true;
-  InAppBrowser.debugLoggingSettings.maxLogMessageLength = -1;
+  InAppBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
   ChromeSafariBrowser.debugLoggingSettings.usePrint = true;
-  ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength = -1;
+  ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength = 7000;
   WebAuthenticationSession.debugLoggingSettings.usePrint = true;
-  WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength = -1;
+  WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength = 7000;
 
   in_app_webview_tests.main();
   service_worker_controller_tests.main();

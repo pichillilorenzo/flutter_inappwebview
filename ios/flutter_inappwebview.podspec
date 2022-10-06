@@ -27,6 +27,6 @@ A new Flutter plugin.
   s.default_subspec = 'Core'
   
   s.subspec 'Core' do |core|
-    core.platform = :ios, '8.0'
+    core.platform = :ios, '9.0'
   end
 end

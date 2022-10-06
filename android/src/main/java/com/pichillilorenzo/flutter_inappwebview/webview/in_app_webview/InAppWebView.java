@@ -385,8 +385,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       WebSettingsCompat.setWillSuppressErrorPage(settings, customSettings.willSuppressErrorPage);
     }
 
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      settings.setAlgorithmicDarkeningAllowed(customSettings.algorithmicDarkeningAllowed);
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, customSettings.algorithmicDarkeningAllowed);
     }
 
     contentBlockerHandler.getRuleList().clear();
@@ -1032,8 +1032,8 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
     if (newSettingsMap.get("algorithmicDarkeningAllowed") != null &&
             !Util.objEquals(customSettings.algorithmicDarkeningAllowed, newCustomSettings.algorithmicDarkeningAllowed) &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-      settings.setAlgorithmicDarkeningAllowed(newCustomSettings.algorithmicDarkeningAllowed);
+            WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+      WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, newCustomSettings.algorithmicDarkeningAllowed);
     }
 
     customSettings = newCustomSettings;

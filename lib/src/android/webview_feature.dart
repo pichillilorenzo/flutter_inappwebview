@@ -196,6 +196,10 @@ class WebViewFeature_ {
   static const SUPPRESS_ERROR_PAGE =
       const WebViewFeature_._internal("SUPPRESS_ERROR_PAGE");
 
+  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  static const ALGORITHMIC_DARKENING =
+      const WebViewFeature_._internal("ALGORITHMIC_DARKENING");
+
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
@@ -402,6 +406,10 @@ class AndroidWebViewFeature_ {
   ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
   static const SUPPRESS_ERROR_PAGE =
     const AndroidWebViewFeature_._internal("SUPPRESS_ERROR_PAGE");
+
+  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  static const ALGORITHMIC_DARKENING =
+      const AndroidWebViewFeature_._internal("ALGORITHMIC_DARKENING");
 
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,

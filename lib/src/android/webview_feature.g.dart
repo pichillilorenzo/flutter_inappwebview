@@ -197,6 +197,10 @@ class WebViewFeature {
   static const SUPPRESS_ERROR_PAGE =
       WebViewFeature._internal('SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
 
+  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  static const ALGORITHMIC_DARKENING = WebViewFeature._internal(
+      'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
+
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -242,6 +246,7 @@ class WebViewFeature {
     WebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
     WebViewFeature.DOCUMENT_START_SCRIPT,
     WebViewFeature.SUPPRESS_ERROR_PAGE,
+    WebViewFeature.ALGORITHMIC_DARKENING,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.
@@ -497,6 +502,10 @@ class AndroidWebViewFeature {
   static const SUPPRESS_ERROR_PAGE = AndroidWebViewFeature._internal(
       'SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
 
+  ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
+  static const ALGORITHMIC_DARKENING = AndroidWebViewFeature._internal(
+      'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
+
   ///Set of all values of [AndroidWebViewFeature].
   static final Set<AndroidWebViewFeature> values = [
     AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -542,6 +551,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
     AndroidWebViewFeature.DOCUMENT_START_SCRIPT,
     AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
+    AndroidWebViewFeature.ALGORITHMIC_DARKENING,
   ].toSet();
 
   ///Gets a possible [AndroidWebViewFeature] instance from [String] value.

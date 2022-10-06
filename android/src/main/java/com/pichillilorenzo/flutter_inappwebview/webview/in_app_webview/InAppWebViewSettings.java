@@ -561,8 +561,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
         realSettings.put("willSuppressErrorPage", WebSettingsCompat.willSuppressErrorPage(settings));
       }
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-        realSettings.put("algorithmicDarkeningAllowed", settings.isAlgorithmicDarkeningAllowed());
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        realSettings.put("algorithmicDarkeningAllowed", WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings));
       }
     }
     return realSettings;

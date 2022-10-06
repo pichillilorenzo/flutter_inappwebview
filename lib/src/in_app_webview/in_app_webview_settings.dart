@@ -672,7 +672,7 @@ class InAppWebViewSettings {
   ///
   ///If Android is applying Force Dark to WebView then WebView will ignore the value of this setting and behave as if it were set to true.
   ///
-  ///**NOTE**: available on Android 33+
+  ///**NOTE**: available on Android 29+.
   bool algorithmicDarkeningAllowed;
 
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.

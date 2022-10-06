@@ -184,9 +184,9 @@ packages:
   flutter_inappwebview_internal_annotations:
     dependency: "direct main"
     description:
-      path: "../flutter_inappwebview_internal_annotations"
-      relative: true
-    source: path
+      name: flutter_inappwebview_internal_annotations
+      url: "https://pub.dartlang.org"
+    source: hosted
     version: "1.0.0"
   frontend_server_client:
     dependency: transitive

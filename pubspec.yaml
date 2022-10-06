@@ -13,8 +13,7 @@ dependencies:
   flutter_web_plugins:
     sdk: flutter
   js: ^0.6.3
-  flutter_inappwebview_internal_annotations:
-    path: dev_packages/flutter_inappwebview_internal_annotations
+  flutter_inappwebview_internal_annotations: ^1.0.0
 
 dev_dependencies:
   flutter_test:

@@ -193,6 +193,10 @@ class WebViewFeature {
   static const DOCUMENT_START_SCRIPT = WebViewFeature._internal(
       'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
 
+  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
+  static const SUPPRESS_ERROR_PAGE =
+      WebViewFeature._internal('SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
+
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -237,6 +241,7 @@ class WebViewFeature {
     WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE,
     WebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
     WebViewFeature.DOCUMENT_START_SCRIPT,
+    WebViewFeature.SUPPRESS_ERROR_PAGE,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.
@@ -488,6 +493,10 @@ class AndroidWebViewFeature {
   static const DOCUMENT_START_SCRIPT = AndroidWebViewFeature._internal(
       'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
 
+  ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
+  static const SUPPRESS_ERROR_PAGE = AndroidWebViewFeature._internal(
+      'SUPPRESS_ERROR_PAGE', 'SUPPRESS_ERROR_PAGE');
+
   ///Set of all values of [AndroidWebViewFeature].
   static final Set<AndroidWebViewFeature> values = [
     AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -532,6 +541,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE,
     AndroidWebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
     AndroidWebViewFeature.DOCUMENT_START_SCRIPT,
+    AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
   ].toSet();
 
   ///Gets a possible [AndroidWebViewFeature] instance from [String] value.

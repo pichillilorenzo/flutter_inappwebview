@@ -9,6 +9,7 @@ import '../types/main.dart';
 import '../util.dart';
 import '../in_app_browser/in_app_browser_settings.dart';
 import 'webview.dart';
+import '../android/webview_feature.dart';
 
 ///This class represents all the WebView settings available.
 class InAppWebViewSettings {
@@ -648,6 +649,32 @@ class InAppWebViewSettings {
   ///- Android native WebView
   Color? horizontalScrollbarTrackColor;
 
+  ///Sets whether the WebView’s internal error page should be suppressed or displayed for bad navigations.
+  ///`true` means suppressed (not shown), `false` means it will be displayed. The default value is `false`.
+  ///
+  ///**NOTE**: available on Android only if [WebViewFeature.SUPPRESS_ERROR_PAGE] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  bool willSuppressErrorPage;
+
+  ///Control whether algorithmic darkening is allowed.
+  ///
+  ///WebView always sets the media query `prefers-color-scheme` according to the app's theme attribute `isLightTheme`,
+  ///i.e. `prefers-color-scheme` is light if `isLightTheme` is `true` or not specified, otherwise it is `dark`.
+  ///This means that the web content's light or dark style will be applied automatically to match the app's theme if the content supports it.
+  ///
+  ///Algorithmic darkening is disallowed by default.
+  ///
+  ///If the app's theme is dark and it allows algorithmic darkening,
+  ///WebView will attempt to darken web content using an algorithm,
+  ///if the content doesn't define its own dark styles and doesn't explicitly disable darkening.
+  ///
+  ///If Android is applying Force Dark to WebView then WebView will ignore the value of this setting and behave as if it were set to true.
+  ///
+  ///**NOTE**: available on Android 33+
+  bool algorithmicDarkeningAllowed;
+
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
@@ -1122,6 +1149,8 @@ class InAppWebViewSettings {
     this.verticalScrollbarTrackColor,
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
+    this.willSuppressErrorPage = false,
+    this.algorithmicDarkeningAllowed = false,
     this.disallowOverScroll = false,
     this.enableViewportScale = false,
     this.suppressesIncrementalRendering = false,
@@ -1268,6 +1297,8 @@ class InAppWebViewSettings {
       "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
       "horizontalScrollbarThumbColor": horizontalScrollbarThumbColor?.toHex(),
       "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
+      "willSuppressErrorPage": willSuppressErrorPage,
+      "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
       "disallowOverScroll": disallowOverScroll,
       "enableViewportScale": enableViewportScale,
       "suppressesIncrementalRendering": suppressesIncrementalRendering,
@@ -1451,6 +1482,8 @@ class InAppWebViewSettings {
             UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
         settings.horizontalScrollbarTrackColor =
             UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
+        settings.willSuppressErrorPage = map["willSuppressErrorPage"];
+        settings.algorithmicDarkeningAllowed = map["algorithmicDarkeningAllowed"];
       }
       else if (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS) {

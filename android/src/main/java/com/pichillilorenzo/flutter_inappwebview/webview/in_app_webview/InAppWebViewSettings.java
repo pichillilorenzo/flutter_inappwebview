@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
+import android.annotation.SuppressLint;
 import android.os.Build;
 import android.view.View;
 import android.webkit.WebSettings;
@@ -112,6 +113,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public String horizontalScrollbarThumbColor;
   @Nullable
   public String horizontalScrollbarTrackColor;
+  public Boolean willSuppressErrorPage = false;
+  public Boolean algorithmicDarkeningAllowed = false;
 
   @NonNull
   @Override
@@ -370,6 +373,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "horizontalScrollbarTrackColor":
           horizontalScrollbarTrackColor = (String) value;
           break;
+        case "willSuppressErrorPage":
+          willSuppressErrorPage = (Boolean) value;
+          break;
+        case "algorithmicDarkeningAllowed":
+          algorithmicDarkeningAllowed = (Boolean) value;
+          break;
       }
     }
 
@@ -462,9 +471,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("verticalScrollbarTrackColor", verticalScrollbarTrackColor);
     settings.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
     settings.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
+    settings.put("willSuppressErrorPage", willSuppressErrorPage);
+    settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
     return settings;
   }
 
+  @SuppressLint("RestrictedApi")
   @NonNull
   @Override
   public Map<String, Object> getRealSettings(@NonNull InAppWebViewInterface inAppWebView) {
@@ -545,6 +557,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         rendererPriorityPolicy.put("rendererRequestedPriority", webView.getRendererRequestedPriority());
         rendererPriorityPolicy.put("waivedWhenNotVisible", webView.getRendererPriorityWaivedWhenNotVisible());
         realSettings.put("rendererPriorityPolicy", rendererPriorityPolicy);
+      }
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
+        realSettings.put("willSuppressErrorPage", WebSettingsCompat.willSuppressErrorPage(settings));
+      }
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+        realSettings.put("algorithmicDarkeningAllowed", settings.isAlgorithmicDarkeningAllowed());
       }
     }
     return realSettings;

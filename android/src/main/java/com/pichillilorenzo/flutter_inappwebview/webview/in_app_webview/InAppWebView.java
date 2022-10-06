@@ -59,6 +59,7 @@ import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
+import com.pichillilorenzo.flutter_inappwebview.types.HitTestResult;
 import com.pichillilorenzo.flutter_inappwebview.webview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -196,6 +197,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     }
   }
 
+  @SuppressLint("RestrictedApi")
   public void prepare() {
     httpClient = new OkHttpClient().newBuilder().build();
 
@@ -377,6 +379,14 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       customSettings.rendererPriorityPolicy.put("rendererRequestedPriority", getRendererRequestedPriority());
       customSettings.rendererPriorityPolicy.put("waivedWhenNotVisible", getRendererPriorityWaivedWhenNotVisible());
+    }
+
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
+      WebSettingsCompat.setWillSuppressErrorPage(settings, customSettings.willSuppressErrorPage);
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      settings.setAlgorithmicDarkeningAllowed(customSettings.algorithmicDarkeningAllowed);
     }
 
     contentBlockerHandler.getRuleList().clear();
@@ -690,6 +700,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     });
   }
 
+  @SuppressLint("RestrictedApi")
   public void setSettings(InAppWebViewSettings newCustomSettings, HashMap<String, Object> newSettingsMap) {
 
     WebSettings settings = getSettings();
@@ -1011,6 +1022,18 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
       if (newSettingsMap.get("horizontalScrollbarTrackColor") != null && !Util.objEquals(customSettings.horizontalScrollbarTrackColor, newCustomSettings.horizontalScrollbarTrackColor))
         setHorizontalScrollbarTrackDrawable(new ColorDrawable(Color.parseColor(newCustomSettings.horizontalScrollbarTrackColor)));
+    }
+
+    if (newSettingsMap.get("willSuppressErrorPage") != null &&
+            !Util.objEquals(customSettings.willSuppressErrorPage, newCustomSettings.willSuppressErrorPage) &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
+      WebSettingsCompat.setWillSuppressErrorPage(settings, newCustomSettings.willSuppressErrorPage);
+    }
+
+    if (newSettingsMap.get("algorithmicDarkeningAllowed") != null &&
+            !Util.objEquals(customSettings.algorithmicDarkeningAllowed, newCustomSettings.algorithmicDarkeningAllowed) &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+      settings.setAlgorithmicDarkeningAllowed(newCustomSettings.algorithmicDarkeningAllowed);
     }
 
     customSettings = newCustomSettings;

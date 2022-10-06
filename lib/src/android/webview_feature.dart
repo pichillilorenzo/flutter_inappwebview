@@ -6,6 +6,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 import 'proxy_controller.dart';
 import 'service_worker_controller.dart';
 import '../web_message/main.dart';
+import '../types/user_script_injection_time.dart';
 
 part 'webview_feature.g.dart';
 
@@ -186,6 +187,10 @@ class WebViewFeature_ {
   ///
   static const WEB_VIEW_RENDERER_TERMINATE =
       const WebViewFeature_._internal("WEB_VIEW_RENDERER_TERMINATE");
+
+  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  static const DOCUMENT_START_SCRIPT =
+      const AndroidWebViewFeature_._internal("DOCUMENT_START_SCRIPT");
 
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
@@ -385,6 +390,10 @@ class AndroidWebViewFeature_ {
   ///
   static const WEB_VIEW_RENDERER_TERMINATE =
       const AndroidWebViewFeature_._internal("WEB_VIEW_RENDERER_TERMINATE");
+
+  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  static const DOCUMENT_START_SCRIPT =
+      const AndroidWebViewFeature_._internal("DOCUMENT_START_SCRIPT");
 
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,

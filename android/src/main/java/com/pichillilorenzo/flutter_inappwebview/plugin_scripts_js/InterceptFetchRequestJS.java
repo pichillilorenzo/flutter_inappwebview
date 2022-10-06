@@ -12,7 +12,8 @@ public class InterceptFetchRequestJS {
           InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_SOURCE,
           UserScriptInjectionTime.AT_DOCUMENT_START,
           null,
-          true
+          true,
+          null
   );
 
   public static final String INTERCEPT_FETCH_REQUEST_JS_SOURCE = "(function(fetch) {" +

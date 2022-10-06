@@ -12,7 +12,8 @@ public class InterceptAjaxRequestJS {
           InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_SOURCE,
           UserScriptInjectionTime.AT_DOCUMENT_START,
           null,
-          true
+          true,
+          null
   );
 
   public static final String INTERCEPT_AJAX_REQUEST_JS_SOURCE = "(function(ajax) {" +

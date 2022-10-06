@@ -28,6 +28,11 @@ class UserScript {
   ///**NOTE**: available only on iOS.
   bool forMainFrameOnly;
 
+  ///A set of matching rules for the allowed origins.
+  ///
+  ///**NOTE**: available only on Android and only if [WebViewFeature.DOCUMENT_START_SCRIPT] feature is supported.
+  late Set<String> allowedOriginRules;
+
   ///A scope of execution in which to evaluate the script to prevent conflicts between different scripts.
   ///For more information about content worlds, see [ContentWorld].
   late ContentWorld contentWorld;
@@ -37,7 +42,10 @@ class UserScript {
       required this.injectionTime,
       @Deprecated("Use forMainFrameOnly instead") this.iosForMainFrameOnly,
       this.forMainFrameOnly = true,
+      Set<String>? allowedOriginRules,
       ContentWorld? contentWorld}) {
+    this.allowedOriginRules =
+        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
     this.forMainFrameOnly = this.iosForMainFrameOnly != null
         ? this.iosForMainFrameOnly!
@@ -57,6 +65,7 @@ class UserScript {
       iosForMainFrameOnly: map['forMainFrameOnly'],
     );
     instance.forMainFrameOnly = map['forMainFrameOnly'];
+    instance.allowedOriginRules = map['allowedOriginRules'].cast<String>();
     instance.contentWorld = map['contentWorld'];
     return instance;
   }
@@ -68,6 +77,7 @@ class UserScript {
       "source": source,
       "injectionTime": injectionTime.toNativeValue(),
       "forMainFrameOnly": forMainFrameOnly,
+      "allowedOriginRules": allowedOriginRules.toList(),
       "contentWorld": contentWorld.toMap(),
     };
   }
@@ -79,6 +89,6 @@ class UserScript {
 
   @override
   String toString() {
-    return 'UserScript{groupName: $groupName, source: $source, injectionTime: $injectionTime, forMainFrameOnly: $forMainFrameOnly, contentWorld: $contentWorld}';
+    return 'UserScript{groupName: $groupName, source: $source, injectionTime: $injectionTime, forMainFrameOnly: $forMainFrameOnly, allowedOriginRules: $allowedOriginRules, contentWorld: $contentWorld}';
   }
 }

@@ -3,11 +3,13 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.Set;
+
 public class PluginScript extends UserScript {
   private boolean requiredInAllContentWorlds;
 
-  public PluginScript(@Nullable String groupName, @NonNull String source, @NonNull UserScriptInjectionTime injectionTime, @Nullable ContentWorld contentWorld, boolean requiredInAllContentWorlds) {
-    super(groupName, source, injectionTime, contentWorld);
+  public PluginScript(@Nullable String groupName, @NonNull String source, @NonNull UserScriptInjectionTime injectionTime, @Nullable ContentWorld contentWorld, boolean requiredInAllContentWorlds, @Nullable Set<String> allowedOriginRules) {
+    super(groupName, source, injectionTime, contentWorld, allowedOriginRules);
     this.requiredInAllContentWorlds = requiredInAllContentWorlds;
   }
 

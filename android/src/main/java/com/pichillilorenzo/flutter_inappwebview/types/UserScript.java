@@ -3,7 +3,10 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 public class UserScript {
   @Nullable
@@ -14,12 +17,19 @@ public class UserScript {
   private UserScriptInjectionTime injectionTime;
   @NonNull
   private ContentWorld contentWorld;
+  @NonNull
+  private Set<String> allowedOriginRules = new HashSet<>();
 
-  public UserScript(@Nullable String groupName, @NonNull String source, @NonNull UserScriptInjectionTime injectionTime, @Nullable ContentWorld contentWorld) {
+  public UserScript(@Nullable String groupName, @NonNull String source,
+                    @NonNull UserScriptInjectionTime injectionTime, @Nullable ContentWorld contentWorld,
+                    @Nullable Set<String> allowedOriginRules) {
     this.groupName = groupName;
     this.source = source;
     this.injectionTime = injectionTime;
     this.contentWorld = contentWorld == null ? ContentWorld.PAGE : contentWorld;
+    this.allowedOriginRules = allowedOriginRules == null ? new HashSet<String>() {{
+      add("*");
+    }} : allowedOriginRules;
   }
 
   @Nullable
@@ -31,8 +41,9 @@ public class UserScript {
     String source = (String) map.get("source");
     UserScriptInjectionTime injectionTime = UserScriptInjectionTime.fromValue((int) map.get("injectionTime"));
     ContentWorld contentWorld = ContentWorld.fromMap((Map<String, Object>) map.get("contentWorld"));
+    Set<String> allowedOriginRules = new HashSet<>((List<String>) map.get("allowedOriginRules"));
     assert source != null;
-    return new UserScript(groupName, source, injectionTime, contentWorld);
+    return new UserScript(groupName, source, injectionTime, contentWorld, allowedOriginRules);
   }
 
   @Nullable
@@ -71,6 +82,15 @@ public class UserScript {
     this.contentWorld = contentWorld == null ? ContentWorld.PAGE : contentWorld;
   }
 
+  @NonNull
+  public Set<String> getAllowedOriginRules() {
+    return allowedOriginRules;
+  }
+
+  public void setAllowedOriginRules(@NonNull Set<String> allowedOriginRules) {
+    this.allowedOriginRules = allowedOriginRules;
+  }
+
   @Override
   public boolean equals(Object o) {
     if (this == o) return true;
@@ -78,10 +98,12 @@ public class UserScript {
 
     UserScript that = (UserScript) o;
 
-    if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null) return false;
+    if (groupName != null ? !groupName.equals(that.groupName) : that.groupName != null)
+      return false;
     if (!source.equals(that.source)) return false;
     if (injectionTime != that.injectionTime) return false;
-    return contentWorld.equals(that.contentWorld);
+    if (!contentWorld.equals(that.contentWorld)) return false;
+    return allowedOriginRules.equals(that.allowedOriginRules);
   }
 
   @Override
@@ -90,6 +112,7 @@ public class UserScript {
     result = 31 * result + source.hashCode();
     result = 31 * result + injectionTime.hashCode();
     result = 31 * result + contentWorld.hashCode();
+    result = 31 * result + allowedOriginRules.hashCode();
     return result;
   }
 
@@ -100,6 +123,7 @@ public class UserScript {
             ", source='" + source + '\'' +
             ", injectionTime=" + injectionTime +
             ", contentWorld=" + contentWorld +
+            ", allowedOriginRules=" + allowedOriginRules +
             '}';
   }
 }

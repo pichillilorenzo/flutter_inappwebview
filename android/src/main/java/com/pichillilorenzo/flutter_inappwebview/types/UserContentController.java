@@ -1,10 +1,15 @@
 package com.pichillilorenzo.flutter_inappwebview.types;
 
+import android.annotation.SuppressLint;
 import android.text.TextUtils;
 import android.util.Log;
+import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.webkit.ScriptHandler;
+import androidx.webkit.WebViewCompat;
+import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
@@ -21,13 +26,16 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class UserContentController {
+@SuppressLint("RestrictedApi")
+public class UserContentController implements Disposable {
   protected static final String LOG_TAG = "UserContentController";
 
   @NonNull
   private final Set<ContentWorld> contentWorlds = new HashSet<ContentWorld>() {{
     add(ContentWorld.PAGE);
   }};
+
+  private final Map<UserScript, ScriptHandler> scriptHandlerMap = new HashMap<>();
 
   @NonNull
   private final Map<UserScriptInjectionTime, LinkedHashSet<UserScript>> userOnlyScripts = new HashMap<UserScriptInjectionTime, LinkedHashSet<UserScript>>() {{
@@ -40,7 +48,11 @@ public class UserContentController {
     put(UserScriptInjectionTime.AT_DOCUMENT_END, new LinkedHashSet<PluginScript>());
   }};
 
-  public UserContentController() {
+  @Nullable
+  public WebView webView;
+
+  public UserContentController(WebView webView) {
+    this.webView = webView;
   }
 
   public String generateWrappedCodeForDocumentStart() {
@@ -52,8 +64,11 @@ public class UserContentController {
 
   public String generateWrappedCodeForDocumentEnd() {
     UserScriptInjectionTime injectionTime = UserScriptInjectionTime.AT_DOCUMENT_END;
-    // try to reload scripts if they were not loaded during the AT_DOCUMENT_START event
-    String js = generateCodeForDocumentStart();
+    String js = "";
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      // try to reload scripts if they were not loaded during the AT_DOCUMENT_START event
+      js += generateCodeForDocumentStart();
+    }
     js += generatePluginScriptsCodeAt(injectionTime);
     js += generateUserOnlyScriptsCodeAt(injectionTime);
     js = USER_SCRIPTS_AT_DOCUMENT_END_WRAPPER_JS_SOURCE.replace(PluginScriptsUtil.VAR_PLACEHOLDER_VALUE, js);
@@ -161,6 +176,14 @@ public class UserContentController {
     if (contentWorld != null) {
       contentWorlds.add(contentWorld);
     }
+    if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
+              webView,
+              userOnlyScript.getSource(),
+              userOnlyScript.getAllowedOriginRules()
+      );
+      this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
+    }
     return this.userOnlyScripts.get(userOnlyScript.getInjectionTime()).add(userOnlyScript);
   }
 
@@ -171,6 +194,13 @@ public class UserContentController {
   }
 
   public boolean removeUserOnlyScript(UserScript userOnlyScript) {
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      ScriptHandler scriptHandler = this.scriptHandlerMap.get(userOnlyScript);
+      if (scriptHandler != null) {
+        scriptHandler.remove();
+        this.scriptHandlerMap.remove(userOnlyScript);
+      }
+    }
     return this.userOnlyScripts.get(userOnlyScript.getInjectionTime()).remove(userOnlyScript);
   }
 
@@ -180,6 +210,15 @@ public class UserContentController {
   }
 
   public void removeAllUserOnlyScripts() {
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      for (UserScript userOnlyScript : this.userOnlyScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START)) {
+        ScriptHandler scriptHandler = this.scriptHandlerMap.get(userOnlyScript);
+        if (scriptHandler != null) {
+          scriptHandler.remove();
+          this.scriptHandlerMap.remove(userOnlyScript);
+        }
+      }
+    }
     this.userOnlyScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START).clear();
     this.userOnlyScripts.get(UserScriptInjectionTime.AT_DOCUMENT_END).clear();
   }
@@ -204,6 +243,14 @@ public class UserContentController {
     if (contentWorld != null) {
       contentWorlds.add(contentWorld);
     }
+    if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
+              webView,
+              pluginScript.getSource(),
+              pluginScript.getAllowedOriginRules()
+      );
+      this.scriptHandlerMap.put(pluginScript, scriptHandler);
+    }
     return this.pluginScripts.get(pluginScript.getInjectionTime()).add(pluginScript);
   }
 
@@ -214,10 +261,26 @@ public class UserContentController {
   }
 
   public boolean removePluginScript(PluginScript pluginScript) {
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      ScriptHandler scriptHandler = this.scriptHandlerMap.get(pluginScript);
+      if (scriptHandler != null) {
+        scriptHandler.remove();
+        this.scriptHandlerMap.remove(pluginScript);
+      }
+    }
     return this.pluginScripts.get(pluginScript.getInjectionTime()).remove(pluginScript);
   }
 
   public void removeAllPluginScripts() {
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      for (PluginScript pluginScript : this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START)) {
+        ScriptHandler scriptHandler = this.scriptHandlerMap.get(pluginScript);
+        if (scriptHandler != null) {
+          scriptHandler.remove();
+          this.scriptHandlerMap.remove(pluginScript);
+        }
+      }
+    }
     this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_START).clear();
     this.pluginScripts.get(UserScriptInjectionTime.AT_DOCUMENT_END).clear();
   }
@@ -353,4 +416,9 @@ public class UserContentController {
   private static final String DOCUMENT_READY_WRAPPER_JS_SOURCE = "if (document.readyState === 'interactive' || document.readyState === 'complete') { " +
           "  " + PluginScriptsUtil.VAR_PLACEHOLDER_VALUE +
           "}";
+
+  @Override
+  public void dispose() {
+    webView = null;
+  }
 }

@@ -11,7 +11,8 @@ public class JavaScriptBridgeJS {
           JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_SOURCE,
           UserScriptInjectionTime.AT_DOCUMENT_START,
           null,
-          true
+          true,
+          null
   );
 
   public static final String JAVASCRIPT_UTIL_VAR_NAME = "window." + JAVASCRIPT_BRIDGE_NAME + "._Util";

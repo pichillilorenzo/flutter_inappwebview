@@ -1,5 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.graphics.Bitmap;
 import android.net.Uri;
@@ -166,15 +167,17 @@ public class InAppWebViewClient extends WebViewClient {
     }
   }
 
+  @SuppressLint("RestrictedApi")
   public void loadCustomJavaScriptOnPageStarted(WebView view) {
     InAppWebView webView = (InAppWebView) view;
 
-    String source = webView.userContentController.generateWrappedCodeForDocumentStart();
-
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-      webView.evaluateJavascript(source, (ValueCallback<String>) null);
-    } else {
-      webView.loadUrl("javascript:" + source.replaceAll("[\r\n]+", ""));
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      String source = webView.userContentController.generateWrappedCodeForDocumentStart();
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+        webView.evaluateJavascript(source, (ValueCallback<String>) null);
+      } else {
+        webView.loadUrl("javascript:" + source.replaceAll("[\r\n]+", ""));
+      }
     }
   }
 

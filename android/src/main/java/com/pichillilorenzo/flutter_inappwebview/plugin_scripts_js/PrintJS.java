@@ -10,7 +10,8 @@ public class PrintJS {
           PrintJS.PRINT_JS_SOURCE,
           UserScriptInjectionTime.AT_DOCUMENT_START,
           null,
-          false
+          false,
+          null
   );
 
   public static final String PRINT_JS_SOURCE = "window.print = function() {" +

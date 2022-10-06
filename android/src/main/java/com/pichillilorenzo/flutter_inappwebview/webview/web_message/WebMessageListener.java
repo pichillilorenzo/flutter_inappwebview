@@ -96,7 +96,8 @@ public class WebMessageListener implements Disposable {
               source,
               UserScriptInjectionTime.AT_DOCUMENT_START,
               null,
-              false
+              false,
+              null
       ));
     }
   }

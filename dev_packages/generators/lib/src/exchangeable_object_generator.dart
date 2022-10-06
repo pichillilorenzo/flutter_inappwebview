@@ -586,7 +586,7 @@ class ExchangeableObjectGenerator
             getToMapValue('$genericTypeFieldName', genericType) +
             ').toList()';
       } else {
-        return fieldName;
+        return elementType.isDartCoreSet ? "$fieldName${(isNullable ? '?' : '')}.toList()" : fieldName;
       }
     } else if (fieldTypeElement != null && hasToMapMethod(fieldTypeElement)) {
       return fieldName +

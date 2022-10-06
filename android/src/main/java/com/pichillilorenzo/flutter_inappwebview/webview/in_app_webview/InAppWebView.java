@@ -2,6 +2,7 @@ package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
+import android.annotation.SuppressLint;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -96,9 +97,11 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -153,13 +156,15 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public Runnable checkContextMenuShouldBeClosedTask;
   public int newCheckContextMenuShouldBeClosedTaskTask = 100; // ms
 
-  public UserContentController userContentController = new UserContentController();
+  public UserContentController userContentController = new UserContentController(this);
 
   public Map<String, ValueCallback<String>> callAsyncJavaScriptCallbacks = new HashMap<>();
   public Map<String, ValueCallback<String>> evaluateJavaScriptContentWorldCallbacks = new HashMap<>();
 
   public Map<String, WebMessageChannel> webMessageChannels = new HashMap<>();
   public List<WebMessageListener> webMessageListeners = new ArrayList<>();
+
+  private List<UserScript> initialUserOnlyScript = new ArrayList<>();
 
   public InAppWebView(Context context) {
     super(context);
@@ -185,7 +190,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     this.windowId = windowId;
     this.customSettings = customSettings;
     this.contextMenu = contextMenu;
-    this.userContentController.addUserOnlyScripts(userScripts);
+    this.initialUserOnlyScript = userScripts;
     if (plugin != null && plugin.activity != null) {
       plugin.activity.registerForContextMenu(this);
     }
@@ -208,24 +213,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       WebViewCompat.setWebViewRenderProcessClient(this, inAppWebViewRenderProcessClient);
     }
 
-    userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
-    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
-    if (customSettings.useShouldInterceptAjaxRequest) {
-      userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT);
-    }
-    if (customSettings.useShouldInterceptFetchRequest) {
-      userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT);
-    }
-    if (customSettings.useOnLoadResource) {
-      userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT);
-    }
-    if (!customSettings.useHybridComposition) {
-      userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
-    }
+    prepareAndAddUserScripts();
 
     if (customSettings.useOnDownloadStart)
       setDownloadListener(new DownloadStartListener());
@@ -502,6 +490,28 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
         return false;
       }
     });
+  }
+
+  private void prepareAndAddUserScripts() {
+    userContentController.addPluginScript(PromisePolyfillJS.PROMISE_POLYFILL_JS_PLUGIN_SCRIPT);
+    userContentController.addPluginScript(JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_JS_PLUGIN_SCRIPT);
+    userContentController.addPluginScript(ConsoleLogJS.CONSOLE_LOG_JS_PLUGIN_SCRIPT);
+    userContentController.addPluginScript(PrintJS.PRINT_JS_PLUGIN_SCRIPT);
+    userContentController.addPluginScript(OnWindowBlurEventJS.ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT);
+    userContentController.addPluginScript(OnWindowFocusEventJS.ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT);
+    if (customSettings.useShouldInterceptAjaxRequest) {
+      userContentController.addPluginScript(InterceptAjaxRequestJS.INTERCEPT_AJAX_REQUEST_JS_PLUGIN_SCRIPT);
+    }
+    if (customSettings.useShouldInterceptFetchRequest) {
+      userContentController.addPluginScript(InterceptFetchRequestJS.INTERCEPT_FETCH_REQUEST_JS_PLUGIN_SCRIPT);
+    }
+    if (customSettings.useOnLoadResource) {
+      userContentController.addPluginScript(OnLoadResourceJS.ON_LOAD_RESOURCE_JS_PLUGIN_SCRIPT);
+    }
+    if (!customSettings.useHybridComposition) {
+      userContentController.addPluginScript(PluginScriptsUtil.CHECK_GLOBAL_KEY_DOWN_EVENT_TO_HIDE_CONTEXT_MENU_JS_PLUGIN_SCRIPT);
+    }
+    this.userContentController.addUserOnlyScripts(this.initialUserOnlyScript);
   }
 
   public void setIncognito(boolean enabled) {
@@ -1879,6 +1889,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Override
   public void dispose() {
+    userContentController.dispose();
     if (windowId != null) {
       InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
     }

@@ -189,6 +189,10 @@ class WebViewFeature {
   static const WEB_VIEW_RENDERER_TERMINATE = WebViewFeature._internal(
       'WEB_VIEW_RENDERER_TERMINATE', 'WEB_VIEW_RENDERER_TERMINATE');
 
+  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  static const DOCUMENT_START_SCRIPT = WebViewFeature._internal(
+      'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
+
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -232,6 +236,7 @@ class WebViewFeature {
     WebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT,
     WebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE,
     WebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
+    WebViewFeature.DOCUMENT_START_SCRIPT,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.
@@ -479,6 +484,10 @@ class AndroidWebViewFeature {
   static const WEB_VIEW_RENDERER_TERMINATE = AndroidWebViewFeature._internal(
       'WEB_VIEW_RENDERER_TERMINATE', 'WEB_VIEW_RENDERER_TERMINATE');
 
+  ///This feature covers [UserScriptInjectionTime.AT_DOCUMENT_START].
+  static const DOCUMENT_START_SCRIPT = AndroidWebViewFeature._internal(
+      'DOCUMENT_START_SCRIPT', 'DOCUMENT_START_SCRIPT');
+
   ///Set of all values of [AndroidWebViewFeature].
   static final Set<AndroidWebViewFeature> values = [
     AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -522,6 +531,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.WEB_RESOURCE_REQUEST_IS_REDIRECT,
     AndroidWebViewFeature.WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE,
     AndroidWebViewFeature.WEB_VIEW_RENDERER_TERMINATE,
+    AndroidWebViewFeature.DOCUMENT_START_SCRIPT,
   ].toSet();
 
   ///Gets a possible [AndroidWebViewFeature] instance from [String] value.

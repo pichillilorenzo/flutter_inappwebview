@@ -53,11 +53,11 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     return {
       "entersReaderIfAvailable": entersReaderIfAvailable,
       "barCollapsingEnabled": barCollapsingEnabled,
-      "dismissButtonStyle": dismissButtonStyle.toValue(),
+      "dismissButtonStyle": dismissButtonStyle.toNativeValue(),
       "preferredBarTintColor": preferredBarTintColor?.toHex(),
       "preferredControlTintColor": preferredControlTintColor?.toHex(),
-      "presentationStyle": presentationStyle.toValue(),
-      "transitionStyle": transitionStyle.toValue()
+      "presentationStyle": presentationStyle.toNativeValue(),
+      "transitionStyle": transitionStyle.toNativeValue()
     };
   }
 
@@ -66,15 +66,15 @@ class IOSSafariOptions implements ChromeSafariBrowserOptions, IosOptions {
     options.entersReaderIfAvailable = map["entersReaderIfAvailable"];
     options.barCollapsingEnabled = map["barCollapsingEnabled"];
     options.dismissButtonStyle =
-        IOSSafariDismissButtonStyle.fromValue(map["dismissButtonStyle"])!;
+        IOSSafariDismissButtonStyle.fromNativeValue(map["dismissButtonStyle"])!;
     options.preferredBarTintColor =
         UtilColor.fromHex(map["preferredBarTintColor"]);
     options.preferredControlTintColor =
         UtilColor.fromHex(map["preferredControlTintColor"]);
     options.presentationStyle =
-        IOSUIModalPresentationStyle.fromValue(map["presentationStyle"])!;
+        IOSUIModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
     options.transitionStyle =
-        IOSUIModalTransitionStyle.fromValue(map["transitionStyle"])!;
+        IOSUIModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
     return options;
   }
 

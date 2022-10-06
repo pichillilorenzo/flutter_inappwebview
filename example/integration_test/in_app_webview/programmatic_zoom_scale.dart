@@ -68,7 +68,9 @@ void programmaticZoomScale() {
               controllerCompleter.complete(controller);
             },
             onLoadStop: (controller, url) {
-              pageLoaded.complete();
+              if (!pageLoaded.isCompleted) {
+                pageLoaded.complete();
+              }
             },
             onZoomScaleChanged: (controller, oldScale, newScale) {
               if (listenForScaleChange) {

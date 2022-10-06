@@ -1,0 +1,26 @@
+{
+  "name": "flutter_inappwebview",
+  "version": "1.0.0",
+  "directories": {
+    "example": "example",
+    "lib": "lib",
+    "test": "test"
+  },
+  "private": true,
+  "scripts": {
+    "build": "flutter pub run build_runner build --delete-conflicting-outputs",
+    "watch": "flutter pub run build_runner watch --delete-conflicting-outputs",
+    "publish:dry": "npm run build && flutter pub publish --dry-run",
+    "publish": "npm run build && flutter pub publish"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pichillilorenzo/flutter_inappwebview.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pichillilorenzo/flutter_inappwebview/issues"
+  },
+  "homepage": "https://github.com/pichillilorenzo/flutter_inappwebview#readme"
+}

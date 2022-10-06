@@ -1,19 +1,25 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'ajax_request.dart';
 
+part 'ajax_request_headers.g.dart';
+
 ///Class that represents the HTTP headers of an [AjaxRequest].
-class AjaxRequestHeaders {
+@ExchangeableObject()
+class AjaxRequestHeaders_ {
   Map<String, dynamic> _headers;
   Map<String, dynamic> _newHeaders = {};
 
-  AjaxRequestHeaders(this._headers);
+  @ExchangeableObjectConstructor()
+  AjaxRequestHeaders_(this._headers);
 
   ///Gets a possible [AjaxRequestHeaders] instance from a [Map] value.
-  static AjaxRequestHeaders? fromMap(Map<String, dynamic>? map) {
+  static AjaxRequestHeaders_? fromMap(Map<String, dynamic>? map) {
     if (map == null) {
       return null;
     }
 
-    return AjaxRequestHeaders(map);
+    return AjaxRequestHeaders_(map);
   }
 
   ///Gets the HTTP headers of the [AjaxRequest].
@@ -34,13 +40,8 @@ class AjaxRequestHeaders {
     return _newHeaders;
   }
 
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return toMap();
-  }
-
   @override
   String toString() {
-    return toMap().toString();
+    return 'AjaxRequestHeaders{headers: $_headers, requestHeaders: $_newHeaders}';
   }
 }

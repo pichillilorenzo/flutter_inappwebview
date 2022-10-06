@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'in_app_webview/webview.dart';
 import 'chrome_safari_browser/chrome_safari_browser.dart';
+import 'in_app_browser/in_app_browser.dart';
 
-///Class that represents the debug logging settings used by [WebView] and [ChromeSafariBrowser].
+///Class that represents the debug logging settings used by [WebView], [InAppBrowser] and [ChromeSafariBrowser].
 class DebugLoggingSettings {
   ///Enables debug logging info.
   ///
@@ -20,9 +21,13 @@ class DebugLoggingSettings {
   ///The default value is `-1`.
   int maxLogMessageLength;
 
+  ///Use [print] instead of `developer.log` to log messages.
+  bool usePrint;
+
   DebugLoggingSettings({
     this.enabled = kDebugMode,
     this.excludeFilter = const [],
-    this.maxLogMessageLength = -1
+    this.maxLogMessageLength = -1,
+    this.usePrint = false
   });
 }

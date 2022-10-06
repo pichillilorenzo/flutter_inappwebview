@@ -1,17 +1,9 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+part 'trusted_web_activity_display_mode.g.dart';
+
 ///Class that represents display mode of a Trusted Web Activity.
-abstract class TrustedWebActivityDisplayMode {
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {};
-  }
+@ExchangeableObject(fromMapFactory: false)
+abstract class TrustedWebActivityDisplayMode_ {
 
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

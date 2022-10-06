@@ -8,10 +8,10 @@
 import Foundation
 
 public class PermissionResponse : NSObject {
-    var resources: [String]
+    var resources: [Any]
     var action: Int?
     
-    public init(resources: [String], action: Int? = nil) {
+    public init(resources: [Any], action: Int? = nil) {
         self.resources = resources
         self.action = action
     }
@@ -20,7 +20,7 @@ public class PermissionResponse : NSObject {
         guard let map = map else {
             return nil
         }
-        let resources = map["resources"] as! [String]
+        let resources = map["resources"] as! [Any]
         let action = map["action"] as? Int
         return PermissionResponse(resources: resources, action: action)
     }

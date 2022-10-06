@@ -1,0 +1,3 @@
+class ExchangeableEnumCustomValue {
+  const ExchangeableEnumCustomValue();
+}

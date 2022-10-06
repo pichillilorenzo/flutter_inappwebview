@@ -24,7 +24,14 @@ class HeadlessInAppWebViewWebElement implements Disposable {
       _messenger,
     );
 
-    this._channel?.setMethodCallHandler(handleMethodCall);
+    this._channel?.setMethodCallHandler((call) async {
+      try {
+        return await handleMethodCall(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   Future<dynamic> handleMethodCall(MethodCall call) async {

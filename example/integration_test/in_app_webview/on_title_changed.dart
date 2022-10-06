@@ -33,7 +33,9 @@ void onTitleChanged() {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
-            pageLoaded.complete();
+            if (!pageLoaded.isCompleted) {
+              pageLoaded.complete();
+            }
           },
           onTitleChanged: (controller, title) {
             if (title == "title test") {

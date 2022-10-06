@@ -1,17 +1,21 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../x509_certificate/x509_certificate.dart';
 import '../x509_certificate/asn1_distinguished_names.dart';
 
 import 'ssl_certificate_dname.dart';
 
+part 'ssl_certificate.g.dart';
+
 ///SSL certificate info (certificate details) class.
-class SslCertificate {
+@ExchangeableObject()
+class SslCertificate_ {
   ///Name of the entity this certificate is issued by.
-  SslCertificateDName? issuedBy;
+  SslCertificateDName_? issuedBy;
 
   ///Name of the entity this certificate is issued to.
-  SslCertificateDName? issuedTo;
+  SslCertificateDName_? issuedTo;
 
   ///Not-after date from the validity period.
   DateTime? validNotAfterDate;
@@ -22,7 +26,7 @@ class SslCertificate {
   ///The original source certificate, if available.
   X509Certificate? x509Certificate;
 
-  SslCertificate(
+  SslCertificate_(
       {this.issuedBy,
         this.issuedTo,
         this.validNotAfterDate,
@@ -87,26 +91,5 @@ class SslCertificate {
       DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"]),
       x509Certificate: x509Certificate,
     );
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "issuedBy": issuedBy?.toMap(),
-      "issuedTo": issuedTo?.toMap(),
-      "validNotAfterDate": validNotAfterDate?.millisecondsSinceEpoch,
-      "validNotBeforeDate": validNotBeforeDate?.millisecondsSinceEpoch,
-      "x509Certificate": x509Certificate?.toMap(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
   }
 }

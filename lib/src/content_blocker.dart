@@ -88,11 +88,11 @@ class ContentBlockerTrigger {
   Map<String, dynamic> toMap() {
     List<String> resourceTypeStringList = [];
     resourceType.forEach((type) {
-      resourceTypeStringList.add(type.toValue());
+      resourceTypeStringList.add(type.toNativeValue());
     });
     List<String> loadTypeStringList = [];
     loadType.forEach((type) {
-      loadTypeStringList.add(type.toValue());
+      loadTypeStringList.add(type.toNativeValue());
     });
 
     Map<String, dynamic> map = {
@@ -123,7 +123,7 @@ class ContentBlockerTrigger {
     List<String> resourceTypeStringList =
         List<String>.from(map["resource-type"] ?? []);
     resourceTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerResourceType.fromValue(typeValue);
+      var type = ContentBlockerTriggerResourceType.fromNativeValue(typeValue);
       if (type != null) {
         resourceType.add(type);
       }
@@ -131,7 +131,7 @@ class ContentBlockerTrigger {
 
     List<String> loadTypeStringList = List<String>.from(map["load-type"] ?? []);
     loadTypeStringList.forEach((typeValue) {
-      var type = ContentBlockerTriggerLoadType.fromValue(typeValue);
+      var type = ContentBlockerTriggerLoadType.fromNativeValue(typeValue);
       if (type != null) {
         loadType.add(type);
       }
@@ -172,7 +172,7 @@ class ContentBlockerAction {
   }
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = {"type": type.toValue(), "selector": selector};
+    Map<String, dynamic> map = {"type": type.toNativeValue(), "selector": selector};
 
     map.keys
         .where((key) =>
@@ -186,7 +186,7 @@ class ContentBlockerAction {
 
   static ContentBlockerAction fromMap(Map<String, dynamic> map) {
     return ContentBlockerAction(
-        type: ContentBlockerActionType.fromValue(map["type"])!,
+        type: ContentBlockerActionType.fromNativeValue(map["type"])!,
         selector: map["selector"]);
   }
 }

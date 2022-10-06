@@ -19,8 +19,8 @@ void loadUrl() {
 
   testWidgets('loadUrl', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
-    final StreamController<String> pageLoads =
-    StreamController<String>.broadcast();
+    final Completer<String> firstUrlLoad = Completer<String>();
+    final Completer<String> loadedUrl = Completer<String>();
 
     await tester.pumpWidget(
       Directionality(
@@ -33,21 +33,21 @@ void loadUrl() {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
-            pageLoads.add(url!.toString());
+            if (url.toString() == initialUrl.toString() && !firstUrlLoad.isCompleted) {
+              firstUrlLoad.complete(url.toString());
+            } else if (url.toString() == TEST_CROSS_PLATFORM_URL_1.toString() && !loadedUrl.isCompleted) {
+              loadedUrl.complete(url.toString());
+            }
           },
         ),
       ),
     );
     final InAppWebViewController controller =
     await controllerCompleter.future;
-    var url = await pageLoads.stream.first;
-    expect(url, initialUrl.toString());
+    expect(await firstUrlLoad.future, initialUrl.toString());
 
     await controller.loadUrl(
         urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
-    url = await pageLoads.stream.first;
-    expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
-
-    pageLoads.close();
+    expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
   }, skip: shouldSkip);
 }

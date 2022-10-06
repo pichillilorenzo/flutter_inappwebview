@@ -1,5 +1,10 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+part 'window_features.g.dart';
+
 ///Class that specifies optional attributes for the containing window when a new web view is requested.
-class WindowFeatures {
+@ExchangeableObject()
+class WindowFeatures_ {
   ///A Boolean value indicating whether the containing window should be resizable, or `null` if resizability is not specified.
   bool? allowsResizing;
 
@@ -24,7 +29,7 @@ class WindowFeatures {
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
 
-  WindowFeatures(
+  WindowFeatures_(
       {this.allowsResizing,
         this.height,
         this.menuBarVisibility,
@@ -33,52 +38,13 @@ class WindowFeatures {
         this.width,
         this.x,
         this.y});
-
-  ///Gets a possible [WindowFeatures] instance from a [Map] value.
-  static WindowFeatures? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return WindowFeatures(
-        allowsResizing: map["allowsResizing"],
-        height: map["height"],
-        menuBarVisibility: map["menuBarVisibility"],
-        statusBarVisibility: map["statusBarVisibility"],
-        toolbarsVisibility: map["toolbarsVisibility"],
-        width: map["width"],
-        x: map["x"],
-        y: map["y"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "allowsResizing": allowsResizing,
-      "height": height,
-      "menuBarVisibility": menuBarVisibility,
-      "statusBarVisibility": statusBarVisibility,
-      "toolbarsVisibility": toolbarsVisibility,
-      "width": width,
-      "x": x,
-      "y": y,
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }
 
 ///An iOS-specific class that specifies optional attributes for the containing window when a new web view is requested.
 ///Use [WindowFeatures] instead.
 @Deprecated("Use WindowFeatures instead")
-class IOSWKWindowFeatures {
+@ExchangeableObject()
+class IOSWKWindowFeatures_ {
   ///A Boolean value indicating whether the containing window should be resizable, or `null` if resizability is not specified.
   bool? allowsResizing;
 
@@ -103,7 +69,7 @@ class IOSWKWindowFeatures {
   ///A Double value specifying the y-coordinate of the containing window, or `null` if the y-coordinate is not specified.
   double? y;
 
-  IOSWKWindowFeatures(
+  IOSWKWindowFeatures_(
       {this.allowsResizing,
         this.height,
         this.menuBarVisibility,
@@ -112,44 +78,4 @@ class IOSWKWindowFeatures {
         this.width,
         this.x,
         this.y});
-
-  ///Gets a possible [IOSWKWindowFeatures] instance from a [Map] value.
-  static IOSWKWindowFeatures? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return IOSWKWindowFeatures(
-        allowsResizing: map["allowsResizing"],
-        height: map["height"],
-        menuBarVisibility: map["menuBarVisibility"],
-        statusBarVisibility: map["statusBarVisibility"],
-        toolbarsVisibility: map["toolbarsVisibility"],
-        width: map["width"],
-        x: map["x"],
-        y: map["y"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "allowsResizing": allowsResizing,
-      "height": height,
-      "menuBarVisibility": menuBarVisibility,
-      "statusBarVisibility": statusBarVisibility,
-      "toolbarsVisibility": toolbarsVisibility,
-      "width": width,
-      "x": x,
-      "y": y,
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

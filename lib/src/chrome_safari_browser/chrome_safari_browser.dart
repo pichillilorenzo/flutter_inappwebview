@@ -62,7 +62,14 @@ class ChromeSafariBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_chromesafaribrowser_$id');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _isOpened = false;
   }
 
@@ -83,7 +90,11 @@ class ChromeSafariBrowser {
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }
-      developer.log(message, name: this.runtimeType.toString());
+      if (!ChromeSafariBrowser.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
     }
   }
 

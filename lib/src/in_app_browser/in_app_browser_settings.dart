@@ -261,8 +261,8 @@ class InAppBrowserSettings
       "toolbarBottomTranslucent": toolbarBottomTranslucent,
       "closeButtonCaption": closeButtonCaption,
       "closeButtonColor": closeButtonColor?.toHex(),
-      "presentationStyle": presentationStyle.toValue(),
-      "transitionStyle": transitionStyle.toValue(),
+      "presentationStyle": presentationStyle.toNativeValue(),
+      "transitionStyle": transitionStyle.toNativeValue(),
     };
   }
 
@@ -296,9 +296,9 @@ class InAppBrowserSettings
       settings.closeButtonCaption = map["closeButtonCaption"];
       settings.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
       settings.presentationStyle =
-          ModalPresentationStyle.fromValue(map["presentationStyle"])!;
+          ModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
       settings.transitionStyle =
-          ModalTransitionStyle.fromValue(map["transitionStyle"])!;
+          ModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
     }
     return settings;
   }

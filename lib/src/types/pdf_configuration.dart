@@ -1,29 +1,19 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 import 'in_app_webview_rect.dart';
 
+part 'pdf_configuration.g.dart';
+
 ///Class that represents the configuration data to use when generating a PDF representation of a web view’s contents.
-class PDFConfiguration {
+@ExchangeableObject()
+class PDFConfiguration_ {
   ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
   ///The default value of this property is `null`, which captures everything in the view’s bounds rectangle.
   ///If you specify a custom rectangle, it must lie within the bounds rectangle of the [WebView] object.
-  InAppWebViewRect? rect;
+  InAppWebViewRect_? rect;
 
-  PDFConfiguration({this.rect});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"rect": rect?.toMap()};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  PDFConfiguration_({this.rect});
 }
 
 ///An iOS-specific class that represents the configuration data to use when generating a PDF representation of a web view’s contents.
@@ -32,26 +22,12 @@ class PDFConfiguration {
 ///
 ///Use [PDFConfiguration] instead.
 @Deprecated("Use PDFConfiguration instead")
-class IOSWKPDFConfiguration {
+@ExchangeableObject()
+class IOSWKPDFConfiguration_ {
   ///The portion of your web view to capture, specified as a rectangle in the view’s coordinate system.
   ///The default value of this property is `null`, which captures everything in the view’s bounds rectangle.
   ///If you specify a custom rectangle, it must lie within the bounds rectangle of the [WebView] object.
-  InAppWebViewRect? rect;
+  InAppWebViewRect_? rect;
 
-  IOSWKPDFConfiguration({this.rect});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"rect": rect?.toMap()};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  IOSWKPDFConfiguration_({this.rect});
 }

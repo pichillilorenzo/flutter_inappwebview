@@ -8,17 +8,17 @@
 import Foundation
 
 public class WebResourceError: NSObject {
-    var errorCode: Int
+    var type: Int
     var errorDescription: String
     
-    public init(errorCode: Int, errorDescription: String) {
-        self.errorCode = errorCode
+    public init(type: Int, errorDescription: String) {
+        self.type = type
         self.errorDescription = errorDescription
     }
     
     public func toMap () -> [String:Any?] {
         return [
-            "errorCode": errorCode,
+            "type": type,
             "description": errorDescription
         ]
     }

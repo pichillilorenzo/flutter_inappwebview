@@ -133,7 +133,7 @@ class PullToRefreshController {
   @Deprecated("Use setIndicatorSize instead")
   Future<void> setSize(AndroidPullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toValue());
+    args.putIfAbsent('size', () => size.toNativeValue());
     await _channel?.invokeMethod('setSize', args);
   }
 
@@ -142,7 +142,7 @@ class PullToRefreshController {
   ///**NOTE**: Available only on Android.
   Future<void> setIndicatorSize(PullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('size', () => size.toValue());
+    args.putIfAbsent('size', () => size.toNativeValue());
     await _channel?.invokeMethod('setSize', args);
   }
 
@@ -166,6 +166,13 @@ class PullToRefreshController {
   void initMethodChannel(dynamic id) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
-    this._channel?.setMethodCallHandler(_handleMethod);
+    this._channel?.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 }

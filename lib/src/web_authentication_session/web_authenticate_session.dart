@@ -95,7 +95,14 @@ class WebAuthenticationSession implements Disposable {
         initialSettings ?? WebAuthenticationSessionSettings();
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_webauthenticationsession_$id');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   _debugLog(String method, dynamic args) {
@@ -115,7 +122,11 @@ class WebAuthenticationSession implements Disposable {
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }
-      developer.log(message, name: this.runtimeType.toString());
+      if (!WebAuthenticationSession.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
     }
   }
 
@@ -126,7 +137,7 @@ class WebAuthenticationSession implements Disposable {
       case "onComplete":
         String? url = call.arguments["url"];
         Uri? uri = url != null ? Uri.parse(url) : null;
-        var error = WebAuthenticationSessionError.fromValue(
+        var error = WebAuthenticationSessionError.fromNativeValue(
             call.arguments["errorCode"]);
         if (onComplete != null) {
           onComplete!(uri, error);

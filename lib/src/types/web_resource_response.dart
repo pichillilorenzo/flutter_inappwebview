@@ -1,9 +1,14 @@
 import 'dart:typed_data';
 
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
+part 'web_resource_response.g.dart';
+
 ///Class representing a resource response of the [WebView].
-class WebResourceResponse {
+@ExchangeableObject()
+class WebResourceResponse_ {
   ///The resource response's MIME type, for example `text/html`.
   String contentType;
 
@@ -30,48 +35,11 @@ class WebResourceResponse {
   ///**NOTE**: available on Android 21+. For Android < 21 it won't be used.
   String? reasonPhrase;
 
-  WebResourceResponse(
+  WebResourceResponse_(
       {this.contentType = "",
       this.contentEncoding = "utf-8",
       this.data,
       this.headers,
       this.statusCode,
       this.reasonPhrase});
-
-  ///Gets a possible [WebResourceResponse] instance from a [Map] value.
-  static WebResourceResponse? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    return WebResourceResponse(
-        contentType: map["contentType"],
-        contentEncoding: map["contentEncoding"],
-        data: map["data"],
-        headers: map["headers"]?.cast<String, String>(),
-        statusCode: map["statusCode"],
-        reasonPhrase: map["reasonPhrase"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "contentType": contentType,
-      "contentEncoding": contentEncoding,
-      "data": data,
-      "headers": headers,
-      "statusCode": statusCode,
-      "reasonPhrase": reasonPhrase
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

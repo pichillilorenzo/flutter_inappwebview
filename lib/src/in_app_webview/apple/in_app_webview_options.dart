@@ -196,8 +196,8 @@ class IOSInAppWebViewOptions
   ///- [IOSInAppWebViewOptions.enableViewportScale]
   ///
   ///Events affected:
-  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
-  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
+  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
+  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
   ///- [WebView.onLoadResource]
   ///- [WebView.shouldInterceptAjaxRequest]
   ///- [WebView.onAjaxReadyStateChange]
@@ -214,7 +214,7 @@ class IOSInAppWebViewOptions
 
   ///Used in combination with [WebView.initialUrlRequest] or [WebView.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
   ///This URL must be a file-based URL (using the `file://` scheme).
-  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
+  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
   ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [WebView.initialData] parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
   Uri? allowingReadAccessTo;
@@ -270,7 +270,7 @@ class IOSInAppWebViewOptions
   Map<String, dynamic> toMap() {
     List<String> dataDetectorTypesList = [];
     dataDetectorTypes.forEach((dataDetectorType) {
-      dataDetectorTypesList.add(dataDetectorType.toValue());
+      dataDetectorTypesList.add(dataDetectorType.toNativeValue());
     });
 
     return {
@@ -286,13 +286,13 @@ class IOSInAppWebViewOptions
       "allowsPictureInPictureMediaPlayback":
           allowsPictureInPictureMediaPlayback,
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
-      "selectionGranularity": selectionGranularity.toValue(),
+      "selectionGranularity": selectionGranularity.toNativeValue(),
       "dataDetectorTypes": dataDetectorTypesList,
       "sharedCookiesEnabled": sharedCookiesEnabled,
       "automaticallyAdjustsScrollIndicatorInsets":
           automaticallyAdjustsScrollIndicatorInsets,
       "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
-      "decelerationRate": decelerationRate.toValue(),
+      "decelerationRate": decelerationRate.toNativeValue(),
       "alwaysBounceVertical": alwaysBounceVertical,
       "alwaysBounceHorizontal": alwaysBounceHorizontal,
       "scrollsToTop": scrollsToTop,
@@ -300,7 +300,7 @@ class IOSInAppWebViewOptions
       "maximumZoomScale": maximumZoomScale,
       "minimumZoomScale": minimumZoomScale,
       "contentInsetAdjustmentBehavior":
-          contentInsetAdjustmentBehavior.toValue(),
+          contentInsetAdjustmentBehavior.toNativeValue(),
       "isDirectionalLockEnabled": isDirectionalLockEnabled,
       "mediaType": mediaType,
       "pageZoom": pageZoom,
@@ -319,7 +319,7 @@ class IOSInAppWebViewOptions
         List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorTypeValue) {
       var dataDetectorType =
-          IOSWKDataDetectorTypes.fromValue(dataDetectorTypeValue);
+          IOSWKDataDetectorTypes.fromNativeValue(dataDetectorTypeValue);
       if (dataDetectorType != null) {
         dataDetectorTypes.add(dataDetectorType);
       }
@@ -342,7 +342,7 @@ class IOSInAppWebViewOptions
     instance.isFraudulentWebsiteWarningEnabled =
         map["isFraudulentWebsiteWarningEnabled"];
     instance.selectionGranularity =
-        IOSWKSelectionGranularity.fromValue(map["selectionGranularity"])!;
+        IOSWKSelectionGranularity.fromNativeValue(map["selectionGranularity"])!;
     instance.dataDetectorTypes = dataDetectorTypes;
     instance.sharedCookiesEnabled = map["sharedCookiesEnabled"];
     instance.automaticallyAdjustsScrollIndicatorInsets =
@@ -350,7 +350,7 @@ class IOSInAppWebViewOptions
     instance.accessibilityIgnoresInvertColors =
         map["accessibilityIgnoresInvertColors"];
     instance.decelerationRate =
-        IOSUIScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
+        IOSUIScrollViewDecelerationRate.fromNativeValue(map["decelerationRate"])!;
     instance.alwaysBounceVertical = map["alwaysBounceVertical"];
     instance.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
     instance.scrollsToTop = map["scrollsToTop"];
@@ -358,7 +358,7 @@ class IOSInAppWebViewOptions
     instance.maximumZoomScale = map["maximumZoomScale"];
     instance.minimumZoomScale = map["minimumZoomScale"];
     instance.contentInsetAdjustmentBehavior =
-        IOSUIScrollViewContentInsetAdjustmentBehavior.fromValue(
+        IOSUIScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
             map["contentInsetAdjustmentBehavior"])!;
     instance.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
     instance.mediaType = map["mediaType"];

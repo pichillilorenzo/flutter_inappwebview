@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:collection';
 import 'dart:typed_data';
+import 'dart:developer' as developer;
 
 import 'package:flutter/services.dart';
 
@@ -14,6 +15,7 @@ import '../in_app_webview/in_app_webview_settings.dart';
 import '../util.dart';
 import '../print_job/main.dart';
 import 'in_app_browser_settings.dart';
+import '../debug_logging_settings.dart';
 
 class InAppBrowserAlreadyOpenedException implements Exception {
   final dynamic message;
@@ -46,6 +48,9 @@ class InAppBrowserNotOpenedException implements Exception {
 ///- Android native WebView
 ///- iOS
 class InAppBrowser {
+  ///Debug settings.
+  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
+
   ///View ID used internally.
   late final String id;
 
@@ -80,20 +85,54 @@ class InAppBrowser {
     id = IdGenerator.generate();
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappbrowser_$id');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _isOpened = false;
     webViewController = new InAppWebViewController.fromInAppBrowser(
         this._channel, this, this.initialUserScripts);
   }
 
+  _debugLog(String method, dynamic args) {
+    if (InAppBrowser.debugLoggingSettings.enabled) {
+      for (var regExp
+      in InAppBrowser.debugLoggingSettings.excludeFilter) {
+        if (regExp.hasMatch(method)) return;
+      }
+      var maxLogMessageLength =
+          InAppBrowser.debugLoggingSettings.maxLogMessageLength;
+      String message = "InAppBrowser ID " +
+          id +
+          " calling \"" +
+          method.toString() +
+          "\" using " +
+          args.toString();
+      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
+        message = message.substring(0, maxLogMessageLength) + "...";
+      }
+      if (!InAppBrowser.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
+    }
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {
     switch (call.method) {
       case "onBrowserCreated":
+        _debugLog(call.method, call.arguments);
         this._isOpened = true;
         this.pullToRefreshController?.initMethodChannel(id);
         onBrowserCreated();
         break;
       case "onExit":
+        _debugLog(call.method, call.arguments);
         this._isOpened = false;
         onExit();
         break;
@@ -133,7 +172,7 @@ class InAppBrowser {
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('implementation', () => implementation.toValue());
+    args.putIfAbsent('implementation', () => implementation.toNativeValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
@@ -201,7 +240,7 @@ class InAppBrowser {
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('implementation', () => implementation.toValue());
+    args.putIfAbsent('implementation', () => implementation.toNativeValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);
@@ -252,7 +291,7 @@ class InAppBrowser {
         () => (historyUrl ?? androidHistoryUrl)?.toString() ?? "about:blank");
     args.putIfAbsent('contextMenu', () => contextMenu?.toMap() ?? {});
     args.putIfAbsent('windowId', () => windowId);
-    args.putIfAbsent('implementation', () => implementation.toValue());
+    args.putIfAbsent('implementation', () => implementation.toNativeValue());
     args.putIfAbsent('initialUserScripts',
         () => initialUserScripts?.map((e) => e.toMap()).toList() ?? []);
     args.putIfAbsent('pullToRefreshSettings', () => pullToRefreshSettings);

@@ -760,7 +760,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             "defaultValue": defaultValue,
             "isMainFrame": isMainFrame
         ]
-        channel?.invokeMethod("onJsConfirm", arguments: arguments, callback: callback)
+        channel?.invokeMethod("onJsPrompt", arguments: arguments, callback: callback)
     }
     
     public class CreateWindowCallback : BaseCallbackResult<Bool> {
@@ -828,7 +828,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
-                if let obj = obj as? [String: Any?], let action = obj["action"] as? Int {
+                if let action = obj as? Int {
                     return WKNavigationActionPolicy.init(rawValue: action) ?? WKNavigationActionPolicy.cancel
                 }
                 return WKNavigationActionPolicy.cancel
@@ -987,7 +987,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
-                if let obj = obj as? [String: Any?], let action = obj["action"] as? Int {
+                if let action = obj as? Int {
                     return WKNavigationResponsePolicy.init(rawValue: action) ?? WKNavigationResponsePolicy.cancel
                 }
                 return WKNavigationResponsePolicy.cancel
@@ -1007,7 +1007,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
         override init() {
             super.init()
             self.decodeResult = { (obj: Any?) in
-                if let obj = obj as? [String: Any?], let action = obj["action"] as? Int {
+                if let action = obj as? Int {
                     return action == 1
                 }
                 return false

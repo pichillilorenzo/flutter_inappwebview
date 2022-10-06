@@ -57,7 +57,6 @@ extension URLProtectionSpace {
             "authenticationMethod": authenticationMethod,
             "distinguishedNames": distinguishedNames,
             "receivesCredentialSecurely": receivesCredentialSecurely,
-            "isProxy": isProxy(),
             "proxyType": proxyType
         ]
     }

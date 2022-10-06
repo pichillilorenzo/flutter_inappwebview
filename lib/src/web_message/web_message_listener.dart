@@ -36,7 +36,14 @@ class WebMessageListener {
         "allowedOriginRules cannot contain empty strings");
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_listener_$jsObjectName');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

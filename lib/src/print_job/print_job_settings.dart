@@ -6,7 +6,7 @@ import 'print_job_controller.dart';
 
 ///Class that represents the settings of a [PrintJobController].
 class PrintJobSettings {
-  ///Set this to `true` to handle the [PrintJobController].
+  ///Set this to `true` to handle the [PrintJobController].
   ///Otherwise, it will be handled and disposed automatically by the system.
   ///The default value is `false`.
   ///
@@ -183,17 +183,17 @@ class PrintJobSettings {
         handledByClient: map["handledByClient"],
         jobName: map["jobName"],
         animated: map["animated"],
-        orientation: PrintJobOrientation.fromValue(map["orientation"]),
+        orientation: PrintJobOrientation.fromNativeValue(map["orientation"]),
         numberOfPages: map["numberOfPages"],
         forceRenderingQuality:
-            PrintJobRenderingQuality.fromValue(map["forceRenderingQuality"]),
+            PrintJobRenderingQuality.fromNativeValue(map["forceRenderingQuality"]),
         margins:
             MapEdgeInsets.fromMap(map["margins"]?.cast<String, dynamic>()),
         mediaSize:
             PrintJobMediaSize.fromMap(map["mediaSize"]?.cast<String, dynamic>()),
-        colorMode: PrintJobColorMode.fromValue(map["colorMode"]),
+        colorMode: PrintJobColorMode.fromNativeValue(map["colorMode"]),
         duplexMode: PrintJobDuplexMode.fromNativeValue(map["duplexMode"]),
-        outputType: PrintJobOutputType.fromValue(map["outputType"]),
+        outputType: PrintJobOutputType.fromNativeValue(map["outputType"]),
         resolution:
             PrintJobResolution.fromMap(map["resolution"]?.cast<String, dynamic>()),
         showsNumberOfCopies: map["showsNumberOfCopies"],
@@ -212,14 +212,14 @@ class PrintJobSettings {
       "handledByClient": handledByClient,
       "jobName": jobName,
       "animated": animated,
-      "orientation": orientation?.toValue(),
+      "orientation": orientation?.toNativeValue(),
       "numberOfPages": numberOfPages,
-      "forceRenderingQuality": forceRenderingQuality?.toValue(),
+      "forceRenderingQuality": forceRenderingQuality?.toNativeValue(),
       "margins": margins?.toMap(),
       "mediaSize": mediaSize?.toMap(),
-      "colorMode": colorMode?.toValue(),
+      "colorMode": colorMode?.toNativeValue(),
       "duplexMode": duplexMode?.toNativeValue(),
-      "outputType": outputType?.toValue(),
+      "outputType": outputType?.toNativeValue(),
       "resolution": resolution?.toMap(),
       "showsNumberOfCopies": showsNumberOfCopies,
       "showsPaperSelectionForLoadedPapers": showsPaperSelectionForLoadedPapers,

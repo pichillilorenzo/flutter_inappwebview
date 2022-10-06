@@ -916,8 +916,8 @@ class InAppWebViewSettings {
   ///- [InAppWebViewSettings.enableViewportScale]
   ///
   ///Events affected:
-  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
-  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
+  ///- the `hitTestResult` argument of [WebView.onLongPressHitTestResult] will be empty
+  ///- the `hitTestResult` argument of [ContextMenu.onCreateContextMenu] will be empty
   ///- [WebView.onLoadResource]
   ///- [WebView.shouldInterceptAjaxRequest]
   ///- [WebView.onAjaxReadyStateChange]
@@ -937,7 +937,7 @@ class InAppWebViewSettings {
 
   ///Used in combination with [WebView.initialUrlRequest] or [WebView.initialData] (using the `file://` scheme), it represents the URL from which to read the web content.
   ///This URL must be a file-based URL (using the `file://` scheme).
-  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
+  ///Specify the same value as the [URLRequest.url] if you are using it with the [WebView.initialUrlRequest] parameter or
   ///the [InAppWebViewInitialData.baseUrl] if you are using it with the [WebView.initialData] parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
   ///
@@ -1108,7 +1108,7 @@ class InAppWebViewSettings {
     this.useHybridComposition = true,
     this.useShouldInterceptRequest = false,
     this.useOnRenderProcessGone = false,
-    this.overScrollMode = OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS,
+    this.overScrollMode = OverScrollMode.IF_CONTENT_SCROLLS,
     this.networkAvailable,
     this.scrollBarStyle = ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
     this.verticalScrollbarPosition =
@@ -1182,7 +1182,7 @@ class InAppWebViewSettings {
     });
     List<String> dataDetectorTypesList = [];
     dataDetectorTypes.forEach((dataDetectorType) {
-      dataDetectorTypesList.add(dataDetectorType.toValue());
+      dataDetectorTypesList.add(dataDetectorType.toNativeValue());
     });
 
     return {
@@ -1200,7 +1200,7 @@ class InAppWebViewSettings {
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
       "resourceCustomSchemes": resourceCustomSchemes,
       "contentBlockers": contentBlockersMapList,
-      "preferredContentMode": preferredContentMode?.toValue(),
+      "preferredContentMode": preferredContentMode?.toNativeValue(),
       "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
       "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
       "incognito": incognito,
@@ -1220,24 +1220,24 @@ class InAppWebViewSettings {
       "domStorageEnabled": domStorageEnabled,
       "useWideViewPort": useWideViewPort,
       "safeBrowsingEnabled": safeBrowsingEnabled,
-      "mixedContentMode": mixedContentMode?.toValue(),
+      "mixedContentMode": mixedContentMode?.toNativeValue(),
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
       "appCachePath": appCachePath,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
-      "cacheMode": cacheMode?.toValue(),
+      "cacheMode": cacheMode?.toNativeValue(),
       "cursiveFontFamily": cursiveFontFamily,
       "defaultFixedFontSize": defaultFixedFontSize,
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
-      "disabledActionModeMenuItems": disabledActionModeMenuItems?.toValue(),
+      "disabledActionModeMenuItems": disabledActionModeMenuItems?.toNativeValue(),
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
-      "forceDark": forceDark?.toValue(),
-      "forceDarkStrategy": forceDarkStrategy?.toValue(),
+      "forceDark": forceDark?.toNativeValue(),
+      "forceDarkStrategy": forceDarkStrategy?.toNativeValue(),
       "geolocationEnabled": geolocationEnabled,
-      "layoutAlgorithm": layoutAlgorithm?.toValue(),
+      "layoutAlgorithm": layoutAlgorithm?.toNativeValue(),
       "loadWithOverviewMode": loadWithOverviewMode,
       "loadsImagesAutomatically": loadsImagesAutomatically,
       "minimumLogicalFontSize": minimumLogicalFontSize,
@@ -1255,10 +1255,10 @@ class InAppWebViewSettings {
       "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
       "useShouldInterceptRequest": useShouldInterceptRequest,
       "useOnRenderProcessGone": useOnRenderProcessGone,
-      "overScrollMode": overScrollMode?.toValue(),
+      "overScrollMode": overScrollMode?.toNativeValue(),
       "networkAvailable": networkAvailable,
-      "scrollBarStyle": scrollBarStyle?.toValue(),
-      "verticalScrollbarPosition": verticalScrollbarPosition?.toValue(),
+      "scrollBarStyle": scrollBarStyle?.toNativeValue(),
+      "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
       "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
       "scrollbarFadingEnabled": scrollbarFadingEnabled,
       "scrollBarFadeDuration": scrollBarFadeDuration,
@@ -1280,13 +1280,13 @@ class InAppWebViewSettings {
       "allowsPictureInPictureMediaPlayback":
           allowsPictureInPictureMediaPlayback,
       "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
-      "selectionGranularity": selectionGranularity.toValue(),
+      "selectionGranularity": selectionGranularity.toNativeValue(),
       "dataDetectorTypes": dataDetectorTypesList,
       "sharedCookiesEnabled": sharedCookiesEnabled,
       "automaticallyAdjustsScrollIndicatorInsets":
           automaticallyAdjustsScrollIndicatorInsets,
       "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
-      "decelerationRate": decelerationRate.toValue(),
+      "decelerationRate": decelerationRate.toNativeValue(),
       "alwaysBounceVertical": alwaysBounceVertical,
       "alwaysBounceHorizontal": alwaysBounceHorizontal,
       "scrollsToTop": scrollsToTop,
@@ -1294,7 +1294,7 @@ class InAppWebViewSettings {
       "maximumZoomScale": maximumZoomScale,
       "minimumZoomScale": minimumZoomScale,
       "contentInsetAdjustmentBehavior":
-          contentInsetAdjustmentBehavior.toValue(),
+          contentInsetAdjustmentBehavior.toNativeValue(),
       "isDirectionalLockEnabled": isDirectionalLockEnabled,
       "mediaType": mediaType,
       "pageZoom": pageZoom,
@@ -1310,7 +1310,7 @@ class InAppWebViewSettings {
       "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
       "iframeAllow": iframeAllow,
       "iframeAllowFullscreen": iframeAllowFullscreen,
-      "iframeSandbox": iframeSandbox?.map((e) => e.toValue()).toList(),
+      "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
       "iframeReferrerPolicy": iframeReferrerPolicy,
       "iframeName": iframeName,
       "iframeCsp": iframeCsp,
@@ -1332,7 +1332,7 @@ class InAppWebViewSettings {
     List<String> dataDetectorTypesList =
         List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorTypeValue) {
-      var dataDetectorType = DataDetectorTypes.fromValue(dataDetectorTypeValue);
+      var dataDetectorType = DataDetectorTypes.fromNativeValue(dataDetectorTypeValue);
       if (dataDetectorType != null) {
         dataDetectorTypes.add(dataDetectorType);
       }
@@ -1356,7 +1356,7 @@ class InAppWebViewSettings {
         List<String>.from(map["resourceCustomSchemes"] ?? []);
     settings.contentBlockers = contentBlockers;
     settings.preferredContentMode =
-        UserPreferredContentMode.fromValue(map["preferredContentMode"]);
+        UserPreferredContentMode.fromNativeValue(map["preferredContentMode"]);
     settings.useShouldInterceptAjaxRequest =
         map["useShouldInterceptAjaxRequest"];
     settings.useShouldInterceptFetchRequest =
@@ -1376,10 +1376,10 @@ class InAppWebViewSettings {
       settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
       settings.iframeSandbox = map["iframeSandbox"] != null
           ? Set.from((map["iframeSandbox"].cast<String>() as List<String>)
-              .map((e) => Sandbox.fromValue(e)))
+              .map((e) => Sandbox.fromNativeValue(e)))
           : null;
       settings.iframeReferrerPolicy =
-          ReferrerPolicy.fromValue(map["iframeReferrerPolicy"]);
+          ReferrerPolicy.fromNativeValue(map["iframeReferrerPolicy"]);
       settings.iframeName = map["iframeName"];
       settings.iframeCsp = map["iframeCsp"];
     } else {
@@ -1393,26 +1393,26 @@ class InAppWebViewSettings {
         settings.useWideViewPort = map["useWideViewPort"];
         settings.safeBrowsingEnabled = map["safeBrowsingEnabled"];
         settings.mixedContentMode =
-            MixedContentMode.fromValue(map["mixedContentMode"]);
+            MixedContentMode.fromNativeValue(map["mixedContentMode"]);
         settings.allowContentAccess = map["allowContentAccess"];
         settings.allowFileAccess = map["allowFileAccess"];
         settings.appCachePath = map["appCachePath"];
         settings.blockNetworkImage = map["blockNetworkImage"];
         settings.blockNetworkLoads = map["blockNetworkLoads"];
-        settings.cacheMode = CacheMode.fromValue(map["cacheMode"]);
+        settings.cacheMode = CacheMode.fromNativeValue(map["cacheMode"]);
         settings.cursiveFontFamily = map["cursiveFontFamily"];
         settings.defaultFixedFontSize = map["defaultFixedFontSize"];
         settings.defaultFontSize = map["defaultFontSize"];
         settings.defaultTextEncodingName = map["defaultTextEncodingName"];
         settings.disabledActionModeMenuItems =
-            ActionModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
+            ActionModeMenuItem.fromNativeValue(map["disabledActionModeMenuItems"]);
         settings.fantasyFontFamily = map["fantasyFontFamily"];
         settings.fixedFontFamily = map["fixedFontFamily"];
-        settings.forceDark = ForceDark.fromValue(map["forceDark"]);
-        settings.forceDarkStrategy = ForceDarkStrategy.fromValue(map["forceDarkStrategy"]);
+        settings.forceDark = ForceDark.fromNativeValue(map["forceDark"]);
+        settings.forceDarkStrategy = ForceDarkStrategy.fromNativeValue(map["forceDarkStrategy"]);
         settings.geolocationEnabled = map["geolocationEnabled"];
         settings.layoutAlgorithm =
-            LayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
+            LayoutAlgorithm.fromNativeValue(map["layoutAlgorithm"]);
         settings.loadWithOverviewMode = map["loadWithOverviewMode"];
         settings.loadsImagesAutomatically = map["loadsImagesAutomatically"];
         settings.minimumLogicalFontSize = map["minimumLogicalFontSize"];
@@ -1431,11 +1431,11 @@ class InAppWebViewSettings {
         settings.useHybridComposition = map["useHybridComposition"];
         settings.useShouldInterceptRequest = map["useShouldInterceptRequest"];
         settings.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-        settings.overScrollMode = OverScrollMode.fromValue(map["overScrollMode"]);
+        settings.overScrollMode = OverScrollMode.fromNativeValue(map["overScrollMode"]);
         settings.networkAvailable = map["networkAvailable"];
-        settings.scrollBarStyle = ScrollBarStyle.fromValue(map["scrollBarStyle"]);
+        settings.scrollBarStyle = ScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
         settings.verticalScrollbarPosition =
-            VerticalScrollbarPosition.fromValue(map["verticalScrollbarPosition"]);
+            VerticalScrollbarPosition.fromNativeValue(map["verticalScrollbarPosition"]);
         settings.scrollBarDefaultDelayBeforeFade =
         map["scrollBarDefaultDelayBeforeFade"];
         settings.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
@@ -1470,7 +1470,7 @@ class InAppWebViewSettings {
         settings.isFraudulentWebsiteWarningEnabled =
         map["isFraudulentWebsiteWarningEnabled"];
         settings.selectionGranularity =
-        SelectionGranularity.fromValue(map["selectionGranularity"])!;
+        SelectionGranularity.fromNativeValue(map["selectionGranularity"])!;
         settings.dataDetectorTypes = dataDetectorTypes;
         settings.sharedCookiesEnabled = map["sharedCookiesEnabled"];
         settings.automaticallyAdjustsScrollIndicatorInsets =
@@ -1478,7 +1478,7 @@ class InAppWebViewSettings {
         settings.accessibilityIgnoresInvertColors =
         map["accessibilityIgnoresInvertColors"];
         settings.decelerationRate =
-        ScrollViewDecelerationRate.fromValue(map["decelerationRate"])!;
+        ScrollViewDecelerationRate.fromNativeValue(map["decelerationRate"])!;
         settings.alwaysBounceVertical = map["alwaysBounceVertical"];
         settings.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
         settings.scrollsToTop = map["scrollsToTop"];
@@ -1486,7 +1486,7 @@ class InAppWebViewSettings {
         settings.maximumZoomScale = map["maximumZoomScale"];
         settings.minimumZoomScale = map["minimumZoomScale"];
         settings.contentInsetAdjustmentBehavior =
-        ScrollViewContentInsetAdjustmentBehavior.fromValue(
+        ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
             map["contentInsetAdjustmentBehavior"])!;
         settings.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
         settings.mediaType = map["mediaType"];
@@ -1782,7 +1782,7 @@ class InAppWebViewOptions
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
       "resourceCustomSchemes": resourceCustomSchemes,
       "contentBlockers": contentBlockersMapList,
-      "preferredContentMode": preferredContentMode?.toValue(),
+      "preferredContentMode": preferredContentMode?.toNativeValue(),
       "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
       "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
       "incognito": incognito,
@@ -1826,7 +1826,7 @@ class InAppWebViewOptions
         List<String>.from(map["resourceCustomSchemes"] ?? []);
     instance.contentBlockers = contentBlockers;
     instance.preferredContentMode =
-        UserPreferredContentMode.fromValue(map["preferredContentMode"]);
+        UserPreferredContentMode.fromNativeValue(map["preferredContentMode"]);
     instance.useShouldInterceptAjaxRequest =
         map["useShouldInterceptAjaxRequest"];
     instance.useShouldInterceptFetchRequest =

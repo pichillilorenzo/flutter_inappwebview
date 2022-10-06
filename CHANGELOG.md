@@ -16,8 +16,10 @@
 
 ### BREAKING CHANGES
 
-- On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`).
-- All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`;
+- On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`)
+- All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
+- Removed `URLProtectionSpace.iosIsProxy` property
+- `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
 
 ## 5.4.4+3
 
@@ -92,7 +94,7 @@
 
 ## 5.4.1
 
-- Managed iOS native `detachFromEngine` flutter plugin event and updated `dispose` methods
+- Managed iOS native `detachFromEngine` flutter plugin event and updated `dispose` methods
 - Updated Android native `HeadlessInAppWebViewManager.dispose` and `HeadlessInAppWebView.dispose` methods
 
 ## 5.4.0+3
@@ -347,7 +349,7 @@
 - Renamed `toolbarTop` InAppBrowser cross-platform option to `hideToolbarTop`
 - Renamed `toolbarBottom` InAppBrowser ios-specific option to `hideToolbarBottom`
 - Removed `debuggingEnabled` WebView option; on Android you should use now the `AndroidInAppWebViewController.setWebContentsDebuggingEnabled(bool debuggingEnabled)` static method; on iOS, debugging is always enabled
-- Removed `androidOnRequestFocus` event because it is never called
+- Removed `androidOnRequestFocus` event because it is never called
 - Removed `initialHeaders` WebView attribute. Use `URLRequest.headers` attribute
 - Removed `headers` argument from `loadFile` WebView method
 - Removed `headers` argument from `openFile` InAppBrowser method
@@ -363,11 +365,11 @@
 - Changed return type of `getOriginalUrl` Android-specific WebView method to `Uri`
 - Changed return type of `getSafeBrowsingPrivacyPolicyUrl` Android-specific WebView method to `Uri`
 - Changed type of `url` argument of `onLoadStart`, `onLoadStop`, `onLoadError`, `onLoadHttpError`, `onLoadResourceCustomScheme`, `onUpdateVisitedHistory`, `onPrint`, `onPageCommitVisible`, `androidOnSafeBrowsingHit`, `androidOnRenderProcessUnresponsive`, `androidOnRenderProcessResponsive`, `androidOnFormResubmission`, `androidOnReceivedTouchIconUrl` WebView events to `Uri`
-- Changed type of `baseUrl` and `androidHistoryUrl` arguments of `loadData` WebView method and `openData` InAppBrowser method
+- Changed type of `baseUrl` and `androidHistoryUrl` arguments of `loadData` WebView method and `openData` InAppBrowser method
 - Changed `openUrl` InAppBrowser method to `openUrlRequest`
 - Changed type of `url` argument of `openWithSystemBrowser` InAppBrowser method to `Uri`
-- Changed all InAppBrowser color options type from `String` to `Color`
-- Changed all ChromeSafariBrowser color options type from `String` to `Color`
+- Changed all InAppBrowser color options type from `String` to `Color`
+- Changed all ChromeSafariBrowser color options type from `String` to `Color`
 - Updated attributes of `ShouldOverrideUrlLoadingRequest`, `ServerTrustChallenge` and `ClientCertChallenge` classes
 - Changed type of `url` attribute to `Uri` for `JsAlertRequest`, `JsAlertConfirm`, `JsPromptRequest` classes
 

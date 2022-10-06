@@ -1,5 +1,10 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+part 'security_origin.g.dart';
+
 ///An object that identifies the origin of a particular resource.
-class SecurityOrigin {
+@ExchangeableObject()
+class SecurityOrigin_ {
   ///The security origin’s host.
   String host;
 
@@ -9,32 +14,8 @@ class SecurityOrigin {
   ///The security origin's protocol.
   String protocol;
 
-  SecurityOrigin(
+  SecurityOrigin_(
       {required this.host, required this.port, required this.protocol});
-
-  ///Gets a possible [SecurityOrigin] instance from a [Map] value.
-  static SecurityOrigin? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return SecurityOrigin(
-        host: map["host"], port: map["port"], protocol: map["protocol"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"host": host, "port": port, "protocol": protocol};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }
 
 ///An object that identifies the origin of a particular resource.
@@ -43,7 +24,8 @@ class SecurityOrigin {
 ///
 ///Use [SecurityOrigin] instead.
 @Deprecated("Use SecurityOrigin instead")
-class IOSWKSecurityOrigin {
+@ExchangeableObject()
+class IOSWKSecurityOrigin_ {
   ///The security origin’s host.
   String host;
 
@@ -53,30 +35,6 @@ class IOSWKSecurityOrigin {
   ///The security origin's protocol.
   String protocol;
 
-  IOSWKSecurityOrigin(
+  IOSWKSecurityOrigin_(
       {required this.host, required this.port, required this.protocol});
-
-  ///Gets a possible [IOSWKSecurityOrigin] instance from a [Map] value.
-  static IOSWKSecurityOrigin? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return IOSWKSecurityOrigin(
-        host: map["host"], port: map["port"], protocol: map["protocol"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"host": host, "port": port, "protocol": protocol};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

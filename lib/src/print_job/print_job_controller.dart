@@ -23,7 +23,14 @@ class PrintJobController implements Disposable {
       {required this.id}) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_$id');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

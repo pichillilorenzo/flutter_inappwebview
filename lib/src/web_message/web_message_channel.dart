@@ -19,7 +19,14 @@ class WebMessageChannel {
       {required this.id, required this.port1, required this.port2}) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_web_message_channel_$id');
-    this._channel.setMethodCallHandler(_handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   static WebMessageChannel? fromMap(Map<String, dynamic>? map) {

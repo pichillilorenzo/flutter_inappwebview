@@ -1,10 +1,15 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
 import 'web_history.dart';
 
+part 'web_history_item.g.dart';
+
 ///A convenience class for accessing fields in an entry in the back/forward list of a [WebView].
 ///Each [WebHistoryItem] is a snapshot of the requested history item.
-class WebHistoryItem {
+@ExchangeableObject()
+class WebHistoryItem_ {
   ///Original url of this history item.
   Uri? originalUrl;
 
@@ -20,27 +25,6 @@ class WebHistoryItem {
   ///Position offset respect to the currentIndex of the back-forward [WebHistory.list].
   int? offset;
 
-  WebHistoryItem(
+  WebHistoryItem_(
       {this.originalUrl, this.title, this.url, this.index, this.offset});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "originalUrl": originalUrl?.toString(),
-      "title": title,
-      "url": url?.toString(),
-      "index": index,
-      "offset": offset
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

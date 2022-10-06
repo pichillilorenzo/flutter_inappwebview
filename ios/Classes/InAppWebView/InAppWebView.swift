@@ -1527,7 +1527,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         
         var result: [String: Any] = [:]
-        result["history"] = history
+        result["list"] = history
         result["currentIndex"] = currentIndex
         
         return result;
@@ -1818,7 +1818,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
         
         let webResourceRequest = WebResourceRequest(url: urlError, headers: nil)
-        let webResourceError = WebResourceError(errorCode: errorCode, errorDescription: errorDescription)
+        let webResourceError = WebResourceError(type: errorCode, errorDescription: errorDescription)
         
         channelDelegate?.onReceivedError(request: webResourceRequest, error: webResourceError)
         

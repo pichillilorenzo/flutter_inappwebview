@@ -1,39 +1,19 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import 'ajax_request.dart';
 
+part 'ajax_request_action.g.dart';
+
 ///Class used by [AjaxRequest] class.
-class AjaxRequestAction {
+@ExchangeableEnum()
+class AjaxRequestAction_ {
+  // ignore: unused_field
   final int _value;
-
-  const AjaxRequestAction._internal(this._value);
-
-  ///Gets [int] value.
-  int toValue() => _value;
+  const AjaxRequestAction_._internal(this._value);
 
   ///Aborts the current [AjaxRequest].
-  static const ABORT = const AjaxRequestAction._internal(0);
+  static const ABORT = const AjaxRequestAction_._internal(0);
 
   ///Proceeds with the current [AjaxRequest].
-  static const PROCEED = const AjaxRequestAction._internal(1);
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "action": _value,
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  static const PROCEED = const AjaxRequestAction_._internal(1);
 }

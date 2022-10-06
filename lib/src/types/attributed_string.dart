@@ -1,13 +1,18 @@
 import 'dart:ui';
 
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../pull_to_refresh/main.dart';
 import 'underline_style.dart';
 import 'attributed_string_text_effect_style.dart';
 import '../util.dart';
 
+part 'attributed_string.g.dart';
+
 ///Class that represents a string with associated attributes
 ///used by the [PullToRefreshController] and [PullToRefreshSettings] classes.
-class AttributedString {
+@ExchangeableObject()
+class AttributedString_ {
   ///The characters for the new object.
   String string;
 
@@ -69,7 +74,7 @@ class AttributedString {
   ///
   ///This value indicates whether the text has a line through it and corresponds to one of the constants described in [UnderlineStyle].
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
-  UnderlineStyle? strikethroughStyle;
+  UnderlineStyle_? strikethroughStyle;
 
   ///The color of the stroke.
   ///
@@ -92,7 +97,7 @@ class AttributedString {
   ///
   ///The value of this attribute is a [AttributedStringTextEffectStyle] object.
   ///The default value of this property is `null`, indicating no text effect.
-  AttributedStringTextEffectStyle? textEffect;
+  AttributedStringTextEffectStyle_? textEffect;
 
   ///The color of the underline.
   ///
@@ -104,9 +109,9 @@ class AttributedString {
   ///
   ///This value indicates whether the text is underlined and corresponds to one of the constants described in [UnderlineStyle].
   ///The default value for this attribute is [UnderlineStyle.STYLE_NONE].
-  UnderlineStyle? underlineStyle;
+  UnderlineStyle_? underlineStyle;
 
-  AttributedString({
+  AttributedString_({
     required this.string,
     this.backgroundColor,
     this.baselineOffset,
@@ -123,42 +128,14 @@ class AttributedString {
     this.underlineColor,
     this.underlineStyle,
   });
-
-  Map<String, dynamic> toMap() {
-    return {
-      "string": this.string,
-      "backgroundColor": this.backgroundColor?.toHex(),
-      "baselineOffset": this.baselineOffset,
-      "expansion": this.expansion,
-      "foregroundColor": this.foregroundColor?.toHex(),
-      "kern": this.kern,
-      "ligature": this.ligature,
-      "obliqueness": this.obliqueness,
-      "strikethroughColor": this.strikethroughColor?.toHex(),
-      "strikethroughStyle": this.strikethroughStyle?.toValue(),
-      "strokeColor": this.strokeColor?.toHex(),
-      "strokeWidth": this.strokeWidth,
-      "textEffect": this.textEffect?.toValue(),
-      "underlineColor": this.underlineColor?.toHex(),
-      "underlineStyle": this.underlineStyle?.toValue(),
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }
 
 ///An iOS-specific class that represents a string with associated attributes
 ///used by the [PullToRefreshController] and [PullToRefreshOptions] classes.
 ///Use [AttributedString] instead.
 @Deprecated("Use AttributedString instead")
-class IOSNSAttributedString {
+@ExchangeableObject()
+class IOSNSAttributedString_ {
   ///The characters for the new object.
   String string;
 
@@ -220,7 +197,7 @@ class IOSNSAttributedString {
   ///
   ///This value indicates whether the text has a line through it and corresponds to one of the constants described in [IOSNSUnderlineStyle].
   ///The default value for this attribute is [IOSNSUnderlineStyle.STYLE_NONE].
-  IOSNSUnderlineStyle? strikethroughStyle;
+  IOSNSUnderlineStyle_? strikethroughStyle;
 
   ///The color of the stroke.
   ///
@@ -243,7 +220,7 @@ class IOSNSAttributedString {
   ///
   ///The value of this attribute is a [IOSNSAttributedStringTextEffectStyle] object.
   ///The default value of this property is `null`, indicating no text effect.
-  IOSNSAttributedStringTextEffectStyle? textEffect;
+  IOSNSAttributedStringTextEffectStyle_? textEffect;
 
   ///The color of the underline.
   ///
@@ -255,9 +232,9 @@ class IOSNSAttributedString {
   ///
   ///This value indicates whether the text is underlined and corresponds to one of the constants described in [IOSNSUnderlineStyle].
   ///The default value for this attribute is [IOSNSUnderlineStyle.STYLE_NONE].
-  IOSNSUnderlineStyle? underlineStyle;
+  IOSNSUnderlineStyle_? underlineStyle;
 
-  IOSNSAttributedString({
+  IOSNSAttributedString_({
     required this.string,
     this.backgroundColor,
     this.baselineOffset,
@@ -274,35 +251,4 @@ class IOSNSAttributedString {
     this.underlineColor,
     this.underlineStyle,
   });
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "string": this.string,
-      "backgroundColor": this.backgroundColor?.toHex(),
-      "baselineOffset": this.baselineOffset,
-      "expansion": this.expansion,
-      "foregroundColor": this.foregroundColor?.toHex(),
-      "kern": this.kern,
-      "ligature": this.ligature,
-      "obliqueness": this.obliqueness,
-      "strikethroughColor": this.strikethroughColor?.toHex(),
-      "strikethroughStyle": this.strikethroughStyle?.toValue(),
-      "strokeColor": this.strokeColor?.toHex(),
-      "strokeWidth": this.strokeWidth,
-      "textEffect": this.textEffect?.toValue(),
-      "underlineColor": this.underlineColor?.toHex(),
-      "underlineStyle": this.underlineStyle?.toValue(),
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

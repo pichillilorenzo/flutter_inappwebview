@@ -1,7 +1,12 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
+part 'download_start_request.g.dart';
+
 ///Class representing a download request of the WebView used by the event [WebView.onDownloadStartRequest].
-class DownloadStartRequest {
+@ExchangeableObject()
+class DownloadStartRequest_ {
   ///The full url to the content that should be downloaded.
   Uri url;
 
@@ -23,7 +28,7 @@ class DownloadStartRequest {
   ///The name of the text encoding of the receiver, or `null` if no text encoding was specified.
   String? textEncodingName;
 
-  DownloadStartRequest(
+  DownloadStartRequest_(
       {required this.url,
         this.userAgent,
         this.contentDisposition,
@@ -31,43 +36,4 @@ class DownloadStartRequest {
         required this.contentLength,
         this.suggestedFilename,
         this.textEncodingName});
-
-  ///Gets a possible [DownloadStartRequest] instance from a [Map] value.
-  static DownloadStartRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-
-    return DownloadStartRequest(
-        url: Uri.parse(map["url"]),
-        userAgent: map["userAgent"],
-        contentDisposition: map["contentDisposition"],
-        mimeType: map["mimeType"],
-        contentLength: map["contentLength"],
-        suggestedFilename: map["suggestedFilename"],
-        textEncodingName: map["textEncodingName"]);
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "url": url.toString(),
-      "userAgent": userAgent,
-      "contentDisposition": contentDisposition,
-      "mimeType": mimeType,
-      "contentLength": contentLength,
-      "suggestedFilename": suggestedFilename,
-      "textEncodingName": textEncodingName
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

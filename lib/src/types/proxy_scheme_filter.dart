@@ -1,49 +1,23 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../android/proxy_controller.dart';
 
+part 'proxy_scheme_filter.g.dart';
+
 ///Class that represent scheme filters used by [ProxyController].
-class ProxySchemeFilter {
+@ExchangeableEnum()
+class ProxySchemeFilter_ {
+  // ignore: unused_field
   final String _value;
-
-  const ProxySchemeFilter._internal(this._value);
-
-  ///Set of all values of [ProxySchemeFilter].
-  static final Set<ProxySchemeFilter> values = [
-    ProxySchemeFilter.MATCH_ALL_SCHEMES,
-    ProxySchemeFilter.MATCH_HTTP,
-    ProxySchemeFilter.MATCH_HTTPS,
-  ].toSet();
-
-  ///Gets a possible [ProxySchemeFilter] instance from a [String] value.
-  static ProxySchemeFilter? fromValue(String? value) {
-    if (value != null) {
-      try {
-        return ProxySchemeFilter.values
-            .firstWhere((element) => element.toValue() == value);
-      } catch (e) {
-        return null;
-      }
-    }
-    return null;
-  }
-
-  ///Gets [String] value.
-  String toValue() => _value;
-
-  @override
-  String toString() => _value;
+  const ProxySchemeFilter_._internal(this._value);
 
   ///Matches all schemes.
-  static const MATCH_ALL_SCHEMES = const ProxySchemeFilter._internal("*");
+  static const MATCH_ALL_SCHEMES = const ProxySchemeFilter_._internal("*");
 
   ///HTTP scheme.
-  static const MATCH_HTTP = const ProxySchemeFilter._internal("http");
+  static const MATCH_HTTP = const ProxySchemeFilter_._internal("http");
 
   ///HTTPS scheme.
   static const MATCH_HTTPS =
-  const ProxySchemeFilter._internal("https");
-
-  bool operator ==(value) => value == _value;
-
-  @override
-  int get hashCode => _value.hashCode;
+  const ProxySchemeFilter_._internal("https");
 }

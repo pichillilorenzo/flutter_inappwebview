@@ -10,12 +10,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WebResourceErrorExt {
-  private int errorCode;
+  private int type;
   @NonNull
   private String description;
 
-  public WebResourceErrorExt(int errorCode, @NonNull String description) {
-    this.errorCode = errorCode;
+  public WebResourceErrorExt(int type, @NonNull String description) {
+    this.type = type;
     this.description = description;
   }
 
@@ -26,17 +26,17 @@ public class WebResourceErrorExt {
 
   public Map<String, Object> toMap() {
     Map<String, Object> webResourceErrorMap = new HashMap<>();
-    webResourceErrorMap.put("errorCode", getErrorCode());
+    webResourceErrorMap.put("type", getType());
     webResourceErrorMap.put("description", getDescription());
     return webResourceErrorMap;
   }
 
-  public int getErrorCode() {
-    return errorCode;
+  public int getType() {
+    return type;
   }
 
-  public void setErrorCode(int errorCode) {
-    this.errorCode = errorCode;
+  public void setType(int type) {
+    this.type = type;
   }
 
   @NonNull
@@ -55,13 +55,13 @@ public class WebResourceErrorExt {
 
     WebResourceErrorExt that = (WebResourceErrorExt) o;
 
-    if (errorCode != that.errorCode) return false;
+    if (type != that.type) return false;
     return description.equals(that.description);
   }
 
   @Override
   public int hashCode() {
-    int result = errorCode;
+    int result = type;
     result = 31 * result + description.hashCode();
     return result;
   }
@@ -69,7 +69,7 @@ public class WebResourceErrorExt {
   @Override
   public String toString() {
     return "WebResourceErrorExt{" +
-            "errorCode=" + errorCode +
+            "type=" + type +
             ", description='" + description + '\'' +
             '}';
   }

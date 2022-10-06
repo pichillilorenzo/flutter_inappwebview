@@ -163,7 +163,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
             }
         }
         else if let initialData = initialData {
-            let baseUrl = URL(string: initialBaseUrl!)!
+            let baseUrl = URL(string: initialBaseUrl ?? "about:blank")!
             var allowingReadAccessToURL: URL? = nil
             if let allowingReadAccessTo = webView?.settings?.allowingReadAccessTo, baseUrl.scheme == "file" {
                 allowingReadAccessToURL = URL(string: allowingReadAccessTo)

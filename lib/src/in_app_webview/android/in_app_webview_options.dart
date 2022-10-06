@@ -307,23 +307,23 @@ class AndroidInAppWebViewOptions
       "domStorageEnabled": domStorageEnabled,
       "useWideViewPort": useWideViewPort,
       "safeBrowsingEnabled": safeBrowsingEnabled,
-      "mixedContentMode": mixedContentMode?.toValue(),
+      "mixedContentMode": mixedContentMode?.toNativeValue(),
       "allowContentAccess": allowContentAccess,
       "allowFileAccess": allowFileAccess,
       "appCachePath": appCachePath,
       "blockNetworkImage": blockNetworkImage,
       "blockNetworkLoads": blockNetworkLoads,
-      "cacheMode": cacheMode?.toValue(),
+      "cacheMode": cacheMode?.toNativeValue(),
       "cursiveFontFamily": cursiveFontFamily,
       "defaultFixedFontSize": defaultFixedFontSize,
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
-      "disabledActionModeMenuItems": disabledActionModeMenuItems?.toValue(),
+      "disabledActionModeMenuItems": disabledActionModeMenuItems?.toNativeValue(),
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
-      "forceDark": forceDark?.toValue(),
+      "forceDark": forceDark?.toNativeValue(),
       "geolocationEnabled": geolocationEnabled,
-      "layoutAlgorithm": layoutAlgorithm?.toValue(),
+      "layoutAlgorithm": layoutAlgorithm?.toNativeValue(),
       "loadWithOverviewMode": loadWithOverviewMode,
       "loadsImagesAutomatically": loadsImagesAutomatically,
       "minimumLogicalFontSize": minimumLogicalFontSize,
@@ -341,10 +341,10 @@ class AndroidInAppWebViewOptions
       "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
       "useShouldInterceptRequest": useShouldInterceptRequest,
       "useOnRenderProcessGone": useOnRenderProcessGone,
-      "overScrollMode": overScrollMode?.toValue(),
+      "overScrollMode": overScrollMode?.toNativeValue(),
       "networkAvailable": networkAvailable,
-      "scrollBarStyle": scrollBarStyle?.toValue(),
-      "verticalScrollbarPosition": verticalScrollbarPosition?.toValue(),
+      "scrollBarStyle": scrollBarStyle?.toNativeValue(),
+      "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
       "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
       "scrollbarFadingEnabled": scrollbarFadingEnabled,
       "scrollBarFadeDuration": scrollBarFadeDuration,
@@ -368,25 +368,25 @@ class AndroidInAppWebViewOptions
     instance.useWideViewPort = map["useWideViewPort"];
     instance.safeBrowsingEnabled = map["safeBrowsingEnabled"];
     instance.mixedContentMode =
-        AndroidMixedContentMode.fromValue(map["mixedContentMode"]);
+        AndroidMixedContentMode.fromNativeValue(map["mixedContentMode"]);
     instance.allowContentAccess = map["allowContentAccess"];
     instance.allowFileAccess = map["allowFileAccess"];
     instance.appCachePath = map["appCachePath"];
     instance.blockNetworkImage = map["blockNetworkImage"];
     instance.blockNetworkLoads = map["blockNetworkLoads"];
-    instance.cacheMode = AndroidCacheMode.fromValue(map["cacheMode"]);
+    instance.cacheMode = AndroidCacheMode.fromNativeValue(map["cacheMode"]);
     instance.cursiveFontFamily = map["cursiveFontFamily"];
     instance.defaultFixedFontSize = map["defaultFixedFontSize"];
     instance.defaultFontSize = map["defaultFontSize"];
     instance.defaultTextEncodingName = map["defaultTextEncodingName"];
     instance.disabledActionModeMenuItems =
-        AndroidActionModeMenuItem.fromValue(map["disabledActionModeMenuItems"]);
+        AndroidActionModeMenuItem.fromNativeValue(map["disabledActionModeMenuItems"]);
     instance.fantasyFontFamily = map["fantasyFontFamily"];
     instance.fixedFontFamily = map["fixedFontFamily"];
-    instance.forceDark = AndroidForceDark.fromValue(map["forceDark"]);
+    instance.forceDark = AndroidForceDark.fromNativeValue(map["forceDark"]);
     instance.geolocationEnabled = map["geolocationEnabled"];
     instance.layoutAlgorithm =
-        AndroidLayoutAlgorithm.fromValue(map["layoutAlgorithm"]);
+        AndroidLayoutAlgorithm.fromNativeValue(map["layoutAlgorithm"]);
     instance.loadWithOverviewMode = map["loadWithOverviewMode"];
     instance.loadsImagesAutomatically = map["loadsImagesAutomatically"];
     instance.minimumLogicalFontSize = map["minimumLogicalFontSize"];
@@ -406,12 +406,12 @@ class AndroidInAppWebViewOptions
     instance.useShouldInterceptRequest = map["useShouldInterceptRequest"];
     instance.useOnRenderProcessGone = map["useOnRenderProcessGone"];
     instance.overScrollMode =
-        AndroidOverScrollMode.fromValue(map["overScrollMode"]);
+        AndroidOverScrollMode.fromNativeValue(map["overScrollMode"]);
     instance.networkAvailable = map["networkAvailable"];
     instance.scrollBarStyle =
-        AndroidScrollBarStyle.fromValue(map["scrollBarStyle"]);
+        AndroidScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
     instance.verticalScrollbarPosition =
-        AndroidVerticalScrollbarPosition.fromValue(
+        AndroidVerticalScrollbarPosition.fromNativeValue(
             map["verticalScrollbarPosition"]);
     instance.scrollBarDefaultDelayBeforeFade =
         map["scrollBarDefaultDelayBeforeFade"];

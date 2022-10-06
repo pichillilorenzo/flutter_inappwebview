@@ -78,7 +78,14 @@ class InAppWebViewController {
     this._id = id;
     this._channel =
         MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
-    this._channel.setMethodCallHandler(handleMethod);
+    this._channel.setMethodCallHandler((call) async {
+      try {
+        return await handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     this._webview = webview;
     this._userScripts =
         List<UserScript>.from(webview.initialUserScripts ?? <UserScript>[]);
@@ -123,7 +130,11 @@ class InAppWebViewController {
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }
-      developer.log(message, name: this.runtimeType.toString());
+      if (!WebView.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
     }
   }
 
@@ -175,13 +186,13 @@ class InAppWebViewController {
             else if (isForMainFrame) {
               // ignore: deprecated_member_use_from_same_package
               _webview!.onLoadError!(this, request.url,
-                  error.type.toNativeValue(), error.description);
+                  error.type.toNativeValue() ?? -1, error.description);
             }
           } else {
             if (isForMainFrame) {
               _inAppBrowser!
                   // ignore: deprecated_member_use_from_same_package
-                  .onLoadError(request.url, error.type.toNativeValue(),
+                  .onLoadError(request.url, error.type.toNativeValue() ?? -1,
                       error.description);
             }
             _inAppBrowser!.onReceivedError(request, error);
@@ -243,10 +254,10 @@ class InAppWebViewController {
           if (_webview != null && _webview!.shouldOverrideUrlLoading != null)
             return (await _webview!.shouldOverrideUrlLoading!(
                     this, navigationAction))
-                ?.toMap();
+                ?.toNativeValue();
           return (await _inAppBrowser!
                   .shouldOverrideUrlLoading(navigationAction))
-              ?.toMap();
+              ?.toNativeValue();
         }
         break;
       case "onConsoleMessage":
@@ -445,19 +456,19 @@ class InAppWebViewController {
           if (_webview != null) {
             if (_webview!.onRenderProcessUnresponsive != null)
               return (await _webview!.onRenderProcessUnresponsive!(this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.androidOnRenderProcessUnresponsive!(
                       this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return ((await _inAppBrowser!.onRenderProcessUnresponsive(uri)) ??
                     (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
                         .androidOnRenderProcessUnresponsive(uri)))
-                ?.toMap();
+                ?.toNativeValue();
           }
         }
         break;
@@ -473,19 +484,19 @@ class InAppWebViewController {
           if (_webview != null) {
             if (_webview!.onRenderProcessResponsive != null)
               return (await _webview!.onRenderProcessResponsive!(this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.androidOnRenderProcessResponsive!(
                       this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return ((await _inAppBrowser!.onRenderProcessResponsive(uri)) ??
                     (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
                         .androidOnRenderProcessResponsive(uri)))
-                ?.toMap();
+                ?.toNativeValue();
           }
         }
         break;
@@ -525,17 +536,17 @@ class InAppWebViewController {
 
           if (_webview != null) {
             if (_webview!.onFormResubmission != null)
-              return (await _webview!.onFormResubmission!(this, uri))?.toMap();
+              return (await _webview!.onFormResubmission!(this, uri))?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.androidOnFormResubmission!(this, uri))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return ((await _inAppBrowser!.onFormResubmission(uri)) ??
                     // ignore: deprecated_member_use_from_same_package
                     (await _inAppBrowser!.androidOnFormResubmission(uri)))
-                ?.toMap();
+                ?.toNativeValue();
           }
         }
         break;
@@ -692,7 +703,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String url = call.arguments["url"];
           SafeBrowsingThreat? threatType =
-              SafeBrowsingThreat.fromValue(call.arguments["threatType"]);
+              SafeBrowsingThreat.fromNativeValue(call.arguments["threatType"]);
           Uri uri = Uri.parse(url);
 
           if (_webview != null) {
@@ -924,21 +935,21 @@ class InAppWebViewController {
             if (_webview!.onNavigationResponse != null)
               return (await _webview!.onNavigationResponse!(
                       this, navigationResponse))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.iosOnNavigationResponse!(
                       this, iosOnNavigationResponse))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return (await _inAppBrowser!
                         .onNavigationResponse(navigationResponse))
-                    ?.toMap() ??
+                    ?.toNativeValue() ??
                 (await _inAppBrowser!
                         // ignore: deprecated_member_use_from_same_package
                         .iosOnNavigationResponse(iosOnNavigationResponse))
-                    ?.toMap();
+                    ?.toNativeValue();
           }
         }
         break;
@@ -957,19 +968,19 @@ class InAppWebViewController {
             if (_webview!.shouldAllowDeprecatedTLS != null)
               return (await _webview!.shouldAllowDeprecatedTLS!(
                       this, challenge))
-                  ?.toMap();
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.iosShouldAllowDeprecatedTLS!(
                       this, challenge))
-                  ?.toMap();
+                  ?.toNativeValue();
             }
           } else {
             return (await _inAppBrowser!.shouldAllowDeprecatedTLS(challenge))
-                    ?.toMap() ??
+                    ?.toNativeValue() ??
                 // ignore: deprecated_member_use_from_same_package
                 (await _inAppBrowser!.iosShouldAllowDeprecatedTLS(challenge))
-                    ?.toMap();
+                    ?.toNativeValue();
           }
         }
         break;
@@ -1139,9 +1150,9 @@ class InAppWebViewController {
                 _webview!.onCameraCaptureStateChanged != null) ||
             _inAppBrowser != null) {
           var oldState =
-              MediaCaptureState.fromValue(call.arguments["oldState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["oldState"]);
           var newState =
-              MediaCaptureState.fromValue(call.arguments["newState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["newState"]);
 
           if (_webview != null && _webview!.onCameraCaptureStateChanged != null)
             _webview!.onCameraCaptureStateChanged!(this, oldState, newState);
@@ -1154,9 +1165,9 @@ class InAppWebViewController {
                 _webview!.onMicrophoneCaptureStateChanged != null) ||
             _inAppBrowser != null) {
           var oldState =
-              MediaCaptureState.fromValue(call.arguments["oldState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["oldState"]);
           var newState =
-              MediaCaptureState.fromValue(call.arguments["newState"]);
+              MediaCaptureState.fromNativeValue(call.arguments["newState"]);
 
           if (_webview != null &&
               _webview!.onMicrophoneCaptureStateChanged != null)
@@ -1217,11 +1228,9 @@ class InAppWebViewController {
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (_webview != null && _webview!.onAjaxReadyStateChange != null)
-                return jsonEncode(
-                    await _webview!.onAjaxReadyStateChange!(this, request));
+                return (await _webview!.onAjaxReadyStateChange!(this, request))?.toNativeValue();
               else
-                return jsonEncode(
-                    await _inAppBrowser!.onAjaxReadyStateChange(request));
+                return (await _inAppBrowser!.onAjaxReadyStateChange(request))?.toNativeValue();
             }
             return null;
           case "onAjaxProgress":
@@ -1231,10 +1240,9 @@ class InAppWebViewController {
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (_webview != null && _webview!.onAjaxProgress != null)
-                return jsonEncode(
-                    await _webview!.onAjaxProgress!(this, request));
+                return (await _webview!.onAjaxProgress!(this, request))?.toNativeValue();
               else
-                return jsonEncode(await _inAppBrowser!.onAjaxProgress(request));
+                return (await _inAppBrowser!.onAjaxProgress(request))?.toNativeValue();
             }
             return null;
           case "shouldInterceptFetchRequest":
@@ -2281,7 +2289,7 @@ class InAppWebViewController {
   ///Prints the current page.
   ///
   ///To obtain the [PrintJobController], use [settings] argument with [PrintJobSettings.handledByClient] to `true`.
-  ///Otherwise this method will return `null` and the [PrintJobController] will be handled and disposed automatically by the system.
+  ///Otherwise this method will return `null` and the [PrintJobController] will be handled and disposed automatically by the system.
   ///
   ///**NOTE**: available on Android 19+.
   ///
@@ -2418,7 +2426,7 @@ class InAppWebViewController {
     hitTestResultMap = hitTestResultMap.cast<String, dynamic>();
 
     InAppWebViewHitTestResultType? type =
-        InAppWebViewHitTestResultType.fromValue(
+        InAppWebViewHitTestResultType.fromNativeValue(
             hitTestResultMap["type"]?.toInt());
     String? extra = hitTestResultMap["extra"];
     return InAppWebViewHitTestResult(type: type, extra: extra);
@@ -2823,9 +2831,9 @@ class InAppWebViewController {
   ///[autoname] if `false`, takes [filePath] to be a file.
   ///If `true`, [filePath] is assumed to be a directory in which a filename will be chosen according to the URL of the current page.
   ///
-  ///**NOTE for iOS**: Available on iOS 14.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
+  ///**NOTE for iOS**: Available on iOS 14.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///
-  ///**NOTE for Android**: if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
+  ///**NOTE for Android**: if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.saveWebArchive](https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
@@ -2834,9 +2842,9 @@ class InAppWebViewController {
       {required String filePath, bool autoname = false}) async {
     if (!autoname) {
       if (defaultTargetPlatform == TargetPlatform.android) {
-        assert(filePath.endsWith("." + WebArchiveFormat.MHT.toValue()));
+        assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toValue()));
+        assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
       }
     }
 
@@ -3303,7 +3311,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate)).
   Future<MediaPlaybackState?> requestMediaPlaybackState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaPlaybackState.fromValue(
+    return MediaPlaybackState.fromNativeValue(
         await _channel.invokeMethod('requestMediaPlaybackState', args));
   }
 
@@ -3325,7 +3333,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate)).
   Future<MediaCaptureState?> getCameraCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromValue(
+    return MediaCaptureState.fromNativeValue(
         await _channel.invokeMethod('getCameraCaptureState', args));
   }
 
@@ -3337,7 +3345,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate)).
   Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toValue());
+    args.putIfAbsent('state', () => state.toNativeValue());
     await _channel.invokeMethod('setCameraCaptureState', args);
   }
 
@@ -3349,7 +3357,7 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate)).
   Future<MediaCaptureState?> getMicrophoneCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
-    return MediaCaptureState.fromValue(
+    return MediaCaptureState.fromNativeValue(
         await _channel.invokeMethod('getMicrophoneCaptureState', args));
   }
 
@@ -3362,7 +3370,7 @@ class InAppWebViewController {
   Future<void> setMicrophoneCaptureState(
       {required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
-    args.putIfAbsent('state', () => state.toValue());
+    args.putIfAbsent('state', () => state.toNativeValue());
     await _channel.invokeMethod('setMicrophoneCaptureState', args);
   }
 

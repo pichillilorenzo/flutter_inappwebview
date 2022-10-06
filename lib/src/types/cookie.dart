@@ -1,8 +1,13 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../cookie_manager.dart';
 import 'http_cookie_same_site_policy.dart';
 
+part 'cookie.g.dart';
+
 ///Class that represents a cookie returned by the [CookieManager].
-class Cookie {
+@ExchangeableObject()
+class Cookie_ {
   ///The cookie name.
   String name;
 
@@ -27,7 +32,7 @@ class Cookie {
   ///The cookie same site policy.
   ///
   ///**NOTE**: on Android it will be always `null`.
-  HTTPCookieSameSitePolicy? sameSite;
+  HTTPCookieSameSitePolicy_? sameSite;
 
   ///Indicates if the cookie is secure or not.
   ///
@@ -44,7 +49,7 @@ class Cookie {
   ///**NOTE**: on Android it will be always `null`.
   String? path;
 
-  Cookie(
+  Cookie_(
       {required this.name,
         required this.value,
         this.expiresDate,
@@ -54,29 +59,4 @@ class Cookie {
         this.isSecure,
         this.isHttpOnly,
         this.path});
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {
-      "name": name,
-      "value": value,
-      "expiresDate": expiresDate,
-      "isSessionOnly": isSessionOnly,
-      "domain": domain,
-      "sameSite": sameSite?.toValue(),
-      "isSecure": isSecure,
-      "isHttpOnly": isHttpOnly,
-      "path": path
-    };
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }

@@ -20,8 +20,14 @@ class HeadlessInAppWebViewManager {
       const StandardMethodCodec(),
       _messenger,
     );
-    HeadlessInAppWebViewManager._sharedChannel
-        .setMethodCallHandler(handleMethod);
+    HeadlessInAppWebViewManager._sharedChannel.setMethodCallHandler((call) async {
+      try {
+        return await handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {

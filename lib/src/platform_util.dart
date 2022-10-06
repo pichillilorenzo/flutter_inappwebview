@@ -12,7 +12,14 @@ class PlatformUtil {
   }
 
   static PlatformUtil _init() {
-    _channel.setMethodCallHandler(_handleMethod);
+    _channel.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
     _instance = PlatformUtil();
     return _instance!;
   }

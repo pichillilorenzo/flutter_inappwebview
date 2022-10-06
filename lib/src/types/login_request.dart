@@ -1,7 +1,12 @@
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
 import '../in_app_webview/webview.dart';
 
+part 'login_request.g.dart';
+
 ///Class used by [WebView.onReceivedLoginRequest] event.
-class LoginRequest {
+@ExchangeableObject()
+class LoginRequest_ {
   ///The account realm used to look up accounts.
   String realm;
 
@@ -12,32 +17,5 @@ class LoginRequest {
   ///Authenticator specific arguments used to log in the user.
   String args;
 
-  LoginRequest({required this.realm, this.account, required this.args});
-
-  ///Gets a possible [LoginRequest] instance from a [Map] value.
-  static LoginRequest? fromMap(Map<String, dynamic>? map) {
-    if (map == null) {
-      return null;
-    }
-    return LoginRequest(
-      realm: map["realm"],
-      account: map["account"],
-      args: map["args"],
-    );
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toMap() {
-    return {"realm": realm, "account": account, "args": args};
-  }
-
-  ///Converts instance to a map.
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
+  LoginRequest_({required this.realm, this.account, required this.args});
 }

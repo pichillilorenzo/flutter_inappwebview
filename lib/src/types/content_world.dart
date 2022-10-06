@@ -4,7 +4,7 @@ final _contentWorldNameRegExp = RegExp(r'[\s]');
 ///
 ///**NOTE for iOS**: available on iOS 14.0+. This class represents the native [WKContentWorld](https://developer.apple.com/documentation/webkit/wkcontentworld) class.
 ///
-///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` attribute equals to `flutter_inappwebview_[name]`
+///**NOTE for Android**: it will create and append an `<iframe>` HTML element with `id` attribute equals to `flutter_inappwebview_[name]`
 ///to the webpage's content that contains only the inline `<script>` HTML elements in order to define a new scope of execution for JavaScript code.
 ///Unfortunately, there isn't any other way to do it.
 ///There are some limitations:
@@ -24,7 +24,6 @@ class ContentWorld {
   }
 
   ///The default world for clients.
-  // ignore: non_constant_identifier_names
   static final ContentWorld DEFAULT_CLIENT =
   ContentWorld.world(name: "defaultClient");
 
@@ -32,7 +31,6 @@ class ContentWorld {
   ///This property contains the content world for scripts that the current webpage executes.
   ///Be careful when manipulating variables in this content world.
   ///If you modify a variable with the same name as one the webpage uses, you may unintentionally disrupt the normal operation of that page.
-  // ignore: non_constant_identifier_names
   static final ContentWorld PAGE = ContentWorld.world(name: "page");
 
   ///Converts instance to a map.

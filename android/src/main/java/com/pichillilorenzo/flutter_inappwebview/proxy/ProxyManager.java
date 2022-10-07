@@ -84,6 +84,9 @@ public class ProxyManager extends ChannelDelegateImpl {
       if (settings.removeImplicitRules != null && settings.removeImplicitRules) {
         proxyConfigBuilder.removeImplicitRules();
       }
+      if (settings.reverseBypassEnabled != null && WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS)) {
+        proxyConfigBuilder.setReverseBypassEnabled(settings.reverseBypassEnabled);
+      }
       proxyController.setProxyOverride(proxyConfigBuilder.build(), new Executor() {
         @Override
         public void execute(Runnable command) {

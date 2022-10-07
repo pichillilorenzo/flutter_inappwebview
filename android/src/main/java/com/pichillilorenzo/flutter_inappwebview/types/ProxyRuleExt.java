@@ -2,17 +2,19 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.webkit.ProxyConfig;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class ProxyRuleExt {
   @Nullable
+  @ProxyConfig.ProxyScheme
   private String schemeFilter;
   @NonNull
   private String url;
 
-  public ProxyRuleExt(@Nullable String schemeFilter, @NonNull String url) {
+  public ProxyRuleExt(@Nullable @ProxyConfig.ProxyScheme String schemeFilter, @NonNull String url) {
     this.schemeFilter = schemeFilter;
     this.url = url;
   }

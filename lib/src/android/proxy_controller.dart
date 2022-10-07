@@ -115,12 +115,24 @@ class ProxySettings {
   ///Set this to `true` to override the default behavior and force localhost and link-local URLs to be sent through the proxy.
   bool? removeImplicitRules;
 
+  ///Reverse the bypass list.
+  ///
+  ///The default value is `false`, in which case all URLs will use proxy settings except the ones in the bypass list, which will be connected to directly instead.
+  ///
+  ///If set to `true`, then only URLs in the bypass list will use these proxy settings, and all other URLs will be connected to directly.
+  ///
+  ///Use [bypassRules] to add bypass rules.
+  ///
+  ///**NOTE**: available only if [WebViewFeature.PROXY_OVERRIDE_REVERSE_BYPASS] feature is supported.
+  bool reverseBypassEnabled;
+
   ProxySettings(
       {this.bypassRules = const [],
       this.directs = const [],
       this.proxyRules = const [],
       this.bypassSimpleHostnames,
-      this.removeImplicitRules});
+      this.removeImplicitRules,
+      this.reverseBypassEnabled = false});
 
   Map<String, dynamic> toMap() {
     return {
@@ -128,7 +140,8 @@ class ProxySettings {
       "directs": directs,
       "proxyRules": proxyRules.map((e) => e.toMap()).toList(),
       "bypassSimpleHostnames": bypassSimpleHostnames,
-      "removeImplicitRules": removeImplicitRules
+      "removeImplicitRules": removeImplicitRules,
+      "reverseBypassEnabled": reverseBypassEnabled
     };
   }
 
@@ -141,6 +154,7 @@ class ProxySettings {
         .map((e) => ProxyRule.fromMap(e)) as List<ProxyRule>;
     settings.bypassSimpleHostnames = map["bypassSimpleHostnames"];
     settings.removeImplicitRules = map["removeImplicitRules"];
+    settings.reverseBypassEnabled = map["reverseBypassEnabled"];
     return settings;
   }
 

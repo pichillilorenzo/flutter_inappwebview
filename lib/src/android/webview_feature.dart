@@ -66,6 +66,10 @@ class WebViewFeature_ {
   static const PROXY_OVERRIDE =
       const WebViewFeature_._internal("PROXY_OVERRIDE");
 
+  ///This feature covers [ProxySettings.reverseBypassEnabled].
+  static const PROXY_OVERRIDE_REVERSE_BYPASS =
+      const WebViewFeature_._internal("PROXY_OVERRIDE_REVERSE_BYPASS");
+
   ///
   static const RECEIVE_HTTP_ERROR =
       const WebViewFeature_._internal("RECEIVE_HTTP_ERROR");

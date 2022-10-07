@@ -17,6 +17,7 @@ public class ProxySettings implements ISettings<ProxyConfig> {
   List<ProxyRuleExt> proxyRules = new ArrayList<>();
   Boolean bypassSimpleHostnames = null;
   Boolean removeImplicitRules = null;
+  Boolean reverseBypassEnabled = false;
 
   @NonNull
   @Override
@@ -51,6 +52,9 @@ public class ProxySettings implements ISettings<ProxyConfig> {
         case "removeImplicitRules":
           removeImplicitRules = (Boolean) value;
           break;
+        case "reverseBypassEnabled":
+          reverseBypassEnabled = (Boolean) value;
+          break;
       }
     }
 
@@ -70,6 +74,7 @@ public class ProxySettings implements ISettings<ProxyConfig> {
     settings.put("proxyRules", proxyRuleMapList);
     settings.put("bypassSimpleHostnames", bypassSimpleHostnames);
     settings.put("removeImplicitRules", removeImplicitRules);
+    settings.put("reverseBypassEnabled", reverseBypassEnabled);
     return settings;
   }
 
@@ -87,6 +92,7 @@ public class ProxySettings implements ISettings<ProxyConfig> {
     }
     realSettings.put("bypassRules", proxyConfig.getBypassRules());
     realSettings.put("proxyRules", proxyRuleMapList);
+    realSettings.put("reverseBypassEnabled", proxyConfig.isReverseBypassEnabled());
     return realSettings;
   }
 }

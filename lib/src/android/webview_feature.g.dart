@@ -205,6 +205,11 @@ class WebViewFeature {
   static const REQUESTED_WITH_HEADER_CONTROL = WebViewFeature._internal(
       'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
 
+  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
+  static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
+      WebViewFeature._internal('ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
+          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
+
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -252,6 +257,7 @@ class WebViewFeature {
     WebViewFeature.SUPPRESS_ERROR_PAGE,
     WebViewFeature.ALGORITHMIC_DARKENING,
     WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
+    WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.
@@ -515,6 +521,12 @@ class AndroidWebViewFeature {
   static const REQUESTED_WITH_HEADER_CONTROL = AndroidWebViewFeature._internal(
       'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
 
+  ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
+  static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
+      AndroidWebViewFeature._internal(
+          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
+          'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
+
   ///Set of all values of [AndroidWebViewFeature].
   static final Set<AndroidWebViewFeature> values = [
     AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -562,6 +574,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
     AndroidWebViewFeature.ALGORITHMIC_DARKENING,
     AndroidWebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
+    AndroidWebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
   ].toSet();
 
   ///Gets a possible [AndroidWebViewFeature] instance from [String] value.

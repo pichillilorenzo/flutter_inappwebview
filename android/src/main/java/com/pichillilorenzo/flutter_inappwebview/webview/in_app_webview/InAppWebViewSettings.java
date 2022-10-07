@@ -117,6 +117,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean algorithmicDarkeningAllowed = false;
   @Nullable
   public Integer requestedWithHeaderMode;
+  public Boolean enterpriseAuthenticationAppLinkPolicyEnabled = true;
 
   @NonNull
   @Override
@@ -384,6 +385,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "requestedWithHeaderMode":
           requestedWithHeaderMode = (Integer) value;
           break;
+        case "enterpriseAuthenticationAppLinkPolicyEnabled":
+          enterpriseAuthenticationAppLinkPolicyEnabled = (Boolean) value;
+          break;
       }
     }
 
@@ -479,6 +483,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("willSuppressErrorPage", willSuppressErrorPage);
     settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
     settings.put("requestedWithHeaderMode", requestedWithHeaderMode);
+    settings.put("enterpriseAuthenticationAppLinkPolicyEnabled", enterpriseAuthenticationAppLinkPolicyEnabled);
     return settings;
   }
 
@@ -572,6 +577,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL)) {
         realSettings.put("requestedWithHeaderMode", WebSettingsCompat.getRequestedWithHeaderMode(settings));
+      }
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
+        realSettings.put("enterpriseAuthenticationAppLinkPolicyEnabled", WebSettingsCompat.getEnterpriseAuthenticationAppLinkPolicyEnabled(settings));
       }
     }
     return realSettings;

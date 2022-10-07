@@ -673,7 +673,10 @@ class InAppWebViewSettings {
   ///
   ///If Android is applying Force Dark to WebView then WebView will ignore the value of this setting and behave as if it were set to true.
   ///
-  ///**NOTE**: available on Android 29+ and only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.
+  ///**NOTE**: available on Android only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   bool algorithmicDarkeningAllowed;
 
   ///Sets how the WebView will set the `X-Requested-With` header on requests.
@@ -682,7 +685,25 @@ class InAppWebViewSettings {
   ///The default behavior may vary depending on the WebView implementation.
   ///
   ///**NOTE**: available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   RequestedWithHeaderMode? requestedWithHeaderMode;
+
+  ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
+  ///effect on WebView.
+  ///
+  ///EnterpriseAuthenticationAppLinkPolicy in WebView allows admins to specify authentication
+  ///urls. When WebView is redirected to authentication url, and an app on the device has
+  ///registered as the default handler for the url, that app is launched.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available on Android only if [WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY] feature is supported.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  bool enterpriseAuthenticationAppLinkPolicyEnabled;
 
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   ///
@@ -1161,6 +1182,7 @@ class InAppWebViewSettings {
     this.willSuppressErrorPage = false,
     this.algorithmicDarkeningAllowed = false,
     this.requestedWithHeaderMode,
+    this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
     this.disallowOverScroll = false,
     this.enableViewportScale = false,
     this.suppressesIncrementalRendering = false,
@@ -1310,6 +1332,7 @@ class InAppWebViewSettings {
       "willSuppressErrorPage": willSuppressErrorPage,
       "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
       "requestedWithHeaderMode": requestedWithHeaderMode?.toNativeValue(),
+      "enterpriseAuthenticationAppLinkPolicyEnabled": enterpriseAuthenticationAppLinkPolicyEnabled,
       "disallowOverScroll": disallowOverScroll,
       "enableViewportScale": enableViewportScale,
       "suppressesIncrementalRendering": suppressesIncrementalRendering,
@@ -1496,6 +1519,7 @@ class InAppWebViewSettings {
         settings.willSuppressErrorPage = map["willSuppressErrorPage"];
         settings.algorithmicDarkeningAllowed = map["algorithmicDarkeningAllowed"];
         settings.requestedWithHeaderMode = RequestedWithHeaderMode.fromNativeValue(map["requestedWithHeaderMode"]);
+        settings.enterpriseAuthenticationAppLinkPolicyEnabled = map["enterpriseAuthenticationAppLinkPolicyEnabled"];
       }
       else if (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS) {

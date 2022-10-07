@@ -391,6 +391,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             customSettings.requestedWithHeaderMode != null) {
       WebSettingsCompat.setRequestedWithHeaderMode(settings, customSettings.requestedWithHeaderMode);
     }
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
+      WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(settings, customSettings.enterpriseAuthenticationAppLinkPolicyEnabled);
+    }
 
     contentBlockerHandler.getRuleList().clear();
     for (Map<String, Map<String, Object>> contentBlocker : customSettings.contentBlockers) {
@@ -1042,6 +1045,11 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL) &&
             newCustomSettings.requestedWithHeaderMode != null) {
       WebSettingsCompat.setRequestedWithHeaderMode(settings, newCustomSettings.requestedWithHeaderMode);
+    }
+    if (newSettingsMap.get("enterpriseAuthenticationAppLinkPolicyEnabled") != null &&
+            !Util.objEquals(customSettings.enterpriseAuthenticationAppLinkPolicyEnabled, newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled) &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY)) {
+      WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(settings, newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled);
     }
 
     customSettings = newCustomSettings;

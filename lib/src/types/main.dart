@@ -160,3 +160,4 @@ export 'webview_implementation.dart' show WebViewImplementation;
 export 'webview_package_info.dart' show WebViewPackageInfo, AndroidWebViewPackageInfo;
 export 'webview_render_process_action.dart' show WebViewRenderProcessAction;
 export 'window_features.dart' show WindowFeatures, IOSWKWindowFeatures;
+export 'requested_with_header_mode.dart' show RequestedWithHeaderMode;

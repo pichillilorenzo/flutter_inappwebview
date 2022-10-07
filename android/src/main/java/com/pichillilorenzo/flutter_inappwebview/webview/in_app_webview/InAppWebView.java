@@ -384,9 +384,12 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
       WebSettingsCompat.setWillSuppressErrorPage(settings, customSettings.willSuppressErrorPage);
     }
-
     if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, customSettings.algorithmicDarkeningAllowed);
+    }
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL) &&
+            customSettings.requestedWithHeaderMode != null) {
+      WebSettingsCompat.setRequestedWithHeaderMode(settings, customSettings.requestedWithHeaderMode);
     }
 
     contentBlockerHandler.getRuleList().clear();
@@ -1029,11 +1032,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
             WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
       WebSettingsCompat.setWillSuppressErrorPage(settings, newCustomSettings.willSuppressErrorPage);
     }
-
     if (newSettingsMap.get("algorithmicDarkeningAllowed") != null &&
             !Util.objEquals(customSettings.algorithmicDarkeningAllowed, newCustomSettings.algorithmicDarkeningAllowed) &&
             WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
       WebSettingsCompat.setAlgorithmicDarkeningAllowed(settings, newCustomSettings.algorithmicDarkeningAllowed);
+    }
+    if (newSettingsMap.get("requestedWithHeaderMode") != null &&
+            !Util.objEquals(customSettings.requestedWithHeaderMode, newCustomSettings.requestedWithHeaderMode) &&
+            WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL) &&
+            newCustomSettings.requestedWithHeaderMode != null) {
+      WebSettingsCompat.setRequestedWithHeaderMode(settings, newCustomSettings.requestedWithHeaderMode);
     }
 
     customSettings = newCustomSettings;

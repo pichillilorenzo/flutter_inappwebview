@@ -115,6 +115,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public String horizontalScrollbarTrackColor;
   public Boolean willSuppressErrorPage = false;
   public Boolean algorithmicDarkeningAllowed = false;
+  @Nullable
+  public Integer requestedWithHeaderMode;
 
   @NonNull
   @Override
@@ -379,6 +381,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "algorithmicDarkeningAllowed":
           algorithmicDarkeningAllowed = (Boolean) value;
           break;
+        case "requestedWithHeaderMode":
+          requestedWithHeaderMode = (Integer) value;
+          break;
       }
     }
 
@@ -473,6 +478,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
     settings.put("willSuppressErrorPage", willSuppressErrorPage);
     settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
+    settings.put("requestedWithHeaderMode", requestedWithHeaderMode);
     return settings;
   }
 
@@ -563,6 +569,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         realSettings.put("algorithmicDarkeningAllowed", WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings));
+      }
+      if (WebViewFeature.isFeatureSupported(WebViewFeature.REQUESTED_WITH_HEADER_CONTROL)) {
+        realSettings.put("requestedWithHeaderMode", WebSettingsCompat.getRequestedWithHeaderMode(settings));
       }
     }
     return realSettings;

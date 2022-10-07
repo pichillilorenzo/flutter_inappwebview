@@ -200,6 +200,10 @@ class WebViewFeature_ {
   static const ALGORITHMIC_DARKENING =
       const WebViewFeature_._internal("ALGORITHMIC_DARKENING");
 
+  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  static const REQUESTED_WITH_HEADER_CONTROL =
+      const WebViewFeature_._internal("REQUESTED_WITH_HEADER_CONTROL");
+
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.
@@ -410,6 +414,10 @@ class AndroidWebViewFeature_ {
   ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
   static const ALGORITHMIC_DARKENING =
       const AndroidWebViewFeature_._internal("ALGORITHMIC_DARKENING");
+
+  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  static const REQUESTED_WITH_HEADER_CONTROL =
+      const AndroidWebViewFeature_._internal("REQUESTED_WITH_HEADER_CONTROL");
 
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,

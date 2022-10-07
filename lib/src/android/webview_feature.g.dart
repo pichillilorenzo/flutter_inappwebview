@@ -201,6 +201,10 @@ class WebViewFeature {
   static const ALGORITHMIC_DARKENING = WebViewFeature._internal(
       'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
 
+  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  static const REQUESTED_WITH_HEADER_CONTROL = WebViewFeature._internal(
+      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
+
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -247,6 +251,7 @@ class WebViewFeature {
     WebViewFeature.DOCUMENT_START_SCRIPT,
     WebViewFeature.SUPPRESS_ERROR_PAGE,
     WebViewFeature.ALGORITHMIC_DARKENING,
+    WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.
@@ -506,6 +511,10 @@ class AndroidWebViewFeature {
   static const ALGORITHMIC_DARKENING = AndroidWebViewFeature._internal(
       'ALGORITHMIC_DARKENING', 'ALGORITHMIC_DARKENING');
 
+  ///This feature covers [InAppWebViewSettings.requestedWithHeaderMode].
+  static const REQUESTED_WITH_HEADER_CONTROL = AndroidWebViewFeature._internal(
+      'REQUESTED_WITH_HEADER_CONTROL', 'REQUESTED_WITH_HEADER_CONTROL');
+
   ///Set of all values of [AndroidWebViewFeature].
   static final Set<AndroidWebViewFeature> values = [
     AndroidWebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -552,6 +561,7 @@ class AndroidWebViewFeature {
     AndroidWebViewFeature.DOCUMENT_START_SCRIPT,
     AndroidWebViewFeature.SUPPRESS_ERROR_PAGE,
     AndroidWebViewFeature.ALGORITHMIC_DARKENING,
+    AndroidWebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
   ].toSet();
 
   ///Gets a possible [AndroidWebViewFeature] instance from [String] value.

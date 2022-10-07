@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/services.dart';
 import 'webview_feature.dart';
 import '../types/main.dart';
+import '../in_app_webview/in_app_webview_settings.dart';
 
 ///Class that manages Service Workers used by [WebView].
 ///
@@ -118,6 +119,16 @@ class ServiceWorkerController {
         await _channel.invokeMethod('getCacheMode', args));
   }
 
+  ///Gets how Service Workers will set the `X-Requested-With` header on HTTP requests.
+  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL].
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#getRequestedWithHeaderMode()
+  static Future<RequestedWithHeaderMode?> getRequestedWithHeaderMode() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return RequestedWithHeaderMode.fromNativeValue(
+        await _channel.invokeMethod('getRequestedWithHeaderMode', args));
+  }
+
   ///Enables or disables content URL access from Service Workers.
   ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_CONTENT_ACCESS].
   ///
@@ -164,6 +175,19 @@ class ServiceWorkerController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("mode", () => mode.toNativeValue());
     await _channel.invokeMethod('setCacheMode', args);
+  }
+
+  ///Sets how Service Workers will set the `X-Requested-With` header on requests.
+  ///If you are calling this method, you may also want to call [InAppWebViewSettings.requestedWithHeaderMode]
+  ///with the same parameter value to configure non-ServiceWorker requests.
+  ///The default behavior may vary depending on the WebView implementation.
+  ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL].
+  ///
+  ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setRequestedWithHeaderMode(int)
+  static Future<void> setRequestedWithHeaderMode(RequestedWithHeaderMode mode) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent("mode", () => mode.toNativeValue());
+    await _channel.invokeMethod('setRequestedWithHeaderMode', args);
   }
 }
 

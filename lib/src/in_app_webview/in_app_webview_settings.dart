@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 
+import '../types/requested_with_header_mode.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
 import '../content_blocker.dart';
@@ -672,8 +673,16 @@ class InAppWebViewSettings {
   ///
   ///If Android is applying Force Dark to WebView then WebView will ignore the value of this setting and behave as if it were set to true.
   ///
-  ///**NOTE**: available on Android 29+.
+  ///**NOTE**: available on Android 29+ and only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.
   bool algorithmicDarkeningAllowed;
+
+  ///Sets how the WebView will set the `X-Requested-With` header on requests.
+  ///If you are calling this method, you may also want to call [ServiceWorkerWebSettingsCompat.setRequestedWithHeaderMode]
+  ///with the same parameter value to configure ServiceWorker requests.
+  ///The default behavior may vary depending on the WebView implementation.
+  ///
+  ///**NOTE**: available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL] feature is supported.
+  RequestedWithHeaderMode? requestedWithHeaderMode;
 
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   ///
@@ -1151,6 +1160,7 @@ class InAppWebViewSettings {
     this.horizontalScrollbarTrackColor,
     this.willSuppressErrorPage = false,
     this.algorithmicDarkeningAllowed = false,
+    this.requestedWithHeaderMode,
     this.disallowOverScroll = false,
     this.enableViewportScale = false,
     this.suppressesIncrementalRendering = false,
@@ -1299,6 +1309,7 @@ class InAppWebViewSettings {
       "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
       "willSuppressErrorPage": willSuppressErrorPage,
       "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
+      "requestedWithHeaderMode": requestedWithHeaderMode?.toNativeValue(),
       "disallowOverScroll": disallowOverScroll,
       "enableViewportScale": enableViewportScale,
       "suppressesIncrementalRendering": suppressesIncrementalRendering,
@@ -1484,6 +1495,7 @@ class InAppWebViewSettings {
             UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
         settings.willSuppressErrorPage = map["willSuppressErrorPage"];
         settings.algorithmicDarkeningAllowed = map["algorithmicDarkeningAllowed"];
+        settings.requestedWithHeaderMode = RequestedWithHeaderMode.fromNativeValue(map["requestedWithHeaderMode"]);
       }
       else if (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS) {

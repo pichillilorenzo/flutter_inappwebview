@@ -27,14 +27,16 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
       String title = b.getString(KEY_URL_TITLE);
 
       String managerId = b.getString(CHROME_MANAGER_ID);
-      ChromeSafariBrowserManager manager = (ChromeSafariBrowserManager) ChromeSafariBrowserManager.shared.get(managerId);
-
-      MethodChannel channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId);
-      Map<String, Object> obj = new HashMap<>();
-      obj.put("url", url);
-      obj.put("title", title);
-      obj.put("id", id);
-      channel.invokeMethod("onChromeSafariBrowserItemActionPerform", obj);
+      if (managerId != null) {
+        ChromeSafariBrowserManager manager = (ChromeSafariBrowserManager) ChromeSafariBrowserManager.shared.get(managerId);
+        if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
+        MethodChannel channel = new MethodChannel(manager.plugin.messenger, "com.pichillilorenzo/flutter_chromesafaribrowser_" + viewId);
+        Map<String, Object> obj = new HashMap<>();
+        obj.put("url", url);
+        obj.put("title", title);
+        obj.put("id", id);
+        channel.invokeMethod("onChromeSafariBrowserItemActionPerform", obj);
+      }
     }
   }
 }

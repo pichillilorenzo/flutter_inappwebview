@@ -1538,6 +1538,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         return;
                     }
                     decisionHandler(.allow)
+                    return
                 }
             })
         }
@@ -1556,15 +1557,19 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     onDownloadStartRequest(request: downloadStartRequest)
                     if useOnNavigationResponse == nil || !useOnNavigationResponse! {
                         decisionHandler(.cancel)
+                        return
                     }
-                    return
+                   
                 }
             }
         }
         
         if useOnNavigationResponse == nil || !useOnNavigationResponse! {
             decisionHandler(.allow)
+            return
         }
+
+        decisionHandler(.allow)
     }
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {

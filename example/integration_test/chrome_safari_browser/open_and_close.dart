@@ -15,7 +15,7 @@ void openAndClose() {
         ].contains(defaultTargetPlatform);
 
   test('open and close', () async {
-    var chromeSafariBrowser = new MyChromeSafariBrowser();
+    var chromeSafariBrowser = MyChromeSafariBrowser();
     expect(chromeSafariBrowser.isOpened(), false);
 
     await chromeSafariBrowser.open(url: TEST_URL_1);

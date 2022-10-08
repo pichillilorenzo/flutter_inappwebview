@@ -1,9 +1,6 @@
-import 'dart:ui';
-
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
 
-import '../types/requested_with_header_mode.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
 import '../content_blocker.dart';

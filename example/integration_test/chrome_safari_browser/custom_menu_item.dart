@@ -15,12 +15,12 @@ void customMenuItem() {
         ].contains(defaultTargetPlatform);
 
   test('add custom menu item', () async {
-    var chromeSafariBrowser = new MyChromeSafariBrowser();
+    var chromeSafariBrowser = MyChromeSafariBrowser();
     chromeSafariBrowser.addMenuItem(ChromeSafariBrowserMenuItem(
         id: 2,
         label: 'Custom item menu 1',
         action: (url, title) {
-          print('Custom item menu 1 clicked!');
+
         }));
     expect(chromeSafariBrowser.isOpened(), false);
 

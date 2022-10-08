@@ -8,7 +8,7 @@ import 'open_and_close.dart';
 import 'trusted_web_activity.dart';
 
 void main() {
-  final shouldSkip = kIsWeb;
+  const shouldSkip = kIsWeb;
 
   group('ChromeSafariBrowser', () {
     openAndClose();

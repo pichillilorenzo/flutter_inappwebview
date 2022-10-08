@@ -7,6 +7,7 @@ part 'ajax_request_event_type.g.dart';
 ///Class used by [AjaxRequestEvent] class.
 @ExchangeableEnum()
 class AjaxRequestEventType_ {
+  // ignore: unused_field
   final String _value;
   const AjaxRequestEventType_._internal(this._value);
 

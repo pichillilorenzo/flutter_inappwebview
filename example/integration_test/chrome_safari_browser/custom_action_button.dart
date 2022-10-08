@@ -14,7 +14,7 @@ void customActionButton() {
         ].contains(defaultTargetPlatform);
 
   test('add custom action button', () async {
-    var chromeSafariBrowser = new MyChromeSafariBrowser();
+    var chromeSafariBrowser = MyChromeSafariBrowser();
     var actionButtonIcon =
         await rootBundle.load('test_assets/images/flutter-logo.png');
     chromeSafariBrowser.setActionButton(ChromeSafariBrowserActionButton(
@@ -22,7 +22,7 @@ void customActionButton() {
         description: 'Action Button description',
         icon: actionButtonIcon.buffer.asUint8List(),
         action: (url, title) {
-          print('Action Button 1 clicked!');
+
         }));
     expect(chromeSafariBrowser.isOpened(), false);
 

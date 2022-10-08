@@ -42,7 +42,7 @@ dev_dependencies:
 #    git:
 #      url: https://github.com/flutter/plugins.git
 #      path: packages/integration_test
-  pedantic: ^1.8.0
+  flutter_lints: ^2.0.1
 
 # For information on the generic Dart part of this file, see the
 # following page: https://www.dartlang.org/tools/pub/pubspec

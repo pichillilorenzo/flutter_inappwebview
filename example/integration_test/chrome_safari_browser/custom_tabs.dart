@@ -14,7 +14,7 @@ void customTabs() {
 
   group('Custom Tabs', () {
     test('single instance', () async {
-      var chromeSafariBrowser = new MyChromeSafariBrowser();
+      var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
       await chromeSafariBrowser.open(

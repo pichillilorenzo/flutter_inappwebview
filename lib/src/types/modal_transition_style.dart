@@ -33,6 +33,7 @@ class ModalTransitionStyle_ {
 @Deprecated("Use ModalTransitionStyle instead")
 @ExchangeableEnum()
 class IOSUIModalTransitionStyle_ {
+  // ignore: unused_field
   final int _value;
   const IOSUIModalTransitionStyle_._internal(this._value);
 

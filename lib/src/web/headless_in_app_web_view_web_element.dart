@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 import 'in_app_web_view_web_element.dart';
 import '../util.dart';

@@ -14,7 +14,7 @@ void trustedWebActivity() {
 
   group('Trusted Web Activity', () {
     test('basic', () async {
-      var chromeSafariBrowser = new MyChromeSafariBrowser();
+      var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
       await chromeSafariBrowser.open(
@@ -33,7 +33,7 @@ void trustedWebActivity() {
     });
 
     test('single instance', () async {
-      var chromeSafariBrowser = new MyChromeSafariBrowser();
+      var chromeSafariBrowser = MyChromeSafariBrowser();
       expect(chromeSafariBrowser.isOpened(), false);
 
       await chromeSafariBrowser.open(

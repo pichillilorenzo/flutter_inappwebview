@@ -77,6 +77,12 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         pullToRefreshControl.delegate = webView
         pullToRefreshControl.prepare()
         
+        let findInteractionController = FindInteractionController(
+            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            id: id, webView: webView, settings: nil)
+        webView.findInteractionController = findInteractionController
+        findInteractionController.prepare()
+        
         prepareWebView()
         webView.windowCreated = true
         

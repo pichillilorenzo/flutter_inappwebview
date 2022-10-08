@@ -6,6 +6,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/src/util.dart';
 
 import '../context_menu.dart';
+import '../find_interaction/find_interaction_controller.dart';
 import '../types/main.dart';
 import '../print_job/main.dart';
 import 'webview.dart';
@@ -61,6 +62,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
     this.contextMenu,
     this.initialUserScripts,
     this.pullToRefreshController,
+    this.findInteractionController,
     this.implementation = WebViewImplementation.NATIVE,
     this.onWebViewCreated,
     this.onLoadStart,
@@ -87,6 +89,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
     this.onReceivedHttpAuthRequest,
     this.onReceivedServerTrustAuthRequest,
     this.onReceivedClientCertRequest,
+    @Deprecated('Use FindInteractionController.onFindResultReceived instead')
     this.onFindResultReceived,
     this.shouldInterceptAjaxRequest,
     this.onAjaxReadyStateChange,
@@ -173,6 +176,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
     switch (call.method) {
       case "onWebViewCreated":
         pullToRefreshController?.initMethodChannel(id);
+        findInteractionController?.initMethodChannel(id);
         if (onWebViewCreated != null) {
           onWebViewCreated!(webViewController);
         }
@@ -324,6 +328,9 @@ class HeadlessInAppWebView implements WebView, Disposable {
   final PullToRefreshController? pullToRefreshController;
 
   @override
+  final FindInteractionController? findInteractionController;
+
+  @override
   final WebViewImplementation implementation;
 
   ///Use [onGeolocationPermissionsHidePrompt] instead.
@@ -422,6 +429,8 @@ class HeadlessInAppWebView implements WebView, Disposable {
   void Function(InAppWebViewController controller,
       DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
+  ///Use [FindInteractionController.onFindResultReceived] instead.
+  @Deprecated('Use FindInteractionController.onFindResultReceived instead')
   @override
   void Function(InAppWebViewController controller, int activeMatchOrdinal,
       int numberOfMatches, bool isDoneCounting)? onFindResultReceived;

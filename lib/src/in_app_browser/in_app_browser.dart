@@ -6,6 +6,7 @@ import 'dart:developer' as developer;
 import 'package:flutter/services.dart';
 
 import '../context_menu.dart';
+import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/main.dart';
 import '../types/main.dart';
 
@@ -59,6 +60,9 @@ class InAppBrowser {
 
   ///Represents the pull-to-refresh feature controller.
   PullToRefreshController? pullToRefreshController;
+
+  ///Represents the find interaction feature controller.
+  FindInteractionController? findInteractionController;
 
   ///Initial list of user scripts to be loaded at start or end of a page loading.
   final UnmodifiableListView<UserScript>? initialUserScripts;
@@ -129,6 +133,7 @@ class InAppBrowser {
         _debugLog(call.method, call.arguments);
         this._isOpened = true;
         this.pullToRefreshController?.initMethodChannel(id);
+        this.findInteractionController?.initMethodChannel(id);
         onBrowserCreated();
         break;
       case "onExit":
@@ -662,18 +667,8 @@ class InAppBrowser {
     return null;
   }
 
-  ///Event fired as find-on-page operations progress.
-  ///The listener may be notified multiple times while the operation is underway, and the [numberOfMatches] value should not be considered final unless [isDoneCounting] is true.
-  ///
-  ///[activeMatchOrdinal] represents the zero-based ordinal of the currently selected match.
-  ///
-  ///[numberOfMatches] represents how many matches have been found.
-  ///
-  ///[isDoneCounting] whether the find operation has actually completed.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.FindListener.onFindResultReceived](https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)))
-  ///- iOS
+  ///Use [FindInteractionController.onFindResultReceived] instead.
+  @Deprecated('Use FindInteractionController.onFindResultReceived instead')
   void onFindResultReceived(
       int activeMatchOrdinal, int numberOfMatches, bool isDoneCounting) {}
 

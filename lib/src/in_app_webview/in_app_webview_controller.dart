@@ -29,6 +29,7 @@ import 'webview.dart';
 import '_static_channel.dart';
 
 import '../print_job/main.dart';
+import '../find_interaction/main.dart';
 
 ///List of forbidden names for JavaScript handlers.
 // ignore: non_constant_identifier_names
@@ -804,17 +805,34 @@ class InAppWebViewController {
         }
         break;
       case "onFindResultReceived":
-        if ((_webview != null && _webview!.onFindResultReceived != null) ||
+        if ((_webview != null && (_webview!.onFindResultReceived != null ||
+            (_webview!.findInteractionController != null && _webview!.findInteractionController!.onFindResultReceived != null))) ||
             _inAppBrowser != null) {
           int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
           int numberOfMatches = call.arguments["numberOfMatches"];
           bool isDoneCounting = call.arguments["isDoneCounting"];
-          if (_webview != null && _webview!.onFindResultReceived != null)
-            _webview!.onFindResultReceived!(
+          if (_webview != null) {
+            if (_webview!.findInteractionController != null &&
+                _webview!.findInteractionController!.onFindResultReceived !=
+                    null)
+              _webview!.findInteractionController!.onFindResultReceived!(
+                  _webview!.findInteractionController!, activeMatchOrdinal,
+                  numberOfMatches, isDoneCounting);
+            else
+              _webview!.onFindResultReceived!(
                 this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
-          else
-            _inAppBrowser!.onFindResultReceived(
-                activeMatchOrdinal, numberOfMatches, isDoneCounting);
+          }
+          else {
+            if (_inAppBrowser!.findInteractionController != null &&
+                _inAppBrowser!.findInteractionController!
+                    .onFindResultReceived != null)
+              _inAppBrowser!.findInteractionController!.onFindResultReceived!(
+                  _webview!.findInteractionController!, activeMatchOrdinal,
+                  numberOfMatches, isDoneCounting);
+            else
+              _inAppBrowser!.onFindResultReceived(
+                  activeMatchOrdinal, numberOfMatches, isDoneCounting);
+          }
         }
         break;
       case "onPermissionRequest":
@@ -2159,45 +2177,24 @@ class InAppWebViewController {
     await _channel.invokeMethod('clearCache', args);
   }
 
-  ///Finds all instances of find on the page and highlights them. Notifies [WebView.onFindResultReceived] listener.
-  ///
-  ///[find] represents the string to find.
-  ///
-  ///**NOTE**: on Android native WebView, it finds all instances asynchronously. Successive calls to this will cancel any pending searches.
-  ///
-  ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.findAllAsync](https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)))
-  ///- iOS
+  ///Use [FindInteractionController.findAllAsync] instead.
+  @Deprecated("Use FindInteractionController.findAllAsync instead")
   Future<void> findAllAsync({required String find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
     await _channel.invokeMethod('findAllAsync', args);
   }
 
-  ///Highlights and scrolls to the next match found by [findAllAsync]. Notifies [WebView.onFindResultReceived] listener.
-  ///
-  ///[forward] represents the direction to search.
-  ///
-  ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.findNext](https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)))
-  ///- iOS
+  ///Use [FindInteractionController.findNext] instead.
+  @Deprecated("Use FindInteractionController.findNext instead")
   Future<void> findNext({required bool forward}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
     await _channel.invokeMethod('findNext', args);
   }
 
-  ///Clears the highlighting surrounding text matches created by [findAllAsync()].
-  ///
-  ///**NOTE**: on iOS, this is implemented using CSS and Javascript.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.clearMatches](https://developer.android.com/reference/android/webkit/WebView#clearMatches()))
-  ///- iOS
+  ///Use [FindInteractionController.clearMatches] instead.
+  @Deprecated("Use FindInteractionController.clearMatches instead")
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('clearMatches', args);

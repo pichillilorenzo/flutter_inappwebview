@@ -1,6 +1,7 @@
 import 'dart:collection';
 import 'dart:typed_data';
 
+import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 
 import '../context_menu.dart';
@@ -333,18 +334,8 @@ abstract class WebView {
           InAppWebViewController controller, ClientCertChallenge challenge)?
       onReceivedClientCertRequest;
 
-  ///Event fired as find-on-page operations progress.
-  ///The listener may be notified multiple times while the operation is underway, and the [numberOfMatches] value should not be considered final unless [isDoneCounting] is true.
-  ///
-  ///[activeMatchOrdinal] represents the zero-based ordinal of the currently selected match.
-  ///
-  ///[numberOfMatches] represents how many matches have been found.
-  ///
-  ///[isDoneCounting] whether the find operation has actually completed.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView ([Official API - WebView.FindListener.onFindResultReceived](https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)))
-  ///- iOS
+  ///Use [FindInteractionController.onFindResultReceived] instead.
+  @Deprecated('Use FindInteractionController.onFindResultReceived instead')
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,
       int numberOfMatches, bool isDoneCounting)? onFindResultReceived;
 
@@ -960,6 +951,13 @@ abstract class WebView {
   ///- iOS
   final PullToRefreshController? pullToRefreshController;
 
+  ///Represents the find interaction feature controller.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  final FindInteractionController? findInteractionController;
+
   ///Represents the WebView native implementation to be used.
   ///The default value is [WebViewImplementation.NATIVE].
   final WebViewImplementation implementation;
@@ -994,6 +992,7 @@ abstract class WebView {
       this.onReceivedHttpAuthRequest,
       this.onReceivedServerTrustAuthRequest,
       this.onReceivedClientCertRequest,
+      @Deprecated('Use FindInteractionController.onFindResultReceived instead')
       this.onFindResultReceived,
       this.shouldInterceptAjaxRequest,
       this.onAjaxReadyStateChange,
@@ -1076,5 +1075,6 @@ abstract class WebView {
       this.contextMenu,
       this.initialUserScripts,
       this.pullToRefreshController,
+      this.findInteractionController,
       this.implementation = WebViewImplementation.NATIVE});
 }

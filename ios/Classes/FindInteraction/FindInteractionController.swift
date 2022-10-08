@@ -1,0 +1,108 @@
+//
+//  FindInteractionController.swift
+//  flutter_inappwebview
+//
+//  Created by Lorenzo Pichilli on 07/10/22.
+//
+
+import Foundation
+import Flutter
+
+public class FindInteractionController : NSObject, Disposable {
+    
+    static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_find_interaction_";
+    var webView: InAppWebView?
+    var channelDelegate: FindInteractionChannelDelegate?
+    var settings: FindInteractionSettings?
+    var shouldCallOnRefresh = false
+    
+    public init(registrar: FlutterPluginRegistrar, id: Any, webView: InAppWebView, settings: FindInteractionSettings?) {
+        super.init()
+        self.webView = webView
+        self.settings = settings
+        let channel = FlutterMethodChannel(name: FindInteractionController.METHOD_CHANNEL_NAME_PREFIX + String(describing: id),
+                                           binaryMessenger: registrar.messenger())
+        self.channelDelegate = FindInteractionChannelDelegate(findInteractionController: self, channel: channel)
+    }
+    
+    public func prepare() {
+//        if let settings = settings {
+//
+//        }
+    }
+    
+    public func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+        guard let webView else {
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+            return
+        }
+        if #available(iOS 16.0, *), webView.isFindInteractionEnabled {
+            if let interaction = webView.findInteraction {
+                interaction.searchText = find
+                interaction.presentFindNavigator(showingReplace: false)
+            }
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+        } else {
+            let startSearch = "window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync('\(find ?? "")');"
+            webView.evaluateJavaScript(startSearch, completionHandler: completionHandler)
+        }
+    }
+
+    public func findNext(forward: Bool, completionHandler: ((Any?, Error?) -> Void)?) {
+        guard let webView else {
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+            return
+        }
+        if #available(iOS 16.0, *), webView.isFindInteractionEnabled {
+            if let interaction = webView.findInteraction {
+                if forward {
+                    interaction.findNext()
+                } else {
+                    interaction.findPrevious()
+                }
+            }
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+        } else {
+            webView.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findNext(\(forward ? "true" : "false"));", completionHandler: completionHandler)
+        }
+    }
+
+    public func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
+        guard let webView else {
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+            return
+        }
+        if #available(iOS 16.0, *), webView.isFindInteractionEnabled {
+            if let interaction = webView.findInteraction {
+                interaction.searchText = nil
+                interaction.dismissFindNavigator()
+            }
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+        } else {
+            webView.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();", completionHandler: completionHandler)
+        }
+    }
+    
+    public func dispose() {
+        channelDelegate?.dispose()
+        channelDelegate = nil
+        webView = nil
+    }
+    
+    deinit {
+        debugPrint("FindInteractionControl - dealloc")
+        dispose()
+    }
+}

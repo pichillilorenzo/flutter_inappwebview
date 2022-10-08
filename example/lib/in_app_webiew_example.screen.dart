@@ -19,12 +19,15 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewSettings settings = InAppWebViewSettings(
     useShouldOverrideUrlLoading: true,
     mediaPlaybackRequiresUserGesture: false,
+    isFindInteractionEnabled: false,
     allowsInlineMediaPlayback: true,
     iframeAllow: "camera; microphone",
     iframeAllowFullscreen: true
   );
 
   PullToRefreshController? pullToRefreshController;
+  FindInteractionController? findInteractionController;
+
   late ContextMenu contextMenu;
   String url = "";
   double progress = 0;
@@ -79,6 +82,14 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               }
             },
           );
+
+    findInteractionController = kIsWeb
+        ? null
+        : FindInteractionController(
+      onFindResultReceived: (controller, activeMatchOrdinal, numberOfMatches, isDoneCounting) => {
+        print("$activeMatchOrdinal $numberOfMatches $isDoneCounting")
+      },
+    );
   }
 
   @override
@@ -114,7 +125,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 InAppWebView(
                   key: webViewKey,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse('https://github.com/flutter/')),
+                      URLRequest(url: Uri.parse('https://developer.apple.com/videos/play/wwdc2022/10049/?time=264')),
                   // initialUrlRequest:
                   // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
@@ -122,6 +133,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   initialSettings: settings,
                   // contextMenu: contextMenu,
                   pullToRefreshController: pullToRefreshController,
+                  findInteractionController: findInteractionController,
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
                   },
@@ -167,6 +179,32 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
+                    await findInteractionController?.findAllAsync(find: "video");
+                    // print(await findInteractionController?.getActiveFindSession());
+                    await Future.delayed(Duration(seconds: 1));
+                    findInteractionController?.findNext(forward: true);
+                    findInteractionController?.findNext(forward: true);
+                    findInteractionController?.findNext(forward: true);
+                    await Future.delayed(Duration(seconds: 1));
+                    // findInteractionController?.clearMatches();
+                    findInteractionController?.findNext(forward: true);
+                    findInteractionController?.findNext(forward: true);
+                    findInteractionController?.findNext(forward: true);
+                    findInteractionController?.findNext(forward: true);
+                    await Future.delayed(Duration(seconds: 1));
+                    findInteractionController?.clearMatches();
+                    // print(await findInteractionController?.getSearchText());
+                    // findInteractionController?.findNext(forward: true);
+                    // findInteractionController?.findNext(forward: false);
+                    // findInteractionController?.setSearchText("text");
+                    // print(await findInteractionController?.getSearchText());
+                    // print(await findInteractionController?.isFindNavigatorVisible());
+                    // findInteractionController?.updateResultCount();
+                    // findInteractionController?.clearMatches();
+                    // findInteractionController?.presentFindNavigator();
+                    // await Future.delayed(Duration(milliseconds: 500));
+                    // findInteractionController?.dismissFindNavigator();
+                    // print(await findInteractionController?.isFindNavigatorVisible());
                   },
                   onReceivedError: (controller, request, error) {
                     pullToRefreshController?.endRefreshing();

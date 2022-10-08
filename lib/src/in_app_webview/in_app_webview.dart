@@ -9,6 +9,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
 
+import '../find_interaction/find_interaction_controller.dart';
 import '../web/web_platform_manager.dart';
 
 import '../context_menu.dart';
@@ -50,6 +51,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.initialSettings,
     this.initialUserScripts,
     this.pullToRefreshController,
+    this.findInteractionController,
     this.implementation = WebViewImplementation.NATIVE,
     this.contextMenu,
     this.onWebViewCreated,
@@ -77,6 +79,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onReceivedHttpAuthRequest,
     this.onReceivedServerTrustAuthRequest,
     this.onReceivedClientCertRequest,
+    @Deprecated('Use FindInteractionController.onFindResultReceived instead')
     this.onFindResultReceived,
     this.shouldInterceptAjaxRequest,
     this.onAjaxReadyStateChange,
@@ -207,6 +210,9 @@ class InAppWebView extends StatefulWidget implements WebView {
   final PullToRefreshController? pullToRefreshController;
 
   @override
+  final FindInteractionController? findInteractionController;
+
+  @override
   final ContextMenu? contextMenu;
 
   @override
@@ -294,6 +300,8 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller,
       DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
+  ///Use [FindInteractionController.onFindResultReceived] instead.
+  @Deprecated('Use FindInteractionController.onFindResultReceived instead')
   @override
   final void Function(InAppWebViewController controller, int activeMatchOrdinal,
       int numberOfMatches, bool isDoneCounting)? onFindResultReceived;
@@ -725,6 +733,7 @@ class _InAppWebViewState extends State<InAppWebView> {
   void _onPlatformViewCreated(int id) {
     _controller = InAppWebViewController(id, widget);
     widget.pullToRefreshController?.initMethodChannel(id);
+    widget.findInteractionController?.initMethodChannel(id);
     if (widget.onWebViewCreated != null) {
       widget.onWebViewCreated!(_controller!);
     }

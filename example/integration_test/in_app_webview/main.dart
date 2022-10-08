@@ -37,7 +37,6 @@ import 'load_file_url.dart';
 import 'load_url.dart';
 import 'on_console_message.dart';
 import 'on_download_start_request.dart';
-import 'on_find_result_received.dart';
 import 'on_js_before_unload.dart';
 import 'on_received_error.dart';
 import 'on_received_http_error.dart';
@@ -106,7 +105,6 @@ void main() {
     contentBlocker();
     httpAuthCredentialDatabase();
     onConsoleMessage();
-    onFindResultReceived();
     onDownloadStartRequest();
     javascriptDialogs();
     onReceivedHttpError();

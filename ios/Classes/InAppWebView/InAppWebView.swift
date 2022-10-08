@@ -12,7 +12,8 @@ import WebKit
 public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                             WKNavigationDelegate, WKScriptMessageHandler, UIGestureRecognizerDelegate,
                             WKDownloadDelegate,
-                            PullToRefreshDelegate, Disposable {
+                            PullToRefreshDelegate,
+                            Disposable {
     static var METHOD_CHANNEL_NAME_PREFIX = "com.pichillilorenzo/flutter_inappwebview_"
 
     var id: Any? // viewId
@@ -22,6 +23,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     var channelDelegate: WebViewChannelDelegate?
     var settings: InAppWebViewSettings?
     var pullToRefreshControl: PullToRefreshControl?
+    var findInteractionController: FindInteractionController?
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
     var currentOriginalUrl: URL?
@@ -329,7 +331,8 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                         name: UIMenuController.didHideMenuNotification,
                         object: nil)
         
-//        if #available(iOS 15.0, *) {
+        // TODO: Still not working on iOS 16.0!
+//        if #available(iOS 16.0, *) {
 //            addObserver(self,
 //                        forKeyPath: #keyPath(WKWebView.fullscreenState),
 //                        options: .new,
@@ -413,6 +416,10 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
             }
             
+            if #available(iOS 16.0, *) {
+                isFindInteractionEnabled = settings.isFindInteractionEnabled
+            }
+            
             // debugging is always enabled for iOS,
             // there isn't any option to set about it such as on Android.
             
@@ -456,6 +463,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             
             if #available(iOS 15.4, *) {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
+                configuration.preferences.isElementFullscreenEnabled = settings.isElementFullscreenEnabled
             }
         }
     }
@@ -669,7 +677,9 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                     }
                 }
             }
-//            else if keyPath == #keyPath(WKWebView.fullscreenState) {
+        } else if #available(iOS 16.0, *) {
+            // TODO: Still not working on iOS 16.0!
+//            if keyPath == #keyPath(WKWebView.fullscreenState) {
 //                if fullscreenState == .enteringFullscreen {
 //                    channelDelegate?.onEnterFullscreen()
 //                } else if fullscreenState == .exitingFullscreen {
@@ -2513,6 +2523,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
     
     @objc func onEnterFullscreen(_ notification: Notification) {
+        // TODO: Still not working on iOS 16.0!
+//        if #available(iOS 16.0, *) {
+//            channelDelegate?.onEnterFullscreen()
+//            inFullscreen = true
+//        }
+//        else
         if (isVideoPlayerWindow(notification.object as AnyObject?)) {
             channelDelegate?.onEnterFullscreen()
             inFullscreen = true
@@ -2520,6 +2536,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
     
     @objc func onExitFullscreen(_ notification: Notification) {
+        // TODO: Still not working on iOS 16.0!
+//        if #available(iOS 16.0, *) {
+//            channelDelegate?.onExitFullscreen()
+//            inFullscreen = false
+//        }
+//        else
         if (isVideoPlayerWindow(notification.object as AnyObject?)) {
             channelDelegate?.onExitFullscreen()
             inFullscreen = false
@@ -2648,6 +2670,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             if let wId = _windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
                 webView = webViewTransport.webView
             }
+            webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
             webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
         } else if message.name == "onCallAsyncJavaScriptResultBelowIOS14Received" {
             let body = message.body as! [String: Any?]
@@ -2699,19 +2722,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 webMessageListener.channelDelegate?.onPostMessage(message: messageData, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
             }
         }
-    }
-    
-    public func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
-        let startSearch = "window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync('\(find ?? "")');"
-        evaluateJavaScript(startSearch, completionHandler: completionHandler)
-    }
-
-    public func findNext(forward: Bool, completionHandler: ((Any?, Error?) -> Void)?) {
-        evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findNext(\(forward ? "true" : "false"));", completionHandler: completionHandler)
-    }
-
-    public func clearMatches(completionHandler: ((Any?, Error?) -> Void)?) {
-        evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._clearMatches();", completionHandler: completionHandler)
     }
     
     public func scrollTo(x: Int, y: Int, animated: Bool) {
@@ -3004,8 +3014,11 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         if #available(iOS 15.0, *) {
             removeObserver(self, forKeyPath: #keyPath(WKWebView.cameraCaptureState))
             removeObserver(self, forKeyPath: #keyPath(WKWebView.microphoneCaptureState))
-//            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
         }
+        // TODO: Still not working on iOS 16.0!
+//        if #available(iOS 16.0, *) {
+//            removeObserver(self, forKeyPath: #keyPath(WKWebView.fullscreenState))
+//        }
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
         resumeTimers()
@@ -3044,6 +3057,8 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         disablePullToRefresh()
         pullToRefreshControl?.dispose()
         pullToRefreshControl = nil
+        findInteractionController?.dispose()
+        findInteractionController = nil
         uiDelegate = nil
         navigationDelegate = nil
         scrollView.delegate = nil

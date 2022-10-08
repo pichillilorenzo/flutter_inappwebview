@@ -19,6 +19,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshSettings;
@@ -83,6 +84,10 @@ public class FlutterWebView implements PlatformWebView {
       pullToRefreshLayout.addView(webView);
       pullToRefreshLayout.prepare();
     }
+
+    FindInteractionController findInteractionController = new FindInteractionController(webView, plugin, id, null);
+    webView.findInteractionController = findInteractionController;
+    findInteractionController.prepare();
 
     webView.prepare();
   }

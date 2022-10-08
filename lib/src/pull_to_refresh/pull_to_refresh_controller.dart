@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'dart:developer' as developer;
 
 import 'package:flutter/services.dart';
 import '../in_app_webview/webview.dart';
@@ -7,6 +8,7 @@ import '../util.dart';
 import '../types/main.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import 'pull_to_refresh_settings.dart';
+import '../debug_logging_settings.dart';
 
 ///A standard controller that can initiate the refreshing of a scroll view’s contents.
 ///This should be used whenever the user can refresh the contents of a WebView via a vertical swipe gesture.
@@ -26,6 +28,9 @@ class PullToRefreshController {
   late PullToRefreshSettings settings;
   MethodChannel? _channel;
 
+  ///Debug settings.
+  static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
+
   ///Event called when a swipe gesture triggers a refresh.
   final void Function()? onRefresh;
 
@@ -40,7 +45,46 @@ class PullToRefreshController {
     this.settings = settings ?? PullToRefreshSettings();
   }
 
+  void initMethodChannel(dynamic id) {
+    this._channel = MethodChannel(
+        'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
+    this._channel?.setMethodCallHandler((call) async {
+      try {
+        return await _handleMethod(call);
+      } on Error catch (e) {
+        print(e);
+        print(e.stackTrace);
+      }
+    });
+  }
+
+  _debugLog(String method, dynamic args) {
+    if (PullToRefreshController.debugLoggingSettings.enabled) {
+      for (var regExp
+      in PullToRefreshController.debugLoggingSettings.excludeFilter) {
+        if (regExp.hasMatch(method)) return;
+      }
+      var maxLogMessageLength =
+          PullToRefreshController.debugLoggingSettings.maxLogMessageLength;
+      String message = "PullToRefreshController " +
+          " calling \"" +
+          method.toString() +
+          "\" using " +
+          args.toString();
+      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
+        message = message.substring(0, maxLogMessageLength) + "...";
+      }
+      if (!PullToRefreshController.debugLoggingSettings.usePrint) {
+        developer.log(message, name: this.runtimeType.toString());
+      } else {
+        print("[${this.runtimeType.toString()}] $message");
+      }
+    }
+  }
+
   Future<dynamic> _handleMethod(MethodCall call) async {
+    _debugLog(call.method, call.arguments);
+
     switch (call.method) {
       case "onRefresh":
         if (onRefresh != null) onRefresh!();
@@ -161,18 +205,5 @@ class PullToRefreshController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());
     await _channel?.invokeMethod('setStyledTitle', args);
-  }
-
-  void initMethodChannel(dynamic id) {
-    this._channel = MethodChannel(
-        'com.pichillilorenzo/flutter_inappwebview_pull_to_refresh_$id');
-    this._channel?.setMethodCallHandler((call) async {
-      try {
-        return await _handleMethod(call);
-      } on Error catch (e) {
-        print(e);
-        print(e.stackTrace);
-      }
-    });
   }
 }

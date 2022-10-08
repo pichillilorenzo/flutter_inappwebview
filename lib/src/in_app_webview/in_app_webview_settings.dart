@@ -1057,6 +1057,26 @@ class InAppWebViewSettings {
   ///- iOS
   bool upgradeKnownHostsToHTTPS;
 
+  ///Sets whether fullscreen API is enabled or not.
+  ///
+  ///The default value is `true`.
+  ///
+  ///**NOTE**: available on iOS 15.4+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  bool isElementFullscreenEnabled;
+
+  ///Sets whether the web view's built-in find interaction native UI is enabled or not.
+  ///
+  ///The default value is `false`.
+  ///
+  ///**NOTE**: available on iOS 16.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  bool isFindInteractionEnabled;
+
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
@@ -1220,6 +1240,8 @@ class InAppWebViewSettings {
     this.isTextInteractionEnabled = true,
     this.isSiteSpecificQuirksModeEnabled = true,
     this.upgradeKnownHostsToHTTPS = true,
+    this.isElementFullscreenEnabled = true,
+    this.isFindInteractionEnabled = false,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,
@@ -1373,6 +1395,8 @@ class InAppWebViewSettings {
       "isTextInteractionEnabled": isTextInteractionEnabled,
       "isSiteSpecificQuirksModeEnabled": isSiteSpecificQuirksModeEnabled,
       "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
+      "isElementFullscreenEnabled": isElementFullscreenEnabled,
+      "isFindInteractionEnabled": isFindInteractionEnabled,
       "iframeAllow": iframeAllow,
       "iframeAllowFullscreen": iframeAllowFullscreen,
       "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
@@ -1576,6 +1600,8 @@ class InAppWebViewSettings {
         settings.isSiteSpecificQuirksModeEnabled =
         map["isSiteSpecificQuirksModeEnabled"];
         settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
+        settings.isElementFullscreenEnabled = map["isElementFullscreenEnabled"];
+        settings.isFindInteractionEnabled = map["isFindInteractionEnabled"];
       }
     }
     return settings;

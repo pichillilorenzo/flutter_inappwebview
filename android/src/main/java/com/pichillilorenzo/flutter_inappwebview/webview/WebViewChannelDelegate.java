@@ -13,6 +13,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
+import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionChannelDelegate;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserActivity;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserSettings;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
@@ -73,24 +74,31 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
 
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
-    switch (call.method) {
-      case "getUrl":
+    WebViewChannelDelegateMethods method = null;
+    try {
+      method = WebViewChannelDelegateMethods.valueOf(call.method);
+    } catch (IllegalArgumentException e) {
+      result.notImplemented();
+      return;
+    }
+    switch (method) {
+      case getUrl:
         result.success((webView != null) ? webView.getUrl() : null);
         break;
-      case "getTitle":
+      case getTitle:
         result.success((webView != null) ? webView.getTitle() : null);
         break;
-      case "getProgress":
+      case getProgress:
         result.success((webView != null) ? webView.getProgress() : null);
         break;
-      case "loadUrl":
+      case loadUrl:
         if (webView != null) {
           Map<String, Object> urlRequest = (Map<String, Object>) call.argument("urlRequest");
           webView.loadUrl(URLRequest.fromMap(urlRequest));
         }
         result.success(true);
         break;
-      case "postUrl":
+      case postUrl:
         if (webView != null) {
           String url = (String) call.argument("url");
           byte[] postData = (byte[]) call.argument("postData");
@@ -98,7 +106,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "loadData":
+      case loadData:
         if (webView != null) {
           String data = (String) call.argument("data");
           String mimeType = (String) call.argument("mimeType");
@@ -109,7 +117,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "loadFile":
+      case loadFile:
         if (webView != null) {
           String assetFilePath = (String) call.argument("assetFilePath");
           try {
@@ -122,7 +130,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "evaluateJavascript":
+      case evaluateJavascript:
         if (webView != null) {
           String source = (String) call.argument("source");
           Map<String, Object> contentWorldMap = (Map<String, Object>) call.argument("contentWorld");
@@ -138,7 +146,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
-      case "injectJavascriptFileFromUrl":
+      case injectJavascriptFileFromUrl:
         if (webView != null) {
           String urlFile = (String) call.argument("urlFile");
           Map<String, Object> scriptHtmlTagAttributes = (Map<String, Object>) call.argument("scriptHtmlTagAttributes");
@@ -146,14 +154,14 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "injectCSSCode":
+      case injectCSSCode:
         if (webView != null) {
           String source = (String) call.argument("source");
           webView.injectCSSCode(source);
         }
         result.success(true);
         break;
-      case "injectCSSFileFromUrl":
+      case injectCSSFileFromUrl:
         if (webView != null) {
           String urlFile = (String) call.argument("urlFile");
           Map<String, Object> cssLinkHtmlTagAttributes = (Map<String, Object>) call.argument("cssLinkHtmlTagAttributes");
@@ -161,44 +169,44 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "reload":
+      case reload:
         if (webView != null)
           webView.reload();
         result.success(true);
         break;
-      case "goBack":
+      case goBack:
         if (webView != null)
           webView.goBack();
         result.success(true);
         break;
-      case "canGoBack":
+      case canGoBack:
         result.success((webView != null) && webView.canGoBack());
         break;
-      case "goForward":
+      case goForward:
         if (webView != null)
           webView.goForward();
         result.success(true);
         break;
-      case "canGoForward":
+      case canGoForward:
         result.success((webView != null) && webView.canGoForward());
         break;
-      case "goBackOrForward":
+      case goBackOrForward:
         if (webView != null)
           webView.goBackOrForward((Integer) call.argument("steps"));
         result.success(true);
         break;
-      case "canGoBackOrForward":
+      case canGoBackOrForward:
         result.success((webView != null) && webView.canGoBackOrForward((Integer) call.argument("steps")));
         break;
-      case "stopLoading":
+      case stopLoading:
         if (webView != null)
           webView.stopLoading();
         result.success(true);
         break;
-      case "isLoading":
+      case isLoading:
         result.success((webView != null) && webView.isLoading());
         break;
-      case "takeScreenshot":
+      case takeScreenshot:
         if (webView != null) {
           Map<String, Object> screenshotConfiguration = (Map<String, Object>) call.argument("screenshotConfiguration");
           webView.takeScreenshot(screenshotConfiguration, result);
@@ -206,7 +214,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         else
           result.success(null);
         break;
-      case "setSettings":
+      case setSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
           InAppBrowserSettings inAppBrowserSettings = new InAppBrowserSettings();
@@ -221,7 +229,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "getSettings":
+      case getSettings:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
           result.success(inAppBrowserActivity.getCustomSettings());
@@ -229,7 +237,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success((webView != null) ? webView.getCustomSettings() : null);
         }
         break;
-      case "close":
+      case close:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
           inAppBrowserActivity.close(result);
@@ -237,7 +245,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.notImplemented();
         }
         break;
-      case "show":
+      case show:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
           inAppBrowserActivity.show();
@@ -246,7 +254,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.notImplemented();
         }
         break;
-      case "hide":
+      case hide:
         if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
           InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
           inAppBrowserActivity.hide();
@@ -255,10 +263,10 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.notImplemented();
         }
         break;
-      case "getCopyBackForwardList":
+      case getCopyBackForwardList:
         result.success((webView != null) ? webView.getCopyBackForwardList() : null);
         break;
-      case "startSafeBrowsing":
+      case startSafeBrowsing:
         if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.START_SAFE_BROWSING)) {
           WebViewCompat.startSafeBrowsing(webView.getContext(), new ValueCallback<Boolean>() {
             @Override
@@ -271,37 +279,37 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-      case "clearCache":
+      case clearCache:
         if (webView != null)
           webView.clearAllCache();
         result.success(true);
         break;
-      case "clearSslPreferences":
+      case clearSslPreferences:
         if (webView != null)
           webView.clearSslPreferences();
         result.success(true);
         break;
-      case "findAllAsync":
+      case findAllAsync:
         if (webView != null) {
           String find = (String) call.argument("find");
           webView.findAllAsync(find);
         }
         result.success(true);
         break;
-      case "findNext":
+      case findNext:
         if (webView != null) {
           Boolean forward = (Boolean) call.argument("forward");
           webView.findNext(forward);
         }
         result.success(true);
         break;
-      case "clearMatches":
+      case clearMatches:
         if (webView != null) {
           webView.clearMatches();
         }
         result.success(true);
         break;
-      case "scrollTo":
+      case scrollTo:
         if (webView != null) {
           Integer x = (Integer) call.argument("x");
           Integer y = (Integer) call.argument("y");
@@ -310,7 +318,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "scrollBy":
+      case scrollBy:
         if (webView != null) {
           Integer x = (Integer) call.argument("x");
           Integer y = (Integer) call.argument("y");
@@ -319,31 +327,31 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
-      case "pause":
+      case pause:
         if (webView != null) {
           webView.onPause();
         }
         result.success(true);
         break;
-      case "resume":
+      case resume:
         if (webView != null) {
           webView.onResume();
         }
         result.success(true);
         break;
-      case "pauseTimers":
+      case pauseTimers:
         if (webView != null) {
           webView.pauseTimers();
         }
         result.success(true);
         break;
-      case "resumeTimers":
+      case resumeTimers:
         if (webView != null) {
           webView.resumeTimers();
         }
         result.success(true);
         break;
-      case "printCurrentPage":
+      case printCurrentPage:
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           PrintJobSettings settings = new PrintJobSettings();
           Map<String, Object> settingsMap = (Map<String, Object>) call.argument("settings");
@@ -355,31 +363,31 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
-      case "getContentHeight":
+      case getContentHeight:
         if (webView instanceof InAppWebView) {
           result.success(webView.getContentHeight());
         } else {
           result.success(null);
         }
         break;
-      case "zoomBy":
+      case zoomBy:
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           double zoomFactor = (double) call.argument("zoomFactor");
           webView.zoomBy((float) zoomFactor);
         }
         result.success(true);
         break;
-      case "getOriginalUrl":
+      case getOriginalUrl:
         result.success((webView != null) ? webView.getOriginalUrl() : null);
         break;
-      case "getZoomScale":
+      case getZoomScale:
         if (webView instanceof InAppWebView) {
           result.success(webView.getZoomScale());
         } else {
           result.success(null);
         }
         break;
-      case "getSelectedText":
+      case getSelectedText:
         if ((webView instanceof InAppWebView && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT)) {
           webView.getSelectedText(new ValueCallback<String>() {
             @Override
@@ -391,14 +399,14 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
-      case "getHitTestResult":
+      case getHitTestResult:
         if (webView instanceof InAppWebView) {
           result.success(HitTestResult.fromWebViewHitTestResult(webView.getHitTestResult()).toMap());
         } else {
           result.success(null);
         }
         break;
-      case "pageDown":
+      case pageDown:
         if (webView != null) {
           boolean bottom = (boolean) call.argument("bottom");
           result.success(webView.pageDown(bottom));
@@ -406,7 +414,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-      case "pageUp":
+      case pageUp:
         if (webView != null) {
           boolean top = (boolean) call.argument("top");
           result.success(webView.pageUp(top));
@@ -414,7 +422,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-      case "saveWebArchive":
+      case saveWebArchive:
         if (webView != null) {
           String filePath = (String) call.argument("filePath");
           boolean autoname = (boolean) call.argument("autoname");
@@ -428,75 +436,75 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
-      case "zoomIn":
+      case zoomIn:
         if (webView != null) {
           result.success(webView.zoomIn());
         } else {
           result.success(false);
         }
         break;
-      case "zoomOut":
+      case zoomOut:
         if (webView != null) {
           result.success(webView.zoomOut());
         } else {
           result.success(false);
         }
         break;
-      case "clearFocus":
+      case clearFocus:
         if (webView != null) {
           webView.clearFocus();
         }
         result.success(true);
         break;
-      case "setContextMenu":
+      case setContextMenu:
         if (webView != null) {
           Map<String, Object> contextMenu = (Map<String, Object>) call.argument("contextMenu");
           webView.setContextMenu(contextMenu);
         }
         result.success(true);
         break;
-      case "requestFocusNodeHref":
+      case requestFocusNodeHref:
         if (webView != null) {
           result.success(webView.requestFocusNodeHref());
         } else {
           result.success(null);
         }
         break;
-      case "requestImageRef":
+      case requestImageRef:
         if (webView != null) {
           result.success(webView.requestImageRef());
         } else {
           result.success(null);
         }
         break;
-      case "getScrollX":
+      case getScrollX:
         if (webView != null) {
           result.success(webView.getScrollX());
         } else {
           result.success(null);
         }
         break;
-      case "getScrollY":
+      case getScrollY:
         if (webView != null) {
           result.success(webView.getScrollY());
         } else {
           result.success(null);
         }
         break;
-      case "getCertificate":
+      case getCertificate:
         if (webView != null) {
           result.success(SslCertificateExt.toMap(webView.getCertificate()));
         } else {
           result.success(null);
         }
         break;
-      case "clearHistory":
+      case clearHistory:
         if (webView != null) {
           webView.clearHistory();
         }
         result.success(true);
         break;
-      case "addUserScript":
+      case addUserScript:
         if (webView != null && webView.getUserContentController() != null) {
           Map<String, Object> userScriptMap = (Map<String, Object>) call.argument("userScript");
           UserScript userScript = UserScript.fromMap(userScriptMap);
@@ -505,7 +513,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-      case "removeUserScript":
+      case removeUserScript:
         if (webView != null && webView.getUserContentController() != null) {
           Integer index = (Integer) call.argument("index");
           Map<String, Object> userScriptMap = (Map<String, Object>) call.argument("userScript");
@@ -515,20 +523,20 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-      case "removeUserScriptsByGroupName":
+      case removeUserScriptsByGroupName:
         if (webView != null && webView.getUserContentController() != null) {
           String groupName = (String) call.argument("groupName");
           webView.getUserContentController().removeUserOnlyScriptsByGroupName(groupName);
         }
         result.success(true);
         break;
-      case "removeAllUserScripts":
+      case removeAllUserScripts:
         if (webView != null && webView.getUserContentController() != null) {
           webView.getUserContentController().removeAllUserOnlyScripts();
         }
         result.success(true);
         break;
-      case "callAsyncJavaScript":
+      case callAsyncJavaScript:
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           String functionBody = (String) call.argument("functionBody");
           Map<String, Object> functionArguments = (Map<String, Object>) call.argument("arguments");
@@ -545,7 +553,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
-      case "isSecureContext":
+      case isSecureContext:
         if (webView != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
           webView.isSecureContext(new ValueCallback<Boolean>() {
             @Override
@@ -557,7 +565,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
-      case "createWebMessageChannel":
+      case createWebMessageChannel:
         if (webView != null) {
           if (webView instanceof InAppWebView && WebViewFeature.isFeatureSupported(WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL)) {
             result.success(webView.createCompatWebMessageChannel().toMap());
@@ -568,7 +576,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
-      case "postWebMessage":
+      case postWebMessage:
         if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.POST_WEB_MESSAGE)) {
           Map<String, Object> message = (Map<String, Object>) call.argument("message");
           String targetOrigin = (String) call.argument("targetOrigin");
@@ -600,7 +608,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(true);
         }
         break;
-      case "addWebMessageListener":
+      case addWebMessageListener:
         if (webView != null) {
           Map<String, Object> webMessageListenerMap = (Map<String, Object>) call.argument("webMessageListener");
           WebMessageListener webMessageListener = WebMessageListener.fromMap(webView, webView.getPlugin().messenger, webMessageListenerMap);
@@ -618,32 +626,35 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.success(true);
         }
         break;
-      case "canScrollVertically":
+      case canScrollVertically:
         if (webView != null) {
           result.success(webView.canScrollVertically());
         } else {
           result.success(false);
         }
         break;
-      case "canScrollHorizontally":
+      case canScrollHorizontally:
         if (webView != null) {
           result.success(webView.canScrollHorizontally());
         } else {
           result.success(false);
         }
         break;
-      case "isInFullscreen":
+      case isInFullscreen:
         if (webView != null) {
           result.success(webView.isInFullscreen());
         } else {
           result.success(false);
         }
         break;
-      default:
-        result.notImplemented();
     }
   }
 
+  /**
+   * @deprecated
+   * Use {@link FindInteractionChannelDelegate#onFindResultReceived} instead.
+   */
+  @Deprecated
   public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
     MethodChannel channel = getChannel();
     if (channel == null) return;

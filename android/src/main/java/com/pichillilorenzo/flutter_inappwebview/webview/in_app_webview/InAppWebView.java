@@ -56,6 +56,7 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
+import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
@@ -166,6 +167,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public List<WebMessageListener> webMessageListeners = new ArrayList<>();
 
   private List<UserScript> initialUserOnlyScript = new ArrayList<>();
+
+  @Nullable
+  public FindInteractionController findInteractionController;
 
   public InAppWebView(Context context) {
     super(context);
@@ -406,7 +410,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     setFindListener(new FindListener() {
       @Override
       public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
-        if (channelDelegate != null) channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        if (findInteractionController != null && findInteractionController.channelDelegate != null)
+          findInteractionController.channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
+        if (channelDelegate != null)
+          channelDelegate.onFindResultReceived(activeMatchOrdinal, numberOfMatches, isDoneCounting);
       }
     });
 
@@ -1929,6 +1936,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   @Override
   public void dispose() {
     userContentController.dispose();
+    if (findInteractionController != null) {
+      findInteractionController.dispose();
+      findInteractionController = null;
+    }
     if (windowId != null) {
       InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);
     }

@@ -74,6 +74,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var isTextInteractionEnabled = true
     var isSiteSpecificQuirksModeEnabled = true
     var upgradeKnownHostsToHTTPS = true
+    var isElementFullscreenEnabled = true
+    var isFindInteractionEnabled = false
     
     override init(){
         super.init()
@@ -146,6 +148,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             if #available(iOS 15.4, *) {
                 realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
+                realSettings["isElementFullscreenEnabled"] = configuration.preferences.isElementFullscreenEnabled
+            }
+            if #available(iOS 16.0, *) {
+                realSettings["isFindInteractionEnabled"] = webView.isFindInteractionEnabled
             }
         }
         return realSettings

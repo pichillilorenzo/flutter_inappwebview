@@ -19,17 +19,22 @@ public class WebViewChannelDelegate : ChannelDelegate {
     public override func handle(_ call: FlutterMethodCall, result: @escaping FlutterResult) {
         let arguments = call.arguments as? NSDictionary
         
-        switch call.method {
-        case "getUrl":
+        guard let method = WebViewChannelDelegateMethods.init(rawValue: call.method) else {
+            result(FlutterMethodNotImplemented)
+            return
+        }
+        
+        switch method {
+        case .getUrl:
             result(webView?.url?.absoluteString)
             break
-        case "getTitle":
+        case .getTitle:
             result(webView?.title)
             break
-        case "getProgress":
+        case .getProgress:
             result( (webView != nil) ? Int(webView!.estimatedProgress * 100) : nil )
             break
-        case "loadUrl":
+        case .loadUrl:
             let urlRequest = arguments!["urlRequest"] as! [String:Any?]
             let allowingReadAccessTo = arguments!["allowingReadAccessTo"] as? String
             var allowingReadAccessToURL: URL? = nil
@@ -39,7 +44,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             webView?.loadUrl(urlRequest: URLRequest.init(fromPluginMap: urlRequest), allowingReadAccessTo: allowingReadAccessToURL)
             result(true)
             break
-        case "postUrl":
+        case .postUrl:
             if let webView = webView {
                 let url = arguments!["url"] as! String
                 let postData = arguments!["postData"] as! FlutterStandardTypedData
@@ -47,7 +52,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             }
             result(true)
             break
-        case "loadData":
+        case .loadData:
             let data = arguments!["data"] as! String
             let mimeType = arguments!["mimeType"] as! String
             let encoding = arguments!["encoding"] as! String
@@ -60,7 +65,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             webView?.loadData(data: data, mimeType: mimeType, encoding: encoding, baseUrl: baseUrl, allowingReadAccessTo: allowingReadAccessToURL)
             result(true)
             break
-        case "loadFile":
+        case .loadFile:
             let assetFilePath = arguments!["assetFilePath"] as! String
             
             do {
@@ -72,7 +77,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             }
             result(true)
             break
-        case "evaluateJavascript":
+        case .evaluateJavascript:
             if let webView = webView {
                 let source = arguments!["source"] as! String
                 let contentWorldMap = arguments!["contentWorld"] as? [String:Any?]
@@ -91,58 +96,58 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "injectJavascriptFileFromUrl":
+        case .injectJavascriptFileFromUrl:
             let urlFile = arguments!["urlFile"] as! String
             let scriptHtmlTagAttributes = arguments!["scriptHtmlTagAttributes"] as? [String:Any?]
             webView?.injectJavascriptFileFromUrl(urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes)
             result(true)
             break
-        case "injectCSSCode":
+        case .injectCSSCode:
             let source = arguments!["source"] as! String
             webView?.injectCSSCode(source: source)
             result(true)
             break
-        case "injectCSSFileFromUrl":
+        case .injectCSSFileFromUrl:
             let urlFile = arguments!["urlFile"] as! String
             let cssLinkHtmlTagAttributes = arguments!["cssLinkHtmlTagAttributes"] as? [String:Any?]
             webView?.injectCSSFileFromUrl(urlFile: urlFile, cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes)
             result(true)
             break
-        case "reload":
+        case .reload:
             webView?.reload()
             result(true)
             break
-        case "goBack":
+        case .goBack:
             webView?.goBack()
             result(true)
             break
-        case "canGoBack":
+        case .canGoBack:
             result(webView?.canGoBack ?? false)
             break
-        case "goForward":
+        case .goForward:
             webView?.goForward()
             result(true)
             break
-        case "canGoForward":
+        case .canGoForward:
             result(webView?.canGoForward ?? false)
             break
-        case "goBackOrForward":
+        case .goBackOrForward:
             let steps = arguments!["steps"] as! Int
             webView?.goBackOrForward(steps: steps)
             result(true)
             break
-        case "canGoBackOrForward":
+        case .canGoBackOrForward:
             let steps = arguments!["steps"] as! Int
             result(webView?.canGoBackOrForward(steps: steps) ?? false)
             break
-        case "stopLoading":
+        case .stopLoading:
             webView?.stopLoading()
             result(true)
             break
-        case "isLoading":
+        case .isLoading:
             result(webView?.isLoading ?? false)
             break
-        case "takeScreenshot":
+        case .takeScreenshot:
             if let webView = webView, #available(iOS 11.0, *) {
                 let screenshotConfiguration = arguments!["screenshotConfiguration"] as? [String: Any?]
                 webView.takeScreenshot(with: screenshotConfiguration, completionHandler: { (screenshot) -> Void in
@@ -153,7 +158,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "setSettings":
+        case .setSettings:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 let inAppBrowserSettings = InAppBrowserSettings()
                 let inAppBrowserSettingsMap = arguments!["settings"] as! [String: Any]
@@ -167,14 +172,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             }
             result(true)
             break
-        case "getSettings":
+        case .getSettings:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 result(iabController.getSettings())
             } else {
                 result(webView?.getSettings())
             }
             break
-        case "close":
+        case .close:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 iabController.close {
                     result(true)
@@ -183,7 +188,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(FlutterMethodNotImplemented)
             }
             break
-        case "show":
+        case .show:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 iabController.show {
                     result(true)
@@ -192,7 +197,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(FlutterMethodNotImplemented)
             }
             break
-        case "hide":
+        case .hide:
             if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
                 iabController.hide {
                     result(true)
@@ -201,13 +206,13 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(FlutterMethodNotImplemented)
             }
             break
-        case "getCopyBackForwardList":
+        case .getCopyBackForwardList:
             result(webView?.getCopyBackForwardList())
             break
-        case "findAllAsync":
-            if let webView = webView {
+        case .findAllAsync:
+            if let webView = webView, let findInteractionController = webView.findInteractionController {
                 let find = arguments!["find"] as! String
-                webView.findAllAsync(find: find, completionHandler: {(value, error) in
+                findInteractionController.findAllAsync(find: find, completionHandler: {(value, error) in
                     if error != nil {
                         result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
                         return
@@ -218,10 +223,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "findNext":
-            if let webView = webView {
+        case .findNext:
+            if let webView = webView, let findInteractionController = webView.findInteractionController {
                 let forward = arguments!["forward"] as! Bool
-                webView.findNext(forward: forward, completionHandler: {(value, error) in
+                findInteractionController.findNext(forward: forward, completionHandler: {(value, error) in
                     if error != nil {
                         result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
                         return
@@ -232,9 +237,9 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "clearMatches":
-            if let webView = webView {
-                webView.clearMatches(completionHandler: {(value, error) in
+        case .clearMatches:
+            if let webView = webView, let findInteractionController = webView.findInteractionController {
+                findInteractionController.clearMatches(completionHandler: {(value, error) in
                     if error != nil {
                         result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
                         return
@@ -245,33 +250,33 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "clearCache":
+        case .clearCache:
             webView?.clearCache()
             result(true)
             break
-        case "scrollTo":
+        case .scrollTo:
             let x = arguments!["x"] as! Int
             let y = arguments!["y"] as! Int
             let animated = arguments!["animated"] as! Bool
             webView?.scrollTo(x: x, y: y, animated: animated)
             result(true)
             break
-        case "scrollBy":
+        case .scrollBy:
             let x = arguments!["x"] as! Int
             let y = arguments!["y"] as! Int
             let animated = arguments!["animated"] as! Bool
             webView?.scrollBy(x: x, y: y, animated: animated)
             result(true)
             break
-        case "pauseTimers":
+        case .pauseTimers:
             webView?.pauseTimers()
             result(true)
             break
-        case "resumeTimers":
+        case .resumeTimers:
             webView?.resumeTimers()
             result(true)
             break
-        case "printCurrentPage":
+        case .printCurrentPage:
             if let webView = webView {
                 let settings = PrintJobSettings()
                 if let settingsMap = arguments!["settings"] as? [String: Any?] {
@@ -282,29 +287,29 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "getContentHeight":
+        case .getContentHeight:
             result(webView?.getContentHeight())
             break
-        case "zoomBy":
+        case .zoomBy:
             let zoomFactor = (arguments!["zoomFactor"] as! NSNumber).floatValue
             let animated = arguments!["animated"] as! Bool
             webView?.zoomBy(zoomFactor: zoomFactor, animated: animated)
             result(true)
             break
-        case "reloadFromOrigin":
+        case .reloadFromOrigin:
             webView?.reloadFromOrigin()
             result(true)
             break
-        case "getOriginalUrl":
+        case .getOriginalUrl:
             result(webView?.getOriginalUrl()?.absoluteString)
             break
-        case "getZoomScale":
+        case .getZoomScale:
             result(webView?.getZoomScale())
             break
-        case "hasOnlySecureContent":
+        case .hasOnlySecureContent:
             result(webView?.hasOnlySecureContent ?? false)
             break
-        case "getSelectedText":
+        case .getSelectedText:
             if let webView = webView {
                 webView.getSelectedText { (value, error) in
                     if let err = error {
@@ -319,7 +324,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "getHitTestResult":
+        case .getHitTestResult:
             if let webView = webView {
                 webView.getHitTestResult { (hitTestResult) in
                     result(hitTestResult.toMap())
@@ -329,11 +334,11 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "clearFocus":
+        case .clearFocus:
             webView?.clearFocus()
             result(true)
             break
-        case "setContextMenu":
+        case .setContextMenu:
             if let webView = webView {
                 let contextMenu = arguments!["contextMenu"] as? [String: Any]
                 webView.contextMenu = contextMenu
@@ -342,7 +347,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "requestFocusNodeHref":
+        case .requestFocusNodeHref:
             if let webView = webView {
                 webView.requestFocusNodeHref { (value, error) in
                     if let err = error {
@@ -356,7 +361,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "requestImageRef":
+        case .requestImageRef:
             if let webView = webView {
                 webView.requestImageRef { (value, error) in
                     if let err = error {
@@ -370,24 +375,24 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "getScrollX":
+        case .getScrollX:
             if let webView = webView {
                 result(Int(webView.scrollView.contentOffset.x))
             } else {
                 result(nil)
             }
             break
-        case "getScrollY":
+        case .getScrollY:
             if let webView = webView {
                 result(Int(webView.scrollView.contentOffset.y))
             } else {
                 result(nil)
             }
             break
-        case "getCertificate":
+        case .getCertificate:
             result(webView?.getCertificate()?.toMap())
             break
-        case "addUserScript":
+        case .addUserScript:
             if let webView = webView {
                 let userScriptMap = arguments!["userScript"] as! [String: Any?]
                 let userScript = UserScript.fromMap(map: userScriptMap, windowId: webView.windowId)!
@@ -396,23 +401,23 @@ public class WebViewChannelDelegate : ChannelDelegate {
             }
             result(true)
             break
-        case "removeUserScript":
+        case .removeUserScript:
             let index = arguments!["index"] as! Int
             let userScriptMap = arguments!["userScript"] as! [String: Any?]
             let userScript = UserScript.fromMap(map: userScriptMap, windowId: webView?.windowId)!
             webView?.configuration.userContentController.removeUserOnlyScript(at: index, injectionTime: userScript.injectionTime)
             result(true)
             break
-        case "removeUserScriptsByGroupName":
+        case .removeUserScriptsByGroupName:
             let groupName = arguments!["groupName"] as! String
             webView?.configuration.userContentController.removeUserOnlyScripts(with: groupName)
             result(true)
             break
-        case "removeAllUserScripts":
+        case .removeAllUserScripts:
             webView?.configuration.userContentController.removeAllUserOnlyScripts()
             result(true)
             break
-        case "callAsyncJavaScript":
+        case .callAsyncJavaScript:
             if let webView = webView, #available(iOS 10.3, *) {
                 if #available(iOS 14.0, *) {
                     let functionBody = arguments!["functionBody"] as! String
@@ -436,7 +441,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "createPdf":
+        case .createPdf:
             if let webView = webView, #available(iOS 14.0, *) {
                 let configuration = arguments!["pdfConfiguration"] as? [String: Any?]
                 webView.createPdf(configuration: configuration, completionHandler: { (pdf) -> Void in
@@ -447,7 +452,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "createWebArchiveData":
+        case .createWebArchiveData:
             if let webView = webView, #available(iOS 14.0, *) {
                 webView.createWebArchiveData(dataCompletionHandler: { (webArchiveData) -> Void in
                     result(webArchiveData)
@@ -457,7 +462,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "saveWebArchive":
+        case .saveWebArchive:
             if let webView = webView, #available(iOS 14.0, *) {
                 let filePath = arguments!["filePath"] as! String
                 let autoname = arguments!["autoname"] as! Bool
@@ -469,7 +474,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "isSecureContext":
+        case .isSecureContext:
             if let webView = webView {
                 webView.isSecureContext(completionHandler: { (isSecureContext) in
                     result(isSecureContext)
@@ -479,7 +484,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "createWebMessageChannel":
+        case .createWebMessageChannel:
             if let webView = webView {
                 let _ = webView.createWebMessageChannel { (webMessageChannel) in
                     result(webMessageChannel.toMap())
@@ -488,7 +493,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "postWebMessage":
+        case .postWebMessage:
             if let webView = webView {
                 let message = arguments!["message"] as! [String: Any?]
                 let targetOrigin = arguments!["targetOrigin"] as! String
@@ -516,7 +521,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "addWebMessageListener":
+        case .addWebMessageListener:
             if let webView = webView {
                 let webMessageListenerMap = arguments!["webMessageListener"] as! [String: Any?]
                 let webMessageListener = WebMessageListener.fromMap(map: webMessageListenerMap)!
@@ -530,21 +535,21 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "canScrollVertically":
+        case .canScrollVertically:
             if let webView = webView {
                 result(webView.canScrollVertically())
             } else {
                 result(false)
             }
             break
-        case "canScrollHorizontally":
+        case .canScrollHorizontally:
             if let webView = webView {
                 result(webView.canScrollHorizontally())
             } else {
                 result(false)
             }
             break
-        case "pauseAllMediaPlayback":
+        case .pauseAllMediaPlayback:
             if let webView = webView, #available(iOS 15.0, *) {
                 webView.pauseAllMediaPlayback(completionHandler: { () -> Void in
                     result(true)
@@ -553,7 +558,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "setAllMediaPlaybackSuspended":
+        case .setAllMediaPlaybackSuspended:
             if let webView = webView, #available(iOS 15.0, *) {
                 let suspended = arguments!["suspended"] as! Bool
                 webView.setAllMediaPlaybackSuspended(suspended, completionHandler: { () -> Void in
@@ -563,7 +568,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "closeAllMediaPresentations":
+        case .closeAllMediaPresentations:
             if let webView = self.webView, #available(iOS 14.5, *) {
                 // closeAllMediaPresentations with completionHandler v15.0 makes the app crash
                 // with error EXC_BAD_ACCESS, so use closeAllMediaPresentations v14.5
@@ -573,7 +578,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "requestMediaPlaybackState":
+        case .requestMediaPlaybackState:
             if let webView = webView, #available(iOS 15.0, *) {
                 webView.requestMediaPlaybackState(completionHandler: { (state) -> Void in
                     result(state.rawValue)
@@ -582,32 +587,33 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(nil)
             }
             break
-        case "getMetaThemeColor":
+        case .getMetaThemeColor:
             if let webView = webView, #available(iOS 15.0, *) {
                 result(webView.themeColor?.hexString)
             } else {
                 result(nil)
             }
             break
-        case "isInFullscreen":
-            //                if let webView = webView, #available(iOS 15.0, *) {
-            //                    result(webView.fullscreenState == .inFullscreen)
-            //                }
+        case .isInFullscreen:
             if let webView = webView {
-                result(webView.inFullscreen)
+                if #available(iOS 16.0, *) {
+                    result(webView.fullscreenState == .inFullscreen)
+                } else {
+                    result(webView.inFullscreen)
+                }
             }
             else {
                 result(false)
             }
             break
-        case "getCameraCaptureState":
+        case .getCameraCaptureState:
             if let webView = webView, #available(iOS 15.0, *) {
                 result(webView.cameraCaptureState.rawValue)
             } else {
                 result(nil)
             }
             break
-        case "setCameraCaptureState":
+        case .setCameraCaptureState:
             if let webView = webView, #available(iOS 15.0, *) {
                 let state = WKMediaCaptureState.init(rawValue: arguments!["state"] as! Int) ?? WKMediaCaptureState.none
                 webView.setCameraCaptureState(state) {
@@ -617,14 +623,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        case "getMicrophoneCaptureState":
+        case .getMicrophoneCaptureState:
             if let webView = webView, #available(iOS 15.0, *) {
                 result(webView.microphoneCaptureState.rawValue)
             } else {
                 result(nil)
             }
             break
-        case "setMicrophoneCaptureState":
+        case .setMicrophoneCaptureState:
             if let webView = webView, #available(iOS 15.0, *) {
                 let state = WKMediaCaptureState.init(rawValue: arguments!["state"] as! Int) ?? WKMediaCaptureState.none
                 webView.setMicrophoneCaptureState(state) {
@@ -634,12 +640,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
-        default:
-            result(FlutterMethodNotImplemented)
-            break
         }
     }
     
+    @available(*, deprecated, message: "Use FindInteractionChannelDelegate.onFindResultReceived instead.")
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         let arguments: [String : Any?] = [
             "activeMatchOrdinal": activeMatchOrdinal,

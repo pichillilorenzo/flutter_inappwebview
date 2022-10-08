@@ -61,6 +61,12 @@ public class FlutterWebViewController: NSObject, FlutterPlatformView, Disposable
         webView!.pullToRefreshControl = pullToRefreshControl
         pullToRefreshControl.delegate = webView!
         pullToRefreshControl.prepare()
+        
+        let findInteractionController = FindInteractionController(
+            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            id: viewId, webView: webView!, settings: nil)
+        webView!.findInteractionController = findInteractionController
+        findInteractionController.prepare()
 
         webView!.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         myView!.autoresizesSubviews = true

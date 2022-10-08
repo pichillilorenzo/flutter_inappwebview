@@ -24,6 +24,7 @@ import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -108,6 +109,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
     webView.windowId = windowId;
     webView.inAppBrowserDelegate = this;
     webView.plugin = manager.plugin;
+
+    FindInteractionController findInteractionController = new FindInteractionController(webView, manager.plugin, id, null);
+    webView.findInteractionController = findInteractionController;
+    findInteractionController.prepare();
 
     final MethodChannel channel = new MethodChannel(manager.plugin.messenger, METHOD_CHANNEL_NAME_PREFIX + id);
     channelDelegate = new InAppBrowserChannelDelegate(channel);

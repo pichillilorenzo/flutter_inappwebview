@@ -28,17 +28,17 @@ public class PullToRefreshControl : UIRefreshControl, Disposable {
     }
     
     public func prepare() {
-        if let options = settings {
-            if options.enabled {
+        if let settings = settings {
+            if settings.enabled {
                 delegate?.enablePullToRefresh()
             }
-            if let color = options.color, !color.isEmpty {
+            if let color = settings.color, !color.isEmpty {
                 tintColor = UIColor(hexString: color)
             }
-            if let backgroundTintColor = options.backgroundColor, !backgroundTintColor.isEmpty {
+            if let backgroundTintColor = settings.backgroundColor, !backgroundTintColor.isEmpty {
                 backgroundColor = UIColor(hexString: backgroundTintColor)
             }
-            if let attributedTitleMap = options.attributedTitle {
+            if let attributedTitleMap = settings.attributedTitle {
                 attributedTitle = NSAttributedString.fromMap(map: attributedTitleMap)
             }
         }

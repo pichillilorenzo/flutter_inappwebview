@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -8,7 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void loadUrl() {
-  final shouldSkip = kIsWeb ? false :
+  final shouldSkip1 = kIsWeb ? false :
       ![
         TargetPlatform.android,
         TargetPlatform.iOS,
@@ -49,5 +50,49 @@ void loadUrl() {
     await controller.loadUrl(
         urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1));
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
-  }, skip: shouldSkip);
+  }, skip: shouldSkip1);
+
+  final shouldSkip2 = kIsWeb ? false :
+  ![
+    TargetPlatform.iOS,
+    TargetPlatform.macOS,
+  ].contains(defaultTargetPlatform);
+
+  testWidgets('loadSimulatedRequest', (WidgetTester tester) async {
+    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<String> firstUrlLoad = Completer<String>();
+    final Completer<String> loadedUrl = Completer<String>();
+
+    await tester.pumpWidget(
+      Directionality(
+        textDirection: TextDirection.ltr,
+        child: InAppWebView(
+          key: GlobalKey(),
+          initialUrlRequest:
+          URLRequest(url: initialUrl),
+          onWebViewCreated: (controller) {
+            controllerCompleter.complete(controller);
+          },
+          onLoadStop: (controller, url) {
+            if (url.toString() == initialUrl.toString() && !firstUrlLoad.isCompleted) {
+              firstUrlLoad.complete(url.toString());
+            } else if (url.toString() == TEST_CROSS_PLATFORM_URL_1.toString() && !loadedUrl.isCompleted) {
+              loadedUrl.complete(url.toString());
+            }
+          },
+        ),
+      ),
+    );
+    final InAppWebViewController controller =
+    await controllerCompleter.future;
+    expect(await firstUrlLoad.future, initialUrl.toString());
+
+    final htmlCode = "<h1>Hello</h1>";
+    await controller.loadSimulatedRequest(
+        urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+        data: Uint8List.fromList(utf8.encode(htmlCode))
+    );
+    expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
+    expect(await controller.evaluateJavascript(source: "document.body").toString().trim(), htmlCode);
+  }, skip: shouldSkip2);
 }

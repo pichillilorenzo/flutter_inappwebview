@@ -1619,7 +1619,7 @@ class InAppWebViewController {
 
   ///Loads the given [url] with [postData] (x-www-form-urlencoded) using `POST` method into this WebView.
   ///
-  ///Example
+  ///Example:
   ///```dart
   ///var postData = Uint8List.fromList(utf8.encode("firstname=Foo&surname=Bar"));
   ///controller.postUrl(url: Uri.parse("https://www.example.com/"), postData: postData);
@@ -3369,6 +3369,36 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state.toNativeValue());
     await _channel.invokeMethod('setMicrophoneCaptureState', args);
+  }
+
+  ///Loads the web content from the data you provide as if the data were the response to the request.
+  ///If [urlResponse] is `null`, it loads the web content from the data as an utf8 encoded HTML string as the response to the request.
+  ///
+  ///[urlRequest] represents a URL request that specifies the base URL and other loading details the system uses to interpret the data you provide.
+  ///
+  ///[urlResponse] represents a response the system uses to interpret the data you provide.
+  ///
+  ///[data] represents the data or the utf8 encoded HTML string to use as the contents of the webpage.
+  ///
+  ///Example:
+  ///```dart
+  ///controller.loadSimulateloadSimulatedRequestdRequest(urlRequest: URLRequest(
+  ///    url: Uri.parse("https://flutter.dev"),
+  ///  ),
+  ///  data: Uint8List.fromList(utf8.encode("<h1>Hello</h1>"))
+  ///);
+  ///```
+  ///
+  ///**NOTE for iOS**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - WKWebView.loadSimulatedRequest(_:response:responseData:)](https://developer.apple.com/documentation/webkit/wkwebview/3763094-loadsimulatedrequest) and [Official API - WKWebView.loadSimulatedRequest(_:responseHTML:)](https://developer.apple.com/documentation/webkit/wkwebview/3763095-loadsimulatedrequest)).
+  Future<void> loadSimulatedRequest({required URLRequest urlRequest, required Uint8List data, URLResponse? urlResponse}) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('urlRequest', () => urlRequest.toMap());
+    args.putIfAbsent('data', () => data);
+    args.putIfAbsent('urlResponse', () => urlResponse?.toMap());
+    await _channel.invokeMethod('loadSimulatedRequest', args);
   }
 
   ///Returns the iframe `id` attribute used on the Web platform.

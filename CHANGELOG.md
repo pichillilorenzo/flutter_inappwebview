@@ -6,7 +6,7 @@
 - Added `PrintJobController` to manage print jobs
 - Added `WebAuthenticationSession` for iOS
 - Added `FindInteractionController` for Android and iOS
-- Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState` WebView controller methods
+- Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState`, `loadSimulatedRequest` WebView controller methods
 - Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS`, `forceDarkStrategy`, `willSuppressErrorPage`, `algorithmicDarkeningAllowed`, `requestedWithHeaderMode`, `enterpriseAuthenticationAppLinkPolicyEnabled`, `isElementFullscreenEnabled`, `isFindInteractionEnabled`, `minimumViewportInset`, `maximumViewportInset` WebView settings
 - Added `onCameraCaptureStateChanged`, `onMicrophoneCaptureStateChanged` WebView events
 - Added support for `onPermissionRequest` event on iOS 15.0+

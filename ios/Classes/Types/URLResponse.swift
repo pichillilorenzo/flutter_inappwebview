@@ -8,6 +8,14 @@
 import Foundation
 
 extension URLResponse {
+    public convenience init?(fromPluginMap: [String:Any?]) {
+        let url = URL(string: fromPluginMap["url"] as? String ?? "about:blank")!
+        let mimeType = fromPluginMap["mimeType"] as? String
+        let expectedContentLength = fromPluginMap["expectedContentLength"] as? Int64 ?? 0
+        let textEncodingName = fromPluginMap["textEncodingName"] as? String
+        self.init(url: url, mimeType: mimeType, expectedContentLength: Int(expectedContentLength), textEncodingName: textEncodingName)
+    }
+    
     public func toMap () -> [String:Any?] {
         let httpResponse: HTTPURLResponse? = self as? HTTPURLResponse
         return [

@@ -640,6 +640,23 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
+        case .loadSimulatedRequest:
+            if let webView = webView, #available(iOS 15.0, *) {
+                let request = URLRequest.init(fromPluginMap: arguments!["urlRequest"] as! [String:Any?])
+                let data = arguments!["data"] as! FlutterStandardTypedData
+                var response: URLResponse? = nil
+                if let urlResponse = arguments!["urlResponse"] as? [String:Any?] {
+                    response = URLResponse.init(fromPluginMap: urlResponse)
+                }
+                if let response = response {
+                    webView.loadSimulatedRequest(request, response: response, responseData: data.data)
+                } else {
+                    webView.loadSimulatedRequest(request, responseHTML: String(decoding: data.data, as: UTF8.self))
+                }
+                result(true)
+            } else {
+                result(false)
+            }
         }
     }
     

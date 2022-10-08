@@ -76,12 +76,23 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var upgradeKnownHostsToHTTPS = true
     var isElementFullscreenEnabled = true
     var isFindInteractionEnabled = false
+    var minimumViewportInset: UIEdgeInsets? = nil
+    var maximumViewportInset: UIEdgeInsets? = nil
     
     override init(){
         super.init()
     }
     
     override func parse(settings: [String: Any?]) -> InAppWebViewSettings {
+        var settings = settings // re-assing to be able to use removeValue
+        if let minimumViewportInsetMap = settings["minimumViewportInset"] as? [String : Double] {
+            minimumViewportInset = UIEdgeInsets.fromMap(map: minimumViewportInsetMap)
+            settings.removeValue(forKey: "minimumViewportInset")
+        }
+        if let maximumViewportInsetMap = settings["maximumViewportInset"] as? [String : Double] {
+            maximumViewportInset = UIEdgeInsets.fromMap(map: maximumViewportInsetMap)
+            settings.removeValue(forKey: "maximumViewportInset")
+        }
         let _ = super.parse(settings: settings)
         if #available(iOS 13.0, *) {} else {
             applePayAPIEnabled = false
@@ -149,6 +160,10 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             if #available(iOS 15.4, *) {
                 realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
                 realSettings["isElementFullscreenEnabled"] = configuration.preferences.isElementFullscreenEnabled
+            }
+            if #available(iOS 15.5, *) {
+                realSettings["minimumViewportInset"] = webView.minimumViewportInset.toMap()
+                realSettings["maximumViewportInset"] = webView.maximumViewportInset.toMap()
             }
             if #available(iOS 16.0, *) {
                 realSettings["isFindInteractionEnabled"] = webView.isFindInteractionEnabled

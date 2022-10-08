@@ -7,7 +7,7 @@
 - Added `WebAuthenticationSession` for iOS
 - Added `FindInteractionController` for Android and iOS
 - Added `pauseAllMediaPlayback`, `setAllMediaPlaybackSuspended`, `closeAllMediaPresentations`, `requestMediaPlaybackState`, `isInFullscreen`, `getCameraCaptureState`, `setCameraCaptureState`, `getMicrophoneCaptureState`, `setMicrophoneCaptureState` WebView controller methods
-- Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS`, `forceDarkStrategy`, `willSuppressErrorPage`, `algorithmicDarkeningAllowed`, `requestedWithHeaderMode`, `enterpriseAuthenticationAppLinkPolicyEnabled`, `isElementFullscreenEnabled`, `isFindInteractionEnabled` WebView settings
+- Added `underPageBackgroundColor`, `isTextInteractionEnabled`, `isSiteSpecificQuirksModeEnabled`, `upgradeKnownHostsToHTTPS`, `forceDarkStrategy`, `willSuppressErrorPage`, `algorithmicDarkeningAllowed`, `requestedWithHeaderMode`, `enterpriseAuthenticationAppLinkPolicyEnabled`, `isElementFullscreenEnabled`, `isFindInteractionEnabled`, `minimumViewportInset`, `maximumViewportInset` WebView settings
 - Added `onCameraCaptureStateChanged`, `onMicrophoneCaptureStateChanged` WebView events
 - Added support for `onPermissionRequest` event on iOS 15.0+
 - Added `debugLoggingSettings` static property for WebView and ChromeSafariBrowser

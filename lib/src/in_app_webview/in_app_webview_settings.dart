@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/widgets.dart';
 
 import '../types/requested_with_header_mode.dart';
 import 'android/in_app_webview_options.dart';
@@ -11,6 +12,9 @@ import '../util.dart';
 import '../in_app_browser/in_app_browser_settings.dart';
 import 'webview.dart';
 import '../android/webview_feature.dart';
+import '../in_app_webview/in_app_webview_controller.dart';
+import '../context_menu.dart';
+
 
 ///This class represents all the WebView settings available.
 class InAppWebViewSettings {
@@ -555,7 +559,7 @@ class InAppWebViewSettings {
 
   ///Sets the WebView's over-scroll mode.
   ///Setting the over-scroll mode of a WebView will have an effect only if the WebView is capable of scrolling.
-  ///The default value is [OverScrollMode.OVER_SCROLL_IF_CONTENT_SCROLLS].
+  ///The default value is [OverScrollMode.IF_CONTENT_SCROLLS].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -1077,6 +1081,24 @@ class InAppWebViewSettings {
   ///- iOS
   bool isFindInteractionEnabled;
 
+  ///Set minimum viewport inset to the smallest inset a webpage may experience in your app's maximally collapsed UI configuration.
+  ///Values must be either zero or positive. It must be smaller than [maximumViewportInset].
+  ///
+  ///**NOTE**: available on iOS 15.5+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  EdgeInsets? minimumViewportInset;
+
+  ///Set maximum viewport inset to the largest inset a webpage may experience in your app's maximally expanded UI configuration.
+  ///Values must be either zero or positive. It must be larger than [minimumViewportInset].
+  ///
+  ///**NOTE**: available on iOS 15.5+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  EdgeInsets? maximumViewportInset;
+
   ///Specifies a feature policy for the `<iframe>`.
   ///The policy defines what features are available to the `<iframe>` based on the origin of the request
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
@@ -1242,6 +1264,8 @@ class InAppWebViewSettings {
     this.upgradeKnownHostsToHTTPS = true,
     this.isElementFullscreenEnabled = true,
     this.isFindInteractionEnabled = false,
+    this.minimumViewportInset,
+    this.maximumViewportInset,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,
@@ -1256,6 +1280,12 @@ class InAppWebViewSettings {
         !this.resourceCustomSchemes.contains("https"));
     assert(
         allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
+    assert((minimumViewportInset == null && maximumViewportInset == null) ||
+        minimumViewportInset != null && maximumViewportInset != null &&
+        minimumViewportInset!.isNonNegative && maximumViewportInset!.isNonNegative &&
+        minimumViewportInset!.vertical <= maximumViewportInset!.vertical &&
+        minimumViewportInset!.horizontal <= maximumViewportInset!.horizontal,
+        "minimumViewportInset cannot be larger than maximumViewportInset");
   }
 
   Map<String, dynamic> toMap() {
@@ -1397,6 +1427,8 @@ class InAppWebViewSettings {
       "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
       "isElementFullscreenEnabled": isElementFullscreenEnabled,
       "isFindInteractionEnabled": isFindInteractionEnabled,
+      "minimumViewportInset": minimumViewportInset?.toMap(),
+      "maximumViewportInset": maximumViewportInset?.toMap(),
       "iframeAllow": iframeAllow,
       "iframeAllowFullscreen": iframeAllowFullscreen,
       "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
@@ -1602,6 +1634,8 @@ class InAppWebViewSettings {
         settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
         settings.isElementFullscreenEnabled = map["isElementFullscreenEnabled"];
         settings.isFindInteractionEnabled = map["isFindInteractionEnabled"];
+        settings.minimumViewportInset = MapEdgeInsets.fromMap(map["minimumViewportInset"]?.cast<String, double>());
+        settings.maximumViewportInset = MapEdgeInsets.fromMap(map["maximumViewportInset"]?.cast<String, double>());
       }
     }
     return settings;

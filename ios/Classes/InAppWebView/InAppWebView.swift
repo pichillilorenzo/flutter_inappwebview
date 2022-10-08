@@ -416,6 +416,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 }
             }
             
+            if #available(iOS 15.5, *) {
+                if let minViewportInset = settings.minimumViewportInset, let maxViewportInset = settings.maximumViewportInset {
+                    setMinimumViewportInset(minViewportInset, maximumViewportInset: maxViewportInset)
+                }
+            }
+            
             if #available(iOS 16.0, *) {
                 isFindInteractionEnabled = settings.isFindInteractionEnabled
             }
@@ -1188,9 +1194,15 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
         if #available(iOS 15.4, *) {
-            if newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil &&
-                settings?.isSiteSpecificQuirksModeEnabled != newSettings.isSiteSpecificQuirksModeEnabled {
+            if newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil, settings?.isSiteSpecificQuirksModeEnabled != newSettings.isSiteSpecificQuirksModeEnabled {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = newSettings.isSiteSpecificQuirksModeEnabled
+            }
+        }
+        if #available(iOS 15.5, *) {
+            if ((newSettingsMap["minimumViewportInset"] != nil && settings?.minimumViewportInset != newSettings.minimumViewportInset) ||
+               (newSettingsMap["maximumViewportInset"] != nil && settings?.maximumViewportInset != newSettings.maximumViewportInset)),
+               let minViewportInset = newSettings.minimumViewportInset, let maxViewportInset = newSettings.maximumViewportInset {
+                setMinimumViewportInset(minViewportInset, maximumViewportInset: maxViewportInset)
             }
         }
         

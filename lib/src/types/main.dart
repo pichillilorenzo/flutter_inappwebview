@@ -163,3 +163,4 @@ export 'window_features.dart' show WindowFeatures, IOSWKWindowFeatures;
 export 'requested_with_header_mode.dart' show RequestedWithHeaderMode;
 export 'find_session.dart' show FindSession;
 export 'search_result_display_style.dart' show SearchResultDisplayStyle;
+export 'content_blocker_trigger_load_context.dart' show ContentBlockerTriggerLoadContext;

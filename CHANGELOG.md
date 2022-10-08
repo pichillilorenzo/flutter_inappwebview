@@ -13,6 +13,7 @@
 - Added `debugLoggingSettings` static property for WebView and ChromeSafariBrowser
 - Added `WebViewFeature.DOCUMENT_START_SCRIPT` Android feature support
 - Added `getRequestedWithHeaderMode`, `setRequestedWithHeaderMode` ServiceWorkerController methods
+- Added `ContentBlockerTrigger.ifFrameUrl` and `ContentBlockerTrigger.loadContext` properties
 - Updated `getMetaThemeColor` on iOS 15.0+
 - Deprecated `onLoadError` for `onReceivedError`. `onReceivedError` will be called also for subframes
 - Deprecated `onLoadHttpError` for `onReceivedError`. `onReceivedHttpError` will be called also for subframes

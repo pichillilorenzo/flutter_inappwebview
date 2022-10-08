@@ -35,53 +35,59 @@ class ContentBlocker {
 ///For example, you can limit the trigger to specific domains or have it not apply when a match is found on a specific domain.
 class ContentBlockerTrigger {
   ///A regular expression pattern to match the URL against.
-  late String urlFilter;
+  String urlFilter;
 
-  ///Used only by iOS. A Boolean value. The default value is false.
-  late bool urlFilterIsCaseSensitive;
+  ///A list of regular expressions to match iframes URL against.
+  ///
+  ///*NOTE*: available only on iOS.
+  List<String> ifFrameUrl;
+
+  ///A Boolean value. The default value is `false`.
+  ///
+  ///*NOTE*: available only on iOS.
+  bool urlFilterIsCaseSensitive;
 
   ///A list of [ContentBlockerTriggerResourceType] representing the resource types (how the browser intends to use the resource) that the rule should match.
   ///If not specified, the rule matches all resource types.
-  late List<ContentBlockerTriggerResourceType> resourceType;
+  List<ContentBlockerTriggerResourceType> resourceType;
 
   ///A list of strings matched to a URL's domain; limits action to a list of specific domains.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.unlessDomain].
-  late List<String> ifDomain;
+  List<String> ifDomain;
 
   ///A list of strings matched to a URL's domain; acts on any site except domains in a provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.ifDomain].
-  late List<String> unlessDomain;
+  List<String> unlessDomain;
 
   ///A list of [ContentBlockerTriggerLoadType] that can include one of two mutually exclusive values. If not specified, the rule matches all load types.
-  late List<ContentBlockerTriggerLoadType> loadType;
+  List<ContentBlockerTriggerLoadType> loadType;
 
   ///A list of strings matched to the entire main document URL; limits the action to a specific list of URL patterns.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.unlessTopUrl].
-  late List<String> ifTopUrl;
+  List<String> ifTopUrl;
 
   ///An array of strings matched to the entire main document URL; acts on any site except URL patterns in provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.ifTopUrl].
-  late List<String> unlessTopUrl;
+  List<String> unlessTopUrl;
+
+  ///An array of strings that specify loading contexts.
+  ///
+  ///*NOTE*: available only on iOS.
+  List<ContentBlockerTriggerLoadContext> loadContext;
 
   ContentBlockerTrigger(
-      {required String urlFilter,
-      bool urlFilterIsCaseSensitive = false,
-      List<ContentBlockerTriggerResourceType> resourceType = const [],
-      List<String> ifDomain = const [],
-      List<String> unlessDomain = const [],
-      List<ContentBlockerTriggerLoadType> loadType = const [],
-      List<String> ifTopUrl = const [],
-      List<String> unlessTopUrl = const []}) {
-    this.urlFilter = urlFilter;
-    this.resourceType = resourceType;
-    this.urlFilterIsCaseSensitive = urlFilterIsCaseSensitive;
-    this.ifDomain = ifDomain;
-    this.unlessDomain = unlessDomain;
+      {required this.urlFilter,
+      this.ifFrameUrl = const <String>[],
+      this.urlFilterIsCaseSensitive = false,
+      this.resourceType = const <ContentBlockerTriggerResourceType>[],
+      this.ifDomain = const <String>[],
+      this.unlessDomain = const <String>[],
+      this.loadType = const <ContentBlockerTriggerLoadType>[],
+      this.ifTopUrl = const <String>[],
+      this.unlessTopUrl = const <String>[],
+      this.loadContext = const <ContentBlockerTriggerLoadContext>[]}) {
     assert(!(this.ifDomain.isEmpty || this.unlessDomain.isEmpty) == false);
-    this.loadType = loadType;
     assert(this.loadType.length <= 2);
-    this.ifTopUrl = ifTopUrl;
-    this.unlessTopUrl = unlessTopUrl;
     assert(!(this.ifTopUrl.isEmpty || this.unlessTopUrl.isEmpty) == false);
   }
 
@@ -94,16 +100,22 @@ class ContentBlockerTrigger {
     loadType.forEach((type) {
       loadTypeStringList.add(type.toNativeValue());
     });
+    List<String> loadContextStringList = [];
+    loadContext.forEach((type) {
+      loadContextStringList.add(type.toNativeValue());
+    });
 
     Map<String, dynamic> map = {
       "url-filter": urlFilter,
+      "if-frame-url": ifFrameUrl,
       "url-filter-is-case-sensitive": urlFilterIsCaseSensitive,
       "if-domain": ifDomain,
       "unless-domain": unlessDomain,
       "resource-type": resourceTypeStringList,
       "load-type": loadTypeStringList,
       "if-top-url": ifTopUrl,
-      "unless-top-url": unlessTopUrl
+      "unless-top-url": unlessTopUrl,
+      "load-context": loadContextStringList
     };
 
     map.keys
@@ -119,6 +131,7 @@ class ContentBlockerTrigger {
   static ContentBlockerTrigger fromMap(Map<String, dynamic> map) {
     List<ContentBlockerTriggerResourceType> resourceType = [];
     List<ContentBlockerTriggerLoadType> loadType = [];
+    List<ContentBlockerTriggerLoadContext> loadContext = [];
 
     List<String> resourceTypeStringList =
         List<String>.from(map["resource-type"] ?? []);
@@ -137,15 +150,25 @@ class ContentBlockerTrigger {
       }
     });
 
+    List<String> loadContextStringList = List<String>.from(map["load-context"] ?? []);
+    loadContextStringList.forEach((typeValue) {
+      var context = ContentBlockerTriggerLoadContext.fromNativeValue(typeValue);
+      if (context != null) {
+        loadContext.add(context);
+      }
+    });
+
     return ContentBlockerTrigger(
         urlFilter: map["url-filter"],
+        ifFrameUrl: map["if-frame-url"],
         urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
         ifDomain: List<String>.from(map["if-domain"] ?? []),
         unlessDomain: List<String>.from(map["unless-domain"] ?? []),
         resourceType: resourceType,
         loadType: loadType,
         ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
-        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []));
+        unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []),
+        loadContext: loadContext);
   }
 }
 
@@ -156,19 +179,17 @@ class ContentBlockerTrigger {
 ///Group the rules with similar actions together to improve performance.
 class ContentBlockerAction {
   ///Type of the action.
-  late ContentBlockerActionType type;
+  ContentBlockerActionType type;
 
   ///If the action type is [ContentBlockerActionType.CSS_DISPLAY_NONE], then also the [selector] property is required, otherwise it is ignored.
   ///It specify a string that defines a selector list. Use CSS identifiers as the individual selector values, separated by commas.
   String? selector;
 
   ContentBlockerAction(
-      {required ContentBlockerActionType type, String? selector}) {
-    this.type = type;
+      {required this.type, this.selector}) {
     if (this.type == ContentBlockerActionType.CSS_DISPLAY_NONE) {
-      assert(selector != null);
+      assert(this.selector != null);
     }
-    this.selector = selector;
   }
 
   Map<String, dynamic> toMap() {

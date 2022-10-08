@@ -116,7 +116,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 InAppWebView(
                   key: webViewKey,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse('https://developer.apple.com/videos/play/wwdc2022/10049/?time=264')),
+                      URLRequest(url: Uri.parse('https://github.com/flutter')),
                   // initialUrlRequest:
                   // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",

@@ -1,5 +1,8 @@
 package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
+import static android.content.Context.INPUT_METHOD_SERVICE;
+import static com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType.fromValue;
+
 import android.animation.ObjectAnimator;
 import android.animation.PropertyValuesHolder;
 import android.annotation.SuppressLint;
@@ -56,18 +59,13 @@ import androidx.webkit.WebViewCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
-import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
-import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
-import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
-import com.pichillilorenzo.flutter_inappwebview.types.HitTestResult;
-import com.pichillilorenzo.flutter_inappwebview.webview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlocker;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerAction;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerHandler;
 import com.pichillilorenzo.flutter_inappwebview.content_blocker.ContentBlockerTrigger;
+import com.pichillilorenzo.flutter_inappwebview.find_interaction.FindInteractionController;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.ConsoleLogJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.InterceptAjaxRequestJS;
@@ -79,16 +77,20 @@ import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.OnWindowFocusE
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PluginScriptsUtil;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PrintJS;
 import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.PromisePolyfillJS;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobController;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
+import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobSettings;
 import com.pichillilorenzo.flutter_inappwebview.pull_to_refresh.PullToRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.types.ContentWorld;
 import com.pichillilorenzo.flutter_inappwebview.types.DownloadStartRequest;
-import com.pichillilorenzo.flutter_inappwebview.webview.ContextMenuSettings;
-import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PluginScript;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserContentController;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
+import com.pichillilorenzo.flutter_inappwebview.webview.ContextMenuSettings;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
+import com.pichillilorenzo.flutter_inappwebview.webview.JavaScriptBridgeInterface;
 import com.pichillilorenzo.flutter_inappwebview.webview.WebViewChannelDelegate;
 import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageChannel;
 import com.pichillilorenzo.flutter_inappwebview.webview.web_message.WebMessageListener;
@@ -99,19 +101,14 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
 import okhttp3.OkHttpClient;
-
-import static android.content.Context.INPUT_METHOD_SERVICE;
-import static com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType.fromValue;
 
 final public class InAppWebView extends InputAwareWebView implements InAppWebViewInterface {
   protected static final String LOG_TAG = "InAppWebView";

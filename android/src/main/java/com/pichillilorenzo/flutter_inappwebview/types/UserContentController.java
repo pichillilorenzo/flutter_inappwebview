@@ -2,7 +2,6 @@ package com.pichillilorenzo.flutter_inappwebview.types;
 
 import android.annotation.SuppressLint;
 import android.text.TextUtils;
-import android.util.Log;
 import android.webkit.WebView;
 
 import androidx.annotation.NonNull;
@@ -37,10 +36,13 @@ public class UserContentController implements Disposable {
 
   private final Map<UserScript, ScriptHandler> scriptHandlerMap = new HashMap<>();
 
+  @Nullable
+  private ScriptHandler contentWorldsCreatorScript;
+
   @NonNull
   private final Map<UserScriptInjectionTime, LinkedHashSet<UserScript>> userOnlyScripts = new HashMap<UserScriptInjectionTime, LinkedHashSet<UserScript>>() {{
-      put(UserScriptInjectionTime.AT_DOCUMENT_START, new LinkedHashSet<UserScript>());
-      put(UserScriptInjectionTime.AT_DOCUMENT_END, new LinkedHashSet<UserScript>());
+    put(UserScriptInjectionTime.AT_DOCUMENT_START, new LinkedHashSet<UserScript>());
+    put(UserScriptInjectionTime.AT_DOCUMENT_END, new LinkedHashSet<UserScript>());
   }};
   @NonNull
   private final Map<UserScriptInjectionTime, LinkedHashSet<PluginScript>> pluginScripts = new HashMap<UserScriptInjectionTime, LinkedHashSet<PluginScript>>() {{
@@ -171,15 +173,35 @@ public class UserContentController implements Disposable {
     return new LinkedHashSet<>(this.userOnlyScripts.get(injectionTime));
   }
 
+  private void updateContentWorldsCreatorScript() {
+    String source = generateContentWorldsCreatorCode();
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+      if (contentWorldsCreatorScript != null) {
+        contentWorldsCreatorScript.remove();
+      }
+      if (!source.isEmpty() && webView != null) {
+        contentWorldsCreatorScript = WebViewCompat.addDocumentStartJavaScript(
+                webView,
+                source,
+                new HashSet<String>() {{
+                  add("*");
+                }}
+        );
+      }
+    }
+  }
+
   public boolean addUserOnlyScript(UserScript userOnlyScript) {
     ContentWorld contentWorld = userOnlyScript.getContentWorld();
     if (contentWorld != null) {
       contentWorlds.add(contentWorld);
     }
-    if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+    this.updateContentWorldsCreatorScript();
+    if (webView != null && userOnlyScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_START
+            && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
-              userOnlyScript.getSource(),
+              wrapSourceCodeInContentWorld(userOnlyScript.getContentWorld(), userOnlyScript.getSource()),
               userOnlyScript.getAllowedOriginRules()
       );
       this.scriptHandlerMap.put(userOnlyScript, scriptHandler);
@@ -200,6 +222,7 @@ public class UserContentController implements Disposable {
         scriptHandler.remove();
         this.scriptHandlerMap.remove(userOnlyScript);
       }
+      this.updateContentWorldsCreatorScript();
     }
     return this.userOnlyScripts.get(userOnlyScript.getInjectionTime()).remove(userOnlyScript);
   }
@@ -243,10 +266,12 @@ public class UserContentController implements Disposable {
     if (contentWorld != null) {
       contentWorlds.add(contentWorld);
     }
-    if (webView != null && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
+    this.updateContentWorldsCreatorScript();
+    if (webView != null && pluginScript.getInjectionTime() == UserScriptInjectionTime.AT_DOCUMENT_START
+            && WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT)) {
       ScriptHandler scriptHandler = WebViewCompat.addDocumentStartJavaScript(
               webView,
-              pluginScript.getSource(),
+              wrapSourceCodeInContentWorld(pluginScript.getContentWorld(), pluginScript.getSource()),
               pluginScript.getAllowedOriginRules()
       );
       this.scriptHandlerMap.put(pluginScript, scriptHandler);
@@ -267,6 +292,7 @@ public class UserContentController implements Disposable {
         scriptHandler.remove();
         this.scriptHandlerMap.remove(pluginScript);
       }
+      this.updateContentWorldsCreatorScript();
     }
     return this.pluginScripts.get(pluginScript.getInjectionTime()).remove(pluginScript);
   }
@@ -383,9 +409,31 @@ public class UserContentController implements Disposable {
           "}";
 
   private static final String CONTENT_WORLDS_GENERATOR_JS_SOURCE = "(function() {" +
-          "  var contentWorldNames = [" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY + "];" +
-          "  for (var contentWorldName of contentWorldNames) {" +
-          "    var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_' + contentWorldName;" +
+          "  var interval = setInterval(function() {" +
+          "    if (document.body == null) {return;}" +
+          "    var contentWorldNames = [" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY + "];" +
+          "    for (var contentWorldName of contentWorldNames) {" +
+          "      var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_' + contentWorldName;" +
+          "      var iframe = document.getElementById(iframeId);" +
+          "      if (iframe == null) {" +
+          "        iframe = document.createElement('iframe');" +
+          "        iframe.id = iframeId;" +
+          "        iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
+          "        document.body.append(iframe);" +
+          "      }" +
+          "      var script = iframe.contentWindow.document.createElement('script');" +
+          "      script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts';" +
+          "      script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
+          "      iframe.contentWindow.document.body.append(script);" +
+          "    }" +
+          "    clearInterval(interval);" +
+          "  });" +
+          "})();";
+
+  private static final String CONTENT_WORLD_WRAPPER_JS_SOURCE = "(function() {" +
+          "  var interval = setInterval(function() {" +
+          "    if (document.body == null) {return;}" +
+          "    var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME + "';" +
           "    var iframe = document.getElementById(iframeId);" +
           "    if (iframe == null) {" +
           "      iframe = document.createElement('iframe');" +
@@ -393,24 +441,14 @@ public class UserContentController implements Disposable {
           "      iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
           "      document.body.append(iframe);" +
           "    }" +
+          "    if (iframe.contentWindow.document.querySelector('#" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
+          "      return;" +
+          "    }" +
           "    var script = iframe.contentWindow.document.createElement('script');" +
-          "    script.innerHTML = "+ PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
+          "    script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
           "    iframe.contentWindow.document.body.append(script);" +
-          "  }" +
-          "})();";
-
-  private static final String CONTENT_WORLD_WRAPPER_JS_SOURCE = "(function() {" +
-          "  var iframeId = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_" + PluginScriptsUtil.VAR_CONTENT_WORLD_NAME + "';" +
-          "  var iframe = document.getElementById(iframeId);" +
-          "  if (iframe == null) {" +
-          "    iframe = document.createElement('iframe');" +
-          "    iframe.id = iframeId;" +
-          "    iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
-          "    document.body.append(iframe);" +
-          "  }" +
-          "  var script = iframe.contentWindow.document.createElement('script');" +
-          "  script.innerHTML = "+ PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
-          "  iframe.contentWindow.document.body.append(script);" +
+          "    clearInterval(interval);" +
+          "  });" +
           "})();";
 
   private static final String DOCUMENT_READY_WRAPPER_JS_SOURCE = "if (document.readyState === 'interactive' || document.readyState === 'complete') { " +
@@ -419,6 +457,11 @@ public class UserContentController implements Disposable {
 
   @Override
   public void dispose() {
+    if (WebViewFeature.isFeatureSupported(WebViewFeature.DOCUMENT_START_SCRIPT) && contentWorldsCreatorScript != null) {
+      contentWorldsCreatorScript.remove();
+    }
+    removeAllUserOnlyScripts();
+    removeAllPluginScripts();
     webView = null;
   }
 }

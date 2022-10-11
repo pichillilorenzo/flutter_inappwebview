@@ -26,6 +26,7 @@ dependencies:
   path_provider: ^2.0.9
   permission_handler: ^10.0.2
   url_launcher: ^6.0.20
+  pointer_interceptor: ^0.9.3+3
   # connectivity: ^0.4.5+6
   flutter_inappwebview:
     path: ../

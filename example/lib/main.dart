@@ -9,6 +9,7 @@ import 'package:flutter_inappwebview_example/headless_in_app_webview.screen.dart
 import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart';
 import 'package:flutter_inappwebview_example/web_authentication_session_example.screen.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
@@ -26,53 +27,55 @@ Future main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
-  await localhostServer.start();
+  // await localhostServer.start();
 
   runApp(MyApp());
 }
 
-Drawer myDrawer({required BuildContext context}) {
-  return Drawer(
-    child: ListView(
-      padding: EdgeInsets.zero,
-      children: <Widget>[
-        DrawerHeader(
-          child: Text('flutter_inappbrowser example'),
-          decoration: BoxDecoration(
-            color: Colors.blue,
+PointerInterceptor myDrawer({required BuildContext context}) {
+  return PointerInterceptor(
+    child: Drawer(
+      child: ListView(
+        padding: EdgeInsets.zero,
+        children: <Widget>[
+          DrawerHeader(
+            child: Text('flutter_inappwebview example'),
+            decoration: BoxDecoration(
+              color: Colors.blue,
+            ),
           ),
-        ),
-        ListTile(
-          title: Text('InAppBrowser'),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/InAppBrowser');
-          },
-        ),
-        ListTile(
-          title: Text('ChromeSafariBrowser'),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
-          },
-        ),
-        ListTile(
-          title: Text('WebAuthenticationSession'),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
-          },
-        ),
-        ListTile(
-          title: Text('InAppWebView'),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/');
-          },
-        ),
-        ListTile(
-          title: Text('HeadlessInAppWebView'),
-          onTap: () {
-            Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
-          },
-        ),
-      ],
+          ListTile(
+            title: Text('InAppBrowser'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/InAppBrowser');
+            },
+          ),
+          ListTile(
+            title: Text('ChromeSafariBrowser'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+            },
+          ),
+          ListTile(
+            title: Text('WebAuthenticationSession'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
+            },
+          ),
+          ListTile(
+            title: Text('InAppWebView'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/');
+            },
+          ),
+          ListTile(
+            title: Text('HeadlessInAppWebView'),
+            onTap: () {
+              Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+            },
+          ),
+        ],
+      ),
     ),
   );
 }

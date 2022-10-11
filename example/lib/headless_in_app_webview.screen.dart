@@ -42,7 +42,7 @@ class _HeadlessInAppWebViewExampleScreenState
           this.url = url.toString();
         });
       },
-      onUpdateVisitedHistory: (controller, url, androidIsReload) {
+      onUpdateVisitedHistory: (controller, url, isReload) {
         setState(() {
           this.url = url.toString();
         });

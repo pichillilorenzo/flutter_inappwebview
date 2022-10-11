@@ -19,7 +19,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
   InAppWebViewSettings settings = InAppWebViewSettings(
     useShouldOverrideUrlLoading: true,
     mediaPlaybackRequiresUserGesture: false,
-    isFindInteractionEnabled: false,
     allowsInlineMediaPlayback: true,
     iframeAllow: "camera; microphone",
     iframeAllowFullscreen: true
@@ -116,7 +115,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 InAppWebView(
                   key: webViewKey,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse('https://github.com/flutter')),
+                      URLRequest(url: Uri.parse('https://flutter.dev')),
                   // initialUrlRequest:
                   // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
@@ -182,7 +181,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       urlController.text = this.url;
                     });
                   },
-                  onUpdateVisitedHistory: (controller, url, androidIsReload) {
+                  onUpdateVisitedHistory: (controller, url, isReload) {
                     setState(() {
                       this.url = url.toString();
                       urlController.text = this.url;

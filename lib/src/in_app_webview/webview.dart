@@ -10,6 +10,8 @@ import '../types/main.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import 'headless_in_app_webview.dart';
+import 'in_app_webview.dart';
+import '../in_app_browser/in_app_browser.dart';
 import '../print_job/main.dart';
 
 import '../debug_logging_settings.dart';

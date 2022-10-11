@@ -49,7 +49,7 @@ Add `flutter_inappwebview` as a [dependency in your pubspec.yaml file](https://f
 
 ### Installation - Web support
 
-To make it work properly on the Web platformm, you need to add the `web_support.js` file inside the `<head>` of your `web/index.html` file:
+To make it work properly on the Web platform, you need to add the `web_support.js` file inside the `<head>` of your `web/index.html` file:
 
 ```html
 <head>

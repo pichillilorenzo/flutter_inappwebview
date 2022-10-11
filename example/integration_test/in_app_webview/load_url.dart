@@ -93,6 +93,6 @@ void loadUrl() {
         data: Uint8List.fromList(utf8.encode(htmlCode))
     );
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
-    expect(await controller.evaluateJavascript(source: "document.body").toString().trim(), htmlCode);
+    expect((await controller.evaluateJavascript(source: "document.body.innerHTML")).toString().trim(), htmlCode);
   }, skip: shouldSkip2);
 }

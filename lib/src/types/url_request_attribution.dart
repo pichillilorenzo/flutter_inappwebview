@@ -17,11 +17,9 @@ class URLRequestAttribution_ {
   ///This includes requests that your app makes to get user data. This is the default value.
   ///
   ///For cases where the user enters a URL, like in the navigation bar of a web browser, or taps or clicks a URL to load the content it represents, use the [URLRequestAttribution.USER] value instead.
-  static const DEVELOPER =
-  const URLRequestAttribution_._internal(0);
+  static const DEVELOPER = const URLRequestAttribution_._internal(0);
 
   ///Use this value for the attribution parameter of a [URLRequest] that satisfies a user request to access an explicit, unmodified URL.
   ///In all other cases, use the [URLRequestAttribution.DEVELOPER] value instead.
-  static const USER =
-  const URLRequestAttribution_._internal(1);
+  static const USER = const URLRequestAttribution_._internal(1);
 }

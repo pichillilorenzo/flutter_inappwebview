@@ -26,8 +26,8 @@ class JsBeforeUnloadResponse_ {
 
   JsBeforeUnloadResponse_(
       {this.message = "",
-        this.handledByClient = false,
-        this.confirmButtonTitle = "",
-        this.cancelButtonTitle = "",
-        this.action = JsBeforeUnloadResponseAction_.CONFIRM});
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.action = JsBeforeUnloadResponseAction_.CONFIRM});
 }

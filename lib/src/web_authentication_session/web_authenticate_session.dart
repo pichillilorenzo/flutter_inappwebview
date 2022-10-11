@@ -11,7 +11,8 @@ import '../types/disposable.dart';
 import 'web_authenticate_session_settings.dart';
 
 ///A completion handler for the [WebAuthenticationSession].
-typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(Uri? url, WebAuthenticationSessionError? error)?;
+typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
+    Uri? url, WebAuthenticationSessionError? error)?;
 
 ///A session that an app uses to authenticate a user through a web service.
 ///

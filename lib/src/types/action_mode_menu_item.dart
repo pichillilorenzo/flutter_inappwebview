@@ -3,9 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 part 'action_mode_menu_item.g.dart';
 
 ///Class used to disable the action mode menu items.
-@ExchangeableEnum(
-    bitwiseOrOperator: true
-)
+@ExchangeableEnum(bitwiseOrOperator: true)
 class ActionModeMenuItem_ {
   // ignore: unused_field
   final int _value;
@@ -30,9 +28,7 @@ class ActionModeMenuItem_ {
 ///
 ///Use [ActionModeMenuItem] instead.
 @Deprecated("Use ActionModeMenuItem instead")
-@ExchangeableEnum(
-    bitwiseOrOperator: true
-)
+@ExchangeableEnum(bitwiseOrOperator: true)
 class AndroidActionModeMenuItem_ {
   // ignore: unused_field
   final int _value;
@@ -46,9 +42,9 @@ class AndroidActionModeMenuItem_ {
 
   ///Disable menu item "Web Search".
   static const MENU_ITEM_WEB_SEARCH =
-  const AndroidActionModeMenuItem_._internal(2);
+      const AndroidActionModeMenuItem_._internal(2);
 
   ///Disable all the action mode menu items for text processing.
   static const MENU_ITEM_PROCESS_TEXT =
-  const AndroidActionModeMenuItem_._internal(4);
+      const AndroidActionModeMenuItem_._internal(4);
 }

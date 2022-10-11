@@ -20,5 +20,6 @@ class LoadedResource_ {
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) duration to fetch a resource.
   double? duration;
 
-  LoadedResource_({this.initiatorType, this.url, this.startTime, this.duration});
+  LoadedResource_(
+      {this.initiatorType, this.url, this.startTime, this.duration});
 }

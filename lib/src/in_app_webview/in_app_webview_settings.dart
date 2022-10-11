@@ -12,7 +12,6 @@ import '../android/webview_feature.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../context_menu.dart';
 
-
 ///This class represents all the WebView settings available.
 class InAppWebViewSettings {
   ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
@@ -1184,7 +1183,8 @@ class InAppWebViewSettings {
     this.fantasyFontFamily = "fantasy",
     this.fixedFontFamily = "monospace",
     this.forceDark = ForceDark.OFF,
-    this.forceDarkStrategy = ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+    this.forceDarkStrategy =
+        ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
     this.geolocationEnabled = true,
     this.layoutAlgorithm,
     this.loadWithOverviewMode = true,
@@ -1277,11 +1277,16 @@ class InAppWebViewSettings {
         !this.resourceCustomSchemes.contains("https"));
     assert(
         allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
-    assert((minimumViewportInset == null && maximumViewportInset == null) ||
-        minimumViewportInset != null && maximumViewportInset != null &&
-        minimumViewportInset!.isNonNegative && maximumViewportInset!.isNonNegative &&
-        minimumViewportInset!.vertical <= maximumViewportInset!.vertical &&
-        minimumViewportInset!.horizontal <= maximumViewportInset!.horizontal,
+    assert(
+        (minimumViewportInset == null && maximumViewportInset == null) ||
+            minimumViewportInset != null &&
+                maximumViewportInset != null &&
+                minimumViewportInset!.isNonNegative &&
+                maximumViewportInset!.isNonNegative &&
+                minimumViewportInset!.vertical <=
+                    maximumViewportInset!.vertical &&
+                minimumViewportInset!.horizontal <=
+                    maximumViewportInset!.horizontal,
         "minimumViewportInset cannot be larger than maximumViewportInset");
   }
 
@@ -1341,7 +1346,8 @@ class InAppWebViewSettings {
       "defaultFixedFontSize": defaultFixedFontSize,
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
-      "disabledActionModeMenuItems": disabledActionModeMenuItems?.toNativeValue(),
+      "disabledActionModeMenuItems":
+          disabledActionModeMenuItems?.toNativeValue(),
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
       "forceDark": forceDark?.toNativeValue(),
@@ -1381,7 +1387,8 @@ class InAppWebViewSettings {
       "willSuppressErrorPage": willSuppressErrorPage,
       "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
       "requestedWithHeaderMode": requestedWithHeaderMode?.toNativeValue(),
-      "enterpriseAuthenticationAppLinkPolicyEnabled": enterpriseAuthenticationAppLinkPolicyEnabled,
+      "enterpriseAuthenticationAppLinkPolicyEnabled":
+          enterpriseAuthenticationAppLinkPolicyEnabled,
       "disallowOverScroll": disallowOverScroll,
       "enableViewportScale": enableViewportScale,
       "suppressesIncrementalRendering": suppressesIncrementalRendering,
@@ -1450,7 +1457,8 @@ class InAppWebViewSettings {
     List<String> dataDetectorTypesList =
         List<String>.from(map["dataDetectorTypes"] ?? []);
     dataDetectorTypesList.forEach((dataDetectorTypeValue) {
-      var dataDetectorType = DataDetectorTypes.fromNativeValue(dataDetectorTypeValue);
+      var dataDetectorType =
+          DataDetectorTypes.fromNativeValue(dataDetectorTypeValue);
       if (dataDetectorType != null) {
         dataDetectorTypes.add(dataDetectorType);
       }
@@ -1523,11 +1531,13 @@ class InAppWebViewSettings {
         settings.defaultFontSize = map["defaultFontSize"];
         settings.defaultTextEncodingName = map["defaultTextEncodingName"];
         settings.disabledActionModeMenuItems =
-            ActionModeMenuItem.fromNativeValue(map["disabledActionModeMenuItems"]);
+            ActionModeMenuItem.fromNativeValue(
+                map["disabledActionModeMenuItems"]);
         settings.fantasyFontFamily = map["fantasyFontFamily"];
         settings.fixedFontFamily = map["fixedFontFamily"];
         settings.forceDark = ForceDark.fromNativeValue(map["forceDark"]);
-        settings.forceDarkStrategy = ForceDarkStrategy.fromNativeValue(map["forceDarkStrategy"]);
+        settings.forceDarkStrategy =
+            ForceDarkStrategy.fromNativeValue(map["forceDarkStrategy"]);
         settings.geolocationEnabled = map["geolocationEnabled"];
         settings.layoutAlgorithm =
             LayoutAlgorithm.fromNativeValue(map["layoutAlgorithm"]);
@@ -1545,17 +1555,20 @@ class InAppWebViewSettings {
         settings.hardwareAcceleration = map["hardwareAcceleration"];
         settings.supportMultipleWindows = map["supportMultipleWindows"];
         settings.regexToCancelSubFramesLoading =
-        map["regexToCancelSubFramesLoading"];
+            map["regexToCancelSubFramesLoading"];
         settings.useHybridComposition = map["useHybridComposition"];
         settings.useShouldInterceptRequest = map["useShouldInterceptRequest"];
         settings.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-        settings.overScrollMode = OverScrollMode.fromNativeValue(map["overScrollMode"]);
+        settings.overScrollMode =
+            OverScrollMode.fromNativeValue(map["overScrollMode"]);
         settings.networkAvailable = map["networkAvailable"];
-        settings.scrollBarStyle = ScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
+        settings.scrollBarStyle =
+            ScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
         settings.verticalScrollbarPosition =
-            VerticalScrollbarPosition.fromNativeValue(map["verticalScrollbarPosition"]);
+            VerticalScrollbarPosition.fromNativeValue(
+                map["verticalScrollbarPosition"]);
         settings.scrollBarDefaultDelayBeforeFade =
-        map["scrollBarDefaultDelayBeforeFade"];
+            map["scrollBarDefaultDelayBeforeFade"];
         settings.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
         settings.scrollBarFadeDuration = map["scrollBarFadeDuration"];
         settings.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
@@ -1570,37 +1583,40 @@ class InAppWebViewSettings {
         settings.horizontalScrollbarTrackColor =
             UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
         settings.willSuppressErrorPage = map["willSuppressErrorPage"];
-        settings.algorithmicDarkeningAllowed = map["algorithmicDarkeningAllowed"];
-        settings.requestedWithHeaderMode = RequestedWithHeaderMode.fromNativeValue(map["requestedWithHeaderMode"]);
-        settings.enterpriseAuthenticationAppLinkPolicyEnabled = map["enterpriseAuthenticationAppLinkPolicyEnabled"];
-      }
-      else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        settings.algorithmicDarkeningAllowed =
+            map["algorithmicDarkeningAllowed"];
+        settings.requestedWithHeaderMode =
+            RequestedWithHeaderMode.fromNativeValue(
+                map["requestedWithHeaderMode"]);
+        settings.enterpriseAuthenticationAppLinkPolicyEnabled =
+            map["enterpriseAuthenticationAppLinkPolicyEnabled"];
+      } else if (defaultTargetPlatform == TargetPlatform.iOS ||
           defaultTargetPlatform == TargetPlatform.macOS) {
         settings.disallowOverScroll = map["disallowOverScroll"];
         settings.enableViewportScale = map["enableViewportScale"];
         settings.suppressesIncrementalRendering =
-        map["suppressesIncrementalRendering"];
+            map["suppressesIncrementalRendering"];
         settings.allowsAirPlayForMediaPlayback =
-        map["allowsAirPlayForMediaPlayback"];
+            map["allowsAirPlayForMediaPlayback"];
         settings.allowsBackForwardNavigationGestures =
-        map["allowsBackForwardNavigationGestures"];
+            map["allowsBackForwardNavigationGestures"];
         settings.allowsLinkPreview = map["allowsLinkPreview"];
         settings.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
         settings.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
         settings.allowsPictureInPictureMediaPlayback =
-        map["allowsPictureInPictureMediaPlayback"];
+            map["allowsPictureInPictureMediaPlayback"];
         settings.isFraudulentWebsiteWarningEnabled =
-        map["isFraudulentWebsiteWarningEnabled"];
+            map["isFraudulentWebsiteWarningEnabled"];
         settings.selectionGranularity =
-        SelectionGranularity.fromNativeValue(map["selectionGranularity"])!;
+            SelectionGranularity.fromNativeValue(map["selectionGranularity"])!;
         settings.dataDetectorTypes = dataDetectorTypes;
         settings.sharedCookiesEnabled = map["sharedCookiesEnabled"];
         settings.automaticallyAdjustsScrollIndicatorInsets =
-        map["automaticallyAdjustsScrollIndicatorInsets"];
+            map["automaticallyAdjustsScrollIndicatorInsets"];
         settings.accessibilityIgnoresInvertColors =
-        map["accessibilityIgnoresInvertColors"];
-        settings.decelerationRate =
-        ScrollViewDecelerationRate.fromNativeValue(map["decelerationRate"])!;
+            map["accessibilityIgnoresInvertColors"];
+        settings.decelerationRate = ScrollViewDecelerationRate.fromNativeValue(
+            map["decelerationRate"])!;
         settings.alwaysBounceVertical = map["alwaysBounceVertical"];
         settings.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
         settings.scrollsToTop = map["scrollsToTop"];
@@ -1608,31 +1624,33 @@ class InAppWebViewSettings {
         settings.maximumZoomScale = map["maximumZoomScale"];
         settings.minimumZoomScale = map["minimumZoomScale"];
         settings.contentInsetAdjustmentBehavior =
-        ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
-            map["contentInsetAdjustmentBehavior"])!;
+            ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
+                map["contentInsetAdjustmentBehavior"])!;
         settings.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
         settings.mediaType = map["mediaType"];
         settings.pageZoom = map["pageZoom"];
         settings.limitsNavigationsToAppBoundDomains =
-        map["limitsNavigationsToAppBoundDomains"];
+            map["limitsNavigationsToAppBoundDomains"];
         settings.useOnNavigationResponse = map["useOnNavigationResponse"];
         settings.applePayAPIEnabled = map["applePayAPIEnabled"];
         settings.allowingReadAccessTo = map["allowingReadAccessTo"] != null
             ? Uri.parse(map["allowingReadAccessTo"])
             : null;
         settings.disableLongPressContextMenuOnLinks =
-        map["disableLongPressContextMenuOnLinks"];
+            map["disableLongPressContextMenuOnLinks"];
         settings.disableInputAccessoryView = map["disableInputAccessoryView"];
         settings.underPageBackgroundColor =
             UtilColor.fromHex(map["underPageBackgroundColor"]);
         settings.isTextInteractionEnabled = map["isTextInteractionEnabled"];
         settings.isSiteSpecificQuirksModeEnabled =
-        map["isSiteSpecificQuirksModeEnabled"];
+            map["isSiteSpecificQuirksModeEnabled"];
         settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
         settings.isElementFullscreenEnabled = map["isElementFullscreenEnabled"];
         settings.isFindInteractionEnabled = map["isFindInteractionEnabled"];
-        settings.minimumViewportInset = MapEdgeInsets.fromMap(map["minimumViewportInset"]?.cast<String, double>());
-        settings.maximumViewportInset = MapEdgeInsets.fromMap(map["maximumViewportInset"]?.cast<String, double>());
+        settings.minimumViewportInset = MapEdgeInsets.fromMap(
+            map["minimumViewportInset"]?.cast<String, double>());
+        settings.maximumViewportInset = MapEdgeInsets.fromMap(
+            map["maximumViewportInset"]?.cast<String, double>());
       }
     }
     return settings;

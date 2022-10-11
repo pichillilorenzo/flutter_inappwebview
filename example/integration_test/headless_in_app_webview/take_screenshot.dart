@@ -20,8 +20,7 @@ void takeScreenshot() {
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
-        initialUrlRequest:
-        URLRequest(url: TEST_URL_1),
+        initialUrlRequest: URLRequest(url: TEST_URL_1),
         onWebViewCreated: (controller) {
           controllerCompleter.complete(controller);
         },
@@ -32,8 +31,7 @@ void takeScreenshot() {
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final String? url = (await controller.getUrl())?.toString();

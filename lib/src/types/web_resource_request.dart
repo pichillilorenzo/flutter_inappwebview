@@ -40,9 +40,9 @@ class WebResourceRequest_ {
 
   WebResourceRequest_(
       {required this.url,
-        this.headers,
-        this.method,
-        this.hasGesture,
-        this.isForMainFrame,
-        this.isRedirect});
+      this.headers,
+      this.method,
+      this.hasGesture,
+      this.isForMainFrame,
+      this.isRedirect});
 }

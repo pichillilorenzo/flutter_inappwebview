@@ -31,13 +31,13 @@ class WindowFeatures_ {
 
   WindowFeatures_(
       {this.allowsResizing,
-        this.height,
-        this.menuBarVisibility,
-        this.statusBarVisibility,
-        this.toolbarsVisibility,
-        this.width,
-        this.x,
-        this.y});
+      this.height,
+      this.menuBarVisibility,
+      this.statusBarVisibility,
+      this.toolbarsVisibility,
+      this.width,
+      this.x,
+      this.y});
 }
 
 ///An iOS-specific class that specifies optional attributes for the containing window when a new web view is requested.
@@ -71,11 +71,11 @@ class IOSWKWindowFeatures_ {
 
   IOSWKWindowFeatures_(
       {this.allowsResizing,
-        this.height,
-        this.menuBarVisibility,
-        this.statusBarVisibility,
-        this.toolbarsVisibility,
-        this.width,
-        this.x,
-        this.y});
+      this.height,
+      this.menuBarVisibility,
+      this.statusBarVisibility,
+      this.toolbarsVisibility,
+      this.width,
+      this.x,
+      this.y});
 }

@@ -134,7 +134,8 @@ class WebViewFeature_ {
 
   ///This feature covers [ServiceWorkerClient.shouldInterceptRequest].
   static const SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST =
-      const WebViewFeature_._internal("SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
+      const WebViewFeature_._internal(
+          "SERVICE_WORKER_SHOULD_INTERCEPT_REQUEST");
 
   ///
   static const SHOULD_OVERRIDE_WITH_REDIRECTS =
@@ -210,7 +211,8 @@ class WebViewFeature_ {
 
   ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
   static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
-      const WebViewFeature_._internal("ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY");
+      const WebViewFeature_._internal(
+          "ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY");
 
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
@@ -249,7 +251,8 @@ class AndroidWebViewFeature_ {
       const AndroidWebViewFeature_._internal("DISABLED_ACTION_MODE_MENU_ITEMS");
 
   ///
-  static const FORCE_DARK = const AndroidWebViewFeature_._internal("FORCE_DARK");
+  static const FORCE_DARK =
+      const AndroidWebViewFeature_._internal("FORCE_DARK");
 
   ///
   static const FORCE_DARK_STRATEGY =
@@ -305,7 +308,8 @@ class AndroidWebViewFeature_ {
 
   ///
   static const SAFE_BROWSING_PRIVACY_POLICY_URL =
-      const AndroidWebViewFeature_._internal("SAFE_BROWSING_PRIVACY_POLICY_URL");
+      const AndroidWebViewFeature_._internal(
+          "SAFE_BROWSING_PRIVACY_POLICY_URL");
 
   ///
   static const SAFE_BROWSING_RESPONSE_BACK_TO_SAFETY =
@@ -400,7 +404,8 @@ class AndroidWebViewFeature_ {
 
   ///
   static const WEB_RESOURCE_REQUEST_IS_REDIRECT =
-      const AndroidWebViewFeature_._internal("WEB_RESOURCE_REQUEST_IS_REDIRECT");
+      const AndroidWebViewFeature_._internal(
+          "WEB_RESOURCE_REQUEST_IS_REDIRECT");
 
   ///
   static const WEB_VIEW_RENDERER_CLIENT_BASIC_USAGE =
@@ -417,7 +422,7 @@ class AndroidWebViewFeature_ {
 
   ///This feature covers [InAppWebViewSettings.willSuppressErrorPage].
   static const SUPPRESS_ERROR_PAGE =
-    const AndroidWebViewFeature_._internal("SUPPRESS_ERROR_PAGE");
+      const AndroidWebViewFeature_._internal("SUPPRESS_ERROR_PAGE");
 
   ///This feature covers [InAppWebViewSettings.algorithmicDarkeningAllowed].
   static const ALGORITHMIC_DARKENING =
@@ -429,7 +434,8 @@ class AndroidWebViewFeature_ {
 
   ///This feature covers [InAppWebViewSettings.enterpriseAuthenticationAppLinkPolicyEnabled].
   static const ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY =
-      const AndroidWebViewFeature_._internal("ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY");
+      const AndroidWebViewFeature_._internal(
+          "ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY");
 
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,

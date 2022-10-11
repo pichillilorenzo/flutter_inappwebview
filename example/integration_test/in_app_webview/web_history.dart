@@ -152,7 +152,8 @@ void webHistory() {
       var url = await pageLoads.stream.first;
       expect(url, TEST_WEB_PLATFORM_URL_1.toString());
 
-      await controller.evaluateJavascript(source: "document.getElementById('link-page-2').click();");
+      await controller.evaluateJavascript(
+          source: "document.getElementById('link-page-2').click();");
       url = await pageLoads.stream.first;
       expect(url, TEST_WEB_PLATFORM_URL_2.toString());
 

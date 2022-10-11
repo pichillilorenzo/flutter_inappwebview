@@ -993,7 +993,7 @@ abstract class WebView {
       this.onReceivedServerTrustAuthRequest,
       this.onReceivedClientCertRequest,
       @Deprecated('Use FindInteractionController.onFindResultReceived instead')
-      this.onFindResultReceived,
+          this.onFindResultReceived,
       this.shouldInterceptAjaxRequest,
       this.onAjaxReadyStateChange,
       this.onAjaxProgress,

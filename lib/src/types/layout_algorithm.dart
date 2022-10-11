@@ -20,11 +20,11 @@ class LayoutAlgorithm_ {
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =
-  const LayoutAlgorithm_._internal("TEXT_AUTOSIZING");
+      const LayoutAlgorithm_._internal("TEXT_AUTOSIZING");
 
   ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
   static const NARROW_COLUMNS =
-  const LayoutAlgorithm_._internal("NARROW_COLUMNS");
+      const LayoutAlgorithm_._internal("NARROW_COLUMNS");
 }
 
 ///An Android-specific class used to set the underlying layout algorithm.
@@ -44,9 +44,9 @@ class AndroidLayoutAlgorithm_ {
   ///
   ///**NOTE**: available on Android 19+.
   static const TEXT_AUTOSIZING =
-  const AndroidLayoutAlgorithm_._internal("TEXT_AUTOSIZING");
+      const AndroidLayoutAlgorithm_._internal("TEXT_AUTOSIZING");
 
   ///NARROW_COLUMNS makes all columns no wider than the screen if possible. Only use this for API levels prior to `Build.VERSION_CODES.KITKAT`.
   static const NARROW_COLUMNS =
-  const AndroidLayoutAlgorithm_._internal("NARROW_COLUMNS");
+      const AndroidLayoutAlgorithm_._internal("NARROW_COLUMNS");
 }

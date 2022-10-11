@@ -20,5 +20,5 @@ class RendererPriority_ {
 
   ///The renderer associated with this WebView is bound with Android `Context#BIND_IMPORTANT`.
   static const RENDERER_PRIORITY_IMPORTANT =
-  const RendererPriority_._internal(2);
+      const RendererPriority_._internal(2);
 }

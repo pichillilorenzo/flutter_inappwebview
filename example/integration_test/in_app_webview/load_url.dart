@@ -9,12 +9,13 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void loadUrl() {
-  final shouldSkip1 = kIsWeb ? false :
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip1 = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   var initialUrl = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
@@ -28,23 +29,23 @@ void loadUrl() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: initialUrl),
+          initialUrlRequest: URLRequest(url: initialUrl),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
-            if (url.toString() == initialUrl.toString() && !firstUrlLoad.isCompleted) {
+            if (url.toString() == initialUrl.toString() &&
+                !firstUrlLoad.isCompleted) {
               firstUrlLoad.complete(url.toString());
-            } else if (url.toString() == TEST_CROSS_PLATFORM_URL_1.toString() && !loadedUrl.isCompleted) {
+            } else if (url.toString() == TEST_CROSS_PLATFORM_URL_1.toString() &&
+                !loadedUrl.isCompleted) {
               loadedUrl.complete(url.toString());
             }
           },
         ),
       ),
     );
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     expect(await firstUrlLoad.future, initialUrl.toString());
 
     await controller.loadUrl(
@@ -52,11 +53,12 @@ void loadUrl() {
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
   }, skip: shouldSkip1);
 
-  final shouldSkip2 = kIsWeb ? true :
-  ![
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+  final shouldSkip2 = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('loadSimulatedRequest', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -68,31 +70,34 @@ void loadUrl() {
         textDirection: TextDirection.ltr,
         child: InAppWebView(
           key: GlobalKey(),
-          initialUrlRequest:
-          URLRequest(url: initialUrl),
+          initialUrlRequest: URLRequest(url: initialUrl),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
           onLoadStop: (controller, url) {
-            if (url.toString() == initialUrl.toString() && !firstUrlLoad.isCompleted) {
+            if (url.toString() == initialUrl.toString() &&
+                !firstUrlLoad.isCompleted) {
               firstUrlLoad.complete(url.toString());
-            } else if (url.toString() == TEST_CROSS_PLATFORM_URL_1.toString() && !loadedUrl.isCompleted) {
+            } else if (url.toString() == TEST_CROSS_PLATFORM_URL_1.toString() &&
+                !loadedUrl.isCompleted) {
               loadedUrl.complete(url.toString());
             }
           },
         ),
       ),
     );
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     expect(await firstUrlLoad.future, initialUrl.toString());
 
     final htmlCode = "<h1>Hello</h1>";
     await controller.loadSimulatedRequest(
         urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-        data: Uint8List.fromList(utf8.encode(htmlCode))
-    );
+        data: Uint8List.fromList(utf8.encode(htmlCode)));
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
-    expect((await controller.evaluateJavascript(source: "document.body.innerHTML")).toString().trim(), htmlCode);
+    expect(
+        (await controller.evaluateJavascript(source: "document.body.innerHTML"))
+            .toString()
+            .trim(),
+        htmlCode);
   }, skip: shouldSkip2);
 }

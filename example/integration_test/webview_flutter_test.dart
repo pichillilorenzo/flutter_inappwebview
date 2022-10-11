@@ -3,7 +3,8 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:integration_test/integration_test.dart';
 
 import 'in_app_webview/main.dart' as in_app_webview_tests;
-import 'find_interaction_controller/main.dart' as find_interaction_controller_tests;
+import 'find_interaction_controller/main.dart'
+    as find_interaction_controller_tests;
 import 'service_worker_controller/main.dart' as service_worker_controller_tests;
 import 'proxy_controller/main.dart' as proxy_controller_tests;
 import 'headless_in_app_webview/main.dart' as headless_in_app_webview_tests;

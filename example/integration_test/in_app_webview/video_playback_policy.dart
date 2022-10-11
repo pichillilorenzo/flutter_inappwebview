@@ -166,9 +166,9 @@ void videoPlaybackPolicy() {
     final shouldSkipTest3 = kIsWeb
         ? true
         : ![
-      TargetPlatform.iOS,
-      TargetPlatform.macOS,
-    ].contains(defaultTargetPlatform);
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets(
         'Video plays fullscreen when allowsInlineMediaPlayback is false',
@@ -213,9 +213,9 @@ void videoPlaybackPolicy() {
     final shouldSkipTest4 = kIsWeb
         ? true
         : ![
-      TargetPlatform.iOS,
-      TargetPlatform.macOS,
-    ].contains(defaultTargetPlatform);
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
     // on Android, entering fullscreen requires user interaction
     testWidgets('exit fullscreen event', (WidgetTester tester) async {
       Completer<InAppWebViewController> controllerCompleter =

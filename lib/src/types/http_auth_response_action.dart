@@ -10,6 +10,7 @@ class HttpAuthResponseAction_ {
   // ignore: unused_field
   final int _value;
   const HttpAuthResponseAction_._internal(this._value);
+
   ///Instructs the WebView to cancel the authentication request.
   static const CANCEL = const HttpAuthResponseAction_._internal(0);
 
@@ -18,5 +19,5 @@ class HttpAuthResponseAction_ {
 
   ///Uses the credentials stored for the current host.
   static const USE_SAVED_HTTP_AUTH_CREDENTIALS =
-  const HttpAuthResponseAction_._internal(2);
+      const HttpAuthResponseAction_._internal(2);
 }

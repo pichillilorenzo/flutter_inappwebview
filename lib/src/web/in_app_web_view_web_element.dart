@@ -110,8 +110,10 @@ class InAppWebViewWebElement implements Disposable {
         return await postUrl(url: url, postData: postData);
       case "injectJavascriptFileFromUrl":
         String urlFile = call.arguments["urlFile"];
-        Map<String, dynamic> scriptHtmlTagAttributes = call.arguments["scriptHtmlTagAttributes"].cast<String, dynamic>();
-        await injectJavascriptFileFromUrl(urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes);
+        Map<String, dynamic> scriptHtmlTagAttributes =
+            call.arguments["scriptHtmlTagAttributes"].cast<String, dynamic>();
+        await injectJavascriptFileFromUrl(
+            urlFile: urlFile, scriptHtmlTagAttributes: scriptHtmlTagAttributes);
         break;
       case "injectCSSCode":
         String source = call.arguments["source"];
@@ -119,8 +121,11 @@ class InAppWebViewWebElement implements Disposable {
         break;
       case "injectCSSFileFromUrl":
         String urlFile = call.arguments["urlFile"];
-        Map<String, dynamic> cssLinkHtmlTagAttributes = call.arguments["cssLinkHtmlTagAttributes"].cast<String, dynamic>();
-        await injectCSSFileFromUrl(urlFile: urlFile, cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes);
+        Map<String, dynamic> cssLinkHtmlTagAttributes =
+            call.arguments["cssLinkHtmlTagAttributes"].cast<String, dynamic>();
+        await injectCSSFileFromUrl(
+            urlFile: urlFile,
+            cssLinkHtmlTagAttributes: cssLinkHtmlTagAttributes);
         break;
       case "scrollTo":
         int x = call.arguments["x"];
@@ -185,12 +190,13 @@ class InAppWebViewWebElement implements Disposable {
 
     if (settings.iframeSandbox != null &&
         settings.iframeSandbox != Sandbox.ALLOW_ALL) {
-      iframe.setAttribute(
-          "sandbox", settings.iframeSandbox!.map((e) => e.toNativeValue()).join(" "));
+      iframe.setAttribute("sandbox",
+          settings.iframeSandbox!.map((e) => e.toNativeValue()).join(" "));
     } else if (settings.iframeSandbox == Sandbox.ALLOW_ALL) {
       iframe.removeAttribute("sandbox");
     } else if (sandbox != Sandbox.values) {
-      iframe.setAttribute("sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
+      iframe.setAttribute(
+          "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
       settings.iframeSandbox = sandbox;
     }
 
@@ -296,33 +302,46 @@ class InAppWebViewWebElement implements Disposable {
     return _callMethod("getTitle");
   }
 
-  Future<void> postUrl({required String url, required Uint8List postData}) async {
-    await loadUrl(urlRequest: URLRequest(url: Uri.parse(url), method: "POST", body: postData));
+  Future<void> postUrl(
+      {required String url, required Uint8List postData}) async {
+    await loadUrl(
+        urlRequest:
+            URLRequest(url: Uri.parse(url), method: "POST", body: postData));
   }
 
-  Future<void> injectJavascriptFileFromUrl({required String urlFile,
-    Map<String, dynamic>? scriptHtmlTagAttributes}) async {
-    _callMethod("injectJavascriptFileFromUrl",
-        [urlFile, scriptHtmlTagAttributes != null ?
-        js.JsObject.jsify(scriptHtmlTagAttributes) : null]);
+  Future<void> injectJavascriptFileFromUrl(
+      {required String urlFile,
+      Map<String, dynamic>? scriptHtmlTagAttributes}) async {
+    _callMethod("injectJavascriptFileFromUrl", [
+      urlFile,
+      scriptHtmlTagAttributes != null
+          ? js.JsObject.jsify(scriptHtmlTagAttributes)
+          : null
+    ]);
   }
 
   Future<void> injectCSSCode({required String source}) async {
     _callMethod("injectCSSCode", [source]);
   }
 
-  Future<void> injectCSSFileFromUrl({required String urlFile,
-    Map<String, dynamic>? cssLinkHtmlTagAttributes}) async {
-    _callMethod("injectCSSFileFromUrl",
-        [urlFile, cssLinkHtmlTagAttributes != null ?
-        js.JsObject.jsify(cssLinkHtmlTagAttributes) : null]);
+  Future<void> injectCSSFileFromUrl(
+      {required String urlFile,
+      Map<String, dynamic>? cssLinkHtmlTagAttributes}) async {
+    _callMethod("injectCSSFileFromUrl", [
+      urlFile,
+      cssLinkHtmlTagAttributes != null
+          ? js.JsObject.jsify(cssLinkHtmlTagAttributes)
+          : null
+    ]);
   }
 
-  Future<void> scrollTo({required int x, required int y, bool animated = false}) async {
+  Future<void> scrollTo(
+      {required int x, required int y, bool animated = false}) async {
     _callMethod('scrollTo', [x, y, animated]);
   }
 
-  Future<void> scrollBy({required int x, required int y, bool animated = false}) async {
+  Future<void> scrollBy(
+      {required int x, required int y, bool animated = false}) async {
     _callMethod('scrollBy', [x, y, animated]);
   }
 
@@ -417,7 +436,8 @@ class InAppWebViewWebElement implements Disposable {
         iframe.removeAttribute("sandbox");
       }
     } else if (sandbox != Sandbox.values) {
-      iframe.setAttribute("sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
+      iframe.setAttribute(
+          "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
     }
     newSettings.iframeSandbox = sandbox;
 
@@ -510,10 +530,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   void onPrintRequest(String? url) async {
-    var obj = {
-      "url": url,
-      "printJobId": null
-    };
+    var obj = {"url": url, "printJobId": null};
 
     await _channel?.invokeMethod("onPrintRequest", obj);
   }

@@ -30,7 +30,9 @@ class LayoutInDisplayCutoutMode_ {
   static const ALWAYS = const LayoutInDisplayCutoutMode_._internal(3);
 
   @ExchangeableObjectMethod(ignore: true)
-  static LayoutInDisplayCutoutMode_? fromNativeValue(int? value) {return null;}
+  static LayoutInDisplayCutoutMode_? fromNativeValue(int? value) {
+    return null;
+  }
 }
 
 ///Android-specific class representing the share state that should be applied to the custom tab.
@@ -54,7 +56,7 @@ class AndroidLayoutInDisplayCutoutMode_ {
   ///
   ///**NOTE**: available on Android 28+.
   static const SHORT_EDGES =
-  const AndroidLayoutInDisplayCutoutMode_._internal(1);
+      const AndroidLayoutInDisplayCutoutMode_._internal(1);
 
   ///Content never renders into the cutout area.
   ///

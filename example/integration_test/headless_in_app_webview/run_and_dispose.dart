@@ -7,20 +7,20 @@ import 'package:flutter_test/flutter_test.dart';
 import '../constants.dart';
 
 void runAndDispose() {
-  final shouldSkip = kIsWeb ? false :
-      ![
-        TargetPlatform.android,
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? false
+      : ![
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   test('run and dispose', () async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(
-      initialUrlRequest:
-      URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);
       },
@@ -32,8 +32,7 @@ void runAndDispose() {
     await headlessWebView.run();
     expect(headlessWebView.isRunning(), true);
 
-    final InAppWebViewController controller =
-    await controllerCompleter.future;
+    final InAppWebViewController controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     final String? url = (await controller.getUrl())?.toString();

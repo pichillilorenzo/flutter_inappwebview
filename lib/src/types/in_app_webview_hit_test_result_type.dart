@@ -26,13 +26,13 @@ class InAppWebViewHitTestResultType_ {
 
   ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http.
   static const SRC_ANCHOR_TYPE =
-  const InAppWebViewHitTestResultType_._internal(7);
+      const InAppWebViewHitTestResultType_._internal(7);
 
   ///[InAppWebViewHitTestResult] for hitting a HTML::a tag with src=http + HTML::img.
   static const SRC_IMAGE_ANCHOR_TYPE =
-  const InAppWebViewHitTestResultType_._internal(8);
+      const InAppWebViewHitTestResultType_._internal(8);
 
   ///[InAppWebViewHitTestResult] for hitting an edit text area.
   static const EDIT_TEXT_TYPE =
-  const InAppWebViewHitTestResultType_._internal(9);
+      const InAppWebViewHitTestResultType_._internal(9);
 }

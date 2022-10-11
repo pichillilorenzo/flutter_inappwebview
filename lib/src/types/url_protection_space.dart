@@ -14,8 +14,7 @@ List<X509Certificate>? _distinguishedNamesDeserializer(dynamic value) {
   List<X509Certificate>? distinguishedNames;
   if (value != null) {
     distinguishedNames = <X509Certificate>[];
-    (value.cast<Uint8List>() as List<Uint8List>)
-        .forEach((data) {
+    (value.cast<Uint8List>() as List<Uint8List>).forEach((data) {
       try {
         distinguishedNames!.add(X509Certificate.fromData(data: data));
       } catch (e, stacktrace) {
@@ -58,29 +57,25 @@ class URLProtectionSpace_ {
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         apiName: "URLProtectionSpace.authenticationMethod",
-        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod"
-    )
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod")
   ])
   URLProtectionSpaceAuthenticationMethod_? authenticationMethod;
 
   ///Use [distinguishedNames] instead.
   @Deprecated("Use distinguishedNames instead")
-  @ExchangeableObjectProperty(
-      deserializer: _distinguishedNamesDeserializer
-  )
+  @ExchangeableObjectProperty(deserializer: _distinguishedNamesDeserializer)
   List<X509Certificate>? iosDistinguishedNames;
 
   ///The acceptable certificate-issuing authorities for client certificate authentication.
   ///This value is `null` if the authentication method of the protection space is not client certificate.
   ///The returned issuing authorities are encoded with Distinguished Encoding Rules (DER).
-  @ExchangeableObjectProperty(
-      deserializer: _distinguishedNamesDeserializer
-  )
+  @ExchangeableObjectProperty(deserializer: _distinguishedNamesDeserializer)
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         apiName: "URLProtectionSpace.distinguishedNames",
-        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames"
-    )
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames")
   ])
   List<X509Certificate>? distinguishedNames;
 
@@ -93,8 +88,8 @@ class URLProtectionSpace_ {
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         apiName: "URLProtectionSpace.receivesCredentialSecurely",
-        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely"
-    )
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely")
   ])
   bool? receivesCredentialSecurely;
 
@@ -108,28 +103,28 @@ class URLProtectionSpace_ {
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         apiName: "URLProtectionSpace.proxyType",
-        apiUrl: "https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype"
-    )
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype")
   ])
   URLProtectionSpaceProxyType_? proxyType;
 
   URLProtectionSpace_(
       {required this.host,
-        this.protocol,
-        this.realm,
-        this.port,
-        this.sslCertificate,
-        this.sslError,
-        @Deprecated("Use authenticationMethod instead")
-        this.iosAuthenticationMethod,
-        this.authenticationMethod,
-        @Deprecated("Use distinguishedNames instead")
-        this.iosDistinguishedNames,
-        this.distinguishedNames,
-        @Deprecated("Use receivesCredentialSecurely instead")
-        this.iosReceivesCredentialSecurely,
-        this.receivesCredentialSecurely,
-        @Deprecated("Use proxyType instead")
-        this.iosProxyType,
-        this.proxyType});
+      this.protocol,
+      this.realm,
+      this.port,
+      this.sslCertificate,
+      this.sslError,
+      @Deprecated("Use authenticationMethod instead")
+          this.iosAuthenticationMethod,
+      this.authenticationMethod,
+      @Deprecated("Use distinguishedNames instead")
+          this.iosDistinguishedNames,
+      this.distinguishedNames,
+      @Deprecated("Use receivesCredentialSecurely instead")
+          this.iosReceivesCredentialSecurely,
+      this.receivesCredentialSecurely,
+      @Deprecated("Use proxyType instead")
+          this.iosProxyType,
+      this.proxyType});
 }

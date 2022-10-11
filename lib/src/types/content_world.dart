@@ -25,7 +25,7 @@ class ContentWorld {
 
   ///The default world for clients.
   static final ContentWorld DEFAULT_CLIENT =
-  ContentWorld.world(name: "defaultClient");
+      ContentWorld.world(name: "defaultClient");
 
   ///The content world for the current webpage’s content.
   ///This property contains the content world for scripts that the current webpage executes.

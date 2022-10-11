@@ -15,7 +15,8 @@ class ForceDarkStrategy_ {
   ///To avoid mixing two different darkening strategies, the `prefers-color-scheme` media query will evaluate to light.
   ///
   ///See [specification](https://drafts.csswg.org/css-color-adjust-1/) for more information.
-  static const USER_AGENT_DARKENING_ONLY = const ForceDarkStrategy_._internal(0);
+  static const USER_AGENT_DARKENING_ONLY =
+      const ForceDarkStrategy_._internal(0);
 
   ///In this mode [WebView] content will always be darkened using dark theme provided by web page.
   ///If web page does not provide dark theme support [WebView] content will be rendered with a default theme.
@@ -29,5 +30,6 @@ class ForceDarkStrategy_ {
   ///If the metadata is not presented [WebView] content will be darkened by a user agent and `prefers-color-scheme` media query will evaluate to light.
   ///
   ///See [specification](https://drafts.csswg.org/css-color-adjust-1/) for more information.
-  static const PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING = const ForceDarkStrategy_._internal(2);
+  static const PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING =
+      const ForceDarkStrategy_._internal(2);
 }

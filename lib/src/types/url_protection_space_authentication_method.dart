@@ -13,23 +13,23 @@ class URLProtectionSpaceAuthenticationMethod_ {
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
-  const URLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodClientCertificate");
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodClientCertificate");
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
-  const URLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodNegotiate");
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodNegotiate");
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
-  const URLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodNTLM");
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodNTLM");
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
-  const URLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodServerTrust");
+      const URLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodServerTrust");
 }
 
 ///An iOS-specific Class that represents the constants describing known values of the [URLProtectionSpace.authenticationMethod] property.
@@ -43,21 +43,21 @@ class IOSNSURLProtectionSpaceAuthenticationMethod_ {
 
   ///Use client certificate authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_CLIENT_CERTIFICATE =
-  const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodClientCertificate");
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodClientCertificate");
 
   ///Negotiate whether to use Kerberos or NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NEGOTIATE =
-  const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodNegotiate");
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodNegotiate");
 
   ///Use NTLM authentication for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_NTLM =
-  const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodNTLM");
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodNTLM");
 
   ///Perform server trust authentication (certificate validation) for this protection space.
   static const NSURL_AUTHENTICATION_METHOD_SERVER_TRUST =
-  const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
-      "NSURLAuthenticationMethodServerTrust");
+      const IOSNSURLProtectionSpaceAuthenticationMethod_._internal(
+          "NSURLAuthenticationMethodServerTrust");
 }

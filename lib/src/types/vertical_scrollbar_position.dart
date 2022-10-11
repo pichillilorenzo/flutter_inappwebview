@@ -11,15 +11,15 @@ class VerticalScrollbarPosition_ {
 
   ///Position the scroll bar at the default position as determined by the system.
   static const SCROLLBAR_POSITION_DEFAULT =
-  const VerticalScrollbarPosition_._internal(0);
+      const VerticalScrollbarPosition_._internal(0);
 
   ///Position the scroll bar along the left edge.
   static const SCROLLBAR_POSITION_LEFT =
-  const VerticalScrollbarPosition_._internal(1);
+      const VerticalScrollbarPosition_._internal(1);
 
   ///Position the scroll bar along the right edge.
   static const SCROLLBAR_POSITION_RIGHT =
-  const VerticalScrollbarPosition_._internal(2);
+      const VerticalScrollbarPosition_._internal(2);
 }
 
 ///An Android-specific class used to configure the position of the vertical scroll bar.
@@ -33,13 +33,13 @@ class AndroidVerticalScrollbarPosition_ {
 
   ///Position the scroll bar at the default position as determined by the system.
   static const SCROLLBAR_POSITION_DEFAULT =
-  const AndroidVerticalScrollbarPosition_._internal(0);
+      const AndroidVerticalScrollbarPosition_._internal(0);
 
   ///Position the scroll bar along the left edge.
   static const SCROLLBAR_POSITION_LEFT =
-  const AndroidVerticalScrollbarPosition_._internal(1);
+      const AndroidVerticalScrollbarPosition_._internal(1);
 
   ///Position the scroll bar along the right edge.
   static const SCROLLBAR_POSITION_RIGHT =
-  const AndroidVerticalScrollbarPosition_._internal(2);
+      const AndroidVerticalScrollbarPosition_._internal(2);
 }

@@ -161,7 +161,8 @@ class CookieManager {
 
     if (isSecure != null && isSecure) cookieValue += "; Secure";
 
-    if (sameSite != null) cookieValue += "; SameSite=" + sameSite.toNativeValue();
+    if (sameSite != null)
+      cookieValue += "; SameSite=" + sameSite.toNativeValue();
 
     cookieValue += ";";
 
@@ -243,7 +244,8 @@ class CookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
+          sameSite:
+              HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));
@@ -364,8 +366,8 @@ class CookieManager {
             expiresDate: cookies[i]["expiresDate"],
             isSessionOnly: cookies[i]["isSessionOnly"],
             domain: cookies[i]["domain"],
-            sameSite:
-                HTTPCookieSameSitePolicy.fromNativeValue(cookies[i]["sameSite"]),
+            sameSite: HTTPCookieSameSitePolicy.fromNativeValue(
+                cookies[i]["sameSite"]),
             isSecure: cookies[i]["isSecure"],
             isHttpOnly: cookies[i]["isHttpOnly"],
             path: cookies[i]["path"]);
@@ -533,7 +535,8 @@ class CookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
+          sameSite:
+              HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));
@@ -595,7 +598,8 @@ class IOSCookieManager {
           expiresDate: cookieMap["expiresDate"],
           isSessionOnly: cookieMap["isSessionOnly"],
           domain: cookieMap["domain"],
-          sameSite: HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
+          sameSite:
+              HTTPCookieSameSitePolicy.fromNativeValue(cookieMap["sameSite"]),
           isSecure: cookieMap["isSecure"],
           isHttpOnly: cookieMap["isHttpOnly"],
           path: cookieMap["path"]));

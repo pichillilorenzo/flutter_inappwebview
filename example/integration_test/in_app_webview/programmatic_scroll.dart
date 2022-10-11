@@ -103,8 +103,8 @@ void programmaticScroll() {
     final shouldSkipTest2 = kIsWeb
         ? true
         : ![
-      TargetPlatform.android,
-    ].contains(defaultTargetPlatform);
+            TargetPlatform.android,
+          ].contains(defaultTargetPlatform);
 
     testWidgets(
         'set and get scroll position on Android without Hybrid Composition',

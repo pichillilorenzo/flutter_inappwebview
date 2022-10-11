@@ -21,5 +21,5 @@ class RendererPriorityPolicy_ {
 
   RendererPriorityPolicy_(
       {required this.rendererRequestedPriority,
-        required this.waivedWhenNotVisible});
+      required this.waivedWhenNotVisible});
 }

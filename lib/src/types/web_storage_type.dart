@@ -18,5 +18,5 @@ class WebStorageType_ {
   ///`window.sessionStorage`: maintains a separate storage area for each given origin that's available for the duration
   ///of the page session (as long as the browser is open, including page reloads and restores).
   static const SESSION_STORAGE =
-  const WebStorageType_._internal("sessionStorage");
+      const WebStorageType_._internal("sessionStorage");
 }

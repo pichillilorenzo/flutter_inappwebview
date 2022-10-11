@@ -26,8 +26,8 @@ class JsConfirmResponse_ {
 
   JsConfirmResponse_(
       {this.message = "",
-        this.handledByClient = false,
-        this.confirmButtonTitle = "",
-        this.cancelButtonTitle = "",
-        this.action = JsConfirmResponseAction_.CANCEL});
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.action = JsConfirmResponseAction_.CANCEL});
 }

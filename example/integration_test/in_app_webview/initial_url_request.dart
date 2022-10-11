@@ -60,10 +60,10 @@ void initialUrlRequest() {
     final shouldSkipTest1 = kIsWeb
         ? false
         : ![
-      TargetPlatform.android,
-      TargetPlatform.iOS,
-      TargetPlatform.macOS,
-    ].contains(defaultTargetPlatform);
+            TargetPlatform.android,
+            TargetPlatform.iOS,
+            TargetPlatform.macOS,
+          ].contains(defaultTargetPlatform);
 
     testWidgets('basic', (WidgetTester tester) async {
       final Completer<void> pageLoaded = Completer<void>();
@@ -87,7 +87,7 @@ void initialUrlRequest() {
 
       await pageLoaded.future;
       final InAppWebViewController controller =
-      await controllerCompleter.future;
+          await controllerCompleter.future;
       final String? currentUrl = (await controller.getUrl())?.toString();
 
       expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());

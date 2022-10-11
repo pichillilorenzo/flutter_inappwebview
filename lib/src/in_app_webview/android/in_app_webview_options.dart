@@ -318,7 +318,8 @@ class AndroidInAppWebViewOptions
       "defaultFixedFontSize": defaultFixedFontSize,
       "defaultFontSize": defaultFontSize,
       "defaultTextEncodingName": defaultTextEncodingName,
-      "disabledActionModeMenuItems": disabledActionModeMenuItems?.toNativeValue(),
+      "disabledActionModeMenuItems":
+          disabledActionModeMenuItems?.toNativeValue(),
       "fantasyFontFamily": fantasyFontFamily,
       "fixedFontFamily": fixedFontFamily,
       "forceDark": forceDark?.toNativeValue(),
@@ -380,7 +381,8 @@ class AndroidInAppWebViewOptions
     instance.defaultFontSize = map["defaultFontSize"];
     instance.defaultTextEncodingName = map["defaultTextEncodingName"];
     instance.disabledActionModeMenuItems =
-        AndroidActionModeMenuItem.fromNativeValue(map["disabledActionModeMenuItems"]);
+        AndroidActionModeMenuItem.fromNativeValue(
+            map["disabledActionModeMenuItems"]);
     instance.fantasyFontFamily = map["fantasyFontFamily"];
     instance.fixedFontFamily = map["fixedFontFamily"];
     instance.forceDark = AndroidForceDark.fromNativeValue(map["forceDark"]);

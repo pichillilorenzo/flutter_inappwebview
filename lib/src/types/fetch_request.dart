@@ -43,9 +43,7 @@ class FetchRequest_ {
   String? mode;
 
   ///The request credentials used by the request.
-  @ExchangeableObjectProperty(
-    deserializer: _fetchRequestCredentialDeserializer
-  )
+  @ExchangeableObjectProperty(deserializer: _fetchRequestCredentialDeserializer)
   FetchRequestCredential_? credentials;
 
   ///The cache mode used by the request.
@@ -71,16 +69,16 @@ class FetchRequest_ {
 
   FetchRequest_(
       {this.url,
-        this.method,
-        this.headers,
-        this.body,
-        this.mode,
-        this.credentials,
-        this.cache,
-        this.redirect,
-        this.referrer,
-        this.referrerPolicy,
-        this.integrity,
-        this.keepalive,
-        this.action = FetchRequestAction_.PROCEED});
+      this.method,
+      this.headers,
+      this.body,
+      this.mode,
+      this.credentials,
+      this.cache,
+      this.redirect,
+      this.referrer,
+      this.referrerPolicy,
+      this.integrity,
+      this.keepalive,
+      this.action = FetchRequestAction_.PROCEED});
 }

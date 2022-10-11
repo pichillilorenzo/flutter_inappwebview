@@ -26,8 +26,8 @@ class JsPromptRequest_ {
 
   JsPromptRequest_(
       {this.url,
-        this.message,
-        this.defaultValue,
-        @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-        this.isMainFrame});
+      this.message,
+      this.defaultValue,
+      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+      this.isMainFrame});
 }

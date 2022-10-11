@@ -11,7 +11,8 @@
     "build": "flutter pub run build_runner build --delete-conflicting-outputs",
     "watch": "flutter pub run build_runner watch --delete-conflicting-outputs",
     "publish:dry": "npm run build && flutter pub publish --dry-run",
-    "publish": "npm run build && flutter pub publish"
+    "publish": "npm run build && flutter pub publish",
+    "format": "flutter format lib example/integration_test"
   },
   "repository": {
     "type": "git",

@@ -21,9 +21,7 @@ class ClientCertResponse_ {
   String? androidKeyStoreType;
 
   ///An Android-specific property used by Java [KeyStore](https://developer.android.com/reference/java/security/KeyStore) class to get the instance.
-  @SupportedPlatforms(platforms: [
-    AndroidPlatform()
-  ])
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   String? keyStoreType;
 
   ///Indicate the [ClientCertResponseAction] to take in response of the client certificate challenge.
@@ -32,11 +30,11 @@ class ClientCertResponse_ {
   @ExchangeableObjectConstructor()
   ClientCertResponse_(
       {required this.certificatePath,
-        this.certificatePassword = "",
-        @Deprecated('Use keyStoreType instead')
-        this.androidKeyStoreType = "PKCS12",
-        this.keyStoreType = "PKCS12",
-        this.action = ClientCertResponseAction_.CANCEL}) {
+      this.certificatePassword = "",
+      @Deprecated('Use keyStoreType instead')
+          this.androidKeyStoreType = "PKCS12",
+      this.keyStoreType = "PKCS12",
+      this.action = ClientCertResponseAction_.CANCEL}) {
     if (this.action == ClientCertResponseAction_.PROCEED)
       assert(certificatePath.isNotEmpty);
 

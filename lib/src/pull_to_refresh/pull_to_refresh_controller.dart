@@ -60,7 +60,7 @@ class PullToRefreshController {
   _debugLog(String method, dynamic args) {
     if (PullToRefreshController.debugLoggingSettings.enabled) {
       for (var regExp
-      in PullToRefreshController.debugLoggingSettings.excludeFilter) {
+          in PullToRefreshController.debugLoggingSettings.excludeFilter) {
         if (regExp.hasMatch(method)) return;
       }
       var maxLogMessageLength =

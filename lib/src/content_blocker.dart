@@ -150,7 +150,8 @@ class ContentBlockerTrigger {
       }
     });
 
-    List<String> loadContextStringList = List<String>.from(map["load-context"] ?? []);
+    List<String> loadContextStringList =
+        List<String>.from(map["load-context"] ?? []);
     loadContextStringList.forEach((typeValue) {
       var context = ContentBlockerTriggerLoadContext.fromNativeValue(typeValue);
       if (context != null) {
@@ -185,15 +186,17 @@ class ContentBlockerAction {
   ///It specify a string that defines a selector list. Use CSS identifiers as the individual selector values, separated by commas.
   String? selector;
 
-  ContentBlockerAction(
-      {required this.type, this.selector}) {
+  ContentBlockerAction({required this.type, this.selector}) {
     if (this.type == ContentBlockerActionType.CSS_DISPLAY_NONE) {
       assert(this.selector != null);
     }
   }
 
   Map<String, dynamic> toMap() {
-    Map<String, dynamic> map = {"type": type.toNativeValue(), "selector": selector};
+    Map<String, dynamic> map = {
+      "type": type.toNativeValue(),
+      "selector": selector
+    };
 
     map.keys
         .where((key) =>

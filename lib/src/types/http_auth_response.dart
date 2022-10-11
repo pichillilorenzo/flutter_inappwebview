@@ -22,7 +22,7 @@ class HttpAuthResponse_ {
 
   HttpAuthResponse_(
       {this.username = "",
-        this.password = "",
-        this.permanentPersistence = false,
-        this.action = HttpAuthResponseAction_.CANCEL});
+      this.password = "",
+      this.permanentPersistence = false,
+      this.action = HttpAuthResponseAction_.CANCEL});
 }

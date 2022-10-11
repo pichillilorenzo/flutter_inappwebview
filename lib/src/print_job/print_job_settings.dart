@@ -180,30 +180,29 @@ class PrintJobSettings {
   ///Gets a [PrintJobSettings] instance from a [Map] value.
   factory PrintJobSettings.fromMap(Map<String, dynamic> map) {
     return PrintJobSettings(
-        handledByClient: map["handledByClient"],
-        jobName: map["jobName"],
-        animated: map["animated"],
-        orientation: PrintJobOrientation.fromNativeValue(map["orientation"]),
-        numberOfPages: map["numberOfPages"],
-        forceRenderingQuality:
-            PrintJobRenderingQuality.fromNativeValue(map["forceRenderingQuality"]),
-        margins:
-            MapEdgeInsets.fromMap(map["margins"]?.cast<String, dynamic>()),
-        mediaSize:
-            PrintJobMediaSize.fromMap(map["mediaSize"]?.cast<String, dynamic>()),
-        colorMode: PrintJobColorMode.fromNativeValue(map["colorMode"]),
-        duplexMode: PrintJobDuplexMode.fromNativeValue(map["duplexMode"]),
-        outputType: PrintJobOutputType.fromNativeValue(map["outputType"]),
-        resolution:
-            PrintJobResolution.fromMap(map["resolution"]?.cast<String, dynamic>()),
-        showsNumberOfCopies: map["showsNumberOfCopies"],
-        showsPaperSelectionForLoadedPapers:
-        map["showsPaperSelectionForLoadedPapers"],
-        showsPaperOrientation: map["showsPaperOrientation"],
-        maximumContentHeight: map["maximumContentHeight"],
-        maximumContentWidth: map["maximumContentWidth"],
-        footerHeight: map["footerHeight"],
-        headerHeight: map["headerHeight"],
+      handledByClient: map["handledByClient"],
+      jobName: map["jobName"],
+      animated: map["animated"],
+      orientation: PrintJobOrientation.fromNativeValue(map["orientation"]),
+      numberOfPages: map["numberOfPages"],
+      forceRenderingQuality: PrintJobRenderingQuality.fromNativeValue(
+          map["forceRenderingQuality"]),
+      margins: MapEdgeInsets.fromMap(map["margins"]?.cast<String, dynamic>()),
+      mediaSize:
+          PrintJobMediaSize.fromMap(map["mediaSize"]?.cast<String, dynamic>()),
+      colorMode: PrintJobColorMode.fromNativeValue(map["colorMode"]),
+      duplexMode: PrintJobDuplexMode.fromNativeValue(map["duplexMode"]),
+      outputType: PrintJobOutputType.fromNativeValue(map["outputType"]),
+      resolution: PrintJobResolution.fromMap(
+          map["resolution"]?.cast<String, dynamic>()),
+      showsNumberOfCopies: map["showsNumberOfCopies"],
+      showsPaperSelectionForLoadedPapers:
+          map["showsPaperSelectionForLoadedPapers"],
+      showsPaperOrientation: map["showsPaperOrientation"],
+      maximumContentHeight: map["maximumContentHeight"],
+      maximumContentWidth: map["maximumContentWidth"],
+      footerHeight: map["footerHeight"],
+      headerHeight: map["headerHeight"],
     );
   }
 

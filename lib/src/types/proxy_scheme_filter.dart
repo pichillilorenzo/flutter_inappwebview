@@ -18,6 +18,5 @@ class ProxySchemeFilter_ {
   static const MATCH_HTTP = const ProxySchemeFilter_._internal("http");
 
   ///HTTPS scheme.
-  static const MATCH_HTTPS =
-  const ProxySchemeFilter_._internal("https");
+  static const MATCH_HTTPS = const ProxySchemeFilter_._internal("https");
 }

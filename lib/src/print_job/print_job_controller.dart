@@ -4,7 +4,8 @@ import '../in_app_webview/in_app_webview_controller.dart';
 import '../types/disposable.dart';
 
 ///A completion handler for the [PrintJobController].
-typedef PrintJobCompletionHandler = Future<void> Function(bool completed, String? error)?;
+typedef PrintJobCompletionHandler = Future<void> Function(
+    bool completed, String? error)?;
 
 ///Class representing a print job eventually returned by [InAppWebViewController.printCurrentPage].
 class PrintJobController implements Disposable {
@@ -19,8 +20,7 @@ class PrintJobController implements Disposable {
   ///- iOS ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
   PrintJobCompletionHandler onComplete;
 
-  PrintJobController(
-      {required this.id}) {
+  PrintJobController({required this.id}) {
     this._channel = MethodChannel(
         'com.pichillilorenzo/flutter_inappwebview_printjobcontroller_$id');
     this._channel.setMethodCallHandler((call) async {
@@ -94,8 +94,7 @@ class PrintJobController implements Disposable {
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
-    (await _channel.invokeMethod('getInfo', args))
-        ?.cast<String, dynamic>();
+        (await _channel.invokeMethod('getInfo', args))?.cast<String, dynamic>();
     return PrintJobInfo.fromMap(infoMap);
   }
 

@@ -18,9 +18,9 @@ class ContentBlockerActionType_ {
   ///
   ///**NOTE**: on Android, JavaScript must be enabled.
   static const CSS_DISPLAY_NONE =
-  const ContentBlockerActionType_._internal('css-display-none');
+      const ContentBlockerActionType_._internal('css-display-none');
 
   ///Changes a URL from http to https. URLs with a specified (nondefault) port and links using other protocols are unaffected.
   static const MAKE_HTTPS =
-  const ContentBlockerActionType_._internal('make-https');
+      const ContentBlockerActionType_._internal('make-https');
 }

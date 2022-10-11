@@ -349,8 +349,8 @@ class IOSInAppWebViewOptions
         map["automaticallyAdjustsScrollIndicatorInsets"];
     instance.accessibilityIgnoresInvertColors =
         map["accessibilityIgnoresInvertColors"];
-    instance.decelerationRate =
-        IOSUIScrollViewDecelerationRate.fromNativeValue(map["decelerationRate"])!;
+    instance.decelerationRate = IOSUIScrollViewDecelerationRate.fromNativeValue(
+        map["decelerationRate"])!;
     instance.alwaysBounceVertical = map["alwaysBounceVertical"];
     instance.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
     instance.scrollsToTop = map["scrollsToTop"];

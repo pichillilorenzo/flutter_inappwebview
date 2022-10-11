@@ -42,18 +42,18 @@ class UserScript_ {
   @ExchangeableObjectConstructor()
   UserScript_(
       {this.groupName,
-        required this.source,
-        required this.injectionTime,
-        @Deprecated("Use forMainFrameOnly instead") this.iosForMainFrameOnly,
-        this.forMainFrameOnly = true,
-        Set<String>? allowedOriginRules,
-        ContentWorld? contentWorld}) {
-    this.allowedOriginRules = allowedOriginRules != null ?
-        allowedOriginRules : Set.from(["*"]);
+      required this.source,
+      required this.injectionTime,
+      @Deprecated("Use forMainFrameOnly instead") this.iosForMainFrameOnly,
+      this.forMainFrameOnly = true,
+      Set<String>? allowedOriginRules,
+      ContentWorld? contentWorld}) {
+    this.allowedOriginRules =
+        allowedOriginRules != null ? allowedOriginRules : Set.from(["*"]);
     this.contentWorld = contentWorld ?? ContentWorld.PAGE;
     // ignore: deprecated_member_use_from_same_package
     this.forMainFrameOnly = this.iosForMainFrameOnly != null
-    // ignore: deprecated_member_use_from_same_package
+        // ignore: deprecated_member_use_from_same_package
         ? this.iosForMainFrameOnly!
         : this.forMainFrameOnly;
   }

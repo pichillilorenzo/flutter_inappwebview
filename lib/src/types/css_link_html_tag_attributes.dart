@@ -43,11 +43,11 @@ class CSSLinkHtmlTagAttributes_ {
 
   CSSLinkHtmlTagAttributes_(
       {this.id,
-        this.media,
-        this.crossOrigin,
-        this.integrity,
-        this.referrerPolicy,
-        this.disabled,
-        this.alternate,
-        this.title});
+      this.media,
+      this.crossOrigin,
+      this.integrity,
+      this.referrerPolicy,
+      this.disabled,
+      this.alternate,
+      this.title});
 }

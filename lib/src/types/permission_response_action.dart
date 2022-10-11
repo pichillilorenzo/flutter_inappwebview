@@ -21,10 +21,9 @@ class PermissionResponseAction_ {
   ///Prompt the user for permission for the requested resource.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
-      available: "15.0",
-      note: "On iOS < 15.0, it will fallback to [DENY]",
-      value: 2
-    )
+        available: "15.0",
+        note: "On iOS < 15.0, it will fallback to [DENY]",
+        value: 2)
   ])
   static const PROMPT = const PermissionResponseAction_._internal(2);
 }

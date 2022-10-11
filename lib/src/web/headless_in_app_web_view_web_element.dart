@@ -39,7 +39,8 @@ class HeadlessInAppWebViewWebElement implements Disposable {
         dispose();
         break;
       case "setSize":
-        Size size = MapSize.fromMap(call.arguments['size'].cast<String, dynamic>())!;
+        Size size =
+            MapSize.fromMap(call.arguments['size'].cast<String, dynamic>())!;
         setSize(size);
         break;
       case "getSize":

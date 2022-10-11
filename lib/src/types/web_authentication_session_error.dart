@@ -13,8 +13,10 @@ class WebAuthenticationSessionError_ {
   static const CANCELED_LOGIN = WebAuthenticationSessionError_._internal(1);
 
   ///A context wasn’t provided.
-  static const PRESENTATION_CONTEXT_NOT_PROVIDED = WebAuthenticationSessionError_._internal(2);
+  static const PRESENTATION_CONTEXT_NOT_PROVIDED =
+      WebAuthenticationSessionError_._internal(2);
 
   ///The context was invalid.
-  static const PRESENTATION_CONTEXT_INVALID = WebAuthenticationSessionError_._internal(3);
+  static const PRESENTATION_CONTEXT_INVALID =
+      WebAuthenticationSessionError_._internal(3);
 }

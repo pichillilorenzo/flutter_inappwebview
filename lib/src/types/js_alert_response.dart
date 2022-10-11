@@ -23,7 +23,7 @@ class JsAlertResponse_ {
 
   JsAlertResponse_(
       {this.message = "",
-        this.handledByClient = false,
-        this.confirmButtonTitle = "",
-        this.action = JsAlertResponseAction_.CONFIRM});
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.action = JsAlertResponseAction_.CONFIRM});
 }

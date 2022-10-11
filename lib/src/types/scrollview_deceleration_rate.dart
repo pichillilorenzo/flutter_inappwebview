@@ -27,7 +27,7 @@ class IOSUIScrollViewDecelerationRate_ {
 
   ///The default deceleration rate for a scroll view: `0.998`.
   static const NORMAL =
-  const IOSUIScrollViewDecelerationRate_._internal("NORMAL");
+      const IOSUIScrollViewDecelerationRate_._internal("NORMAL");
 
   ///A fast deceleration rate for a scroll view: `0.99`.
   static const FAST = const IOSUIScrollViewDecelerationRate_._internal("FAST");

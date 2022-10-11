@@ -17,11 +17,7 @@ void customMenuItem() {
   test('add custom menu item', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();
     chromeSafariBrowser.addMenuItem(ChromeSafariBrowserMenuItem(
-        id: 2,
-        label: 'Custom item menu 1',
-        action: (url, title) {
-
-        }));
+        id: 2, label: 'Custom item menu 1', action: (url, title) {}));
     expect(chromeSafariBrowser.isOpened(), false);
 
     await chromeSafariBrowser.open(url: TEST_URL_1);

@@ -17,10 +17,10 @@ class PrintJobState_ {
   ///Next valid states: [QUEUED].
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
-      apiName: 'PrintJobInfo.STATE_CREATED',
-      apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CREATED',
-      value: 1
-    ),
+        apiName: 'PrintJobInfo.STATE_CREATED',
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CREATED',
+        value: 1),
     EnumIOSPlatform(value: 1)
   ])
   static const CREATED = const PrintJobState_._internal(1);
@@ -31,9 +31,9 @@ class PrintJobState_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'PrintJobInfo.STATE_QUEUED',
-        apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_QUEUED',
-        value: 2
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_QUEUED',
+        value: 2)
   ])
   static const QUEUED = const PrintJobState_._internal(2);
 
@@ -43,9 +43,9 @@ class PrintJobState_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'PrintJobInfo.STATE_STARTED',
-        apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_STARTED',
-        value: 3
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_STARTED',
+        value: 3),
     EnumIOSPlatform(value: 3)
   ])
   static const STARTED = const PrintJobState_._internal(3);
@@ -56,9 +56,9 @@ class PrintJobState_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'PrintJobInfo.STATE_BLOCKED',
-        apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_BLOCKED',
-        value: 4
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_BLOCKED',
+        value: 4)
   ])
   static const BLOCKED = const PrintJobState_._internal(4);
 
@@ -68,13 +68,12 @@ class PrintJobState_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'PrintJobInfo.STATE_COMPLETED',
-        apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED',
-        value: 5
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED',
+        value: 5),
     EnumIOSPlatform(value: 5)
   ])
   static const COMPLETED = const PrintJobState_._internal(5);
-
 
   ///Print job state: The print job was printing but printing failed.
   ///
@@ -82,9 +81,9 @@ class PrintJobState_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'PrintJobInfo.STATE_FAILED',
-        apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_FAILED',
-        value: 6
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_FAILED',
+        value: 6),
     EnumIOSPlatform(value: 6)
   ])
   static const FAILED = const PrintJobState_._internal(6);
@@ -95,9 +94,9 @@ class PrintJobState_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'PrintJobInfo.STATE_CANCELED',
-        apiUrl: 'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED',
-        value: 7
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED',
+        value: 7),
     EnumIOSPlatform(value: 7)
   ])
   static const CANCELED = const PrintJobState_._internal(7);

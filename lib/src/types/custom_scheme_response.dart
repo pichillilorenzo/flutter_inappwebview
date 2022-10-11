@@ -21,6 +21,6 @@ class CustomSchemeResponse_ {
 
   CustomSchemeResponse_(
       {required this.data,
-        required this.contentType,
-        this.contentEncoding = 'utf-8'});
+      required this.contentType,
+      this.contentEncoding = 'utf-8'});
 }

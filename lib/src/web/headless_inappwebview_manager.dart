@@ -20,7 +20,8 @@ class HeadlessInAppWebViewManager {
       const StandardMethodCodec(),
       _messenger,
     );
-    HeadlessInAppWebViewManager._sharedChannel.setMethodCallHandler((call) async {
+    HeadlessInAppWebViewManager._sharedChannel
+        .setMethodCallHandler((call) async {
       try {
         return await handleMethod(call);
       } on Error catch (e) {
@@ -62,7 +63,7 @@ class HeadlessInAppWebViewManager {
       webView.iframe.style.height = initialSize["height"].toString() + 'px';
     }
     Map<String, dynamic> initialSettings =
-    params["initialSettings"].cast<String, dynamic>();
+        params["initialSettings"].cast<String, dynamic>();
     if (initialSettings.isEmpty) {
       webView.initialSettings = InAppWebViewSettings();
     } else {

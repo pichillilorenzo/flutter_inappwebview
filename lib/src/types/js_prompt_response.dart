@@ -32,10 +32,10 @@ class JsPromptResponse_ {
 
   JsPromptResponse_(
       {this.message = "",
-        this.defaultValue = "",
-        this.handledByClient = false,
-        this.confirmButtonTitle = "",
-        this.cancelButtonTitle = "",
-        this.value,
-        this.action = JsPromptResponseAction_.CANCEL});
+      this.defaultValue = "",
+      this.handledByClient = false,
+      this.confirmButtonTitle = "",
+      this.cancelButtonTitle = "",
+      this.value,
+      this.action = JsPromptResponseAction_.CANCEL});
 }

@@ -63,8 +63,8 @@ class PrintJobMediaSize_ {
       id: "ISO_A3", widthMils: 11690, heightMils: 16540);
 
   ///ISO A4 media size: 210mm x 297mm (8.27" x 11.69")
-  static const ISO_A4 =
-      const PrintJobMediaSize_(id: "ISO_A4", widthMils: 8270, heightMils: 11690);
+  static const ISO_A4 = const PrintJobMediaSize_(
+      id: "ISO_A4", widthMils: 8270, heightMils: 11690);
 
   ///ISO A5 media size: 148mm x 210mm (5.83" x 8.27")
   static const ISO_A5 =
@@ -87,8 +87,8 @@ class PrintJobMediaSize_ {
       const PrintJobMediaSize_(id: "ISO_A9", widthMils: 1460, heightMils: 2050);
 
   ///ISO A10 media size: 26mm x 37mm (1.02" x 1.46")
-  static const ISO_A10 =
-      const PrintJobMediaSize_(id: "ISO_A10", widthMils: 1020, heightMils: 1460);
+  static const ISO_A10 = const PrintJobMediaSize_(
+      id: "ISO_A10", widthMils: 1020, heightMils: 1460);
 
   ///ISO B0 media size: 1000mm x 1414mm (39.37" x 55.67")
   static const ISO_B0 = const PrintJobMediaSize_(
@@ -107,8 +107,8 @@ class PrintJobMediaSize_ {
       id: "ISO_B3", widthMils: 13900, heightMils: 19690);
 
   ///ISO B4 media size: 250mm x 353mm (9.84" x 13.90")
-  static const ISO_B4 =
-      const PrintJobMediaSize_(id: "ISO_B4", widthMils: 9840, heightMils: 13900);
+  static const ISO_B4 = const PrintJobMediaSize_(
+      id: "ISO_B4", widthMils: 9840, heightMils: 13900);
 
   ///ISO B5 media size: 176mm x 250mm (6.93" x 9.84")
   static const ISO_B5 =
@@ -131,8 +131,8 @@ class PrintJobMediaSize_ {
       const PrintJobMediaSize_(id: "ISO_B9", widthMils: 1730, heightMils: 2440);
 
   ///ISO B10 media size: 31mm x 44mm (1.22" x 1.73")
-  static const ISO_B10 =
-      const PrintJobMediaSize_(id: "ISO_B10", widthMils: 1220, heightMils: 1730);
+  static const ISO_B10 = const PrintJobMediaSize_(
+      id: "ISO_B10", widthMils: 1220, heightMils: 1730);
 
   ///ISO C0 media size: 917mm x 1297mm (36.10" x 51.06")
   static const ISO_C0 = const PrintJobMediaSize_(
@@ -151,8 +151,8 @@ class PrintJobMediaSize_ {
       id: "ISO_C3", widthMils: 12760, heightMils: 18030);
 
   ///ISO C4 media size: 229mm x 324mm (9.02" x 12.76")
-  static const ISO_C4 =
-      const PrintJobMediaSize_(id: "ISO_C4", widthMils: 9020, heightMils: 12760);
+  static const ISO_C4 = const PrintJobMediaSize_(
+      id: "ISO_C4", widthMils: 9020, heightMils: 12760);
 
   ///ISO C5 media size: 162mm x 229mm (6.38" x 9.02")
   static const ISO_C5 =
@@ -175,8 +175,8 @@ class PrintJobMediaSize_ {
       const PrintJobMediaSize_(id: "ISO_C9", widthMils: 1570, heightMils: 2240);
 
   ///ISO C10 media size: 28mm x 40mm (1.10" x 1.57")
-  static const ISO_C10 =
-      const PrintJobMediaSize_(id: "ISO_C10", widthMils: 1100, heightMils: 1570);
+  static const ISO_C10 = const PrintJobMediaSize_(
+      id: "ISO_C10", widthMils: 1100, heightMils: 1570);
 
   // North America
 
@@ -323,8 +323,8 @@ class PrintJobMediaSize_ {
       id: "PRC_10", widthMils: 12756, heightMils: 18032);
 
   ///Chinese PRC 16k media size: 146mm x 215mm (5.749" x 8.465")
-  static const PRC_16K =
-      const PrintJobMediaSize_(id: "PRC_16K", widthMils: 5749, heightMils: 8465);
+  static const PRC_16K = const PrintJobMediaSize_(
+      id: "PRC_16K", widthMils: 5749, heightMils: 8465);
 
   ///Chinese Pa Kai media size: 267mm x 389mm (10.512" x 15.315")
   static const OM_PA_KAI = const PrintJobMediaSize_(
@@ -341,8 +341,8 @@ class PrintJobMediaSize_ {
   // Japanese
 
   ///Japanese JIS B10 media size: 32mm x 45mm (1.259" x 1.772")
-  static const JIS_B10 =
-      const PrintJobMediaSize_(id: "JIS_B10", widthMils: 1259, heightMils: 1772);
+  static const JIS_B10 = const PrintJobMediaSize_(
+      id: "JIS_B10", widthMils: 1259, heightMils: 1772);
 
   ///Japanese JIS B9 media size: 45mm x 64mm (1.772" x 2.52")
   static const JIS_B9 =
@@ -361,8 +361,8 @@ class PrintJobMediaSize_ {
       const PrintJobMediaSize_(id: "JIS_B6", widthMils: 5049, heightMils: 7165);
 
   ///Japanese JIS B5 media size: 182mm x 257mm (7.165" x 10.118")
-  static const JIS_B5 =
-      const PrintJobMediaSize_(id: "JIS_B5", widthMils: 7165, heightMils: 10118);
+  static const JIS_B5 = const PrintJobMediaSize_(
+      id: "JIS_B5", widthMils: 7165, heightMils: 10118);
 
   ///Japanese JIS B4 media size: 257mm x 364mm (10.118" x 14.331")
   static const JIS_B4 = const PrintJobMediaSize_(

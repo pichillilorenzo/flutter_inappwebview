@@ -9,10 +9,10 @@ void findInteractions() {
   final shouldSkip = kIsWeb
       ? true
       : ![
-    TargetPlatform.android,
-    TargetPlatform.iOS,
-    TargetPlatform.macOS,
-  ].contains(defaultTargetPlatform);
+          TargetPlatform.android,
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   testWidgets('find interactions', (WidgetTester tester) async {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
@@ -27,9 +27,7 @@ void findInteractions() {
           initialFile: "test_assets/in_app_webview_initial_file_test.html",
           findInteractionController: findInteractionController,
           initialSettings: InAppWebViewSettings(
-            clearCache: true,
-            isFindInteractionEnabled: true
-          ),
+              clearCache: true, isFindInteractionEnabled: true),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },
@@ -46,17 +44,23 @@ void findInteractions() {
     await Future.delayed(Duration(seconds: 1));
 
     const firstSearchText = "InAppWebViewInitialFileTest";
-    await expectLater(findInteractionController.findAllAsync(find: firstSearchText), completes);
-    if ([TargetPlatform.iOS, TargetPlatform.macOS].contains(defaultTargetPlatform)) {
+    await expectLater(
+        findInteractionController.findAllAsync(find: firstSearchText),
+        completes);
+    if ([TargetPlatform.iOS, TargetPlatform.macOS]
+        .contains(defaultTargetPlatform)) {
       expect(await findInteractionController.getSearchText(), firstSearchText);
       final session = await findInteractionController.getActiveFindSession();
       expect(session!.resultCount, 2);
     }
-    await expectLater(findInteractionController.findNext(forward: true), completes);
-    await expectLater(findInteractionController.findNext(forward: false), completes);
+    await expectLater(
+        findInteractionController.findNext(forward: true), completes);
+    await expectLater(
+        findInteractionController.findNext(forward: false), completes);
     await expectLater(findInteractionController.clearMatches(), completes);
 
-    if ([TargetPlatform.iOS, TargetPlatform.macOS].contains(defaultTargetPlatform)) {
+    if ([TargetPlatform.iOS, TargetPlatform.macOS]
+        .contains(defaultTargetPlatform)) {
       const secondSearchText = "text";
       await expectLater(
           findInteractionController.setSearchText(secondSearchText), completes);
@@ -64,7 +68,8 @@ void findInteractions() {
           findInteractionController.presentFindNavigator(), completes);
       expect(await findInteractionController.getSearchText(), secondSearchText);
       expect(await findInteractionController.isFindNavigatorVisible(), true);
-      await expectLater(findInteractionController.updateResultCount(), completes);
+      await expectLater(
+          findInteractionController.updateResultCount(), completes);
       await expectLater(
           findInteractionController.dismissFindNavigator(), completes);
       expect(await findInteractionController.isFindNavigatorVisible(), false);
@@ -91,9 +96,7 @@ void findInteractions() {
           key: GlobalKey(),
           initialFile: "test_assets/in_app_webview_initial_file_test.html",
           initialSettings: InAppWebViewSettings(
-            clearCache: true,
-              isFindInteractionEnabled: false
-          ),
+              clearCache: true, isFindInteractionEnabled: false),
           findInteractionController: findInteractionController,
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);

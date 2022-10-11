@@ -184,7 +184,8 @@ class ServiceWorkerController {
   ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL].
   ///
   ///**Official Android API**: https://developer.android.com/reference/androidx/webkit/ServiceWorkerWebSettingsCompat#setRequestedWithHeaderMode(int)
-  static Future<void> setRequestedWithHeaderMode(RequestedWithHeaderMode mode) async {
+  static Future<void> setRequestedWithHeaderMode(
+      RequestedWithHeaderMode mode) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("mode", () => mode.toNativeValue());
     await _channel.invokeMethod('setRequestedWithHeaderMode', args);

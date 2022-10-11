@@ -4,6 +4,4 @@ part 'trusted_web_activity_display_mode.g.dart';
 
 ///Class that represents display mode of a Trusted Web Activity.
 @ExchangeableObject(fromMapFactory: false)
-abstract class TrustedWebActivityDisplayMode_ {
-
-}
+abstract class TrustedWebActivityDisplayMode_ {}

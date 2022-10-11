@@ -22,17 +22,17 @@ class ScrollBarStyle_ {
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
-  const ScrollBarStyle_._internal(16777216);
+      const ScrollBarStyle_._internal(16777216);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
   static const SCROLLBARS_OUTSIDE_OVERLAY =
-  const ScrollBarStyle_._internal(33554432);
+      const ScrollBarStyle_._internal(33554432);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
-  const ScrollBarStyle_._internal(50331648);
+      const ScrollBarStyle_._internal(50331648);
 }
 
 ///An Android-specific class used to configure the style of the scrollbars.
@@ -54,20 +54,20 @@ class AndroidScrollBarStyle_ {
   ///The scrollbar style to display the scrollbars inside the content area, without increasing the padding.
   ///The scrollbars will be overlaid with translucency on the view's content.
   static const SCROLLBARS_INSIDE_OVERLAY =
-  const AndroidScrollBarStyle_._internal(0);
+      const AndroidScrollBarStyle_._internal(0);
 
   ///The scrollbar style to display the scrollbars inside the padded area, increasing the padding of the view.
   ///The scrollbars will not overlap the content area of the view.
   static const SCROLLBARS_INSIDE_INSET =
-  const AndroidScrollBarStyle_._internal(16777216);
+      const AndroidScrollBarStyle_._internal(16777216);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, without increasing the padding.
   ///The scrollbars will be overlaid with translucency.
   static const SCROLLBARS_OUTSIDE_OVERLAY =
-  const AndroidScrollBarStyle_._internal(33554432);
+      const AndroidScrollBarStyle_._internal(33554432);
 
   ///The scrollbar style to display the scrollbars at the edge of the view, increasing the padding of the view.
   ///The scrollbars will only overlap the background, if any.
   static const SCROLLBARS_OUTSIDE_INSET =
-  const AndroidScrollBarStyle_._internal(50331648);
+      const AndroidScrollBarStyle_._internal(50331648);
 }

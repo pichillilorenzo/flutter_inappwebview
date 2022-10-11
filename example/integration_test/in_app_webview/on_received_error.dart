@@ -19,7 +19,8 @@ void onReceivedError() {
   group('onReceivedError', () {
     testWidgets('invalid url', (WidgetTester tester) async {
       final Completer<String> errorUrlCompleter = Completer<String>();
-      final Completer<WebResourceErrorType> errorCodeCompleter = Completer<WebResourceErrorType>();
+      final Completer<WebResourceErrorType> errorCodeCompleter =
+          Completer<WebResourceErrorType>();
 
       await tester.pumpWidget(
         Directionality(

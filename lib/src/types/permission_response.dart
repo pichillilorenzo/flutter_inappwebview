@@ -18,7 +18,8 @@ class PermissionResponse_ {
   PermissionResponseAction_? action;
 
   PermissionResponse_(
-      {this.resources = const [], this.action = PermissionResponseAction_.DENY});
+      {this.resources = const [],
+      this.action = PermissionResponseAction_.DENY});
 }
 
 ///Class that represents the response used by the [WebView.androidOnPermissionRequest] event.
@@ -34,5 +35,5 @@ class PermissionRequestResponse_ {
 
   PermissionRequestResponse_(
       {this.resources = const [],
-        this.action = PermissionRequestResponseAction_.DENY});
+      this.action = PermissionRequestResponseAction_.DENY});
 }

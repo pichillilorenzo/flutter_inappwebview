@@ -103,8 +103,7 @@ class InAppBrowser {
 
   _debugLog(String method, dynamic args) {
     if (InAppBrowser.debugLoggingSettings.enabled) {
-      for (var regExp
-      in InAppBrowser.debugLoggingSettings.excludeFilter) {
+      for (var regExp in InAppBrowser.debugLoggingSettings.excludeFilter) {
         if (regExp.hasMatch(method)) return;
       }
       var maxLogMessageLength =
@@ -773,7 +772,8 @@ class InAppBrowser {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  Future<bool?>? onPrintRequest(Uri? url, PrintJobController? printJobController) {
+  Future<bool?>? onPrintRequest(
+      Uri? url, PrintJobController? printJobController) {
     return null;
   }
 

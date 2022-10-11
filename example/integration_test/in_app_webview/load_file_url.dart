@@ -8,11 +8,12 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
 
 void loadFileUrl() {
-  final shouldSkip = kIsWeb ? true :
-      ![
-        TargetPlatform.iOS,
-        TargetPlatform.macOS,
-      ].contains(defaultTargetPlatform);
+  final shouldSkip = kIsWeb
+      ? true
+      : ![
+          TargetPlatform.iOS,
+          TargetPlatform.macOS,
+        ].contains(defaultTargetPlatform);
 
   group('load file URL', () {
     late Directory appSupportDir;
@@ -83,8 +84,8 @@ void loadFileUrl() {
             initialUrlRequest:
                 URLRequest(url: Uri.parse('file://${fileHtml.path}')),
             initialSettings: InAppWebViewSettings(
-                    allowingReadAccessTo:
-                        Uri.parse('file://${appSupportDir.path}/')),
+                allowingReadAccessTo:
+                    Uri.parse('file://${appSupportDir.path}/')),
             onConsoleMessage: (controller, consoleMessage) {
               consoleMessageCompleter.complete(consoleMessage);
             },

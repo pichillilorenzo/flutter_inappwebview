@@ -20,9 +20,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'SslError.SSL_NOTYETVALID',
-        apiUrl: 'https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID',
-        value: 0
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/net/http/SslError#SSL_NOTYETVALID',
+        value: 0)
   ])
   static const NOT_YET_VALID = SslErrorType_._internal('NOT_YET_VALID');
 
@@ -30,9 +30,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'SslError.SSL_EXPIRED',
-        apiUrl: 'https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED',
-        value: 1
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/net/http/SslError#SSL_EXPIRED',
+        value: 1)
   ])
   static const EXPIRED = SslErrorType_._internal('EXPIRED');
 
@@ -40,9 +40,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'SslError.SSL_IDMISMATCH',
-        apiUrl: 'https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH',
-        value: 2
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/net/http/SslError#SSL_IDMISMATCH',
+        value: 2)
   ])
   static const IDMISMATCH = SslErrorType_._internal('IDMISMATCH');
 
@@ -50,9 +50,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'SslError.SSL_UNTRUSTED',
-        apiUrl: 'https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED',
-        value: 3
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/net/http/SslError#SSL_UNTRUSTED',
+        value: 3)
   ])
   static const UNTRUSTED = SslErrorType_._internal('UNTRUSTED');
 
@@ -60,9 +60,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'SslError.DATE_INVALID',
-        apiUrl: 'https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID',
-        value: 4
-    )
+        apiUrl:
+            'https://developer.android.com/reference/android/net/http/SslError#SSL_DATE_INVALID',
+        value: 4)
   ])
   static const DATE_INVALID = SslErrorType_._internal('DATE_INVALID');
 
@@ -70,14 +70,14 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumAndroidPlatform(
         apiName: 'SslError.SSL_INVALID',
-        apiUrl: 'https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID',
-        value: 5
-    ),
+        apiUrl:
+            'https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID',
+        value: 5),
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.invalid',
-        apiUrl: 'https://developer.apple.com/documentation/security/sectrustresulttype/invalid',
-        value: 0
-    )
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/invalid',
+        value: 0)
   ])
   static const INVALID = SslErrorType_._internal('INVALID');
 
@@ -90,9 +90,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.deny',
-        apiUrl: 'https://developer.apple.com/documentation/security/sectrustresulttype/deny',
-        value: 3
-    )
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/deny',
+        value: 3)
   ])
   static const DENY = SslErrorType_._internal('DENY');
 
@@ -107,9 +107,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.unspecified',
-        apiUrl: 'https://developer.apple.com/documentation/security/sectrustresulttype/unspecified',
-        value: 4
-    )
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/unspecified',
+        value: 4)
   ])
   static const UNSPECIFIED = SslErrorType_._internal('UNSPECIFIED');
 
@@ -125,11 +125,12 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.recoverableTrustFailure',
-        apiUrl: 'https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure',
-        value: 5
-    )
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure',
+        value: 5)
   ])
-  static const RECOVERABLE_TRUST_FAILURE = SslErrorType_._internal('RECOVERABLE_TRUST_FAILURE');
+  static const RECOVERABLE_TRUST_FAILURE =
+      SslErrorType_._internal('RECOVERABLE_TRUST_FAILURE');
 
   ///Trust is denied and no simple fix is available.
   ///
@@ -140,11 +141,12 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.fatalTrustFailure',
-        apiUrl: 'https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure',
-        value: 6
-    )
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure',
+        value: 6)
   ])
-  static const FATAL_TRUST_FAILURE = SslErrorType_._internal('FATAL_TRUST_FAILURE');
+  static const FATAL_TRUST_FAILURE =
+      SslErrorType_._internal('FATAL_TRUST_FAILURE');
 
   ///Indicates a failure other than that of trust evaluation.
   ///
@@ -153,9 +155,9 @@ class SslErrorType_ {
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'SecTrustResultType.otherError',
-        apiUrl: 'https://developer.apple.com/documentation/security/sectrustresulttype/othererror',
-        value: 7
-    )
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/othererror',
+        value: 7)
   ])
   static const OTHER_ERROR = SslErrorType_._internal('OTHER_ERROR');
 }

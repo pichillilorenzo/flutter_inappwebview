@@ -534,7 +534,8 @@ class InAppWebViewController {
 
           if (_webview != null) {
             if (_webview!.onFormResubmission != null)
-              return (await _webview!.onFormResubmission!(this, uri))?.toNativeValue();
+              return (await _webview!.onFormResubmission!(this, uri))
+                  ?.toNativeValue();
             else {
               // ignore: deprecated_member_use_from_same_package
               return (await _webview!.androidOnFormResubmission!(this, uri))
@@ -802,8 +803,12 @@ class InAppWebViewController {
         }
         break;
       case "onFindResultReceived":
-        if ((_webview != null && (_webview!.onFindResultReceived != null ||
-            (_webview!.findInteractionController != null && _webview!.findInteractionController!.onFindResultReceived != null))) ||
+        if ((_webview != null &&
+                (_webview!.onFindResultReceived != null ||
+                    (_webview!.findInteractionController != null &&
+                        _webview!.findInteractionController!
+                                .onFindResultReceived !=
+                            null))) ||
             _inAppBrowser != null) {
           int activeMatchOrdinal = call.arguments["activeMatchOrdinal"];
           int numberOfMatches = call.arguments["numberOfMatches"];
@@ -813,19 +818,23 @@ class InAppWebViewController {
                 _webview!.findInteractionController!.onFindResultReceived !=
                     null)
               _webview!.findInteractionController!.onFindResultReceived!(
-                  _webview!.findInteractionController!, activeMatchOrdinal,
-                  numberOfMatches, isDoneCounting);
+                  _webview!.findInteractionController!,
+                  activeMatchOrdinal,
+                  numberOfMatches,
+                  isDoneCounting);
             else
               _webview!.onFindResultReceived!(
-                this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
-          }
-          else {
+                  this, activeMatchOrdinal, numberOfMatches, isDoneCounting);
+          } else {
             if (_inAppBrowser!.findInteractionController != null &&
-                _inAppBrowser!.findInteractionController!
-                    .onFindResultReceived != null)
+                _inAppBrowser!
+                        .findInteractionController!.onFindResultReceived !=
+                    null)
               _inAppBrowser!.findInteractionController!.onFindResultReceived!(
-                  _webview!.findInteractionController!, activeMatchOrdinal,
-                  numberOfMatches, isDoneCounting);
+                  _webview!.findInteractionController!,
+                  activeMatchOrdinal,
+                  numberOfMatches,
+                  isDoneCounting);
             else
               _inAppBrowser!.onFindResultReceived(
                   activeMatchOrdinal, numberOfMatches, isDoneCounting);
@@ -1243,9 +1252,11 @@ class InAppWebViewController {
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (_webview != null && _webview!.onAjaxReadyStateChange != null)
-                return (await _webview!.onAjaxReadyStateChange!(this, request))?.toNativeValue();
+                return (await _webview!.onAjaxReadyStateChange!(this, request))
+                    ?.toNativeValue();
               else
-                return (await _inAppBrowser!.onAjaxReadyStateChange(request))?.toNativeValue();
+                return (await _inAppBrowser!.onAjaxReadyStateChange(request))
+                    ?.toNativeValue();
             }
             return null;
           case "onAjaxProgress":
@@ -1255,9 +1266,11 @@ class InAppWebViewController {
               AjaxRequest request = AjaxRequest.fromMap(arguments)!;
 
               if (_webview != null && _webview!.onAjaxProgress != null)
-                return (await _webview!.onAjaxProgress!(this, request))?.toNativeValue();
+                return (await _webview!.onAjaxProgress!(this, request))
+                    ?.toNativeValue();
               else
-                return (await _inAppBrowser!.onAjaxProgress(request))?.toNativeValue();
+                return (await _inAppBrowser!.onAjaxProgress(request))
+                    ?.toNativeValue();
             }
             return null;
           case "shouldInterceptFetchRequest":
@@ -2293,7 +2306,8 @@ class InAppWebViewController {
   ///- Android native WebView ([Official API - PrintManager.print](https://developer.android.com/reference/android/print/PrintManager#print(java.lang.String,%20android.print.PrintDocumentAdapter,%20android.print.PrintAttributes)))
   ///- iOS ([Official API - UIPrintInteractionController.present](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/1618149-present))
   ///- Web ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print))
-  Future<PrintJobController?> printCurrentPage({PrintJobSettings? settings}) async {
+  Future<PrintJobController?> printCurrentPage(
+      {PrintJobSettings? settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("settings", () => settings?.toMap());
     String? jobId = await _channel.invokeMethod('printCurrentPage', args);
@@ -2838,7 +2852,8 @@ class InAppWebViewController {
       if (defaultTargetPlatform == TargetPlatform.android) {
         assert(filePath.endsWith("." + WebArchiveFormat.MHT.toNativeValue()));
       } else if (defaultTargetPlatform == TargetPlatform.iOS) {
-        assert(filePath.endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
+        assert(filePath
+            .endsWith("." + WebArchiveFormat.WEBARCHIVE.toNativeValue()));
       }
     }
 
@@ -3390,7 +3405,10 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.loadSimulatedRequest(_:response:responseData:)](https://developer.apple.com/documentation/webkit/wkwebview/3763094-loadsimulatedrequest) and [Official API - WKWebView.loadSimulatedRequest(_:responseHTML:)](https://developer.apple.com/documentation/webkit/wkwebview/3763095-loadsimulatedrequest)).
-  Future<void> loadSimulatedRequest({required URLRequest urlRequest, required Uint8List data, URLResponse? urlResponse}) async {
+  Future<void> loadSimulatedRequest(
+      {required URLRequest urlRequest,
+      required Uint8List data,
+      URLResponse? urlResponse}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlRequest', () => urlRequest.toMap());
     args.putIfAbsent('data', () => data);

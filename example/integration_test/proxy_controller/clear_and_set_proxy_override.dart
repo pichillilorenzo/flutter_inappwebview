@@ -19,15 +19,15 @@ void clearAndSetProxyOverride() {
     final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
-    var proxyAvailable = await WebViewFeature.isFeatureSupported(
-        WebViewFeature.PROXY_OVERRIDE);
+    var proxyAvailable =
+        await WebViewFeature.isFeatureSupported(WebViewFeature.PROXY_OVERRIDE);
 
     if (proxyAvailable) {
-      ProxyController proxyController =
-        ProxyController.instance();
+      ProxyController proxyController = ProxyController.instance();
 
       await proxyController.clearProxyOverride();
-      await proxyController.setProxyOverride(settings: ProxySettings(
+      await proxyController.setProxyOverride(
+          settings: ProxySettings(
         proxyRules: [ProxyRule(url: "${environment["NODE_SERVER_IP"]}:8083")],
       ));
     }
@@ -53,8 +53,17 @@ void clearAndSetProxyOverride() {
     final String url = await pageLoaded.future;
     expect(url, TEST_URL_HTTP_EXAMPLE.toString());
 
-    expect(await controller.evaluateJavascript(source: "document.getElementById('url').innerHTML;"), TEST_URL_HTTP_EXAMPLE.toString());
-    expect(await controller.evaluateJavascript(source: "document.getElementById('method').innerHTML;"), "GET");
-    expect(await controller.evaluateJavascript(source: "document.getElementById('headers').innerHTML;"), isNotNull);
+    expect(
+        await controller.evaluateJavascript(
+            source: "document.getElementById('url').innerHTML;"),
+        TEST_URL_HTTP_EXAMPLE.toString());
+    expect(
+        await controller.evaluateJavascript(
+            source: "document.getElementById('method').innerHTML;"),
+        "GET");
+    expect(
+        await controller.evaluateJavascript(
+            source: "document.getElementById('headers').innerHTML;"),
+        isNotNull);
   }, skip: shouldSkip);
 }

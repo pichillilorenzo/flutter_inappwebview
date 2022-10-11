@@ -18,9 +18,9 @@ class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "ClientCertRequest.getPrincipals",
-        apiUrl: "https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()",
-        available: "21"
-    )
+        apiUrl:
+            "https://developer.android.com/reference/android/webkit/ClientCertRequest#getPrincipals()",
+        available: "21")
   ])
   List<String>? principals;
 
@@ -32,17 +32,17 @@ class ClientCertChallenge_ extends URLAuthenticationChallenge_ {
   @SupportedPlatforms(platforms: [
     AndroidPlatform(
         apiName: "ClientCertRequest.getKeyTypes",
-        apiUrl: "https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()",
-        available: "21"
-    )
+        apiUrl:
+            "https://developer.android.com/reference/android/webkit/ClientCertRequest#getKeyTypes()",
+        available: "21")
   ])
   List<String>? keyTypes;
 
   ClientCertChallenge_(
       {required URLProtectionSpace_ protectionSpace,
-        @Deprecated('Use principals instead') this.androidPrincipals,
-        this.principals,
-        @Deprecated('Use keyTypes instead') this.androidKeyTypes,
-        this.keyTypes})
+      @Deprecated('Use principals instead') this.androidPrincipals,
+      this.principals,
+      @Deprecated('Use keyTypes instead') this.androidKeyTypes,
+      this.keyTypes})
       : super(protectionSpace: protectionSpace);
 }

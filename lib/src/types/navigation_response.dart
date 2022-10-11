@@ -19,8 +19,8 @@ class NavigationResponse_ {
 
   NavigationResponse_(
       {this.response,
-        required this.isForMainFrame,
-        required this.canShowMIMEType});
+      required this.isForMainFrame,
+      required this.canShowMIMEType});
 }
 
 ///An iOS-specific Class that represents the navigation response used by the [WebView.onNavigationResponse] event.
@@ -39,6 +39,6 @@ class IOSWKNavigationResponse_ {
 
   IOSWKNavigationResponse_(
       {this.response,
-        required this.isForMainFrame,
-        required this.canShowMIMEType});
+      required this.isForMainFrame,
+      required this.canShowMIMEType});
 }

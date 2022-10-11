@@ -28,12 +28,12 @@ class URLResponse_ {
 
   URLResponse_(
       {this.url,
-        required this.expectedContentLength,
-        this.mimeType,
-        this.suggestedFilename,
-        this.textEncodingName,
-        this.headers,
-        this.statusCode});
+      required this.expectedContentLength,
+      this.mimeType,
+      this.suggestedFilename,
+      this.textEncodingName,
+      this.headers,
+      this.statusCode});
 }
 
 ///Use [URLResponse] instead.
@@ -63,10 +63,10 @@ class IOSURLResponse_ {
 
   IOSURLResponse_(
       {this.url,
-        required this.expectedContentLength,
-        this.mimeType,
-        this.suggestedFilename,
-        this.textEncodingName,
-        this.headers,
-        this.statusCode});
+      required this.expectedContentLength,
+      this.mimeType,
+      this.suggestedFilename,
+      this.textEncodingName,
+      this.headers,
+      this.statusCode});
 }

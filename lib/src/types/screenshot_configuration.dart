@@ -46,15 +46,15 @@ class ScreenshotConfiguration_ {
   @ExchangeableObjectConstructor()
   ScreenshotConfiguration_(
       {this.rect,
-        this.snapshotWidth,
-        this.compressFormat = CompressFormat_.PNG,
-        this.quality = 100,
-        @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
-        this.afterScreenUpdates = true}) {
+      this.snapshotWidth,
+      this.compressFormat = CompressFormat_.PNG,
+      this.quality = 100,
+      @Deprecated("Use afterScreenUpdates instead") this.iosAfterScreenUpdates,
+      this.afterScreenUpdates = true}) {
     assert(this.quality >= 0);
     // ignore: deprecated_member_use_from_same_package
     this.afterScreenUpdates = this.iosAfterScreenUpdates != null
-    // ignore: deprecated_member_use_from_same_package
+        // ignore: deprecated_member_use_from_same_package
         ? this.iosAfterScreenUpdates!
         : this.afterScreenUpdates;
   }

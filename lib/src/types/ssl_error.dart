@@ -24,7 +24,7 @@ class SslError_ {
 
   SslError_(
       {@Deprecated('Use code instead') this.androidError,
-        @Deprecated('Use code instead') this.iosError,
-        this.code,
-        this.message}) {}
+      @Deprecated('Use code instead') this.iosError,
+      this.code,
+      this.message}) {}
 }

@@ -28,10 +28,10 @@ class SslCertificate_ {
 
   SslCertificate_(
       {this.issuedBy,
-        this.issuedTo,
-        this.validNotAfterDate,
-        this.validNotBeforeDate,
-        this.x509Certificate});
+      this.issuedTo,
+      this.validNotAfterDate,
+      this.validNotBeforeDate,
+      this.x509Certificate});
 
   ///Gets a possible [SslCertificate] instance from a [Map] value.
   static SslCertificate? fromMap(Map<String, dynamic>? map) {
@@ -52,25 +52,25 @@ class SslCertificate_ {
         return SslCertificate(
           issuedBy: SslCertificateDName(
               CName: x509Certificate.issuer(
-                  dn: ASN1DistinguishedNames.COMMON_NAME) ??
+                      dn: ASN1DistinguishedNames.COMMON_NAME) ??
                   "",
               DName: x509Certificate.issuerDistinguishedName ?? "",
               OName: x509Certificate.issuer(
-                  dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
+                      dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
                   "",
               UName: x509Certificate.issuer(
-                  dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
+                      dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
                   ""),
           issuedTo: SslCertificateDName(
               CName: x509Certificate.subject(
-                  dn: ASN1DistinguishedNames.COMMON_NAME) ??
+                      dn: ASN1DistinguishedNames.COMMON_NAME) ??
                   "",
               DName: x509Certificate.subjectDistinguishedName ?? "",
               OName: x509Certificate.subject(
-                  dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
+                      dn: ASN1DistinguishedNames.ORGANIZATION_NAME) ??
                   "",
               UName: x509Certificate.subject(
-                  dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
+                      dn: ASN1DistinguishedNames.ORGANIZATIONAL_UNIT_NAME) ??
                   ""),
           validNotAfterDate: x509Certificate.notAfter,
           validNotBeforeDate: x509Certificate.notBefore,
@@ -82,13 +82,13 @@ class SslCertificate_ {
 
     return SslCertificate(
       issuedBy:
-      SslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
+          SslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
       issuedTo:
-      SslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
+          SslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
       validNotAfterDate:
-      DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"]),
+          DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"]),
       validNotBeforeDate:
-      DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"]),
+          DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"]),
       x509Certificate: x509Certificate,
     );
   }

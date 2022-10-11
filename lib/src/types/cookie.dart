@@ -51,12 +51,12 @@ class Cookie_ {
 
   Cookie_(
       {required this.name,
-        required this.value,
-        this.expiresDate,
-        this.isSessionOnly,
-        this.domain,
-        this.sameSite,
-        this.isSecure,
-        this.isHttpOnly,
-        this.path});
+      required this.value,
+      this.expiresDate,
+      this.isSessionOnly,
+      this.domain,
+      this.sameSite,
+      this.isSecure,
+      this.isHttpOnly,
+      this.path});
 }

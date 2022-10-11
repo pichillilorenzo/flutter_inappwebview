@@ -22,23 +22,18 @@ class PrintJobAttributes_ {
 
   ///The duplex mode to use for the print job.
   @SupportedPlatforms(
-      platforms: [AndroidPlatform(available: "23"), IOSPlatform()]
-  )
+      platforms: [AndroidPlatform(available: "23"), IOSPlatform()])
   PrintJobDuplexMode_? duplex;
 
   ///The orientation of the printed content, portrait or landscape.
   PrintJobOrientation_? orientation;
 
   ///The media size.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform()]
-  )
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   PrintJobMediaSize_? mediaSize;
 
   ///The supported resolution in DPI (dots per inch).
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform()]
-  )
+  @SupportedPlatforms(platforms: [AndroidPlatform()])
   PrintJobResolution_? resolution;
 
   ///The margins for each printed page.

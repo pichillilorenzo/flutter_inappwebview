@@ -23,7 +23,7 @@ class JsAlertRequest_ {
 
   JsAlertRequest_(
       {this.url,
-        this.message,
-        @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
-        this.isMainFrame});
+      this.message,
+      @Deprecated("Use isMainFrame instead") this.iosIsMainFrame,
+      this.isMainFrame});
 }

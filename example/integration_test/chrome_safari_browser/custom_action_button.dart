@@ -21,9 +21,7 @@ void customActionButton() {
         id: 1,
         description: 'Action Button description',
         icon: actionButtonIcon.buffer.asUint8List(),
-        action: (url, title) {
-
-        }));
+        action: (url, title) {}));
     expect(chromeSafariBrowser.isOpened(), false);
 
     await chromeSafariBrowser.open(url: TEST_URL_1);

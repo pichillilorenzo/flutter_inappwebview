@@ -19,5 +19,5 @@ class SafeBrowsingResponse_ {
 
   SafeBrowsingResponse_(
       {this.report = true,
-        this.action = SafeBrowsingResponseAction_.SHOW_INTERSTITIAL});
+      this.action = SafeBrowsingResponseAction_.SHOW_INTERSTITIAL});
 }

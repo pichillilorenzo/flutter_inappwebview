@@ -30,10 +30,10 @@ class DownloadStartRequest_ {
 
   DownloadStartRequest_(
       {required this.url,
-        this.userAgent,
-        this.contentDisposition,
-        this.mimeType,
-        required this.contentLength,
-        this.suggestedFilename,
-        this.textEncodingName});
+      this.userAgent,
+      this.contentDisposition,
+      this.mimeType,
+      required this.contentLength,
+      this.suggestedFilename,
+      this.textEncodingName});
 }

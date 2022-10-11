@@ -37,7 +37,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   CustomTabsShareState shareState;
 
   ///Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
@@ -45,13 +45,13 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool showTitle;
 
   ///Set the custom background color of the toolbar.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   Color? toolbarBackgroundColor;
 
   ///Set to `true` to enable the url bar to hide as the user scrolls down on the page. The default value is `false`.
@@ -59,7 +59,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool enableUrlBarHiding;
 
   ///Set to `true` to enable Instant Apps. The default value is `false`.
@@ -67,7 +67,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool instantAppsEnabled;
 
   ///Set an explicit application package name that limits
@@ -77,31 +77,31 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///application package.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   String? packageName;
 
   ///Set to `true` to enable Keep Alive. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool keepAliveEnabled;
 
   ///Set to `true` to launch the Android activity in `singleInstance` mode. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool isSingleInstance;
 
   ///Set to `true` to launch the Android intent with the flag `FLAG_ACTIVITY_NO_HISTORY`. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool noHistory;
 
   ///Set to `true` to launch the Custom Tab as a Trusted Web Activity. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   bool isTrustedWebActivity;
 
   ///Sets a list of additional trusted origins that the user may navigate or be redirected to from the starting uri.
@@ -109,7 +109,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Available only in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   List<String> additionalTrustedOrigins;
 
   ///Sets a display mode of a Trusted Web Activity.
@@ -117,7 +117,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Available only in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   TrustedWebActivityDisplayMode? displayMode;
 
   ///Sets a screen orientation. This can be used e.g. to enable the locking of an orientation lock type.
@@ -125,7 +125,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**NOTE**: Available only in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android
   TrustedWebActivityScreenOrientation screenOrientation;
 
   ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.

@@ -13,6 +13,10 @@ import '../types/main.dart';
 ///On iOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore).
 ///
 ///**NOTE for iOS**: available from iOS 9.0+.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
 class WebStorageManager {
   static WebStorageManager? _instance;
   static const MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;

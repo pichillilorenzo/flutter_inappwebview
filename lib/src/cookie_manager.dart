@@ -14,12 +14,8 @@ import 'types/main.dart';
 ///On Android, it is implemented using [CookieManager](https://developer.android.com/reference/android/webkit/CookieManager).
 ///On iOS, it is implemented using [WKHTTPCookieStore](https://developer.apple.com/documentation/webkit/wkhttpcookiestore).
 ///
-///**NOTE for iOS below 11.0 (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] and [CookieManager.getAllCookies] are not supported!)
+///**NOTE for iOS below 11.0 and Web platform (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] and [CookieManager.getAllCookies] are not supported!)
 ///has been implemented using JavaScript because there is no other way to work with them on iOS below 11.0.
-///See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
-///
-///**NOTE for Web (LIMITED SUPPORT!)**: in this case, almost all of the methods ([CookieManager.deleteAllCookies] and [CookieManager.getAllCookies] are not supported!)
-///has been implemented using JavaScript, so all methods will have effect only if the iframe has the same origin.
 ///See https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies for JavaScript restrictions.
 ///
 ///**Supported Platforms/Implementations**:

@@ -40,16 +40,23 @@ class Sandbox_ {
   String? toValue() => _value;
 
   @override
-  String toString() =>
-      _value == null ? "allow-all" : (_value == "" ? "allow-none" : "");
+  String toString() {
+    if (_value == null)
+      return 'allow-all';
+    if (_value == '')
+      return 'allow-none';
+    return _value ?? '';
+  }
 
   static const _ALL = const Sandbox_._internal(null);
   static const _NONE = const Sandbox_._internal("");
 
   ///Allow all.
+  @ExchangeableEnumCustomValue()
   static const ALLOW_ALL = const [_ALL];
 
   ///Allow none.
+  @ExchangeableEnumCustomValue()
   static const ALLOW_NONE = const [_NONE];
 
   ///Allows for downloads to occur with a gesture from the user.

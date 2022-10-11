@@ -28,7 +28,8 @@ var options = {
   cert: fs.readFileSync('server-crt.pem'),
   ca: fs.readFileSync('ca-crt.pem'),
   requestCert: true,
-  rejectUnauthorized: false
+  rejectUnauthorized: false,
+  ciphers: "DEFAULT:@SECLEVEL=0"
 };
 
 appHttps.get('/', (req, res) => {

@@ -52,7 +52,7 @@ void loadUrl() {
     expect(await loadedUrl.future, TEST_CROSS_PLATFORM_URL_1.toString());
   }, skip: shouldSkip1);
 
-  final shouldSkip2 = kIsWeb ? false :
+  final shouldSkip2 = kIsWeb ? true :
   ![
     TargetPlatform.iOS,
     TargetPlatform.macOS,

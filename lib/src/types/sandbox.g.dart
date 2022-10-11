@@ -18,10 +18,10 @@ class Sandbox {
   static const _NONE = Sandbox._internal('', '');
 
   ///Allow all.
-  static const ALLOW_ALL = Sandbox._internal(null, null);
+  static const ALLOW_ALL = const [_ALL];
 
   ///Allow none.
-  static const ALLOW_NONE = Sandbox._internal(null, null);
+  static const ALLOW_NONE = const [_NONE];
 
   ///Allows for downloads to occur with a gesture from the user.
   static const ALLOW_DOWNLOADS =
@@ -74,8 +74,6 @@ class Sandbox {
 
   ///Set of all values of [Sandbox].
   static final Set<Sandbox> values = [
-    Sandbox.ALLOW_ALL,
-    Sandbox.ALLOW_NONE,
     Sandbox.ALLOW_DOWNLOADS,
     Sandbox.ALLOW_FORMS,
     Sandbox.ALLOW_MODALS,
@@ -122,8 +120,11 @@ class Sandbox {
   ///Gets [String] value.
   String? toValue() => _value;
   @override
-  String toString() =>
-      _value == null ? "allow-all" : (_value == "" ? "allow-none" : "");
+  String toString() {
+    if (_value == null) return 'allow-all';
+    if (_value == '') return 'allow-none';
+    return _value ?? '';
+  }
 
   ///Gets [String?] native value.
   String? toNativeValue() => _nativeValue;

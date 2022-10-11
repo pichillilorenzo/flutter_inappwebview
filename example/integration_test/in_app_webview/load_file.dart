@@ -46,7 +46,7 @@ void loadFile() {
 
     final Uri? url = await controller.getUrl();
     expect(url, isNotNull);
-    expect(url!.scheme, 'file');
+    expect(url!.scheme, kIsWeb ? 'http' : 'file');
     expect(url.path,
         endsWith("test_assets/in_app_webview_initial_file_test.html"));
 

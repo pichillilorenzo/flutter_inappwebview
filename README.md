@@ -29,7 +29,7 @@ A Flutter plugin that allows you to add an inline webview, to use an headless we
 - Read the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the **full API documentation**.
 - [Official blog: inappwebview.dev/blog](https://inappwebview.dev/blog/)
 - Find open source projects on the [Official Showcase page: inappwebview.dev/showcase](https://inappwebview.dev/showcase/)
-- Check the [example/integration_test/webview_flutter_test.dart](https://github.com/pichillilorenzo/flutter_inappwebview/blob/master/example/integration_test/webview_flutter_test.dart) file for other code examples
+- Check the [example/integration_test/webview_flutter_test.dart](/example/integration_test/webview_flutter_test.dart) file for other code examples
 - [Flutter Browser App](https://github.com/pichillilorenzo/flutter_browser_app): A Full-Featured Mobile Browser App (such as the Google Chrome mobile browser) created using Flutter and the features offered by the flutter_inappwebview plugin
 
 ## Showcase - Who use it
@@ -62,18 +62,6 @@ To make it work properly on the Web platform, you need to add the `web_support.j
     <!-- ... -->
 </head>
 ```  
-
-## Main Classes Overview
-
-* [InAppWebView](https://inappwebview.dev/docs/in-app-webview/basic-usage/): Flutter Widget for adding an inline native WebView integrated into the flutter widget tree.
-* [ContextMenu](https://inappwebview.dev/docs/context-menu/basic-usage/): This class represents the WebView context menu.
-* [HeadlessInAppWebView](https://inappwebview.dev/docs/headless-in-app-webview/basic-usage/): Class that represents a WebView in headless mode. It can be used to run a WebView in background without attaching an InAppWebView to the widget tree.
-* [InAppBrowser](https://inappwebview.dev/docs/in-app-browser/basic-usage/): In-App Browser using native WebView.
-* [ChromeSafariBrowser](https://inappwebview.dev/docs/chrome-safari-browser/basic-usage/): In-App Browser using Chrome Custom Tabs on Android / SFSafariViewController on iOS.
-* [InAppLocalhostServer](https://inappwebview.dev/docs/in-app-localhost-server/basic-usage/): This class allows you to create a simple server on http://localhost:[port]/. The default port value is 8080.
-* [CookieManager](https://inappwebview.dev/docs/cookie-manager/basic-usage/): This class implements a singleton object (shared instance) which manages the cookies used by WebView instances.
-* [HttpAuthCredentialDatabase](https://inappwebview.dev/docs/http-auth-credential-database/basic-usage/): This class implements a singleton object (shared instance) that manages the shared HTTP auth credentials cache.
-* [WebStorageManager](https://inappwebview.dev/docs/web-storage-manager/basic-usage/): This class implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 
 ## Support
 

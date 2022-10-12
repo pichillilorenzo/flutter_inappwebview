@@ -27,7 +27,9 @@ Future main() async {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
-  // await localhostServer.start();
+  if (!kIsWeb) {
+    await localhostServer.start();
+  }
 
   runApp(MyApp());
 }

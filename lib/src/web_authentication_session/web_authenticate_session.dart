@@ -58,6 +58,12 @@ class WebAuthenticationSession implements Disposable {
       'com.pichillilorenzo/flutter_webauthenticationsession');
 
   ///Used to create and initialize a session.
+  ///
+  ///[url] represents a URL with the `http` or `https` scheme pointing to the authentication webpage.
+  ///
+  ///[callbackURLScheme] represents the custom URL scheme that the app expects in the callback URL.
+  ///
+  ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
   static Future<WebAuthenticationSession> create(
       {required Uri url,
       String? callbackURLScheme,

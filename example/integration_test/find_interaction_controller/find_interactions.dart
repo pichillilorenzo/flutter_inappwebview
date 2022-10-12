@@ -120,5 +120,7 @@ void findInteractions() {
     await controller.findAll(find: "InAppWebViewInitialFileTest");
     final int numberOfMatches = await numberOfMatchesCompleter.future;
     expect(numberOfMatches, 2);
+    final session = await findInteractionController.getActiveFindSession();
+    expect(session!.resultCount, 2);
   }, skip: shouldSkip);
 }

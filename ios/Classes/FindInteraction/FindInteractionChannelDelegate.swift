@@ -132,12 +132,8 @@ public class FindInteractionChannelDelegate : ChannelDelegate {
                 }
                 break
             case "getActiveFindSession":
-                if #available(iOS 16.0, *) {
-                    if let interaction = findInteractionController?.webView?.findInteraction {
-                        result(interaction.activeFindSession?.toMap())
-                    } else {
-                        result(nil)
-                    }
+                if let findInteractionController = findInteractionController {
+                    result(findInteractionController.activeFindSession?.toMap())
                 } else {
                     result(nil)
                 }
@@ -149,6 +145,12 @@ public class FindInteractionChannelDelegate : ChannelDelegate {
     }
     
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
+        if isDoneCounting, let findInteractionController = findInteractionController {
+            findInteractionController.activeFindSession = FindSession(resultCount: activeMatchOrdinal,
+                                                                      highlightedResultIndex: numberOfMatches,
+                                                                      searchResultDisplayStyle: 2) // matches UIFindSession.SearchResultDisplayStyle.none
+        }
+        
         let arguments: [String : Any?] = [
             "activeMatchOrdinal": activeMatchOrdinal,
             "numberOfMatches": numberOfMatches,

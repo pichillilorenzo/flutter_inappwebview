@@ -16,6 +16,22 @@ public class FindInteractionController : NSObject, Disposable {
     var settings: FindInteractionSettings?
     var shouldCallOnRefresh = false
     
+    private var _activeFindSession: FindSession? = nil
+    var activeFindSession: FindSession? {
+        get {
+            if #available(iOS 16.0, *), let interaction = webView?.findInteraction {
+                if let activeFindSession = interaction.activeFindSession {
+                    return FindSession.fromUIFindSession(uiFindSession: activeFindSession)
+                }
+                return nil
+            }
+            return _activeFindSession
+        }
+        set {
+            self._activeFindSession = newValue
+        }
+    }
+    
     public init(registrar: FlutterPluginRegistrar, id: Any, webView: InAppWebView, settings: FindInteractionSettings?) {
         super.init()
         self.webView = webView
@@ -99,6 +115,7 @@ public class FindInteractionController : NSObject, Disposable {
         channelDelegate?.dispose()
         channelDelegate = nil
         webView = nil
+        activeFindSession = nil
     }
     
     deinit {

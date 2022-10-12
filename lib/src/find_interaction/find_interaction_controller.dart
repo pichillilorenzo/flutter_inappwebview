@@ -210,9 +210,7 @@ class FindInteractionController {
     await _channel?.invokeMethod('dismissFindNavigator', args);
   }
 
-  ///If there's a currently active find session (on iOS, implying [isFindNavigatorVisible] is `true`), returns the active find session.
-  ///
-  ///**NOTE**: available on iOS only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
+  ///If there's a currently active find session, returns the active find session.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView

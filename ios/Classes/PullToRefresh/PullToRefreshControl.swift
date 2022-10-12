@@ -70,6 +70,9 @@ public class PullToRefreshControl : UIRefreshControl, FlutterPlugin {
             }
             result(true)
             break
+        case "isRefreshing":
+            result(isRefreshing)
+            break
         case "setColor":
             let color = arguments!["color"] as! String
             tintColor = UIColor(hexString: color)

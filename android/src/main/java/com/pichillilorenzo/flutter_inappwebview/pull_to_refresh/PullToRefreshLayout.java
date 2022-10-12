@@ -94,6 +94,7 @@ public class PullToRefreshLayout extends SwipeRefreshLayout implements MethodCha
       case "setEnabled":
         {
           Boolean enabled = (Boolean) call.argument("enabled");
+          options.enabled = enabled; // used by InAppWebView.onOverScrolled
           setEnabled(enabled);
         }
         result.success(true);

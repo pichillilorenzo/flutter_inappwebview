@@ -1,3 +1,9 @@
+## 5.4.4+4
+
+- Fixed missing `PullToRefreshController.isRefreshing` iOS implementation
+- Fixed Android `PullToRefreshController.setEnabled` at runtime
+- Fixed iOS `findNext`
+
 ## 5.4.4+3
 
 - Removed Android unsafe trust manager

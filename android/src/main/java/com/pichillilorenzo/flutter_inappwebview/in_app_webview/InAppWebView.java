@@ -360,10 +360,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       setRendererPriorityPolicy(
               (int) options.rendererPriorityPolicy.get("rendererRequestedPriority"),
               (boolean) options.rendererPriorityPolicy.get("waivedWhenNotVisible"));
-    } else if ((options.rendererPriorityPolicy == null || (options.rendererPriorityPolicy != null && options.rendererPriorityPolicy.isEmpty())) &&
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-      options.rendererPriorityPolicy.put("rendererRequestedPriority", getRendererRequestedPriority());
-      options.rendererPriorityPolicy.put("waivedWhenNotVisible", getRendererPriorityWaivedWhenNotVisible());
     }
 
     contentBlockerHandler.getRuleList().clear();
@@ -939,9 +935,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (newOptionsMap.get("networkAvailable") != null && options.networkAvailable != newOptions.networkAvailable)
       setNetworkAvailable(newOptions.networkAvailable);
 
-    if (newOptionsMap.get("rendererPriorityPolicy") != null &&
+    if (newOptionsMap.get("rendererPriorityPolicy") != null && (options.rendererPriorityPolicy == null ||
             (options.rendererPriorityPolicy.get("rendererRequestedPriority") != newOptions.rendererPriorityPolicy.get("rendererRequestedPriority") ||
-                    options.rendererPriorityPolicy.get("waivedWhenNotVisible") != newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible")) &&
+                    options.rendererPriorityPolicy.get("waivedWhenNotVisible") != newOptions.rendererPriorityPolicy.get("waivedWhenNotVisible"))) &&
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       setRendererPriorityPolicy(
               (int) newOptions.rendererPriorityPolicy.get("rendererRequestedPriority"),

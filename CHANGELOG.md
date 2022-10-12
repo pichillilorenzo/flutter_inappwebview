@@ -3,6 +3,7 @@
 - Fixed missing `PullToRefreshController.isRefreshing` iOS implementation
 - Fixed Android `PullToRefreshController.setEnabled` at runtime
 - Fixed iOS `findNext`
+- Fixed Android `RendererPriorityPolicy.waivedWhenNotVisible` type 'Null' is not a subtype of type 'bool'
 
 ## 5.4.4+3
 

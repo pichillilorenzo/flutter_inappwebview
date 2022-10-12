@@ -95,7 +95,8 @@ public class InAppWebViewOptions implements Options<InAppWebViewInterface> {
   public Integer scrollBarDefaultDelayBeforeFade = null;
   public Boolean scrollbarFadingEnabled = true;
   public Integer scrollBarFadeDuration = null;
-  public Map<String, Object> rendererPriorityPolicy = new HashMap<>();
+  @Nullable
+  public Map<String, Object> rendererPriorityPolicy = null;
   public Boolean useShouldInterceptRequest = false;
   public Boolean useOnRenderProcessGone = false;
   public Boolean disableDefaultErrorPage = false;

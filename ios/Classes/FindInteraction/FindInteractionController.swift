@@ -31,7 +31,7 @@ public class FindInteractionController : NSObject, Disposable {
 //        }
     }
     
-    public func findAllAsync(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
+    public func findAll(find: String?, completionHandler: ((Any?, Error?) -> Void)?) {
         guard let webView else {
             if let completionHandler = completionHandler {
                 completionHandler(nil, nil)

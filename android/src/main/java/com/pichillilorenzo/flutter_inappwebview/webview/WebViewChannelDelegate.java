@@ -289,7 +289,7 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           webView.clearSslPreferences();
         result.success(true);
         break;
-      case findAllAsync:
+      case findAll:
         if (webView != null) {
           String find = (String) call.argument("find");
           webView.findAllAsync(find);

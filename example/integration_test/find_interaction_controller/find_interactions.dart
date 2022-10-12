@@ -45,7 +45,7 @@ void findInteractions() {
 
     const firstSearchText = "InAppWebViewInitialFileTest";
     await expectLater(
-        findInteractionController.findAllAsync(find: firstSearchText),
+        findInteractionController.findAll(find: firstSearchText),
         completes);
     if ([TargetPlatform.iOS, TargetPlatform.macOS]
         .contains(defaultTargetPlatform)) {
@@ -117,7 +117,7 @@ void findInteractions() {
     await tester.pump();
     await Future.delayed(Duration(seconds: 1));
 
-    await controller.findAllAsync(find: "InAppWebViewInitialFileTest");
+    await controller.findAll(find: "InAppWebViewInitialFileTest");
     final int numberOfMatches = await numberOfMatchesCompleter.future;
     expect(numberOfMatches, 2);
   }, skip: shouldSkip);

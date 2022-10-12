@@ -19,10 +19,10 @@ public class FindInteractionChannelDelegate : ChannelDelegate {
         let arguments = call.arguments as? NSDictionary
         
         switch call.method {
-            case "findAllAsync":
+            case "findAll":
                 if let findInteractionController = findInteractionController {
                     let find = arguments!["find"] as! String
-                    findInteractionController.findAllAsync(find: find, completionHandler: {(value, error) in
+                    findInteractionController.findAll(find: find, completionHandler: {(value, error) in
                         if error != nil {
                             result(FlutterError(code: "FindInteractionChannelDelegate", message: error?.localizedDescription, details: nil))
                             return

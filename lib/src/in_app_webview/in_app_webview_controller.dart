@@ -2187,12 +2187,12 @@ class InAppWebViewController {
     await _channel.invokeMethod('clearCache', args);
   }
 
-  ///Use [FindInteractionController.findAllAsync] instead.
-  @Deprecated("Use FindInteractionController.findAllAsync instead")
+  ///Use [FindInteractionController.findAll] instead.
+  @Deprecated("Use FindInteractionController.findAll instead")
   Future<void> findAllAsync({required String find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
-    await _channel.invokeMethod('findAllAsync', args);
+    await _channel.invokeMethod('findAll', args);
   }
 
   ///Use [FindInteractionController.findNext] instead.

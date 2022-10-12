@@ -106,13 +106,13 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findAllAsync](https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)))
   ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
-  Future<void> findAllAsync({required String find}) async {
+  Future<void> findAll({required String find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
-    await _channel?.invokeMethod('findAllAsync', args);
+    await _channel?.invokeMethod('findAll', args);
   }
 
-  ///Highlights and scrolls to the next match found by [findAllAsync]. Notifies [FindInteractionController.onFindResultReceived] listener.
+  ///Highlights and scrolls to the next match found by [findAll]. Notifies [FindInteractionController.onFindResultReceived] listener.
   ///
   ///[forward] represents the direction to search.
   ///
@@ -129,7 +129,7 @@ class FindInteractionController {
     await _channel?.invokeMethod('findNext', args);
   }
 
-  ///Clears the highlighting surrounding text matches created by [findAllAsync].
+  ///Clears the highlighting surrounding text matches created by [findAll].
   ///
   ///**NOTE**: on iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true`,
   ///it uses the built-in find interaction native UI,

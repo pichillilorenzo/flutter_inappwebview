@@ -24,7 +24,7 @@ public class FindInteractionChannelDelegate extends ChannelDelegateImpl {
   @Override
   public void onMethodCall(@NonNull MethodCall call, @NonNull final MethodChannel.Result result) {
     switch (call.method) {
-      case "findAllAsync":
+      case "findAll":
         if (findInteractionController != null && findInteractionController.webView != null) {
           String find = (String) call.argument("find");
           findInteractionController.webView.findAllAsync(find);

@@ -31,7 +31,11 @@ public enum WebViewChannelDelegateMethods {
   startSafeBrowsing,
   clearCache,
   clearSslPreferences,
-  findAllAsync,
+  /**
+   * @deprecated
+   */
+  @Deprecated
+  findAll,
   findNext,
   clearMatches,
   scrollTo,

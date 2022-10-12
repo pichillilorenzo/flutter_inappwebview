@@ -209,10 +209,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
         case .getCopyBackForwardList:
             result(webView?.getCopyBackForwardList())
             break
-        case .findAllAsync:
+        case .findAll:
             if let webView = webView, let findInteractionController = webView.findInteractionController {
                 let find = arguments!["find"] as! String
-                findInteractionController.findAllAsync(find: find, completionHandler: {(value, error) in
+                findInteractionController.findAll(find: find, completionHandler: {(value, error) in
                     if error != nil {
                         result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
                         return

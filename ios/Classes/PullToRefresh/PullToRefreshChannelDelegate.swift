@@ -32,6 +32,13 @@ public class PullToRefreshChannelDelegate : ChannelDelegate {
                 result(false)
             }
             break
+        case "isEnabled":
+            if let pullToRefreshView = pullToRefreshControl {
+                result(pullToRefreshView.delegate?.isPullToRefreshEnabled())
+            } else {
+                result(false)
+            }
+            break
         case "setRefreshing":
             if let pullToRefreshView = pullToRefreshControl {
                 let refreshing = arguments!["refreshing"] as! Bool
@@ -41,6 +48,13 @@ public class PullToRefreshChannelDelegate : ChannelDelegate {
                     pullToRefreshView.endRefreshing()
                 }
                 result(true)
+            } else {
+                result(false)
+            }
+            break
+        case "isRefreshing":
+            if let pullToRefreshView = pullToRefreshControl {
+                result(pullToRefreshView.isRefreshing)
             } else {
                 result(false)
             }

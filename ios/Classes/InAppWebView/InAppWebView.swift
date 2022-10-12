@@ -2966,6 +2966,14 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
+    public func isPullToRefreshEnabled() -> Bool {
+        if #available(iOS 10.0, *) {
+            return scrollView.refreshControl != nil
+        } else {
+            return pullToRefreshControl?.superview != nil
+        }
+    }
+    
     public func createWebMessageChannel(completionHandler: ((WebMessageChannel) -> Void)? = nil) -> WebMessageChannel {
         let id = NSUUID().uuidString
         let webMessageChannel = WebMessageChannel(id: id)

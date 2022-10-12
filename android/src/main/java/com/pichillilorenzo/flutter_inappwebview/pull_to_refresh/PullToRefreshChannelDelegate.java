@@ -29,8 +29,16 @@ public class PullToRefreshChannelDelegate extends ChannelDelegateImpl {
       case "setEnabled":
         if (pullToRefreshView != null) {
           Boolean enabled = (Boolean) call.argument("enabled");
+          pullToRefreshView.settings.enabled = enabled; // used by InAppWebView.onOverScrolled
           pullToRefreshView.setEnabled(enabled);
           result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "isEnabled":
+        if (pullToRefreshView != null) {
+          result.success(pullToRefreshView.isEnabled());
         } else {
           result.success(false);
         }

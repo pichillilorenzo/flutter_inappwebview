@@ -3,6 +3,7 @@ package com.pichillilorenzo.flutter_inappwebview.pull_to_refresh;
 import android.content.Context;
 import android.graphics.Color;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.View;
 
 import androidx.annotation.NonNull;
@@ -12,6 +13,8 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
+
+import java.util.Arrays;
 
 import io.flutter.plugin.common.MethodChannel;
 

@@ -95,10 +95,24 @@ class PullToRefreshController {
   }
 
   ///Sets whether the pull-to-refresh feature is enabled or not.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.setEnabled](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setEnabled(boolean)))
+  ///- iOS ([Official API - UIScrollView.refreshControl](https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol))
   Future<void> setEnabled(bool enabled) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('enabled', () => enabled);
     await _channel?.invokeMethod('setEnabled', args);
+  }
+
+  ///Returns `true` is pull-to-refresh feature is enabled, otherwise `false`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - View.isEnabled](https://developer.android.com/reference/android/view/View#isEnabled()))
+  ///- iOS ([Official API - UIScrollView.refreshControl](https://developer.apple.com/documentation/uikit/uiscrollview/2127691-refreshcontrol))
+  Future<bool> isEnabled() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel?.invokeMethod('isEnabled', args);
   }
 
   Future<void> _setRefreshing(bool refreshing) async {
@@ -112,6 +126,10 @@ class PullToRefreshController {
   ///Call this method when an external event source triggers a programmatic refresh of your scrolling view.
   ///This method updates the state of the refresh control to reflect the in-progress refresh operation.
   ///When the refresh operation ends, be sure to call the [endRefreshing] method to return the controller to its default state.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<void> beginRefreshing() async {
     return await _setRefreshing(true);
   }
@@ -122,17 +140,29 @@ class PullToRefreshController {
   ///to return the refresh control to its default state.
   ///If the refresh control is at least partially visible, calling this method also hides it.
   ///If animations are also enabled, the control is hidden using an animation.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Future<void> endRefreshing() async {
     await _setRefreshing(false);
   }
 
   ///Returns whether a refresh operation has been triggered and is in progress.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.isRefreshing](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#isRefreshing()))
+  ///- iOS ([Official API - UIRefreshControl.isRefreshing](https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624844-isrefreshing))
   Future<bool> isRefreshing() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel?.invokeMethod('isRefreshing', args);
   }
 
   ///Sets the color of the refresh control.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.setColorSchemeColors](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setColorSchemeColors(int...)))
+  ///- iOS ([Official API - UIRefreshControl.tintColor](https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624847-tintcolor))
   Future<void> setColor(Color color) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('color', () => color.toHex());
@@ -140,6 +170,10 @@ class PullToRefreshController {
   }
 
   ///Sets the background color of the refresh control.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.setProgressBackgroundColorSchemeColor](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setProgressBackgroundColorSchemeColor(int)))
+  ///- iOS ([Official API - UIView.backgroundColor](https://developer.apple.com/documentation/uikit/uiview/1622591-backgroundcolor))
   Future<void> setBackgroundColor(Color color) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('color', () => color.toHex());
@@ -148,7 +182,8 @@ class PullToRefreshController {
 
   ///Set the distance to trigger a sync in dips.
   ///
-  ///**NOTE**: Available only on Android.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.setDistanceToTriggerSync](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setDistanceToTriggerSync(int)))
   Future<void> setDistanceToTriggerSync(int distanceToTriggerSync) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('distanceToTriggerSync', () => distanceToTriggerSync);
@@ -157,7 +192,8 @@ class PullToRefreshController {
 
   ///Sets the distance that the refresh indicator can be pulled beyond its resting position during a swipe gesture.
   ///
-  ///**NOTE**: Available only on Android.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.setSlingshotDistance](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSlingshotDistance(int)))
   Future<void> setSlingshotDistance(int slingshotDistance) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('slingshotDistance', () => slingshotDistance);
@@ -166,7 +202,8 @@ class PullToRefreshController {
 
   ///Gets the default distance that the refresh indicator can be pulled beyond its resting position during a swipe gesture.
   ///
-  ///**NOTE**: Available only on Android.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.DEFAULT_SLINGSHOT_DISTANCE](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#DEFAULT_SLINGSHOT_DISTANCE()))
   Future<int> getDefaultSlingshotDistance() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel?.invokeMethod('getDefaultSlingshotDistance', args);
@@ -182,7 +219,8 @@ class PullToRefreshController {
 
   ///Sets the size of the refresh indicator. One of [PullToRefreshSize.DEFAULT], or [PullToRefreshSize.LARGE].
   ///
-  ///**NOTE**: Available only on Android.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - SwipeRefreshLayout.setSize](https://developer.android.com/reference/androidx/swiperefreshlayout/widget/SwipeRefreshLayout#setSize(int)))
   Future<void> setIndicatorSize(PullToRefreshSize size) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('size', () => size.toNativeValue());
@@ -199,7 +237,8 @@ class PullToRefreshController {
 
   ///Sets the styled title text to display in the refresh control.
   ///
-  ///**NOTE**: Available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS ([Official API - UIRefreshControl.attributedTitle](https://developer.apple.com/documentation/uikit/uirefreshcontrol/1624845-attributedtitle))
   Future<void> setStyledTitle(AttributedString attributedTitle) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('attributedTitle', () => attributedTitle.toMap());

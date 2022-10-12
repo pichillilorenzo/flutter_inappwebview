@@ -10,4 +10,5 @@ import Foundation
 public protocol PullToRefreshDelegate {
     func enablePullToRefresh()
     func disablePullToRefresh()
+    func isPullToRefreshEnabled() -> Bool
 }

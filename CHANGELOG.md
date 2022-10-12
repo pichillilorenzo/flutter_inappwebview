@@ -22,7 +22,7 @@
 ### BREAKING CHANGES
 
 - Updated Android `minSdkVersion` to `19`
-- Updated minimum iOS version to `9`
+- Updated minimum iOS version to `9.0`
 - On Android, the `InAppWebView` widget uses hybrid composition by default (`useHybridComposition: true`)
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property

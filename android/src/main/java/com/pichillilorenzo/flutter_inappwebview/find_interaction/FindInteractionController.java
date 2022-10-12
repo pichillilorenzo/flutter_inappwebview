@@ -5,6 +5,7 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.FindSession;
 import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 
 import io.flutter.plugin.common.MethodChannel;
@@ -15,6 +16,8 @@ public class FindInteractionController implements Disposable {
 
   @Nullable
   public InAppWebViewInterface webView;
+  @Nullable
+  public FindSession activeFindSession;
   @Nullable
   public FindInteractionChannelDelegate channelDelegate;
   @Nullable
@@ -38,5 +41,6 @@ public class FindInteractionController implements Disposable {
       channelDelegate = null;
     }
     webView = null;
+    activeFindSession = null;
   }
 }

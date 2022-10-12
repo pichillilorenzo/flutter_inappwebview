@@ -50,9 +50,12 @@ void findInteractions() {
     if ([TargetPlatform.iOS, TargetPlatform.macOS]
         .contains(defaultTargetPlatform)) {
       expect(await findInteractionController.getSearchText(), firstSearchText);
-      final session = await findInteractionController.getActiveFindSession();
-      expect(session!.resultCount, 2);
     }
+    if ([TargetPlatform.android].contains(defaultTargetPlatform)) {
+      await Future.delayed(Duration(seconds: 1));
+    }
+    final session = await findInteractionController.getActiveFindSession();
+    expect(session!.resultCount, 2);
     await expectLater(
         findInteractionController.findNext(forward: true), completes);
     await expectLater(

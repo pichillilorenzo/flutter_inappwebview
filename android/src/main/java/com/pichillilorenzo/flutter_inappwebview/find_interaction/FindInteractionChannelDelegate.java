@@ -4,6 +4,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
+import com.pichillilorenzo.flutter_inappwebview.types.FindSession;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -43,6 +44,13 @@ public class FindInteractionChannelDelegate extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
+      case "getActiveFindSession":
+        if (findInteractionController != null && findInteractionController.activeFindSession != null) {
+          result.success(findInteractionController.activeFindSession.toMap());
+        } else {
+          result.success(null);
+        }
+        break;
       default:
         result.notImplemented();
     }
@@ -51,6 +59,11 @@ public class FindInteractionChannelDelegate extends ChannelDelegateImpl {
   public void onFindResultReceived(int activeMatchOrdinal, int numberOfMatches, boolean isDoneCounting) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
+
+    if (isDoneCounting && findInteractionController != null && findInteractionController.webView != null) {
+      findInteractionController.activeFindSession = new FindSession(numberOfMatches, activeMatchOrdinal);
+    }
+
     Map<String, Object> obj = new HashMap<>();
     obj.put("activeMatchOrdinal", activeMatchOrdinal);
     obj.put("numberOfMatches", numberOfMatches);

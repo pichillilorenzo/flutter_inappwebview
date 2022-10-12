@@ -106,7 +106,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findAllAsync](https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)))
   ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
-  Future<void> findAll({required String find}) async {
+  Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
     await _channel?.invokeMethod('findAll', args);
@@ -114,7 +114,7 @@ class FindInteractionController {
 
   ///Highlights and scrolls to the next match found by [findAll]. Notifies [FindInteractionController.onFindResultReceived] listener.
   ///
-  ///[forward] represents the direction to search.
+  ///[forward] represents the direction to search. The default value is `true`, meaning forward.
   ///
   ///**NOTE**: on iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true`,
   ///it uses the built-in find interaction native UI,
@@ -123,7 +123,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findNext](https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)))
   ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)))
-  Future<void> findNext({required bool forward}) async {
+  Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
     await _channel?.invokeMethod('findNext', args);
@@ -143,11 +143,13 @@ class FindInteractionController {
     await _channel?.invokeMethod('clearMatches', args);
   }
 
-  ///Pre-populate the system find panel's search text field with a search query.
+  ///Pre-populate the search text to be used.
   ///
-  ///**NOTE**: available only on iOS and only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
+  ///On iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true,
+  ///it will pre-populate the system find panel's search text field with a search query.
   ///
   ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   ///- iOS ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -155,11 +157,13 @@ class FindInteractionController {
     await _channel?.invokeMethod('setSearchText', args);
   }
 
-  ///Get the system find panel's search text field value.
+  ///Get the search text used.
   ///
-  ///**NOTE**: available only on iOS and only if [InAppWebViewSettings.isFindInteractionEnabled] is `true`.
+  ///On iOS, if [InAppWebViewSettings.isFindInteractionEnabled] is `true,
+  ///it will get the system find panel's search text field value.
   ///
   ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   ///- iOS ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};

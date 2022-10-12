@@ -16,6 +16,22 @@ public class FindInteractionController : NSObject, Disposable {
     var settings: FindInteractionSettings?
     var shouldCallOnRefresh = false
     
+    private var _searchText: String? = nil
+    var searchText: String? {
+        get {
+            if #available(iOS 16.0, *), let interaction = webView?.findInteraction {
+                return  interaction.searchText
+            }
+            return _searchText
+        }
+        set {
+            if #available(iOS 16.0, *), let interaction = webView?.findInteraction {
+                interaction.searchText = newValue
+            }
+            self._searchText = newValue
+        }
+    }
+    
     private var _activeFindSession: FindSession? = nil
     var activeFindSession: FindSession? {
         get {
@@ -54,6 +70,22 @@ public class FindInteractionController : NSObject, Disposable {
             }
             return
         }
+        
+        var find = find
+        if find == nil {
+            find = searchText
+        } else {
+            // updated searchText
+            searchText = find
+        }
+        
+        guard let find else {
+            if let completionHandler = completionHandler {
+                completionHandler(nil, nil)
+            }
+            return
+        }
+        
         if #available(iOS 16.0, *), webView.isFindInteractionEnabled {
             if let interaction = webView.findInteraction {
                 interaction.searchText = find
@@ -63,7 +95,7 @@ public class FindInteractionController : NSObject, Disposable {
                 completionHandler(nil, nil)
             }
         } else {
-            let startSearch = "window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync('\(find ?? "")');"
+            let startSearch = "window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync('\(find)');"
             webView.evaluateJavaScript(startSearch, completionHandler: completionHandler)
         }
     }

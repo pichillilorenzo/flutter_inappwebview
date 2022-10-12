@@ -61,28 +61,16 @@ public class FindInteractionChannelDelegate : ChannelDelegate {
                 }
                 break
             case "setSearchText":
-                if #available(iOS 16.0, *) {
-                    if let interaction = findInteractionController?.webView?.findInteraction {
-                        let searchText = arguments!["searchText"] as? String
-                        interaction.searchText = searchText
-                        result(true)
-                    } else {
-                        result(false)
-                    }
+                if let findInteractionController = findInteractionController {
+                    let searchText = arguments!["searchText"] as? String
+                    findInteractionController.searchText = searchText
+                    result(true)
                 } else {
                     result(false)
                 }
                 break
             case "getSearchText":
-                if #available(iOS 16.0, *) {
-                    if let interaction = findInteractionController?.webView?.findInteraction {
-                        result(interaction.searchText)
-                    } else {
-                        result(nil)
-                    }
-                } else {
-                    result(nil)
-                }
+                result(findInteractionController?.searchText)
                 break
             case "isFindNavigatorVisible":
                 if #available(iOS 16.0, *) {

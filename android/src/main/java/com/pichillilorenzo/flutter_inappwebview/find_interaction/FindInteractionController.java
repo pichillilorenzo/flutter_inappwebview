@@ -22,6 +22,8 @@ public class FindInteractionController implements Disposable {
   public FindInteractionChannelDelegate channelDelegate;
   @Nullable
   public FindInteractionSettings settings;
+  @Nullable
+  public String searchText;
 
   public FindInteractionController(@NonNull InAppWebViewInterface webView, @NonNull InAppWebViewFlutterPlugin plugin,
                              @NonNull Object id, @Nullable FindInteractionSettings settings) {
@@ -35,6 +37,30 @@ public class FindInteractionController implements Disposable {
 
   }
 
+  public void findAll(@Nullable String find) {
+    if (find == null) {
+      find = searchText;
+    } else {
+      // updated searchText
+      searchText = find;
+    }
+    if (webView != null && find != null) {
+      webView.findAllAsync(find);
+    }
+  }
+
+  public void findNext(boolean forward) {
+    if (webView != null) {
+      webView.findNext(forward);
+    }
+  }
+
+  public void clearMatches() {
+    if (webView != null) {
+      webView.clearMatches();
+    }
+  }
+
   public void dispose() {
     if (channelDelegate != null) {
       channelDelegate.dispose();
@@ -42,5 +68,6 @@ public class FindInteractionController implements Disposable {
     }
     webView = null;
     activeFindSession = null;
+    searchText = null;
   }
 }

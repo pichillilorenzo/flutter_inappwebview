@@ -1206,6 +1206,12 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             }
         }
         
+        if #available(iOS 16.0, *) {
+            if newSettingsMap["isFindInteractionEnabled"] != nil, settings?.isFindInteractionEnabled != newSettings.isFindInteractionEnabled {
+                isFindInteractionEnabled = newSettings.isFindInteractionEnabled
+            }
+        }
+        
         scrollView.isScrollEnabled = !(newSettings.disableVerticalScroll && newSettings.disableHorizontalScroll)
         
         self.settings = newSettings

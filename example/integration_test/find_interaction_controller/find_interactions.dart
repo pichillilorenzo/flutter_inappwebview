@@ -47,10 +47,7 @@ void findInteractions() {
     await expectLater(
         findInteractionController.findAll(find: firstSearchText),
         completes);
-    if ([TargetPlatform.iOS, TargetPlatform.macOS]
-        .contains(defaultTargetPlatform)) {
-      expect(await findInteractionController.getSearchText(), firstSearchText);
-    }
+    expect(await findInteractionController.getSearchText(), firstSearchText);
     if ([TargetPlatform.android].contains(defaultTargetPlatform)) {
       await Future.delayed(Duration(seconds: 1));
     }
@@ -62,11 +59,11 @@ void findInteractions() {
         findInteractionController.findNext(forward: false), completes);
     await expectLater(findInteractionController.clearMatches(), completes);
 
+    const secondSearchText = "text";
+    await expectLater(
+        findInteractionController.setSearchText(secondSearchText), completes);
     if ([TargetPlatform.iOS, TargetPlatform.macOS]
         .contains(defaultTargetPlatform)) {
-      const secondSearchText = "text";
-      await expectLater(
-          findInteractionController.setSearchText(secondSearchText), completes);
       await expectLater(
           findInteractionController.presentFindNavigator(), completes);
       expect(await findInteractionController.getSearchText(), secondSearchText);

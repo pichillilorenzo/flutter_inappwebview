@@ -94,7 +94,7 @@ public class FindInteractionController : NSObject, Disposable {
             if let completionHandler = completionHandler {
                 completionHandler(nil, nil)
             }
-        } else {
+        } else if find != "" {
             let startSearch = "window.\(JAVASCRIPT_BRIDGE_NAME)._findAllAsync('\(find)');"
             webView.evaluateJavaScript(startSearch, completionHandler: completionHandler)
         }

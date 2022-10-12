@@ -2,7 +2,7 @@
 
 # Flutter InAppWebView Plugin [![Share on Twitter](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?text=Flutter%20InAppBrowser%20plugin!&url=https://github.com/pichillilorenzo/flutter_inappwebview&hashtags=flutter,flutterio,dart,dartlang,webview) [![Share on Facebook](https://img.shields.io/badge/share-facebook-blue.svg?longCache=true&style=flat&colorB=%234267b2)](https://www.facebook.com/sharer/sharer.php?u=https%3A//github.com/pichillilorenzo/flutter_inappwebview)
 
-![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195421529-f008f74d-4215-4108-816d-f05d7e30c08c.svg)
+![InAppWebView-logo](https://user-images.githubusercontent.com/5956938/195422387-9bc88200-c130-401e-9669-a788777d0cd9.png)
 
 </div>
 

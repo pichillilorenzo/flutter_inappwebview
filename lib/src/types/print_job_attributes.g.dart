@@ -128,7 +128,7 @@ class PrintJobAttributes {
           PrintJobMediaSize.fromMap(map['mediaSize']?.cast<String, dynamic>()),
       resolution: PrintJobResolution.fromMap(
           map['resolution']?.cast<String, dynamic>()),
-      margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>())!,
+      margins: MapEdgeInsets.fromMap(map['margins']?.cast<String, dynamic>()),
       footerHeight: map['footerHeight'],
       headerHeight: map['headerHeight'],
       printableRect: InAppWebViewRect.fromMap(

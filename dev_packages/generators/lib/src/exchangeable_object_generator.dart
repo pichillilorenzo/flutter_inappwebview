@@ -497,9 +497,9 @@ class ExchangeableObjectGenerator
       }
     } else if (elementType.getDisplayString(withNullability: false) ==
         "EdgeInsets") {
-      return "MapEdgeInsets.fromMap($value?.cast<String, dynamic>())${isNullable ? '!' : ''}";
+      return "MapEdgeInsets.fromMap($value?.cast<String, dynamic>())${!isNullable ? '!' : ''}";
     } else if (elementType.getDisplayString(withNullability: false) == "Size") {
-      return "MapSize.fromMap($value?.cast<String, dynamic>())${isNullable ? '!' : ''}";
+      return "MapSize.fromMap($value?.cast<String, dynamic>())${!isNullable ? '!' : ''}";
     } else if (elementType.getDisplayString(withNullability: false) ==
         "DateTime") {
       if (!isNullable) {

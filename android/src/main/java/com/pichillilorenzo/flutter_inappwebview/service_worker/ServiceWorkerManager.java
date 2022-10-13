@@ -88,13 +88,7 @@ public class ServiceWorkerManager implements Disposable {
   }
 
   private ServiceWorkerClientCompat dummyServiceWorkerClientCompat() {
-    return new ServiceWorkerClientCompat() {
-      @Nullable
-      @Override
-      public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
-        return null;
-      }
-    };
+    return DummyServiceWorkerClientCompat.INSTANCE;
   }
 
   @Override
@@ -108,5 +102,15 @@ public class ServiceWorkerManager implements Disposable {
       serviceWorkerController = null; 
     }
     plugin = null;
+  }
+
+  private static final class DummyServiceWorkerClientCompat extends ServiceWorkerClientCompat {
+    static final ServiceWorkerClientCompat INSTANCE = new DummyServiceWorkerClientCompat();
+
+    @Nullable
+    @Override
+    public WebResourceResponse shouldInterceptRequest(@NonNull WebResourceRequest request) {
+      return null;
+    }
   }
 }

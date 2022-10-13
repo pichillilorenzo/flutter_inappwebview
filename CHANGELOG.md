@@ -36,6 +36,7 @@
 - Fixed iOS `findNext`
 - Fixed Android `RendererPriorityPolicy.waivedWhenNotVisible` type 'Null' is not a subtype of type 'bool'
 - Fixed iOS 14.0 crash when calling `callAsyncJavaScript` method
+- Merged "Android fix leaking MethodChannel through anonymous class" [#1201](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1201) (thanks to [emakar](https://github.com/emakar))
 
 ## 5.4.4+3
 

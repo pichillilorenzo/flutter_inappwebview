@@ -147,9 +147,8 @@ public class JavaScriptBridgeJS {
           "        });" +
           "    }," +
           "    arrayBufferToString: function(arrayBuffer) {" +
-          "        const uint8Array = new Uint8Array(arrayBuffer);" +
-          "        const data = uint8Array.reduce(function(acc, i) { return acc += String.fromCharCode.apply(null, [i]); }, '');" +
-          "        return data;" +
+          "        var uint8Array = new Uint8Array(arrayBuffer);" +
+          "        return uint8Array.reduce(function(acc, i) { return acc += String.fromCharCode.apply(null, [i]); }, '');" +
           "    }," +
           "    isBodyFormData: function(bodyString) {" +
           "        return bodyString.indexOf('------WebKitFormBoundary') >= 0;" +

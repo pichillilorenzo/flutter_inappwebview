@@ -35,7 +35,6 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 let url = arguments!["url"] as! String
                 let name = arguments!["name"] as! String
                 let value = arguments!["value"] as! String
-                let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
                 
                 var expiresDate: Int64?
@@ -47,12 +46,13 @@ class MyCookieManager: NSObject, FlutterPlugin {
                 let isSecure = arguments!["isSecure"] as? Bool
                 let isHttpOnly = arguments!["isHttpOnly"] as? Bool
                 let sameSite = arguments!["sameSite"] as? String
+                let domain = arguments!["domain"] as? String
                 
                 MyCookieManager.setCookie(url: url,
                                           name: name,
                                           value: value,
-                                          domain: domain,
                                           path: path,
+                                          domain: domain,
                                           expiresDate: expiresDate,
                                           maxAge: maxAge,
                                           isSecure: isSecure,
@@ -92,8 +92,8 @@ class MyCookieManager: NSObject, FlutterPlugin {
     public static func setCookie(url: String,
                           name: String,
                           value: String,
-                          domain: String,
                           path: String,
+                          domain: String?,
                           expiresDate: Int64?,
                           maxAge: Int64?,
                           isSecure: Bool?,
@@ -109,8 +109,12 @@ class MyCookieManager: NSObject, FlutterPlugin {
         properties[.originURL] = url
         properties[.name] = name
         properties[.value] = value
-        properties[.domain] = domain
         properties[.path] = path
+        
+        if domain != nil {
+            properties[.domain] = domain
+        }
+
         if expiresDate != nil {
             // convert from milliseconds
             properties[.expires] = Date(timeIntervalSince1970: TimeInterval(Double(expiresDate!)/1000))

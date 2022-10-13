@@ -1533,13 +1533,18 @@ class InAppWebViewController {
     }
 
     if (manifestFound) {
-      Map<String, dynamic> manifest =
-          json.decode(await manifestResponse!.transform(Utf8Decoder()).join());
-      if (manifest.containsKey("icons")) {
-        for (Map<String, dynamic> icon in manifest["icons"]) {
-          favicons.addAll(_createFavicons(webviewUrl, assetPathBase,
-              icon["src"], icon["rel"], icon["sizes"], true));
+      try {
+        Map<String, dynamic> manifest =
+        json.decode(await manifestResponse!.transform(Utf8Decoder()).join());
+        if (manifest.containsKey("icons")) {
+          for (Map<String, dynamic> icon in manifest["icons"]) {
+            favicons.addAll(_createFavicons(webviewUrl, assetPathBase,
+                icon["src"], icon["rel"], icon["sizes"], true));
+          }
         }
+      } on FormatException catch (_) {
+        /// The [manifestResponse] might not has a valid JSON string, catch and
+        /// ignore the error
       }
     }
 

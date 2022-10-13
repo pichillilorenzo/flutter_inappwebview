@@ -417,7 +417,7 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                 break
             case "callAsyncJavaScript":
                 if let webView = webView, #available(iOS 10.3, *) {
-                    if #available(iOS 14.0, *) {
+                    if #available(iOS 14.3, *) { // on iOS 14.0, for some reason, it crashes
                         let functionBody = arguments!["functionBody"] as! String
                         let functionArguments = arguments!["arguments"] as! [String:Any]
                         var contentWorld = WKContentWorld.page

@@ -5,6 +5,7 @@
 - Fixed Android `PullToRefreshController.setEnabled` at runtime
 - Fixed iOS `findNext`
 - Fixed Android `RendererPriorityPolicy.waivedWhenNotVisible` type 'Null' is not a subtype of type 'bool'
+- Fixed iOS 14.0 crash when calling `callAsyncJavaScript` method 
 
 ## 5.4.4+3
 

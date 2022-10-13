@@ -2204,6 +2204,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
     }
     
     public func webViewWebContentProcessDidTerminate(_ webView: WKWebView) {
+        webView.reload()
         onWebContentProcessDidTerminate()
     }
     

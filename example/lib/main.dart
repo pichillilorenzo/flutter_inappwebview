@@ -13,15 +13,13 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
-InAppLocalhostServer localhostServer = new InAppLocalhostServer();
+InAppLocalhostServer localhostServer = new InAppLocalhostServer(documentRoot: 'assets');
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Permission.camera.request();
   // await Permission.microphone.request();
   // await Permission.storage.request();
-
-  WebView.debugLoggingSettings.maxLogMessageLength = 500;
 
   if (defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);

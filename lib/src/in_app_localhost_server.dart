@@ -6,7 +6,8 @@ import 'package:flutter/services.dart' show rootBundle;
 
 import 'mime_type_resolver.dart';
 
-///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server. The default [port] value is `8080`.
+///This class allows you to create a simple server on `http://localhost:[port]/` in order to be able to load your assets file on a server.
+///The default `port` value is `8080`.
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
@@ -15,14 +16,28 @@ class InAppLocalhostServer {
   bool _started = false;
   HttpServer? _server;
   int _port = 8080;
+  String _directoryIndex = 'index.html';
+  String _documentRoot = './';
 
-  InAppLocalhostServer({int port = 8080}) {
+  ///- [port] represents the port of the server. The default value is `8080`.
+  ///
+  ///- [directoryIndex] represents the index file to use. The default value is `index.html`.
+  ///
+  ///- [documentRoot] represents the document root path to serve. The default value is `./`.
+  InAppLocalhostServer({
+    int port = 8080,
+    String directoryIndex = 'index.html',
+    String documentRoot = './',
+  }) {
     this._port = port;
+    this._directoryIndex = directoryIndex;
+    this._documentRoot = (documentRoot.endsWith('/')) ? documentRoot : '$documentRoot/';
   }
 
   ///Starts the server on `http://localhost:[port]/`.
   ///
-  ///**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file (See [ATS Configuration Basics](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35)):
+  ///**NOTE for iOS**: For the iOS Platform, you need to add the `NSAllowsLocalNetworking` key with `true` in the `Info.plist` file
+  ///(See [ATS Configuration Basics](https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CocoaKeys.html#//apple_ref/doc/uid/TP40009251-SW35)):
   ///```xml
   ///<key>NSAppTransportSecurity</key>
   ///<dict>
@@ -50,7 +65,12 @@ class InAppLocalhostServer {
 
           var path = request.requestedUri.path;
           path = (path.startsWith('/')) ? path.substring(1) : path;
-          path += (path.endsWith('/')) ? 'index.html' : '';
+          path += (path.endsWith('/')) ? _directoryIndex : '';
+          if (path == '') {
+            // if the path still empty, try to load the index file
+            path = _directoryIndex;
+          }
+          path = _documentRoot + path;
 
           try {
             body = (await rootBundle.load(path)).buffer.asUint8List();

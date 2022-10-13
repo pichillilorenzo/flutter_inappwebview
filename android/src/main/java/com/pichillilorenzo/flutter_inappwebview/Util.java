@@ -20,6 +20,8 @@ import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.FileInputStream;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.net.Inet6Address;
 import java.net.InetAddress;
 import java.net.UnknownHostException;
@@ -30,7 +32,6 @@ import java.security.cert.Certificate;
 import java.security.cert.CertificateException;
 import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
-import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -38,7 +39,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
-import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.net.ssl.HostnameVerifier;
@@ -184,50 +184,12 @@ public class Util {
     }
   }
 
-  public static OkHttpClient getUnsafeOkHttpClient() {
-    try {
-      // Create a trust manager that does not validate certificate chains
-      final TrustManager[] trustAllCerts = new TrustManager[] {
-              new X509TrustManager() {
-                @Override
-                public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                }
-
-                @Override
-                public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
-                }
-
-                @Override
-                public java.security.cert.X509Certificate[] getAcceptedIssuers() {
-                  return new java.security.cert.X509Certificate[]{};
-                }
-              }
-      };
-
-      // Install the all-trusting trust manager
-      final SSLContext sslContext = SSLContext.getInstance("SSL");
-      sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-      // Create an ssl socket factory with our all-trusting manager
-      final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
-
-      OkHttpClient.Builder builder = new OkHttpClient.Builder();
-      builder.sslSocketFactory(sslSocketFactory, (X509TrustManager)trustAllCerts[0]);
-      builder.hostnameVerifier(new HostnameVerifier() {
-        @Override
-        public boolean verify(String hostname, SSLSession session) {
-          return true;
-        }
-      });
-
-      OkHttpClient okHttpClient = builder
-              .connectTimeout(15, TimeUnit.SECONDS)
-              .writeTimeout(15, TimeUnit.SECONDS)
-              .readTimeout(15, TimeUnit.SECONDS)
-              .build();
-      return okHttpClient;
-    } catch (Exception e) {
-      throw new RuntimeException(e);
-    }
+  public static OkHttpClient getBasicOkHttpClient() {
+    return new OkHttpClient.Builder()
+            .connectTimeout(15, TimeUnit.SECONDS)
+            .writeTimeout(15, TimeUnit.SECONDS)
+            .readTimeout(15, TimeUnit.SECONDS)
+            .build();
   }
 
   /**
@@ -327,5 +289,22 @@ public class Util {
 
   public static Object getOrDefault(Map map, String key, Object defaultValue) {
     return map.containsKey(key) ? map.get(key) : defaultValue;
+  }
+
+  @Nullable
+  public static <O> Object invokeMethodIfExists(final O o, final String methodName, Object... args) {
+    Method[] methods = o.getClass().getMethods();
+    for (Method method : methods) {
+      if (method.getName().equals(methodName)) {
+        try {
+          return method.invoke(o, args);
+        } catch (IllegalAccessException e) {
+          return null;
+        } catch (InvocationTargetException e) {
+          return null;
+        }
+      }
+    }
+    return null;
   }
 }

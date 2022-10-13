@@ -328,31 +328,21 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedHttpAuthRequest(final WebView view, final HttpAuthHandler handler, final String host, final String realm) {
-
-    URI uri;
-    try {
-      uri = new URI(view.getUrl());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-
-      credentialsProposed = null;
-      previousAuthRequestFailureCount = 0;
-
-      handler.cancel();
-      return;
+    final String url = view.getUrl();
+    String protocol = "https";
+    int port = 0;
+    
+    if (url != null) {
+      try {
+        URI uri = new URI(url);
+        protocol = uri.getScheme();
+        port = uri.getPort();
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
     }
 
-    final String protocol = uri.getScheme();
-    final int port = uri.getPort();
-
     previousAuthRequestFailureCount++;
-
-    Map<String, Object> obj = new HashMap<>();
-    obj.put("host", host);
-    obj.put("protocol", protocol);
-    obj.put("realm", realm);
-    obj.put("port", port);
-    obj.put("previousFailureCount", previousAuthRequestFailureCount);
 
     if (credentialsProposed == null)
       credentialsProposed = CredentialDatabase.getInstance(view.getContext()).getHttpAuthCredentials(host, protocol, realm, port);
@@ -365,6 +355,8 @@ public class InAppWebViewClient extends WebViewClient {
     URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, realm, port, view.getCertificate(), null);
     HttpAuthenticationChallenge challenge = new HttpAuthenticationChallenge(protectionSpace, previousAuthRequestFailureCount, credentialProposed);
 
+    final String finalProtocol = protocol;
+    final int finalPort = port;
     channel.invokeMethod("onReceivedHttpAuthRequest", challenge.toMap(), new MethodChannel.Result() {
       @Override
       public void success(Object response) {
@@ -378,7 +370,7 @@ public class InAppWebViewClient extends WebViewClient {
                 String password = (String) responseMap.get("password");
                 Boolean permanentPersistence = (Boolean) responseMap.get("permanentPersistence");
                 if (permanentPersistence != null && permanentPersistence) {
-                  CredentialDatabase.getInstance(view.getContext()).setHttpAuthCredential(host, protocol, realm, port, username, password);
+                  CredentialDatabase.getInstance(view.getContext()).setHttpAuthCredential(host, finalProtocol, realm, finalPort, username, password);
                 }
                 handler.proceed(username, password);
                 return;
@@ -419,19 +411,20 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError sslError) {
-    URI uri;
+    final String url = sslError.getUrl();
+    String host = "";
+    String protocol = "https";
+    final String realm = null;
+    int port = 0;
+
     try {
-      uri = new URI(sslError.getUrl());
+      URI uri = new URI(url);
+      host = uri.getHost();
+      protocol = uri.getScheme();
+      port = uri.getPort();
     } catch (URISyntaxException e) {
       e.printStackTrace();
-      handler.cancel();
-      return;
     }
-
-    final String host = uri.getHost();
-    final String protocol = uri.getScheme();
-    final String realm = null;
-    final int port = uri.getPort();
 
     URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, realm, port, sslError.getCertificate(), sslError);
     ServerTrustChallenge challenge = new ServerTrustChallenge(protectionSpace);
@@ -473,22 +466,20 @@ public class InAppWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   @Override
   public void onReceivedClientCertRequest(final WebView view, final ClientCertRequest request) {
-
-    InAppWebView webView = (InAppWebView) view;
-
-    URI uri;
-    try {
-      uri = new URI(view.getUrl());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-      request.cancel();
-      return;
-    }
-
+    final String url = view.getUrl();
     final String host = request.getHost();
-    final String protocol = uri.getScheme();
+    String protocol = "https";
     final String realm = null;
     final int port = request.getPort();
+
+    if (url != null) {
+      try {
+        URI uri = new URI(url);
+        protocol = uri.getScheme();
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
+    }
 
     URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, realm, port, view.getCertificate(), null);
     ClientCertChallenge challenge = new ClientCertChallenge(protectionSpace, request.getPrincipals(), request.getKeyTypes());

@@ -17,6 +17,7 @@ import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.io.ByteArrayInputStream;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
@@ -139,17 +140,23 @@ public class Util {
   public static PrivateKeyAndCertificates loadPrivateKeyAndCertificate(InAppWebViewFlutterPlugin plugin, String certificatePath, String certificatePassword, String keyStoreType) {
 
     PrivateKeyAndCertificates privateKeyAndCertificates = null;
+    InputStream certificateFileStream = null;
 
     try {
-      InputStream certificateFileStream = getFileAsset(plugin, certificatePath);
+      certificateFileStream = getFileAsset(plugin, certificatePath);
+    } catch (IOException ignored) {}
 
+    try {
+      if (certificateFileStream == null) {
+        certificateFileStream = new FileInputStream(certificatePath);
+      }
       KeyStore keyStore = KeyStore.getInstance(keyStoreType);
-      keyStore.load(certificateFileStream, certificatePassword != null ? certificatePassword.toCharArray() : null);
+      keyStore.load(certificateFileStream, (certificatePassword != null ? certificatePassword : "").toCharArray());
 
       Enumeration<String> aliases = keyStore.aliases();
       String alias = aliases.nextElement();
 
-      Key key = keyStore.getKey(alias, certificatePassword.toCharArray());
+      Key key = keyStore.getKey(alias, (certificatePassword != null ? certificatePassword : "").toCharArray());
       if (key instanceof PrivateKey) {
         PrivateKey privateKey = (PrivateKey)key;
         Certificate cert = keyStore.getCertificate(alias);
@@ -161,6 +168,15 @@ public class Util {
     } catch (Exception e) {
       e.printStackTrace();
       Log.e(LOG_TAG, e.getMessage());
+    } finally {
+      if (certificateFileStream != null) {
+        try {
+          certificateFileStream.close();
+        } catch (IOException ex) {
+          ex.printStackTrace();
+          Log.e(LOG_TAG, ex.getMessage());
+        }
+      }
     }
 
     return privateKeyAndCertificates;

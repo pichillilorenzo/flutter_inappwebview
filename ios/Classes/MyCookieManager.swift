@@ -62,15 +62,15 @@ public class MyCookieManager: ChannelDelegate {
             case "deleteCookie":
                 let url = arguments!["url"] as! String
                 let name = arguments!["name"] as! String
-                let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                MyCookieManager.deleteCookie(url: url, name: name, domain: domain, path: path, result: result)
+                let domain = arguments!["domain"] as? String
+                MyCookieManager.deleteCookie(url: url, name: name, path: path, domain: domain, result: result)
                 break;
             case "deleteCookies":
                 let url = arguments!["url"] as! String
-                let domain = arguments!["domain"] as! String
                 let path = arguments!["path"] as! String
-                MyCookieManager.deleteCookies(url: url, domain: domain, path: path, result: result)
+                let domain = arguments!["domain"] as? String
+                MyCookieManager.deleteCookies(url: url, path: path, domain: domain, result: result)
                 break;
             case "deleteAllCookies":
                 MyCookieManager.deleteAllCookies(result: result)
@@ -231,25 +231,30 @@ public class MyCookieManager: ChannelDelegate {
         }
     }
     
-    public static func deleteCookie(url: String, name: String, domain: String, path: String, result: @escaping FlutterResult) {
+    public static func deleteCookie(url: String, name: String, path: String, domain: String?, result: @escaping FlutterResult) {
         guard let httpCookieStore = MyCookieManager.httpCookieStore else {
             result(false)
             return
         }
-    
+
+        var domain = domain
         httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
-                var originURL = ""
+                var originURL = url
                 if cookie.properties![.originURL] is String {
                     originURL = cookie.properties![.originURL] as! String
                 }
                 else if cookie.properties![.originURL] is URL {
                     originURL = (cookie.properties![.originURL] as! URL).absoluteString
                 }
-                if (!originURL.isEmpty && originURL != url) {
-                    continue
+                if domain == nil, let domainUrl = URL(string: originURL) {
+                    if #available(iOS 16.0, *) {
+                        domain = domainUrl.host()
+                    } else {
+                        domain = domainUrl.host
+                    }
                 }
-                if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.name == name && cookie.path == path {
+                if let domain = domain, cookie.domain == domain, cookie.name == name, cookie.path == path {
                     httpCookieStore.delete(cookie, completionHandler: {
                         result(true)
                     })
@@ -260,25 +265,30 @@ public class MyCookieManager: ChannelDelegate {
         }
     }
     
-    public static func deleteCookies(url: String, domain: String, path: String, result: @escaping FlutterResult) {
+    public static func deleteCookies(url: String, path: String, domain: String?, result: @escaping FlutterResult) {
         guard let httpCookieStore = MyCookieManager.httpCookieStore else {
             result(false)
             return
         }
         
+        var domain = domain
         httpCookieStore.getAllCookies { (cookies) in
             for cookie in cookies {
-                var originURL = ""
+                var originURL = url
                 if cookie.properties![.originURL] is String {
                     originURL = cookie.properties![.originURL] as! String
                 }
-                else if cookie.properties![.originURL] is URL{
+                else if cookie.properties![.originURL] is URL {
                     originURL = (cookie.properties![.originURL] as! URL).absoluteString
                 }
-                if (!originURL.isEmpty && originURL != url) {
-                    continue
+                if domain == nil, let domainUrl = URL(string: originURL) {
+                    if #available(iOS 16.0, *) {
+                        domain = domainUrl.host()
+                    } else {
+                        domain = domainUrl.host
+                    }
                 }
-                if (cookie.domain == domain || cookie.domain == ".\(domain)" || ".\(cookie.domain)" == domain) && cookie.path == path {
+                if let domain = domain, cookie.domain == domain, cookie.path == path {
                     httpCookieStore.delete(cookie, completionHandler: nil)
                 }
             }

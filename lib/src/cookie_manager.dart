@@ -372,7 +372,6 @@ class CookieManager {
   ///Removes a cookie by its [name] for the given [url], [domain] and [path].
   ///
   ///The default value of [path] is `"/"`.
-  ///If [domain] is empty, its default value will be the domain name of [url].
   ///
   ///[webViewController] is used for deleting the cookie (also session-only cookie) using JavaScript (cookie with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. JavaScript must be enabled in order to work.
@@ -392,12 +391,11 @@ class CookieManager {
   Future<void> deleteCookie(
       {required Uri url,
       required String name,
-      String domain = "",
       String path = "/",
+      String? domain,
       @Deprecated("Use webViewController instead")
           InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
-    if (domain.isEmpty) domain = _getDomainName(url);
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
@@ -435,7 +433,6 @@ class CookieManager {
   ///Removes all cookies for the given [url], [domain] and [path].
   ///
   ///The default value of [path] is `"/"`.
-  ///If [domain] is empty, its default value will be the domain name of [url].
   ///
   ///[webViewController] is used for deleting the cookies (also session-only cookies) using JavaScript (cookies with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. JavaScript must be enabled in order to work.
@@ -454,12 +451,11 @@ class CookieManager {
   ///- Web
   Future<void> deleteCookies(
       {required Uri url,
-      String domain = "",
       String path = "/",
+      String? domain,
       @Deprecated("Use webViewController instead")
           InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
-    if (domain.isEmpty) domain = _getDomainName(url);
 
     assert(url.toString().isNotEmpty);
 
@@ -536,11 +532,6 @@ class CookieManager {
           path: cookieMap["path"]));
     });
     return cookies;
-  }
-
-  String _getDomainName(Uri url) {
-    String domain = url.host;
-    return domain.startsWith("www.") ? domain.substring(4) : domain;
   }
 
   Future<String> _getCookieExpirationDate(int expiresDate) async {

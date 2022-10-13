@@ -52,7 +52,7 @@ void setGetDelete() {
     cookie = await cookieManager.getCookie(url: url, name: "myCookie");
     expect(cookie, isNull);
 
-    await cookieManager.deleteCookies(url: url);
+    await cookieManager.deleteCookies(url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}");
     cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isEmpty);
   }, skip: shouldSkip);

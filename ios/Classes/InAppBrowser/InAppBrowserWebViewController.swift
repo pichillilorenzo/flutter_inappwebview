@@ -128,6 +128,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
         
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView?.load(webViewTransport.request)
+            channelDelegate?.onBrowserCreated()
         } else {
             if #available(iOS 11.0, *) {
                 if let contentBlockers = webView?.settings?.contentBlockers, contentBlockers.count > 0 {

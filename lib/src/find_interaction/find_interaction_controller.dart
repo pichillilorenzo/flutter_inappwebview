@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import '../debug_logging_settings.dart';
@@ -58,7 +59,7 @@ class FindInteractionController {
       }
       var maxLogMessageLength =
           FindInteractionController.debugLoggingSettings.maxLogMessageLength;
-      String message = "FindInteractionController " +
+      String message = "(${defaultTargetPlatform.name}) FindInteractionController " +
           " calling \"" +
           method.toString() +
           "\" using " +

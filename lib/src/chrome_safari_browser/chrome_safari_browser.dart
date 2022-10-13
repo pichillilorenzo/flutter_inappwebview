@@ -80,7 +80,7 @@ class ChromeSafariBrowser {
       }
       var maxLogMessageLength =
           ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength;
-      String message = "ChromeSafariBrowser ID " +
+      String message = "(${defaultTargetPlatform.name}) ChromeSafariBrowser ID " +
           id +
           " calling \"" +
           method.toString() +

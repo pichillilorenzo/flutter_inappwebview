@@ -118,7 +118,8 @@ class InAppWebViewController {
       var maxLogMessageLength =
           WebView.debugLoggingSettings.maxLogMessageLength;
       String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
-      String message = (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
+      String message = "(${defaultTargetPlatform.name}) " +
+          (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
           " ID " +
           viewId +
           " calling \"" +

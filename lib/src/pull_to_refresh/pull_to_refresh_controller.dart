@@ -1,5 +1,6 @@
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';
@@ -65,7 +66,7 @@ class PullToRefreshController {
       }
       var maxLogMessageLength =
           PullToRefreshController.debugLoggingSettings.maxLogMessageLength;
-      String message = "PullToRefreshController " +
+      String message = "(${defaultTargetPlatform.name}) PullToRefreshController " +
           " calling \"" +
           method.toString() +
           "\" using " +

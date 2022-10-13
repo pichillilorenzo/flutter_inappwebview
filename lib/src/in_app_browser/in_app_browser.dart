@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:developer' as developer;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../context_menu.dart';
@@ -108,7 +109,7 @@ class InAppBrowser {
       }
       var maxLogMessageLength =
           InAppBrowser.debugLoggingSettings.maxLogMessageLength;
-      String message = "InAppBrowser ID " +
+      String message = "(${defaultTargetPlatform.name}) InAppBrowser ID " +
           id +
           " calling \"" +
           method.toString() +

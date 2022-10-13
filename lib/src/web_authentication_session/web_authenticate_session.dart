@@ -120,7 +120,7 @@ class WebAuthenticationSession implements Disposable {
       }
       var maxLogMessageLength =
           WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength;
-      String message = "WebAuthenticationSession ID " +
+      String message = "(${defaultTargetPlatform.name}) WebAuthenticationSession ID " +
           id +
           " calling \"" +
           method.toString() +

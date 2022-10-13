@@ -549,6 +549,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "bagedevimo",
+      "name": "Ben Anderson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1319813?v=4",
+      "profile": "http://www.acidic.co.nz",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -495,6 +495,96 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "emakar",
+      "name": "emakar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7767193?v=4",
+      "profile": "https://github.com/emakar",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "liasica",
+      "name": "liasica",
+      "avatar_url": "https://avatars.githubusercontent.com/u/671431?v=4",
+      "profile": "https://weibo.com/magicrolan",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "addie9000",
+      "name": "Eiichiro Adachi",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2036910?v=4",
+      "profile": "https://github.com/addie9000",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "kamilpowalowski",
+      "name": "Kamil Powałowski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83073?v=4",
+      "profile": "https://github.com/kamilpowalowski",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "akioyamamoto1977",
+      "name": "Akio Yamamoto",
+      "avatar_url": "https://avatars.githubusercontent.com/u/429219?v=4",
+      "profile": "https://github.com/akioyamamoto1977",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "mohenaxiba",
+      "name": "mohenaxiba",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7977540?v=4",
+      "profile": "https://github.com/mohenaxiba",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "bagedevimo",
+      "name": "Ben Anderson",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1319813?v=4",
+      "profile": "http://www.acidic.co.nz",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "daanporon",
+      "name": "Daan Poron",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71901?v=4",
+      "profile": "https://github.com/daanporon",
+      "contributions": [
+        "security"
+      ]
+    },
+    {
+      "login": "fa0311",
+      "name": "ふぁ",
+      "avatar_url": "https://avatars.githubusercontent.com/u/34892635?v=4",
+      "profile": "https://yuki0311.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "perffecto",
+      "name": "perffecto",
+      "avatar_url": "https://avatars.githubusercontent.com/u/2116618?v=4",
+      "profile": "https://github.com/perffecto",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

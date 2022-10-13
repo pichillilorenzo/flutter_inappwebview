@@ -145,11 +145,22 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
       <td align="center"><a href="https://github.com/Sense545"><img src="https://avatars.githubusercontent.com/u/769406?v=4?s=100" width="100px;" alt="Jan Henrik Høiland"/><br /><sub><b>Jan Henrik Høiland</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=Sense545" title="Code">💻</a></td>
       <td align="center"><a href="https://github.com/igtm"><img src="https://avatars.githubusercontent.com/u/6331737?v=4?s=100" width="100px;" alt="Iguchi Tomokatsu"/><br /><sub><b>Iguchi Tomokatsu</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=igtm" title="Code">💻</a></td>
       <td align="center"><a href="https://uekoetter.dev/"><img src="https://avatars.githubusercontent.com/u/1270149?v=4?s=100" width="100px;" alt="Jonas Uekötter"/><br /><sub><b>Jonas Uekötter</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=ueman" title="Documentation">📖</a></td>
+      <td align="center"><a href="https://github.com/emakar"><img src="https://avatars.githubusercontent.com/u/7767193?v=4?s=100" width="100px;" alt="emakar"/><br /><sub><b>emakar</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=emakar" title="Code">💻</a></td>
+      <td align="center"><a href="https://weibo.com/magicrolan"><img src="https://avatars.githubusercontent.com/u/671431?v=4?s=100" width="100px;" alt="liasica"/><br /><sub><b>liasica</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=liasica" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://github.com/addie9000"><img src="https://avatars.githubusercontent.com/u/2036910?v=4?s=100" width="100px;" alt="Eiichiro Adachi"/><br /><sub><b>Eiichiro Adachi</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=addie9000" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/kamilpowalowski"><img src="https://avatars.githubusercontent.com/u/83073?v=4?s=100" width="100px;" alt="Kamil Powałowski"/><br /><sub><b>Kamil Powałowski</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=kamilpowalowski" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/akioyamamoto1977"><img src="https://avatars.githubusercontent.com/u/429219?v=4?s=100" width="100px;" alt="Akio Yamamoto"/><br /><sub><b>Akio Yamamoto</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=akioyamamoto1977" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/mohenaxiba"><img src="https://avatars.githubusercontent.com/u/7977540?v=4?s=100" width="100px;" alt="mohenaxiba"/><br /><sub><b>mohenaxiba</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=mohenaxiba" title="Code">💻</a></td>
+      <td align="center"><a href="http://www.acidic.co.nz"><img src="https://avatars.githubusercontent.com/u/1319813?v=4?s=100" width="100px;" alt="Ben Anderson"/><br /><sub><b>Ben Anderson</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=bagedevimo" title="Code">💻</a></td>
+      <td align="center"><a href="https://github.com/daanporon"><img src="https://avatars.githubusercontent.com/u/71901?v=4?s=100" width="100px;" alt="Daan Poron"/><br /><sub><b>Daan Poron</b></sub></a><br /><a href="#security-daanporon" title="Security">🛡️</a></td>
+      <td align="center"><a href="https://yuki0311.com"><img src="https://avatars.githubusercontent.com/u/34892635?v=4?s=100" width="100px;" alt="ふぁ"/><br /><sub><b>ふぁ</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=fa0311" title="Code">💻</a></td>
+    </tr>
+    <tr>
+      <td align="center"><a href="https://github.com/perffecto"><img src="https://avatars.githubusercontent.com/u/2116618?v=4?s=100" width="100px;" alt="perffecto"/><br /><sub><b>perffecto</b></sub></a><br /><a href="https://github.com/pichillilorenzo/flutter_inappwebview/commits?author=perffecto" title="Code">💻</a></td>
     </tr>
   </tbody>
-  <tfoot>
-
-  </tfoot>
 </table>
 
 <!-- markdownlint-restore -->

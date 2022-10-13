@@ -522,6 +522,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "kamilpowalowski",
+      "name": "Kamil Powałowski",
+      "avatar_url": "https://avatars.githubusercontent.com/u/83073?v=4",
+      "profile": "https://github.com/kamilpowalowski",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

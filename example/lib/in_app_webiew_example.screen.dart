@@ -118,7 +118,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   key: webViewKey,
                   // contextMenu: contextMenu,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse("https://flutter.dev/")),
+                      URLRequest(url: Uri.parse("https://github.com/flutter")),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialOptions: options,
@@ -169,26 +169,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                       this.url = url.toString();
                       urlController.text = this.url;
                     });
-
-                    CookieManager cookieManager = CookieManager.instance();
-
-                    await cookieManager.setCookie(
-                        url: url!, name: "myCookie", value: "myValue");
-                    List<Cookie> cookies = await cookieManager.getCookies(url: url);
-                    print(cookies);
-
-                    Cookie? cookie =
-                    await cookieManager.getCookie(url: url, name: "myCookie");
-                    print(cookie);
-
-                    await cookieManager.deleteCookie(url: url, name: "myCookie", domain: ".flutter.dev");
-                    cookie = await cookieManager.getCookie(url: url, name: "myCookie");
-                    print(cookie);
-
-                    await cookieManager.deleteCookies(url: url, domain: ".flutter.dev");
-                    await Future.delayed(Duration(seconds: 1));
-                    cookies = await cookieManager.getCookies(url: url);
-                    print(cookies);
                   },
                   onLoadError: (controller, url, code, message) {
                     pullToRefreshController.endRefreshing();

@@ -148,7 +148,7 @@ public class JavaScriptBridgeJS {
           "    }," +
           "    arrayBufferToString: function(arrayBuffer) {" +
           "        const uint8Array = new Uint8Array(arrayBuffer);" +
-          "        const data = uint8Array.reduce((acc, i) => acc += String.fromCharCode.apply(null, [i]), '');" +
+          "        const data = uint8Array.reduce(function(acc, i) { return acc += String.fromCharCode.apply(null, [i]); }, '');" +
           "        return data;" +
           "    }," +
           "    isBodyFormData: function(bodyString) {" +

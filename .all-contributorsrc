@@ -495,6 +495,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "emakar",
+      "name": "emakar",
+      "avatar_url": "https://avatars.githubusercontent.com/u/7767193?v=4",
+      "profile": "https://github.com/emakar",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

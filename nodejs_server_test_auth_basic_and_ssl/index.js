@@ -1,5 +1,15 @@
 // Example of the server https is taken from here: https://engineering.circle.com/https-authorized-certs-with-node-js-315e548354a2
+// Renew certificates:
+// - openssl x509 -req -extfile server.cnf -days 9999 -passin "pass:password" -in server-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out server-crt.pem
+// - openssl x509 -req -extfile client1.cnf -days 9999 -passin "pass:password" -in client1-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out client1-crt.pem
+// - openssl x509 -req -extfile client2.cnf -days 9999 -passin "pass:password" -in client2-csr.pem -CA ca-crt.pem -CAkey ca-key.pem -CAcreateserial -out client2-crt.pem
+// Verify certificates:
+// - openssl verify -CAfile ca-crt.pem server-crt.pem
+// - openssl verify -CAfile ca-crt.pem client1-crt.pem
+// - openssl verify -CAfile ca-crt.pem client2-crt.pem
 // Conversion of client1-crt.pem to certificate.pfx: https://stackoverflow.com/a/38408666/4637638
+// - openssl pkcs12 -export -out certificate.pfx -inkey client1-key.pem -in client1-crt.pem -certfile ca-crt.pem
+// - Overwrite certificate.pfx to example/test_assets/certificate.pfx
 const express = require('express')
 const https = require('https')
 const cors = require('cors')

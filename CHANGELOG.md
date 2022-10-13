@@ -1,3 +1,32 @@
+## 5.4.4+4
+
+- Fixed missing `PullToRefreshController.isRefreshing` iOS implementation
+- Fixed Android `PullToRefreshController.setEnabled` at runtime
+- Fixed iOS `findNext`
+- Fixed Android `RendererPriorityPolicy.waivedWhenNotVisible` type 'Null' is not a subtype of type 'bool'
+
+## 5.4.4+3
+
+- Removed Android unsafe trust manager
+
+## 5.4.4+2
+
+- Fixed LICENSE
+
+## 5.4.4+1
+
+- Fixed README
+
+## 5.4.4
+
+- Added support for Android 33
+- Fixed possible null pointer exception in Android `ChromeCustomTabsActivity.java`
+
+## 5.4.3+8
+
+- Merged "Xcode 14 build error: Stored properties cannot be marked potentially unavailable with '@available'" [#1238](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1238) (thanks to [CodeEagle](https://github.com/CodeEagle))
+- Fixed example for iOS
+
 ## 5.4.3+7
 
 - Fixed possible Android java.lang.NullPointerException in "InAppBrowserActivity.onCreateOptionsMenu" about "webView.getTitle()"

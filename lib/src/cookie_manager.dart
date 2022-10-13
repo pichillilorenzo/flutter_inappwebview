@@ -58,7 +58,6 @@ class CookieManager {
   ///The cookie being set will be ignored if it is expired.
   ///
   ///The default value of [path] is `"/"`.
-  ///If [domain] is `null`, its default value will be the domain name of [url].
   ///
   ///[webViewController] could be used if you need to set a session-only cookie using JavaScript (so [isHttpOnly] cannot be set, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///on the current URL of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. In this case the [url] parameter is ignored.
@@ -78,8 +77,8 @@ class CookieManager {
       {required Uri url,
       required String name,
       required String value,
-      String? domain,
       String path = "/",
+      String? domain,
       int? expiresDate,
       int? maxAge,
       bool? isSecure,
@@ -88,14 +87,12 @@ class CookieManager {
       @Deprecated("Use webViewController instead")
           InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
-    if (domain == null) domain = _getDomainName(url);
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
     assert(value.isNotEmpty);
-    assert(domain.isNotEmpty);
     assert(path.isNotEmpty);
 
     if (defaultTargetPlatform == TargetPlatform.iOS || kIsWeb) {
@@ -140,15 +137,16 @@ class CookieManager {
       {required Uri url,
       required String name,
       required String value,
-      required String domain,
       String path = "/",
+      String? domain,
       int? expiresDate,
       int? maxAge,
       bool? isSecure,
       HTTPCookieSameSitePolicy? sameSite,
       InAppWebViewController? webViewController}) async {
-    var cookieValue =
-        name + "=" + value + "; Domain=" + domain + "; Path=" + path;
+    var cookieValue = name + "=" + value + "; Path=" + path;
+
+    if (domain != null) cookieValue += "; Domain=" + domain;
 
     if (expiresDate != null)
       cookieValue += "; Expires=" + await _getCookieExpirationDate(expiresDate);

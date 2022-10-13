@@ -11,9 +11,17 @@ class InAppLocalhostServer {
   bool _started = false;
   HttpServer? _server;
   int _port = 8080;
+  String _directoryIndex = 'index.html';
+  String _documentRoot = './';
 
-  InAppLocalhostServer({int port = 8080}) {
+  InAppLocalhostServer({
+    int port = 8080,
+    String directoryIndex = 'index.html',
+    String documentRoot = './',
+  }) {
     this._port = port;
+    this._directoryIndex = directoryIndex;
+    this._documentRoot = (documentRoot.endsWith('/')) ? documentRoot : '$documentRoot/';
   }
 
   ///Starts the server on `http://localhost:[port]/`.
@@ -46,7 +54,8 @@ class InAppLocalhostServer {
 
           var path = request.requestedUri.path;
           path = (path.startsWith('/')) ? path.substring(1) : path;
-          path += (path.endsWith('/')) ? 'index.html' : '';
+          path += (path.endsWith('/')) ? _directoryIndex : '';
+          path = _documentRoot + path;
 
           try {
             body = (await rootBundle.load(path)).buffer.asUint8List();

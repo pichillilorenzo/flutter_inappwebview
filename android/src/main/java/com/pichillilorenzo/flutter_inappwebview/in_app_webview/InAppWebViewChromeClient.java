@@ -44,7 +44,6 @@ import com.pichillilorenzo.flutter_inappwebview.types.CreateWindowAction;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.ActivityResultListener;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
-import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 
 import java.io.ByteArrayOutputStream;

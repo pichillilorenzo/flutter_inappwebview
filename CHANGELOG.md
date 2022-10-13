@@ -11,6 +11,8 @@
 - Merged "fix: try to open with Chrome if default browser app does not support custom tabs" [#1233](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1233) (thanks to [addie9000](https://github.com/addie9000))
 - Merged "fix: Prevent Android java.lang.NullPointerException in InAppWebViewCl…" [#1237](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1237) (thanks to [kamilpowalowski](https://github.com/kamilpowalowski))
 - Merged "Android - Load client certificate from local storage" [#1241](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1241) (thanks to [akioyamamoto1977](https://github.com/akioyamamoto1977))
+- Merged "fix Theme_AppCompat_Dialog_Alert not found" [#1262](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1262) (thanks to [mohenaxiba](https://github.com/mohenaxiba))
+- Merged "Allow a cookie without a domain to be set on Android" [#1295](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1295) (thanks to [bagedevimo](https://github.com/bagedevimo))
 
 ## 5.4.4+3
 

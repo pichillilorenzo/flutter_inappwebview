@@ -44,7 +44,6 @@ class CookieManager {
   ///The cookie being set will be ignored if it is expired.
   ///
   ///The default value of [path] is `"/"`.
-  ///If [domain] is `null`, its default value will be the domain name of [url].
   ///
   ///[iosBelow11WebViewController] could be used if you need to set a session-only cookie using JavaScript (so [isHttpOnly] cannot be set, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///on the current URL of the [WebView] managed by that controller when you need to target iOS below 11. In this case the [url] parameter is ignored.
@@ -55,8 +54,8 @@ class CookieManager {
       {required Uri url,
       required String name,
       required String value,
-      String? domain,
       String path = "/",
+      String? domain,
       int? expiresDate,
       int? maxAge,
       bool? isSecure,

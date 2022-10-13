@@ -1770,21 +1770,21 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                                 let certificatePath = response["certificatePath"] as! String;
                                 let certificatePassword = response["certificatePassword"] as? String ?? "";
                                 
-                                var path: String = certificatePath
-                                do {
-                                    path = try Util.getAbsPathAsset(assetFilePath: certificatePath)
-                                } catch {}
-                                
-                                if let PKCS12Data = NSData(contentsOfFile: path),
-                                   let identityAndTrust: IdentityAndTrust = self.extractIdentity(PKCS12Data: PKCS12Data, password: certificatePassword) {
-                                    let urlCredential: URLCredential = URLCredential(
-                                        identity: identityAndTrust.identityRef,
-                                        certificates: identityAndTrust.certArray as? [AnyObject],
-                                        persistence: URLCredential.Persistence.forSession);
-                                    completionHandler(.useCredential, urlCredential)
-                                } else {
-                                    completionHandler(.performDefaultHandling, nil)
-                                }
+                            var path: String = certificatePath
+                            do {
+                                path = try Util.getAbsPathAsset(assetFilePath: certificatePath)
+                            } catch {}
+                            
+                            if let PKCS12Data = NSData(contentsOfFile: path),
+                               let identityAndTrust: IdentityAndTrust = self.extractIdentity(PKCS12Data: PKCS12Data, password: certificatePassword) {
+                                let urlCredential: URLCredential = URLCredential(
+                                    identity: identityAndTrust.identityRef,
+                                    certificates: identityAndTrust.certArray as? [AnyObject],
+                                    persistence: URLCredential.Persistence.forSession);
+                                completionHandler(.useCredential, urlCredential)
+                            } else {
+                                completionHandler(.performDefaultHandling, nil)
+                            }
                                 
                                 break
                             case 2:

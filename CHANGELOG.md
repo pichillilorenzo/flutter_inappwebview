@@ -1,4 +1,4 @@
-## 5.4.5
+## 5.5.0
 
 - Added Android direct camera capture feature
 - Fixed missing `PullToRefreshController.isRefreshing` iOS implementation
@@ -16,6 +16,7 @@
 - Merged "Catch and ignore utf8 format exception in getFavicons()" [#1302](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1302) (thanks to [Doflatango](https://github.com/Doflatango))
 - Merged "Disable exporting activity definitions for Android" [#1313](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1313) (thanks to [daanporon](https://github.com/daanporon))
 - Merged "Add directoryIndex and documentRoot to InAppLocalhostServer option" [#1319](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1319) (thanks to [fa0311](https://github.com/fa0311))
+- Merged "fix(ios): invoke onBrowserCreated when viewDidLoad is called with win…" [#1344](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1344) (thanks to [perffecto](https://github.com/perffecto))
 
 ## 5.4.4+3
 

@@ -558,6 +558,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "daanporon",
+      "name": "Daan Poron",
+      "avatar_url": "https://avatars.githubusercontent.com/u/71901?v=4",
+      "profile": "https://github.com/daanporon",
+      "contributions": [
+        "security"
+      ]
     }
   ],
   "contributorsPerLine": 7,

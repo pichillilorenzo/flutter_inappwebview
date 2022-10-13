@@ -5578,7 +5578,7 @@ setTimeout(function() {
       cookie = await cookieManager.getCookie(url: url, name: "myCookie");
       expect(cookie, isNull);
 
-      await cookieManager.deleteCookies(url: url);
+      await cookieManager.deleteCookies(url: url, domain: ".flutter.dev");
       cookies = await cookieManager.getCookies(url: url);
       expect(cookies, isEmpty);
     });

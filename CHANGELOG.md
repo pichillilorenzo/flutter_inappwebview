@@ -18,6 +18,10 @@
 - Merged "Add directoryIndex and documentRoot to InAppLocalhostServer option" [#1319](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1319) (thanks to [fa0311](https://github.com/fa0311))
 - Merged "fix(ios): invoke onBrowserCreated when viewDidLoad is called with win…" [#1344](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1344) (thanks to [perffecto](https://github.com/perffecto))
 
+### BREAKING CHANGES
+
+- `CookieManager.getCookie`, `CookieManager.deleteCookie` and `CookieManager.deleteCookies` have the `domain` argument optional and without a default value
+
 ## 5.4.4+3
 
 - Removed Android unsafe trust manager

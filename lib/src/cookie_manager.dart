@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -300,7 +299,6 @@ class CookieManager {
   ///Removes a cookie by its [name] for the given [url], [domain] and [path].
   ///
   ///The default value of [path] is `"/"`.
-  ///If [domain] is empty, its default value will be the domain name of [url].
   ///
   ///[iosBelow11WebViewController] is used for deleting the cookie (also session-only cookie) using JavaScript (cookie with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11. JavaScript must be enabled in order to work.
@@ -311,10 +309,9 @@ class CookieManager {
   Future<void> deleteCookie(
       {required Uri url,
       required String name,
-      String domain = "",
       String path = "/",
+      String? domain,
       InAppWebViewController? iosBelow11WebViewController}) async {
-    if (domain.isEmpty) domain = _getDomainName(url);
 
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
@@ -346,7 +343,6 @@ class CookieManager {
   ///Removes all cookies for the given [url], [domain] and [path].
   ///
   ///The default value of [path] is `"/"`.
-  ///If [domain] is empty, its default value will be the domain name of [url].
   ///
   ///[iosBelow11WebViewController] is used for deleting the cookies (also session-only cookies) using JavaScript (cookies with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
   ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11. JavaScript must be enabled in order to work.
@@ -356,10 +352,9 @@ class CookieManager {
   ///to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!).
   Future<void> deleteCookies(
       {required Uri url,
-      String domain = "",
       String path = "/",
+      String? domain,
       InAppWebViewController? iosBelow11WebViewController}) async {
-    if (domain.isEmpty) domain = _getDomainName(url);
 
     assert(url.toString().isNotEmpty);
 
@@ -396,11 +391,6 @@ class CookieManager {
   Future<void> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('deleteAllCookies', args);
-  }
-
-  String _getDomainName(Uri url) {
-    String domain = url.host;
-    return domain.startsWith("www.") ? domain.substring(4) : domain;
   }
 
   Future<String> _getCookieExpirationDate(int expiresDate) async {

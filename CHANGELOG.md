@@ -1,5 +1,6 @@
-## 5.4.4+4
+## 5.4.5
 
+- Added Android direct camera capture feature
 - Fixed missing `PullToRefreshController.isRefreshing` iOS implementation
 - Fixed Android `PullToRefreshController.setEnabled` at runtime
 - Fixed iOS `findNext`

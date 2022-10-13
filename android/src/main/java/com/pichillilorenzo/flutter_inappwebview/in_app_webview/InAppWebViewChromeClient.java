@@ -780,15 +780,15 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType) {
-    startPhotoPickerIntent(filePathCallback, acceptType);
+    startPickerIntent(filePathCallback, acceptType, null);
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback) {
-    startPhotoPickerIntent(filePathCallback, "");
+    startPickerIntent(filePathCallback, "", null);
   }
 
   protected void openFileChooser(ValueCallback<Uri> filePathCallback, String acceptType, String capture) {
-    startPhotoPickerIntent(filePathCallback, acceptType);
+    startPickerIntent(filePathCallback, acceptType, capture);
   }
 
   @TargetApi(Build.VERSION_CODES.LOLLIPOP)
@@ -796,8 +796,8 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onShowFileChooser(WebView webView, ValueCallback<Uri[]> filePathCallback, FileChooserParams fileChooserParams) {
     String[] acceptTypes = fileChooserParams.getAcceptTypes();
     boolean allowMultiple = fileChooserParams.getMode() == WebChromeClient.FileChooserParams.MODE_OPEN_MULTIPLE;
-    Intent intent = fileChooserParams.createIntent();
-    return startPhotoPickerIntent(filePathCallback, intent, acceptTypes, allowMultiple);
+    boolean captureEnabled = fileChooserParams.isCaptureEnabled();
+    return startPickerIntent(filePathCallback, acceptTypes, allowMultiple, captureEnabled);
   }
 
   @Override
@@ -898,58 +898,89 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     return null;
   }
 
-  public void startPhotoPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType) {
+  public void startPickerIntent(ValueCallback<Uri> filePathCallback, String acceptType, @Nullable String capture) {
     InAppWebViewFlutterPlugin.filePathCallbackLegacy = filePathCallback;
 
-    Intent fileChooserIntent = getFileChooserIntent(acceptType);
-    Intent chooserIntent = Intent.createChooser(fileChooserIntent, "");
+    boolean images = acceptsImages(acceptType);
+    boolean video = acceptsVideo(acceptType);
 
-    ArrayList<Parcelable> extraIntents = new ArrayList<>();
-    if (acceptsImages(acceptType)) {
-      extraIntents.add(getPhotoIntent());
+    Intent pickerIntent = null;
+
+    if (capture != null) {
+      if (!needsCameraPermission()) {
+        if (images) {
+          pickerIntent = getPhotoIntent();
+        }
+        else if (video) {
+          pickerIntent = getVideoIntent();
+        }
+      }
     }
-    if (acceptsVideo(acceptType)) {
-      extraIntents.add(getVideoIntent());
+    if (pickerIntent == null) {
+      Intent fileChooserIntent = getFileChooserIntent(acceptType);
+      pickerIntent = Intent.createChooser(fileChooserIntent, "");
+
+      ArrayList<Parcelable> extraIntents = new ArrayList<>();
+      if (!needsCameraPermission()) {
+        if (images) {
+          extraIntents.add(getPhotoIntent());
+        }
+        if (video) {
+          extraIntents.add(getVideoIntent());
+        }
+      }
+      pickerIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
     }
-    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
 
     Activity activity = getActivity();
-    if (activity == null) {
-      return;
-    }
-    if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
-      activity.startActivityForResult(chooserIntent, PICKER_LEGACY);
+    if (activity != null && pickerIntent.resolveActivity(activity.getPackageManager()) != null) {
+      activity.startActivityForResult(pickerIntent, PICKER_LEGACY);
     } else {
       Log.d(LOG_TAG, "there is no Activity to handle this Intent");
     }
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
-  public boolean startPhotoPickerIntent(final ValueCallback<Uri[]> callback, final Intent intent, final String[] acceptTypes, final boolean allowMultiple) {
+  public boolean startPickerIntent(final ValueCallback<Uri[]> callback, final String[] acceptTypes,
+                                   final boolean allowMultiple, final boolean captureEnabled) {
     InAppWebViewFlutterPlugin.filePathCallback = callback;
 
-    ArrayList<Parcelable> extraIntents = new ArrayList<>();
-    if (!needsCameraPermission()) {
-      if (acceptsImages(acceptTypes)) {
-        extraIntents.add(getPhotoIntent());
-      }
-      if (acceptsVideo(acceptTypes)) {
-        extraIntents.add(getVideoIntent());
+    boolean images = acceptsImages(acceptTypes);
+    boolean video = acceptsVideo(acceptTypes);
+
+    Intent pickerIntent = null;
+
+    if (captureEnabled) {
+      if (!needsCameraPermission()) {
+        if (images) {
+          pickerIntent = getPhotoIntent();
+        }
+        else if (video) {
+          pickerIntent = getVideoIntent();
+        }
       }
     }
+    if (pickerIntent == null) {
+      ArrayList<Parcelable> extraIntents = new ArrayList<>();
+      if (!needsCameraPermission()) {
+        if (images) {
+          extraIntents.add(getPhotoIntent());
+        }
+        if (video) {
+          extraIntents.add(getVideoIntent());
+        }
+      }
 
-    Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
+      Intent fileSelectionIntent = getFileChooserIntent(acceptTypes, allowMultiple);
 
-    Intent chooserIntent = new Intent(Intent.ACTION_CHOOSER);
-    chooserIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
-    chooserIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+      pickerIntent = new Intent(Intent.ACTION_CHOOSER);
+      pickerIntent.putExtra(Intent.EXTRA_INTENT, fileSelectionIntent);
+      pickerIntent.putExtra(Intent.EXTRA_INITIAL_INTENTS, extraIntents.toArray(new Parcelable[]{}));
+    }
 
     Activity activity = getActivity();
-    if (activity == null) {
-      return true;
-    }
-    if (chooserIntent.resolveActivity(activity.getPackageManager()) != null) {
-      activity.startActivityForResult(chooserIntent, PICKER);
+    if (activity != null && pickerIntent.resolveActivity(activity.getPackageManager()) != null) {
+      activity.startActivityForResult(pickerIntent, PICKER);
     } else {
       Log.d(LOG_TAG, "there is no Activity to handle this Intent");
     }

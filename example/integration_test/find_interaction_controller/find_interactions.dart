@@ -15,7 +15,6 @@ void findInteractions() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('find interactions', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final findInteractionController = FindInteractionController();
 
@@ -28,9 +27,6 @@ void findInteractions() {
           findInteractionController: findInteractionController,
           initialSettings: InAppWebViewSettings(
               clearCache: true, isFindInteractionEnabled: true),
-          onWebViewCreated: (controller) {
-            controllerCompleter.complete(controller);
-          },
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },
@@ -77,7 +73,6 @@ void findInteractions() {
   }, skip: shouldSkip);
 
   testWidgets('onFindResultReceived', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<int> numberOfMatchesCompleter = Completer<int>();
     final findInteractionController = FindInteractionController(
@@ -98,9 +93,6 @@ void findInteractions() {
           initialSettings: InAppWebViewSettings(
               clearCache: true, isFindInteractionEnabled: false),
           findInteractionController: findInteractionController,
-          onWebViewCreated: (controller) {
-            controllerCompleter.complete(controller);
-          },
           onLoadStop: (controller, url) {
             pageLoaded.complete();
           },
@@ -108,13 +100,12 @@ void findInteractions() {
       ),
     );
 
-    var controller = await controllerCompleter.future;
     await pageLoaded.future;
 
     await tester.pump();
     await Future.delayed(Duration(seconds: 1));
 
-    await controller.findAll(find: "InAppWebViewInitialFileTest");
+    await findInteractionController.findAll(find: "InAppWebViewInitialFileTest");
     final int numberOfMatches = await numberOfMatchesCompleter.future;
     expect(numberOfMatches, 2);
     final session = await findInteractionController.getActiveFindSession();

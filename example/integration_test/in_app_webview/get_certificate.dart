@@ -17,7 +17,7 @@ void getCertificate() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('getCertificate', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(

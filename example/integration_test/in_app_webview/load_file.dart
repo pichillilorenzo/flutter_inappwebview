@@ -17,7 +17,7 @@ void loadFile() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('loadFile', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final StreamController<String> pageLoads =
         StreamController<String>.broadcast();
 

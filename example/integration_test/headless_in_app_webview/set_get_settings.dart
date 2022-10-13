@@ -16,7 +16,7 @@ void setGetSettings() {
         ].contains(defaultTargetPlatform);
 
   test('set/get settings', () async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(

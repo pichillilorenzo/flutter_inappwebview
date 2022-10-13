@@ -1,7 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'in_app_webview/webview.dart';
-import 'chrome_safari_browser/chrome_safari_browser.dart';
-import 'in_app_browser/in_app_browser.dart';
 
 ///Class that represents the debug logging settings.
 class DebugLoggingSettings {

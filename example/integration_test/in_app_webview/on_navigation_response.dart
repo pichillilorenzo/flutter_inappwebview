@@ -17,7 +17,7 @@ void onNavigationResponse() {
 
   group("onNavigationResponse", () {
     testWidgets('allow navigation', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer<String> onNavigationResponseCompleter =
           Completer<String>();
@@ -51,7 +51,7 @@ void onNavigationResponse() {
     });
 
     testWidgets('cancel navigation', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer<String> onNavigationResponseCompleter =
           Completer<String>();

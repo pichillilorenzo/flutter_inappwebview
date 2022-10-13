@@ -27,7 +27,7 @@ void webViewWindows() {
           ].contains(defaultTargetPlatform);
 
     testWidgets('onCreateWindow return false', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       await tester.pumpWidget(
         Directionality(
@@ -68,7 +68,7 @@ void webViewWindows() {
           ].contains(defaultTargetPlatform);
 
     testWidgets('onCreateWindow return true', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<int> onCreateWindowCompleter = Completer<int>();
       await tester.pumpWidget(
         Directionality(
@@ -140,7 +140,7 @@ void webViewWindows() {
 
     testWidgets('window.open() with target _blank opens in same window',
         (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -182,7 +182,7 @@ void webViewWindows() {
           ].contains(defaultTargetPlatform);
     // on Android, for some reason, it works on an example app but not in this test
     testWidgets('can open new window and go back', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -264,7 +264,7 @@ void webViewWindows() {
       ''';
       final String openWindowTestBase64 =
           base64Encode(const Utf8Encoder().convert(openWindowTest));
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoadCompleter = Completer<void>();
 
       await tester.pumpWidget(
@@ -307,7 +307,7 @@ void webViewWindows() {
     final shouldSkipTest6 = true;
     // on Web, opening a new window during tests makes crash
     testWidgets('onCreateWindow called on Web', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<String> onCreateWindowCalled = Completer<String>();
       await tester.pumpWidget(
         Directionality(

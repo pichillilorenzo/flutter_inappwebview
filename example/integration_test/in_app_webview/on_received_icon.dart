@@ -15,7 +15,7 @@ void onReceivedIcon() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onReceivedIcon', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<Uint8List> onReceivedIconCompleter = Completer<Uint8List>();
 

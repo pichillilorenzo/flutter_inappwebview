@@ -15,7 +15,7 @@ void javascriptDialogs() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('javascript dialogs', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<JsAlertRequest> alertCompleter =
         Completer<JsAlertRequest>();

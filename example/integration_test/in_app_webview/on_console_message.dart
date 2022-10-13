@@ -17,7 +17,7 @@ void onConsoleMessage() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onConsoleMessage', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<ConsoleMessage> onConsoleMessageCompleter =
         Completer<ConsoleMessage>();
     await tester.pumpWidget(

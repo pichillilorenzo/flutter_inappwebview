@@ -27,7 +27,7 @@ void reload() {
           ].contains(defaultTargetPlatform);
 
     testWidgets('from origin', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -55,7 +55,7 @@ void reload() {
     }, skip: shouldSkipTest1);
 
     testWidgets('basic', (WidgetTester tester) async {
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 

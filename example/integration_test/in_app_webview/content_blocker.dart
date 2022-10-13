@@ -17,7 +17,7 @@ void contentBlocker() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('Content Blocker', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     await tester.pumpWidget(
       Directionality(

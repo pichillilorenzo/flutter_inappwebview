@@ -13,7 +13,7 @@ void onReceivedTouchIconUrl() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onReceivedTouchIconUrl', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<String> onReceivedTouchIconUrlCompleter =
         Completer<String>();
 

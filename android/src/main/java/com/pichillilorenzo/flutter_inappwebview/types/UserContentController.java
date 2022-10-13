@@ -25,6 +25,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import io.flutter.Log;
+
 @SuppressLint("RestrictedApi")
 public class UserContentController implements Disposable {
   protected static final String LOG_TAG = "UserContentController";
@@ -139,13 +141,17 @@ public class UserContentController implements Disposable {
       if (!contentWorlds.contains(contentWorld)) {
         contentWorlds.add(contentWorld);
 
+        StringBuilder pluginScriptsSource = new StringBuilder();
         LinkedHashSet<PluginScript> pluginScriptsRequired = this.getPluginScriptsRequiredInAllContentWorlds();
         for (PluginScript script : pluginScriptsRequired) {
-          sourceWrapped.append(";").append(script.getSource());
+          pluginScriptsSource.append(script.getSource());
         }
+        String contentWorldCreatorCode = CONTENT_WORLDS_GENERATOR_JS_SOURCE
+                .replace(PluginScriptsUtil.VAR_CONTENT_WORLD_NAME_ARRAY, "'" + escapeContentWorldName(contentWorld.getName()) + "'")
+                .replace(PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED, escapeCode(pluginScriptsSource.toString()));
+        sourceWrapped.append(contentWorldCreatorCode).append(";");
       }
-      sourceWrapped.append(source);
-      return wrapSourceCodeInContentWorld(contentWorld, sourceWrapped.toString());
+      return sourceWrapped.append(wrapSourceCodeInContentWorld(contentWorld, source)).toString();
     }
     return source;
   }
@@ -421,10 +427,12 @@ public class UserContentController implements Disposable {
           "        iframe.style = 'display: none; z-index: 0; position: absolute; width: 0px; height: 0px';" +
           "        document.body.append(iframe);" +
           "      }" +
-          "      var script = iframe.contentWindow.document.createElement('script');" +
-          "      script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts';" +
-          "      script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
-          "      iframe.contentWindow.document.body.append(script);" +
+          "      if (iframe.contentWindow.document.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts') == null) {" +
+          "        var script = iframe.contentWindow.document.createElement('script');" +
+          "        script.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "_plugin_scripts';" +
+          "        script.innerHTML = " + PluginScriptsUtil.VAR_JSON_SOURCE_ENCODED + ";" +
+          "        iframe.contentWindow.document.body.append(script);" +
+          "      }" +
           "    }" +
           "    clearInterval(interval);" +
           "  });" +

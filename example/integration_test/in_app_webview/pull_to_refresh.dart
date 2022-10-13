@@ -18,7 +18,7 @@ void pullToRefresh() {
 
   testWidgets('launches with pull-to-refresh feature',
       (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final pullToRefreshController = PullToRefreshController(
       settings: PullToRefreshSettings(
           color: Colors.blue,

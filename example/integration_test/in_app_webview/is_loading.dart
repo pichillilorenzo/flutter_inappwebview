@@ -17,7 +17,7 @@ void isLoading() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('isLoading', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
 

@@ -17,7 +17,7 @@ void onPageCommitVisible() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onPageCommitVisible', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<String> onPageCommitVisibleCompleter = Completer<String>();
 
     await tester.pumpWidget(

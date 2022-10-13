@@ -19,7 +19,7 @@ void onScrollChanged() {
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   testWidgets('onScrollChanged', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<void> onScrollChangedCompleter = Completer<void>();
     await tester.pumpWidget(

@@ -17,7 +17,7 @@ void onDownloadStartRequest() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onDownloadStartRequest', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<String> onDownloadStartCompleter = Completer<String>();
     await tester.pumpWidget(
       Directionality(

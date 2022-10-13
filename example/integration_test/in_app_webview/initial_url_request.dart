@@ -27,7 +27,7 @@ void initialUrlRequest() {
     testWidgets('launches with allowsBackForwardNavigationGestures true',
         (WidgetTester tester) async {
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -67,7 +67,7 @@ void initialUrlRequest() {
 
     testWidgets('basic', (WidgetTester tester) async {
       final Completer<void> pageLoaded = Completer<void>();
-      final Completer controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(

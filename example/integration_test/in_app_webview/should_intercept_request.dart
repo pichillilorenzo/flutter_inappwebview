@@ -20,7 +20,7 @@ void shouldInterceptRequest() {
     ];
     List<String> resourceLoaded = [];
 
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
     final Completer<void> loadedResourceCompleter = Completer<void>();
 

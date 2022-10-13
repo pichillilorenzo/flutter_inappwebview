@@ -15,7 +15,7 @@ void pageDownUp() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('pageDown/pageUp', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(

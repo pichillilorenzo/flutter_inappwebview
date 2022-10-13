@@ -16,7 +16,7 @@ void runAndDispose() {
         ].contains(defaultTargetPlatform);
 
   test('run and dispose', () async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(

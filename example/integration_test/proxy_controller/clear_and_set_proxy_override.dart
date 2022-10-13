@@ -16,7 +16,7 @@ void clearAndSetProxyOverride() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('clear and set proxy override', (WidgetTester tester) async {
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
 
     var proxyAvailable =

@@ -18,7 +18,7 @@ void setGetDelete() {
 
   testWidgets('set, get, delete', (WidgetTester tester) async {
     CookieManager cookieManager = CookieManager.instance();
-    final Completer controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
     await tester.pumpWidget(
       Directionality(

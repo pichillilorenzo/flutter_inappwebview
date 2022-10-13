@@ -343,21 +343,19 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedHttpAuthRequest(final WebView view, final HttpAuthHandler handler, final String host, final String realm) {
-    URI uri;
-    try {
-      uri = new URI(view.getUrl());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
+    final String url = view.getUrl();
+    String protocol = "https";
+    int port = 0;
 
-      credentialsProposed = null;
-      previousAuthRequestFailureCount = 0;
-
-      handler.cancel();
-      return;
+    if (url != null) {
+      try {
+        URI uri = new URI(url);
+        protocol = uri.getScheme();
+        port = uri.getPort();
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
     }
-
-    final String protocol = uri.getScheme();
-    final int port = uri.getPort();
 
     previousAuthRequestFailureCount++;
 
@@ -373,6 +371,8 @@ public class InAppWebViewClient extends WebViewClient {
     HttpAuthenticationChallenge challenge = new HttpAuthenticationChallenge(protectionSpace, previousAuthRequestFailureCount, credentialProposed);
 
     final InAppWebView webView = (InAppWebView) view;
+    final String finalProtocol = protocol;
+    final int finalPort = port;
     final WebViewChannelDelegate.ReceivedHttpAuthRequestCallback callback = new WebViewChannelDelegate.ReceivedHttpAuthRequestCallback() {
       @Override
       public boolean nonNullSuccess(@NonNull HttpAuthResponse response) {
@@ -385,7 +385,7 @@ public class InAppWebViewClient extends WebViewClient {
               boolean permanentPersistence = response.isPermanentPersistence();
               if (permanentPersistence) {
                 CredentialDatabase.getInstance(view.getContext())
-                        .setHttpAuthCredential(host, protocol, realm, port, username, password);
+                        .setHttpAuthCredential(host, finalProtocol, realm, finalPort, username, password);
               }
               handler.proceed(username, password);
               break;
@@ -433,18 +433,19 @@ public class InAppWebViewClient extends WebViewClient {
 
   @Override
   public void onReceivedSslError(final WebView view, final SslErrorHandler handler, final SslError sslError) {
-    URI uri;
+    final String url = sslError.getUrl();
+    String host = "";
+    String protocol = "https";
+    int port = 0;
+
     try {
-      uri = new URI(sslError.getUrl());
+      URI uri = new URI(url);
+      host = uri.getHost();
+      protocol = uri.getScheme();
+      port = uri.getPort();
     } catch (URISyntaxException e) {
       e.printStackTrace();
-      handler.cancel();
-      return;
     }
-
-    final String host = uri.getHost();
-    final String protocol = uri.getScheme();
-    final int port = uri.getPort();
 
     URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, null, port, sslError.getCertificate(), sslError);
     ServerTrustChallenge challenge = new ServerTrustChallenge(protectionSpace);
@@ -492,18 +493,19 @@ public class InAppWebViewClient extends WebViewClient {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
   @Override
   public void onReceivedClientCertRequest(final WebView view, final ClientCertRequest request) {
-    URI uri;
-    try {
-      uri = new URI(view.getUrl());
-    } catch (URISyntaxException e) {
-      e.printStackTrace();
-      request.cancel();
-      return;
-    }
-
+    final String url = view.getUrl();
     final String host = request.getHost();
-    final String protocol = uri.getScheme();
+    String protocol = "https";
     final int port = request.getPort();
+
+    if (url != null) {
+      try {
+        URI uri = new URI(url);
+        protocol = uri.getScheme();
+      } catch (URISyntaxException e) {
+        e.printStackTrace();
+      }
+    }
 
     URLProtectionSpace protectionSpace = new URLProtectionSpace(host, protocol, null, port, view.getCertificate(), null);
     ClientCertChallenge challenge = new ClientCertChallenge(protectionSpace, request.getPrincipals(), request.getKeyTypes());

@@ -16,7 +16,8 @@ void takeScreenshot() {
       ].contains(defaultTargetPlatform);
 
   test('take screenshot', () async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     var headlessWebView = new HeadlessInAppWebView(

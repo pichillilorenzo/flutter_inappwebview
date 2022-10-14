@@ -19,7 +19,8 @@ void getMetaThemeColor() {
   var url = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   testWidgets('getMetaThemeColor', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(

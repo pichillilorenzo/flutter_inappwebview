@@ -87,7 +87,6 @@ class CookieManager {
       @Deprecated("Use webViewController instead")
           InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
-
     webViewController = webViewController ?? iosBelow11WebViewController;
 
     assert(url.toString().isNotEmpty);
@@ -396,7 +395,6 @@ class CookieManager {
       @Deprecated("Use webViewController instead")
           InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
-
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
@@ -456,7 +454,6 @@ class CookieManager {
       @Deprecated("Use webViewController instead")
           InAppWebViewController? iosBelow11WebViewController,
       InAppWebViewController? webViewController}) async {
-
     assert(url.toString().isNotEmpty);
 
     webViewController = webViewController ?? iosBelow11WebViewController;

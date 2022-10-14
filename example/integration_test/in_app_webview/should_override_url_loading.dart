@@ -24,7 +24,8 @@ void shouldOverrideUrlLoading() {
         base64Encode(const Utf8Encoder().convert(page));
 
     testWidgets('can allow requests', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -76,7 +77,8 @@ void shouldOverrideUrlLoading() {
     testWidgets(
         'allow requests on iOS only if navigationType == NavigationType.LINK_ACTIVATED',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -134,7 +136,8 @@ void shouldOverrideUrlLoading() {
     }, skip: shouldSkipTest2);
 
     testWidgets('can block requests', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(
@@ -185,7 +188,8 @@ void shouldOverrideUrlLoading() {
     });
 
     testWidgets('supports asynchronous decisions', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
       await tester.pumpWidget(

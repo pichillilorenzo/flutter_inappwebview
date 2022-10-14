@@ -17,7 +17,8 @@ void loadAssetFile(InAppLocalhostServer localhostServer) {
   testWidgets('load asset file', (WidgetTester tester) async {
     expect(localhostServer.isRunning(), true);
 
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,

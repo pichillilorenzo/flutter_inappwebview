@@ -17,7 +17,8 @@ void requestImageRef() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('requestImageRef', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(

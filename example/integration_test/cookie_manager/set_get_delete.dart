@@ -18,7 +18,8 @@ void setGetDelete() {
 
   testWidgets('set, get, delete', (WidgetTester tester) async {
     CookieManager cookieManager = CookieManager.instance();
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
     await tester.pumpWidget(
       Directionality(
@@ -52,7 +53,8 @@ void setGetDelete() {
     cookie = await cookieManager.getCookie(url: url, name: "myCookie");
     expect(cookie, isNull);
 
-    await cookieManager.deleteCookies(url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}");
+    await cookieManager.deleteCookies(
+        url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}");
     cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isEmpty);
   }, skip: shouldSkip);

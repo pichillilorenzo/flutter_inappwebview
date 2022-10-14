@@ -41,8 +41,7 @@ void findInteractions() {
 
     const firstSearchText = "InAppWebViewInitialFileTest";
     await expectLater(
-        findInteractionController.findAll(find: firstSearchText),
-        completes);
+        findInteractionController.findAll(find: firstSearchText), completes);
     expect(await findInteractionController.getSearchText(), firstSearchText);
     if ([TargetPlatform.android].contains(defaultTargetPlatform)) {
       await Future.delayed(Duration(seconds: 1));
@@ -105,7 +104,8 @@ void findInteractions() {
     await tester.pump();
     await Future.delayed(Duration(seconds: 1));
 
-    await findInteractionController.findAll(find: "InAppWebViewInitialFileTest");
+    await findInteractionController.findAll(
+        find: "InAppWebViewInitialFileTest");
     final int numberOfMatches = await numberOfMatchesCompleter.future;
     expect(numberOfMatches, 2);
     final session = await findInteractionController.getActiveFindSession();

@@ -20,7 +20,8 @@ void injectJavascriptFile() {
 
   group('inject javascript file', () {
     testWidgets('from url', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer<void> jQueryLoaded = Completer<void>();
       final Completer<void> jQueryLoadError = Completer<void>();
@@ -82,7 +83,8 @@ void injectJavascriptFile() {
     });
 
     testWidgets('from asset', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
 
       await tester.pumpWidget(

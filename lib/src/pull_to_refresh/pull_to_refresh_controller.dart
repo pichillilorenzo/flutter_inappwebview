@@ -66,11 +66,12 @@ class PullToRefreshController {
       }
       var maxLogMessageLength =
           PullToRefreshController.debugLoggingSettings.maxLogMessageLength;
-      String message = "(${defaultTargetPlatform.name}) PullToRefreshController " +
-          " calling \"" +
-          method.toString() +
-          "\" using " +
-          args.toString();
+      String message =
+          "(${defaultTargetPlatform.name}) PullToRefreshController " +
+              " calling \"" +
+              method.toString() +
+              "\" using " +
+              args.toString();
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }

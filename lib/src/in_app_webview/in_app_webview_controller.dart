@@ -1535,8 +1535,8 @@ class InAppWebViewController {
 
     if (manifestFound) {
       try {
-        Map<String, dynamic> manifest =
-        json.decode(await manifestResponse!.transform(Utf8Decoder()).join());
+        Map<String, dynamic> manifest = json
+            .decode(await manifestResponse!.transform(Utf8Decoder()).join());
         if (manifest.containsKey("icons")) {
           for (Map<String, dynamic> icon in manifest["icons"]) {
             favicons.addAll(_createFavicons(webviewUrl, assetPathBase,

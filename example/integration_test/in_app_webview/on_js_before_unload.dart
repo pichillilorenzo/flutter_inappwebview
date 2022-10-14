@@ -13,7 +13,8 @@ void onJsBeforeUnload() {
   final shouldSkip = true;
   // on Android, for some reason, it works on an example app but not in this test
   testWidgets('onJsBeforeUnload', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> onJsBeforeUnloadCompleter = Completer<String>();
 
     await tester.pumpWidget(

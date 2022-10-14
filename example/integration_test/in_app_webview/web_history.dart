@@ -27,7 +27,8 @@ void webHistory() {
 
     testWidgets('get history list and go back/forward',
         (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
 
       await tester.pumpWidget(
         Directionality(
@@ -124,7 +125,8 @@ void webHistory() {
     final shouldSkipTest2 = !kIsWeb;
 
     testWidgets('go back/forward on web platform', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 
@@ -182,7 +184,8 @@ void webHistory() {
           ].contains(defaultTargetPlatform);
 
     testWidgets('clearHistory', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final StreamController<String> pageLoads =
           StreamController<String>.broadcast();
 

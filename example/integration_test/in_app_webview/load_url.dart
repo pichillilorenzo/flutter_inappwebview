@@ -20,7 +20,8 @@ void loadUrl() {
   var initialUrl = !kIsWeb ? TEST_URL_1 : TEST_WEB_PLATFORM_URL_1;
 
   testWidgets('loadUrl', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> firstUrlLoad = Completer<String>();
     final Completer<String> loadedUrl = Completer<String>();
 
@@ -61,7 +62,8 @@ void loadUrl() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('loadSimulatedRequest', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<String> firstUrlLoad = Completer<String>();
     final Completer<String> loadedUrl = Completer<String>();
 

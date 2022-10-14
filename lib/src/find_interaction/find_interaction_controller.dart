@@ -59,11 +59,12 @@ class FindInteractionController {
       }
       var maxLogMessageLength =
           FindInteractionController.debugLoggingSettings.maxLogMessageLength;
-      String message = "(${defaultTargetPlatform.name}) FindInteractionController " +
-          " calling \"" +
-          method.toString() +
-          "\" using " +
-          args.toString();
+      String message =
+          "(${defaultTargetPlatform.name}) FindInteractionController " +
+              " calling \"" +
+              method.toString() +
+              "\" using " +
+              args.toString();
       if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
         message = message.substring(0, maxLogMessageLength) + "...";
       }

@@ -18,7 +18,8 @@ void webMessage() {
 
   group('WebMessage', () {
     testWidgets('WebMessageChannel', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer webMessageCompleter = Completer<String>();
       await tester.pumpWidget(
         Directionality(
@@ -85,7 +86,8 @@ void webMessage() {
     });
 
     testWidgets('WebMessageListener', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> pageLoaded = Completer<void>();
       final Completer webMessageCompleter = Completer<String>();
       await tester.pumpWidget(

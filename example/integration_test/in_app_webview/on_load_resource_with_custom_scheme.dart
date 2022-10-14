@@ -16,7 +16,8 @@ void onLoadResourceWithCustomScheme() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onLoadResourceWithCustomScheme', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> imageLoaded = Completer<void>();
 
     await tester.pumpWidget(

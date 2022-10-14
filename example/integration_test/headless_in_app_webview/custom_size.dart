@@ -17,7 +17,8 @@ void customSize() {
         ].contains(defaultTargetPlatform);
 
   test('set and get custom size', () async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
 
     var headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),

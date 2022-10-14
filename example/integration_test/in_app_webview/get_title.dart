@@ -36,7 +36,8 @@ void getTitle() {
   testWidgets('getTitle', (WidgetTester tester) async {
     final Completer<void> pageStarted = Completer<void>();
     final Completer<void> pageLoaded = Completer<void>();
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
 
     await tester.pumpWidget(
       Directionality(

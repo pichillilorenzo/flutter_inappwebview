@@ -17,7 +17,8 @@ void pauseResumeTimers() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('pause/resume timers', (WidgetTester tester) async {
-    final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+    final Completer<InAppWebViewController> controllerCompleter =
+        Completer<InAppWebViewController>();
     final Completer<void> pageLoaded = Completer<void>();
 
     await tester.pumpWidget(

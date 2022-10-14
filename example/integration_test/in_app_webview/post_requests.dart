@@ -19,7 +19,8 @@ void postRequests() {
 
   group('POST requests', () {
     testWidgets('initialUrlRequest', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -57,7 +58,8 @@ void postRequests() {
     });
 
     testWidgets('loadUrl', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(
@@ -102,7 +104,8 @@ void postRequests() {
     });
 
     testWidgets('postUrl', (WidgetTester tester) async {
-      final Completer<InAppWebViewController> controllerCompleter = Completer<InAppWebViewController>();
+      final Completer<InAppWebViewController> controllerCompleter =
+          Completer<InAppWebViewController>();
       final Completer<void> postPageLoaded = Completer<void>();
 
       await tester.pumpWidget(

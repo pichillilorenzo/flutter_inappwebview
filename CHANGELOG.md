@@ -1,3 +1,7 @@
+## 5.5.0+2
+
+- Fixed README
+
 ## 5.5.0+1
 
 - Fixed README

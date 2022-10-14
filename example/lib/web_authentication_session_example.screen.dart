@@ -52,7 +52,7 @@ class _WebAuthenticationSessionExampleScreenState
                               await WebAuthenticationSession.isAvailable()) {
                             session = await WebAuthenticationSession.create(
                                 url: Uri.parse(
-                                    "http://localhost:8080/assets/web-auth.html"),
+                                    "http://localhost:8080/web-auth.html"),
                                 callbackURLScheme: "test",
                                 onComplete: (url, error) async {
                                   if (url != null) {

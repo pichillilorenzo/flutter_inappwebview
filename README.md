@@ -62,7 +62,7 @@ To make it work properly on the Web platform, you need to add the `web_support.j
 ```html
 <head>
     <!-- ... -->
-    <script src="/packages/flutter_inappwebview/assets/web/web_support.js" defer></script>
+    <script type="application/javascript" src="/assets/packages/flutter_inappwebview/assets/web/web_support.js" defer></script>
     <!-- ... -->
 </head>
 ```  

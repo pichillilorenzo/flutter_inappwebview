@@ -1,3 +1,8 @@
+## 6.0.0-beta.2
+
+- Fixed web example
+- Fixed export library 
+
 ## 6.0.0-beta.1
 
 - Deprecated old classes/properties/methods to make them eventually compatible with other Platforms and WebView engines.

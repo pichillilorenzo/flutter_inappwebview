@@ -16,7 +16,7 @@ import 'in_app_localhost_server/main.dart' as in_app_localhost_server_tests;
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
-  if (defaultTargetPlatform == TargetPlatform.android) {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 

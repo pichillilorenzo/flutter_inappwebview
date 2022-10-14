@@ -2084,7 +2084,7 @@ class InAppWebViewController {
     this.javaScriptHandlersMap[handlerName] = (callback);
   }
 
-  ///Removes a JavaScript message handler previously added with the [addJavaScriptHandler()] associated to [handlerName] key.
+  ///Removes a JavaScript message handler previously added with the [addJavaScriptHandler] associated to [handlerName] key.
   ///Returns the value associated with [handlerName] before it was removed.
   ///Returns `null` if [handlerName] was not found.
   ///

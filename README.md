@@ -23,6 +23,10 @@ A Flutter plugin that allows you to add an inline webview, to use an headless we
 
 </div>
 
+## New Version 6.0.0-beta.1 is OUT NOW!
+
+Migrating from version `5.x.x` is easy! Follow the online [Migration guide](https://inappwebview.dev/docs/migration-guide).
+
 ## Articles/Resources
 
 - [Official documentation: inappwebview.dev/docs](https://inappwebview.dev/docs/)

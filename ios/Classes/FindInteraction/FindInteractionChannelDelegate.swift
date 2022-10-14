@@ -134,8 +134,8 @@ public class FindInteractionChannelDelegate : ChannelDelegate {
     
     public func onFindResultReceived(activeMatchOrdinal: Int, numberOfMatches: Int, isDoneCounting: Bool) {
         if isDoneCounting, let findInteractionController = findInteractionController {
-            findInteractionController.activeFindSession = FindSession(resultCount: activeMatchOrdinal,
-                                                                      highlightedResultIndex: numberOfMatches,
+            findInteractionController.activeFindSession = FindSession(resultCount: numberOfMatches,
+                                                                      highlightedResultIndex: activeMatchOrdinal,
                                                                       searchResultDisplayStyle: 2) // matches UIFindSession.SearchResultDisplayStyle.none
         }
         

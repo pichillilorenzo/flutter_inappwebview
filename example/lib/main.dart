@@ -21,7 +21,7 @@ Future main() async {
   // await Permission.microphone.request();
   // await Permission.storage.request();
 
-  if (defaultTargetPlatform == TargetPlatform.android) {
+  if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
     await InAppWebViewController.setWebContentsDebuggingEnabled(true);
   }
 
@@ -33,6 +33,42 @@ Future main() async {
 }
 
 PointerInterceptor myDrawer({required BuildContext context}) {
+  final children = [
+    ListTile(
+      title: Text('InAppWebView'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/');
+      },
+    )
+  ];
+  if (!kIsWeb) {
+    children.addAll([
+      ListTile(
+        title: Text('InAppBrowser'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/InAppBrowser');
+        },
+      ),
+      ListTile(
+        title: Text('ChromeSafariBrowser'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+        },
+      ),
+      ListTile(
+        title: Text('WebAuthenticationSession'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
+        },
+      ),
+      ListTile(
+        title: Text('HeadlessInAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+        },
+      ),
+    ]);
+  }
   return PointerInterceptor(
     child: Drawer(
       child: ListView(
@@ -44,36 +80,7 @@ PointerInterceptor myDrawer({required BuildContext context}) {
               color: Colors.blue,
             ),
           ),
-          ListTile(
-            title: Text('InAppBrowser'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/InAppBrowser');
-            },
-          ),
-          ListTile(
-            title: Text('ChromeSafariBrowser'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
-            },
-          ),
-          ListTile(
-            title: Text('WebAuthenticationSession'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
-            },
-          ),
-          ListTile(
-            title: Text('InAppWebView'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/');
-            },
-          ),
-          ListTile(
-            title: Text('HeadlessInAppWebView'),
-            onTap: () {
-              Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
-            },
-          ),
+          ...children
         ],
       ),
     ),
@@ -98,6 +105,11 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
+    if (kIsWeb) {
+      return MaterialApp(initialRoute: '/', routes: {
+        '/': (context) => InAppWebViewExampleScreen(),
+      });
+    }
     return MaterialApp(initialRoute: '/', routes: {
       '/': (context) => InAppWebViewExampleScreen(),
       '/InAppBrowser': (context) => InAppBrowserExampleScreen(),

@@ -110,7 +110,7 @@ public class InAppBrowserManager: ChannelDelegate {
         navController.tmpWindow = tmpWindow
         
         var animated = true
-        if let browserOptions = webViewController.browserSettings, browserOptions.hidden {
+        if let browserSettings = webViewController.browserSettings, browserSettings.hidden {
             tmpWindow.isHidden = true
             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             animated = false

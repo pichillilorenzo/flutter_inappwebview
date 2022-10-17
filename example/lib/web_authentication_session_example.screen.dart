@@ -48,7 +48,8 @@ class _WebAuthenticationSessionExampleScreenState
                         onPressed: () async {
                           if (session == null &&
                               !kIsWeb &&
-                              defaultTargetPlatform == TargetPlatform.iOS &&
+                              [TargetPlatform.iOS, TargetPlatform.macOS]
+                                  .contains(defaultTargetPlatform) &&
                               await WebAuthenticationSession.isAvailable()) {
                             session = await WebAuthenticationSession.create(
                                 url: Uri.parse(

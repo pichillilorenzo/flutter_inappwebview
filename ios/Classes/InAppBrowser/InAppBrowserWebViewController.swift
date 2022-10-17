@@ -254,7 +254,7 @@ public class InAppBrowserWebViewController: UIViewController, InAppBrowserDelega
                     navigationController?.navigationBar.barTintColor = UIColor(hexString: barTintColor)
                 }
                 if let tintColor = browserOptions.toolbarTopTintColor, !tintColor.isEmpty {
-                    navigationController?.navigationBar.barTintColor = UIColor(hexString: tintColor)
+                    navigationController?.navigationBar.tintColor = UIColor(hexString: tintColor)
                 }
                 navigationController?.navigationBar.isTranslucent = browserOptions.toolbarTopTranslucent
             }

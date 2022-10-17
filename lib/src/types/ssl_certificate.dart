@@ -85,10 +85,12 @@ class SslCertificate_ {
           SslCertificateDName.fromMap(map["issuedBy"]?.cast<String, dynamic>()),
       issuedTo:
           SslCertificateDName.fromMap(map["issuedTo"]?.cast<String, dynamic>()),
-      validNotAfterDate:
-          DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"]),
-      validNotBeforeDate:
-          DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"]),
+      validNotAfterDate: map["validNotAfterDate"] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map["validNotAfterDate"])
+          : null,
+      validNotBeforeDate: map["validNotBeforeDate"] != null
+          ? DateTime.fromMillisecondsSinceEpoch(map["validNotBeforeDate"])
+          : null,
       x509Certificate: x509Certificate,
     );
   }

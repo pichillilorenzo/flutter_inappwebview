@@ -33,26 +33,65 @@ Future main() async {
 }
 
 PointerInterceptor myDrawer({required BuildContext context}) {
-  final children = [
+  var children = [
     ListTile(
       title: Text('InAppWebView'),
       onTap: () {
         Navigator.pushReplacementNamed(context, '/');
       },
-    )
+    ),
+    ListTile(
+      title: Text('InAppBrowser'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/InAppBrowser');
+      },
+    ),
+    ListTile(
+      title: Text('ChromeSafariBrowser'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+      },
+    ),
+    ListTile(
+      title: Text('WebAuthenticationSession'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/WebAuthenticationSession');
+      },
+    ),
+    ListTile(
+      title: Text('HeadlessInAppWebView'),
+      onTap: () {
+        Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
+      },
+    ),
   ];
-  if (!kIsWeb) {
-    children.addAll([
+  if (kIsWeb) {
+    children = [
+      ListTile(
+        title: Text('InAppWebView'),
+        onTap: () {
+          Navigator.pushReplacementNamed(context, '/');
+        },
+      )
+    ];
+  } else if (defaultTargetPlatform == TargetPlatform.macOS) {
+    children = [
+      // ListTile(
+      //   title: Text('InAppWebView'),
+      //   onTap: () {
+      //     Navigator.pushReplacementNamed(context, '/');
+      //   },
+      // ),
+      // ListTile(
+      //   title: Text('InAppBrowser'),
+      //   onTap: () {
+      //     Navigator.pushReplacementNamed(context, '/InAppBrowser');
+      //   },
+      // ),
       ListTile(
         title: Text('InAppBrowser'),
         onTap: () {
-          Navigator.pushReplacementNamed(context, '/InAppBrowser');
-        },
-      ),
-      ListTile(
-        title: Text('ChromeSafariBrowser'),
-        onTap: () {
-          Navigator.pushReplacementNamed(context, '/ChromeSafariBrowser');
+          Navigator.pushReplacementNamed(context, '/');
         },
       ),
       ListTile(
@@ -67,7 +106,7 @@ PointerInterceptor myDrawer({required BuildContext context}) {
           Navigator.pushReplacementNamed(context, '/HeadlessInAppWebView');
         },
       ),
-    ]);
+    ];
   }
   return PointerInterceptor(
     child: Drawer(
@@ -108,6 +147,15 @@ class _MyAppState extends State<MyApp> {
     if (kIsWeb) {
       return MaterialApp(initialRoute: '/', routes: {
         '/': (context) => InAppWebViewExampleScreen(),
+      });
+    }
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      return MaterialApp(initialRoute: '/', routes: {
+        // '/': (context) => InAppWebViewExampleScreen(),
+        // '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
+        '/': (context) => InAppBrowserExampleScreen(),
+        '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
+        '/WebAuthenticationSession': (context) => WebAuthenticationSessionExampleScreen(),
       });
     }
     return MaterialApp(initialRoute: '/', routes: {

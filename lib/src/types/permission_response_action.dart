@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import 'permission_response.dart';
@@ -19,12 +18,6 @@ class PermissionResponseAction_ {
   static const GRANT = const PermissionResponseAction_._internal(1);
 
   ///Prompt the user for permission for the requested resource.
-  @EnumSupportedPlatforms(platforms: [
-    EnumIOSPlatform(
-        available: "15.0",
-        note: "On iOS < 15.0, it will fallback to [DENY]",
-        value: 2)
-  ])
   static const PROMPT = const PermissionResponseAction_._internal(2);
 }
 

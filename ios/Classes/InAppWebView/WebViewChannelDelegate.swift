@@ -206,6 +206,13 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(FlutterMethodNotImplemented)
             }
             break
+        case .isHidden:
+            if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
+                result(iabController.isHidden)
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+            break
         case .getCopyBackForwardList:
             result(webView?.getCopyBackForwardList())
             break
@@ -289,6 +296,9 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case .getContentHeight:
             result(webView?.getContentHeight())
+            break
+        case .getContentWidth:
+            result(webView?.getContentWidth())
             break
         case .zoomBy:
             let zoomFactor = (arguments!["zoomFactor"] as! NSNumber).floatValue
@@ -572,8 +582,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             if let webView = self.webView, #available(iOS 14.5, *) {
                 // closeAllMediaPresentations with completionHandler v15.0 makes the app crash
                 // with error EXC_BAD_ACCESS, so use closeAllMediaPresentations v14.5
-                webView.closeAllMediaPresentations()
-                result(true)
+                if #available(iOS 16.0, *) {
+                    webView.closeAllMediaPresentations {
+                        result(true)
+                    }
+                } else {
+                    webView.closeAllMediaPresentations()
+                    result(true)
+                }
             } else {
                 result(false)
             }

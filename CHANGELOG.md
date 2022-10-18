@@ -1,3 +1,14 @@
+## 6.0.0-beta.3
+
+- Added MacOS support
+- Added `PrintJobInfo.printer`
+- Added `getContentWidth` WebView method
+
+### BREAKING CHANGES
+
+- Removed `PrintJobInfo.printerId`
+- All `InAppWebViewSettings`, `InAppBrowserSettings` properties are optionals
+
 ## 6.0.0-beta.2
 
 - Fixed web example

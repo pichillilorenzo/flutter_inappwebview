@@ -1,53 +1,13 @@
-import 'package:flutter/foundation.dart';
-import 'package:flutter/widgets.dart';
-import 'package:flutter_inappwebview/src/types/user_preferred_content_mode.dart';
-import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
-import '../types/action_mode_menu_item.dart';
-import '../types/cache_mode.dart';
-import '../types/data_detector_types.dart';
-import '../types/force_dark.dart';
-import '../types/force_dark_strategy.dart';
-import '../types/layout_algorithm.dart';
-import '../types/mixed_content_mode.dart';
-import '../types/over_scroll_mode.dart';
-import '../types/referrer_policy.dart';
-import '../types/renderer_priority_policy.dart';
-import '../types/requested_with_header_mode.dart';
-import '../types/sandbox.dart';
-import '../types/scrollbar_style.dart';
-import '../types/scrollview_content_inset_adjustment_behavior.dart';
-import '../types/scrollview_deceleration_rate.dart';
-import '../types/selection_granularity.dart';
-import '../types/vertical_scrollbar_position.dart';
-import 'android/in_app_webview_options.dart';
-import 'apple/in_app_webview_options.dart';
-import '../content_blocker.dart';
-import '../types/main.dart';
-import '../util.dart';
-import '../in_app_browser/in_app_browser_settings.dart';
-import 'webview.dart';
-import '../android/webview_feature.dart';
-import '../in_app_webview/in_app_webview_controller.dart';
-import '../context_menu.dart';
+part of 'in_app_webview_settings.dart';
 
-part 'in_app_webview_settings.g.dart';
-
-List<ContentBlocker> _deserializeContentBlockers(List<dynamic>? contentBlockersMapList) {
-  List<ContentBlocker> contentBlockers = [];
-  if (contentBlockersMapList != null) {
-    contentBlockersMapList.forEach((contentBlocker) {
-      contentBlockers.add(ContentBlocker.fromMap(
-          Map<dynamic, Map<dynamic, dynamic>>.from(
-              Map<dynamic, dynamic>.from(contentBlocker))));
-    });
-  }
-  return contentBlockers;
-}
+// **************************************************************************
+// ExchangeableObjectGenerator
+// **************************************************************************
 
 ///This class represents all the WebView settings available.
-@ExchangeableObject(copyMethod: true)
-class InAppWebViewSettings_ {
+class InAppWebViewSettings {
   ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
@@ -184,7 +144,6 @@ class InAppWebViewSettings_ {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  @ExchangeableObjectProperty(deserializer: _deserializeContentBlockers)
   List<ContentBlocker>? contentBlockers;
 
   ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
@@ -197,7 +156,7 @@ class InAppWebViewSettings_ {
   ///- Android native WebView
   ///- iOS
   ///- MacOS
-  UserPreferredContentMode_? preferredContentMode;
+  UserPreferredContentMode? preferredContentMode;
 
   ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event. The default value is `false`.
   ///
@@ -378,7 +337,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  MixedContentMode_? mixedContentMode;
+  MixedContentMode? mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
   ///
@@ -417,7 +376,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  CacheMode_? cacheMode;
+  CacheMode? cacheMode;
 
   ///Sets the cursive font family name. The default value is `"cursive"`.
   ///
@@ -449,7 +408,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ActionModeMenuItem_? disabledActionModeMenuItems;
+  ActionModeMenuItem? disabledActionModeMenuItems;
 
   ///Sets the fantasy font family name. The default value is `"fantasy"`.
   ///
@@ -469,7 +428,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ForceDark_? forceDark;
+  ForceDark? forceDark;
 
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
@@ -478,7 +437,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ForceDarkStrategy_? forceDarkStrategy;
+  ForceDarkStrategy? forceDarkStrategy;
 
   ///Sets whether Geolocation API is enabled. The default value is `true`.
   ///
@@ -490,7 +449,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  LayoutAlgorithm_? layoutAlgorithm;
+  LayoutAlgorithm? layoutAlgorithm;
 
   ///Sets whether the WebView loads pages in overview mode, that is, zooms out the content to fit on screen by width.
   ///This setting is taken into account when the content width is greater than the width of the WebView control, for example, when [useWideViewPort] is enabled.
@@ -626,7 +585,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  OverScrollMode_? overScrollMode;
+  OverScrollMode? overScrollMode;
 
   ///Informs WebView of the network state.
   ///This is used to set the JavaScript property `window.navigator.isOnline` and generates the online/offline event as specified in HTML5, sec. 5.7.7.
@@ -644,14 +603,14 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ScrollBarStyle_? scrollBarStyle;
+  ScrollBarStyle? scrollBarStyle;
 
   ///Sets the position of the vertical scroll bar.
   ///The default value is [VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  VerticalScrollbarPosition_? verticalScrollbarPosition;
+  VerticalScrollbarPosition? verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
   ///
@@ -676,7 +635,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  RendererPriorityPolicy_? rendererPriorityPolicy;
+  RendererPriorityPolicy? rendererPriorityPolicy;
 
   ///Sets whether the default Android error page should be disabled.
   ///The default value is `false`.
@@ -755,7 +714,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  RequestedWithHeaderMode_? requestedWithHeaderMode;
+  RequestedWithHeaderMode? requestedWithHeaderMode;
 
   ///Sets whether EnterpriseAuthenticationAppLinkPolicy if set by admin is allowed to have any
   ///effect on WebView.
@@ -855,7 +814,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  SelectionGranularity_? selectionGranularity;
+  SelectionGranularity? selectionGranularity;
 
   ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
   ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [DataDetectorTypes.LINK].
@@ -865,7 +824,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  List<DataDetectorTypes_>? dataDetectorTypes;
+  List<DataDetectorTypes>? dataDetectorTypes;
 
   ///Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
   ///The default value is `false`.
@@ -902,7 +861,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  ScrollViewDecelerationRate_? decelerationRate;
+  ScrollViewDecelerationRate? decelerationRate;
 
   ///A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content.
   ///If this property is set to `true` and [InAppWebViewSettings.disallowOverScroll] is `false`,
@@ -961,7 +920,7 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  ScrollViewContentInsetAdjustmentBehavior_? contentInsetAdjustmentBehavior;
+  ScrollViewContentInsetAdjustmentBehavior? contentInsetAdjustmentBehavior;
 
   ///A Boolean value that determines whether scrolling is disabled in a particular direction.
   ///If this property is `false`, scrolling is permitted in both horizontal and vertical directions.
@@ -1055,10 +1014,6 @@ class InAppWebViewSettings_ {
   ///- [InAppWebViewController.getScrollY]
   ///- [InAppWebViewController.scrollTo]
   ///- [InAppWebViewController.scrollBy]
-  ///- [InAppWebViewController.getContentHeight]
-  ///- [InAppWebViewController.getContentWidth]
-  ///- [InAppWebViewController.canScrollVertically]
-  ///- [InAppWebViewController.canScrollHorizontally]
   ///
   ///Settings affected:
   ///- [WebView.initialUserScripts]
@@ -1230,13 +1185,13 @@ class InAppWebViewSettings_ {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
-  Set<Sandbox_>? iframeSandbox;
+  Set<Sandbox>? iframeSandbox;
 
   ///A string that reflects the `referrerpolicy` HTML attribute indicating which referrer to use when fetching the linked resource.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Web
-  ReferrerPolicy_? iframeReferrerPolicy;
+  ReferrerPolicy? iframeReferrerPolicy;
 
   ///A string that reflects the `name` HTML attribute, containing a name by which to refer to the frame.
   ///
@@ -1249,735 +1204,7 @@ class InAppWebViewSettings_ {
   ///**Supported Platforms/Implementations**:
   ///- Web
   String? iframeCsp;
-
-  InAppWebViewSettings_({
-    this.useShouldOverrideUrlLoading = false,
-    this.useOnLoadResource = false,
-    this.useOnDownloadStart = false,
-    this.clearCache = false,
-    this.userAgent = "",
-    this.applicationNameForUserAgent = "",
-    this.javaScriptEnabled = true,
-    this.javaScriptCanOpenWindowsAutomatically = false,
-    this.mediaPlaybackRequiresUserGesture = true,
-    this.minimumFontSize,
-    this.verticalScrollBarEnabled = true,
-    this.horizontalScrollBarEnabled = true,
-    this.resourceCustomSchemes = const [],
-    this.contentBlockers = const [],
-    this.preferredContentMode = UserPreferredContentMode_.RECOMMENDED,
-    this.useShouldInterceptAjaxRequest = false,
-    this.useShouldInterceptFetchRequest = false,
-    this.incognito = false,
-    this.cacheEnabled = true,
-    this.transparentBackground = false,
-    this.disableVerticalScroll = false,
-    this.disableHorizontalScroll = false,
-    this.disableContextMenu = false,
-    this.supportZoom = true,
-    this.allowFileAccessFromFileURLs = false,
-    this.allowUniversalAccessFromFileURLs = false,
-    this.textZoom = 100,
-    this.clearSessionCache = false,
-    this.builtInZoomControls = true,
-    this.displayZoomControls = false,
-    this.databaseEnabled = true,
-    this.domStorageEnabled = true,
-    this.useWideViewPort = true,
-    this.safeBrowsingEnabled = true,
-    this.mixedContentMode,
-    this.allowContentAccess = true,
-    this.allowFileAccess = true,
-    this.appCachePath,
-    this.blockNetworkImage = false,
-    this.blockNetworkLoads = false,
-    this.cacheMode = CacheMode_.LOAD_DEFAULT,
-    this.cursiveFontFamily = "cursive",
-    this.defaultFixedFontSize = 16,
-    this.defaultFontSize = 16,
-    this.defaultTextEncodingName = "UTF-8",
-    this.disabledActionModeMenuItems,
-    this.fantasyFontFamily = "fantasy",
-    this.fixedFontFamily = "monospace",
-    this.forceDark = ForceDark_.OFF,
-    this.forceDarkStrategy =
-        ForceDarkStrategy_.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
-    this.geolocationEnabled = true,
-    this.layoutAlgorithm,
-    this.loadWithOverviewMode = true,
-    this.loadsImagesAutomatically = true,
-    this.minimumLogicalFontSize = 8,
-    this.needInitialFocus = true,
-    this.offscreenPreRaster = false,
-    this.sansSerifFontFamily = "sans-serif",
-    this.serifFontFamily = "sans-serif",
-    this.standardFontFamily = "sans-serif",
-    this.saveFormData = true,
-    this.thirdPartyCookiesEnabled = true,
-    this.hardwareAcceleration = true,
-    this.initialScale = 0,
-    this.supportMultipleWindows = false,
-    this.regexToCancelSubFramesLoading,
-    this.useHybridComposition = true,
-    this.useShouldInterceptRequest = false,
-    this.useOnRenderProcessGone = false,
-    this.overScrollMode = OverScrollMode_.IF_CONTENT_SCROLLS,
-    this.networkAvailable,
-    this.scrollBarStyle = ScrollBarStyle_.SCROLLBARS_INSIDE_OVERLAY,
-    this.verticalScrollbarPosition =
-        VerticalScrollbarPosition_.SCROLLBAR_POSITION_DEFAULT,
-    this.scrollBarDefaultDelayBeforeFade,
-    this.scrollbarFadingEnabled = true,
-    this.scrollBarFadeDuration,
-    this.rendererPriorityPolicy,
-    this.disableDefaultErrorPage = false,
-    this.verticalScrollbarThumbColor,
-    this.verticalScrollbarTrackColor,
-    this.horizontalScrollbarThumbColor,
-    this.horizontalScrollbarTrackColor,
-    this.willSuppressErrorPage = false,
-    this.algorithmicDarkeningAllowed = false,
-    this.requestedWithHeaderMode,
-    this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
-    this.disallowOverScroll = false,
-    this.enableViewportScale = false,
-    this.suppressesIncrementalRendering = false,
-    this.allowsAirPlayForMediaPlayback = true,
-    this.allowsBackForwardNavigationGestures = true,
-    this.allowsLinkPreview = true,
-    this.ignoresViewportScaleLimits = false,
-    this.allowsInlineMediaPlayback = false,
-    this.allowsPictureInPictureMediaPlayback = true,
-    this.isFraudulentWebsiteWarningEnabled = true,
-    this.selectionGranularity = SelectionGranularity_.DYNAMIC,
-    this.dataDetectorTypes = const [DataDetectorTypes_.NONE],
-    this.sharedCookiesEnabled = false,
-    this.automaticallyAdjustsScrollIndicatorInsets = false,
-    this.accessibilityIgnoresInvertColors = false,
-    this.decelerationRate = ScrollViewDecelerationRate_.NORMAL,
-    this.alwaysBounceVertical = false,
-    this.alwaysBounceHorizontal = false,
-    this.scrollsToTop = true,
-    this.isPagingEnabled = false,
-    this.maximumZoomScale = 1.0,
-    this.minimumZoomScale = 1.0,
-    this.contentInsetAdjustmentBehavior =
-        ScrollViewContentInsetAdjustmentBehavior_.NEVER,
-    this.isDirectionalLockEnabled = false,
-    this.mediaType,
-    this.pageZoom = 1.0,
-    this.limitsNavigationsToAppBoundDomains = false,
-    this.useOnNavigationResponse = false,
-    this.applePayAPIEnabled = false,
-    this.allowingReadAccessTo,
-    this.disableLongPressContextMenuOnLinks = false,
-    this.disableInputAccessoryView = false,
-    this.underPageBackgroundColor,
-    this.isTextInteractionEnabled = true,
-    this.isSiteSpecificQuirksModeEnabled = true,
-    this.upgradeKnownHostsToHTTPS = true,
-    this.isElementFullscreenEnabled = true,
-    this.isFindInteractionEnabled = false,
-    this.minimumViewportInset,
-    this.maximumViewportInset,
-    this.iframeAllow,
-    this.iframeAllowFullscreen,
-    this.iframeSandbox,
-    this.iframeReferrerPolicy,
-    this.iframeName,
-    this.iframeCsp,
-  }) {
-    if (this.minimumFontSize == null)
-      this.minimumFontSize =
-          defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
-    assert(this.resourceCustomSchemes == null ||
-        (this.resourceCustomSchemes != null &&
-            !this.resourceCustomSchemes!.contains("http") &&
-            !this.resourceCustomSchemes!.contains("https")));
-    assert(
-        allowingReadAccessTo == null || allowingReadAccessTo!.isScheme("file"));
-    assert(
-        (minimumViewportInset == null && maximumViewportInset == null) ||
-            minimumViewportInset != null &&
-                maximumViewportInset != null &&
-                minimumViewportInset!.isNonNegative &&
-                maximumViewportInset!.isNonNegative &&
-                minimumViewportInset!.vertical <=
-                    maximumViewportInset!.vertical &&
-                minimumViewportInset!.horizontal <=
-                    maximumViewportInset!.horizontal,
-        "minimumViewportInset cannot be larger than maximumViewportInset");
-  }
-
-  // Map<String, dynamic> toMap() {
-  //   List<Map<String, Map<String, dynamic>>> contentBlockersMapList = [];
-  //   contentBlockers.forEach((contentBlocker) {
-  //     contentBlockersMapList.add(contentBlocker.toMap());
-  //   });
-  //   List<String> dataDetectorTypesList = [];
-  //   dataDetectorTypes.forEach((dataDetectorType) {
-  //     dataDetectorTypesList.add(dataDetectorType.toNativeValue());
-  //   });
-  //
-  //   return {
-  //     "useShouldOverrideUrlLoading": useShouldOverrideUrlLoading,
-  //     "useOnLoadResource": useOnLoadResource,
-  //     "useOnDownloadStart": useOnDownloadStart,
-  //     "clearCache": clearCache,
-  //     "userAgent": userAgent,
-  //     "applicationNameForUserAgent": applicationNameForUserAgent,
-  //     "javaScriptEnabled": javaScriptEnabled,
-  //     "javaScriptCanOpenWindowsAutomatically":
-  //         javaScriptCanOpenWindowsAutomatically,
-  //     "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
-  //     "verticalScrollBarEnabled": verticalScrollBarEnabled,
-  //     "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
-  //     "resourceCustomSchemes": resourceCustomSchemes,
-  //     "contentBlockers": contentBlockersMapList,
-  //     "preferredContentMode": preferredContentMode?.toNativeValue(),
-  //     "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
-  //     "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
-  //     "incognito": incognito,
-  //     "cacheEnabled": cacheEnabled,
-  //     "transparentBackground": transparentBackground,
-  //     "disableVerticalScroll": disableVerticalScroll,
-  //     "disableHorizontalScroll": disableHorizontalScroll,
-  //     "disableContextMenu": disableContextMenu,
-  //     "supportZoom": supportZoom,
-  //     "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
-  //     "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
-  //     "textZoom": textZoom,
-  //     "clearSessionCache": clearSessionCache,
-  //     "builtInZoomControls": builtInZoomControls,
-  //     "displayZoomControls": displayZoomControls,
-  //     "databaseEnabled": databaseEnabled,
-  //     "domStorageEnabled": domStorageEnabled,
-  //     "useWideViewPort": useWideViewPort,
-  //     "safeBrowsingEnabled": safeBrowsingEnabled,
-  //     "mixedContentMode": mixedContentMode?.toNativeValue(),
-  //     "allowContentAccess": allowContentAccess,
-  //     "allowFileAccess": allowFileAccess,
-  //     "appCachePath": appCachePath,
-  //     "blockNetworkImage": blockNetworkImage,
-  //     "blockNetworkLoads": blockNetworkLoads,
-  //     "cacheMode": cacheMode?.toNativeValue(),
-  //     "cursiveFontFamily": cursiveFontFamily,
-  //     "defaultFixedFontSize": defaultFixedFontSize,
-  //     "defaultFontSize": defaultFontSize,
-  //     "defaultTextEncodingName": defaultTextEncodingName,
-  //     "disabledActionModeMenuItems":
-  //         disabledActionModeMenuItems?.toNativeValue(),
-  //     "fantasyFontFamily": fantasyFontFamily,
-  //     "fixedFontFamily": fixedFontFamily,
-  //     "forceDark": forceDark?.toNativeValue(),
-  //     "forceDarkStrategy": forceDarkStrategy?.toNativeValue(),
-  //     "geolocationEnabled": geolocationEnabled,
-  //     "layoutAlgorithm": layoutAlgorithm?.toNativeValue(),
-  //     "loadWithOverviewMode": loadWithOverviewMode,
-  //     "loadsImagesAutomatically": loadsImagesAutomatically,
-  //     "minimumLogicalFontSize": minimumLogicalFontSize,
-  //     "initialScale": initialScale,
-  //     "needInitialFocus": needInitialFocus,
-  //     "offscreenPreRaster": offscreenPreRaster,
-  //     "sansSerifFontFamily": sansSerifFontFamily,
-  //     "serifFontFamily": serifFontFamily,
-  //     "standardFontFamily": standardFontFamily,
-  //     "saveFormData": saveFormData,
-  //     "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
-  //     "hardwareAcceleration": hardwareAcceleration,
-  //     "supportMultipleWindows": supportMultipleWindows,
-  //     "useHybridComposition": useHybridComposition,
-  //     "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
-  //     "useShouldInterceptRequest": useShouldInterceptRequest,
-  //     "useOnRenderProcessGone": useOnRenderProcessGone,
-  //     "overScrollMode": overScrollMode?.toNativeValue(),
-  //     "networkAvailable": networkAvailable,
-  //     "scrollBarStyle": scrollBarStyle?.toNativeValue(),
-  //     "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
-  //     "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
-  //     "scrollbarFadingEnabled": scrollbarFadingEnabled,
-  //     "scrollBarFadeDuration": scrollBarFadeDuration,
-  //     "rendererPriorityPolicy": rendererPriorityPolicy?.toMap(),
-  //     "disableDefaultErrorPage": disableDefaultErrorPage,
-  //     "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
-  //     "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
-  //     "horizontalScrollbarThumbColor": horizontalScrollbarThumbColor?.toHex(),
-  //     "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
-  //     "willSuppressErrorPage": willSuppressErrorPage,
-  //     "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
-  //     "requestedWithHeaderMode": requestedWithHeaderMode?.toNativeValue(),
-  //     "enterpriseAuthenticationAppLinkPolicyEnabled":
-  //         enterpriseAuthenticationAppLinkPolicyEnabled,
-  //     "disallowOverScroll": disallowOverScroll,
-  //     "enableViewportScale": enableViewportScale,
-  //     "suppressesIncrementalRendering": suppressesIncrementalRendering,
-  //     "allowsAirPlayForMediaPlayback": allowsAirPlayForMediaPlayback,
-  //     "allowsBackForwardNavigationGestures":
-  //         allowsBackForwardNavigationGestures,
-  //     "allowsLinkPreview": allowsLinkPreview,
-  //     "ignoresViewportScaleLimits": ignoresViewportScaleLimits,
-  //     "allowsInlineMediaPlayback": allowsInlineMediaPlayback,
-  //     "allowsPictureInPictureMediaPlayback":
-  //         allowsPictureInPictureMediaPlayback,
-  //     "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
-  //     "selectionGranularity": selectionGranularity.toNativeValue(),
-  //     "dataDetectorTypes": dataDetectorTypesList,
-  //     "sharedCookiesEnabled": sharedCookiesEnabled,
-  //     "automaticallyAdjustsScrollIndicatorInsets":
-  //         automaticallyAdjustsScrollIndicatorInsets,
-  //     "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
-  //     "decelerationRate": decelerationRate.toNativeValue(),
-  //     "alwaysBounceVertical": alwaysBounceVertical,
-  //     "alwaysBounceHorizontal": alwaysBounceHorizontal,
-  //     "scrollsToTop": scrollsToTop,
-  //     "isPagingEnabled": isPagingEnabled,
-  //     "maximumZoomScale": maximumZoomScale,
-  //     "minimumZoomScale": minimumZoomScale,
-  //     "contentInsetAdjustmentBehavior":
-  //         contentInsetAdjustmentBehavior.toNativeValue(),
-  //     "isDirectionalLockEnabled": isDirectionalLockEnabled,
-  //     "mediaType": mediaType,
-  //     "pageZoom": pageZoom,
-  //     "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
-  //     "useOnNavigationResponse": useOnNavigationResponse,
-  //     "applePayAPIEnabled": applePayAPIEnabled,
-  //     "allowingReadAccessTo": allowingReadAccessTo.toString(),
-  //     "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
-  //     "disableInputAccessoryView": disableInputAccessoryView,
-  //     "underPageBackgroundColor": underPageBackgroundColor?.toHex(),
-  //     "isTextInteractionEnabled": isTextInteractionEnabled,
-  //     "isSiteSpecificQuirksModeEnabled": isSiteSpecificQuirksModeEnabled,
-  //     "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
-  //     "isElementFullscreenEnabled": isElementFullscreenEnabled,
-  //     "isFindInteractionEnabled": isFindInteractionEnabled,
-  //     "minimumViewportInset": minimumViewportInset?.toMap(),
-  //     "maximumViewportInset": maximumViewportInset?.toMap(),
-  //     "iframeAllow": iframeAllow,
-  //     "iframeAllowFullscreen": iframeAllowFullscreen,
-  //     "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
-  //     "iframeReferrerPolicy": iframeReferrerPolicy,
-  //     "iframeName": iframeName,
-  //     "iframeCsp": iframeCsp,
-  //   };
-  // }
-  //
-  // ///Gets a [InAppWebViewSettings] instance from a [Map] value.
-  // factory InAppWebViewSettings.fromMap(Map<String, dynamic> map) {
-  //   List<ContentBlocker> contentBlockers = [];
-  //   List<dynamic>? contentBlockersMapList = map["contentBlockers"];
-  //   if (contentBlockersMapList != null) {
-  //     contentBlockersMapList.forEach((contentBlocker) {
-  //       contentBlockers.add(ContentBlocker.fromMap(
-  //           Map<dynamic, Map<dynamic, dynamic>>.from(
-  //               Map<dynamic, dynamic>.from(contentBlocker))));
-  //     });
-  //   }
-  //   List<DataDetectorTypes> dataDetectorTypes = [];
-  //   List<String> dataDetectorTypesList =
-  //       List<String>.from(map["dataDetectorTypes"] ?? []);
-  //   dataDetectorTypesList.forEach((dataDetectorTypeValue) {
-  //     var dataDetectorType =
-  //         DataDetectorTypes.fromNativeValue(dataDetectorTypeValue);
-  //     if (dataDetectorType != null) {
-  //       dataDetectorTypes.add(dataDetectorType);
-  //     }
-  //   });
-  //
-  //   var settings = InAppWebViewSettings();
-  //   settings.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
-  //   settings.useOnLoadResource = map["useOnLoadResource"];
-  //   settings.useOnDownloadStart = map["useOnDownloadStart"];
-  //   settings.clearCache = map["clearCache"];
-  //   settings.userAgent = map["userAgent"];
-  //   settings.applicationNameForUserAgent = map["applicationNameForUserAgent"];
-  //   settings.javaScriptEnabled = map["javaScriptEnabled"];
-  //   settings.javaScriptCanOpenWindowsAutomatically =
-  //       map["javaScriptCanOpenWindowsAutomatically"];
-  //   settings.mediaPlaybackRequiresUserGesture =
-  //       map["mediaPlaybackRequiresUserGesture"];
-  //   settings.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
-  //   settings.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
-  //   settings.resourceCustomSchemes =
-  //       List<String>.from(map["resourceCustomSchemes"] ?? []);
-  //   settings.contentBlockers = contentBlockers;
-  //   settings.preferredContentMode =
-  //       UserPreferredContentMode.fromNativeValue(map["preferredContentMode"]);
-  //   settings.useShouldInterceptAjaxRequest =
-  //       map["useShouldInterceptAjaxRequest"];
-  //   settings.useShouldInterceptFetchRequest =
-  //       map["useShouldInterceptFetchRequest"];
-  //   settings.incognito = map["incognito"];
-  //   settings.cacheEnabled = map["cacheEnabled"];
-  //   settings.transparentBackground = map["transparentBackground"];
-  //   settings.disableVerticalScroll = map["disableVerticalScroll"];
-  //   settings.disableHorizontalScroll = map["disableHorizontalScroll"];
-  //   settings.disableContextMenu = map["disableContextMenu"];
-  //   settings.supportZoom = map["supportZoom"];
-  //   settings.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-  //   settings.allowUniversalAccessFromFileURLs =
-  //       map["allowUniversalAccessFromFileURLs"];
-  //   if (kIsWeb) {
-  //     settings.iframeAllow = map["iframeAllow"];
-  //     settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
-  //     settings.iframeSandbox = map["iframeSandbox"] != null
-  //         ? Set.from((map["iframeSandbox"].cast<String>() as List<String>)
-  //             .map((e) => Sandbox.fromNativeValue(e)))
-  //         : null;
-  //     settings.iframeReferrerPolicy =
-  //         ReferrerPolicy.fromNativeValue(map["iframeReferrerPolicy"]);
-  //     settings.iframeName = map["iframeName"];
-  //     settings.iframeCsp = map["iframeCsp"];
-  //   } else {
-  //     if (defaultTargetPlatform == TargetPlatform.android) {
-  //       settings.textZoom = map["textZoom"];
-  //       settings.clearSessionCache = map["clearSessionCache"];
-  //       settings.builtInZoomControls = map["builtInZoomControls"];
-  //       settings.displayZoomControls = map["displayZoomControls"];
-  //       settings.databaseEnabled = map["databaseEnabled"];
-  //       settings.domStorageEnabled = map["domStorageEnabled"];
-  //       settings.useWideViewPort = map["useWideViewPort"];
-  //       settings.safeBrowsingEnabled = map["safeBrowsingEnabled"];
-  //       settings.mixedContentMode =
-  //           MixedContentMode.fromNativeValue(map["mixedContentMode"]);
-  //       settings.allowContentAccess = map["allowContentAccess"];
-  //       settings.allowFileAccess = map["allowFileAccess"];
-  //       settings.appCachePath = map["appCachePath"];
-  //       settings.blockNetworkImage = map["blockNetworkImage"];
-  //       settings.blockNetworkLoads = map["blockNetworkLoads"];
-  //       settings.cacheMode = CacheMode.fromNativeValue(map["cacheMode"]);
-  //       settings.cursiveFontFamily = map["cursiveFontFamily"];
-  //       settings.defaultFixedFontSize = map["defaultFixedFontSize"];
-  //       settings.defaultFontSize = map["defaultFontSize"];
-  //       settings.defaultTextEncodingName = map["defaultTextEncodingName"];
-  //       settings.disabledActionModeMenuItems =
-  //           ActionModeMenuItem.fromNativeValue(
-  //               map["disabledActionModeMenuItems"]);
-  //       settings.fantasyFontFamily = map["fantasyFontFamily"];
-  //       settings.fixedFontFamily = map["fixedFontFamily"];
-  //       settings.forceDark = ForceDark.fromNativeValue(map["forceDark"]);
-  //       settings.forceDarkStrategy =
-  //           ForceDarkStrategy.fromNativeValue(map["forceDarkStrategy"]);
-  //       settings.geolocationEnabled = map["geolocationEnabled"];
-  //       settings.layoutAlgorithm =
-  //           LayoutAlgorithm.fromNativeValue(map["layoutAlgorithm"]);
-  //       settings.loadWithOverviewMode = map["loadWithOverviewMode"];
-  //       settings.loadsImagesAutomatically = map["loadsImagesAutomatically"];
-  //       settings.minimumLogicalFontSize = map["minimumLogicalFontSize"];
-  //       settings.initialScale = map["initialScale"];
-  //       settings.needInitialFocus = map["needInitialFocus"];
-  //       settings.offscreenPreRaster = map["offscreenPreRaster"];
-  //       settings.sansSerifFontFamily = map["sansSerifFontFamily"];
-  //       settings.serifFontFamily = map["serifFontFamily"];
-  //       settings.standardFontFamily = map["standardFontFamily"];
-  //       settings.saveFormData = map["saveFormData"];
-  //       settings.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
-  //       settings.hardwareAcceleration = map["hardwareAcceleration"];
-  //       settings.supportMultipleWindows = map["supportMultipleWindows"];
-  //       settings.regexToCancelSubFramesLoading =
-  //           map["regexToCancelSubFramesLoading"];
-  //       settings.useHybridComposition = map["useHybridComposition"];
-  //       settings.useShouldInterceptRequest = map["useShouldInterceptRequest"];
-  //       settings.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-  //       settings.overScrollMode =
-  //           OverScrollMode.fromNativeValue(map["overScrollMode"]);
-  //       settings.networkAvailable = map["networkAvailable"];
-  //       settings.scrollBarStyle =
-  //           ScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
-  //       settings.verticalScrollbarPosition =
-  //           VerticalScrollbarPosition.fromNativeValue(
-  //               map["verticalScrollbarPosition"]);
-  //       settings.scrollBarDefaultDelayBeforeFade =
-  //           map["scrollBarDefaultDelayBeforeFade"];
-  //       settings.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
-  //       settings.scrollBarFadeDuration = map["scrollBarFadeDuration"];
-  //       settings.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
-  //           map["rendererPriorityPolicy"]?.cast<String, dynamic>());
-  //       settings.disableDefaultErrorPage = map["disableDefaultErrorPage"];
-  //       settings.verticalScrollbarThumbColor =
-  //           UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
-  //       settings.verticalScrollbarTrackColor =
-  //           UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
-  //       settings.horizontalScrollbarThumbColor =
-  //           UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
-  //       settings.horizontalScrollbarTrackColor =
-  //           UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
-  //       settings.willSuppressErrorPage = map["willSuppressErrorPage"];
-  //       settings.algorithmicDarkeningAllowed =
-  //           map["algorithmicDarkeningAllowed"];
-  //       settings.requestedWithHeaderMode =
-  //           RequestedWithHeaderMode.fromNativeValue(
-  //               map["requestedWithHeaderMode"]);
-  //       settings.enterpriseAuthenticationAppLinkPolicyEnabled =
-  //           map["enterpriseAuthenticationAppLinkPolicyEnabled"];
-  //     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
-  //         defaultTargetPlatform == TargetPlatform.macOS) {
-  //       settings.disallowOverScroll = map["disallowOverScroll"];
-  //       settings.enableViewportScale = map["enableViewportScale"];
-  //       settings.suppressesIncrementalRendering =
-  //           map["suppressesIncrementalRendering"];
-  //       settings.allowsAirPlayForMediaPlayback =
-  //           map["allowsAirPlayForMediaPlayback"];
-  //       settings.allowsBackForwardNavigationGestures =
-  //           map["allowsBackForwardNavigationGestures"];
-  //       settings.allowsLinkPreview = map["allowsLinkPreview"];
-  //       settings.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
-  //       settings.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
-  //       settings.allowsPictureInPictureMediaPlayback =
-  //           map["allowsPictureInPictureMediaPlayback"];
-  //       settings.isFraudulentWebsiteWarningEnabled =
-  //           map["isFraudulentWebsiteWarningEnabled"];
-  //       settings.selectionGranularity =
-  //           SelectionGranularity.fromNativeValue(map["selectionGranularity"])!;
-  //       settings.dataDetectorTypes = dataDetectorTypes;
-  //       settings.sharedCookiesEnabled = map["sharedCookiesEnabled"];
-  //       settings.automaticallyAdjustsScrollIndicatorInsets =
-  //           map["automaticallyAdjustsScrollIndicatorInsets"];
-  //       settings.accessibilityIgnoresInvertColors =
-  //           map["accessibilityIgnoresInvertColors"];
-  //       settings.decelerationRate = ScrollViewDecelerationRate.fromNativeValue(
-  //           map["decelerationRate"])!;
-  //       settings.alwaysBounceVertical = map["alwaysBounceVertical"];
-  //       settings.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
-  //       settings.scrollsToTop = map["scrollsToTop"];
-  //       settings.isPagingEnabled = map["isPagingEnabled"];
-  //       settings.maximumZoomScale = map["maximumZoomScale"];
-  //       settings.minimumZoomScale = map["minimumZoomScale"];
-  //       settings.contentInsetAdjustmentBehavior =
-  //           ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
-  //               map["contentInsetAdjustmentBehavior"])!;
-  //       settings.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
-  //       settings.mediaType = map["mediaType"];
-  //       settings.pageZoom = map["pageZoom"];
-  //       settings.limitsNavigationsToAppBoundDomains =
-  //           map["limitsNavigationsToAppBoundDomains"];
-  //       settings.useOnNavigationResponse = map["useOnNavigationResponse"];
-  //       settings.applePayAPIEnabled = map["applePayAPIEnabled"];
-  //       settings.allowingReadAccessTo = map["allowingReadAccessTo"] != null
-  //           ? Uri.parse(map["allowingReadAccessTo"])
-  //           : null;
-  //       settings.disableLongPressContextMenuOnLinks =
-  //           map["disableLongPressContextMenuOnLinks"];
-  //       settings.disableInputAccessoryView = map["disableInputAccessoryView"];
-  //       settings.underPageBackgroundColor =
-  //           UtilColor.fromHex(map["underPageBackgroundColor"]);
-  //       settings.isTextInteractionEnabled = map["isTextInteractionEnabled"];
-  //       settings.isSiteSpecificQuirksModeEnabled =
-  //           map["isSiteSpecificQuirksModeEnabled"];
-  //       settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
-  //       settings.isElementFullscreenEnabled = map["isElementFullscreenEnabled"];
-  //       settings.isFindInteractionEnabled = map["isFindInteractionEnabled"];
-  //       settings.minimumViewportInset = MapEdgeInsets.fromMap(
-  //           map["minimumViewportInset"]?.cast<String, double>());
-  //       settings.maximumViewportInset = MapEdgeInsets.fromMap(
-  //           map["maximumViewportInset"]?.cast<String, double>());
-  //     }
-  //   }
-  //   return settings;
-  // }
-}
-
-///Class that represents the options that can be used for a [WebView].
-///Use [InAppWebViewSettings] instead.
-@Deprecated('Use InAppWebViewSettings instead')
-class InAppWebViewGroupOptions {
-  ///Cross-platform options.
-  late InAppWebViewOptions crossPlatform;
-
-  ///Android-specific options.
-  late AndroidInAppWebViewOptions android;
-
-  ///iOS-specific options.
-  late IOSInAppWebViewOptions ios;
-
-  InAppWebViewGroupOptions(
-      {InAppWebViewOptions? crossPlatform,
-      AndroidInAppWebViewOptions? android,
-      IOSInAppWebViewOptions? ios}) {
-    this.crossPlatform = crossPlatform ?? InAppWebViewOptions();
-    this.android = android ?? AndroidInAppWebViewOptions();
-    this.ios = ios ?? IOSInAppWebViewOptions();
-  }
-
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> options = {};
-    options.addAll(this.crossPlatform.toMap());
-    if (defaultTargetPlatform == TargetPlatform.android)
-      options.addAll(this.android.toMap());
-    else if (defaultTargetPlatform == TargetPlatform.iOS)
-      options.addAll(this.ios.toMap());
-
-    return options;
-  }
-
-  static InAppWebViewGroupOptions fromMap(Map<String, dynamic> options) {
-    InAppWebViewGroupOptions inAppWebViewGroupOptions =
-        InAppWebViewGroupOptions();
-
-    inAppWebViewGroupOptions.crossPlatform =
-        InAppWebViewOptions.fromMap(options);
-    if (defaultTargetPlatform == TargetPlatform.android)
-      inAppWebViewGroupOptions.android =
-          AndroidInAppWebViewOptions.fromMap(options);
-    else if (defaultTargetPlatform == TargetPlatform.iOS)
-      inAppWebViewGroupOptions.ios = IOSInAppWebViewOptions.fromMap(options);
-
-    return inAppWebViewGroupOptions;
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-
-  InAppWebViewGroupOptions copy() {
-    return InAppWebViewGroupOptions.fromMap(this.toMap());
-  }
-}
-
-class WebViewOptions {
-  Map<String, dynamic> toMap() {
-    return {};
-  }
-
-  static WebViewOptions fromMap(Map<String, dynamic> map) {
-    return WebViewOptions();
-  }
-
-  WebViewOptions copy() {
-    return WebViewOptions.fromMap(this.toMap());
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
-
-///Use [InAppWebViewSettings] instead.
-@Deprecated('Use InAppWebViewSettings instead')
-class InAppWebViewOptions
-    implements WebViewOptions, BrowserOptions, AndroidOptions, IosOptions {
-  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
-  bool useShouldOverrideUrlLoading;
-
-  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event. The default value is `false`.
-  bool useOnLoadResource;
-
-  ///Set to `true` to be able to listen at the [WebView.onDownloadStart] event. The default value is `false`.
-  bool useOnDownloadStart;
-
-  ///Set to `true` to have all the browser's cache cleared before the new WebView is opened. The default value is `false`.
-  bool clearCache;
-
-  ///Sets the user-agent for the WebView.
-  ///
-  ///**NOTE**: available on iOS 9.0+.
-  String userAgent;
-
-  ///Append to the existing user-agent. Setting userAgent will override this.
-  ///
-  ///**NOTE**: available on Android 17+ and on iOS 9.0+.
-  String applicationNameForUserAgent;
-
-  ///Set to `true` to enable JavaScript. The default value is `true`.
-  bool javaScriptEnabled;
-
-  ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
-  bool javaScriptCanOpenWindowsAutomatically;
-
-  ///Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
-  ///
-  ///**NOTE**: available on iOS 10.0+.
-  bool mediaPlaybackRequiresUserGesture;
-
-  ///Sets the minimum font size. The default value is `8` for Android, `0` for iOS.
-  int? minimumFontSize;
-
-  ///Define whether the vertical scrollbar should be drawn or not. The default value is `true`.
-  bool verticalScrollBarEnabled;
-
-  ///Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
-  bool horizontalScrollBarEnabled;
-
-  ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceCustomScheme] event to intercept resource requests with custom scheme.
-  ///
-  ///**NOTE**: available on iOS 11.0+.
-  List<String> resourceCustomSchemes;
-
-  ///List of [ContentBlocker] that are a set of rules used to block content in the browser window.
-  ///
-  ///**NOTE**: available on iOS 11.0+.
-  List<ContentBlocker> contentBlockers;
-
-  ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
-  ///
-  ///**NOTE**: available on iOS 13.0+.
-  UserPreferredContentMode? preferredContentMode;
-
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event. The default value is `false`.
-  bool useShouldInterceptAjaxRequest;
-
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event. The default value is `false`.
-  bool useShouldInterceptFetchRequest;
-
-  ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
-  ///
-  ///**NOTE**: available on iOS 9.0+.
-  ///On Android, by setting this option to `true`, it will clear all the cookies of all WebView instances,
-  ///because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS.
-  bool incognito;
-
-  ///Sets whether WebView should use browser caching. The default value is `true`.
-  ///
-  ///**NOTE**: available on iOS 9.0+.
-  bool cacheEnabled;
-
-  ///Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
-  bool transparentBackground;
-
-  ///Set to `true` to disable vertical scroll. The default value is `false`.
-  bool disableVerticalScroll;
-
-  ///Set to `true` to disable horizontal scroll. The default value is `false`.
-  bool disableHorizontalScroll;
-
-  ///Set to `true` to disable context menu. The default value is `false`.
-  bool disableContextMenu;
-
-  ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
-  bool supportZoom;
-
-  ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from other file scheme URLs.
-  ///Note that some accesses such as image HTML elements don't follow same-origin rules and aren't affected by this setting.
-  ///
-  ///Don't enable this setting if you open files that may be created or altered by external sources.
-  ///Enabling this setting allows malicious scripts loaded in a `file://` context to access arbitrary local files including WebView cookies and app private data.
-  ///
-  ///Note that the value of this setting is ignored if the value of [allowUniversalAccessFromFileURLs] is `true`.
-  ///
-  ///The default value is `false`.
-  bool allowFileAccessFromFileURLs;
-
-  ///Sets whether cross-origin requests in the context of a file scheme URL should be allowed to access content from any origin.
-  ///This includes access to content from other file scheme URLs or web contexts.
-  ///Note that some access such as image HTML elements doesn't follow same-origin rules and isn't affected by this setting.
-  ///
-  ///Don't enable this setting if you open files that may be created or altered by external sources.
-  ///Enabling this setting allows malicious scripts loaded in a `file://` context to launch cross-site scripting attacks,
-  ///either accessing arbitrary local files including WebView cookies, app private data or even credentials used on arbitrary web sites.
-  ///
-  ///The default value is `false`.
-  bool allowUniversalAccessFromFileURLs;
-
-  InAppWebViewOptions(
+  InAppWebViewSettings(
       {this.useShouldOverrideUrlLoading = false,
       this.useOnLoadResource = false,
       this.useOnDownloadStart = false,
@@ -2003,21 +1230,320 @@ class InAppWebViewOptions
       this.disableContextMenu = false,
       this.supportZoom = true,
       this.allowFileAccessFromFileURLs = false,
-      this.allowUniversalAccessFromFileURLs = false}) {
-    if (this.minimumFontSize == null)
-      this.minimumFontSize =
-          defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
-    assert(!this.resourceCustomSchemes.contains("http") &&
-        !this.resourceCustomSchemes.contains("https"));
+      this.allowUniversalAccessFromFileURLs = false,
+      this.textZoom = 100,
+      this.clearSessionCache = false,
+      this.builtInZoomControls = true,
+      this.displayZoomControls = false,
+      this.databaseEnabled = true,
+      this.domStorageEnabled = true,
+      this.useWideViewPort = true,
+      this.safeBrowsingEnabled = true,
+      this.mixedContentMode,
+      this.allowContentAccess = true,
+      this.allowFileAccess = true,
+      this.appCachePath,
+      this.blockNetworkImage = false,
+      this.blockNetworkLoads = false,
+      this.cacheMode = CacheMode.LOAD_DEFAULT,
+      this.cursiveFontFamily = "cursive",
+      this.defaultFixedFontSize = 16,
+      this.defaultFontSize = 16,
+      this.defaultTextEncodingName = "UTF-8",
+      this.disabledActionModeMenuItems,
+      this.fantasyFontFamily = "fantasy",
+      this.fixedFontFamily = "monospace",
+      this.forceDark = ForceDark.OFF,
+      this.forceDarkStrategy =
+          ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING,
+      this.geolocationEnabled = true,
+      this.layoutAlgorithm,
+      this.loadWithOverviewMode = true,
+      this.loadsImagesAutomatically = true,
+      this.minimumLogicalFontSize = 8,
+      this.initialScale = 0,
+      this.needInitialFocus = true,
+      this.offscreenPreRaster = false,
+      this.sansSerifFontFamily = "sans-serif",
+      this.serifFontFamily = "sans-serif",
+      this.standardFontFamily = "sans-serif",
+      this.saveFormData = true,
+      this.thirdPartyCookiesEnabled = true,
+      this.hardwareAcceleration = true,
+      this.supportMultipleWindows = false,
+      this.regexToCancelSubFramesLoading,
+      this.useHybridComposition = true,
+      this.useShouldInterceptRequest = false,
+      this.useOnRenderProcessGone = false,
+      this.overScrollMode = OverScrollMode.IF_CONTENT_SCROLLS,
+      this.networkAvailable,
+      this.scrollBarStyle = ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
+      this.verticalScrollbarPosition =
+          VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT,
+      this.scrollBarDefaultDelayBeforeFade,
+      this.scrollbarFadingEnabled = true,
+      this.scrollBarFadeDuration,
+      this.rendererPriorityPolicy,
+      this.disableDefaultErrorPage = false,
+      this.verticalScrollbarThumbColor,
+      this.verticalScrollbarTrackColor,
+      this.horizontalScrollbarThumbColor,
+      this.horizontalScrollbarTrackColor,
+      this.willSuppressErrorPage = false,
+      this.algorithmicDarkeningAllowed = false,
+      this.requestedWithHeaderMode,
+      this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
+      this.disallowOverScroll = false,
+      this.enableViewportScale = false,
+      this.suppressesIncrementalRendering = false,
+      this.allowsAirPlayForMediaPlayback = true,
+      this.allowsBackForwardNavigationGestures = true,
+      this.allowsLinkPreview = true,
+      this.ignoresViewportScaleLimits = false,
+      this.allowsInlineMediaPlayback = false,
+      this.allowsPictureInPictureMediaPlayback = true,
+      this.isFraudulentWebsiteWarningEnabled = true,
+      this.selectionGranularity = SelectionGranularity.DYNAMIC,
+      this.dataDetectorTypes = const [DataDetectorTypes.NONE],
+      this.sharedCookiesEnabled = false,
+      this.automaticallyAdjustsScrollIndicatorInsets = false,
+      this.accessibilityIgnoresInvertColors = false,
+      this.decelerationRate = ScrollViewDecelerationRate.NORMAL,
+      this.alwaysBounceVertical = false,
+      this.alwaysBounceHorizontal = false,
+      this.scrollsToTop = true,
+      this.isPagingEnabled = false,
+      this.maximumZoomScale = 1.0,
+      this.minimumZoomScale = 1.0,
+      this.contentInsetAdjustmentBehavior =
+          ScrollViewContentInsetAdjustmentBehavior.NEVER,
+      this.isDirectionalLockEnabled = false,
+      this.mediaType,
+      this.pageZoom = 1.0,
+      this.limitsNavigationsToAppBoundDomains = false,
+      this.useOnNavigationResponse = false,
+      this.applePayAPIEnabled = false,
+      this.allowingReadAccessTo,
+      this.disableLongPressContextMenuOnLinks = false,
+      this.disableInputAccessoryView = false,
+      this.underPageBackgroundColor,
+      this.isTextInteractionEnabled = true,
+      this.isSiteSpecificQuirksModeEnabled = true,
+      this.upgradeKnownHostsToHTTPS = true,
+      this.isElementFullscreenEnabled = true,
+      this.isFindInteractionEnabled = false,
+      this.minimumViewportInset,
+      this.maximumViewportInset,
+      this.iframeAllow,
+      this.iframeAllowFullscreen,
+      this.iframeSandbox,
+      this.iframeReferrerPolicy,
+      this.iframeName,
+      this.iframeCsp});
+
+  ///Gets a possible [InAppWebViewSettings] instance from a [Map] value.
+  static InAppWebViewSettings? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    final instance = InAppWebViewSettings(
+      minimumFontSize: map['minimumFontSize'],
+      mixedContentMode:
+          MixedContentMode.fromNativeValue(map['mixedContentMode']),
+      appCachePath: map['appCachePath'],
+      disabledActionModeMenuItems: ActionModeMenuItem.fromNativeValue(
+          map['disabledActionModeMenuItems']),
+      layoutAlgorithm: LayoutAlgorithm.fromNativeValue(map['layoutAlgorithm']),
+      regexToCancelSubFramesLoading: map['regexToCancelSubFramesLoading'],
+      networkAvailable: map['networkAvailable'],
+      scrollBarDefaultDelayBeforeFade: map['scrollBarDefaultDelayBeforeFade'],
+      scrollBarFadeDuration: map['scrollBarFadeDuration'],
+      rendererPriorityPolicy: RendererPriorityPolicy.fromMap(
+          map['rendererPriorityPolicy']?.cast<String, dynamic>()),
+      verticalScrollbarThumbColor: map['verticalScrollbarThumbColor'] != null
+          ? UtilColor.fromStringRepresentation(
+              map['verticalScrollbarThumbColor'])
+          : null,
+      verticalScrollbarTrackColor: map['verticalScrollbarTrackColor'] != null
+          ? UtilColor.fromStringRepresentation(
+              map['verticalScrollbarTrackColor'])
+          : null,
+      horizontalScrollbarThumbColor:
+          map['horizontalScrollbarThumbColor'] != null
+              ? UtilColor.fromStringRepresentation(
+                  map['horizontalScrollbarThumbColor'])
+              : null,
+      horizontalScrollbarTrackColor:
+          map['horizontalScrollbarTrackColor'] != null
+              ? UtilColor.fromStringRepresentation(
+                  map['horizontalScrollbarTrackColor'])
+              : null,
+      requestedWithHeaderMode: RequestedWithHeaderMode.fromNativeValue(
+          map['requestedWithHeaderMode']),
+      mediaType: map['mediaType'],
+      allowingReadAccessTo: map['allowingReadAccessTo'] != null
+          ? Uri.parse(map['allowingReadAccessTo'])
+          : null,
+      underPageBackgroundColor: map['underPageBackgroundColor'] != null
+          ? UtilColor.fromStringRepresentation(map['underPageBackgroundColor'])
+          : null,
+      minimumViewportInset: MapEdgeInsets.fromMap(
+          map['minimumViewportInset']?.cast<String, dynamic>()),
+      maximumViewportInset: MapEdgeInsets.fromMap(
+          map['maximumViewportInset']?.cast<String, dynamic>()),
+      iframeAllow: map['iframeAllow'],
+      iframeAllowFullscreen: map['iframeAllowFullscreen'],
+      iframeSandbox: map['iframeSandbox'] != null
+          ? Set<Sandbox>.from(
+              map['iframeSandbox'].map((e) => Sandbox.fromNativeValue(e)!))
+          : null,
+      iframeReferrerPolicy:
+          ReferrerPolicy.fromNativeValue(map['iframeReferrerPolicy']),
+      iframeName: map['iframeName'],
+      iframeCsp: map['iframeCsp'],
+    );
+    instance.useShouldOverrideUrlLoading = map['useShouldOverrideUrlLoading'];
+    instance.useOnLoadResource = map['useOnLoadResource'];
+    instance.useOnDownloadStart = map['useOnDownloadStart'];
+    instance.clearCache = map['clearCache'];
+    instance.userAgent = map['userAgent'];
+    instance.applicationNameForUserAgent = map['applicationNameForUserAgent'];
+    instance.javaScriptEnabled = map['javaScriptEnabled'];
+    instance.javaScriptCanOpenWindowsAutomatically =
+        map['javaScriptCanOpenWindowsAutomatically'];
+    instance.mediaPlaybackRequiresUserGesture =
+        map['mediaPlaybackRequiresUserGesture'];
+    instance.verticalScrollBarEnabled = map['verticalScrollBarEnabled'];
+    instance.horizontalScrollBarEnabled = map['horizontalScrollBarEnabled'];
+    instance.resourceCustomSchemes =
+        map['resourceCustomSchemes']?.cast<String>();
+    instance.contentBlockers =
+        _deserializeContentBlockers(map['contentBlockers']);
+    instance.preferredContentMode =
+        UserPreferredContentMode.fromNativeValue(map['preferredContentMode']);
+    instance.useShouldInterceptAjaxRequest =
+        map['useShouldInterceptAjaxRequest'];
+    instance.useShouldInterceptFetchRequest =
+        map['useShouldInterceptFetchRequest'];
+    instance.incognito = map['incognito'];
+    instance.cacheEnabled = map['cacheEnabled'];
+    instance.transparentBackground = map['transparentBackground'];
+    instance.disableVerticalScroll = map['disableVerticalScroll'];
+    instance.disableHorizontalScroll = map['disableHorizontalScroll'];
+    instance.disableContextMenu = map['disableContextMenu'];
+    instance.supportZoom = map['supportZoom'];
+    instance.allowFileAccessFromFileURLs = map['allowFileAccessFromFileURLs'];
+    instance.allowUniversalAccessFromFileURLs =
+        map['allowUniversalAccessFromFileURLs'];
+    instance.textZoom = map['textZoom'];
+    instance.clearSessionCache = map['clearSessionCache'];
+    instance.builtInZoomControls = map['builtInZoomControls'];
+    instance.displayZoomControls = map['displayZoomControls'];
+    instance.databaseEnabled = map['databaseEnabled'];
+    instance.domStorageEnabled = map['domStorageEnabled'];
+    instance.useWideViewPort = map['useWideViewPort'];
+    instance.safeBrowsingEnabled = map['safeBrowsingEnabled'];
+    instance.allowContentAccess = map['allowContentAccess'];
+    instance.allowFileAccess = map['allowFileAccess'];
+    instance.blockNetworkImage = map['blockNetworkImage'];
+    instance.blockNetworkLoads = map['blockNetworkLoads'];
+    instance.cacheMode = CacheMode.fromNativeValue(map['cacheMode']);
+    instance.cursiveFontFamily = map['cursiveFontFamily'];
+    instance.defaultFixedFontSize = map['defaultFixedFontSize'];
+    instance.defaultFontSize = map['defaultFontSize'];
+    instance.defaultTextEncodingName = map['defaultTextEncodingName'];
+    instance.fantasyFontFamily = map['fantasyFontFamily'];
+    instance.fixedFontFamily = map['fixedFontFamily'];
+    instance.forceDark = ForceDark.fromNativeValue(map['forceDark']);
+    instance.forceDarkStrategy =
+        ForceDarkStrategy.fromNativeValue(map['forceDarkStrategy']);
+    instance.geolocationEnabled = map['geolocationEnabled'];
+    instance.loadWithOverviewMode = map['loadWithOverviewMode'];
+    instance.loadsImagesAutomatically = map['loadsImagesAutomatically'];
+    instance.minimumLogicalFontSize = map['minimumLogicalFontSize'];
+    instance.initialScale = map['initialScale'];
+    instance.needInitialFocus = map['needInitialFocus'];
+    instance.offscreenPreRaster = map['offscreenPreRaster'];
+    instance.sansSerifFontFamily = map['sansSerifFontFamily'];
+    instance.serifFontFamily = map['serifFontFamily'];
+    instance.standardFontFamily = map['standardFontFamily'];
+    instance.saveFormData = map['saveFormData'];
+    instance.thirdPartyCookiesEnabled = map['thirdPartyCookiesEnabled'];
+    instance.hardwareAcceleration = map['hardwareAcceleration'];
+    instance.supportMultipleWindows = map['supportMultipleWindows'];
+    instance.useHybridComposition = map['useHybridComposition'];
+    instance.useShouldInterceptRequest = map['useShouldInterceptRequest'];
+    instance.useOnRenderProcessGone = map['useOnRenderProcessGone'];
+    instance.overScrollMode =
+        OverScrollMode.fromNativeValue(map['overScrollMode']);
+    instance.scrollBarStyle =
+        ScrollBarStyle.fromNativeValue(map['scrollBarStyle']);
+    instance.verticalScrollbarPosition =
+        VerticalScrollbarPosition.fromNativeValue(
+            map['verticalScrollbarPosition']);
+    instance.scrollbarFadingEnabled = map['scrollbarFadingEnabled'];
+    instance.disableDefaultErrorPage = map['disableDefaultErrorPage'];
+    instance.willSuppressErrorPage = map['willSuppressErrorPage'];
+    instance.algorithmicDarkeningAllowed = map['algorithmicDarkeningAllowed'];
+    instance.enterpriseAuthenticationAppLinkPolicyEnabled =
+        map['enterpriseAuthenticationAppLinkPolicyEnabled'];
+    instance.disallowOverScroll = map['disallowOverScroll'];
+    instance.enableViewportScale = map['enableViewportScale'];
+    instance.suppressesIncrementalRendering =
+        map['suppressesIncrementalRendering'];
+    instance.allowsAirPlayForMediaPlayback =
+        map['allowsAirPlayForMediaPlayback'];
+    instance.allowsBackForwardNavigationGestures =
+        map['allowsBackForwardNavigationGestures'];
+    instance.allowsLinkPreview = map['allowsLinkPreview'];
+    instance.ignoresViewportScaleLimits = map['ignoresViewportScaleLimits'];
+    instance.allowsInlineMediaPlayback = map['allowsInlineMediaPlayback'];
+    instance.allowsPictureInPictureMediaPlayback =
+        map['allowsPictureInPictureMediaPlayback'];
+    instance.isFraudulentWebsiteWarningEnabled =
+        map['isFraudulentWebsiteWarningEnabled'];
+    instance.selectionGranularity =
+        SelectionGranularity.fromNativeValue(map['selectionGranularity']);
+    instance.dataDetectorTypes = map['dataDetectorTypes'] != null
+        ? List<DataDetectorTypes>.from(map['dataDetectorTypes']
+            .map((e) => DataDetectorTypes.fromNativeValue(e)!))
+        : null;
+    instance.sharedCookiesEnabled = map['sharedCookiesEnabled'];
+    instance.automaticallyAdjustsScrollIndicatorInsets =
+        map['automaticallyAdjustsScrollIndicatorInsets'];
+    instance.accessibilityIgnoresInvertColors =
+        map['accessibilityIgnoresInvertColors'];
+    instance.decelerationRate =
+        ScrollViewDecelerationRate.fromNativeValue(map['decelerationRate']);
+    instance.alwaysBounceVertical = map['alwaysBounceVertical'];
+    instance.alwaysBounceHorizontal = map['alwaysBounceHorizontal'];
+    instance.scrollsToTop = map['scrollsToTop'];
+    instance.isPagingEnabled = map['isPagingEnabled'];
+    instance.maximumZoomScale = map['maximumZoomScale'];
+    instance.minimumZoomScale = map['minimumZoomScale'];
+    instance.contentInsetAdjustmentBehavior =
+        ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
+            map['contentInsetAdjustmentBehavior']);
+    instance.isDirectionalLockEnabled = map['isDirectionalLockEnabled'];
+    instance.pageZoom = map['pageZoom'];
+    instance.limitsNavigationsToAppBoundDomains =
+        map['limitsNavigationsToAppBoundDomains'];
+    instance.useOnNavigationResponse = map['useOnNavigationResponse'];
+    instance.applePayAPIEnabled = map['applePayAPIEnabled'];
+    instance.disableLongPressContextMenuOnLinks =
+        map['disableLongPressContextMenuOnLinks'];
+    instance.disableInputAccessoryView = map['disableInputAccessoryView'];
+    instance.isTextInteractionEnabled = map['isTextInteractionEnabled'];
+    instance.isSiteSpecificQuirksModeEnabled =
+        map['isSiteSpecificQuirksModeEnabled'];
+    instance.upgradeKnownHostsToHTTPS = map['upgradeKnownHostsToHTTPS'];
+    instance.isElementFullscreenEnabled = map['isElementFullscreenEnabled'];
+    instance.isFindInteractionEnabled = map['isFindInteractionEnabled'];
+    return instance;
   }
 
-  @override
+  ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    List<Map<String, Map<String, dynamic>>> contentBlockersMapList = [];
-    contentBlockers.forEach((contentBlocker) {
-      contentBlockersMapList.add(contentBlocker.toMap());
-    });
-
     return {
       "useShouldOverrideUrlLoading": useShouldOverrideUrlLoading,
       "useOnLoadResource": useOnLoadResource,
@@ -2029,10 +1555,11 @@ class InAppWebViewOptions
       "javaScriptCanOpenWindowsAutomatically":
           javaScriptCanOpenWindowsAutomatically,
       "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
+      "minimumFontSize": minimumFontSize,
       "verticalScrollBarEnabled": verticalScrollBarEnabled,
       "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
       "resourceCustomSchemes": resourceCustomSchemes,
-      "contentBlockers": contentBlockersMapList,
+      "contentBlockers": contentBlockers?.map((e) => e.toMap()).toList(),
       "preferredContentMode": preferredContentMode?.toNativeValue(),
       "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
       "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
@@ -2044,69 +1571,135 @@ class InAppWebViewOptions
       "disableContextMenu": disableContextMenu,
       "supportZoom": supportZoom,
       "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
-      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs
+      "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
+      "textZoom": textZoom,
+      "clearSessionCache": clearSessionCache,
+      "builtInZoomControls": builtInZoomControls,
+      "displayZoomControls": displayZoomControls,
+      "databaseEnabled": databaseEnabled,
+      "domStorageEnabled": domStorageEnabled,
+      "useWideViewPort": useWideViewPort,
+      "safeBrowsingEnabled": safeBrowsingEnabled,
+      "mixedContentMode": mixedContentMode?.toNativeValue(),
+      "allowContentAccess": allowContentAccess,
+      "allowFileAccess": allowFileAccess,
+      "appCachePath": appCachePath,
+      "blockNetworkImage": blockNetworkImage,
+      "blockNetworkLoads": blockNetworkLoads,
+      "cacheMode": cacheMode?.toNativeValue(),
+      "cursiveFontFamily": cursiveFontFamily,
+      "defaultFixedFontSize": defaultFixedFontSize,
+      "defaultFontSize": defaultFontSize,
+      "defaultTextEncodingName": defaultTextEncodingName,
+      "disabledActionModeMenuItems":
+          disabledActionModeMenuItems?.toNativeValue(),
+      "fantasyFontFamily": fantasyFontFamily,
+      "fixedFontFamily": fixedFontFamily,
+      "forceDark": forceDark?.toNativeValue(),
+      "forceDarkStrategy": forceDarkStrategy?.toNativeValue(),
+      "geolocationEnabled": geolocationEnabled,
+      "layoutAlgorithm": layoutAlgorithm?.toNativeValue(),
+      "loadWithOverviewMode": loadWithOverviewMode,
+      "loadsImagesAutomatically": loadsImagesAutomatically,
+      "minimumLogicalFontSize": minimumLogicalFontSize,
+      "initialScale": initialScale,
+      "needInitialFocus": needInitialFocus,
+      "offscreenPreRaster": offscreenPreRaster,
+      "sansSerifFontFamily": sansSerifFontFamily,
+      "serifFontFamily": serifFontFamily,
+      "standardFontFamily": standardFontFamily,
+      "saveFormData": saveFormData,
+      "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
+      "hardwareAcceleration": hardwareAcceleration,
+      "supportMultipleWindows": supportMultipleWindows,
+      "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
+      "useHybridComposition": useHybridComposition,
+      "useShouldInterceptRequest": useShouldInterceptRequest,
+      "useOnRenderProcessGone": useOnRenderProcessGone,
+      "overScrollMode": overScrollMode?.toNativeValue(),
+      "networkAvailable": networkAvailable,
+      "scrollBarStyle": scrollBarStyle?.toNativeValue(),
+      "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
+      "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
+      "scrollbarFadingEnabled": scrollbarFadingEnabled,
+      "scrollBarFadeDuration": scrollBarFadeDuration,
+      "rendererPriorityPolicy": rendererPriorityPolicy?.toMap(),
+      "disableDefaultErrorPage": disableDefaultErrorPage,
+      "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
+      "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
+      "horizontalScrollbarThumbColor": horizontalScrollbarThumbColor?.toHex(),
+      "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
+      "willSuppressErrorPage": willSuppressErrorPage,
+      "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
+      "requestedWithHeaderMode": requestedWithHeaderMode?.toNativeValue(),
+      "enterpriseAuthenticationAppLinkPolicyEnabled":
+          enterpriseAuthenticationAppLinkPolicyEnabled,
+      "disallowOverScroll": disallowOverScroll,
+      "enableViewportScale": enableViewportScale,
+      "suppressesIncrementalRendering": suppressesIncrementalRendering,
+      "allowsAirPlayForMediaPlayback": allowsAirPlayForMediaPlayback,
+      "allowsBackForwardNavigationGestures":
+          allowsBackForwardNavigationGestures,
+      "allowsLinkPreview": allowsLinkPreview,
+      "ignoresViewportScaleLimits": ignoresViewportScaleLimits,
+      "allowsInlineMediaPlayback": allowsInlineMediaPlayback,
+      "allowsPictureInPictureMediaPlayback":
+          allowsPictureInPictureMediaPlayback,
+      "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
+      "selectionGranularity": selectionGranularity?.toNativeValue(),
+      "dataDetectorTypes":
+          dataDetectorTypes?.map((e) => e.toNativeValue()).toList(),
+      "sharedCookiesEnabled": sharedCookiesEnabled,
+      "automaticallyAdjustsScrollIndicatorInsets":
+          automaticallyAdjustsScrollIndicatorInsets,
+      "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
+      "decelerationRate": decelerationRate?.toNativeValue(),
+      "alwaysBounceVertical": alwaysBounceVertical,
+      "alwaysBounceHorizontal": alwaysBounceHorizontal,
+      "scrollsToTop": scrollsToTop,
+      "isPagingEnabled": isPagingEnabled,
+      "maximumZoomScale": maximumZoomScale,
+      "minimumZoomScale": minimumZoomScale,
+      "contentInsetAdjustmentBehavior":
+          contentInsetAdjustmentBehavior?.toNativeValue(),
+      "isDirectionalLockEnabled": isDirectionalLockEnabled,
+      "mediaType": mediaType,
+      "pageZoom": pageZoom,
+      "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
+      "useOnNavigationResponse": useOnNavigationResponse,
+      "applePayAPIEnabled": applePayAPIEnabled,
+      "allowingReadAccessTo": allowingReadAccessTo?.toString(),
+      "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
+      "disableInputAccessoryView": disableInputAccessoryView,
+      "underPageBackgroundColor": underPageBackgroundColor?.toHex(),
+      "isTextInteractionEnabled": isTextInteractionEnabled,
+      "isSiteSpecificQuirksModeEnabled": isSiteSpecificQuirksModeEnabled,
+      "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
+      "isElementFullscreenEnabled": isElementFullscreenEnabled,
+      "isFindInteractionEnabled": isFindInteractionEnabled,
+      "minimumViewportInset": minimumViewportInset?.toMap(),
+      "maximumViewportInset": maximumViewportInset?.toMap(),
+      "iframeAllow": iframeAllow,
+      "iframeAllowFullscreen": iframeAllowFullscreen,
+      "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
+      "iframeReferrerPolicy": iframeReferrerPolicy?.toNativeValue(),
+      "iframeName": iframeName,
+      "iframeCsp": iframeCsp,
     };
   }
 
-  static InAppWebViewOptions fromMap(Map<String, dynamic> map) {
-    List<ContentBlocker> contentBlockers = [];
-    List<dynamic>? contentBlockersMapList = map["contentBlockers"];
-    if (contentBlockersMapList != null) {
-      contentBlockersMapList.forEach((contentBlocker) {
-        contentBlockers.add(ContentBlocker.fromMap(
-            Map<String, Map<String, dynamic>>.from(
-                Map<String, dynamic>.from(contentBlocker))));
-      });
-    }
-
-    var instance = InAppWebViewOptions();
-    instance.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
-    instance.useOnLoadResource = map["useOnLoadResource"];
-    instance.useOnDownloadStart = map["useOnDownloadStart"];
-    instance.clearCache = map["clearCache"];
-    instance.userAgent = map["userAgent"];
-    instance.applicationNameForUserAgent = map["applicationNameForUserAgent"];
-    instance.javaScriptEnabled = map["javaScriptEnabled"];
-    instance.javaScriptCanOpenWindowsAutomatically =
-        map["javaScriptCanOpenWindowsAutomatically"];
-    instance.mediaPlaybackRequiresUserGesture =
-        map["mediaPlaybackRequiresUserGesture"];
-    instance.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
-    instance.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
-    instance.resourceCustomSchemes =
-        List<String>.from(map["resourceCustomSchemes"] ?? []);
-    instance.contentBlockers = contentBlockers;
-    instance.preferredContentMode =
-        UserPreferredContentMode.fromNativeValue(map["preferredContentMode"]);
-    instance.useShouldInterceptAjaxRequest =
-        map["useShouldInterceptAjaxRequest"];
-    instance.useShouldInterceptFetchRequest =
-        map["useShouldInterceptFetchRequest"];
-    instance.incognito = map["incognito"];
-    instance.cacheEnabled = map["cacheEnabled"];
-    instance.transparentBackground = map["transparentBackground"];
-    instance.disableVerticalScroll = map["disableVerticalScroll"];
-    instance.disableHorizontalScroll = map["disableHorizontalScroll"];
-    instance.disableContextMenu = map["disableContextMenu"];
-    instance.supportZoom = map["supportZoom"];
-    instance.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-    instance.allowUniversalAccessFromFileURLs =
-        map["allowUniversalAccessFromFileURLs"];
-    return instance;
+  ///Converts instance to a map.
+  Map<String, dynamic> toJson() {
+    return toMap();
   }
 
-  @override
-  Map<String, dynamic> toJson() {
-    return this.toMap();
+  ///Returns a copy of InAppWebViewSettings.
+  InAppWebViewSettings copy() {
+    return InAppWebViewSettings.fromMap(toMap()) ?? InAppWebViewSettings();
   }
 
   @override
   String toString() {
-    return toMap().toString();
-  }
-
-  @override
-  InAppWebViewOptions copy() {
-    return InAppWebViewOptions.fromMap(this.toMap());
+    return 'InAppWebViewSettings{useShouldOverrideUrlLoading: $useShouldOverrideUrlLoading, useOnLoadResource: $useOnLoadResource, useOnDownloadStart: $useOnDownloadStart, clearCache: $clearCache, userAgent: $userAgent, applicationNameForUserAgent: $applicationNameForUserAgent, javaScriptEnabled: $javaScriptEnabled, javaScriptCanOpenWindowsAutomatically: $javaScriptCanOpenWindowsAutomatically, mediaPlaybackRequiresUserGesture: $mediaPlaybackRequiresUserGesture, minimumFontSize: $minimumFontSize, verticalScrollBarEnabled: $verticalScrollBarEnabled, horizontalScrollBarEnabled: $horizontalScrollBarEnabled, resourceCustomSchemes: $resourceCustomSchemes, contentBlockers: $contentBlockers, preferredContentMode: $preferredContentMode, useShouldInterceptAjaxRequest: $useShouldInterceptAjaxRequest, useShouldInterceptFetchRequest: $useShouldInterceptFetchRequest, incognito: $incognito, cacheEnabled: $cacheEnabled, transparentBackground: $transparentBackground, disableVerticalScroll: $disableVerticalScroll, disableHorizontalScroll: $disableHorizontalScroll, disableContextMenu: $disableContextMenu, supportZoom: $supportZoom, allowFileAccessFromFileURLs: $allowFileAccessFromFileURLs, allowUniversalAccessFromFileURLs: $allowUniversalAccessFromFileURLs, textZoom: $textZoom, clearSessionCache: $clearSessionCache, builtInZoomControls: $builtInZoomControls, displayZoomControls: $displayZoomControls, databaseEnabled: $databaseEnabled, domStorageEnabled: $domStorageEnabled, useWideViewPort: $useWideViewPort, safeBrowsingEnabled: $safeBrowsingEnabled, mixedContentMode: $mixedContentMode, allowContentAccess: $allowContentAccess, allowFileAccess: $allowFileAccess, appCachePath: $appCachePath, blockNetworkImage: $blockNetworkImage, blockNetworkLoads: $blockNetworkLoads, cacheMode: $cacheMode, cursiveFontFamily: $cursiveFontFamily, defaultFixedFontSize: $defaultFixedFontSize, defaultFontSize: $defaultFontSize, defaultTextEncodingName: $defaultTextEncodingName, disabledActionModeMenuItems: $disabledActionModeMenuItems, fantasyFontFamily: $fantasyFontFamily, fixedFontFamily: $fixedFontFamily, forceDark: $forceDark, forceDarkStrategy: $forceDarkStrategy, geolocationEnabled: $geolocationEnabled, layoutAlgorithm: $layoutAlgorithm, loadWithOverviewMode: $loadWithOverviewMode, loadsImagesAutomatically: $loadsImagesAutomatically, minimumLogicalFontSize: $minimumLogicalFontSize, initialScale: $initialScale, needInitialFocus: $needInitialFocus, offscreenPreRaster: $offscreenPreRaster, sansSerifFontFamily: $sansSerifFontFamily, serifFontFamily: $serifFontFamily, standardFontFamily: $standardFontFamily, saveFormData: $saveFormData, thirdPartyCookiesEnabled: $thirdPartyCookiesEnabled, hardwareAcceleration: $hardwareAcceleration, supportMultipleWindows: $supportMultipleWindows, regexToCancelSubFramesLoading: $regexToCancelSubFramesLoading, useHybridComposition: $useHybridComposition, useShouldInterceptRequest: $useShouldInterceptRequest, useOnRenderProcessGone: $useOnRenderProcessGone, overScrollMode: $overScrollMode, networkAvailable: $networkAvailable, scrollBarStyle: $scrollBarStyle, verticalScrollbarPosition: $verticalScrollbarPosition, scrollBarDefaultDelayBeforeFade: $scrollBarDefaultDelayBeforeFade, scrollbarFadingEnabled: $scrollbarFadingEnabled, scrollBarFadeDuration: $scrollBarFadeDuration, rendererPriorityPolicy: $rendererPriorityPolicy, disableDefaultErrorPage: $disableDefaultErrorPage, verticalScrollbarThumbColor: $verticalScrollbarThumbColor, verticalScrollbarTrackColor: $verticalScrollbarTrackColor, horizontalScrollbarThumbColor: $horizontalScrollbarThumbColor, horizontalScrollbarTrackColor: $horizontalScrollbarTrackColor, willSuppressErrorPage: $willSuppressErrorPage, algorithmicDarkeningAllowed: $algorithmicDarkeningAllowed, requestedWithHeaderMode: $requestedWithHeaderMode, enterpriseAuthenticationAppLinkPolicyEnabled: $enterpriseAuthenticationAppLinkPolicyEnabled, disallowOverScroll: $disallowOverScroll, enableViewportScale: $enableViewportScale, suppressesIncrementalRendering: $suppressesIncrementalRendering, allowsAirPlayForMediaPlayback: $allowsAirPlayForMediaPlayback, allowsBackForwardNavigationGestures: $allowsBackForwardNavigationGestures, allowsLinkPreview: $allowsLinkPreview, ignoresViewportScaleLimits: $ignoresViewportScaleLimits, allowsInlineMediaPlayback: $allowsInlineMediaPlayback, allowsPictureInPictureMediaPlayback: $allowsPictureInPictureMediaPlayback, isFraudulentWebsiteWarningEnabled: $isFraudulentWebsiteWarningEnabled, selectionGranularity: $selectionGranularity, dataDetectorTypes: $dataDetectorTypes, sharedCookiesEnabled: $sharedCookiesEnabled, automaticallyAdjustsScrollIndicatorInsets: $automaticallyAdjustsScrollIndicatorInsets, accessibilityIgnoresInvertColors: $accessibilityIgnoresInvertColors, decelerationRate: $decelerationRate, alwaysBounceVertical: $alwaysBounceVertical, alwaysBounceHorizontal: $alwaysBounceHorizontal, scrollsToTop: $scrollsToTop, isPagingEnabled: $isPagingEnabled, maximumZoomScale: $maximumZoomScale, minimumZoomScale: $minimumZoomScale, contentInsetAdjustmentBehavior: $contentInsetAdjustmentBehavior, isDirectionalLockEnabled: $isDirectionalLockEnabled, mediaType: $mediaType, pageZoom: $pageZoom, limitsNavigationsToAppBoundDomains: $limitsNavigationsToAppBoundDomains, useOnNavigationResponse: $useOnNavigationResponse, applePayAPIEnabled: $applePayAPIEnabled, allowingReadAccessTo: $allowingReadAccessTo, disableLongPressContextMenuOnLinks: $disableLongPressContextMenuOnLinks, disableInputAccessoryView: $disableInputAccessoryView, underPageBackgroundColor: $underPageBackgroundColor, isTextInteractionEnabled: $isTextInteractionEnabled, isSiteSpecificQuirksModeEnabled: $isSiteSpecificQuirksModeEnabled, upgradeKnownHostsToHTTPS: $upgradeKnownHostsToHTTPS, isElementFullscreenEnabled: $isElementFullscreenEnabled, isFindInteractionEnabled: $isFindInteractionEnabled, minimumViewportInset: $minimumViewportInset, maximumViewportInset: $maximumViewportInset, iframeAllow: $iframeAllow, iframeAllowFullscreen: $iframeAllowFullscreen, iframeSandbox: $iframeSandbox, iframeReferrerPolicy: $iframeReferrerPolicy, iframeName: $iframeName, iframeCsp: $iframeCsp}';
   }
 }

@@ -35,6 +35,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.badURL',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl',
+        value: -1000),
+    EnumMacOSPlatform(
+        apiName: 'URLError.badURL',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl',
         value: -1000)
   ])
   static const BAD_URL = WebResourceErrorType_._internal("BAD_URL");
@@ -47,6 +52,11 @@ class WebResourceErrorType_ {
             'https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_CONNECT',
         value: -6),
     EnumIOSPlatform(
+        apiName: 'URLError.cannotConnectToHost',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost',
+        value: -1004),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotConnectToHost',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost',
@@ -88,6 +98,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.fileDoesNotExist',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist',
+        value: -1100),
+    EnumMacOSPlatform(
+        apiName: 'URLError.fileDoesNotExist',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist',
         value: -1100)
   ])
   static const FILE_NOT_FOUND =
@@ -101,6 +116,11 @@ class WebResourceErrorType_ {
             'https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_HOST_LOOKUP',
         value: -2),
     EnumIOSPlatform(
+        apiName: 'URLError.cannotFindHost',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost',
+        value: -1003),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotFindHost',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost',
@@ -140,6 +160,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.httpTooManyRedirects',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects',
+        value: -1007),
+    EnumMacOSPlatform(
+        apiName: 'URLError.httpTooManyRedirects',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects',
         value: -1007)
   ])
   static const TOO_MANY_REDIRECTS =
@@ -153,6 +178,11 @@ class WebResourceErrorType_ {
             'https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TIMEOUT',
         value: -8),
     EnumIOSPlatform(
+        apiName: 'URLError.timedOut',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout',
+        value: -1001),
+    EnumMacOSPlatform(
         apiName: 'URLError.timedOut',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout',
@@ -179,6 +209,11 @@ class WebResourceErrorType_ {
             'https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNKNOWN',
         value: -1),
     EnumIOSPlatform(
+        apiName: 'URLError.unknown',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown',
+        value: -1),
+    EnumMacOSPlatform(
         apiName: 'URLError.unknown',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown',
@@ -220,6 +255,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.unsupportedURL',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl',
+        value: -1002),
+    EnumMacOSPlatform(
+        apiName: 'URLError.unsupportedURL',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl',
         value: -1002)
   ])
   static const UNSUPPORTED_SCHEME =
@@ -231,6 +271,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.cancelled',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled',
+        value: -999),
+    EnumMacOSPlatform(
+        apiName: 'URLError.cancelled',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled',
         value: -999)
   ])
   static const CANCELLED = WebResourceErrorType_._internal("CANCELLED");
@@ -238,6 +283,11 @@ class WebResourceErrorType_ {
   ///A client or server connection was severed in the middle of an in-progress load.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.networkConnectionLost',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost',
+        value: -1005),
+    EnumMacOSPlatform(
         apiName: 'URLError.networkConnectionLost',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost',
@@ -253,6 +303,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.resourceUnavailable',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable',
+        value: -1008),
+    EnumMacOSPlatform(
+        apiName: 'URLError.resourceUnavailable',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable',
         value: -1008)
   ])
   static const RESOURCE_UNAVAILABLE =
@@ -261,6 +316,11 @@ class WebResourceErrorType_ {
   ///A network resource was requested, but an internet connection hasn’t been established and can’t be established automatically.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.notConnectedToInternet',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet',
+        value: -1009),
+    EnumMacOSPlatform(
         apiName: 'URLError.notConnectedToInternet',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet',
@@ -275,6 +335,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.redirectToNonExistentLocation',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation',
+        value: -1010),
+    EnumMacOSPlatform(
+        apiName: 'URLError.redirectToNonExistentLocation',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation',
         value: -1010)
   ])
   static const REDIRECT_TO_NON_EXISTENT_LOCATION =
@@ -283,6 +348,11 @@ class WebResourceErrorType_ {
   ///The URL Loading System received bad data from the server.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.badServerResponse',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse',
+        value: -1011),
+    EnumMacOSPlatform(
         apiName: 'URLError.badServerResponse',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse',
@@ -298,6 +368,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.userCancelledAuthentication',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication',
+        value: -1012),
+    EnumMacOSPlatform(
+        apiName: 'URLError.userCancelledAuthentication',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication',
         value: -1012)
   ])
   static const USER_CANCELLED_AUTHENTICATION =
@@ -306,6 +381,11 @@ class WebResourceErrorType_ {
   ///Authentication is required to access a resource.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.userAuthenticationRequired',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired',
+        value: -1013),
+    EnumMacOSPlatform(
         apiName: 'URLError.userAuthenticationRequired',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired',
@@ -320,6 +400,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.zeroByteResource',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource',
+        value: -1014),
+    EnumMacOSPlatform(
+        apiName: 'URLError.zeroByteResource',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource',
         value: -1014)
   ])
   static const ZERO_BYTE_RESOURCE =
@@ -328,6 +413,11 @@ class WebResourceErrorType_ {
   ///Content data received during a connection request couldn’t be decoded for a known content encoding.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.cannotDecodeRawData',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata',
+        value: -1015),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotDecodeRawData',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata',
@@ -342,6 +432,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.cannotDecodeContentData',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata',
+        value: -1016),
+    EnumMacOSPlatform(
+        apiName: 'URLError.cannotDecodeContentData',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata',
         value: -1016)
   ])
   static const CANNOT_DECODE_CONTENT_DATA =
@@ -350,6 +445,11 @@ class WebResourceErrorType_ {
   ///A task could not parse a response.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.cannotParseResponse',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse',
+        value: -1017),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotParseResponse',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse',
@@ -367,6 +467,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.appTransportSecurityRequiresSecureConnection',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu',
+        value: -1022),
+    EnumMacOSPlatform(
+        apiName: 'URLError.appTransportSecurityRequiresSecureConnection',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu',
         value: -1022)
   ])
   static const APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
@@ -376,6 +481,11 @@ class WebResourceErrorType_ {
   ///A request for an FTP file resulted in the server responding that the file is not a plain file, but a directory.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.fileIsDirectory',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory',
+        value: -1101),
+    EnumMacOSPlatform(
         apiName: 'URLError.fileIsDirectory',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory',
@@ -390,6 +500,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.noPermissionsToReadFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile',
+        value: -1102),
+    EnumMacOSPlatform(
+        apiName: 'URLError.noPermissionsToReadFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile',
         value: -1102)
   ])
   static const NO_PERMISSIONS_TO_READ_FILE =
@@ -398,6 +513,11 @@ class WebResourceErrorType_ {
   ///The length of the resource data exceeds the maximum allowed.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.dataLengthExceedsMaximum',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum',
+        value: -1103),
+    EnumMacOSPlatform(
         apiName: 'URLError.dataLengthExceedsMaximum',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum',
@@ -412,6 +532,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.secureConnectionFailed',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed',
+        value: -1200),
+    EnumMacOSPlatform(
+        apiName: 'URLError.secureConnectionFailed',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed',
         value: -1200)
   ])
   static const SECURE_CONNECTION_FAILED =
@@ -423,6 +548,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.serverCertificateHasBadDate',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate',
+        value: -1201),
+    EnumMacOSPlatform(
+        apiName: 'URLError.serverCertificateHasBadDate',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate',
         value: -1201)
   ])
   static const SERVER_CERTIFICATE_HAS_BAD_DATE =
@@ -431,6 +561,11 @@ class WebResourceErrorType_ {
   ///A server certificate was signed by a root server that isn’t trusted.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.serverCertificateUntrusted',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted',
+        value: -1202),
+    EnumMacOSPlatform(
         apiName: 'URLError.serverCertificateUntrusted',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted',
@@ -448,6 +583,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.serverCertificateHasUnknownRoot',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot',
+        value: -1203),
+    EnumMacOSPlatform(
+        apiName: 'URLError.serverCertificateHasUnknownRoot',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot',
         value: -1203)
   ])
   static const SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
@@ -462,6 +602,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.serverCertificateNotYetValid',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid',
+        value: -1204),
+    EnumMacOSPlatform(
+        apiName: 'URLError.serverCertificateNotYetValid',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid',
         value: -1204)
   ])
   static const SERVER_CERTIFICATE_NOT_YET_VALID =
@@ -470,6 +615,11 @@ class WebResourceErrorType_ {
   ///A server certificate was rejected.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.clientCertificateRejected',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected',
+        value: -1205),
+    EnumMacOSPlatform(
         apiName: 'URLError.clientCertificateRejected',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected',
@@ -484,6 +634,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.clientCertificateRequired',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired',
+        value: -1206),
+    EnumMacOSPlatform(
+        apiName: 'URLError.clientCertificateRequired',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired',
         value: -1206)
   ])
   static const CLIENT_CERTIFICATE_REQUIRED =
@@ -492,6 +647,11 @@ class WebResourceErrorType_ {
   ///A request to load an item only from the cache could not be satisfied.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.cannotLoadFromNetwork',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork',
+        value: -2000),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotLoadFromNetwork',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork',
@@ -506,6 +666,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.cannotCreateFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile',
+        value: -3000),
+    EnumMacOSPlatform(
+        apiName: 'URLError.cannotCreateFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile',
         value: -3000)
   ])
   static const CANNOT_CREATE_FILE =
@@ -514,6 +679,11 @@ class WebResourceErrorType_ {
   ///A download task was unable to open the downloaded file on disk.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.cannotOpenFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile',
+        value: -3001),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotOpenFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile',
@@ -528,6 +698,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.cannotCloseFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile',
+        value: -3002),
+    EnumMacOSPlatform(
+        apiName: 'URLError.cannotCloseFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile',
         value: -3002)
   ])
   static const CANNOT_CLOSE_FILE =
@@ -536,6 +711,11 @@ class WebResourceErrorType_ {
   ///A download task was unable to write to the downloaded file on disk.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.cannotWriteToFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile',
+        value: -3003),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotWriteToFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile',
@@ -550,6 +730,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.cannotRemoveFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile',
+        value: -3004),
+    EnumMacOSPlatform(
+        apiName: 'URLError.cannotRemoveFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile',
         value: -3004)
   ])
   static const CANNOT_REMOVE_FILE =
@@ -558,6 +743,11 @@ class WebResourceErrorType_ {
   ///A download task was unable to move a downloaded file on disk.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.cannotMoveFile',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile',
+        value: -3005),
+    EnumMacOSPlatform(
         apiName: 'URLError.cannotMoveFile',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile',
@@ -575,6 +765,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.downloadDecodingFailedMidStream',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream',
+        value: -3006),
+    EnumMacOSPlatform(
+        apiName: 'URLError.downloadDecodingFailedMidStream',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream',
         value: -3006)
   ])
   static const DOWNLOAD_DECODING_FAILED_MID_STREAM =
@@ -589,6 +784,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.downloadDecodingFailedToComplete',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete',
+        value: -3007),
+    EnumMacOSPlatform(
+        apiName: 'URLError.downloadDecodingFailedToComplete',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete',
         value: -3007)
   ])
   static const DOWNLOAD_DECODING_FAILED_TO_COMPLETE =
@@ -597,6 +797,11 @@ class WebResourceErrorType_ {
   ///The attempted connection required activating a data context while roaming, but international roaming is disabled.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.internationalRoamingOff',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff',
+        value: -1018),
+    EnumMacOSPlatform(
         apiName: 'URLError.internationalRoamingOff',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff',
@@ -611,6 +816,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.callIsActive',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive',
+        value: -1019),
+    EnumMacOSPlatform(
+        apiName: 'URLError.callIsActive',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive',
         value: -1019)
   ])
   static const CALL_IS_ACTIVE =
@@ -619,6 +829,11 @@ class WebResourceErrorType_ {
   ///The cellular network disallowed a connection.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.dataNotAllowed',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed',
+        value: -1020),
+    EnumMacOSPlatform(
         apiName: 'URLError.dataNotAllowed',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed',
@@ -633,6 +848,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.requestBodyStreamExhausted',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted',
+        value: -1021),
+    EnumMacOSPlatform(
+        apiName: 'URLError.requestBodyStreamExhausted',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted',
         value: -1021)
   ])
   static const REQUEST_BODY_STREAM_EXHAUSTED =
@@ -644,6 +864,11 @@ class WebResourceErrorType_ {
   ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.backgroundSessionRequiresSharedContainer',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc',
+        value: -995),
+    EnumMacOSPlatform(
         apiName: 'URLError.backgroundSessionRequiresSharedContainer',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc',
@@ -662,6 +887,11 @@ class WebResourceErrorType_ {
         apiName: 'URLError.backgroundSessionInUseByAnotherProcess',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp',
+        value: -996),
+    EnumMacOSPlatform(
+        apiName: 'URLError.backgroundSessionInUseByAnotherProcess',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp',
         value: -996)
   ])
   static const BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
@@ -674,6 +904,11 @@ class WebResourceErrorType_ {
   ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'URLError.backgroundSessionWasDisconnected',
+        apiUrl:
+            'https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected',
+        value: -997),
+    EnumMacOSPlatform(
         apiName: 'URLError.backgroundSessionWasDisconnected',
         apiUrl:
             'https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected',

@@ -5,6 +5,7 @@ import 'open_data_and_close.dart';
 import 'open_file_and_close.dart';
 import 'open_url_and_close.dart';
 import 'set_get_settings.dart';
+import 'hide_and_show.dart';
 
 void main() {
   final shouldSkip = kIsWeb;
@@ -14,5 +15,6 @@ void main() {
     openFileAndClose();
     openDataAndClose();
     setGetSettings();
+    hideAndShow();
   }, skip: shouldSkip);
 }

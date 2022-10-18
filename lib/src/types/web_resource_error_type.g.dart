@@ -37,12 +37,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_BAD_URL](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_BAD_URL))
   ///- iOS ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
+  ///- MacOS ([Official API - URLError.badURL](https://developer.apple.com/documentation/foundation/urlerror/2293516-badurl))
   static final BAD_URL =
       WebResourceErrorType._internalMultiPlatform('BAD_URL', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -12;
       case TargetPlatform.iOS:
+        return -1000;
+      case TargetPlatform.macOS:
         return -1000;
       default:
         break;
@@ -55,12 +58,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_CONNECT](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_CONNECT))
   ///- iOS ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
+  ///- MacOS ([Official API - URLError.cannotConnectToHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883001-cannotconnecttohost))
   static final CANNOT_CONNECT_TO_HOST =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CONNECT_TO_HOST', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -6;
       case TargetPlatform.iOS:
+        return -1004;
+      case TargetPlatform.macOS:
         return -1004;
       default:
         break;
@@ -103,12 +109,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_FILE_NOT_FOUND](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_FILE_NOT_FOUND))
   ///- iOS ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
+  ///- MacOS ([Official API - URLError.fileDoesNotExist](https://developer.apple.com/documentation/foundation/urlerror/code/2883074-filedoesnotexist))
   static final FILE_NOT_FOUND =
       WebResourceErrorType._internalMultiPlatform('FILE_NOT_FOUND', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -14;
       case TargetPlatform.iOS:
+        return -1100;
+      case TargetPlatform.macOS:
         return -1100;
       default:
         break;
@@ -121,12 +130,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_HOST_LOOKUP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_HOST_LOOKUP))
   ///- iOS ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
+  ///- MacOS ([Official API - URLError.cannotFindHost](https://developer.apple.com/documentation/foundation/urlerror/code/2883157-cannotfindhost))
   static final HOST_LOOKUP =
       WebResourceErrorType._internalMultiPlatform('HOST_LOOKUP', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -2;
       case TargetPlatform.iOS:
+        return -1003;
+      case TargetPlatform.macOS:
         return -1003;
       default:
         break;
@@ -168,12 +180,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_REDIRECT_LOOP](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_REDIRECT_LOOP))
   ///- iOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
+  ///- MacOS ([Official API - URLError.httpTooManyRedirects](https://developer.apple.com/documentation/foundation/urlerror/code/2883099-httptoomanyredirects))
   static final TOO_MANY_REDIRECTS =
       WebResourceErrorType._internalMultiPlatform('TOO_MANY_REDIRECTS', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -9;
       case TargetPlatform.iOS:
+        return -1007;
+      case TargetPlatform.macOS:
         return -1007;
       default:
         break;
@@ -186,12 +201,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_TIMEOUT](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_TIMEOUT))
   ///- iOS ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
+  ///- MacOS ([Official API - URLError.timedOut](https://developer.apple.com/documentation/foundation/urlerror/code/2883027-timedout))
   static final TIMEOUT =
       WebResourceErrorType._internalMultiPlatform('TIMEOUT', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -8;
       case TargetPlatform.iOS:
+        return -1001;
+      case TargetPlatform.macOS:
         return -1001;
       default:
         break;
@@ -219,12 +237,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_UNKNOWN](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNKNOWN))
   ///- iOS ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
+  ///- MacOS ([Official API - URLError.unknown](https://developer.apple.com/documentation/foundation/urlerror/2293357-unknown))
   static final UNKNOWN =
       WebResourceErrorType._internalMultiPlatform('UNKNOWN', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -1;
       case TargetPlatform.iOS:
+        return -1;
+      case TargetPlatform.macOS:
         return -1;
       default:
         break;
@@ -269,12 +290,15 @@ class WebResourceErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.ERROR_UNSUPPORTED_SCHEME](https://developer.android.com/reference/android/webkit/WebViewClient#ERROR_UNSUPPORTED_SCHEME))
   ///- iOS ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
+  ///- MacOS ([Official API - URLError.unsupportedURL](https://developer.apple.com/documentation/foundation/urlerror/code/2883043-unsupportedurl))
   static final UNSUPPORTED_SCHEME =
       WebResourceErrorType._internalMultiPlatform('UNSUPPORTED_SCHEME', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return -10;
       case TargetPlatform.iOS:
+        return -1002;
+      case TargetPlatform.macOS:
         return -1002;
       default:
         break;
@@ -286,10 +310,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
+  ///- MacOS ([Official API - URLError.cancelled](https://developer.apple.com/documentation/foundation/urlerror/code/2883178-cancelled))
   static final CANCELLED =
       WebResourceErrorType._internalMultiPlatform('CANCELLED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -999;
+      case TargetPlatform.macOS:
         return -999;
       default:
         break;
@@ -301,11 +328,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
+  ///- MacOS ([Official API - URLError.networkConnectionLost](https://developer.apple.com/documentation/foundation/urlerror/2293759-networkconnectionlost))
   static final NETWORK_CONNECTION_LOST =
       WebResourceErrorType._internalMultiPlatform('NETWORK_CONNECTION_LOST',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1005;
+      case TargetPlatform.macOS:
         return -1005;
       default:
         break;
@@ -318,10 +348,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
+  ///- MacOS ([Official API - URLError.resourceUnavailable](https://developer.apple.com/documentation/foundation/urlerror/2293555-resourceunavailable))
   static final RESOURCE_UNAVAILABLE =
       WebResourceErrorType._internalMultiPlatform('RESOURCE_UNAVAILABLE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1008;
+      case TargetPlatform.macOS:
         return -1008;
       default:
         break;
@@ -333,11 +366,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
+  ///- MacOS ([Official API - URLError.notConnectedToInternet](https://developer.apple.com/documentation/foundation/urlerror/2293104-notconnectedtointernet))
   static final NOT_CONNECTED_TO_INTERNET =
       WebResourceErrorType._internalMultiPlatform('NOT_CONNECTED_TO_INTERNET',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1009;
+      case TargetPlatform.macOS:
         return -1009;
       default:
         break;
@@ -349,11 +385,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
+  ///- MacOS ([Official API - URLError.redirectToNonExistentLocation](https://developer.apple.com/documentation/foundation/urlerror/2293066-redirecttononexistentlocation))
   static final REDIRECT_TO_NON_EXISTENT_LOCATION =
       WebResourceErrorType._internalMultiPlatform(
           'REDIRECT_TO_NON_EXISTENT_LOCATION', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1010;
+      case TargetPlatform.macOS:
         return -1010;
       default:
         break;
@@ -365,10 +404,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
+  ///- MacOS ([Official API - URLError.badServerResponse](https://developer.apple.com/documentation/foundation/urlerror/2293606-badserverresponse))
   static final BAD_SERVER_RESPONSE =
       WebResourceErrorType._internalMultiPlatform('BAD_SERVER_RESPONSE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1011;
+      case TargetPlatform.macOS:
         return -1011;
       default:
         break;
@@ -381,11 +423,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
+  ///- MacOS ([Official API - URLError.userCancelledAuthentication](https://developer.apple.com/documentation/foundation/urlerror/2293330-usercancelledauthentication))
   static final USER_CANCELLED_AUTHENTICATION =
       WebResourceErrorType._internalMultiPlatform(
           'USER_CANCELLED_AUTHENTICATION', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1012;
+      case TargetPlatform.macOS:
         return -1012;
       default:
         break;
@@ -397,11 +442,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
+  ///- MacOS ([Official API - URLError.userAuthenticationRequired](https://developer.apple.com/documentation/foundation/urlerror/2293560-userauthenticationrequired))
   static final USER_AUTHENTICATION_REQUIRED =
       WebResourceErrorType._internalMultiPlatform(
           'USER_AUTHENTICATION_REQUIRED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1013;
+      case TargetPlatform.macOS:
         return -1013;
       default:
         break;
@@ -413,10 +461,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
+  ///- MacOS ([Official API - URLError.zeroByteResource](https://developer.apple.com/documentation/foundation/urlerror/2293773-zerobyteresource))
   static final ZERO_BYTE_RESOURCE =
       WebResourceErrorType._internalMultiPlatform('ZERO_BYTE_RESOURCE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1014;
+      case TargetPlatform.macOS:
         return -1014;
       default:
         break;
@@ -428,10 +479,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
+  ///- MacOS ([Official API - URLError.cannotDecodeRawData](https://developer.apple.com/documentation/foundation/urlerror/2293573-cannotdecoderawdata))
   static final CANNOT_DECODE_RAW_DATA =
       WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_RAW_DATA', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1015;
+      case TargetPlatform.macOS:
         return -1015;
       default:
         break;
@@ -443,11 +497,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
+  ///- MacOS ([Official API - URLError.cannotDecodeContentData](https://developer.apple.com/documentation/foundation/urlerror/2292983-cannotdecodecontentdata))
   static final CANNOT_DECODE_CONTENT_DATA =
       WebResourceErrorType._internalMultiPlatform('CANNOT_DECODE_CONTENT_DATA',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1016;
+      case TargetPlatform.macOS:
         return -1016;
       default:
         break;
@@ -459,10 +516,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
+  ///- MacOS ([Official API - URLError.cannotParseResponse](https://developer.apple.com/documentation/foundation/urlerror/code/2882919-cannotparseresponse))
   static final CANNOT_PARSE_RESPONSE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_PARSE_RESPONSE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1017;
+      case TargetPlatform.macOS:
         return -1017;
       default:
         break;
@@ -477,11 +537,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
+  ///- MacOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
   static final APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
       WebResourceErrorType._internalMultiPlatform(
           'APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1022;
+      case TargetPlatform.macOS:
         return -1022;
       default:
         break;
@@ -493,10 +556,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
+  ///- MacOS ([Official API - URLError.fileIsDirectory](https://developer.apple.com/documentation/foundation/urlerror/code/2883220-fileisdirectory))
   static final FILE_IS_DIRECTORY =
       WebResourceErrorType._internalMultiPlatform('FILE_IS_DIRECTORY', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1101;
+      case TargetPlatform.macOS:
         return -1101;
       default:
         break;
@@ -508,11 +574,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
+  ///- MacOS ([Official API - URLError.noPermissionsToReadFile](https://developer.apple.com/documentation/foundation/urlerror/code/2882941-nopermissionstoreadfile))
   static final NO_PERMISSIONS_TO_READ_FILE =
       WebResourceErrorType._internalMultiPlatform('NO_PERMISSIONS_TO_READ_FILE',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1102;
+      case TargetPlatform.macOS:
         return -1102;
       default:
         break;
@@ -524,11 +593,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
+  ///- MacOS ([Official API - URLError.dataLengthExceedsMaximum](https://developer.apple.com/documentation/foundation/urlerror/code/2882930-datalengthexceedsmaximum))
   static final DATA_LENGTH_EXCEEDS_MAXIMUM =
       WebResourceErrorType._internalMultiPlatform('DATA_LENGTH_EXCEEDS_MAXIMUM',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1103;
+      case TargetPlatform.macOS:
         return -1103;
       default:
         break;
@@ -540,11 +612,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
+  ///- MacOS ([Official API - URLError.secureConnectionFailed](https://developer.apple.com/documentation/foundation/urlerror/code/2883122-secureconnectionfailed))
   static final SECURE_CONNECTION_FAILED =
       WebResourceErrorType._internalMultiPlatform('SECURE_CONNECTION_FAILED',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1200;
+      case TargetPlatform.macOS:
         return -1200;
       default:
         break;
@@ -556,11 +631,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
+  ///- MacOS ([Official API - URLError.serverCertificateHasBadDate](https://developer.apple.com/documentation/foundation/urlerror/code/2883088-servercertificatehasbaddate))
   static final SERVER_CERTIFICATE_HAS_BAD_DATE =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_HAS_BAD_DATE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1201;
+      case TargetPlatform.macOS:
         return -1201;
       default:
         break;
@@ -572,11 +650,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
+  ///- MacOS ([Official API - URLError.serverCertificateUntrusted](https://developer.apple.com/documentation/foundation/urlerror/code/2882976-servercertificateuntrusted))
   static final SERVER_CERTIFICATE_UNTRUSTED =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_UNTRUSTED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1202;
+      case TargetPlatform.macOS:
         return -1202;
       default:
         break;
@@ -591,11 +672,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
+  ///- MacOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
   static final SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1203;
+      case TargetPlatform.macOS:
         return -1203;
       default:
         break;
@@ -610,11 +694,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
+  ///- MacOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
   static final SERVER_CERTIFICATE_NOT_YET_VALID =
       WebResourceErrorType._internalMultiPlatform(
           'SERVER_CERTIFICATE_NOT_YET_VALID', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1204;
+      case TargetPlatform.macOS:
         return -1204;
       default:
         break;
@@ -626,11 +713,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
+  ///- MacOS ([Official API - URLError.clientCertificateRejected](https://developer.apple.com/documentation/foundation/urlerror/code/2883091-clientcertificaterejected))
   static final CLIENT_CERTIFICATE_REJECTED =
       WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REJECTED',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1205;
+      case TargetPlatform.macOS:
         return -1205;
       default:
         break;
@@ -642,11 +732,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
+  ///- MacOS ([Official API - URLError.clientCertificateRequired](https://developer.apple.com/documentation/foundation/urlerror/code/2883199-clientcertificaterequired))
   static final CLIENT_CERTIFICATE_REQUIRED =
       WebResourceErrorType._internalMultiPlatform('CLIENT_CERTIFICATE_REQUIRED',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1206;
+      case TargetPlatform.macOS:
         return -1206;
       default:
         break;
@@ -658,11 +751,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
+  ///- MacOS ([Official API - URLError.cannotLoadFromNetwork](https://developer.apple.com/documentation/foundation/urlerror/code/2882968-cannotloadfromnetwork))
   static final CANNOT_LOAD_FROM_NETWORK =
       WebResourceErrorType._internalMultiPlatform('CANNOT_LOAD_FROM_NETWORK',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -2000;
+      case TargetPlatform.macOS:
         return -2000;
       default:
         break;
@@ -674,10 +770,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
+  ///- MacOS ([Official API - URLError.cannotCreateFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883204-cannotcreatefile))
   static final CANNOT_CREATE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CREATE_FILE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3000;
+      case TargetPlatform.macOS:
         return -3000;
       default:
         break;
@@ -689,10 +788,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
+  ///- MacOS ([Official API - URLError.cannotOpenFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883034-cannotopenfile))
   static final CANNOT_OPEN_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_OPEN_FILE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3001;
+      case TargetPlatform.macOS:
         return -3001;
       default:
         break;
@@ -704,10 +806,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
+  ///- MacOS ([Official API - URLError.cannotCloseFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883215-cannotclosefile))
   static final CANNOT_CLOSE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_CLOSE_FILE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3002;
+      case TargetPlatform.macOS:
         return -3002;
       default:
         break;
@@ -719,10 +824,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
+  ///- MacOS ([Official API - URLError.cannotWriteToFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883098-cannotwritetofile))
   static final CANNOT_WRITE_TO_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_WRITE_TO_FILE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3003;
+      case TargetPlatform.macOS:
         return -3003;
       default:
         break;
@@ -734,10 +842,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
+  ///- MacOS ([Official API - URLError.cannotRemoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883202-cannotremovefile))
   static final CANNOT_REMOVE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_REMOVE_FILE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3004;
+      case TargetPlatform.macOS:
         return -3004;
       default:
         break;
@@ -749,10 +860,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
+  ///- MacOS ([Official API - URLError.cannotMoveFile](https://developer.apple.com/documentation/foundation/urlerror/code/2883180-cannotmovefile))
   static final CANNOT_MOVE_FILE =
       WebResourceErrorType._internalMultiPlatform('CANNOT_MOVE_FILE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3005;
+      case TargetPlatform.macOS:
         return -3005;
       default:
         break;
@@ -767,11 +881,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
+  ///- MacOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
   static final DOWNLOAD_DECODING_FAILED_MID_STREAM =
       WebResourceErrorType._internalMultiPlatform(
           'DOWNLOAD_DECODING_FAILED_MID_STREAM', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3006;
+      case TargetPlatform.macOS:
         return -3006;
       default:
         break;
@@ -786,11 +903,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
+  ///- MacOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
   static final DOWNLOAD_DECODING_FAILED_TO_COMPLETE =
       WebResourceErrorType._internalMultiPlatform(
           'DOWNLOAD_DECODING_FAILED_TO_COMPLETE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -3007;
+      case TargetPlatform.macOS:
         return -3007;
       default:
         break;
@@ -802,11 +922,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
+  ///- MacOS ([Official API - URLError.internationalRoamingOff](https://developer.apple.com/documentation/foundation/urlerror/code/2883134-internationalroamingoff))
   static final INTERNATIONAL_ROAMING_OFF =
       WebResourceErrorType._internalMultiPlatform('INTERNATIONAL_ROAMING_OFF',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1018;
+      case TargetPlatform.macOS:
         return -1018;
       default:
         break;
@@ -818,10 +941,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
+  ///- MacOS ([Official API - URLError.callIsActive](https://developer.apple.com/documentation/foundation/urlerror/code/2883170-callisactive))
   static final CALL_IS_ACTIVE =
       WebResourceErrorType._internalMultiPlatform('CALL_IS_ACTIVE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1019;
+      case TargetPlatform.macOS:
         return -1019;
       default:
         break;
@@ -833,10 +959,13 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
+  ///- MacOS ([Official API - URLError.dataNotAllowed](https://developer.apple.com/documentation/foundation/urlerror/code/2883217-datanotallowed))
   static final DATA_NOT_ALLOWED =
       WebResourceErrorType._internalMultiPlatform('DATA_NOT_ALLOWED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1020;
+      case TargetPlatform.macOS:
         return -1020;
       default:
         break;
@@ -848,11 +977,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
+  ///- MacOS ([Official API - URLError.requestBodyStreamExhausted](https://developer.apple.com/documentation/foundation/urlerror/code/2883176-requestbodystreamexhausted))
   static final REQUEST_BODY_STREAM_EXHAUSTED =
       WebResourceErrorType._internalMultiPlatform(
           'REQUEST_BODY_STREAM_EXHAUSTED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -1021;
+      case TargetPlatform.macOS:
         return -1021;
       default:
         break;
@@ -867,11 +999,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
+  ///- MacOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
   static final BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER =
       WebResourceErrorType._internalMultiPlatform(
           'BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -995;
+      case TargetPlatform.macOS:
         return -995;
       default:
         break;
@@ -886,11 +1021,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
+  ///- MacOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
   static final BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
       WebResourceErrorType._internalMultiPlatform(
           'BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -996;
+      case TargetPlatform.macOS:
         return -996;
       default:
         break;
@@ -905,11 +1043,14 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
+  ///- MacOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
   static final BACKGROUND_SESSION_WAS_DISCONNECTED =
       WebResourceErrorType._internalMultiPlatform(
           'BACKGROUND_SESSION_WAS_DISCONNECTED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return -997;
+      case TargetPlatform.macOS:
         return -997;
       default:
         break;

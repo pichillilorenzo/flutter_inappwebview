@@ -8,6 +8,11 @@ typedef PrintJobCompletionHandler = Future<void> Function(
     bool completed, String? error)?;
 
 ///Class representing a print job eventually returned by [InAppWebViewController.printCurrentPage].
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- MacOS
 class PrintJobController implements Disposable {
   ///Print job ID.
   final String id;
@@ -18,6 +23,7 @@ class PrintJobController implements Disposable {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - UIPrintInteractionController.CompletionHandler](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/completionhandler))
+  ///- MacOS ([Official API - NSPrintOperation.runModal](https://developer.apple.com/documentation/appkit/nsprintoperation/1532065-runmodal))
   PrintJobCompletionHandler onComplete;
 
   PrintJobController({required this.id}) {
@@ -91,6 +97,7 @@ class PrintJobController implements Disposable {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJob.getInfo](https://developer.android.com/reference/android/print/PrintJob#getInfo()))
   ///- iOS
+  ///- MacOS
   Future<PrintJobInfo?> getInfo() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? infoMap =
@@ -103,6 +110,7 @@ class PrintJobController implements Disposable {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   @override
   Future<void> dispose() async {
     Map<String, dynamic> args = <String, dynamic>{};

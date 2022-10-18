@@ -36,6 +36,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   final void Function(InAppWebViewController controller)? onWebViewCreated;
 
@@ -49,6 +50,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageStarted](https://developer.android.com/reference/android/webkit/WebViewClient#onPageStarted(android.webkit.WebView,%20java.lang.String,%20android.graphics.Bitmap)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   ///- Web
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
 
@@ -60,6 +62,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageFinished](https://developer.android.com/reference/android/webkit/WebViewClient#onPageFinished(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   ///- Web ([Official API - Window.onload](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event))
   final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
 
@@ -73,6 +76,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceError)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455623-webview))
   final void Function(InAppWebViewController controller,
       WebResourceRequest request, WebResourceError error)? onReceivedError;
 
@@ -92,6 +96,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpError(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20android.webkit.WebResourceResponse)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   final void Function(
       InAppWebViewController controller,
       WebResourceRequest request,
@@ -102,6 +107,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onProgressChanged](https://developer.android.com/reference/android/webkit/WebChromeClient#onProgressChanged(android.webkit.WebView,%20int)))
   ///- iOS
+  ///- MacOS
   final void Function(InAppWebViewController controller, int progress)?
       onProgressChanged;
 
@@ -112,6 +118,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onConsoleMessage](https://developer.android.com/reference/android/webkit/WebChromeClient#onConsoleMessage(android.webkit.ConsoleMessage)))
   ///- iOS
+  ///- MacOS
   ///- Web
   final void Function(
           InAppWebViewController controller, ConsoleMessage consoleMessage)?
@@ -120,30 +127,32 @@ abstract class WebView {
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
   ///
   ///Note that on Android there isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.
-  ///However, if you want to cancel requests for subframes, you can use the [InAppWebViewSettings.regexToCancelSubFramesLoading] option
+  ///However, if you want to cancel requests for subframes, you can use the [InAppWebViewSettings.regexToCancelSubFramesLoading] setting
   ///to write a Regular Expression that, if the url request of a subframe matches, then the request of that subframe is canceled.
   ///
   ///Also, on Android, this method is not called for POST requests.
   ///
   ///[navigationAction] represents an object that contains information about an action that causes navigation to occur.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldOverrideUrlLoading] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldOverrideUrlLoading] setting to `true`.
   ///Also, on Android this event is not called on the first page load.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.shouldOverrideUrlLoading](https://developer.android.com/reference/android/webkit/WebViewClient#shouldOverrideUrlLoading(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455641-webview))
   final Future<NavigationActionPolicy?> Function(
           InAppWebViewController controller, NavigationAction navigationAction)?
       shouldOverrideUrlLoading;
 
   ///Event fired when the [WebView] loads a resource.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnLoadResource] and [InAppWebViewSettings.javaScriptEnabled] options to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnLoadResource] and [InAppWebViewSettings.javaScriptEnabled] setting to `true`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final void Function(
           InAppWebViewController controller, LoadedResource resource)?
       onLoadResource;
@@ -156,10 +165,13 @@ abstract class WebView {
   ///
   ///**NOTE for Web**: this event will be called only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: this method is implemented with using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.onScrollChanged](https://developer.android.com/reference/android/webkit/WebView#onScrollChanged(int,%20int,%20int,%20int)))
   ///- iOS ([Official API - UIScrollViewDelegate.scrollViewDidScroll](https://developer.apple.com/documentation/uikit/uiscrollviewdelegate/1619392-scrollviewdidscroll))
   ///- Web ([Official API - Window.onscroll](https://developer.mozilla.org/en-US/docs/Web/API/GlobalEventHandlers/onscroll))
+  ///- MacOS
   final void Function(InAppWebViewController controller, int x, int y)?
       onScrollChanged;
 
@@ -173,11 +185,12 @@ abstract class WebView {
   ///
   ///[downloadStartRequest] represents the request of the file to download.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnDownloadStart] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnDownloadStart] setting to `true`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.setDownloadListener](https://developer.android.com/reference/android/webkit/WebView#setDownloadListener(android.webkit.DownloadListener)))
   ///- iOS
+  ///- MacOS
   final void Function(InAppWebViewController controller,
       DownloadStartRequest downloadStartRequest)? onDownloadStartRequest;
 
@@ -192,6 +205,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
+  ///- MacOS ([Official API - WKURLSchemeHandler](https://developer.apple.com/documentation/webkit/wkurlschemehandler))
   final Future<CustomSchemeResponse?> Function(
           InAppWebViewController controller, WebResourceRequest request)?
       onLoadResourceWithCustomScheme;
@@ -204,12 +218,12 @@ abstract class WebView {
   ///
   ///- [createWindowAction] represents the request.
   ///
-  ///**NOTE**: to allow JavaScript to open windows, you need to set [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically] option to `true`.
+  ///**NOTE**: to allow JavaScript to open windows, you need to set [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically] setting to `true`.
   ///
-  ///**NOTE for Android**: you need to set [InAppWebViewSettings.supportMultipleWindows] option to `true`.
+  ///**NOTE for Android**: you need to set [InAppWebViewSettings.supportMultipleWindows] setting to `true`.
   ///Also, if the request has been created using JavaScript (`window.open()`), then there are some limitation: check the [NavigationAction] class.
   ///
-  ///**NOTE for iOS**: setting these initial options: [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
+  ///**NOTE for iOS and MacOS**: setting these initial options: [InAppWebViewSettings.supportZoom], [InAppWebViewSettings.useOnLoadResource], [InAppWebViewSettings.useShouldInterceptAjaxRequest],
   ///[InAppWebViewSettings.useShouldInterceptFetchRequest], [InAppWebViewSettings.applicationNameForUserAgent], [InAppWebViewSettings.javaScriptCanOpenWindowsAutomatically],
   ///[InAppWebViewSettings.javaScriptEnabled], [InAppWebViewSettings.minimumFontSize], [InAppWebViewSettings.preferredContentMode], [InAppWebViewSettings.incognito],
   ///[InAppWebViewSettings.cacheEnabled], [InAppWebViewSettings.mediaPlaybackRequiresUserGesture],
@@ -231,6 +245,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onCreateWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCreateWindow(android.webkit.WebView,%20boolean,%20boolean,%20android.os.Message)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
+  ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536907-webview))
   ///- Web
   final Future<bool?> Function(InAppWebViewController controller,
       CreateWindowAction createWindowAction)? onCreateWindow;
@@ -241,6 +256,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onCloseWindow](https://developer.android.com/reference/android/webkit/WebChromeClient#onCloseWindow(android.webkit.WebView)))
   ///- iOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
+  ///- MacOS ([Official API - WKUIDelegate.webViewDidClose](https://developer.apple.com/documentation/webkit/wkuidelegate/1537390-webviewdidclose))
   final void Function(InAppWebViewController controller)? onCloseWindow;
 
   ///Event fired when the JavaScript `window` object of the WebView has received focus.
@@ -251,6 +267,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web ([Official API - Window.onfocus](https://developer.mozilla.org/en-US/docs/Web/API/Window/focus_event))
   final void Function(InAppWebViewController controller)? onWindowFocus;
 
@@ -262,6 +279,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web ([Official API - Window.onblur](https://developer.mozilla.org/en-US/docs/Web/API/Window/blur_event))
   final void Function(InAppWebViewController controller)? onWindowBlur;
 
@@ -273,6 +291,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsAlert](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsAlert(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
+  ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1537406-webview))
   final Future<JsAlertResponse?> Function(
           InAppWebViewController controller, JsAlertRequest jsAlertRequest)?
       onJsAlert;
@@ -285,6 +304,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsConfirm](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsConfirm(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20android.webkit.JsResult)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
+  ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1536489-webview))
   final Future<JsConfirmResponse?> Function(
           InAppWebViewController controller, JsConfirmRequest jsConfirmRequest)?
       onJsConfirm;
@@ -297,6 +317,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onJsPrompt](https://developer.android.com/reference/android/webkit/WebChromeClient#onJsPrompt(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20android.webkit.JsPromptResult)))
   ///- iOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
+  ///- MacOS ([Official API - WKUIDelegate.webView](https://developer.apple.com/documentation/webkit/wkuidelegate/1538086-webview))
   final Future<JsPromptResponse?> Function(
           InAppWebViewController controller, JsPromptRequest jsPromptRequest)?
       onJsPrompt;
@@ -308,6 +329,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedHttpAuthRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedHttpAuthRequest(android.webkit.WebView,%20android.webkit.HttpAuthHandler,%20java.lang.String,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   final Future<HttpAuthResponse?> Function(InAppWebViewController controller,
       HttpAuthenticationChallenge challenge)? onReceivedHttpAuthRequest;
 
@@ -319,6 +341,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedSslError](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedSslError(android.webkit.WebView,%20android.webkit.SslErrorHandler,%20android.net.http.SslError)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   final Future<ServerTrustAuthResponse?> Function(
           InAppWebViewController controller, ServerTrustChallenge challenge)?
       onReceivedServerTrustAuthRequest;
@@ -333,6 +356,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onReceivedClientCertRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedClientCertRequest(android.webkit.WebView,%20android.webkit.ClientCertRequest)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455638-webview))
   final Future<ClientCertResponse?> Function(
           InAppWebViewController controller, ClientCertChallenge challenge)?
       onReceivedClientCertRequest;
@@ -347,7 +371,7 @@ abstract class WebView {
   ///
   ///[ajaxRequest] represents the `XMLHttpRequest`.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptAjaxRequest] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting to `true`.
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
@@ -356,6 +380,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final Future<AjaxRequest?> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       shouldInterceptAjaxRequest;
@@ -365,7 +390,7 @@ abstract class WebView {
   ///
   ///[ajaxRequest] represents the [XMLHttpRequest].
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptAjaxRequest] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting to `true`.
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
@@ -374,6 +399,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final Future<AjaxRequestAction?> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       onAjaxReadyStateChange;
@@ -383,7 +409,7 @@ abstract class WebView {
   ///
   ///[ajaxRequest] represents the [XMLHttpRequest].
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptAjaxRequest] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptAjaxRequest] setting to `true`.
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept ajax requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
@@ -392,6 +418,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final Future<AjaxRequestAction?> Function(
           InAppWebViewController controller, AjaxRequest ajaxRequest)?
       onAjaxProgress;
@@ -401,7 +428,7 @@ abstract class WebView {
   ///
   ///[fetchRequest] represents a resource request.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptFetchRequest] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useShouldInterceptFetchRequest] setting to `true`.
   ///Also, unlike iOS that has [WKUserScript](https://developer.apple.com/documentation/webkit/wkuserscript) that
   ///can inject javascript code right after the document element is created but before any other content is loaded, in Android the javascript code
   ///used to intercept fetch requests is loaded as soon as possible so it won't be instantaneous as iOS but just after some milliseconds (< ~100ms).
@@ -410,6 +437,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final Future<FetchRequest?> Function(
           InAppWebViewController controller, FetchRequest fetchRequest)?
       shouldInterceptFetchRequest;
@@ -428,6 +456,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.doUpdateVisitedHistory](https://developer.android.com/reference/android/webkit/WebViewClient#doUpdateVisitedHistory(android.webkit.WebView,%20java.lang.String,%20boolean)))
   ///- iOS
+  ///- MacOS
   ///- Web
   final void Function(
           InAppWebViewController controller, Uri? url, bool? isReload)?
@@ -451,6 +480,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   final Future<bool?> Function(InAppWebViewController controller, Uri? url,
       PrintJobController? printJobController)? onPrintRequest;
@@ -470,6 +500,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onShowCustomView](https://developer.android.com/reference/android/webkit/WebChromeClient#onShowCustomView(android.view.View,%20android.webkit.WebChromeClient.CustomViewCallback)))
   ///- iOS ([Official API - UIWindow.didBecomeVisibleNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621621-didbecomevisiblenotification))
+  ///- MacOS ([Official API - NSWindow.didEnterFullScreenNotification](https://developer.apple.com/documentation/appkit/nswindow/1419651-didenterfullscreennotification))
   ///- Web ([Official API - Document.onfullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event))
   final void Function(InAppWebViewController controller)? onEnterFullscreen;
 
@@ -482,6 +513,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onHideCustomView](https://developer.android.com/reference/android/webkit/WebChromeClient#onHideCustomView()))
   ///- iOS ([Official API - UIWindow.didBecomeHiddenNotification](https://developer.apple.com/documentation/uikit/uiwindow/1621617-didbecomehiddennotification))
+  ///- MacOS ([Official API - NSWindow.didExitFullScreenNotification](https://developer.apple.com/documentation/appkit/nswindow/1419177-didexitfullscreennotification))
   ///- Web ([Official API - Document.onfullscreenchange](https://developer.mozilla.org/en-US/docs/Web/API/Document/fullscreenchange_event))
   final void Function(InAppWebViewController controller)? onExitFullscreen;
 
@@ -495,6 +527,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onPageCommitVisible](https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
   final void Function(InAppWebViewController controller, Uri? url)?
       onPageCommitVisible;
 
@@ -507,6 +540,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTitle](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTitle(android.webkit.WebView,%20java.lang.String)))
   ///- iOS
+  ///- MacOS
   ///- Web
   final void Function(InAppWebViewController controller, String? title)?
       onTitleChanged;
@@ -583,9 +617,12 @@ abstract class WebView {
   ///
   ///**NOTE for iOS**: available only on iOS 15.0+. The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///
+  ///**NOTE for MacOS**: available only on iOS 12.0+. The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequest](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)))
   ///- iOS
+  ///- MacOS
   final Future<PermissionResponse?> Function(InAppWebViewController controller,
       PermissionRequest permissionRequest)? onPermissionRequest;
 
@@ -812,6 +849,7 @@ abstract class WebView {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webViewWebContentProcessDidTerminate](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi))
+  ///- MacOS ([Official API - WKNavigationDelegate.webViewWebContentProcessDidTerminate](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455639-webviewwebcontentprocessdidtermi))
   final void Function(InAppWebViewController controller)?
       onWebContentProcessDidTerminate;
 
@@ -824,6 +862,7 @@ abstract class WebView {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455627-webview))
   final void Function(InAppWebViewController controller)?
       onDidReceiveServerRedirectForProvisionalNavigation;
 
@@ -837,10 +876,11 @@ abstract class WebView {
   ///
   ///[navigationResponse] represents the navigation response.
   ///
-  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnNavigationResponse] option to `true`.
+  ///**NOTE**: In order to be able to listen this event, you need to set [InAppWebViewSettings.useOnNavigationResponse] setting to `true`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455643-webview))
   final Future<NavigationResponseAction?> Function(
       InAppWebViewController controller,
       NavigationResponse navigationResponse)? onNavigationResponse;
@@ -855,20 +895,26 @@ abstract class WebView {
   ///
   ///[challenge] represents the authentication challenge.
   ///
-  ///**NOTE**: available only on iOS 14.0+.
+  ///**NOTE for iOS**: available only on iOS 14.0+.
+  ///
+  ///**NOTE for MacOS**: available only on MacOS 11.0+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
+  ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/3601237-webview))
   final Future<ShouldAllowDeprecatedTLSAction?> Function(
       InAppWebViewController controller,
       URLAuthenticationChallenge challenge)? shouldAllowDeprecatedTLS;
 
   ///Event fired when a change in the camera capture state occurred.
   ///
-  ///**NOTE**: available only on iOS 15.0+.
+  ///**NOTE for iOS**: available only on iOS 15.0+.
+  ///
+  ///**NOTE for MacOS**: available only on MacOS 12.0+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   final Future<void> Function(
     InAppWebViewController controller,
     MediaCaptureState? oldState,
@@ -877,10 +923,13 @@ abstract class WebView {
 
   ///Event fired when a change in the microphone capture state occurred.
   ///
-  ///**NOTE**: available only on iOS 15.0+.
+  ///**NOTE for iOS**: available only on iOS 15.0+.
+  ///
+  ///**NOTE for MacOS**: available only on MacOS 12.0+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   final Future<void> Function(
     InAppWebViewController controller,
     MediaCaptureState? oldState,
@@ -894,6 +943,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   final URLRequest? initialUrlRequest;
 
@@ -902,6 +952,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   final String? initialFile;
 
@@ -910,6 +961,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   final InAppWebViewInitialData? initialData;
 
@@ -922,6 +974,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   final InAppWebViewSettings? initialSettings;
 
@@ -943,6 +996,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final UnmodifiableListView<UserScript>? initialUserScripts;
 
   ///Represents the pull-to-refresh feature controller.
@@ -959,6 +1013,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   final FindInteractionController? findInteractionController;
 
   ///Represents the WebView native implementation to be used.

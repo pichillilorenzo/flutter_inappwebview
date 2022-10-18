@@ -19,7 +19,6 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
         myView = NSView(frame: frame)
         
         let initialSettings = params["initialSettings"] as! [String: Any?]
-        let contextMenu = params["contextMenu"] as? [String: Any]
         let windowId = params["windowId"] as? Int64
         let initialUserScripts = params["initialUserScripts"] as? [[String: Any]]
         
@@ -43,14 +42,12 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
                                                binaryMessenger: registrar.messenger)
             webView!.channelDelegate = WebViewChannelDelegate(webView: webView!, channel: channel)
             webView!.frame = myView!.bounds
-            webView!.contextMenu = contextMenu
             webView!.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(id: viewId,
                                    registrar: registrar,
                                    frame: myView!.bounds,
                                    configuration: preWebviewConfiguration,
-                                   contextMenu: contextMenu,
                                    userScripts: userScripts)
         }
 

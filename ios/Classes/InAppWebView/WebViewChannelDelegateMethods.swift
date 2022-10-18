@@ -34,6 +34,7 @@ public enum WebViewChannelDelegateMethods: String {
     case close = "close"
     case show = "show"
     case hide = "hide"
+    case isHidden = "isHidden"
     case getCopyBackForwardList = "getCopyBackForwardList"
     @available(*, deprecated, message: "Use FindInteractionController.findAll instead.")
     case findAll = "findAll"
@@ -48,6 +49,7 @@ public enum WebViewChannelDelegateMethods: String {
     case resumeTimers = "resumeTimers"
     case printCurrentPage = "printCurrentPage"
     case getContentHeight = "getContentHeight"
+    case getContentWidth = "getContentWidth"
     case zoomBy = "zoomBy"
     case reloadFromOrigin = "reloadFromOrigin"
     case getOriginalUrl = "getOriginalUrl"

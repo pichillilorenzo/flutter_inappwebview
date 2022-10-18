@@ -106,7 +106,6 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                           URLRequest(url: Uri.parse("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(
                         browserSettings: InAppBrowserSettings(
-                          hidden: false,
                           toolbarTopBackgroundColor: Colors.blue,
                           presentationStyle: ModalPresentationStyle.POPOVER
                         ),

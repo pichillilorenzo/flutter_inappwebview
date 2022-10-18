@@ -71,9 +71,9 @@ public class InAppBrowserManager: ChannelDelegate {
         webViewController.initialMimeType = mimeType
         webViewController.initialEncoding = encoding
         webViewController.initialBaseUrl = baseUrl
-        webViewController.contextMenu = contextMenu
         webViewController.windowId = windowId
         webViewController.initialUserScripts = initialUserScripts ?? []
+        webViewController.isHidden = browserSettings.hidden
         
         let window = InAppBrowserWindow(contentViewController: webViewController)
         window.browserSettings = browserSettings

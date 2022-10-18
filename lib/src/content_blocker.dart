@@ -2,7 +2,7 @@ import 'types/main.dart';
 
 ///Class that represents a set of rules to use block content in the browser window.
 ///
-///On iOS, it uses [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore).
+///On iOS and MacOS, it uses [WKContentRuleListStore](https://developer.apple.com/documentation/webkit/wkcontentruleliststore).
 ///On Android, it uses a custom implementation because such functionality doesn't exist.
 ///
 ///In general, this [article](https://developer.apple.com/documentation/safariservices/creating_a_content_blocker) can be used to get an overview about this functionality
@@ -27,6 +27,11 @@ class ContentBlocker {
         action: ContentBlockerAction.fromMap(
             Map<String, dynamic>.from(map["action"]!)));
   }
+
+  @override
+  String toString() {
+    return 'ContentBlocker{trigger: $trigger, action: $action}';
+  }
 }
 
 ///Trigger of the content blocker. The trigger tells to the WebView when to perform the corresponding action.
@@ -39,40 +44,76 @@ class ContentBlockerTrigger {
 
   ///A list of regular expressions to match iframes URL against.
   ///
-  ///*NOTE*: available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
   List<String> ifFrameUrl;
 
   ///A Boolean value. The default value is `false`.
   ///
-  ///*NOTE*: available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
   bool urlFilterIsCaseSensitive;
 
   ///A list of [ContentBlockerTriggerResourceType] representing the resource types (how the browser intends to use the resource) that the rule should match.
   ///If not specified, the rule matches all resource types.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<ContentBlockerTriggerResourceType> resourceType;
 
   ///A list of strings matched to a URL's domain; limits action to a list of specific domains.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.unlessDomain].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<String> ifDomain;
 
   ///A list of strings matched to a URL's domain; acts on any site except domains in a provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.ifDomain].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<String> unlessDomain;
 
   ///A list of [ContentBlockerTriggerLoadType] that can include one of two mutually exclusive values. If not specified, the rule matches all load types.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<ContentBlockerTriggerLoadType> loadType;
 
   ///A list of strings matched to the entire main document URL; limits the action to a specific list of URL patterns.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.unlessTopUrl].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<String> ifTopUrl;
 
   ///An array of strings matched to the entire main document URL; acts on any site except URL patterns in provided list.
   ///Values must be lowercase ASCII, or punycode for non-ASCII. Can't be used with [ContentBlockerTrigger.ifTopUrl].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
   List<String> unlessTopUrl;
 
   ///An array of strings that specify loading contexts.
   ///
-  ///*NOTE*: available only on iOS.
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
   List<ContentBlockerTriggerLoadContext> loadContext;
 
   ContentBlockerTrigger(
@@ -161,7 +202,7 @@ class ContentBlockerTrigger {
 
     return ContentBlockerTrigger(
         urlFilter: map["url-filter"],
-        ifFrameUrl: map["if-frame-url"],
+        ifFrameUrl: List<String>.from(map["if-frame-url"] ?? []),
         urlFilterIsCaseSensitive: map["url-filter-is-case-sensitive"],
         ifDomain: List<String>.from(map["if-domain"] ?? []),
         unlessDomain: List<String>.from(map["unless-domain"] ?? []),
@@ -170,6 +211,11 @@ class ContentBlockerTrigger {
         ifTopUrl: List<String>.from(map["if-top-url"] ?? []),
         unlessTopUrl: List<String>.from(map["unless-top-url"] ?? []),
         loadContext: loadContext);
+  }
+
+  @override
+  String toString() {
+    return 'ContentBlockerTrigger{urlFilter: $urlFilter, ifFrameUrl: $ifFrameUrl, urlFilterIsCaseSensitive: $urlFilterIsCaseSensitive, resourceType: $resourceType, ifDomain: $ifDomain, unlessDomain: $unlessDomain, loadType: $loadType, ifTopUrl: $ifTopUrl, unlessTopUrl: $unlessTopUrl, loadContext: $loadContext}';
   }
 }
 
@@ -212,5 +258,10 @@ class ContentBlockerAction {
     return ContentBlockerAction(
         type: ContentBlockerActionType.fromNativeValue(map["type"])!,
         selector: map["selector"]);
+  }
+
+  @override
+  String toString() {
+    return 'ContentBlockerAction{type: $type, selector: $selector}';
   }
 }

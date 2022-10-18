@@ -204,6 +204,13 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(FlutterMethodNotImplemented)
             }
             break
+        case .isHidden:
+            if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
+                result(iabController.isHidden)
+            } else {
+                result(FlutterMethodNotImplemented)
+            }
+            break
         case .getCopyBackForwardList:
             result(webView?.getCopyBackForwardList())
             break
@@ -295,11 +302,15 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 result(contentHeight)
             }
             break
-        case .zoomBy:
-//            let zoomFactor = (arguments!["zoomFactor"] as! NSNumber).floatValue
-//            let animated = arguments!["animated"] as! Bool
-//            webView?.zoomBy(zoomFactor: zoomFactor, animated: animated)
-            result(true)
+        case .getContentWidth:
+            webView?.getContentWidth { contentWidth, error in
+                if let error = error {
+                    print(error)
+                    result(nil)
+                    return
+                }
+                result(contentWidth)
+            }
             break
         case .reloadFromOrigin:
             webView?.reloadFromOrigin()
@@ -326,57 +337,6 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 }
             }
             else {
-                result(nil)
-            }
-            break
-        case .getHitTestResult:
-            if let webView = webView {
-                webView.getHitTestResult { (hitTestResult) in
-                    result(hitTestResult.toMap())
-                }
-            }
-            else {
-                result(nil)
-            }
-            break
-        case .clearFocus:
-            webView?.clearFocus()
-            result(true)
-            break
-        case .setContextMenu:
-            if let webView = webView {
-                let contextMenu = arguments!["contextMenu"] as? [String: Any]
-                webView.contextMenu = contextMenu
-                result(true)
-            } else {
-                result(false)
-            }
-            break
-        case .requestFocusNodeHref:
-            if let webView = webView {
-                webView.requestFocusNodeHref { (value, error) in
-                    if let err = error {
-                        print(err.localizedDescription)
-                        result(nil)
-                        return
-                    }
-                    result(value)
-                }
-            } else {
-                result(nil)
-            }
-            break
-        case .requestImageRef:
-            if let webView = webView {
-                webView.requestImageRef { (value, error) in
-                    if let err = error {
-                        print(err.localizedDescription)
-                        result(nil)
-                        return
-                    }
-                    result(value)
-                }
-            } else {
                 result(nil)
             }
             break
@@ -558,14 +518,28 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case .canScrollVertically:
             if let webView = webView {
-                result(webView.canScrollVertically())
+                webView.canScrollVertically { canScrollVertically, error in
+                    if let error = error {
+                        print(error)
+                        result(false)
+                        return
+                    }
+                    result(canScrollVertically)
+                }
             } else {
                 result(false)
             }
             break
         case .canScrollHorizontally:
             if let webView = webView {
-                result(webView.canScrollHorizontally())
+                webView.canScrollHorizontally { canScrollHorizontally, error in
+                    if let error = error {
+                        print(error)
+                        result(false)
+                        return
+                    }
+                    result(canScrollHorizontally)
+                }
             } else {
                 result(false)
             }
@@ -591,10 +565,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case .closeAllMediaPresentations:
             if let webView = self.webView, #available(macOS 11.3, *) {
-                // closeAllMediaPresentations with completionHandler v15.0 makes the app crash
-                // with error EXC_BAD_ACCESS, so use closeAllMediaPresentations v14.5
-                webView.closeAllMediaPresentations()
-                result(true)
+                if #available(macOS 12.0, *) {
+                    webView.closeAllMediaPresentations {
+                        result(true)
+                    }
+                } else {
+                    webView.closeAllMediaPresentations()
+                    result(true)
+                }
             } else {
                 result(false)
             }

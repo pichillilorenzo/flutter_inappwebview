@@ -22,7 +22,6 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     var channelDelegate: InAppBrowserChannelDelegate?
     var initialUrlRequest: URLRequest?
     var initialFile: String?
-    var contextMenu: [String: Any]?
     var browserSettings: InAppBrowserSettings?
     var webViewSettings: InAppWebViewSettings?
     var initialData: String?
@@ -30,6 +29,7 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     var initialEncoding: String?
     var initialBaseUrl: String?
     var initialUserScripts: [[String: Any]] = []
+    var isHidden = false
 
     public override func loadView() {
         let channel = FlutterMethodChannel(name: InAppBrowserWebViewController.METHOD_CHANNEL_NAME_PREFIX + id, binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger)
@@ -43,14 +43,12 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         let preWebviewConfiguration = InAppWebView.preWKWebViewConfiguration(settings: webViewSettings)
         if let wId = windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
             webView = webViewTransport.webView
-            webView!.contextMenu = contextMenu
             webView!.initialUserScripts = userScripts
         } else {
             webView = InAppWebView(id: nil,
                                    registrar: nil,
                                    frame: .zero,
                                    configuration: preWebviewConfiguration,
-                                   contextMenu: contextMenu,
                                    userScripts: userScripts)
         }
         
@@ -184,7 +182,12 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         guard let title = title else {
             return
         }
-        window?.title = title
+        if let browserSettings = browserSettings,
+           let toolbarTopFixedTitle = browserSettings.toolbarTopFixedTitle {
+            window?.title = toolbarTopFixedTitle
+        } else {
+            window?.title = title
+        }
         window?.update()
     }
     
@@ -281,10 +284,12 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
     }
     
     public func hide() {
+        isHidden = true
         window?.hide()
     }
     
     public func show() {
+        isHidden = false
         window?.show()
     }
     

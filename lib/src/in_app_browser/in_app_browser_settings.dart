@@ -2,7 +2,10 @@ import 'dart:ui';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/src/types/main.dart';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../types/modal_presentation_style.dart';
+import '../types/modal_transition_style.dart';
 import '../util.dart';
 
 import '../in_app_webview/in_app_webview_settings.dart';
@@ -12,6 +15,8 @@ import '../in_app_webview/android/in_app_webview_options.dart';
 
 import 'apple/in_app_browser_options.dart';
 import '../in_app_webview/apple/in_app_webview_options.dart';
+
+part 'in_app_browser_settings.g.dart';
 
 ///Class that represents the settings that can be used for an [InAppBrowser] instance.
 class InAppBrowserClassSettings {
@@ -50,8 +55,8 @@ class InAppBrowserClassSettings {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
-    instance.browserSettings = InAppBrowserSettings.fromMap(options);
-    instance.webViewSettings = InAppWebViewSettings.fromMap(options);
+    instance.browserSettings = InAppBrowserSettings.fromMap(options) ?? InAppBrowserSettings();
+    instance.webViewSettings = InAppWebViewSettings.fromMap(options) ?? InAppWebViewSettings();
     return instance;
   }
 
@@ -84,7 +89,8 @@ class BrowserOptions {
 }
 
 ///This class represents all [InAppBrowser] settings available.
-class InAppBrowserSettings
+@ExchangeableObject(copyMethod: true)
+class InAppBrowserSettings_
     implements BrowserOptions, AndroidOptions, IosOptions {
   ///Set to `true` to create the browser and load the page, but not show it. Omit or set to `false` to have the browser open and load normally.
   ///The default value is `false`.
@@ -92,20 +98,23 @@ class InAppBrowserSettings
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  bool hidden;
+  ///- MacOS
+  bool? hidden;
 
   ///Set to `true` to hide the toolbar at the top of the WebView. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  bool hideToolbarTop;
+  ///- MacOS
+  bool? hideToolbarTop;
 
   ///Set the custom background color of the toolbar at the top.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Color? toolbarTopBackgroundColor;
 
   ///Set to `true` to hide the url bar on the toolbar at the top. The default value is `false`.
@@ -113,50 +122,53 @@ class InAppBrowserSettings
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  bool hideUrlBar;
+  ///- MacOS
+  bool? hideUrlBar;
 
   ///Set to `true` to hide the progress bar when the WebView is loading a page. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  bool hideProgressBar;
+  ///- MacOS
+  bool? hideProgressBar;
 
   ///Set to `true` if you want the title should be displayed. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  bool hideTitleBar;
+  bool? hideTitleBar;
 
   ///Set the action bar's title.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- MacOS
   String? toolbarTopFixedTitle;
 
   ///Set to `false` to not close the InAppBrowser when the user click on the Android back button and the WebView cannot go back to the history. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  bool closeOnCannotGoBack;
+  bool? closeOnCannotGoBack;
 
   ///Set to `false` to block the InAppBrowser WebView going back when the user click on the Android back button. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  bool allowGoBackWithBackButton;
+  bool? allowGoBackWithBackButton;
 
   ///Set to `true` to close the InAppBrowser when the user click on the Android back button. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  bool shouldCloseOnBackButtonPressed;
+  bool? shouldCloseOnBackButtonPressed;
 
   ///Set to `true` to set the toolbar at the top translucent. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  bool toolbarTopTranslucent;
+  bool? toolbarTopTranslucent;
 
   ///Set the tint color to apply to the navigation bar background.
   ///
@@ -174,7 +186,7 @@ class InAppBrowserSettings
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  bool hideToolbarBottom;
+  bool? hideToolbarBottom;
 
   ///Set the custom background color of the toolbar at the bottom.
   ///
@@ -192,7 +204,7 @@ class InAppBrowserSettings
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  bool toolbarBottomTranslucent;
+  bool? toolbarBottomTranslucent;
 
   ///Set the custom text for the close button.
   ///
@@ -210,15 +222,15 @@ class InAppBrowserSettings
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  ModalPresentationStyle presentationStyle;
+  ModalPresentationStyle_? presentationStyle;
 
   ///Set to the custom transition style when presenting the WebView. The default value is [ModalTransitionStyle.COVER_VERTICAL].
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  ModalTransitionStyle transitionStyle;
+  ModalTransitionStyle_? transitionStyle;
 
-  InAppBrowserSettings(
+  InAppBrowserSettings_(
       {this.hidden = false,
       this.hideToolbarTop = false,
       this.toolbarTopBackgroundColor,
@@ -232,8 +244,8 @@ class InAppBrowserSettings
       this.toolbarBottomTranslucent = true,
       this.closeButtonCaption,
       this.closeButtonColor,
-      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+      this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
+      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
       this.hideTitleBar = false,
       this.toolbarTopFixedTitle,
       this.closeOnCannotGoBack = true,
@@ -241,81 +253,21 @@ class InAppBrowserSettings
       this.shouldCloseOnBackButtonPressed = false});
 
   @override
-  Map<String, dynamic> toMap() {
-    return {
-      "hidden": hidden,
-      "hideToolbarTop": hideToolbarTop,
-      "toolbarTopBackgroundColor": toolbarTopBackgroundColor?.toHex(),
-      "hideUrlBar": hideUrlBar,
-      "hideProgressBar": hideProgressBar,
-      "hideTitleBar": hideTitleBar,
-      "toolbarTopFixedTitle": toolbarTopFixedTitle,
-      "closeOnCannotGoBack": closeOnCannotGoBack,
-      "allowGoBackWithBackButton": allowGoBackWithBackButton,
-      "shouldCloseOnBackButtonPressed": shouldCloseOnBackButtonPressed,
-      "toolbarTopTranslucent": toolbarTopTranslucent,
-      "toolbarTopTintColor": toolbarTopTintColor?.toHex(),
-      "hideToolbarBottom": hideToolbarBottom,
-      "toolbarBottomBackgroundColor": toolbarBottomBackgroundColor?.toHex(),
-      "toolbarBottomTintColor": toolbarBottomTintColor?.toHex(),
-      "toolbarBottomTranslucent": toolbarBottomTranslucent,
-      "closeButtonCaption": closeButtonCaption,
-      "closeButtonColor": closeButtonColor?.toHex(),
-      "presentationStyle": presentationStyle.toNativeValue(),
-      "transitionStyle": transitionStyle.toNativeValue(),
-    };
-  }
-
-  static InAppBrowserSettings fromMap(Map<String, dynamic> map) {
-    var settings = InAppBrowserSettings();
-    settings.hidden = map["hidden"];
-    settings.hideToolbarTop = map["hideToolbarTop"];
-    settings.toolbarTopBackgroundColor =
-        UtilColor.fromHex(map["toolbarTopBackgroundColor"]);
-    settings.hideUrlBar = map["hideUrlBar"];
-    settings.hideProgressBar = map["hideProgressBar"];
-    if (defaultTargetPlatform == TargetPlatform.android) {
-      settings.hideTitleBar = map["hideTitleBar"];
-      settings.toolbarTopFixedTitle = map["toolbarTopFixedTitle"];
-      settings.closeOnCannotGoBack = map["closeOnCannotGoBack"];
-      settings.allowGoBackWithBackButton = map["allowGoBackWithBackButton"];
-      settings.shouldCloseOnBackButtonPressed =
-          map["shouldCloseOnBackButtonPressed"];
-    }
-    if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.macOS) {
-      settings.toolbarTopTranslucent = map["toolbarTopTranslucent"];
-      settings.toolbarTopTintColor =
-          UtilColor.fromHex(map["toolbarTopTintColor"]);
-      settings.hideToolbarBottom = map["hideToolbarBottom"];
-      settings.toolbarBottomBackgroundColor =
-          UtilColor.fromHex(map["toolbarBottomBackgroundColor"]);
-      settings.toolbarBottomTintColor =
-          UtilColor.fromHex(map["toolbarBottomTintColor"]);
-      settings.toolbarBottomTranslucent = map["toolbarBottomTranslucent"];
-      settings.closeButtonCaption = map["closeButtonCaption"];
-      settings.closeButtonColor = UtilColor.fromHex(map["closeButtonColor"]);
-      settings.presentationStyle =
-          ModalPresentationStyle.fromNativeValue(map["presentationStyle"])!;
-      settings.transitionStyle =
-          ModalTransitionStyle.fromNativeValue(map["transitionStyle"])!;
-    }
-    return settings;
+  @ExchangeableObjectMethod(ignore: true)
+  InAppBrowserSettings_ copy() {
+    throw UnimplementedError();
   }
 
   @override
+  @ExchangeableObjectMethod(ignore: true)
   Map<String, dynamic> toJson() {
-    return this.toMap();
+    throw UnimplementedError();
   }
 
   @override
-  String toString() {
-    return toMap().toString();
-  }
-
-  @override
-  InAppBrowserSettings copy() {
-    return InAppBrowserSettings.fromMap(this.toMap());
+  @ExchangeableObjectMethod(ignore: true)
+  Map<String, dynamic> toMap() {
+    throw UnimplementedError();
   }
 }
 

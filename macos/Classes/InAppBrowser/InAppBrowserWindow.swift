@@ -123,6 +123,9 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
         backButton?.isEnabled = false
         
         if let browserSettings = browserSettings {
+            if let toolbarTopFixedTitle = browserSettings.toolbarTopFixedTitle {
+                title = toolbarTopFixedTitle
+            }
             if !browserSettings.hideToolbarTop {
                 toolbar?.isVisible = true
                 if browserSettings.hideUrlBar {

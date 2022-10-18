@@ -4,6 +4,7 @@ class ExchangeableObject {
   final bool fromMapFactory;
   final bool nullableFromMapFactory;
   final bool toStringMethod;
+  final bool copyMethod;
 
   const ExchangeableObject({
     this.toMapMethod = true,
@@ -11,5 +12,6 @@ class ExchangeableObject {
     this.fromMapFactory = true,
     this.nullableFromMapFactory = true,
     this.toStringMethod = true,
+    this.copyMethod = false
   });
 }

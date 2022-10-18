@@ -1343,6 +1343,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getUrl](https://developer.android.com/reference/android/webkit/WebView#getUrl()))
   ///- iOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
+  ///- MacOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- Web
   Future<Uri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1357,6 +1358,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getTitle](https://developer.android.com/reference/android/webkit/WebView#getTitle()))
   ///- iOS ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
+  ///- MacOS ([Official API - WKWebView.title](https://developer.apple.com/documentation/webkit/wkwebview/1415015-title))
   ///- Web
   Future<String?> getTitle() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1368,6 +1370,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getProgress](https://developer.android.com/reference/android/webkit/WebView#getProgress()))
   ///- iOS ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
+  ///- MacOS ([Official API - WKWebView.estimatedProgress](https://developer.apple.com/documentation/webkit/wkwebview/1415007-estimatedprogress))
   Future<int?> getProgress() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('getProgress', args);
@@ -1383,6 +1386,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<String?> getHtml() async {
     String? html;
@@ -1427,6 +1431,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<List<Favicon>> getFavicons() async {
     List<Favicon> favicons = [];
@@ -1611,6 +1616,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String))). If method is "POST", [Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[]))
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
+  ///- MacOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load). If [allowingReadAccessTo] is used, [Official API - WKWebView.loadFileURL](https://developer.apple.com/documentation/webkit/wkwebview/1414973-loadfileurl))
   ///- Web
   Future<void> loadUrl(
       {required URLRequest urlRequest,
@@ -1646,6 +1652,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.postUrl](https://developer.android.com/reference/android/webkit/WebView#postUrl(java.lang.String,%20byte[])))
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> postUrl({required Uri url, required Uint8List postData}) async {
     assert(url.toString().isNotEmpty);
@@ -1672,6 +1679,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadDataWithBaseURL](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
   ///- iOS ([Official API - WKWebView.loadHTMLString](https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring) or [Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1415011-load))
+  ///- MacOS ([Official API - WKWebView.loadHTMLString](https://developer.apple.com/documentation/webkit/wkwebview/1415004-loadhtmlstring) or [Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1415011-load))
   ///- Web
   Future<void> loadData(
       {required String data,
@@ -1741,6 +1749,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadUrl](https://developer.android.com/reference/android/webkit/WebView#loadUrl(java.lang.String)))
   ///- iOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load))
+  ///- MacOS ([Official API - WKWebView.load](https://developer.apple.com/documentation/webkit/wkwebview/1414954-load))
   ///- Web
   Future<void> loadFile({required String assetFilePath}) async {
     assert(assetFilePath.isNotEmpty);
@@ -1756,6 +1765,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.reload](https://developer.android.com/reference/android/webkit/WebView#reload()))
   ///- iOS ([Official API - WKWebView.reload](https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload))
+  ///- MacOS ([Official API - WKWebView.reload](https://developer.apple.com/documentation/webkit/wkwebview/1414969-reload))
   ///- Web ([Official API - Location.reload](https://developer.mozilla.org/en-US/docs/Web/API/Location/reload))
   Future<void> reload() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1769,6 +1779,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBack](https://developer.android.com/reference/android/webkit/WebView#goBack()))
   ///- iOS ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
+  ///- MacOS ([Official API - WKWebView.goBack](https://developer.apple.com/documentation/webkit/wkwebview/1414952-goback))
   ///- Web ([Official API - History.back](https://developer.mozilla.org/en-US/docs/Web/API/History/back))
   Future<void> goBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1780,6 +1791,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.canGoBack](https://developer.android.com/reference/android/webkit/WebView#canGoBack()))
   ///- iOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
+  ///- MacOS ([Official API - WKWebView.canGoBack](https://developer.apple.com/documentation/webkit/wkwebview/1414966-cangoback))
   Future<bool> canGoBack() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canGoBack', args);
@@ -1792,6 +1804,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goForward](https://developer.android.com/reference/android/webkit/WebView#goForward()))
   ///- iOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
+  ///- MacOS ([Official API - WKWebView.goForward](https://developer.apple.com/documentation/webkit/wkwebview/1414993-goforward))
   ///- Web ([Official API - History.forward](https://developer.mozilla.org/en-US/docs/Web/API/History/forward))
   Future<void> goForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1803,6 +1816,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.canGoForward](https://developer.android.com/reference/android/webkit/WebView#canGoForward()))
   ///- iOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
+  ///- MacOS ([Official API - WKWebView.canGoForward](https://developer.apple.com/documentation/webkit/wkwebview/1414962-cangoforward))
   Future<bool> canGoForward() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('canGoForward', args);
@@ -1815,6 +1829,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.goBackOrForward](https://developer.android.com/reference/android/webkit/WebView#goBackOrForward(int)))
   ///- iOS ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
+  ///- MacOS ([Official API - WKWebView.go](https://developer.apple.com/documentation/webkit/wkwebview/1414991-go))
   ///- Web ([Official API - History.go](https://developer.mozilla.org/en-US/docs/Web/API/History/go))
   Future<void> goBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1827,6 +1842,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.canGoBackOrForward](https://developer.android.com/reference/android/webkit/WebView#canGoBackOrForward(int)))
   ///- iOS
+  ///- MacOS
   Future<bool> canGoBackOrForward({required int steps}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('steps', () => steps);
@@ -1840,6 +1856,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> goTo({required WebHistoryItem historyItem}) async {
     var steps = historyItem.offset;
@@ -1853,6 +1870,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<bool> isLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1866,6 +1884,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.stopLoading](https://developer.android.com/reference/android/webkit/WebView#stopLoading()))
   ///- iOS ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
+  ///- MacOS ([Official API - WKWebView.stopLoading](https://developer.apple.com/documentation/webkit/wkwebview/1414981-stoploading))
   ///- Web ([Official API - Window.stop](https://developer.mozilla.org/en-US/docs/Web/API/Window/stop))
   Future<void> stopLoading() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1879,7 +1898,7 @@ class InAppWebViewController {
   ///This parameter doesn’t apply to changes you make to the underlying web content, such as the document’s DOM structure.
   ///Those changes remain visible to all scripts, regardless of which content world you specify.
   ///For more information about content worlds, see [ContentWorld].
-  ///Available on iOS 14.0+.
+  ///Available on iOS 14.0+ and MacOS 11.0+.
   ///**NOTE**: not used on Web.
   ///
   ///**NOTE**: This method shouldn't be called in the [WebView.onWebViewCreated] or [WebView.onLoadStart] events,
@@ -1892,6 +1911,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.evaluateJavascript](https://developer.android.com/reference/android/webkit/WebView#evaluateJavascript(java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
   ///- iOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
+  ///- MacOS ([Official API - WKWebView.evaluateJavascript](https://developer.apple.com/documentation/webkit/wkwebview/3656442-evaluatejavascript))
   ///- Web ([Official API - Window.eval](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/eval?retiredLocale=it))
   Future<dynamic> evaluateJavascript(
       {required String source, ContentWorld? contentWorld}) async {
@@ -1924,6 +1944,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> injectJavascriptFileFromUrl(
       {required Uri urlFile,
@@ -1952,6 +1973,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<dynamic> injectJavascriptFileFromAsset(
       {required String assetFilePath}) async {
@@ -1971,6 +1993,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> injectCSSCode({required String source}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -1992,6 +2015,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> injectCSSFileFromUrl(
       {required Uri urlFile,
@@ -2016,6 +2040,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> injectCSSFileFromAsset({required String assetFilePath}) async {
     String source = await rootBundle.loadString(assetFilePath);
@@ -2076,6 +2101,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   void addJavaScriptHandler(
       {required String handlerName,
       required JavaScriptHandlerCallback callback}) {
@@ -2091,6 +2117,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   JavaScriptHandlerCallback? removeJavaScriptHandler(
       {required String handlerName}) {
     return this.javaScriptHandlersMap.remove(handlerName);
@@ -2102,9 +2129,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 11.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 10.13+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
+  ///- MacOS ([Official API - WKWebView.takeSnapshot](https://developer.apple.com/documentation/webkit/wkwebview/2873260-takesnapshot))
   Future<Uint8List?> takeScreenshot(
       {ScreenshotConfiguration? screenshotConfiguration}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2117,7 +2147,7 @@ class InAppWebViewController {
   @Deprecated('Use setSettings instead')
   Future<void> setOptions({required InAppWebViewGroupOptions options}) async {
     InAppWebViewSettings settings =
-        InAppWebViewSettings.fromMap(options.toMap());
+        InAppWebViewSettings.fromMap(options.toMap()) ?? InAppWebViewSettings();
     await setSettings(settings: settings);
   }
 
@@ -2140,6 +2170,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> setSettings({required InAppWebViewSettings settings}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2153,6 +2184,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<InAppWebViewSettings?> getSettings() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2175,6 +2207,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.copyBackForwardList](https://developer.android.com/reference/android/webkit/WebView#copyBackForwardList()))
   ///- iOS ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
+  ///- MacOS ([Official API - WKWebView.backForwardList](https://developer.apple.com/documentation/webkit/wkwebview/1414977-backforwardlist))
   Future<WebHistory?> getCopyBackForwardList() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
@@ -2188,6 +2221,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<void> clearCache() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('clearCache', args);
@@ -2238,9 +2272,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: this method is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.scrollTo](https://developer.android.com/reference/android/view/View#scrollTo(int,%20int)))
   ///- iOS ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
+  ///- MacOS
   ///- Web ([Official API - Window.scrollTo](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollTo))
   Future<void> scrollTo(
       {required int x, required int y, bool animated = false}) async {
@@ -2261,9 +2298,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: this method is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.scrollBy](https://developer.android.com/reference/android/view/View#scrollBy(int,%20int)))
   ///- iOS ([Official API - UIScrollView.setContentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619400-setcontentoffset))
+  ///- MacOS
   ///- Web ([Official API - Window.scrollBy](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollBy))
   Future<void> scrollBy(
       {required int x, required int y, bool animated = false}) async {
@@ -2277,11 +2317,14 @@ class InAppWebViewController {
   ///On Android native WebView, it pauses all layout, parsing, and JavaScript timers for all WebViews.
   ///This is a global requests, not restricted to just this WebView. This can be useful if the application has been paused.
   ///
-  ///On iOS, it is implemented using JavaScript and it is restricted to just this WebView.
+  ///**NOTE for iOS**: it is implemented using JavaScript and it is restricted to just this WebView.
+  ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript and it is restricted to just this WebView.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.pauseTimers](https://developer.android.com/reference/android/webkit/WebView#pauseTimers()))
   ///- iOS
+  ///- MacOS
   Future<void> pauseTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('pauseTimers', args);
@@ -2289,11 +2332,14 @@ class InAppWebViewController {
 
   ///On Android, it resumes all layout, parsing, and JavaScript timers for all WebViews. This will resume dispatching all timers.
   ///
-  ///On iOS, it is implemented using JavaScript and it resumes all layout, parsing, and JavaScript timers to just this WebView.
+  ///**NOTE for iOS**: it is implemented using JavaScript and it is restricted to just this WebView.
+  ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript and it is restricted to just this WebView.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.resumeTimers](https://developer.android.com/reference/android/webkit/WebView#resumeTimers()))
   ///- iOS
+  ///- MacOS
   Future<void> resumeTimers() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('resumeTimers', args);
@@ -2304,13 +2350,16 @@ class InAppWebViewController {
   ///To obtain the [PrintJobController], use [settings] argument with [PrintJobSettings.handledByClient] to `true`.
   ///Otherwise this method will return `null` and the [PrintJobController] will be handled and disposed automatically by the system.
   ///
-  ///**NOTE**: available on Android 19+.
+  ///**NOTE for Android**: available on Android 19+.
+  ///
+  ///**NOTE for MacOS**: [PrintJobController] is available on MacOS 11.0+.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin. Also, [PrintJobController] is always `null`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintManager.print](https://developer.android.com/reference/android/print/PrintManager#print(java.lang.String,%20android.print.PrintDocumentAdapter,%20android.print.PrintAttributes)))
   ///- iOS ([Official API - UIPrintInteractionController.present](https://developer.apple.com/documentation/uikit/uiprintinteractioncontroller/1618149-present))
+  ///- MacOS (if 11.0+, [Official API - WKWebView.printOperation](https://developer.apple.com/documentation/webkit/wkwebview/3516861-printoperation), else [Official API - NSView.printView](https://developer.apple.com/documentation/appkit/nsview/1483705-printview))
   ///- Web ([Official API - Window.print](https://developer.mozilla.org/en-US/docs/Web/API/Window/print))
   Future<PrintJobController?> printCurrentPage(
       {PrintJobSettings? settings}) async {
@@ -2327,9 +2376,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getContentHeight](https://developer.android.com/reference/android/webkit/WebView#getContentHeight()))
   ///- iOS ([Official API - UIScrollView.contentSize](https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize))
+  ///- MacOS
   ///- Web ([Official API - Document.documentElement.scrollHeight](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollHeight))
   Future<int?> getContentHeight() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2338,6 +2390,33 @@ class InAppWebViewController {
       // try to use javascript
       var scrollHeight = await evaluateJavascript(
           source: "document.documentElement.scrollHeight;");
+      if (scrollHeight != null && scrollHeight is num) {
+        height = scrollHeight.toInt();
+      }
+    }
+    return height;
+  }
+
+  ///Gets the width of the HTML content.
+  ///
+  ///**NOTE for Android**: it is implemented using JavaScript.
+  ///
+  ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
+  ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS ([Official API - UIScrollView.contentSize](https://developer.apple.com/documentation/uikit/uiscrollview/1619399-contentsize))
+  ///- MacOS
+  ///- Web ([Official API - Document.documentElement.scrollWidth](https://developer.mozilla.org/en-US/docs/Web/API/Element/scrollWidth))
+  Future<int?> getContentWidth() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    var height = await _channel.invokeMethod('getContentWidth', args);
+    if (height == null || height == 0) {
+      // try to use javascript
+      var scrollHeight = await evaluateJavascript(
+          source: "document.documentElement.scrollWidth;");
       if (scrollHeight != null && scrollHeight is num) {
         height = scrollHeight.toInt();
       }
@@ -2381,6 +2460,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getOriginalUrl](https://developer.android.com/reference/android/webkit/WebView#getOriginalUrl()))
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2415,6 +2495,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<String?> getSelectedText() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2515,6 +2596,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<List<MetaTag>> getMetaTags() async {
     List<MetaTag> metaTags = [];
@@ -2578,13 +2660,14 @@ class InAppWebViewController {
   ///Returns an instance of [Color] representing the `content` value of the
   ///`<meta name="theme-color" content="">` tag of the current WebView, if available, otherwise `null`.
   ///
-  ///**NOTE**: on Android, Web and iOS < 15.0, it is implemented using JavaScript.
+  ///**NOTE**: on Android, Web, iOS < 15.0 and MacOS < 12.0, it is implemented using JavaScript.
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor))
+  ///- MacOS ([Official API - WKWebView.themeColor](https://developer.apple.com/documentation/webkit/wkwebview/3794258-themecolor))
   ///- Web
   Future<Color?> getMetaThemeColor() async {
     Color? themeColor;
@@ -2626,9 +2709,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.getScrollX](https://developer.android.com/reference/android/view/View#getScrollX()))
   ///- iOS ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
+  ///- MacOS
   ///- Web ([Official API - Window.scrollX](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollX))
   Future<int?> getScrollX() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2639,9 +2725,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - View.getScrollY](https://developer.android.com/reference/android/view/View#getScrollY()))
   ///- iOS ([Official API - UIScrollView.contentOffset](https://developer.apple.com/documentation/uikit/uiscrollview/1619404-contentoffset))
+  ///- MacOS
   ///- Web ([Official API - Window.scrollY](https://developer.mozilla.org/en-US/docs/Web/API/Window/scrollY))
   Future<int?> getScrollY() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2653,6 +2742,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.getCertificate](https://developer.android.com/reference/android/webkit/WebView#getCertificate()))
   ///- iOS
+  ///- MacOS
   Future<SslCertificate?> getCertificate() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? sslCertificateMap =
@@ -2663,13 +2753,14 @@ class InAppWebViewController {
 
   ///Injects the specified [userScript] into the webpage’s content.
   ///
-  ///**NOTE for iOS**: this method will throw an error if the [WebView.windowId] has been set.
-  ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
-  ///This is a limitation of the native iOS WebKit APIs.
+  ///**NOTE for iOS and MacOS**: this method will throw an error if the [WebView.windowId] has been set.
+  ///There isn't any way to add/remove user scripts specific to window WebViews.
+  ///This is a limitation of the native WebKit APIs.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKUserContentController.addUserScript](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript))
+  ///- MacOS ([Official API - WKUserContentController.addUserScript](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1537448-adduserscript))
   Future<void> addUserScript({required UserScript userScript}) async {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
@@ -2684,13 +2775,14 @@ class InAppWebViewController {
 
   ///Injects the [userScripts] into the webpage’s content.
   ///
-  ///**NOTE for iOS**: this method will throw an error if the [WebView.windowId] has been set.
-  ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
-  ///This is a limitation of the native iOS WebKit APIs.
+  ///**NOTE for iOS and MacOS**: this method will throw an error if the [WebView.windowId] has been set.
+  ///There isn't any way to add/remove user scripts specific to window WebViews.
+  ///This is a limitation of the native WebKit APIs.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<void> addUserScripts({required List<UserScript> userScripts}) async {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
@@ -2704,13 +2796,14 @@ class InAppWebViewController {
   ///User scripts already loaded into the webpage's content cannot be removed. This will have effect only on the next page load.
   ///Returns `true` if [userScript] was in the list, `false` otherwise.
   ///
-  ///**NOTE for iOS**: this method will throw an error if the [WebView.windowId] has been set.
-  ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
-  ///This is a limitation of the native iOS WebKit APIs.
+  ///**NOTE for iOS and MacOS**: this method will throw an error if the [WebView.windowId] has been set.
+  ///There isn't any way to add/remove user scripts specific to window WebViews.
+  ///This is a limitation of the native WebKit APIs.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<bool> removeUserScript({required UserScript userScript}) async {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
@@ -2732,13 +2825,14 @@ class InAppWebViewController {
   ///Removes all the [UserScript]s with [groupName] as group name from the webpage’s content.
   ///User scripts already loaded into the webpage's content cannot be removed. This will have effect only on the next page load.
   ///
-  ///**NOTE for iOS**: this method will throw an error if the [WebView.windowId] has been set.
-  ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
-  ///This is a limitation of the native iOS WebKit APIs.
+  ///**NOTE for iOS and MacOS**: this method will throw an error if the [WebView.windowId] has been set.
+  ///There isn't any way to add/remove user scripts specific to window WebViews.
+  ///This is a limitation of the native WebKit APIs.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<void> removeUserScriptsByGroupName({required String groupName}) async {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
@@ -2751,13 +2845,14 @@ class InAppWebViewController {
   ///Removes the [userScripts] from the webpage’s content.
   ///User scripts already loaded into the webpage's content cannot be removed. This will have effect only on the next page load.
   ///
-  ///**NOTE for iOS**: this method will throw an error if the [WebView.windowId] has been set.
-  ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
-  ///This is a limitation of the native iOS WebKit APIs.
+  ///**NOTE for iOS and MacOS**: this method will throw an error if the [WebView.windowId] has been set.
+  ///There isn't any way to add/remove user scripts specific to window WebViews.
+  ///This is a limitation of the native WebKit APIs.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<void> removeUserScripts(
       {required List<UserScript> userScripts}) async {
     assert(_webview?.windowId == null ||
@@ -2770,13 +2865,14 @@ class InAppWebViewController {
 
   ///Removes all the user scripts from the webpage’s content.
   ///
-  ///**NOTE for iOS**: this method will throw an error if the [WebView.windowId] has been set.
-  ///There isn't any way to add/remove user scripts specific to iOS window WebViews.
-  ///This is a limitation of the native iOS WebKit APIs.
+  ///**NOTE for iOS and MacOS**: this method will throw an error if the [WebView.windowId] has been set.
+  ///There isn't any way to add/remove user scripts specific to window WebViews.
+  ///This is a limitation of the native WebKit APIs.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKUserContentController.removeAllUserScripts](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts))
+  ///- MacOS ([Official API - WKUserContentController.removeAllUserScripts](https://developer.apple.com/documentation/webkit/wkusercontentcontroller/1536540-removealluserscripts))
   Future<void> removeAllUserScripts() async {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
@@ -2818,6 +2914,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
+  ///- MacOS ([Official API - WKWebView.callAsyncJavaScript](https://developer.apple.com/documentation/webkit/wkwebview/3656441-callasyncjavascript))
   Future<CallAsyncJavaScriptResult?> callAsyncJavaScript(
       {required String functionBody,
       Map<String, dynamic> arguments = const <String, dynamic>{},
@@ -2847,11 +2944,14 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: Available on iOS 14.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
   ///
+  ///**NOTE for MacOS**: Available on MacOS 11.0+. If [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.WEBARCHIVE] file extension.
+  ///
   ///**NOTE for Android**: if [autoname] is `false`, the [filePath] must ends with the [WebArchiveFormat.MHT] file extension.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.saveWebArchive](https://developer.android.com/reference/android/webkit/WebView#saveWebArchive(java.lang.String,%20boolean,%20android.webkit.ValueCallback%3Cjava.lang.String%3E)))
   ///- iOS
+  ///- MacOS
   Future<String?> saveWebArchive(
       {required String filePath, bool autoname = false}) async {
     if (!autoname) {
@@ -2879,6 +2979,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web ([Official API - Window.isSecureContext](https://developer.mozilla.org/en-US/docs/Web/API/Window/isSecureContext))
   Future<bool> isSecureContext() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2894,11 +2995,14 @@ class InAppWebViewController {
   ///
   ///**NOTE for Android native WebView**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL].
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE for iOS**: it is implemented using JavaScript.
+  ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.createWebMessageChannel](https://developer.android.com/reference/androidx/webkit/WebViewCompat#createWebMessageChannel(android.webkit.WebView)))
   ///- iOS
+  ///- MacOS
   Future<WebMessageChannel?> createWebMessageChannel() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =
@@ -2914,11 +3018,14 @@ class InAppWebViewController {
   ///
   ///**NOTE for Android native WebView**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.POST_WEB_MESSAGE].
   ///
-  ///**NOTE**: On iOS, it is implemented using JavaScript.
+  ///**NOTE for iOS**: it is implemented using JavaScript.
+  ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.postWebMessage](https://developer.android.com/reference/androidx/webkit/WebViewCompat#postWebMessage(android.webkit.WebView,%20androidx.webkit.WebMessageCompat,%20android.net.Uri)))
   ///- iOS
+  ///- MacOS
   Future<void> postWebMessage(
       {required WebMessage message, Uri? targetOrigin}) async {
     if (targetOrigin == null) {
@@ -3086,11 +3193,14 @@ class InAppWebViewController {
   ///
   ///**NOTE for Android**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.WEB_MESSAGE_LISTENER].
   ///
-  ///**NOTE for iOS**: This is implemented using Javascript.
+  ///**NOTE for iOS**: it is implemented using JavaScript.
+  ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.WebMessageListener](https://developer.android.com/reference/androidx/webkit/WebViewCompat#addWebMessageListener(android.webkit.WebView,%20java.lang.String,%20java.util.Set%3Cjava.lang.String%3E,%20androidx.webkit.WebViewCompat.WebMessageListener)))
   ///- iOS
+  ///- MacOS
   Future<void> addWebMessageListener(
       WebMessageListener webMessageListener) async {
     assert(
@@ -3107,9 +3217,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<bool> canScrollVertically() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -3120,9 +3233,12 @@ class InAppWebViewController {
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
   ///
+  ///**NOTE for MacOS**: it is implemented using JavaScript.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<bool> canScrollHorizontally() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -3233,6 +3349,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.reloadFromOrigin](https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin))
+  ///- MacOS ([Official API - WKWebView.reloadFromOrigin](https://developer.apple.com/documentation/webkit/wkwebview/1414956-reloadfromorigin))
   Future<void> reloadFromOrigin() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('reloadFromOrigin', args);
@@ -3245,8 +3362,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available only on iOS 14.0+.
   ///
+  ///**NOTE for MacOS**: available only on MacOS 11.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
+  ///- MacOS ([Official API - WKWebView.createPdf](https://developer.apple.com/documentation/webkit/wkwebview/3650490-createpdf))
   Future<Uint8List?> createPdf(
       {@Deprecated("Use pdfConfiguration instead")
           // ignore: deprecated_member_use_from_same_package
@@ -3263,8 +3383,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available only on iOS 14.0+.
   ///
+  ///**NOTE for MacOS**: available only on MacOS 11.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.createWebArchiveData](https://developer.apple.com/documentation/webkit/wkwebview/3650491-createwebarchivedata))
+  ///- MacOS ([Official API - WKWebView.createWebArchiveData](https://developer.apple.com/documentation/webkit/wkwebview/3650491-createwebarchivedata))
   Future<Uint8List?> createWebArchiveData() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('createWebArchiveData', args);
@@ -3274,6 +3397,7 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.hasOnlySecureContent](https://developer.apple.com/documentation/webkit/wkwebview/1415002-hasonlysecurecontent))
+  ///- MacOS ([Official API - WKWebView.hasOnlySecureContent](https://developer.apple.com/documentation/webkit/wkwebview/1415002-hasonlysecurecontent))
   Future<bool> hasOnlySecureContent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('hasOnlySecureContent', args);
@@ -3283,8 +3407,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.pauseAllMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback)).
+  ///- MacOS ([Official API - WKWebView.pauseAllMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebview/3752240-pauseallmediaplayback)).
   Future<void> pauseAllMediaPlayback() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('pauseAllMediaPlayback', args);
@@ -3297,8 +3424,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.setAllMediaPlaybackSuspended](https://developer.apple.com/documentation/webkit/wkwebview/3752242-setallmediaplaybacksuspended)).
+  ///- MacOS ([Official API - WKWebView.setAllMediaPlaybackSuspended](https://developer.apple.com/documentation/webkit/wkwebview/3752242-setallmediaplaybacksuspended)).
   Future<void> setAllMediaPlaybackSuspended({required bool suspended}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent("suspended", () => suspended);
@@ -3309,8 +3439,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 14.5+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 11.3+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.closeAllMediaPresentations](https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations)).
+  ///- MacOS ([Official API - WKWebView.closeAllMediaPresentations](https://developer.apple.com/documentation/webkit/wkwebview/3752235-closeallmediapresentations)).
   Future<void> closeAllMediaPresentations() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('closeAllMediaPresentations', args);
@@ -3322,8 +3455,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate)).
+  ///- MacOS ([Official API - WKWebView.requestMediaPlaybackState](https://developer.apple.com/documentation/webkit/wkwebview/3752241-requestmediaplaybackstate)).
   Future<MediaPlaybackState?> requestMediaPlaybackState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return MediaPlaybackState.fromNativeValue(
@@ -3335,6 +3471,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<bool> isInFullscreen() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel.invokeMethod('isInFullscreen', args);
@@ -3344,8 +3481,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate)).
+  ///- MacOS ([Official API - WKWebView.cameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763093-cameracapturestate)).
   Future<MediaCaptureState?> getCameraCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return MediaCaptureState.fromNativeValue(
@@ -3356,8 +3496,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate)).
+  ///- MacOS ([Official API - WKWebView.setCameraCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763097-setcameracapturestate)).
   Future<void> setCameraCaptureState({required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('state', () => state.toNativeValue());
@@ -3368,8 +3511,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate)).
+  ///- MacOS ([Official API - WKWebView.microphoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763096-microphonecapturestate)).
   Future<MediaCaptureState?> getMicrophoneCaptureState() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return MediaCaptureState.fromNativeValue(
@@ -3380,8 +3526,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.setMicrophoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763098-setmicrophonecapturestate)).
+  ///- MacOS ([Official API - WKWebView.setMicrophoneCaptureState](https://developer.apple.com/documentation/webkit/wkwebview/3763098-setmicrophonecapturestate)).
   Future<void> setMicrophoneCaptureState(
       {required MediaCaptureState state}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -3409,8 +3558,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available on iOS 15.0+.
   ///
+  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.loadSimulatedRequest(_:response:responseData:)](https://developer.apple.com/documentation/webkit/wkwebview/3763094-loadsimulatedrequest) and [Official API - WKWebView.loadSimulatedRequest(_:responseHTML:)](https://developer.apple.com/documentation/webkit/wkwebview/3763095-loadsimulatedrequest)).
+  ///- MacOS ([Official API - WKWebView.loadSimulatedRequest(_:response:responseData:)](https://developer.apple.com/documentation/webkit/wkwebview/3763094-loadsimulatedrequest) and [Official API - WKWebView.loadSimulatedRequest(_:responseHTML:)](https://developer.apple.com/documentation/webkit/wkwebview/3763095-loadsimulatedrequest)).
   Future<void> loadSimulatedRequest(
       {required URLRequest urlRequest,
       required Uint8List data,
@@ -3436,6 +3588,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebSettings.getDefaultUserAgent](https://developer.android.com/reference/android/webkit/WebSettings#getDefaultUserAgent(android.content.Context)))
   ///- iOS
+  ///- MacOS
   static Future<String> getDefaultUserAgent() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod('getDefaultUserAgent', args);
@@ -3545,8 +3698,11 @@ class InAppWebViewController {
   ///
   ///**NOTE for iOS**: available only on iOS 11.0+.
   ///
+  ///**NOTE for MacOS**: available only on MacOS 10.13+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebView.handlesURLScheme](https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme))
+  ///- MacOS ([Official API - WKWebView.handlesURLScheme](https://developer.apple.com/documentation/webkit/wkwebview/2875370-handlesurlscheme))
   static Future<bool> handlesURLScheme(String urlScheme) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('urlScheme', () => urlScheme);
@@ -3558,6 +3714,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   static Future<String> get tRexRunnerHtml async => await rootBundle.loadString(
       'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.html');
 
@@ -3566,6 +3723,7 @@ class InAppWebViewController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   static Future<String> get tRexRunnerCss async => await rootBundle.loadString(
       'packages/flutter_inappwebview/assets/t_rex_runner/t-rex.css');
 

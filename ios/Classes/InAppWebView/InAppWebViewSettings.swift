@@ -119,7 +119,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             } else {
                 realSettings["mediaPlaybackRequiresUserGesture"] = configuration.mediaPlaybackRequiresUserAction
             }
-            realSettings["minimumFontSize"] = configuration.preferences.minimumFontSize
+            realSettings["minimumFontSize"] = Int(configuration.preferences.minimumFontSize)
             realSettings["suppressesIncrementalRendering"] = configuration.suppressesIncrementalRendering
             realSettings["allowsBackForwardNavigationGestures"] = webView.allowsBackForwardNavigationGestures
             realSettings["allowsInlineMediaPlayback"] = configuration.allowsInlineMediaPlayback

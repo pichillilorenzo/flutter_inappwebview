@@ -38,17 +38,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     var isPausedTimers = false
     var isPausedTimersCompletionHandler: (() -> Void)?
 
-    var contextMenu: [String: Any]?
     var initialUserScripts: [UserScript] = []
-    
-    var lastLongPressTouchPoint: CGPoint?
-    
-    var lastTouchPoint: CGPoint?
-    var lastTouchPointTimestamp = Int64(Date().timeIntervalSince1970 * 1000)
-    
-    var contextMenuIsShowing = false
-    // flag used for the workaround to trigger onCreateContextMenu event as the same on Android
-    var onCreateContextMenuEventTriggeredWhenMenuDisabled = false
     
     var customIMPs: [IMP] = []
     
@@ -57,10 +47,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     var callAsyncJavaScriptBelowIOS14Results: [String:((Any?) -> Void)] = [:]
     
-    var oldZoomScale = Float(1.0)
-    
     init(id: Any?, registrar: FlutterPluginRegistrar?, frame: CGRect, configuration: WKWebViewConfiguration,
-         contextMenu: [String: Any]?, userScripts: [UserScript] = []) {
+         userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
         self.id = id
         if let id = id, let registrar = registrar {
@@ -68,7 +56,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                                            binaryMessenger: registrar.messenger)
             self.channelDelegate = WebViewChannelDelegate(webView: self, channel: channel)
         }
-        self.contextMenu = contextMenu
         self.initialUserScripts = userScripts
         uiDelegate = self
         navigationDelegate = self
@@ -133,11 +120,9 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
         
             allowsBackForwardNavigationGestures = settings.allowsBackForwardNavigationGestures
-            if #available(iOS 9.0, *) {
-                allowsLinkPreview = settings.allowsLinkPreview
-                if !settings.userAgent.isEmpty {
-                    customUserAgent = settings.userAgent
-                }
+            allowsLinkPreview = settings.allowsLinkPreview
+            if !settings.userAgent.isEmpty {
+                customUserAgent = settings.userAgent
             }
 
             if #available(macOS 11.0, *) {
@@ -216,7 +201,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         configuration.userContentController.addPluginScript(ON_WINDOW_BLUR_EVENT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(ON_WINDOW_FOCUS_EVENT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(FIND_ELEMENTS_AT_POINT_JS_PLUGIN_SCRIPT)
-        configuration.userContentController.addPluginScript(LAST_TOUCHED_ANCHOR_OR_IMAGE_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(FIND_TEXT_HIGHLIGHT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(ORIGINAL_VIEWPORT_METATAG_CONTENT_JS_PLUGIN_SCRIPT)
         configuration.userContentController.addPluginScript(ON_SCROLL_CHANGED_EVENT_JS_PLUGIN_SCRIPT)
@@ -306,43 +290,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         return configuration
-    }
-    
-    @objc func onCreateContextMenu() {
-        let mapSorted = SharedLastTouchPointTimestamp.sorted { $0.value > $1.value }
-        if (mapSorted.first?.key != self) {
-            return
-        }
-        
-        contextMenuIsShowing = true
-        
-        let hitTestResult = HitTestResult(type: .unknownType, extra: nil)
-        
-        if let lastLongPressTouhLocation = lastLongPressTouchPoint {
-            if configuration.preferences.javaScriptEnabled {
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastLongPressTouhLocation.x),\(lastLongPressTouhLocation.y))", completionHandler: {(value, error) in
-                    if error != nil {
-                        print("Long press gesture recognizer error: \(error?.localizedDescription ?? "")")
-                    } else if let value = value as? [String: Any?] {
-                        self.channelDelegate?.onCreateContextMenu(hitTestResult: HitTestResult.fromMap(map: value) ?? hitTestResult)
-                    } else {
-                        self.channelDelegate?.onCreateContextMenu(hitTestResult: hitTestResult)
-                    }
-                })
-            } else {
-                channelDelegate?.onCreateContextMenu(hitTestResult: hitTestResult)
-            }
-        } else {
-            channelDelegate?.onCreateContextMenu(hitTestResult: hitTestResult)
-        }
-    }
-    
-    @objc func onHideContextMenu() {
-        if contextMenuIsShowing == false {
-            return
-        }
-        contextMenuIsShowing = false
-        channelDelegate?.onHideContextMenu()
     }
     
     override public func observeValue(forKeyPath keyPath: String?, of object: Any?,
@@ -546,7 +493,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     public func loadUrl(urlRequest: URLRequest, allowingReadAccessTo: URL?) {
         let url = urlRequest.url!
         
-        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo, url.scheme == "file", allowingReadAccessTo.scheme == "file" {
+        if let allowingReadAccessTo = allowingReadAccessTo, url.scheme == "file", allowingReadAccessTo.scheme == "file" {
             loadFileURL(url, allowingReadAccessTo: allowingReadAccessTo)
         } else {
             load(urlRequest)
@@ -563,15 +510,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     }
     
     public func loadData(data: String, mimeType: String, encoding: String, baseUrl: URL, allowingReadAccessTo: URL?) {
-        if #available(iOS 9.0, *), let allowingReadAccessTo = allowingReadAccessTo, baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file" {
+        if let allowingReadAccessTo = allowingReadAccessTo, baseUrl.scheme == "file", allowingReadAccessTo.scheme == "file" {
             loadFileURL(baseUrl, allowingReadAccessTo: allowingReadAccessTo)
         }
-        
-        if #available(iOS 9.0, *) {
-            load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: baseUrl)
-        } else {
-            loadHTMLString(data, baseURL: baseUrl)
-        }
+        load(data.data(using: .utf8)!, mimeType: mimeType, characterEncodingName: encoding, baseURL: baseUrl)
     }
     
     public func loadFile(assetFilePath: String) throws {
@@ -583,17 +525,15 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     func setSettings(newSettings: InAppWebViewSettings, newSettingsMap: [String: Any]) {
         
         // MUST be the first! In this way, all the settings that uses evaluateJavaScript can be applied/blocked!
-        if #available(iOS 13.0, *) {
-            if newSettingsMap["applePayAPIEnabled"] != nil && settings?.applePayAPIEnabled != newSettings.applePayAPIEnabled {
-                if let settings = settings {
-                    settings.applePayAPIEnabled = newSettings.applePayAPIEnabled
-                }
-                if !newSettings.applePayAPIEnabled {
-                    // re-add WKUserScripts for the next page load
-                    prepareAndAddUserScripts()
-                } else {
-                    configuration.userContentController.removeAllUserScripts()
-                }
+        if newSettingsMap["applePayAPIEnabled"] != nil && settings?.applePayAPIEnabled != newSettings.applePayAPIEnabled {
+            if let settings = settings {
+                settings.applePayAPIEnabled = newSettings.applePayAPIEnabled
+            }
+            if !newSettings.applePayAPIEnabled {
+                // re-add WKUserScripts for the next page load
+                prepareAndAddUserScripts()
+            } else {
+                configuration.userContentController.removeAllUserScripts()
             }
         }
         
@@ -1122,9 +1062,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         return result;
     }
 
-    @available(iOS 15.0, *)
     @available(macOS 12.0, *)
-    @available(macCatalyst 15.0, *)
     public func webView(_ webView: WKWebView,
                         requestMediaCapturePermissionFor origin: WKSecurityOrigin,
                         initiatedByFrame frame: WKFrameInfo,
@@ -1301,7 +1239,6 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
         currentOriginalUrl = url
-        lastTouchPoint = nil
         
         disposeWebMessageChannels()
         initializeWindowIdJS()
@@ -1585,9 +1522,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             }
         } else {
             print("Security Error: " + securityError.description)
-            if #available(iOS 11.3, *) {
-                print(SecCopyErrorMessageString(securityError,nil) ?? "")
-            }
+            print(SecCopyErrorMessageString(securityError,nil) ?? "")
         }
         return identityAndTrust;
     }
@@ -1762,7 +1697,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         InAppWebView.windowAutoincrementId += 1
         let windowId = InAppWebView.windowAutoincrementId
         
-        let windowWebView = InAppWebView(id: nil, registrar: nil, frame: CGRect.zero, configuration: configuration, contextMenu: nil)
+        let windowWebView = InAppWebView(id: nil, registrar: nil, frame: CGRect.zero, configuration: configuration)
         windowWebView.windowId = windowId
         
         let webViewTransport = WebViewTransport(
@@ -1950,20 +1885,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     // https://stackoverflow.com/a/42840541/4637638
     public func isVideoPlayerWindow(_ notificationObject: AnyObject?) -> Bool {
-        let nonVideoClasses = ["_UIAlertControllerShimPresenterWindow",
-                               "UITextEffectsWindow",
-                               "UIRemoteKeyboardWindow",
-                               "PGHostedWindow"]
-        
-        var isVideo = true
-        if let obj = notificationObject {
-            for nonVideoClass in nonVideoClasses {
-                if let clazz = NSClassFromString(nonVideoClass) {
-                    isVideo = isVideo && !(obj.isKind(of: clazz))
-                }
-            }
+        if let obj = notificationObject, let clazz = NSClassFromString("WebCoreFullScreenWindow") {
+            return obj.isKind(of: clazz)
         }
-        return isVideo
+        return false
     }
     
     @objc func onEnterFullscreen(_ notification: Notification) {
@@ -2152,27 +2077,18 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             if let webMessageListener = webMessageListeners.first(where: ({($0.jsObjectName == jsObjectName)})) {
                 let isMainFrame = message.frameInfo.isMainFrame
                 
-                var scheme: String? = nil
-                var host: String? = nil
-                var port: Int? = nil
-                if #available(iOS 9.0, *) {
-                    let sourceOrigin = message.frameInfo.securityOrigin
-                    scheme = sourceOrigin.protocol
-                    host = sourceOrigin.host
-                    port = sourceOrigin.port
-                } else if let url = message.frameInfo.request.url {
-                    scheme = url.scheme
-                    host = url.host
-                    port = url.port
-                }
+                let securityOrigin = message.frameInfo.securityOrigin
+                let scheme = securityOrigin.protocol
+                let host = securityOrigin.host
+                let port = securityOrigin.port
                 
                 if !webMessageListener.isOriginAllowed(scheme: scheme, host: host, port: port) {
                     return
                 }
                 
                 var sourceOrigin: URL? = nil
-                if let scheme = scheme, !scheme.isEmpty, let host = host, !host.isEmpty {
-                    sourceOrigin = URL(string: "\(scheme)://\(host)\(port != nil && port != 0 ? ":" + String(port!) : "")")
+                if !scheme.isEmpty, !host.isEmpty {
+                    sourceOrigin = URL(string: "\(scheme)://\(host)\(port != 0 ? ":" + String(port) : "")")
                 }
                 webMessageListener.channelDelegate?.onPostMessage(message: messageData, sourceOrigin: sourceOrigin, isMainFrame: isMainFrame)
             }
@@ -2372,6 +2288,16 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
+    public func getContentWidth(completionHandler: @escaping ((Int64?, Error?) -> Void)) {
+        evaluateJavaScript("document.body.scrollWidth") { scrollWidth, error in
+            if let error = error {
+                completionHandler(nil, error)
+            } else {
+                completionHandler(Int64(scrollWidth as? Double ?? 0.0), nil)
+            }
+        }
+    }
+    
     public func getOriginalUrl() -> URL? {
         return currentOriginalUrl
     }
@@ -2382,56 +2308,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         } else {
             completionHandler(nil, nil)
         }
-    }
-    
-    public func getHitTestResult(completionHandler: @escaping (HitTestResult) -> Void) {
-        if configuration.preferences.javaScriptEnabled, let lastTouchLocation = lastTouchPoint {
-            self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._findElementsAtPoint(\(lastTouchLocation.x),\(lastTouchLocation.y))", completionHandler: {(value, error) in
-                if error != nil {
-                    print("getHitTestResult error: \(error?.localizedDescription ?? "")")
-                    completionHandler(HitTestResult(type: .unknownType, extra: nil))
-                } else if let value = value as? [String: Any?] {
-                    let hitTestResult = HitTestResult.fromMap(map: value)!
-                    completionHandler(hitTestResult)
-                } else {
-                    completionHandler(HitTestResult(type: .unknownType, extra: nil))
-                }
-            })
-        } else {
-            completionHandler(HitTestResult(type: .unknownType, extra: nil))
-        }
-    }
-    
-    public func requestFocusNodeHref(completionHandler: @escaping ([String: Any?]?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
-            // add some delay to make it sure _lastAnchorOrImageTouched is updated
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastAnchorOrImageTouched", completionHandler: {(value, error) in
-                    let lastAnchorOrImageTouched = value as? [String: Any?]
-                    completionHandler(lastAnchorOrImageTouched, error)
-                })
-            }
-        } else {
-            completionHandler(nil, nil)
-        }
-    }
-    
-    public func requestImageRef(completionHandler: @escaping ([String: Any?]?, Error?) -> Void) {
-        if configuration.preferences.javaScriptEnabled {
-            // add some delay to make it sure _lastImageTouched is updated
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
-                self.evaluateJavaScript("window.\(JAVASCRIPT_BRIDGE_NAME)._lastImageTouched", completionHandler: {(value, error) in
-                    let lastImageTouched = value as? [String: Any?]
-                    completionHandler(lastImageTouched, error)
-                })
-            }
-        } else {
-            completionHandler(nil, nil)
-        }
-    }
-    
-    public func clearFocus() {
-        self.enclosingScrollView?.subviews.first?.resignFirstResponder()
     }
     
     public func getCertificate() -> SslCertificate? {
@@ -2454,12 +2330,24 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         }
     }
     
-    public func canScrollVertically() -> Bool {
-        return enclosingScrollView?.contentSize.height ?? 0 > self.frame.height
+    public func canScrollVertically(completionHandler: @escaping ((Bool, Error?) -> Void)) {
+        getContentHeight { contentHeight, error in
+            if let error = error {
+                completionHandler(false, error)
+            } else {
+                completionHandler(CGFloat(contentHeight ?? 0) > self.frame.height, nil)
+            }
+        }
     }
     
-    public func canScrollHorizontally() -> Bool {
-        return enclosingScrollView?.contentSize.width ?? 0 > self.frame.width
+    public func canScrollHorizontally(completionHandler: @escaping ((Bool, Error?) -> Void)) {
+        getContentWidth { contentWidth, error in
+            if let error = error {
+                completionHandler(false, error)
+            } else {
+                completionHandler(CGFloat(contentWidth ?? 0) > self.frame.width, nil)
+            }
+        }
     }
     
     public func createWebMessageChannel(completionHandler: ((WebMessageChannel) -> Void)? = nil) -> WebMessageChannel {
@@ -2578,7 +2466,6 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         uiDelegate = nil
         navigationDelegate = nil
         isPausedTimersCompletionHandler = nil
-        SharedLastTouchPointTimestamp.removeValue(forKey: self)
         callAsyncJavaScriptBelowIOS14Results.removeAll()
         super.removeFromSuperview()
     }

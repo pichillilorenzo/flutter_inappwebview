@@ -22,7 +22,8 @@ public class PlatformUtil: ChannelDelegate {
         
         switch call.method {
             case "getSystemVersion":
-                result(ProcessInfo.processInfo.operatingSystemVersionString)
+                let version = ProcessInfo.processInfo.operatingSystemVersion
+                result("\(version.majorVersion).\(version.minorVersion).\(version.patchVersion)")
                 break
             case "formatDate":
                 let date = arguments!["date"] as! Int64

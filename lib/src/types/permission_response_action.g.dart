@@ -23,20 +23,7 @@ class PermissionResponseAction {
   static const GRANT = PermissionResponseAction._internal(1, 1);
 
   ///Prompt the user for permission for the requested resource.
-  ///
-  ///**NOTE for iOS**: On iOS < 15.0, it will fallback to [DENY]
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS 15.0+
-  static final PROMPT = PermissionResponseAction._internalMultiPlatform(2, () {
-    switch (defaultTargetPlatform) {
-      case TargetPlatform.iOS:
-        return 2;
-      default:
-        break;
-    }
-    return null;
-  });
+  static const PROMPT = PermissionResponseAction._internal(2, 2);
 
   ///Set of all values of [PermissionResponseAction].
   static final Set<PermissionResponseAction> values = [

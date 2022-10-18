@@ -69,6 +69,7 @@ public interface InAppWebViewInterface {
   String printCurrentPage(@Nullable PrintJobSettings settings);
   int getContentHeight();
   void getContentHeight(ValueCallback<Integer> callback);
+  void getContentWidth(ValueCallback<Integer> callback);
   void zoomBy(float zoomFactor);
   String getOriginalUrl();
   void getSelectedText(ValueCallback<String> callback);

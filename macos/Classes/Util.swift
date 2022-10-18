@@ -9,8 +9,6 @@ import Foundation
 import WebKit
 import FlutterMacOS
 
-var SharedLastTouchPointTimestamp: [InAppWebView: Int64] = [:]
-
 public class Util {
     public static func getUrlAsset(assetFilePath: String) throws -> URL {
 //        let key = SwiftFlutterPlugin.instance?.registrar?.lookupKey(forAsset: assetFilePath)

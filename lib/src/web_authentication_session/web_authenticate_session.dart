@@ -16,7 +16,7 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 
 ///A session that an app uses to authenticate a user through a web service.
 ///
-///It is implemented using [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) on iOS 12.0+
+///It is implemented using [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) on iOS 12.0+ and MacOS 10.15+
 ///and [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) on iOS 11.0.
 ///
 ///Use an [WebAuthenticationSession] instance to authenticate a user through a web service, including one run by a third party.
@@ -32,8 +32,11 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 ///
 ///**NOTE for iOS**: Available only on iOS 11.0+.
 ///
+///**NOTE for MacOS**: Available only on MacOS 10.15+.
+///
 ///**Supported Platforms/Implementations**:
 ///- iOS
+///- MacOS
 class WebAuthenticationSession implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();

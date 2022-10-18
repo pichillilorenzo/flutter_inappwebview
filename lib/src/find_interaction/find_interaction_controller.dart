@@ -9,6 +9,7 @@ import '../types/main.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 class FindInteractionController {
   MethodChannel? _channel;
 
@@ -29,6 +30,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.FindListener.onFindResultReceived](https://developer.android.com/reference/android/webkit/WebView.FindListener#onFindResultReceived(int,%20int,%20boolean)))
   ///- iOS
+  ///- MacOS
   final void Function(
       FindInteractionController controller,
       int activeMatchOrdinal,
@@ -108,6 +110,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findAllAsync](https://developer.android.com/reference/android/webkit/WebView#findAllAsync(java.lang.String)))
   ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.presentFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975832-presentfindnavigator?changes=_2) with [Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
+  ///- MacOS
   Future<void> findAll({String? find}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('find', () => find);
@@ -125,6 +128,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.findNext](https://developer.android.com/reference/android/webkit/WebView#findNext(boolean)))
   ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.findNext](https://developer.apple.com/documentation/uikit/uifindinteraction/3975829-findnext?changes=_2) and ([Official API - UIFindInteraction.findPrevious](https://developer.apple.com/documentation/uikit/uifindinteraction/3975830-findprevious?changes=_2)))
+  ///- MacOS
   Future<void> findNext({bool forward = true}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('forward', () => forward);
@@ -140,6 +144,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.clearMatches](https://developer.android.com/reference/android/webkit/WebView#clearMatches()))
   ///- iOS (if [InAppWebViewSettings.isFindInteractionEnabled] is `true`: [Official API - UIFindInteraction.dismissFindNavigator](https://developer.apple.com/documentation/uikit/uifindinteraction/3975827-dismissfindnavigator?changes=_2))
+  ///- MacOS
   Future<void> clearMatches() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel?.invokeMethod('clearMatches', args);
@@ -153,6 +158,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
+  ///- MacOS
   Future<void> setSearchText(String? searchText) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('searchText', () => searchText);
@@ -167,6 +173,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - UIFindInteraction.searchText](https://developer.apple.com/documentation/uikit/uifindinteraction/3975834-searchtext?changes=_2))
+  ///- MacOS
   Future<String?> getSearchText() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _channel?.invokeMethod('getSearchText', args);
@@ -221,6 +228,7 @@ class FindInteractionController {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - UIFindInteraction.activeFindSession](https://developer.apple.com/documentation/uikit/uifindinteraction/3975825-activefindsession?changes=_7____4_8&language=objc))
+  ///- MacOS
   Future<FindSession?> getActiveFindSession() async {
     Map<String, dynamic> args = <String, dynamic>{};
     Map<String, dynamic>? result =

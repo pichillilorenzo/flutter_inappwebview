@@ -4,7 +4,6 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import 'in_app_webview/in_app_webview_controller.dart';
-import 'in_app_webview/in_app_webview_settings.dart';
 import 'in_app_webview/headless_in_app_webview.dart';
 import 'platform_util.dart';
 
@@ -21,13 +20,13 @@ import 'types/main.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 ///- Web
 class CookieManager {
   static CookieManager? _instance;
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
-  ///Contains only iOS-specific methods of [CookieManager].
   ///Use [CookieManager] instead.
   @Deprecated("Use CookieManager instead")
   late IOSCookieManager ios;
@@ -60,9 +59,9 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///
   ///[webViewController] could be used if you need to set a session-only cookie using JavaScript (so [isHttpOnly] cannot be set, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
-  ///on the current URL of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. In this case the [url] parameter is ignored.
+  ///on the current URL of the [WebView] managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. In this case the [url] parameter is ignored.
   ///
-  ///**NOTE for iOS below 11.0**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
+  ///**NOTE for iOS below 11.0 and MacOS below 10.13**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to set the cookie (session-only cookie won't work! In that case, you should set also [expiresDate] or [maxAge]).
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
@@ -72,6 +71,7 @@ class CookieManager {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - CookieManager.setCookie](https://developer.android.com/reference/android/webkit/CookieManager#setCookie(java.lang.String,%20java.lang.String,%20android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
   ///- iOS ([Official API - WKHTTPCookieStore.setCookie](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882007-setcookie))
+  ///- MacOS ([Official API - WKHTTPCookieStore.setCookie](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882007-setcookie))
   ///- Web
   Future<void> setCookie(
       {required Uri url,
@@ -94,27 +94,19 @@ class CookieManager {
     assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
-    if (defaultTargetPlatform == TargetPlatform.iOS || kIsWeb) {
-      var shouldUseJavascript = kIsWeb;
-      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {
-        var platformUtil = PlatformUtil.instance();
-        var version = double.tryParse(await platformUtil.getSystemVersion());
-        shouldUseJavascript = version != null && version < 11.0;
-      }
-      if (shouldUseJavascript) {
-        await _setCookieWithJavaScript(
-            url: url,
-            name: name,
-            value: value,
-            domain: domain,
-            path: path,
-            expiresDate: expiresDate,
-            maxAge: maxAge,
-            isSecure: isSecure,
-            sameSite: sameSite,
-            webViewController: webViewController);
-        return;
-      }
+    if (await _shouldUseJavascript()) {
+      await _setCookieWithJavaScript(
+          url: url,
+          name: name,
+          value: value,
+          domain: domain,
+          path: path,
+          expiresDate: expiresDate,
+          maxAge: maxAge,
+          isSecure: isSecure,
+          sameSite: sameSite,
+          webViewController: webViewController);
+      return;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -160,16 +152,17 @@ class CookieManager {
     cookieValue += ";";
 
     if (webViewController != null) {
-      InAppWebViewSettings? settings = await webViewController.getSettings();
-      if (settings != null && settings.javaScriptEnabled) {
+      final javaScriptEnabled =
+          (await webViewController.getSettings())?.javaScriptEnabled ?? false;
+      if (javaScriptEnabled) {
         await webViewController.evaluateJavascript(
             source: 'document.cookie="$cookieValue"');
         return;
       }
     }
 
-    var setCookieCompleter = Completer<void>();
-    var headlessWebView = new HeadlessInAppWebView(
+    final setCookieCompleter = Completer<void>();
+    final headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: url),
       onLoadStop: (controller, url) async {
         await controller.evaluateJavascript(
@@ -185,10 +178,10 @@ class CookieManager {
   ///Gets all the cookies for the given [url].
   ///
   ///[webViewController] is used for getting the cookies (also session-only cookies) using JavaScript (cookies with `isHttpOnly` enabled cannot be found, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
-  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. JavaScript must be enabled in order to work.
+  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. JavaScript must be enabled in order to work.
   ///In this case the [url] parameter is ignored.
   ///
-  ///**NOTE for iOS below 11.0**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
+  ///**NOTE for iOS below 11.0 and MacOS below 10.13**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
   ///If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be found!).
   ///
@@ -199,6 +192,7 @@ class CookieManager {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - CookieManager.getCookie](https://developer.android.com/reference/android/webkit/CookieManager#getCookie(java.lang.String)))
   ///- iOS ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
+  ///- MacOS ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
   ///- Web
   Future<List<Cookie>> getCookies(
       {required Uri url,
@@ -209,17 +203,9 @@ class CookieManager {
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
-    if (defaultTargetPlatform == TargetPlatform.iOS || kIsWeb) {
-      var shouldUseJavascript = kIsWeb;
-      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {
-        var platformUtil = PlatformUtil.instance();
-        var version = double.tryParse(await platformUtil.getSystemVersion());
-        shouldUseJavascript = version != null && version < 11.0;
-      }
-      if (shouldUseJavascript) {
-        return await _getCookiesWithJavaScript(
-            url: url, webViewController: webViewController);
-      }
+    if (await _shouldUseJavascript()) {
+      return await _getCookiesWithJavaScript(
+          url: url, webViewController: webViewController);
     }
 
     List<Cookie> cookies = [];
@@ -253,8 +239,9 @@ class CookieManager {
     List<Cookie> cookies = [];
 
     if (webViewController != null) {
-      InAppWebViewSettings? settings = await webViewController.getSettings();
-      if (settings != null && settings.javaScriptEnabled) {
+      final javaScriptEnabled =
+          (await webViewController.getSettings())?.javaScriptEnabled ?? false;
+      if (javaScriptEnabled) {
         List<String> documentCookies = (await webViewController
                 .evaluateJavascript(source: 'document.cookie') as String)
             .split(';')
@@ -273,8 +260,8 @@ class CookieManager {
       }
     }
 
-    var pageLoaded = Completer<void>();
-    var headlessWebView = new HeadlessInAppWebView(
+    final pageLoaded = Completer<void>();
+    final headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: url),
       onLoadStop: (controller, url) async {
         pageLoaded.complete();
@@ -304,10 +291,10 @@ class CookieManager {
   ///Gets a cookie by its [name] for the given [url].
   ///
   ///[webViewController] is used for getting the cookie (also session-only cookie) using JavaScript (cookie with `isHttpOnly` enabled cannot be found, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
-  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. JavaScript must be enabled in order to work.
+  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. JavaScript must be enabled in order to work.
   ///In this case the [url] parameter is ignored.
   ///
-  ///**NOTE for iOS below 11.0**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
+  ///**NOTE for iOS below 11.0 and MacOS below 10.13**: All the cookies returned this way will have all the properties to `null` except for [Cookie.name] and [Cookie.value].
   ///If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to get the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be found!).
   ///
@@ -318,6 +305,7 @@ class CookieManager {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<Cookie?> getCookie(
       {required Uri url,
@@ -330,20 +318,12 @@ class CookieManager {
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
-    if (defaultTargetPlatform == TargetPlatform.iOS || kIsWeb) {
-      var shouldUseJavascript = kIsWeb;
-      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {
-        var platformUtil = PlatformUtil.instance();
-        var version = double.tryParse(await platformUtil.getSystemVersion());
-        shouldUseJavascript = version != null && version < 11.0;
-      }
-      if (shouldUseJavascript) {
-        List<Cookie> cookies = await _getCookiesWithJavaScript(
-            url: url, webViewController: webViewController);
-        return cookies
-            .cast<Cookie?>()
-            .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
-      }
+    if (await _shouldUseJavascript()) {
+      List<Cookie> cookies = await _getCookiesWithJavaScript(
+          url: url, webViewController: webViewController);
+      return cookies
+          .cast<Cookie?>()
+          .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -373,10 +353,10 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///
   ///[webViewController] is used for deleting the cookie (also session-only cookie) using JavaScript (cookie with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
-  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. JavaScript must be enabled in order to work.
+  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. JavaScript must be enabled in order to work.
   ///In this case the [url] parameter is ignored.
   ///
-  ///**NOTE for iOS below 11.0**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
+  ///**NOTE for iOS below 11.0 and MacOS below 10.13**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookie (session-only cookie and cookie with `isHttpOnly` enabled won't be deleted!).
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
@@ -386,6 +366,7 @@ class CookieManager {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - WKHTTPCookieStore.delete](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882009-delete)
+  ///- MacOS ([Official API - WKHTTPCookieStore.delete](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882009-delete)
   ///- Web
   Future<void> deleteCookie(
       {required Uri url,
@@ -400,24 +381,16 @@ class CookieManager {
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
-    if (defaultTargetPlatform == TargetPlatform.iOS || kIsWeb) {
-      var shouldUseJavascript = kIsWeb;
-      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {
-        var platformUtil = PlatformUtil.instance();
-        var version = double.tryParse(await platformUtil.getSystemVersion());
-        shouldUseJavascript = version != null && version < 11.0;
-      }
-      if (shouldUseJavascript) {
-        await _setCookieWithJavaScript(
-            url: url,
-            name: name,
-            value: "",
-            path: path,
-            domain: domain,
-            maxAge: -1,
-            webViewController: webViewController);
-        return;
-      }
+    if (await _shouldUseJavascript()) {
+      await _setCookieWithJavaScript(
+          url: url,
+          name: name,
+          value: "",
+          path: path,
+          domain: domain,
+          maxAge: -1,
+          webViewController: webViewController);
+      return;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -433,10 +406,10 @@ class CookieManager {
   ///The default value of [path] is `"/"`.
   ///
   ///[webViewController] is used for deleting the cookies (also session-only cookies) using JavaScript (cookies with `isHttpOnly` enabled cannot be deleted, see: https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies#restrict_access_to_cookies)
-  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11 and Web platform. JavaScript must be enabled in order to work.
+  ///from the current context of the [WebView] managed by that controller when you need to target iOS below 11, MacOS below 10.13 and Web platform. JavaScript must be enabled in order to work.
   ///In this case the [url] parameter is ignored.
   ///
-  ///**NOTE for iOS below 11.0**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
+  ///**NOTE for iOS below 11.0 and MacOS below 10.13**: If [webViewController] is `null` or JavaScript is disabled for it, it will try to use a [HeadlessInAppWebView]
   ///to delete the cookies (session-only cookies and cookies with `isHttpOnly` enabled won't be deleted!).
   ///
   ///**NOTE for Web**: this method will have effect only if the iframe has the same origin.
@@ -446,6 +419,7 @@ class CookieManager {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   ///- Web
   Future<void> deleteCookies(
       {required Uri url,
@@ -458,28 +432,20 @@ class CookieManager {
 
     webViewController = webViewController ?? iosBelow11WebViewController;
 
-    if (defaultTargetPlatform == TargetPlatform.iOS || kIsWeb) {
-      var shouldUseJavascript = kIsWeb;
-      if (defaultTargetPlatform == TargetPlatform.iOS && !kIsWeb) {
-        var platformUtil = PlatformUtil.instance();
-        var version = double.tryParse(await platformUtil.getSystemVersion());
-        shouldUseJavascript = version != null && version < 11.0;
+    if (await _shouldUseJavascript()) {
+      List<Cookie> cookies = await _getCookiesWithJavaScript(
+          url: url, webViewController: webViewController);
+      for (var i = 0; i < cookies.length; i++) {
+        await _setCookieWithJavaScript(
+            url: url,
+            name: cookies[i].name,
+            value: "",
+            path: path,
+            domain: domain,
+            maxAge: -1,
+            webViewController: webViewController);
       }
-      if (shouldUseJavascript) {
-        List<Cookie> cookies = await _getCookiesWithJavaScript(
-            url: url, webViewController: webViewController);
-        for (var i = 0; i < cookies.length; i++) {
-          await _setCookieWithJavaScript(
-              url: url,
-              name: cookies[i].name,
-              value: "",
-              path: path,
-              domain: domain,
-              maxAge: -1,
-              webViewController: webViewController);
-        }
-        return;
-      }
+      return;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -493,9 +459,12 @@ class CookieManager {
   ///
   ///**NOTE for iOS**: available from iOS 11.0+.
   ///
+  ///**NOTE for MacOS**: available from iOS 10.13+.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - CookieManager.removeAllCookies](https://developer.android.com/reference/android/webkit/CookieManager#removeAllCookies(android.webkit.ValueCallback%3Cjava.lang.Boolean%3E)))
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
+  ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   Future<void> deleteAllCookies() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('deleteAllCookies', args);
@@ -503,10 +472,13 @@ class CookieManager {
 
   ///Fetches all stored cookies.
   ///
-  ///**NOTE**: available on iOS 11.0+.
+  ///**NOTE for iOS**: available on iOS 11.0+.
+  ///
+  ///**NOTE for MacOS**: available from iOS 10.13+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
+  ///- MacOS ([Official API - WKHTTPCookieStore.getAllCookies](https://developer.apple.com/documentation/webkit/wkhttpcookiestore/2882005-getallcookies))
   Future<List<Cookie>> getAllCookies() async {
     List<Cookie> cookies = [];
 
@@ -541,6 +513,21 @@ class CookieManager {
             locale: 'en_US',
             timezone: 'GMT')
         : await platformUtil.getWebCookieExpirationDate(date: dateTime);
+  }
+
+  Future<bool> _shouldUseJavascript() async {
+    if (kIsWeb) {
+      return true;
+    }
+    if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
+      final platformUtil = PlatformUtil.instance();
+      final systemVersion = await platformUtil.getSystemVersion();
+      return defaultTargetPlatform == TargetPlatform.iOS
+          ? systemVersion.compareTo("11") == -1
+          : systemVersion.compareTo("10.13") == -1;
+    }
+    return false;
   }
 }
 

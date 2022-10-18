@@ -95,11 +95,14 @@ class SslErrorType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - SslError.SSL_INVALID](https://developer.android.com/reference/android/net/http/SslError#SSL_INVALID))
   ///- iOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
+  ///- MacOS ([Official API - SecTrustResultType.invalid](https://developer.apple.com/documentation/security/sectrustresulttype/invalid))
   static final INVALID = SslErrorType._internalMultiPlatform('INVALID', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 5;
       case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
         return 0;
       default:
         break;
@@ -116,9 +119,12 @@ class SslErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
+  ///- MacOS ([Official API - SecTrustResultType.deny](https://developer.apple.com/documentation/security/sectrustresulttype/deny))
   static final DENY = SslErrorType._internalMultiPlatform('DENY', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 3;
+      case TargetPlatform.macOS:
         return 3;
       default:
         break;
@@ -137,10 +143,13 @@ class SslErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
+  ///- MacOS ([Official API - SecTrustResultType.unspecified](https://developer.apple.com/documentation/security/sectrustresulttype/unspecified))
   static final UNSPECIFIED =
       SslErrorType._internalMultiPlatform('UNSPECIFIED', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 4;
+      case TargetPlatform.macOS:
         return 4;
       default:
         break;
@@ -160,10 +169,13 @@ class SslErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
+  ///- MacOS ([Official API - SecTrustResultType.recoverableTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure))
   static final RECOVERABLE_TRUST_FAILURE =
       SslErrorType._internalMultiPlatform('RECOVERABLE_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 5;
+      case TargetPlatform.macOS:
         return 5;
       default:
         break;
@@ -180,10 +192,13 @@ class SslErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
+  ///- MacOS ([Official API - SecTrustResultType.fatalTrustFailure](https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure))
   static final FATAL_TRUST_FAILURE =
       SslErrorType._internalMultiPlatform('FATAL_TRUST_FAILURE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 6;
+      case TargetPlatform.macOS:
         return 6;
       default:
         break;
@@ -198,10 +213,13 @@ class SslErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
+  ///- MacOS ([Official API - SecTrustResultType.otherError](https://developer.apple.com/documentation/security/sectrustresulttype/othererror))
   static final OTHER_ERROR =
       SslErrorType._internalMultiPlatform('OTHER_ERROR', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 7;
+      case TargetPlatform.macOS:
         return 7;
       default:
         break;

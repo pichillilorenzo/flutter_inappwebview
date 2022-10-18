@@ -20,8 +20,6 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var javaScriptEnabled = true
     var javaScriptCanOpenWindowsAutomatically = false
     var mediaPlaybackRequiresUserGesture = true
-    var verticalScrollBarEnabled = true
-    var horizontalScrollBarEnabled = true
     var resourceCustomSchemes: [String] = []
     var contentBlockers: [[String: [String : Any]]] = []
     var minimumFontSize = 0
@@ -30,54 +28,29 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
     var incognito = false
     var cacheEnabled = true
     var transparentBackground = false
-    var disableVerticalScroll = false
-    var disableHorizontalScroll = false
-    var disableContextMenu = false
     var supportZoom = true
     var allowUniversalAccessFromFileURLs = false
     var allowFileAccessFromFileURLs = false
 
-    var disallowOverScroll = false
     var enableViewportScale = false
     var suppressesIncrementalRendering = false
     var allowsAirPlayForMediaPlayback = true
     var allowsBackForwardNavigationGestures = true
     var allowsLinkPreview = true
-    var ignoresViewportScaleLimits = false
-    var allowsInlineMediaPlayback = false
-    var allowsPictureInPictureMediaPlayback = true
     var isFraudulentWebsiteWarningEnabled = true
-    var selectionGranularity = 0
-    var dataDetectorTypes: [String] = ["NONE"] // WKDataDetectorTypeNone
     var preferredContentMode = 0
     var sharedCookiesEnabled = false
-    var automaticallyAdjustsScrollIndicatorInsets = false
-    var accessibilityIgnoresInvertColors = false
-    var decelerationRate = "NORMAL" // UIScrollView.DecelerationRate.normal
-    var alwaysBounceVertical = false
-    var alwaysBounceHorizontal = false
-    var scrollsToTop = true
-    var isPagingEnabled = false
-    var maximumZoomScale = 1.0
-    var minimumZoomScale = 1.0
-    var contentInsetAdjustmentBehavior = 2 // UIScrollView.ContentInsetAdjustmentBehavior.never
-    var isDirectionalLockEnabled = false
     var mediaType: String? = nil
     var pageZoom = 1.0
     var limitsNavigationsToAppBoundDomains = false
     var useOnNavigationResponse = false
     var applePayAPIEnabled = false
     var allowingReadAccessTo: String? = nil
-    var disableLongPressContextMenuOnLinks = false
-    var disableInputAccessoryView = false
     var underPageBackgroundColor: String?
     var isTextInteractionEnabled = true
     var isSiteSpecificQuirksModeEnabled = true
     var upgradeKnownHostsToHTTPS = true
     var isElementFullscreenEnabled = true
-    var isFindInteractionEnabled = false
-    var minimumViewportInset: NSEdgeInsets? = nil
-    var maximumViewportInset: NSEdgeInsets? = nil
     
     override init(){
         super.init()
@@ -105,7 +78,7 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             if #available(macOS 10.12, *) {
                 realSettings["mediaPlaybackRequiresUserGesture"] = configuration.mediaTypesRequiringUserActionForPlayback == .all
             }
-            realSettings["minimumFontSize"] = configuration.preferences.minimumFontSize
+            realSettings["minimumFontSize"] = Int(configuration.preferences.minimumFontSize)
             realSettings["suppressesIncrementalRendering"] = configuration.suppressesIncrementalRendering
             realSettings["allowsBackForwardNavigationGestures"] = webView.allowsBackForwardNavigationGestures
             if #available(macOS 10.15, *) {

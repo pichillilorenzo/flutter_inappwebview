@@ -56,6 +56,7 @@ public class InAppBrowserManager: ChannelDelegate {
         
         let webViewController = InAppBrowserWebViewController()
         webViewController.browserSettings = browserSettings
+        webViewController.isHidden = browserSettings.hidden
         webViewController.webViewSettings = webViewSettings
         webViewController.previousStatusBarStyle = previousStatusBarStyle
         return webViewController

@@ -17,6 +17,7 @@ import '../types/main.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 class WebStorageManager {
   static WebStorageManager? _instance;
   static const MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;
@@ -121,6 +122,7 @@ class WebStorageManager {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
+  ///- MacOS ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
   Future<List<WebsiteDataRecord>> fetchDataRecords(
       {required Set<WebsiteDataType> dataTypes}) async {
     List<WebsiteDataRecord> recordList = [];
@@ -156,6 +158,7 @@ class WebStorageManager {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
+  ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
   Future<void> removeDataFor(
       {required Set<WebsiteDataType> dataTypes,
       required List<WebsiteDataRecord> dataRecords}) async {
@@ -183,6 +186,7 @@ class WebStorageManager {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
+  ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   Future<void> removeDataModifiedSince(
       {required Set<WebsiteDataType> dataTypes, required DateTime date}) async {
     List<String> dataTypesList = [];

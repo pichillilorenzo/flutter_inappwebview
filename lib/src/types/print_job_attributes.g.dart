@@ -13,6 +13,7 @@ class PrintJobAttributes {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- MacOS
   PrintJobColorMode? colorMode;
 
   ///The duplex mode to use for the print job.
@@ -20,6 +21,7 @@ class PrintJobAttributes {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView 23+
   ///- iOS
+  ///- MacOS
   PrintJobDuplexMode? duplex;
 
   ///The orientation of the printed content, portrait or landscape.
@@ -43,6 +45,7 @@ class PrintJobAttributes {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   EdgeInsets? margins;
 
   ///The height of the page footer.
@@ -70,6 +73,7 @@ class PrintJobAttributes {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   InAppWebViewRect? printableRect;
 
   ///The size of the paper used for printing.
@@ -79,6 +83,7 @@ class PrintJobAttributes {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   InAppWebViewRect? paperRect;
 
   ///The maximum height of the content area.
@@ -101,6 +106,108 @@ class PrintJobAttributes {
   ///**Supported Platforms/Implementations**:
   ///- iOS
   double? maximumContentWidth;
+
+  ///The name of the currently selected paper size.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  String? paperName;
+
+  ///The human-readable name of the currently selected paper size, suitable for presentation in user interfaces.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  String? localizedPaperName;
+
+  ///The horizontal pagination mode.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobPaginationMode? horizontalPagination;
+
+  ///The vertical pagination to the specified mode.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobPaginationMode? verticalPagination;
+
+  ///The action specified for the job.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobDisposition? jobDisposition;
+
+  ///Indicates whether the image is centered horizontally.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? isHorizontallyCentered;
+
+  ///Indicates whether the image is centered vertically.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? isVerticallyCentered;
+
+  ///Indicates whether only the currently selected contents should be printed.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? isSelectionOnly;
+
+  ///The current scaling factor.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  double? scalingFactor;
+
+  ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  Uri? jobSavingURL;
+
+  ///If `true`, produce detailed reports when an error occurs.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? detailedErrorReporting;
+
+  ///A fax number.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  String? faxNumber;
+
+  ///If `true`, a standard header and footer are added outside the margins of each page.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? headerAndFooter;
+
+  ///If `true`, collates output.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? mustCollate;
+
+  ///The number of logical pages to be tiled horizontally on a physical sheet of paper.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  int? pagesAcross;
+
+  ///The number of logical pages to be tiled vertically on a physical sheet of paper.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  int? pagesDown;
+
+  ///A timestamp that specifies the time at which printing should begin.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  int? time;
   PrintJobAttributes(
       {this.colorMode,
       this.duplex,
@@ -113,7 +220,24 @@ class PrintJobAttributes {
       this.printableRect,
       this.paperRect,
       this.maximumContentHeight,
-      this.maximumContentWidth});
+      this.maximumContentWidth,
+      this.paperName,
+      this.localizedPaperName,
+      this.horizontalPagination,
+      this.verticalPagination,
+      this.jobDisposition,
+      this.isHorizontallyCentered,
+      this.isVerticallyCentered,
+      this.isSelectionOnly,
+      this.scalingFactor,
+      this.jobSavingURL,
+      this.detailedErrorReporting,
+      this.faxNumber,
+      this.headerAndFooter,
+      this.mustCollate,
+      this.pagesAcross,
+      this.pagesDown,
+      this.time});
 
   ///Gets a possible [PrintJobAttributes] instance from a [Map] value.
   static PrintJobAttributes? fromMap(Map<String, dynamic>? map) {
@@ -137,6 +261,27 @@ class PrintJobAttributes {
           InAppWebViewRect.fromMap(map['paperRect']?.cast<String, dynamic>()),
       maximumContentHeight: map['maximumContentHeight'],
       maximumContentWidth: map['maximumContentWidth'],
+      paperName: map['paperName'],
+      localizedPaperName: map['localizedPaperName'],
+      horizontalPagination:
+          PrintJobPaginationMode.fromNativeValue(map['horizontalPagination']),
+      verticalPagination:
+          PrintJobPaginationMode.fromNativeValue(map['verticalPagination']),
+      jobDisposition:
+          PrintJobDisposition.fromNativeValue(map['jobDisposition']),
+      isHorizontallyCentered: map['isHorizontallyCentered'],
+      isVerticallyCentered: map['isVerticallyCentered'],
+      isSelectionOnly: map['isSelectionOnly'],
+      scalingFactor: map['scalingFactor'],
+      jobSavingURL:
+          map['jobSavingURL'] != null ? Uri.parse(map['jobSavingURL']) : null,
+      detailedErrorReporting: map['detailedErrorReporting'],
+      faxNumber: map['faxNumber'],
+      headerAndFooter: map['headerAndFooter'],
+      mustCollate: map['mustCollate'],
+      pagesAcross: map['pagesAcross'],
+      pagesDown: map['pagesDown'],
+      time: map['time'],
     );
     return instance;
   }
@@ -156,6 +301,23 @@ class PrintJobAttributes {
       "paperRect": paperRect?.toMap(),
       "maximumContentHeight": maximumContentHeight,
       "maximumContentWidth": maximumContentWidth,
+      "paperName": paperName,
+      "localizedPaperName": localizedPaperName,
+      "horizontalPagination": horizontalPagination?.toNativeValue(),
+      "verticalPagination": verticalPagination?.toNativeValue(),
+      "jobDisposition": jobDisposition?.toNativeValue(),
+      "isHorizontallyCentered": isHorizontallyCentered,
+      "isVerticallyCentered": isVerticallyCentered,
+      "isSelectionOnly": isSelectionOnly,
+      "scalingFactor": scalingFactor,
+      "jobSavingURL": jobSavingURL?.toString(),
+      "detailedErrorReporting": detailedErrorReporting,
+      "faxNumber": faxNumber,
+      "headerAndFooter": headerAndFooter,
+      "mustCollate": mustCollate,
+      "pagesAcross": pagesAcross,
+      "pagesDown": pagesDown,
+      "time": time,
     };
   }
 
@@ -166,6 +328,6 @@ class PrintJobAttributes {
 
   @override
   String toString() {
-    return 'PrintJobAttributes{colorMode: $colorMode, duplex: $duplex, orientation: $orientation, mediaSize: $mediaSize, resolution: $resolution, margins: $margins, footerHeight: $footerHeight, headerHeight: $headerHeight, printableRect: $printableRect, paperRect: $paperRect, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth}';
+    return 'PrintJobAttributes{colorMode: $colorMode, duplex: $duplex, orientation: $orientation, mediaSize: $mediaSize, resolution: $resolution, margins: $margins, footerHeight: $footerHeight, headerHeight: $headerHeight, printableRect: $printableRect, paperRect: $paperRect, maximumContentHeight: $maximumContentHeight, maximumContentWidth: $maximumContentWidth, paperName: $paperName, localizedPaperName: $localizedPaperName, horizontalPagination: $horizontalPagination, verticalPagination: $verticalPagination, jobDisposition: $jobDisposition, isHorizontallyCentered: $isHorizontallyCentered, isVerticallyCentered: $isVerticallyCentered, isSelectionOnly: $isSelectionOnly, scalingFactor: $scalingFactor, jobSavingURL: $jobSavingURL, detailedErrorReporting: $detailedErrorReporting, faxNumber: $faxNumber, headerAndFooter: $headerAndFooter, mustCollate: $mustCollate, pagesAcross: $pagesAcross, pagesDown: $pagesDown, time: $time}';
   }
 }

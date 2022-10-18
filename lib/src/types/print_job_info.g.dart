@@ -14,12 +14,14 @@ class PrintJobInfo {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   PrintJobState? state;
 
   ///How many copies to print.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
+  ///- MacOS
   int? copies;
 
   ///The number of pages to print.
@@ -27,6 +29,7 @@ class PrintJobInfo {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   int? numberOfPages;
 
   ///The timestamp when the print job was created.
@@ -34,6 +37,7 @@ class PrintJobInfo {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   int? creationTime;
 
   ///The human readable print job label.
@@ -41,20 +45,80 @@ class PrintJobInfo {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   String? label;
 
-  ///The unique id of the printer.
+  ///The printer object to be used for printing.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  String? printerId;
+  ///- MacOS
+  Printer? printer;
+
+  ///The page order that will be used to generate the pages in this job.
+  ///This is the physical page order of the pages.
+  ///It depends on the stacking order of the printer, the capability of the app to reverse page order, etc.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobPageOrder? pageOrder;
+
+  ///The printing quality.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  PrintJobRenderingQuality? preferredRenderingQuality;
+
+  ///Whether the progress panel is shown during the operation.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? showsProgressPanel;
+
+  ///Whether the print panel is shown during the operation.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? showsPrintPanel;
+
+  ///Whether the print operation should spawn a separate thread in which to run itself.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? canSpawnSeparateThread;
+
+  ///A Boolean value that indicates whether the print operation is an EPS or PDF copy operation.
+  ///It's `true` if the receiver is an EPS or PDF copy operation; otherwise, `false`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  bool? isCopyingOperation;
+
+  ///The current page number being previewed or printed.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  int? currentPage;
+
+  ///An integer value that specifies the first page in the print job.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  int? firstPage;
+
+  ///An integer value that specifies the last page in the print job.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  int? lastPage;
 
   ///The attributes of a print job.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   PrintJobAttributes? attributes;
   PrintJobInfo(
       {this.state,
@@ -62,7 +126,16 @@ class PrintJobInfo {
       this.numberOfPages,
       this.creationTime,
       this.label,
-      this.printerId,
+      this.printer,
+      this.pageOrder,
+      this.preferredRenderingQuality,
+      this.showsProgressPanel,
+      this.showsPrintPanel,
+      this.canSpawnSeparateThread,
+      this.isCopyingOperation,
+      this.currentPage,
+      this.firstPage,
+      this.lastPage,
       this.attributes});
 
   ///Gets a possible [PrintJobInfo] instance from a [Map] value.
@@ -76,7 +149,17 @@ class PrintJobInfo {
       numberOfPages: map['numberOfPages'],
       creationTime: map['creationTime'],
       label: map['label'],
-      printerId: map['printerId'],
+      printer: Printer.fromMap(map['printer']?.cast<String, dynamic>()),
+      pageOrder: PrintJobPageOrder.fromNativeValue(map['pageOrder']),
+      preferredRenderingQuality: PrintJobRenderingQuality.fromNativeValue(
+          map['preferredRenderingQuality']),
+      showsProgressPanel: map['showsProgressPanel'],
+      showsPrintPanel: map['showsPrintPanel'],
+      canSpawnSeparateThread: map['canSpawnSeparateThread'],
+      isCopyingOperation: map['isCopyingOperation'],
+      currentPage: map['currentPage'],
+      firstPage: map['firstPage'],
+      lastPage: map['lastPage'],
       attributes: PrintJobAttributes.fromMap(
           map['attributes']?.cast<String, dynamic>()),
     );
@@ -91,7 +174,16 @@ class PrintJobInfo {
       "numberOfPages": numberOfPages,
       "creationTime": creationTime,
       "label": label,
-      "printerId": printerId,
+      "printer": printer?.toMap(),
+      "pageOrder": pageOrder?.toNativeValue(),
+      "preferredRenderingQuality": preferredRenderingQuality?.toNativeValue(),
+      "showsProgressPanel": showsProgressPanel,
+      "showsPrintPanel": showsPrintPanel,
+      "canSpawnSeparateThread": canSpawnSeparateThread,
+      "isCopyingOperation": isCopyingOperation,
+      "currentPage": currentPage,
+      "firstPage": firstPage,
+      "lastPage": lastPage,
       "attributes": attributes?.toMap(),
     };
   }
@@ -103,6 +195,6 @@ class PrintJobInfo {
 
   @override
   String toString() {
-    return 'PrintJobInfo{state: $state, copies: $copies, numberOfPages: $numberOfPages, creationTime: $creationTime, label: $label, printerId: $printerId, attributes: $attributes}';
+    return 'PrintJobInfo{state: $state, copies: $copies, numberOfPages: $numberOfPages, creationTime: $creationTime, label: $label, printer: $printer, pageOrder: $pageOrder, preferredRenderingQuality: $preferredRenderingQuality, showsProgressPanel: $showsProgressPanel, showsPrintPanel: $showsPrintPanel, canSpawnSeparateThread: $canSpawnSeparateThread, isCopyingOperation: $isCopyingOperation, currentPage: $currentPage, firstPage: $firstPage, lastPage: $lastPage, attributes: $attributes}';
   }
 }

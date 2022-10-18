@@ -12,7 +12,6 @@ public enum PrintJobState: Int {
     case created = 1
     case started = 3
     case completed = 5
-    case failed = 6
     case canceled = 7
 }
 

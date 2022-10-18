@@ -84,6 +84,8 @@ public class InAppBrowserManager: ChannelDelegate {
         
         if browserSettings.hidden {
             window.hide()
+        } else {
+            window.makeKeyAndOrderFront(self)
         }
     }
     

@@ -208,3 +208,7 @@ export 'find_session.dart' show FindSession;
 export 'search_result_display_style.dart' show SearchResultDisplayStyle;
 export 'content_blocker_trigger_load_context.dart'
     show ContentBlockerTriggerLoadContext;
+export 'print_job_page_order.dart' show PrintJobPageOrder;
+export 'print_job_pagination_mode.dart' show PrintJobPaginationMode;
+export 'print_job_disposition.dart' show PrintJobDisposition;
+export 'printer.dart' show Printer;

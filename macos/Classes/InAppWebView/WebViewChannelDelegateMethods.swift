@@ -35,6 +35,12 @@ public enum WebViewChannelDelegateMethods: String {
     case show = "show"
     case hide = "hide"
     case getCopyBackForwardList = "getCopyBackForwardList"
+    @available(*, deprecated, message: "Use FindInteractionController.findAll instead.")
+    case findAll = "findAll"
+    @available(*, deprecated, message: "Use FindInteractionController.findNext instead.")
+    case findNext = "findNext"
+    @available(*, deprecated, message: "Use FindInteractionController.clearMatches instead.")
+    case clearMatches = "clearMatches"
     case clearCache = "clearCache"
     case scrollTo = "scrollTo"
     case scrollBy = "scrollBy"

@@ -54,6 +54,12 @@ public class FlutterWebViewController: NSObject, /*FlutterPlatformView,*/ Dispos
                                    userScripts: userScripts)
         }
 
+        let findInteractionController = FindInteractionController(
+            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            id: viewId, webView: webView!, settings: nil)
+        webView!.findInteractionController = findInteractionController
+        findInteractionController.prepare()
+        
         webView!.autoresizingMask = [.width, .height]
         myView!.autoresizesSubviews = true
         myView!.autoresizingMask = [.width, .height]

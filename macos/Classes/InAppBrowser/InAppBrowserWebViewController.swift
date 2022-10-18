@@ -62,6 +62,12 @@ public class InAppBrowserWebViewController: NSViewController, InAppBrowserDelega
         webView.id = id
         webView.channelDelegate = WebViewChannelDelegate(webView: webView, channel: channel)
         
+        let findInteractionController = FindInteractionController(
+            registrar: SwiftFlutterPlugin.instance!.registrar!,
+            id: id, webView: webView, settings: nil)
+        webView.findInteractionController = findInteractionController
+        findInteractionController.prepare()
+        
         prepareWebView()
         webView.windowCreated = true
         

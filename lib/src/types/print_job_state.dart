@@ -10,6 +10,8 @@ part 'print_job_state.g.dart';
 class PrintJobState_ {
   // ignore: unused_field
   final int _value;
+  // ignore: unused_field
+  final int? _nativeValue = null;
   const PrintJobState_._internal(this._value);
 
   ///Print job state: The print job is being created but not yet ready to be printed.
@@ -21,7 +23,8 @@ class PrintJobState_ {
         apiUrl:
             'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CREATED',
         value: 1),
-    EnumIOSPlatform(value: 1)
+    EnumIOSPlatform(value: 1),
+    EnumMacOSPlatform(value: 1)
   ])
   static const CREATED = const PrintJobState_._internal(1);
 
@@ -46,7 +49,8 @@ class PrintJobState_ {
         apiUrl:
             'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_STARTED',
         value: 3),
-    EnumIOSPlatform(value: 3)
+    EnumIOSPlatform(value: 3),
+    EnumMacOSPlatform(value: 3)
   ])
   static const STARTED = const PrintJobState_._internal(3);
 
@@ -71,7 +75,8 @@ class PrintJobState_ {
         apiUrl:
             'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED',
         value: 5),
-    EnumIOSPlatform(value: 5)
+    EnumIOSPlatform(value: 5),
+    EnumMacOSPlatform(value: 5)
   ])
   static const COMPLETED = const PrintJobState_._internal(5);
 
@@ -97,7 +102,8 @@ class PrintJobState_ {
         apiUrl:
             'https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED',
         value: 7),
-    EnumIOSPlatform(value: 7)
+    EnumIOSPlatform(value: 7),
+    EnumMacOSPlatform(value: 7)
   ])
   static const CANCELED = const PrintJobState_._internal(7);
 }

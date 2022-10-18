@@ -21,6 +21,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     var inAppBrowserDelegate: InAppBrowserDelegate?
     var channelDelegate: WebViewChannelDelegate?
     var settings: InAppWebViewSettings?
+    var findInteractionController: FindInteractionController?
     var webMessageChannels: [String:WebMessageChannel] = [:]
     var webMessageListeners: [WebMessageListener] = []
     var currentOriginalUrl: URL?
@@ -1650,7 +1651,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let cancelButton = cancelButtonTitle != nil && !cancelButtonTitle!.isEmpty ? cancelButtonTitle : NSLocalizedString("Cancel", comment: "")
         
         let alert = NSAlert()
-        alert.messageText = title ?? ""
+        alert.messageText = dialogMessage ?? ""
         alert.alertStyle = .informational
         alert.addButton(withTitle: okButton ?? "")
         alert.addButton(withTitle: cancelButton ?? "")
@@ -1702,7 +1703,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let cancelButton = cancelButtonTitle != nil && !cancelButtonTitle!.isEmpty ? cancelButtonTitle : NSLocalizedString("Cancel", comment: "")
         
         let alert = NSAlert()
-        alert.messageText = title ?? ""
+        alert.messageText = dialogMessage ?? ""
         alert.alertStyle = .informational
         alert.addButton(withTitle: okButton ?? "")
         alert.addButton(withTitle: cancelButton ?? "")
@@ -2113,6 +2114,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
             if let wId = _windowId, let webViewTransport = InAppWebView.windowWebViews[wId] {
                 webView = webViewTransport.webView
             }
+            webView.findInteractionController?.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
             webView.channelDelegate?.onFindResultReceived(activeMatchOrdinal: activeMatchOrdinal, numberOfMatches: numberOfMatches, isDoneCounting: isDoneCounting)
         } else if message.name == "onScrollChanged" {
             let body = message.body as! [String: Any?]
@@ -2212,7 +2214,36 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                 printJobId = NSUUID().uuidString
             }
             
-            let printInfo = NSPrintInfo()
+            var printInfoDictionary: [NSPrintInfo.AttributeKey : Any] = [:]
+            if let settings = settings {
+                if let jobSavingURL = settings.jobSavingURL, let url = URL(string: jobSavingURL) {
+                    printInfoDictionary[.jobSavingURL] = url
+                }
+                printInfoDictionary[.copies] = settings.copies
+                if let firstPage = settings.firstPage {
+                    printInfoDictionary[.firstPage] = firstPage
+                }
+                if let lastPage = settings.lastPage {
+                    printInfoDictionary[.lastPage] = lastPage
+                }
+                printInfoDictionary[.detailedErrorReporting] = settings.detailedErrorReporting
+                printInfoDictionary[.faxNumber] = settings.faxNumber ?? ""
+                printInfoDictionary[.headerAndFooter] = settings.headerAndFooter
+                if let mustCollate = settings.mustCollate {
+                    printInfoDictionary[.mustCollate] = mustCollate
+                }
+                if let pagesAcross = settings.pagesAcross {
+                    printInfoDictionary[.pagesAcross] = pagesAcross
+                }
+                if let pagesDown = settings.pagesDown {
+                    printInfoDictionary[.pagesDown] = pagesDown
+                }
+                if let time = settings.time {
+                    printInfoDictionary[.time] = Date(timeIntervalSince1970: TimeInterval(Double(time)/1000))
+                }
+            }
+            
+            let printInfo = NSPrintInfo(dictionary: printInfoDictionary)
             
             if let settings = settings {
                 if let orientationValue = settings.orientation,
@@ -2225,13 +2256,84 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
                     printInfo.bottomMargin = margins.bottom
                     printInfo.leftMargin = margins.left
                 }
+                if let numberOfPages = settings.numberOfPages {
+                    printInfo.printSettings["com_apple_print_PrintSettings_PMLastPage"] = numberOfPages
+                }
+                if let colorMode = settings.colorMode {
+                    printInfo.printSettings["ColorModel"] = colorMode
+                }
+                if let scalingFactor = settings.scalingFactor {
+                    printInfo.scalingFactor = scalingFactor
+                }
+                if let jobDisposition = settings.jobDisposition {
+                    printInfo.jobDisposition = Util.getNSPrintInfoJobDisposition(name: jobDisposition)
+                }
+                if let paperName = settings.paperName {
+                    printInfo.paperName = NSPrinter.PaperName.init(rawValue: paperName)
+                }
+                if let horizontalPagination = settings.horizontalPagination,
+                   let pagination = NSPrintInfo.PaginationMode.init(rawValue: horizontalPagination) {
+                    printInfo.horizontalPagination = pagination
+                }
+                if let verticalPagination = settings.verticalPagination,
+                   let pagination = NSPrintInfo.PaginationMode.init(rawValue: verticalPagination) {
+                    printInfo.verticalPagination = pagination
+                }
+                printInfo.isHorizontallyCentered = settings.isHorizontallyCentered
+                printInfo.isVerticallyCentered = settings.isVerticallyCentered
             }
             let printOperation = printOperation(with: printInfo)
             printOperation.jobTitle = settings?.jobName ?? (title ?? url?.absoluteString ?? "") + " Document"
             printOperation.view?.frame = bounds
-            printOperation.printPanel.options.insert(.showsOrientation)
-            printOperation.printPanel.options.insert(.showsPaperSize)
-            printOperation.printPanel.options.insert(.showsScaling)
+            
+            if let settings = settings {
+                if let pageOrder = settings.pageOrder, let order = NSPrintOperation.PageOrder.init(rawValue: pageOrder) {
+                    printOperation.pageOrder = order
+                }
+                printOperation.canSpawnSeparateThread = settings.canSpawnSeparateThread
+                printOperation.showsPrintPanel = settings.showsPrintPanel
+                printOperation.showsProgressPanel = settings.showsProgressPanel
+                if settings.showsPaperOrientation {
+                    printOperation.printPanel.options.insert(.showsOrientation)
+                } else {
+                    printOperation.printPanel.options.remove(.showsOrientation)
+                }
+                if settings.showsNumberOfCopies {
+                    printOperation.printPanel.options.insert(.showsCopies)
+                } else {
+                    printOperation.printPanel.options.remove(.showsCopies)
+                }
+                if settings.showsPaperSize {
+                    printOperation.printPanel.options.insert(.showsPaperSize)
+                } else {
+                    printOperation.printPanel.options.remove(.showsPaperSize)
+                }
+                if settings.showsScaling {
+                    printOperation.printPanel.options.insert(.showsScaling)
+                } else {
+                    printOperation.printPanel.options.remove(.showsScaling)
+                }
+                if settings.showsPageRange {
+                    printOperation.printPanel.options.insert(.showsPageRange)
+                } else {
+                    printOperation.printPanel.options.remove(.showsPageRange)
+                }
+                if settings.showsPageSetupAccessory {
+                    printOperation.printPanel.options.insert(.showsPageSetupAccessory)
+                } else {
+                    printOperation.printPanel.options.remove(.showsPageSetupAccessory)
+                }
+                if settings.showsPreview {
+                    printOperation.printPanel.options.insert(.showsPreview)
+                } else {
+                    printOperation.printPanel.options.remove(.showsPreview)
+                }
+                if settings.showsPrintSelection {
+                    printOperation.printPanel.options.insert(.showsPrintSelection)
+                } else {
+                    printOperation.printPanel.options.remove(.showsPrintSelection)
+                }
+            }
             
             if let id = printJobId {
                 let printJob = PrintJobController(id: id, job: printOperation, settings: settings)
@@ -2471,6 +2573,8 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
         for imp in customIMPs {
             imp_removeBlock(imp)
         }
+        findInteractionController?.dispose()
+        findInteractionController = nil
         uiDelegate = nil
         navigationDelegate = nil
         isPausedTimersCompletionHandler = nil

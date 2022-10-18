@@ -207,6 +207,47 @@ public class WebViewChannelDelegate : ChannelDelegate {
         case .getCopyBackForwardList:
             result(webView?.getCopyBackForwardList())
             break
+        case .findAll:
+            if let webView = webView, let findInteractionController = webView.findInteractionController {
+                let find = arguments!["find"] as! String
+                findInteractionController.findAll(find: find, completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
+                        return
+                    }
+                    result(true)
+                })
+            } else {
+                result(false)
+            }
+            break
+        case .findNext:
+            if let webView = webView, let findInteractionController = webView.findInteractionController {
+                let forward = arguments!["forward"] as! Bool
+                findInteractionController.findNext(forward: forward, completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
+                        return
+                    }
+                    result(true)
+                })
+            } else {
+                result(false)
+            }
+            break
+        case .clearMatches:
+            if let webView = webView, let findInteractionController = webView.findInteractionController {
+                findInteractionController.clearMatches(completionHandler: {(value, error) in
+                    if error != nil {
+                        result(FlutterError(code: "WebViewChannelDelegate", message: error?.localizedDescription, details: nil))
+                        return
+                    }
+                    result(true)
+                })
+            } else {
+                result(false)
+            }
+            break
         case .clearCache:
             webView?.clearCache()
             result(true)

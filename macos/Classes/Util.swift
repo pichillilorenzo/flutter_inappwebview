@@ -64,6 +64,21 @@ public class Util {
         }
     }
     
+    public static func getNSPrintInfoJobDisposition(name: String) -> NSPrintInfo.JobDisposition {
+        switch name {
+        case "save":
+            return NSPrintInfo.JobDisposition.save
+        case "cancel":
+            return NSPrintInfo.JobDisposition.cancel
+        case "preview":
+            return NSPrintInfo.JobDisposition.preview
+        case "spool":
+            return NSPrintInfo.JobDisposition.spool
+        default:
+            return NSPrintInfo.JobDisposition.spool
+        }
+    }
+    
     public static func isIPv4(address: String) -> Bool {
         var sin = sockaddr_in()
         return address.withCString({ cstring in inet_pton(AF_INET, cstring, &sin.sin_addr) }) == 1

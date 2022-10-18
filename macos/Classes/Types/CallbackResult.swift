@@ -1,8 +1,8 @@
 //
 //  CallbackResult.swift
-//  flutter_inappwebview
+//  shared-apple
 //
-//  Created by Lorenzo Pichilli on 06/05/22.
+//  Created by Lorenzo Pichilli on 17/10/22.
 //
 
 import Foundation

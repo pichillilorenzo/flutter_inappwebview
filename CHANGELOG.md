@@ -44,6 +44,16 @@
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
 
+## 5.5.0+3
+
+- Fixed iOS `toolbarTopTintColor` InAppBrowser option
+- Fixed iOS `InAppBrowserOptions.hideProgressBar` when getting options
+- Fixed missing implementation `InAppBrowser.isHidden` method on Android and iOS
+- Fixed "Attempt to invoke virtual method 'java.lang.String android.webkit.WebView.getUrl()' on a null object reference" [#1324](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1324)
+- Fixed "(Crash) NullPointerException at in_app_browser.InAppBrowserActivity.close' on a null object reference" [#1278](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1278)
+- Fixed "ios system version parser error" [#1355](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1355)
+- Removed unnamed constructors for all Singleton classes to avoid incorrect usage
+
 ## 5.5.0+2
 
 - Fixed README

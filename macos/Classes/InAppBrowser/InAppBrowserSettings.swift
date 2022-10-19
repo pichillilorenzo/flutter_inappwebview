@@ -26,7 +26,7 @@ public class InAppBrowserSettings: ISettings<InAppBrowserWebViewController> {
         if let inAppBrowserWebViewController = obj {
             realOptions["hidden"] = inAppBrowserWebViewController.isHidden
             realOptions["hideUrlBar"] = inAppBrowserWebViewController.window?.searchBar?.isHidden
-            realOptions["progressBar"] = inAppBrowserWebViewController.progressBar.isHidden
+            realOptions["hideProgressBar"] = inAppBrowserWebViewController.progressBar.isHidden
             realOptions["hideToolbarTop"] = !(inAppBrowserWebViewController.window?.toolbar?.isVisible ?? true)
             realOptions["toolbarTopBackgroundColor"] = inAppBrowserWebViewController.window?.backgroundColor.hexString
         }

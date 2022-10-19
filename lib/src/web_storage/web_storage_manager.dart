@@ -22,6 +22,8 @@ class WebStorageManager {
   static WebStorageManager? _instance;
   static const MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;
 
+  WebStorageManager._();
+
   ///Use [WebStorageManager] instead.
   @Deprecated("Use WebStorageManager instead")
   AndroidWebStorageManager android = AndroidWebStorageManager();
@@ -44,7 +46,7 @@ class WebStorageManager {
         print(e.stackTrace);
       }
     });
-    _instance = new WebStorageManager();
+    _instance = new WebStorageManager._();
     return _instance!;
   }
 

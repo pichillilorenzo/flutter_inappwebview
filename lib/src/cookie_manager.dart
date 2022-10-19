@@ -27,6 +27,8 @@ class CookieManager {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
+  CookieManager._();
+
   ///Use [CookieManager] instead.
   @Deprecated("Use CookieManager instead")
   late IOSCookieManager ios;
@@ -45,7 +47,7 @@ class CookieManager {
         print(e.stackTrace);
       }
     });
-    _instance = CookieManager();
+    _instance = CookieManager._();
     // ignore: deprecated_member_use_from_same_package
     _instance!.ios = IOSCookieManager.instance();
     return _instance!;
@@ -542,8 +544,10 @@ class IOSCookieManager {
     return (_instance != null) ? _instance! : _init();
   }
 
+  IOSCookieManager._();
+
   static IOSCookieManager _init() {
-    _instance = IOSCookieManager();
+    _instance = IOSCookieManager._();
     return _instance!;
   }
 

@@ -6,6 +6,8 @@ class PlatformUtil {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_platformutil');
 
+  PlatformUtil._();
+
   ///Get [PlatformUtil] instance.
   static PlatformUtil instance() {
     return (_instance != null) ? _instance! : _init();
@@ -20,7 +22,7 @@ class PlatformUtil {
         print(e.stackTrace);
       }
     });
-    _instance = PlatformUtil();
+    _instance = PlatformUtil._();
     return _instance!;
   }
 

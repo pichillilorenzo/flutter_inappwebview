@@ -13,6 +13,8 @@ class AndroidServiceWorkerController {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_android_serviceworkercontroller');
 
+  AndroidServiceWorkerController._();
+
   AndroidServiceWorkerClient? _serviceWorkerClient;
 
   AndroidServiceWorkerClient? get serviceWorkerClient => _serviceWorkerClient;
@@ -40,7 +42,7 @@ class AndroidServiceWorkerController {
 
   static AndroidServiceWorkerController _init() {
     _channel.setMethodCallHandler(_handleMethod);
-    _instance = AndroidServiceWorkerController();
+    _instance = AndroidServiceWorkerController._();
     return _instance!;
   }
 

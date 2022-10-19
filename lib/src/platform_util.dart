@@ -5,13 +5,15 @@ class PlatformUtil {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_platformutil');
 
+  PlatformUtil._();
+
   static PlatformUtil instance() {
     return (_instance != null) ? _instance! : _init();
   }
 
   static PlatformUtil _init() {
     _channel.setMethodCallHandler(_handleMethod);
-    _instance = PlatformUtil();
+    _instance = PlatformUtil._();
     return _instance!;
   }
 

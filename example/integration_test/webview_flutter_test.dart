@@ -2,12 +2,10 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:integration_test/integration_test.dart';
@@ -1360,6 +1358,7 @@ void main() {
         // blocked. Still wait for a potential page change for some time in order
         // to give the test a chance to fail.
         await pageLoads.stream
+            // ignore: unnecessary_cast
             .map((event) => event as String?)
             .first
             .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
@@ -1417,6 +1416,7 @@ void main() {
         // blocked. Still wait for a potential page change for some time in order
         // to give the test a chance to fail.
         await pageLoads.stream
+            // ignore: unnecessary_cast
             .map((event) => event as String?)
             .first
             .timeout(const Duration(milliseconds: 500), onTimeout: () => null);
@@ -3337,6 +3337,7 @@ setTimeout(function() {
             },
             androidOnPermissionRequest: (controller, origin, resources) async {
               onPermissionRequestCompleter.complete(resources);
+              return null;
             },
           ),
         ),
@@ -3510,6 +3511,7 @@ setTimeout(function() {
             androidOnJsBeforeUnload: (controller, jsBeforeUnloadRequest) async {
               onJsBeforeUnloadCompleter
                   .complete(jsBeforeUnloadRequest.url.toString());
+              return null;
             },
           ),
         ),
@@ -5447,6 +5449,7 @@ setTimeout(function() {
               },
               onJsAlert: (controller, jsAlertRequest) async {
                 alertMessageCompleter.complete(jsAlertRequest.message);
+                return null;
               },
             ),
           ),
@@ -5494,8 +5497,9 @@ setTimeout(function() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: Uri.parse('https://mdn.github.io/dom-examples/service-worker/simple-service-worker/')),
+            initialUrlRequest: URLRequest(
+                url: Uri.parse(
+                    'https://mdn.github.io/dom-examples/service-worker/simple-service-worker/')),
           ),
         ),
       );
@@ -5523,8 +5527,9 @@ setTimeout(function() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest:
-                URLRequest(url: Uri.parse('https://mdn.github.io/dom-examples/service-worker/simple-service-worker/')),
+            initialUrlRequest: URLRequest(
+                url: Uri.parse(
+                    'https://mdn.github.io/dom-examples/service-worker/simple-service-worker/')),
             onLoadStop: (controller, url) {
               pageLoaded.complete(url!.toString());
             },
@@ -5533,7 +5538,8 @@ setTimeout(function() {
       );
 
       final String url = await pageLoaded.future;
-      expect(url, "https://mdn.github.io/dom-examples/service-worker/simple-service-worker/");
+      expect(url,
+          "https://mdn.github.io/dom-examples/service-worker/simple-service-worker/");
     }, skip: !Platform.isAndroid);
   });
 

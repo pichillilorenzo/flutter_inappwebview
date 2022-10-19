@@ -1,5 +1,3 @@
-import 'dart:ui';
-
 import 'package:flutter/services.dart';
 import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';

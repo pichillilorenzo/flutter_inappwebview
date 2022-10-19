@@ -170,12 +170,15 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   public void onBrowserCreated() {
     Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onBrowserCreated", obj);
+    if (channel != null) {
+      channel.invokeMethod("onBrowserCreated", obj);
+    }
   }
 
   private void prepareView() {
-
-    webView.prepare();
+    if (webView != null) {
+      webView.prepare();
+    }
 
     if (options.hidden)
       hide();
@@ -296,7 +299,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
   public void close(final MethodChannel.Result result) {
     Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onExit", obj);
+    if (channel != null) {
+      channel.invokeMethod("onExit", obj);
+    }
 
     dispose();
 
@@ -333,6 +338,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   }
 
   public void hide() {
+    if (fromActivity == null) {
+      return;
+    }
     try {
       isHidden = true;
       Intent openActivity = new Intent(this, Class.forName(fromActivity));
@@ -362,7 +370,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   public void shareButtonClicked(MenuItem item) {
     Intent share = new Intent(Intent.ACTION_SEND);
     share.setType("text/plain");
-    share.putExtra(Intent.EXTRA_TEXT, webView.getUrl());
+    share.putExtra(Intent.EXTRA_TEXT, webView != null ? webView.getUrl() : "");
     startActivity(Intent.createChooser(share, "Share"));
   }
 
@@ -378,7 +386,9 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
 
     InAppWebViewOptions newInAppWebViewOptions = new InAppWebViewOptions();
     newInAppWebViewOptions.parse(newOptionsMap);
-    webView.setOptions(newInAppWebViewOptions, newOptionsMap);
+    if (webView != null) {
+      webView.setOptions(newInAppWebViewOptions, newOptionsMap);
+    }
 
     if (newOptionsMap.get("hidden") != null && options.hidden != newOptions.hidden) {
       if (newOptions.hidden)
@@ -414,7 +424,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
             !newOptions.toolbarTopFixedTitle.isEmpty())
       actionBar.setTitle(newOptions.toolbarTopFixedTitle);
 
-    if (newOptionsMap.get("hideUrlBar") != null && options.hideUrlBar != newOptions.hideUrlBar) {
+    if (menu != null && newOptionsMap.get("hideUrlBar") != null && options.hideUrlBar != newOptions.hideUrlBar) {
       if (newOptions.hideUrlBar)
         menu.findItem(R.id.menu_search).setVisible(false);
       else
@@ -425,7 +435,7 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   }
 
   public Map<String, Object> getOptions() {
-    Map<String, Object> webViewOptionsMap = webView.getOptions();
+    Map<String, Object> webViewOptionsMap = webView != null ? webView.getOptions() : null;
     if (options == null || webViewOptionsMap == null)
       return null;
 

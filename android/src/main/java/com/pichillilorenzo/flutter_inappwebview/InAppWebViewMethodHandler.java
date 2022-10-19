@@ -228,6 +228,14 @@ public class InAppWebViewMethodHandler implements MethodChannel.MethodCallHandle
           result.notImplemented();
         }
         break;
+      case "isHidden":
+        if (webView != null && webView.getInAppBrowserDelegate() != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
+          InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
+          result.success(inAppBrowserActivity.isHidden);
+        } else {
+          result.notImplemented();
+        }
+        break;
       case "getCopyBackForwardList":
         result.success((webView != null) ? webView.getCopyBackForwardList() : null);
         break;

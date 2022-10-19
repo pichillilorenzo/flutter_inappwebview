@@ -1,14 +1,10 @@
 import 'dart:io';
-import 'dart:async';
 import 'dart:collection';
-import 'dart:typed_data';
 import 'dart:convert';
 import 'dart:core';
 
 import 'package:flutter/foundation.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter/widgets.dart';
 
 import 'android/in_app_webview_controller.dart';
 import 'ios/in_app_webview_controller.dart';
@@ -1097,8 +1093,8 @@ class InAppWebViewController {
 
     if (manifestFound) {
       try {
-        Map<String, dynamic> manifest =
-            json.decode(await manifestResponse!.transform(Utf8Decoder()).join());
+        Map<String, dynamic> manifest = json
+            .decode(await manifestResponse!.transform(Utf8Decoder()).join());
         if (manifest.containsKey("icons")) {
           for (Map<String, dynamic> icon in manifest["icons"]) {
             favicons.addAll(_createFavicons(webviewUrl, assetPathBase,

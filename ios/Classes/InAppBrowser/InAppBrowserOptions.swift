@@ -36,7 +36,7 @@ public class InAppBrowserOptions: Options<InAppBrowserWebViewController> {
         var realOptions: [String: Any?] = toMap()
         if let inAppBrowserWebViewController = obj {
             realOptions["hideUrlBar"] = inAppBrowserWebViewController.searchBar.isHidden
-            realOptions["hideUrlBar"] = inAppBrowserWebViewController.progressBar.isHidden
+            realOptions["hideProgressBar"] = inAppBrowserWebViewController.progressBar.isHidden
             realOptions["closeButtonCaption"] = inAppBrowserWebViewController.closeButton.title
             realOptions["closeButtonColor"] = inAppBrowserWebViewController.closeButton.tintColor?.hexString
             if let navController = inAppBrowserWebViewController.navigationController {

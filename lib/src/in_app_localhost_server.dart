@@ -27,7 +27,8 @@ class InAppLocalhostServer {
   }) {
     this._port = port;
     this._directoryIndex = directoryIndex;
-    this._documentRoot = (documentRoot.endsWith('/')) ? documentRoot : '$documentRoot/';
+    this._documentRoot =
+        (documentRoot.endsWith('/')) ? documentRoot : '$documentRoot/';
   }
 
   ///Starts the server on `http://localhost:[port]/`.

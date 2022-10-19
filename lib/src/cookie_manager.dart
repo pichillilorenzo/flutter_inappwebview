@@ -22,6 +22,8 @@ class CookieManager {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_cookiemanager');
 
+  CookieManager._();
+
   ///Contains only iOS-specific methods of [CookieManager].
   late IOSCookieManager ios;
 
@@ -32,7 +34,7 @@ class CookieManager {
 
   static CookieManager _init() {
     _channel.setMethodCallHandler(_handleMethod);
-    _instance = CookieManager();
+    _instance = CookieManager._();
     _instance!.ios = IOSCookieManager.instance();
     return _instance!;
   }
@@ -66,23 +68,19 @@ class CookieManager {
     assert(value.isNotEmpty);
     assert(path.isNotEmpty);
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      var platformUtil = PlatformUtil();
-      var version = double.tryParse(await platformUtil.getSystemVersion());
-      if (version != null && version < 11.0) {
-        await _setCookieWithJavaScript(
-            url: url,
-            name: name,
-            value: value,
-            domain: domain,
-            path: path,
-            expiresDate: expiresDate,
-            maxAge: maxAge,
-            isSecure: isSecure,
-            sameSite: sameSite,
-            webViewController: iosBelow11WebViewController);
-        return;
-      }
+    if (await _shouldUseJavascript()) {
+      await _setCookieWithJavaScript(
+          url: url,
+          name: name,
+          value: value,
+          domain: domain,
+          path: path,
+          expiresDate: expiresDate,
+          maxAge: maxAge,
+          isSecure: isSecure,
+          sameSite: sameSite,
+          webViewController: iosBelow11WebViewController);
+      return;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -163,13 +161,9 @@ class CookieManager {
       InAppWebViewController? iosBelow11WebViewController}) async {
     assert(url.toString().isNotEmpty);
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      var platformUtil = PlatformUtil();
-      var version = double.tryParse(await platformUtil.getSystemVersion());
-      if (version != null && version < 11.0) {
-        return await _getCookiesWithJavaScript(
-            url: url, webViewController: iosBelow11WebViewController);
-      }
+    if (await _shouldUseJavascript()) {
+      return await _getCookiesWithJavaScript(
+          url: url, webViewController: iosBelow11WebViewController);
     }
 
     List<Cookie> cookies = [];
@@ -262,16 +256,12 @@ class CookieManager {
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      var platformUtil = PlatformUtil();
-      var version = double.tryParse(await platformUtil.getSystemVersion());
-      if (version != null && version < 11.0) {
-        List<Cookie> cookies = await _getCookiesWithJavaScript(
-            url: url, webViewController: iosBelow11WebViewController);
-        return cookies
-            .cast<Cookie?>()
-            .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
-      }
+    if (await _shouldUseJavascript()) {
+      List<Cookie> cookies = await _getCookiesWithJavaScript(
+          url: url, webViewController: iosBelow11WebViewController);
+      return cookies
+          .cast<Cookie?>()
+          .firstWhere((cookie) => cookie!.name == name, orElse: () => null);
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -312,24 +302,19 @@ class CookieManager {
       String path = "/",
       String? domain,
       InAppWebViewController? iosBelow11WebViewController}) async {
-
     assert(url.toString().isNotEmpty);
     assert(name.isNotEmpty);
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      var platformUtil = PlatformUtil();
-      var version = double.tryParse(await platformUtil.getSystemVersion());
-      if (version != null && version < 11.0) {
-        await _setCookieWithJavaScript(
-            url: url,
-            name: name,
-            value: "",
-            path: path,
-            domain: domain,
-            maxAge: -1,
-            webViewController: iosBelow11WebViewController);
-        return;
-      }
+    if (await _shouldUseJavascript()) {
+      await _setCookieWithJavaScript(
+          url: url,
+          name: name,
+          value: "",
+          path: path,
+          domain: domain,
+          maxAge: -1,
+          webViewController: iosBelow11WebViewController);
+      return;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -355,27 +340,22 @@ class CookieManager {
       String path = "/",
       String? domain,
       InAppWebViewController? iosBelow11WebViewController}) async {
-
     assert(url.toString().isNotEmpty);
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
-      var platformUtil = PlatformUtil();
-      var version = double.tryParse(await platformUtil.getSystemVersion());
-      if (version != null && version < 11.0) {
-        List<Cookie> cookies = await _getCookiesWithJavaScript(
-            url: url, webViewController: iosBelow11WebViewController);
-        for (var i = 0; i < cookies.length; i++) {
-          await _setCookieWithJavaScript(
-              url: url,
-              name: cookies[i].name,
-              value: "",
-              path: path,
-              domain: domain,
-              maxAge: -1,
-              webViewController: iosBelow11WebViewController);
-        }
-        return;
+    if (await _shouldUseJavascript()) {
+      List<Cookie> cookies = await _getCookiesWithJavaScript(
+          url: url, webViewController: iosBelow11WebViewController);
+      for (var i = 0; i < cookies.length; i++) {
+        await _setCookieWithJavaScript(
+            url: url,
+            name: cookies[i].name,
+            value: "",
+            path: path,
+            domain: domain,
+            maxAge: -1,
+            webViewController: iosBelow11WebViewController);
       }
+      return;
     }
 
     Map<String, dynamic> args = <String, dynamic>{};
@@ -394,7 +374,7 @@ class CookieManager {
   }
 
   Future<String> _getCookieExpirationDate(int expiresDate) async {
-    var platformUtil = PlatformUtil();
+    var platformUtil = PlatformUtil.instance();
     var dateTime = DateTime.fromMillisecondsSinceEpoch(expiresDate).toUtc();
     return await platformUtil.formatDate(
         date: dateTime,
@@ -402,11 +382,22 @@ class CookieManager {
         locale: 'en_US',
         timezone: 'GMT');
   }
+
+  Future<bool> _shouldUseJavascript() async {
+    if (defaultTargetPlatform == TargetPlatform.iOS) {
+      final platformUtil = PlatformUtil.instance();
+      final systemVersion = await platformUtil.getSystemVersion();
+      return systemVersion.compareTo("11") == -1;
+    }
+    return false;
+  }
 }
 
 ///Class that contains only iOS-specific methods of [CookieManager].
 class IOSCookieManager {
   static IOSCookieManager? _instance;
+
+  IOSCookieManager._();
 
   ///Gets the [IOSCookieManager] shared instance.
   static IOSCookieManager instance() {
@@ -414,7 +405,7 @@ class IOSCookieManager {
   }
 
   static IOSCookieManager _init() {
-    _instance = IOSCookieManager();
+    _instance = IOSCookieManager._();
     return _instance!;
   }
 

@@ -1,6 +1,4 @@
 import 'dart:collection';
-import 'dart:typed_data';
-import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/src/util.dart';
@@ -12,7 +10,6 @@ import 'in_app_webview_controller.dart';
 import 'in_app_webview_options.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_options.dart';
-import '../util.dart';
 
 ///Class that represents a WebView in headless mode.
 ///It can be used to run a WebView in background without attaching an `InAppWebView` to the widget tree.

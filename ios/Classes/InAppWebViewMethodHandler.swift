@@ -201,6 +201,13 @@ public class InAppWebViewMethodHandler: FlutterMethodCallDelegate {
                     result(FlutterMethodNotImplemented)
                 }
                 break
+            case "isHidden":
+                if let iabController = webView?.inAppBrowserDelegate as? InAppBrowserWebViewController {
+                    result(iabController.isHidden)
+                } else {
+                    result(FlutterMethodNotImplemented)
+                }
+                break
             case "getCopyBackForwardList":
                 result(webView?.getCopyBackForwardList())
                 break

@@ -18,6 +18,8 @@ class WebStorageManager {
   AndroidWebStorageManager android = AndroidWebStorageManager();
   IOSWebStorageManager ios = IOSWebStorageManager();
 
+  WebStorageManager._();
+
   ///Gets the WebStorage manager shared instance.
   static WebStorageManager instance() {
     return (_instance != null) ? _instance! : _init();
@@ -25,7 +27,7 @@ class WebStorageManager {
 
   static WebStorageManager _init() {
     _staticChannel.setMethodCallHandler(_handleMethod);
-    _instance = new WebStorageManager();
+    _instance = new WebStorageManager._();
     return _instance!;
   }
 

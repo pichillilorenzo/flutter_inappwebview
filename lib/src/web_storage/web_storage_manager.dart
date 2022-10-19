@@ -10,7 +10,7 @@ import '../types/main.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 ///On Android, it is implemented using [WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html).
-///On iOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore).
+///On iOS and MacOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore).
 ///
 ///**NOTE for iOS**: available from iOS 9.0+.
 ///

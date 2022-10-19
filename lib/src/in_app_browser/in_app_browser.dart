@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:developer' as developer;
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
 import '../context_menu.dart';
@@ -73,12 +71,13 @@ class InAppBrowser {
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
-  InAppWebViewController? _webViewController;
+  late final InAppWebViewController _webViewController;
+
   ///WebView Controller that can be used to access the [InAppWebViewController] API.
   ///When [onExit] is fired, this will be `null` and cannot be used anymore.
   InAppWebViewController? get webViewController {
-    return _webViewController;
-}
+    return _isOpened ? _webViewController : null;
+  }
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
@@ -108,27 +107,12 @@ class InAppBrowser {
   }
 
   _debugLog(String method, dynamic args) {
-    if (InAppBrowser.debugLoggingSettings.enabled) {
-      for (var regExp in InAppBrowser.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          InAppBrowser.debugLoggingSettings.maxLogMessageLength;
-      String message = "(${defaultTargetPlatform.name}) InAppBrowser ID " +
-          id +
-          " calling \"" +
-          method.toString() +
-          "\" using " +
-          args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!InAppBrowser.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        id: id,
+        debugLoggingSettings: InAppBrowser.debugLoggingSettings,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {
@@ -143,11 +127,10 @@ class InAppBrowser {
       case "onExit":
         _debugLog(call.method, call.arguments);
         this._isOpened = false;
-        this._webViewController = null;
         onExit();
         break;
       default:
-        return _webViewController?.handleMethod(call);
+        return _webViewController.handleMethod(call);
     }
   }
 

@@ -12,6 +12,7 @@ import FlutterMacOS
 public class Util {
     public static func getUrlAsset(assetFilePath: String) throws -> URL {
 //        let key = SwiftFlutterPlugin.instance?.registrar?.lookupKey(forAsset: assetFilePath)
+        let assetFilePath = "../Frameworks/App.framework/Resources/flutter_assets/\(assetFilePath)"
         guard let assetURL = Bundle.main.url(forResource: assetFilePath, withExtension: nil) else {
             throw NSError(domain: assetFilePath + " asset file cannot be found!", code: 0)
         }
@@ -20,6 +21,7 @@ public class Util {
     
     public static func getAbsPathAsset(assetFilePath: String) throws -> String {
 //        let key = SwiftFlutterPlugin.instance?.registrar?.lookupKey(forAsset: assetFilePath)
+        let assetFilePath = "../Frameworks/App.framework/Resources/flutter_assets/\(assetFilePath)"
         guard let assetAbsPath = Bundle.main.path(forResource: assetFilePath, ofType: nil) else {
             throw NSError(domain: assetFilePath + " asset file cannot be found!", code: 0)
         }

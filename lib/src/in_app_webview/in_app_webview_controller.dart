@@ -111,30 +111,13 @@ class InAppWebViewController {
   }
 
   _debugLog(String method, dynamic args) {
-    if (WebView.debugLoggingSettings.enabled) {
-      for (var regExp in WebView.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          WebView.debugLoggingSettings.maxLogMessageLength;
-      String viewId = (getViewId() ?? _inAppBrowser?.id).toString();
-      String message = "(${defaultTargetPlatform.name}) " +
-          (_inAppBrowser == null ? "WebView" : "InAppBrowser") +
-          " ID " +
-          viewId +
-          " calling \"" +
-          method.toString() +
-          "\" using " +
-          args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!WebView.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        name:  _inAppBrowser == null ? "WebView" : "InAppBrowser",
+        id: (getViewId() ?? _inAppBrowser?.id).toString(),
+        debugLoggingSettings: WebView.debugLoggingSettings,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> handleMethod(MethodCall call) async {

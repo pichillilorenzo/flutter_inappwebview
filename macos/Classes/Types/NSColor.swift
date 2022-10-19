@@ -30,10 +30,10 @@ extension NSColor {
         guard let rgbColor = usingColorSpace(.sRGB) else {
             return "#FFFFFF"
         }
-        var red: CGFloat = rgbColor.redComponent
-        var green: CGFloat = rgbColor.greenComponent
-        var blue: CGFloat = rgbColor.blueComponent
-        var alpha: CGFloat = rgbColor.alphaComponent
+        let red: CGFloat = rgbColor.redComponent
+        let green: CGFloat = rgbColor.greenComponent
+        let blue: CGFloat = rgbColor.blueComponent
+        let alpha: CGFloat = rgbColor.alphaComponent
 
         if alpha == 1.0 {
             return String(

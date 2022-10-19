@@ -47,6 +47,8 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     var callAsyncJavaScriptBelowIOS14Results: [String:((Any?) -> Void)] = [:]
     
+    var currentOpenPanel: NSOpenPanel?
+    
     init(id: Any?, registrar: FlutterPluginRegistrar?, frame: CGRect, configuration: WKWebViewConfiguration,
          userScripts: [UserScript] = []) {
         super.init(frame: frame, configuration: configuration)
@@ -1527,6 +1529,30 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         return identityAndTrust;
     }
     
+    @available(macOS 10.12, *)
+    public func webView(
+        _ webView: WKWebView,
+        runOpenPanelWith parameters: WKOpenPanelParameters,
+        initiatedByFrame frame: WKFrameInfo,
+        completionHandler: @escaping ([URL]?) -> Void
+    ) {
+        let openPanel = NSOpenPanel()
+        currentOpenPanel = openPanel
+        openPanel.canChooseFiles = true
+        if #available(macOS 10.13.4, *) {
+            openPanel.canChooseDirectories = parameters.allowsDirectories
+        }
+        openPanel.allowsMultipleSelection = parameters.allowsMultipleSelection
+        openPanel.begin { (result) in
+            if result == .OK {
+                completionHandler(openPanel.urls)
+            } else {
+                completionHandler([])
+            }
+            self.currentOpenPanel = nil
+        }
+    }
+    
     func createAlertDialog(message: String?, responseMessage: String?, confirmButtonTitle: String?, completionHandler: @escaping () -> Void) {
         let title = responseMessage != nil && !responseMessage!.isEmpty ? responseMessage : message
         let okButton = confirmButtonTitle != nil && !confirmButtonTitle!.isEmpty ? confirmButtonTitle : NSLocalizedString("Ok", comment: "")
@@ -2425,6 +2451,9 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     public func dispose() {
         channelDelegate?.dispose()
         channelDelegate = nil
+        currentOpenPanel?.cancel(self)
+        currentOpenPanel?.close()
+        currentOpenPanel = nil
         printJobCompletionHandler = nil
         removeObserver(self, forKeyPath: #keyPath(WKWebView.estimatedProgress))
         removeObserver(self, forKeyPath: #keyPath(WKWebView.url))

@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -116,29 +115,12 @@ class WebAuthenticationSession implements Disposable {
   }
 
   _debugLog(String method, dynamic args) {
-    if (WebAuthenticationSession.debugLoggingSettings.enabled) {
-      for (var regExp
-          in WebAuthenticationSession.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength;
-      String message =
-          "(${defaultTargetPlatform.name}) WebAuthenticationSession ID " +
-              id +
-              " calling \"" +
-              method.toString() +
-              "\" using " +
-              args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!WebAuthenticationSession.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        debugLoggingSettings: WebAuthenticationSession.debugLoggingSettings,
+        id: id,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:collection';
-import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -73,29 +72,12 @@ class ChromeSafariBrowser {
   }
 
   _debugLog(String method, dynamic args) {
-    if (ChromeSafariBrowser.debugLoggingSettings.enabled) {
-      for (var regExp
-          in ChromeSafariBrowser.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          ChromeSafariBrowser.debugLoggingSettings.maxLogMessageLength;
-      String message =
-          "(${defaultTargetPlatform.name}) ChromeSafariBrowser ID " +
-              id +
-              " calling \"" +
-              method.toString() +
-              "\" using " +
-              args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!ChromeSafariBrowser.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        id: id,
+        debugLoggingSettings: ChromeSafariBrowser.debugLoggingSettings,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

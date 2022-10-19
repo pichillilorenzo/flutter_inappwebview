@@ -1,10 +1,8 @@
-import 'dart:developer' as developer;
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import '../debug_logging_settings.dart';
 import '../types/main.dart';
+import '../util.dart';
 
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
@@ -54,28 +52,11 @@ class FindInteractionController {
   }
 
   _debugLog(String method, dynamic args) {
-    if (FindInteractionController.debugLoggingSettings.enabled) {
-      for (var regExp
-          in FindInteractionController.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          FindInteractionController.debugLoggingSettings.maxLogMessageLength;
-      String message =
-          "(${defaultTargetPlatform.name}) FindInteractionController " +
-              " calling \"" +
-              method.toString() +
-              "\" using " +
-              args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!FindInteractionController.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        debugLoggingSettings: FindInteractionController.debugLoggingSettings,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

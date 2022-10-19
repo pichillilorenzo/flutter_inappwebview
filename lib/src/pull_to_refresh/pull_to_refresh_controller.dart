@@ -1,6 +1,3 @@
-import 'dart:developer' as developer;
-
-import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import '../in_app_webview/webview.dart';
 import '../in_app_browser/in_app_browser.dart';
@@ -59,28 +56,11 @@ class PullToRefreshController {
   }
 
   _debugLog(String method, dynamic args) {
-    if (PullToRefreshController.debugLoggingSettings.enabled) {
-      for (var regExp
-          in PullToRefreshController.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          PullToRefreshController.debugLoggingSettings.maxLogMessageLength;
-      String message =
-          "(${defaultTargetPlatform.name}) PullToRefreshController " +
-              " calling \"" +
-              method.toString() +
-              "\" using " +
-              args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!PullToRefreshController.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        debugLoggingSettings: PullToRefreshController.debugLoggingSettings,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

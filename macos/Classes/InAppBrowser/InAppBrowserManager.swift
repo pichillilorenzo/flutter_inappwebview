@@ -50,7 +50,6 @@ public class InAppBrowserManager: ChannelDelegate {
         let encoding = arguments["encoding"] as? String
         let baseUrl = arguments["baseUrl"] as? String
         let settings = arguments["settings"] as! [String: Any?]
-        let contextMenu = arguments["contextMenu"] as! [String: Any]
         let windowId = arguments["windowId"] as? Int64
         let initialUserScripts = arguments["initialUserScripts"] as? [[String: Any]]
         

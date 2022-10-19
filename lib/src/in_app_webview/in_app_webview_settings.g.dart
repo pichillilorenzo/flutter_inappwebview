@@ -1014,6 +1014,10 @@ class InAppWebViewSettings {
   ///- [InAppWebViewController.getScrollY]
   ///- [InAppWebViewController.scrollTo]
   ///- [InAppWebViewController.scrollBy]
+  ///- [InAppWebViewController.getContentHeight]
+  ///- [InAppWebViewController.getContentWidth]
+  ///- [InAppWebViewController.canScrollVertically]
+  ///- [InAppWebViewController.canScrollHorizontally]
   ///
   ///Settings affected:
   ///- [WebView.initialUserScripts]

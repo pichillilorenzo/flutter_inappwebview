@@ -212,3 +212,6 @@ export 'print_job_page_order.dart' show PrintJobPageOrder;
 export 'print_job_pagination_mode.dart' show PrintJobPaginationMode;
 export 'print_job_disposition.dart' show PrintJobDisposition;
 export 'printer.dart' show Printer;
+export 'window_type.dart' show WindowType;
+export 'window_style_mask.dart' show WindowStyleMask;
+export 'window_titlebar_separator_style.dart' show WindowTitlebarSeparatorStyle;

@@ -146,6 +146,41 @@ class InAppBrowserSettings
   ///**Supported Platforms/Implementations**:
   ///- iOS
   ModalTransitionStyle? transitionStyle;
+
+  ///How the browser window should be added to the main window.
+  ///The default value is [WindowType.CHILD].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  WindowType? windowType;
+
+  ///The window’s alpha value.
+  ///The default value is `1.0`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  double? windowAlphaValue;
+
+  ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  WindowStyleMask? windowStyleMask;
+
+  ///The type of separator that the app displays between the title bar and content of a window.
+  ///
+  ///**NOTE for MacOS**: available on MacOS 11.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  WindowTitlebarSeparatorStyle? windowTitlebarSeparatorStyle;
+
+  ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
+  ///thereby setting its position and size onscreen.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  InAppWebViewRect? windowFrame;
   InAppBrowserSettings(
       {this.hidden = false,
       this.hideToolbarTop = false,
@@ -166,7 +201,12 @@ class InAppBrowserSettings
       this.closeButtonCaption,
       this.closeButtonColor,
       this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL});
+      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+      this.windowType,
+      this.windowAlphaValue = 1.0,
+      this.windowStyleMask,
+      this.windowTitlebarSeparatorStyle,
+      this.windowFrame});
 
   ///Gets a possible [InAppBrowserSettings] instance from a [Map] value.
   static InAppBrowserSettings? fromMap(Map<String, dynamic>? map) {
@@ -192,6 +232,13 @@ class InAppBrowserSettings
       closeButtonColor: map['closeButtonColor'] != null
           ? UtilColor.fromStringRepresentation(map['closeButtonColor'])
           : null,
+      windowType: WindowType.fromNativeValue(map['windowType']),
+      windowStyleMask: WindowStyleMask.fromNativeValue(map['windowStyleMask']),
+      windowTitlebarSeparatorStyle:
+          WindowTitlebarSeparatorStyle.fromNativeValue(
+              map['windowTitlebarSeparatorStyle']),
+      windowFrame:
+          InAppWebViewRect.fromMap(map['windowFrame']?.cast<String, dynamic>()),
     );
     instance.hidden = map['hidden'];
     instance.hideToolbarTop = map['hideToolbarTop'];
@@ -212,6 +259,7 @@ class InAppBrowserSettings
         ModalPresentationStyle.fromNativeValue(map['presentationStyle']);
     instance.transitionStyle =
         ModalTransitionStyle.fromNativeValue(map['transitionStyle']);
+    instance.windowAlphaValue = map['windowAlphaValue'];
     return instance;
   }
 
@@ -239,6 +287,12 @@ class InAppBrowserSettings
       "closeButtonColor": closeButtonColor?.toHex(),
       "presentationStyle": presentationStyle?.toNativeValue(),
       "transitionStyle": transitionStyle?.toNativeValue(),
+      "windowType": windowType?.toNativeValue(),
+      "windowAlphaValue": windowAlphaValue,
+      "windowStyleMask": windowStyleMask?.toNativeValue(),
+      "windowTitlebarSeparatorStyle":
+          windowTitlebarSeparatorStyle?.toNativeValue(),
+      "windowFrame": windowFrame?.toMap(),
     };
   }
 
@@ -254,6 +308,6 @@ class InAppBrowserSettings
 
   @override
   String toString() {
-    return 'InAppBrowserSettings{hidden: $hidden, hideToolbarTop: $hideToolbarTop, toolbarTopBackgroundColor: $toolbarTopBackgroundColor, hideUrlBar: $hideUrlBar, hideProgressBar: $hideProgressBar, hideTitleBar: $hideTitleBar, toolbarTopFixedTitle: $toolbarTopFixedTitle, closeOnCannotGoBack: $closeOnCannotGoBack, allowGoBackWithBackButton: $allowGoBackWithBackButton, shouldCloseOnBackButtonPressed: $shouldCloseOnBackButtonPressed, toolbarTopTranslucent: $toolbarTopTranslucent, toolbarTopBarTintColor: $toolbarTopBarTintColor, toolbarTopTintColor: $toolbarTopTintColor, hideToolbarBottom: $hideToolbarBottom, toolbarBottomBackgroundColor: $toolbarBottomBackgroundColor, toolbarBottomTintColor: $toolbarBottomTintColor, toolbarBottomTranslucent: $toolbarBottomTranslucent, closeButtonCaption: $closeButtonCaption, closeButtonColor: $closeButtonColor, presentationStyle: $presentationStyle, transitionStyle: $transitionStyle}';
+    return 'InAppBrowserSettings{hidden: $hidden, hideToolbarTop: $hideToolbarTop, toolbarTopBackgroundColor: $toolbarTopBackgroundColor, hideUrlBar: $hideUrlBar, hideProgressBar: $hideProgressBar, hideTitleBar: $hideTitleBar, toolbarTopFixedTitle: $toolbarTopFixedTitle, closeOnCannotGoBack: $closeOnCannotGoBack, allowGoBackWithBackButton: $allowGoBackWithBackButton, shouldCloseOnBackButtonPressed: $shouldCloseOnBackButtonPressed, toolbarTopTranslucent: $toolbarTopTranslucent, toolbarTopBarTintColor: $toolbarTopBarTintColor, toolbarTopTintColor: $toolbarTopTintColor, hideToolbarBottom: $hideToolbarBottom, toolbarBottomBackgroundColor: $toolbarBottomBackgroundColor, toolbarBottomTintColor: $toolbarBottomTintColor, toolbarBottomTranslucent: $toolbarBottomTranslucent, closeButtonCaption: $closeButtonCaption, closeButtonColor: $closeButtonColor, presentationStyle: $presentationStyle, transitionStyle: $transitionStyle, windowType: $windowType, windowAlphaValue: $windowAlphaValue, windowStyleMask: $windowStyleMask, windowTitlebarSeparatorStyle: $windowTitlebarSeparatorStyle, windowFrame: $windowFrame}';
   }
 }

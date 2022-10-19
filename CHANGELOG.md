@@ -1,6 +1,7 @@
 ## 6.0.0-beta.3
 
 - Added MacOS support
+- Added `windowType`, `windowAlphaValue`, `windowStyleMask`, `windowTitlebarSeparatorStyle`, `windowFrame` for MacOS `InAppBrowserSettings`
 - Added `PrintJobInfo.printer`
 - Added `getContentWidth` WebView method
 

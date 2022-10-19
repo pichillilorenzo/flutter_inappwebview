@@ -27,6 +27,12 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
+  Future<PermissionResponse> onPermissionRequest(request) async {
+    return PermissionResponse(
+        resources: request.resources, action: PermissionResponseAction.GRANT);
+  }
+
+  @override
   void onLoadError(url, code, message) {
     pullToRefreshController?.endRefreshing();
   }
@@ -106,9 +112,8 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                           URLRequest(url: Uri.parse("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(
                         browserSettings: InAppBrowserSettings(
-                          toolbarTopBackgroundColor: Colors.blue,
-                          presentationStyle: ModalPresentationStyle.POPOVER
-                        ),
+                            toolbarTopBackgroundColor: Colors.blue,
+                            presentationStyle: ModalPresentationStyle.POPOVER),
                         webViewSettings: InAppWebViewSettings(
                           useShouldOverrideUrlLoading: true,
                           useOnLoadResource: true,

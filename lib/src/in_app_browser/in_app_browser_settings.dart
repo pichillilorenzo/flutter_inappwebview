@@ -4,8 +4,12 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview/src/types/main.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../types/in_app_webview_rect.dart';
 import '../types/modal_presentation_style.dart';
 import '../types/modal_transition_style.dart';
+import '../types/window_style_mask.dart';
+import '../types/window_titlebar_separator_style.dart';
+import '../types/window_type.dart';
 import '../util.dart';
 
 import '../in_app_webview/in_app_webview_settings.dart';
@@ -230,6 +234,41 @@ class InAppBrowserSettings_
   ///- iOS
   ModalTransitionStyle_? transitionStyle;
 
+  ///How the browser window should be added to the main window.
+  ///The default value is [WindowType.CHILD].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  WindowType_? windowType;
+
+  ///The window’s alpha value.
+  ///The default value is `1.0`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  double? windowAlphaValue;
+
+  ///Flags that describe the window’s current style, such as if it’s resizable or in full-screen mode.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  WindowStyleMask_? windowStyleMask;
+
+  ///The type of separator that the app displays between the title bar and content of a window.
+  ///
+  ///**NOTE for MacOS**: available on MacOS 11.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  WindowTitlebarSeparatorStyle_? windowTitlebarSeparatorStyle;
+
+  ///Sets the origin and size of the window’s frame rectangle according to a given frame rectangle,
+  ///thereby setting its position and size onscreen.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- MacOS
+  InAppWebViewRect_? windowFrame;
+
   InAppBrowserSettings_(
       {this.hidden = false,
       this.hideToolbarTop = false,
@@ -250,7 +289,12 @@ class InAppBrowserSettings_
       this.toolbarTopFixedTitle,
       this.closeOnCannotGoBack = true,
       this.allowGoBackWithBackButton = true,
-      this.shouldCloseOnBackButtonPressed = false});
+      this.shouldCloseOnBackButtonPressed = false,
+      this.windowType,
+      this.windowAlphaValue = 1.0,
+      this.windowStyleMask,
+      this.windowTitlebarSeparatorStyle,
+      this.windowFrame});
 
   @override
   @ExchangeableObjectMethod(ignore: true)

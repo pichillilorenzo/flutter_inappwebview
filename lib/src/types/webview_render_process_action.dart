@@ -12,9 +12,6 @@ class WebViewRenderProcessAction_ {
   final int _value;
   const WebViewRenderProcessAction_._internal(this._value);
 
-  ///Gets [int] value.
-  int toValue() => _value;
-
   ///Cause this renderer to terminate.
   static const TERMINATE = const WebViewRenderProcessAction_._internal(0);
 }

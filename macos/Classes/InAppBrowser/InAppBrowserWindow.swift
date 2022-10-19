@@ -49,7 +49,13 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
     
     public func prepare() {
         title = ""
+        collectionBehavior = .fullScreenPrimary
         delegate = self
+        
+        NotificationCenter.default.addObserver(self,
+                                               selector: #selector(onMainWindowClose(_:)),
+                                               name: NSWindow.willCloseNotification,
+                                               object: NSApplication.shared.mainWindow)
         
         if #available(macOS 10.13, *) {
             let windowToolbar = NSToolbar()
@@ -142,6 +148,16 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
             else {
                 toolbar?.isVisible = false
             }
+            if #available(macOS 11.0, *), let windowTitlebarSeparatorStyle = browserSettings.windowTitlebarSeparatorStyle {
+                titlebarSeparatorStyle = windowTitlebarSeparatorStyle
+            }
+            alphaValue = browserSettings.windowAlphaValue
+            if let windowStyleMask = browserSettings.windowStyleMask {
+                styleMask = windowStyleMask
+            }
+            if let windowFrame = browserSettings.windowFrame {
+                setFrame(windowFrame, display: true)
+            }
         }
     }
     
@@ -208,7 +224,11 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
     }
     
     public func show() {
-        if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false) {
+        if #available(macOS 10.12, *),
+           !(NSApplication.shared.mainWindow?.tabbedWindows?.contains(self) ?? false),
+           browserSettings?.windowType == .tabbed {
+            NSApplication.shared.mainWindow?.addTabbedWindow(self, ordered: .above)
+        } else if !(NSApplication.shared.mainWindow?.childWindows?.contains(self) ?? false) {
             NSApplication.shared.mainWindow?.addChildWindow(self, ordered: .above)
         } else {
             orderFront(self)
@@ -241,13 +261,17 @@ public class InAppBrowserWindow : NSWindow, NSWindowDelegate, NSToolbarDelegate,
                 backgroundColor = nil
             }
         }
-        
         browserSettings = newSettings
     }
     
     public func windowWillClose(_ notification: Notification) {
         dispose()
     }
+    
+    @objc func onMainWindowClose(_ notification: Notification) {
+        close()
+    }
+    
     
     public func dispose() {
         delegate = nil

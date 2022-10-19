@@ -76,11 +76,11 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
             ),
             onRefresh: () async {
               if (Platform.isAndroid) {
-                widget.browser.webViewController.reload();
+                widget.browser.webViewController?.reload();
               } else if (Platform.isIOS) {
-                widget.browser.webViewController.loadUrl(
+                widget.browser.webViewController?.loadUrl(
                     urlRequest: URLRequest(
-                        url: await widget.browser.webViewController.getUrl()));
+                        url: await widget.browser.webViewController?.getUrl()));
               }
             },
           );

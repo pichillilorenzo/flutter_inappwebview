@@ -73,8 +73,12 @@ class InAppBrowser {
   static const MethodChannel _sharedChannel =
       const MethodChannel('com.pichillilorenzo/flutter_inappbrowser');
 
-  /// WebView Controller that can be used to access the [InAppWebViewController] API.
-  late final InAppWebViewController webViewController;
+  InAppWebViewController? _webViewController;
+  ///WebView Controller that can be used to access the [InAppWebViewController] API.
+  ///When [onExit] is fired, this will be `null` and cannot be used anymore.
+  InAppWebViewController? get webViewController {
+    return _webViewController;
+}
 
   ///The window id of a [CreateWindowAction.windowId].
   final int? windowId;
@@ -99,7 +103,7 @@ class InAppBrowser {
       }
     });
     _isOpened = false;
-    webViewController = new InAppWebViewController.fromInAppBrowser(
+    _webViewController = new InAppWebViewController.fromInAppBrowser(
         this._channel, this, this.initialUserScripts);
   }
 
@@ -139,10 +143,11 @@ class InAppBrowser {
       case "onExit":
         _debugLog(call.method, call.arguments);
         this._isOpened = false;
+        this._webViewController = null;
         onExit();
         break;
       default:
-        return webViewController.handleMethod(call);
+        return _webViewController?.handleMethod(call);
     }
   }
 

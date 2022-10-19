@@ -21,24 +21,39 @@ void setGetDelete() {
     final Completer<InAppWebViewController> controllerCompleter =
         Completer<InAppWebViewController>();
     final Completer<String> pageLoaded = Completer<String>();
-    await tester.pumpWidget(
-      Directionality(
-        textDirection: TextDirection.ltr,
-        child: InAppWebView(
-          key: GlobalKey(),
-          initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
-          onWebViewCreated: (controller) {
-            controllerCompleter.complete(controller);
-          },
-          initialSettings: InAppWebViewSettings(
-            clearCache: true,
-          ),
-          onLoadStop: (controller, url) {
-            pageLoaded.complete(url!.toString());
-          },
-        ),
-      ),
+
+    var headlessWebView = new HeadlessInAppWebView(
+      initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+      onWebViewCreated: (controller) {
+        controllerCompleter.complete(controller);
+      },
     );
+
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      headlessWebView.onLoadStop = (controller, url) async {
+        pageLoaded.complete(url!.toString());
+      };
+      await headlessWebView.run();
+    } else {
+      await tester.pumpWidget(
+        Directionality(
+          textDirection: TextDirection.ltr,
+          child: InAppWebView(
+            key: GlobalKey(),
+            initialUrlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_1),
+            onWebViewCreated: (controller) {
+              controllerCompleter.complete(controller);
+            },
+            initialSettings: InAppWebViewSettings(
+              clearCache: true,
+            ),
+            onLoadStop: (controller, url) {
+              pageLoaded.complete(url!.toString());
+            },
+          ),
+        ),
+      );
+    }
 
     final url = Uri.parse(await pageLoaded.future);
 
@@ -57,5 +72,9 @@ void setGetDelete() {
         url: url, domain: ".${TEST_CROSS_PLATFORM_URL_1.host}");
     cookies = await cookieManager.getCookies(url: url);
     expect(cookies, isEmpty);
+
+    if (defaultTargetPlatform == TargetPlatform.macOS) {
+      headlessWebView.dispose();
+    }
   }, skip: shouldSkip);
 }

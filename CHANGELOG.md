@@ -8,6 +8,7 @@
 
 - Removed `PrintJobInfo.printerId`
 - All `InAppWebViewSettings`, `InAppBrowserSettings` properties are optionals
+- `InAppBrowser.webViewController` can be null
 
 ## 6.0.0-beta.2
 

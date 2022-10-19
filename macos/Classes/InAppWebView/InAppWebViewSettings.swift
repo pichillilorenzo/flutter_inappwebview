@@ -85,8 +85,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
                 realSettings["isFraudulentWebsiteWarningEnabled"] = configuration.preferences.isFraudulentWebsiteWarningEnabled
                 realSettings["preferredContentMode"] = configuration.defaultWebpagePreferences.preferredContentMode.rawValue
             }
-            realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs")
-            realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs")
+            realSettings["allowUniversalAccessFromFileURLs"] = configuration.value(forKey: "allowUniversalAccessFromFileURLs") as? Bool
+            realSettings["allowFileAccessFromFileURLs"] = configuration.preferences.value(forKey: "allowFileAccessFromFileURLs") as? Bool
             realSettings["javaScriptEnabled"] = configuration.preferences.javaScriptEnabled
             if #available(macOS 11.0, *) {
                 realSettings["mediaType"] = webView.mediaType

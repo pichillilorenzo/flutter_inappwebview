@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'apple_pay_api.dart';
@@ -84,6 +85,8 @@ import 'web_message.dart';
 import 'webview_windows.dart';
 
 void main() {
+  final shouldSkip = [TargetPlatform.macOS].contains(defaultTargetPlatform);
+
   group('InAppWebView', () {
     initialUrlRequest();
     setGetSettings();
@@ -167,5 +170,5 @@ void main() {
     createPdf();
     applePayAPI();
     handlesURLScheme();
-  });
+  }, skip: shouldSkip);
 }

@@ -27,30 +27,29 @@ extension NSColor {
     }
     
     var hexString: String? {
-        var red: CGFloat = 0
-        var green: CGFloat = 0
-        var blue: CGFloat = 0
-        var alpha: CGFloat = 0
-
-        let multiplier = CGFloat(255.999999)
-        
-        self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        guard let rgbColor = usingColorSpace(.sRGB) else {
+            return "#FFFFFF"
+        }
+        var red: CGFloat = rgbColor.redComponent
+        var green: CGFloat = rgbColor.greenComponent
+        var blue: CGFloat = rgbColor.blueComponent
+        var alpha: CGFloat = rgbColor.alphaComponent
 
         if alpha == 1.0 {
             return String(
                 format: "#%02lX%02lX%02lX",
-                Int(red * multiplier),
-                Int(green * multiplier),
-                Int(blue * multiplier)
+                Int(red * 0xFF),
+                Int(green * 0xFF),
+                Int(blue * 0xFF)
             )
         }
         else {
             return String(
                 format: "#%02lX%02lX%02lX%02lX",
-                Int(red * multiplier),
-                Int(green * multiplier),
-                Int(blue * multiplier),
-                Int(alpha * multiplier)
+                Int(red * 0xFF),
+                Int(green * 0xFF),
+                Int(blue * 0xFF),
+                Int(alpha * 0xFF)
             )
         }
     }

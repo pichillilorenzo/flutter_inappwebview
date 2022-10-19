@@ -29,17 +29,12 @@ public class ISettings<T>: NSObject {
     
     func toMap() -> [String: Any?] {
         var settings: [String: Any?] = [:]
-        var counts = UInt32()
-        let properties = class_copyPropertyList(object_getClass(self), &counts)
-        for i in 0..<counts {
-            if let property = properties?.advanced(by: Int(i)).pointee {
-                let cName = property_getName(property)
-                let name = String(cString: cName)
-                let key = !name.hasPrefix("_") ? name : String(name.suffix(from: name.index(name.startIndex, offsetBy: 1)))
-                settings[key] = self.value(forKey: key)
+        let mirrored_object = Mirror(reflecting: self)
+        for (_, attr) in mirrored_object.children.enumerated() {
+            if let property_name = attr.label as String? {
+                settings[property_name] = attr.value
             }
         }
-        free(properties)
         return settings
     }
     

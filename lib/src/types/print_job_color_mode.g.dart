@@ -9,7 +9,7 @@ part of 'print_job_color_mode.dart';
 ///Class representing how the printed content of a [PrintJobController] should be laid out.
 class PrintJobColorMode {
   final int _value;
-  final int _nativeValue;
+  final dynamic _nativeValue;
   const PrintJobColorMode._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory PrintJobColorMode._internalMultiPlatform(
@@ -17,10 +17,38 @@ class PrintJobColorMode {
       PrintJobColorMode._internal(value, nativeValue());
 
   ///Monochrome color scheme, for example one color is used.
-  static const MONOCHROME = PrintJobColorMode._internal(1, 1);
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  static final MONOCHROME = PrintJobColorMode._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      case TargetPlatform.macOS:
+        return 'Gray';
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Color color scheme, for example many colors are used.
-  static const COLOR = PrintJobColorMode._internal(2, 2);
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- MacOS
+  static final COLOR = PrintJobColorMode._internalMultiPlatform(2, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 1;
+      case TargetPlatform.macOS:
+        return 'RGB';
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Set of all values of [PrintJobColorMode].
   static final Set<PrintJobColorMode> values = [
@@ -42,7 +70,7 @@ class PrintJobColorMode {
   }
 
   ///Gets a possible [PrintJobColorMode] instance from a native value.
-  static PrintJobColorMode? fromNativeValue(int? value) {
+  static PrintJobColorMode? fromNativeValue(dynamic value) {
     if (value != null) {
       try {
         return PrintJobColorMode.values
@@ -57,8 +85,8 @@ class PrintJobColorMode {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [dynamic] native value.
+  dynamic toNativeValue() => _nativeValue;
 
   @override
   int get hashCode => _value.hashCode;

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:collection';
 import 'dart:io';
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 
@@ -18,13 +19,17 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  Future onLoadStart(url) async {
-
-  }
+  Future onLoadStart(url) async {}
 
   @override
   Future onLoadStop(url) async {
     pullToRefreshController?.endRefreshing();
+  }
+
+  @override
+  Future<PermissionResponse> onPermissionRequest(request) async {
+    return PermissionResponse(
+        resources: request.resources, action: PermissionResponseAction.GRANT);
   }
 
   @override
@@ -61,26 +66,30 @@ class InAppBrowserExampleScreen extends StatefulWidget {
 }
 
 class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
-  late PullToRefreshController pullToRefreshController;
+  PullToRefreshController? pullToRefreshController;
 
   @override
   void initState() {
     super.initState();
 
-    pullToRefreshController = PullToRefreshController(
-      settings: PullToRefreshSettings(
-        color: Colors.black,
-      ),
-      onRefresh: () async {
-        if (Platform.isAndroid) {
-          widget.browser.webViewController.reload();
-        } else if (Platform.isIOS) {
-          widget.browser.webViewController.loadUrl(
-              urlRequest: URLRequest(
-                  url: await widget.browser.webViewController.getUrl()));
-        }
-      },
-    );
+    pullToRefreshController = kIsWeb ||
+            ![TargetPlatform.iOS, TargetPlatform.android]
+                .contains(defaultTargetPlatform)
+        ? null
+        : PullToRefreshController(
+            settings: PullToRefreshSettings(
+              color: Colors.black,
+            ),
+            onRefresh: () async {
+              if (Platform.isAndroid) {
+                widget.browser.webViewController?.reload();
+              } else if (Platform.isIOS) {
+                widget.browser.webViewController?.loadUrl(
+                    urlRequest: URLRequest(
+                        url: await widget.browser.webViewController?.getUrl()));
+              }
+            },
+          );
     widget.browser.pullToRefreshController = pullToRefreshController;
   }
 
@@ -103,9 +112,8 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                           URLRequest(url: Uri.parse("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(
                         browserSettings: InAppBrowserSettings(
-                          toolbarTopBackgroundColor: Colors.blue,
-                          presentationStyle: ModalPresentationStyle.POPOVER
-                        ),
+                            toolbarTopBackgroundColor: Colors.blue,
+                            presentationStyle: ModalPresentationStyle.POPOVER),
                         webViewSettings: InAppWebViewSettings(
                           useShouldOverrideUrlLoading: true,
                           useOnLoadResource: true,

@@ -24,6 +24,12 @@ class PermissionResourceType_ {
         apiName: 'WKMediaCaptureType.microphone',
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone',
+        value: 1),
+    EnumMacOSPlatform(
+        available: "12.0",
+        apiName: 'WKMediaCaptureType.microphone',
+        apiUrl:
+        'https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone',
         value: 1)
   ])
   static const MICROPHONE = PermissionResourceType_._internal('MICROPHONE');
@@ -63,6 +69,12 @@ class PermissionResourceType_ {
         apiName: 'WKMediaCaptureType.camera',
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera',
+        value: 0),
+    EnumMacOSPlatform(
+        available: "12.0",
+        apiName: 'WKMediaCaptureType.camera',
+        apiUrl:
+        'https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera',
         value: 0)
   ])
   static const CAMERA = PermissionResourceType_._internal('CAMERA');
@@ -74,6 +86,12 @@ class PermissionResourceType_ {
         apiName: 'WKMediaCaptureType.cameraAndMicrophone',
         apiUrl:
             'https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone',
+        value: 2),
+    EnumMacOSPlatform(
+        available: "12.0",
+        apiName: 'WKMediaCaptureType.cameraAndMicrophone',
+        apiUrl:
+        'https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone',
         value: 2)
   ])
   static const CAMERA_AND_MICROPHONE =
@@ -81,7 +99,8 @@ class PermissionResourceType_ {
 
   ///Resource belongs to the device’s orientation and motion.
   @EnumSupportedPlatforms(platforms: [
-    EnumIOSPlatform(available: "15.0", value: 'deviceOrientationAndMotion')
+    EnumIOSPlatform(available: "15.0", value: 'deviceOrientationAndMotion'),
+    EnumMacOSPlatform(available: "12.0", value: 'deviceOrientationAndMotion')
   ])
   static const DEVICE_ORIENTATION_AND_MOTION =
       PermissionResourceType_._internal('DEVICE_ORIENTATION_AND_MOTION');

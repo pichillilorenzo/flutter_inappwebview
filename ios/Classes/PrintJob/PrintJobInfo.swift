@@ -37,7 +37,9 @@ public class PrintJobInfo : NSObject {
             "numberOfPages": numberOfPages,
             "creationTime": creationTime,
             "label": label,
-            "printerId": printerId
+            "printer": [
+                "id": printerId
+            ]
         ]
     }
 }

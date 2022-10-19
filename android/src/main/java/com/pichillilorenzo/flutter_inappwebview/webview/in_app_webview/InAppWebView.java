@@ -1910,6 +1910,19 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     callback.onReceiveValue(getContentHeight());
   }
 
+  public void getContentWidth(final ValueCallback<Integer> callback) {
+    evaluateJavascript("document.documentElement.scrollWidth;", new ValueCallback<String>() {
+      @Override
+      public void onReceiveValue(@Nullable String value) {
+        Integer contentWidth = null;
+        if (value != null && !value.equalsIgnoreCase("null")) {
+          contentWidth = Integer.parseInt(value);
+        }
+        callback.onReceiveValue(contentWidth);
+      }
+    });
+  }
+
   @Override
   public void getHitTestResult(ValueCallback<com.pichillilorenzo.flutter_inappwebview.types.HitTestResult> callback) {
     callback.onReceiveValue(com.pichillilorenzo.flutter_inappwebview.types.HitTestResult.fromWebViewHitTestResult(getHitTestResult()));

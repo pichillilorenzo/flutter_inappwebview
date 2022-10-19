@@ -15,6 +15,8 @@ class ServiceWorkerController {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_serviceworkercontroller');
 
+  ServiceWorkerController._();
+
   ///Gets the [ServiceWorkerController] shared instance.
   ///
   ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.SERVICE_WORKER_BASIC_USAGE].
@@ -47,7 +49,7 @@ class ServiceWorkerController {
         print(e.stackTrace);
       }
     });
-    _instance = ServiceWorkerController();
+    _instance = ServiceWorkerController._();
     return _instance!;
   }
 

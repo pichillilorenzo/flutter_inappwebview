@@ -263,6 +263,14 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
           result.notImplemented();
         }
         break;
+      case isHidden:
+        if (webView != null && webView.getInAppBrowserDelegate() instanceof InAppBrowserActivity) {
+          InAppBrowserActivity inAppBrowserActivity = (InAppBrowserActivity) webView.getInAppBrowserDelegate();
+          result.success(inAppBrowserActivity.isHidden);
+        } else {
+          result.notImplemented();
+        }
+        break;
       case getCopyBackForwardList:
         result.success((webView != null) ? webView.getCopyBackForwardList() : null);
         break;
@@ -366,6 +374,18 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
       case getContentHeight:
         if (webView instanceof InAppWebView) {
           result.success(webView.getContentHeight());
+        } else {
+          result.success(null);
+        }
+        break;
+      case getContentWidth:
+        if (webView instanceof InAppWebView) {
+          webView.getContentWidth(new ValueCallback<Integer>() {
+            @Override
+            public void onReceiveValue(@Nullable Integer contentWidth) {
+              result.success(contentWidth);
+            }
+          });
         } else {
           result.success(null);
         }

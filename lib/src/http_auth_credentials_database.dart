@@ -4,7 +4,7 @@ import 'types/main.dart';
 import 'package:flutter/services.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the shared HTTP auth credentials cache.
-///On iOS, this class uses the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.
+///On iOS and MacOS, this class uses the [URLCredentialStorage](https://developer.apple.com/documentation/foundation/urlcredentialstorage) class.
 ///On Android, this class has a custom implementation using `android.database.sqlite.SQLiteDatabase` because
 ///[WebViewDatabase](https://developer.android.com/reference/android/webkit/WebViewDatabase)
 ///doesn't offer the same functionalities as iOS `URLCredentialStorage`.
@@ -12,10 +12,13 @@ import 'package:flutter/services.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 class HttpAuthCredentialDatabase {
   static HttpAuthCredentialDatabase? _instance;
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_credential_database');
+
+  HttpAuthCredentialDatabase._();
 
   ///Gets the database shared instance.
   static HttpAuthCredentialDatabase instance() {
@@ -31,7 +34,7 @@ class HttpAuthCredentialDatabase {
         print(e.stackTrace);
       }
     });
-    _instance = HttpAuthCredentialDatabase();
+    _instance = HttpAuthCredentialDatabase._();
     return _instance!;
   }
 
@@ -44,6 +47,7 @@ class HttpAuthCredentialDatabase {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
+  ///- MacOS ([Official API - URLCredentialStorage.allCredentials](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1413859-allcredentials))
   Future<List<URLProtectionSpaceHttpAuthCredentials>>
       getAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -67,6 +71,7 @@ class HttpAuthCredentialDatabase {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<List<URLCredential>> getHttpAuthCredentials(
       {required URLProtectionSpace protectionSpace}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -91,6 +96,7 @@ class HttpAuthCredentialDatabase {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
+  ///- MacOS ([Official API - URLCredentialStorage.set](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1407227-set))
   Future<void> setHttpAuthCredential(
       {required URLProtectionSpace protectionSpace,
       required URLCredential credential}) async {
@@ -109,6 +115,7 @@ class HttpAuthCredentialDatabase {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
+  ///- MacOS ([Official API - URLCredentialStorage.remove](https://developer.apple.com/documentation/foundation/urlcredentialstorage/1408664-remove))
   Future<void> removeHttpAuthCredential(
       {required URLProtectionSpace protectionSpace,
       required URLCredential credential}) async {
@@ -127,6 +134,7 @@ class HttpAuthCredentialDatabase {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<void> removeHttpAuthCredentials(
       {required URLProtectionSpace protectionSpace}) async {
     Map<String, dynamic> args = <String, dynamic>{};
@@ -142,6 +150,7 @@ class HttpAuthCredentialDatabase {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
+  ///- MacOS
   Future<void> clearAllAuthCredentials() async {
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('clearAllAuthCredentials', args);

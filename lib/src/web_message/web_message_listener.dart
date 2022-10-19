@@ -3,6 +3,11 @@ import '../in_app_webview/in_app_webview_controller.dart';
 import '../types/main.dart';
 
 ///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- MacOS
 class WebMessageListener {
   ///The name for the injected JavaScript object.
   final String jsObjectName;

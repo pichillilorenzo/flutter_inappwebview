@@ -17,11 +17,40 @@ class PrintJobRenderingQuality {
       PrintJobRenderingQuality._internal(value, nativeValue());
 
   ///Renders the printing at the best possible quality, regardless of speed.
-  static const BEST = PrintJobRenderingQuality._internal(0, 0);
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final BEST = PrintJobRenderingQuality._internalMultiPlatform(0, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
+        return 0;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Sacrifices the least possible amount of rendering quality for speed to maintain a responsive user interface.
   ///This option should be used only after establishing that best quality rendering does indeed make the user interface unresponsive.
-  static const RESPONSIVE = PrintJobRenderingQuality._internal(1, 1);
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final RESPONSIVE =
+      PrintJobRenderingQuality._internalMultiPlatform(1, () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 1;
+      case TargetPlatform.macOS:
+        return 1;
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Set of all values of [PrintJobRenderingQuality].
   static final Set<PrintJobRenderingQuality> values = [

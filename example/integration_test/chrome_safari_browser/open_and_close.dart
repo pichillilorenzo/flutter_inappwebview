@@ -10,8 +10,7 @@ void openAndClose() {
       ? true
       : ![
           TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
+          TargetPlatform.iOS
         ].contains(defaultTargetPlatform);
 
   test('open and close', () async {

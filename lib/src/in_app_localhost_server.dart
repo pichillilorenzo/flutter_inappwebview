@@ -12,6 +12,7 @@ import 'mime_type_resolver.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 class InAppLocalhostServer {
   bool _started = false;
   HttpServer? _server;

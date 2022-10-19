@@ -9,7 +9,7 @@ part of 'print_job_state.dart';
 ///Class representing the state of a [PrintJobController].
 class PrintJobState {
   final int _value;
-  final int _nativeValue;
+  final int? _nativeValue;
   const PrintJobState._internal(this._value, this._nativeValue);
 // ignore: unused_element
   factory PrintJobState._internalMultiPlatform(
@@ -23,11 +23,14 @@ class PrintJobState {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_CREATED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CREATED))
   ///- iOS
+  ///- MacOS
   static final CREATED = PrintJobState._internalMultiPlatform(1, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 1;
       case TargetPlatform.iOS:
+        return 1;
+      case TargetPlatform.macOS:
         return 1;
       default:
         break;
@@ -58,11 +61,14 @@ class PrintJobState {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_STARTED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_STARTED))
   ///- iOS
+  ///- MacOS
   static final STARTED = PrintJobState._internalMultiPlatform(3, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 3;
       case TargetPlatform.iOS:
+        return 3;
+      case TargetPlatform.macOS:
         return 3;
       default:
         break;
@@ -93,11 +99,14 @@ class PrintJobState {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_COMPLETED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_COMPLETED))
   ///- iOS
+  ///- MacOS
   static final COMPLETED = PrintJobState._internalMultiPlatform(5, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 5;
       case TargetPlatform.iOS:
+        return 5;
+      case TargetPlatform.macOS:
         return 5;
       default:
         break;
@@ -131,11 +140,14 @@ class PrintJobState {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PrintJobInfo.STATE_CANCELED](https://developer.android.com/reference/android/print/PrintJobInfo#STATE_CANCELED))
   ///- iOS
+  ///- MacOS
   static final CANCELED = PrintJobState._internalMultiPlatform(7, () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 7;
       case TargetPlatform.iOS:
+        return 7;
+      case TargetPlatform.macOS:
         return 7;
       default:
         break;
@@ -183,8 +195,8 @@ class PrintJobState {
   ///Gets [int] value.
   int toValue() => _value;
 
-  ///Gets [int] native value.
-  int toNativeValue() => _nativeValue;
+  ///Gets [int?] native value.
+  int? toNativeValue() => _nativeValue;
 
   @override
   int get hashCode => _value.hashCode;

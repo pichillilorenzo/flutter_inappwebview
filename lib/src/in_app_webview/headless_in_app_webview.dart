@@ -23,6 +23,7 @@ import '../types/disposable.dart';
 ///- Android native WebView
 ///- iOS
 ///- Web
+///- MacOS
 class HeadlessInAppWebView implements WebView, Disposable {
   ///View ID.
   late final String id;
@@ -192,6 +193,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///- MacOS
   Future<void> run() async {
     if (_started) {
       return;
@@ -236,6 +238,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///- MacOS
   @override
   Future<void> dispose() async {
     if (!_running) {
@@ -253,6 +256,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///- MacOS
   bool isRunning() {
     return _running;
   }
@@ -270,6 +274,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///- MacOS
   Future<void> setSize(Size size) async {
     if (!_running) {
       return;
@@ -288,6 +293,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///- Android native WebView
   ///- iOS
   ///- Web
+  ///- MacOS
   Future<Size?> getSize() async {
     if (!_running) {
       return null;

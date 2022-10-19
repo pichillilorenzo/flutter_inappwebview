@@ -1,5 +1,4 @@
 import 'dart:async';
-import 'dart:developer' as developer;
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -16,7 +15,7 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 
 ///A session that an app uses to authenticate a user through a web service.
 ///
-///It is implemented using [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) on iOS 12.0+
+///It is implemented using [ASWebAuthenticationSession](https://developer.apple.com/documentation/authenticationservices/aswebauthenticationsession) on iOS 12.0+ and MacOS 10.15+
 ///and [SFAuthenticationSession](https://developer.apple.com/documentation/safariservices/sfauthenticationsession) on iOS 11.0.
 ///
 ///Use an [WebAuthenticationSession] instance to authenticate a user through a web service, including one run by a third party.
@@ -32,8 +31,11 @@ typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
 ///
 ///**NOTE for iOS**: Available only on iOS 11.0+.
 ///
+///**NOTE for MacOS**: Available only on MacOS 10.15+.
+///
 ///**Supported Platforms/Implementations**:
 ///- iOS
+///- MacOS
 class WebAuthenticationSession implements Disposable {
   ///Debug settings.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings();
@@ -113,29 +115,12 @@ class WebAuthenticationSession implements Disposable {
   }
 
   _debugLog(String method, dynamic args) {
-    if (WebAuthenticationSession.debugLoggingSettings.enabled) {
-      for (var regExp
-          in WebAuthenticationSession.debugLoggingSettings.excludeFilter) {
-        if (regExp.hasMatch(method)) return;
-      }
-      var maxLogMessageLength =
-          WebAuthenticationSession.debugLoggingSettings.maxLogMessageLength;
-      String message =
-          "(${defaultTargetPlatform.name}) WebAuthenticationSession ID " +
-              id +
-              " calling \"" +
-              method.toString() +
-              "\" using " +
-              args.toString();
-      if (maxLogMessageLength >= 0 && message.length > maxLogMessageLength) {
-        message = message.substring(0, maxLogMessageLength) + "...";
-      }
-      if (!WebAuthenticationSession.debugLoggingSettings.usePrint) {
-        developer.log(message, name: this.runtimeType.toString());
-      } else {
-        print("[${this.runtimeType.toString()}] $message");
-      }
-    }
+    debugLog(
+        className: this.runtimeType.toString(),
+        debugLoggingSettings: WebAuthenticationSession.debugLoggingSettings,
+        id: id,
+        method: method,
+        args: args);
   }
 
   Future<dynamic> _handleMethod(MethodCall call) async {

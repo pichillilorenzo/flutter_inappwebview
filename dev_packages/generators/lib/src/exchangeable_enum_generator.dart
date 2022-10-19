@@ -284,7 +284,13 @@ class ExchangeableEnumGenerator
 
     if (annotation.read("bitwiseOrOperator").boolValue) {
       classBuffer.writeln(
-          "$extClassName operator |($extClassName value) => $extClassName._internal(value.toValue() | _value, value.toNativeValue() | _nativeValue);");
+          "$extClassName operator |($extClassName value) => $extClassName._internal(value.toValue() | _value, ");
+      if (Util.typeIsNullable(enumNativeValue.type)) {
+        classBuffer.write("value.toNativeValue() != null && _nativeValue != null ? value.toNativeValue()! | _nativeValue! : _nativeValue");
+      } else {
+        classBuffer.write("value.toNativeValue() | _nativeValue");
+      }
+      classBuffer.write(");");
     }
 
     if (annotation.read("toStringMethod").boolValue && (!visitor.methods.containsKey("toString") ||

@@ -10,16 +10,19 @@ import '../types/main.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the web storage used by WebView instances.
 ///On Android, it is implemented using [WebStorage](https://developer.android.com/reference/android/webkit/WebStorage.html).
-///On iOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore).
+///On iOS and MacOS, it is implemented using [WKWebsiteDataStore.default()](https://developer.apple.com/documentation/webkit/wkwebsitedatastore).
 ///
 ///**NOTE for iOS**: available from iOS 9.0+.
 ///
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 class WebStorageManager {
   static WebStorageManager? _instance;
   static const MethodChannel _staticChannel = WEB_STORAGE_STATIC_CHANNEL;
+
+  WebStorageManager._();
 
   ///Use [WebStorageManager] instead.
   @Deprecated("Use WebStorageManager instead")
@@ -43,7 +46,7 @@ class WebStorageManager {
         print(e.stackTrace);
       }
     });
-    _instance = new WebStorageManager();
+    _instance = new WebStorageManager._();
     return _instance!;
   }
 
@@ -121,6 +124,7 @@ class WebStorageManager {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
+  ///- MacOS ([Official API - WKWebsiteDataStore.fetchDataRecords](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532932-fetchdatarecords))
   Future<List<WebsiteDataRecord>> fetchDataRecords(
       {required Set<WebsiteDataType> dataTypes}) async {
     List<WebsiteDataRecord> recordList = [];
@@ -156,6 +160,7 @@ class WebStorageManager {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
+  ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532936-removedata))
   Future<void> removeDataFor(
       {required Set<WebsiteDataType> dataTypes,
       required List<WebsiteDataRecord> dataRecords}) async {
@@ -183,6 +188,7 @@ class WebStorageManager {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
+  ///- MacOS ([Official API - WKWebsiteDataStore.removeData](https://developer.apple.com/documentation/webkit/wkwebsitedatastore/1532938-removedata))
   Future<void> removeDataModifiedSince(
       {required Set<WebsiteDataType> dataTypes, required DateTime date}) async {
     List<String> dataTypesList = [];

@@ -1562,8 +1562,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
 
     @available(iOS 15.0, *)
-    @available(macOS 12.0, *)
-    @available(macCatalyst 15.0, *)
     public func webView(_ webView: WKWebView,
                         requestMediaCapturePermissionFor origin: WKSecurityOrigin,
                         initiatedByFrame frame: WKFrameInfo,
@@ -1605,8 +1603,6 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
     }
     
     @available(iOS 15.0, *)
-    @available(macOS 12.0, *)
-    @available(macCatalyst 15.0, *)
     public func webView(_ webView: WKWebView,
                         requestDeviceOrientationAndMotionPermissionFor origin: WKSecurityOrigin,
                         initiatedByFrame frame: WKFrameInfo,
@@ -2846,6 +2842,10 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
     
     public func getContentHeight() -> Int64 {
         return Int64(scrollView.contentSize.height)
+    }
+    
+    public func getContentWidth() -> Int64 {
+        return Int64(scrollView.contentSize.width)
     }
     
     public func zoomBy(zoomFactor: Float, animated: Bool) {

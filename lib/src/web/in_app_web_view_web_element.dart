@@ -97,7 +97,7 @@ class InAppWebViewWebElement implements Disposable {
         return await getSettings();
       case "setSettings":
         InAppWebViewSettings newSettings = InAppWebViewSettings.fromMap(
-            call.arguments["settings"].cast<String, dynamic>());
+            call.arguments["settings"].cast<String, dynamic>()) ?? InAppWebViewSettings();
         await setSettings(newSettings);
         break;
       case "getUrl":
@@ -176,7 +176,7 @@ class InAppWebViewWebElement implements Disposable {
 
     Set<Sandbox> sandbox = Set.from(Sandbox.values);
 
-    if (!settings.javaScriptEnabled) {
+    if (settings.javaScriptEnabled != null && !settings.javaScriptEnabled!) {
       sandbox.remove(Sandbox.ALLOW_SCRIPTS);
     }
 
@@ -403,8 +403,8 @@ class InAppWebViewWebElement implements Disposable {
   Future<void> setSettings(InAppWebViewSettings newSettings) async {
     Set<Sandbox> sandbox = getSandbox();
 
-    if (settings.javaScriptEnabled != newSettings.javaScriptEnabled) {
-      if (!newSettings.javaScriptEnabled) {
+    if (newSettings.javaScriptEnabled != null && settings.javaScriptEnabled != newSettings.javaScriptEnabled) {
+      if (!newSettings.javaScriptEnabled!) {
         sandbox.remove(Sandbox.ALLOW_SCRIPTS);
       } else {
         sandbox.add(Sandbox.ALLOW_SCRIPTS);

@@ -19,6 +19,8 @@ class ProxyController {
   static const MethodChannel _channel = const MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_proxycontroller');
 
+  ProxyController._();
+
   ///Gets the [ProxyController] shared instance.
   ///
   ///This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.PROXY_OVERRIDE].
@@ -35,7 +37,7 @@ class ProxyController {
         print(e.stackTrace);
       }
     });
-    _instance = ProxyController();
+    _instance = ProxyController._();
     return _instance!;
   }
 

@@ -443,6 +443,14 @@ class ExchangeableObjectGenerator
       classBuffer.writeln('}');
     }
 
+    if (annotation.read("copyMethod").boolValue && (!visitor.methods.containsKey("copy") ||
+        Util.methodHasIgnore(visitor.methods['copy']!))) {
+      classBuffer.writeln('///Returns a copy of $extClassName.');
+      classBuffer.writeln('$extClassName copy() {');
+      classBuffer.writeln('return $extClassName.fromMap(toMap()) ?? $extClassName();');
+      classBuffer.writeln('}');
+    }
+
     if (annotation.read("toStringMethod").boolValue && (!visitor.methods.containsKey("toString") ||
         Util.methodHasIgnore(visitor.methods['toString']!))) {
       classBuffer.writeln('@override');

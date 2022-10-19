@@ -3,6 +3,11 @@ import '../types/main.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 
 ///The representation of the [HTML5 message channels](https://html.spec.whatwg.org/multipage/web-messaging.html#message-channels).
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
+///- iOS
+///- MacOS
 class WebMessageChannel {
   ///Message Channel ID used internally.
   final String id;

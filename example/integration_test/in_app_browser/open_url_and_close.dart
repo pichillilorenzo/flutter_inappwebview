@@ -1,5 +1,4 @@
 import 'package:flutter/foundation.dart';
-import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -33,12 +32,12 @@ void openUrlAndClose() {
     await inAppBrowser.firstPageLoaded.future;
     var controller = inAppBrowser.webViewController;
 
-    final String? url = (await controller.getUrl())?.toString();
+    expect(controller, isNotNull);
+    final String? url = (await controller!.getUrl())?.toString();
     expect(url, TEST_URL_1.toString());
 
     await inAppBrowser.close();
     expect(inAppBrowser.isOpened(), false);
-    expect(() async => await inAppBrowser.webViewController.getUrl(),
-        throwsA(isInstanceOf<MissingPluginException>()));
+    expect(inAppBrowser.webViewController, isNull);
   }, skip: shouldSkip);
 }

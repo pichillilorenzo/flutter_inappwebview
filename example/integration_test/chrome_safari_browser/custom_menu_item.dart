@@ -10,8 +10,7 @@ void customMenuItem() {
       ? true
       : ![
           TargetPlatform.android,
-          TargetPlatform.iOS,
-          TargetPlatform.macOS,
+          TargetPlatform.iOS
         ].contains(defaultTargetPlatform);
 
   test('add custom menu item', () async {

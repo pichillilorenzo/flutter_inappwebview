@@ -8,7 +8,8 @@ import 'open_and_close.dart';
 import 'trusted_web_activity.dart';
 
 void main() {
-  const shouldSkip = kIsWeb;
+  final shouldSkip =
+      kIsWeb || [TargetPlatform.macOS].contains(defaultTargetPlatform);
 
   group('ChromeSafariBrowser', () {
     openAndClose();

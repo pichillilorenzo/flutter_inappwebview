@@ -9,6 +9,7 @@ import '../types/main.dart';
 ///**Supported Platforms/Implementations**:
 ///- Android native WebView
 ///- iOS
+///- MacOS
 ///- Web
 class WebStorage {
   ///Represents `window.localStorage`.

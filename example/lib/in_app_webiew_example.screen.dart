@@ -63,7 +63,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               contextMenuItemClicked.title);
         });
 
-    pullToRefreshController = kIsWeb
+    pullToRefreshController = kIsWeb || ![TargetPlatform.iOS, TargetPlatform.android].contains(defaultTargetPlatform)
         ? null
         : PullToRefreshController(
             settings: PullToRefreshSettings(

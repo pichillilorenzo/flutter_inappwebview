@@ -56,6 +56,7 @@ public class InAppBrowserManager: ChannelDelegate {
         
         let webViewController = InAppBrowserWebViewController()
         webViewController.browserSettings = browserSettings
+        webViewController.isHidden = browserSettings.hidden
         webViewController.webViewSettings = webViewSettings
         webViewController.previousStatusBarStyle = previousStatusBarStyle
         return webViewController
@@ -110,7 +111,7 @@ public class InAppBrowserManager: ChannelDelegate {
         navController.tmpWindow = tmpWindow
         
         var animated = true
-        if let browserOptions = webViewController.browserSettings, browserOptions.hidden {
+        if let browserSettings = webViewController.browserSettings, browserSettings.hidden {
             tmpWindow.isHidden = true
             UIApplication.shared.delegate?.window??.makeKeyAndVisible()
             animated = false

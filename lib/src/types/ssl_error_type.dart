@@ -77,6 +77,11 @@ class SslErrorType_ {
         apiName: 'SecTrustResultType.invalid',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/invalid',
+        value: 0),
+    EnumMacOSPlatform(
+        apiName: 'SecTrustResultType.invalid',
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/invalid',
         value: 0)
   ])
   static const INVALID = SslErrorType_._internal('INVALID');
@@ -89,6 +94,11 @@ class SslErrorType_ {
   ///The Keychain Access utility refers to this value as "Never Trust."
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'SecTrustResultType.deny',
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/deny',
+        value: 3),
+    EnumMacOSPlatform(
         apiName: 'SecTrustResultType.deny',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/deny',
@@ -106,6 +116,11 @@ class SslErrorType_ {
   ///When receiving this value, most apps should trust the chain.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'SecTrustResultType.unspecified',
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/unspecified',
+        value: 4),
+    EnumMacOSPlatform(
         apiName: 'SecTrustResultType.unspecified',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/unspecified',
@@ -127,6 +142,11 @@ class SslErrorType_ {
         apiName: 'SecTrustResultType.recoverableTrustFailure',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure',
+        value: 5),
+    EnumMacOSPlatform(
+        apiName: 'SecTrustResultType.recoverableTrustFailure',
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/recoverabletrustfailure',
         value: 5)
   ])
   static const RECOVERABLE_TRUST_FAILURE =
@@ -143,6 +163,11 @@ class SslErrorType_ {
         apiName: 'SecTrustResultType.fatalTrustFailure',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure',
+        value: 6),
+    EnumMacOSPlatform(
+        apiName: 'SecTrustResultType.fatalTrustFailure',
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/fataltrustfailure',
         value: 6)
   ])
   static const FATAL_TRUST_FAILURE =
@@ -154,6 +179,11 @@ class SslErrorType_ {
   ///This can be caused by either a revoked certificate or by OS-level errors that are unrelated to the certificates themselves.
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
+        apiName: 'SecTrustResultType.otherError',
+        apiUrl:
+            'https://developer.apple.com/documentation/security/sectrustresulttype/othererror',
+        value: 7),
+    EnumMacOSPlatform(
         apiName: 'SecTrustResultType.otherError',
         apiUrl:
             'https://developer.apple.com/documentation/security/sectrustresulttype/othererror',

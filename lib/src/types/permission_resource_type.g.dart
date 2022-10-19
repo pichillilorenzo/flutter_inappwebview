@@ -21,12 +21,15 @@ class PermissionResourceType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_AUDIO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_AUDIO_CAPTURE))
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
+  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.microphone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/microphone))
   static final MICROPHONE =
       PermissionResourceType._internalMultiPlatform('MICROPHONE', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 'android.webkit.resource.AUDIO_CAPTURE';
       case TargetPlatform.iOS:
+        return 1;
+      case TargetPlatform.macOS:
         return 1;
       default:
         break;
@@ -71,12 +74,15 @@ class PermissionResourceType {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - PermissionRequest.RESOURCE_VIDEO_CAPTURE](https://developer.android.com/reference/android/webkit/PermissionRequest#RESOURCE_VIDEO_CAPTURE))
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
+  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.camera](https://developer.apple.com/documentation/webkit/wkmediacapturetype/camera))
   static final CAMERA =
       PermissionResourceType._internalMultiPlatform('CAMERA', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return 'android.webkit.resource.VIDEO_CAPTURE';
       case TargetPlatform.iOS:
+        return 0;
+      case TargetPlatform.macOS:
         return 0;
       default:
         break;
@@ -88,11 +94,14 @@ class PermissionResourceType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS 15.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
+  ///- MacOS 12.0+ ([Official API - WKMediaCaptureType.cameraAndMicrophone](https://developer.apple.com/documentation/webkit/wkmediacapturetype/cameraandmicrophone))
   static final CAMERA_AND_MICROPHONE =
       PermissionResourceType._internalMultiPlatform('CAMERA_AND_MICROPHONE',
           () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 2;
+      case TargetPlatform.macOS:
         return 2;
       default:
         break;
@@ -104,11 +113,14 @@ class PermissionResourceType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS 15.0+
+  ///- MacOS 12.0+
   static final DEVICE_ORIENTATION_AND_MOTION =
       PermissionResourceType._internalMultiPlatform(
           'DEVICE_ORIENTATION_AND_MOTION', () {
     switch (defaultTargetPlatform) {
       case TargetPlatform.iOS:
+        return 'deviceOrientationAndMotion';
+      case TargetPlatform.macOS:
         return 'deviceOrientationAndMotion';
       default:
         break;

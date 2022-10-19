@@ -48,7 +48,9 @@ public class PrintJobInfoExt {
     obj.put("numberOfPages", numberOfPages);
     obj.put("creationTime", creationTime);
     obj.put("label", label);
-    obj.put("printerId", printerId);
+    Map<String, Object> printer = new HashMap<>();
+    printer.put("id", printerId);
+    obj.put("printer", printer);
     obj.put("attributes", attributes != null ? attributes.toMap() : null);
     return obj;
   }

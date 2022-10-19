@@ -8,10 +8,8 @@ import '../util.dart';
 void customMenuItem() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android, TargetPlatform.iOS]
+          .contains(defaultTargetPlatform);
 
   test('add custom menu item', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();

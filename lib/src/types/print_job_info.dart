@@ -139,7 +139,7 @@ class PrintJobInfo_ {
       this.canSpawnSeparateThread,
       this.isCopyingOperation,
       this.currentPage,
-        this.firstPage,
-        this.lastPage,
+      this.firstPage,
+      this.lastPage,
       this.attributes});
 }

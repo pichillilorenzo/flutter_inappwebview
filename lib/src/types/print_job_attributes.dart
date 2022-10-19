@@ -23,8 +23,11 @@ class PrintJobAttributes_ {
   PrintJobColorMode_? colorMode;
 
   ///The duplex mode to use for the print job.
-  @SupportedPlatforms(
-      platforms: [AndroidPlatform(available: "23"), IOSPlatform(), MacOSPlatform()])
+  @SupportedPlatforms(platforms: [
+    AndroidPlatform(available: "23"),
+    IOSPlatform(),
+    MacOSPlatform()
+  ])
   PrintJobDuplexMode_? duplex;
 
   ///The orientation of the printed content, portrait or landscape.

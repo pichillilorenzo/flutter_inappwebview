@@ -33,7 +33,8 @@ import '../context_menu.dart';
 
 part 'in_app_webview_settings.g.dart';
 
-List<ContentBlocker> _deserializeContentBlockers(List<dynamic>? contentBlockersMapList) {
+List<ContentBlocker> _deserializeContentBlockers(
+    List<dynamic>? contentBlockersMapList) {
   List<ContentBlocker> contentBlockers = [];
   if (contentBlockersMapList != null) {
     contentBlockersMapList.forEach((contentBlocker) {

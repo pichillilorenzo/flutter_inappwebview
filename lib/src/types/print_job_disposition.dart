@@ -13,26 +13,18 @@ class PrintJobDisposition_ {
   const PrintJobDisposition_._internal(this._value);
 
   ///Normal print job.
-  @EnumSupportedPlatforms(platforms: [
-    EnumMacOSPlatform(value: 'spool')
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumMacOSPlatform(value: 'spool')])
   static const SPOOL = const PrintJobDisposition_._internal('SPOOL');
 
   ///Send to Preview application.
-  @EnumSupportedPlatforms(platforms: [
-    EnumMacOSPlatform(value: 'preview')
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumMacOSPlatform(value: 'preview')])
   static const PREVIEW = const PrintJobDisposition_._internal("PREVIEW");
 
   ///Save to a file.
-  @EnumSupportedPlatforms(platforms: [
-    EnumMacOSPlatform(value: 'save')
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumMacOSPlatform(value: 'save')])
   static const SAVE = const PrintJobDisposition_._internal("SAVE");
 
   ///Cancel print job.
-  @EnumSupportedPlatforms(platforms: [
-    EnumMacOSPlatform(value: 'cancel')
-  ])
+  @EnumSupportedPlatforms(platforms: [EnumMacOSPlatform(value: 'cancel')])
   static const CANCEL = const PrintJobDisposition_._internal("CANCEL");
 }

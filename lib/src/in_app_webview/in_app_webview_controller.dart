@@ -113,7 +113,7 @@ class InAppWebViewController {
   _debugLog(String method, dynamic args) {
     debugLog(
         className: this.runtimeType.toString(),
-        name:  _inAppBrowser == null ? "WebView" : "InAppBrowser",
+        name: _inAppBrowser == null ? "WebView" : "InAppBrowser",
         id: (getViewId() ?? _inAppBrowser?.id).toString(),
         debugLoggingSettings: WebView.debugLoggingSettings,
         method: method,

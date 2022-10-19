@@ -8,10 +8,8 @@ import '../util.dart';
 void openAndClose() {
   final shouldSkip = kIsWeb
       ? true
-      : ![
-          TargetPlatform.android,
-          TargetPlatform.iOS
-        ].contains(defaultTargetPlatform);
+      : ![TargetPlatform.android, TargetPlatform.iOS]
+          .contains(defaultTargetPlatform);
 
   test('open and close', () async {
     var chromeSafariBrowser = MyChromeSafariBrowser();

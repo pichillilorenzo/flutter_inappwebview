@@ -688,7 +688,9 @@ class _InAppWebViewState extends State<InAppWebView> {
           creationParamsCodec: const StandardMessageCodec(),
         );
       }
-    } else if (defaultTargetPlatform == TargetPlatform.iOS/* || defaultTargetPlatform == TargetPlatform.macOS*/) {
+    } else if (defaultTargetPlatform ==
+        TargetPlatform
+            .iOS /* || defaultTargetPlatform == TargetPlatform.macOS*/) {
       return UiKitView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         onPlatformViewCreated: _onPlatformViewCreated,

@@ -59,8 +59,10 @@ class InAppBrowserClassSettings {
     if (instance == null) {
       instance = InAppBrowserClassSettings();
     }
-    instance.browserSettings = InAppBrowserSettings.fromMap(options) ?? InAppBrowserSettings();
-    instance.webViewSettings = InAppWebViewSettings.fromMap(options) ?? InAppWebViewSettings();
+    instance.browserSettings =
+        InAppBrowserSettings.fromMap(options) ?? InAppBrowserSettings();
+    instance.webViewSettings =
+        InAppWebViewSettings.fromMap(options) ?? InAppWebViewSettings();
     return instance;
   }
 

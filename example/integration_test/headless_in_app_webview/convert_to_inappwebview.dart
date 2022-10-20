@@ -40,7 +40,7 @@ void convertToInAppWebView() {
     expect(url, TEST_CROSS_PLATFORM_URL_1.toString());
 
     final Completer<InAppWebViewController> widgetControllerCompleter =
-    Completer<InAppWebViewController>();
+        Completer<InAppWebViewController>();
     final Completer<String> loadedUrl = Completer<String>();
 
     await tester.pumpWidget(
@@ -61,11 +61,13 @@ void convertToInAppWebView() {
         ),
       ),
     );
-    final InAppWebViewController widgetController = await widgetControllerCompleter.future;
+    final InAppWebViewController widgetController =
+        await widgetControllerCompleter.future;
 
     expect(headlessWebView.isRunning(), false);
 
-    expect((await widgetController.getUrl())?.toString(), TEST_CROSS_PLATFORM_URL_1.toString());
+    expect((await widgetController.getUrl())?.toString(),
+        TEST_CROSS_PLATFORM_URL_1.toString());
 
     await widgetController.loadUrl(
         urlRequest: URLRequest(url: TEST_CROSS_PLATFORM_URL_2));

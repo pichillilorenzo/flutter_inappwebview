@@ -185,7 +185,8 @@ class InAppWebViewWebElement implements Disposable {
 
   void prepare() {
     if (headlessWebViewId != null) {
-      final headlessWebView = HeadlessInAppWebViewManager.webViews[headlessWebViewId!];
+      final headlessWebView =
+          HeadlessInAppWebViewManager.webViews[headlessWebViewId!];
       if (headlessWebView != null && headlessWebView.webView != null) {
         final webView = headlessWebView.disposeAndGetFlutterWebView();
         if (webView != null) {
@@ -211,15 +212,16 @@ class InAppWebViewWebElement implements Disposable {
 
       Set<Sandbox> sandbox = Set.from(Sandbox.values);
 
-      if (settings!.javaScriptEnabled != null && !settings!.javaScriptEnabled!) {
+      if (settings!.javaScriptEnabled != null &&
+          !settings!.javaScriptEnabled!) {
         sandbox.remove(Sandbox.ALLOW_SCRIPTS);
       }
 
       iframe.allow = settings!.iframeAllow ?? iframe.allow;
       iframe.allowFullscreen =
           settings!.iframeAllowFullscreen ?? iframe.allowFullscreen;
-      iframe.referrerPolicy =
-          settings!.iframeReferrerPolicy?.toNativeValue() ?? iframe.referrerPolicy;
+      iframe.referrerPolicy = settings!.iframeReferrerPolicy?.toNativeValue() ??
+          iframe.referrerPolicy;
       iframe.name = settings!.iframeName ?? iframe.name;
       iframe.csp = settings!.iframeCsp ?? iframe.csp;
 

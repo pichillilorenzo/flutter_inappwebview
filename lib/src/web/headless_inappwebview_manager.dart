@@ -62,8 +62,10 @@ class HeadlessInAppWebViewManager {
     webView.iframeContainer.style.display = 'none';
     Map<String, num>? initialSize = params["initialSize"]?.cast<String, num>();
     if (initialSize != null) {
-      webView.iframeContainer.style.width = initialSize["width"].toString() + 'px';
-      webView.iframeContainer.style.height = initialSize["height"].toString() + 'px';
+      webView.iframeContainer.style.width =
+          initialSize["width"].toString() + 'px';
+      webView.iframeContainer.style.height =
+          initialSize["height"].toString() + 'px';
     }
     Map<String, dynamic> initialSettings =
         params["initialSettings"].cast<String, dynamic>();

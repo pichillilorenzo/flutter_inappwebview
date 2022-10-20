@@ -625,7 +625,10 @@ class _InAppWebViewState extends State<InAppWebView> {
           webViewHtmlElement.initialUrlRequest = widget.initialUrlRequest;
           webViewHtmlElement.initialFile = widget.initialFile;
           webViewHtmlElement.initialData = widget.initialData;
-          webViewHtmlElement.headlessWebViewId = widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null;
+          webViewHtmlElement.headlessWebViewId =
+              widget.headlessWebView?.isRunning() ?? false
+                  ? widget.headlessWebView?.id
+                  : null;
           webViewHtmlElement.prepare();
           if (webViewHtmlElement.headlessWebViewId == null) {
             webViewHtmlElement.makeInitialLoad();
@@ -672,7 +675,10 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialSettings': initialSettings,
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
                 'windowId': widget.windowId,
-                'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null,
+                'headlessWebViewId':
+                    widget.headlessWebView?.isRunning() ?? false
+                        ? widget.headlessWebView?.id
+                        : null,
                 'implementation': widget.implementation.toNativeValue(),
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
@@ -700,7 +706,9 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialSettings': initialSettings,
             'contextMenu': widget.contextMenu?.toMap() ?? {},
             'windowId': widget.windowId,
-            'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null,
+            'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
+                ? widget.headlessWebView?.id
+                : null,
             'implementation': widget.implementation.toNativeValue(),
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
@@ -723,7 +731,9 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialSettings': initialSettings,
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
-          'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null,
+          'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
+              ? widget.headlessWebView?.id
+              : null,
           'implementation': widget.implementation.toNativeValue(),
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
@@ -754,7 +764,9 @@ class _InAppWebViewState extends State<InAppWebView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    final viewId = (!kIsWeb && (widget.headlessWebView?.isRunning() ?? false)) ? widget.headlessWebView?.id : id;
+    final viewId = (!kIsWeb && (widget.headlessWebView?.isRunning() ?? false))
+        ? widget.headlessWebView?.id
+        : id;
     widget.headlessWebView?.internalDispose();
     _controller = InAppWebViewController(viewId, widget);
     widget.pullToRefreshController?.initMethodChannel(viewId);

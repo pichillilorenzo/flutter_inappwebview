@@ -45,6 +45,18 @@ public class HeadlessInAppWebView implements Disposable {
   }
 
   public void prepare(Map<String, Object> params) {
+    if (flutterWebView != null) {
+      View view = flutterWebView.getView();
+      if (view != null) {
+        final Map<String, Object> initialSize = (Map<String, Object>) params.get("initialSize");
+        Size2D size = Size2D.fromMap(initialSize);
+        if (size == null) {
+          size = new Size2D(-1, -1);
+        }
+        setSize(size);
+        view.setVisibility(View.INVISIBLE);
+      }
+    }
     if (plugin != null && plugin.activity != null) {
       // Add the headless WebView to the view hierarchy.
       // This way is also possible to take screenshots.
@@ -54,14 +66,7 @@ public class HeadlessInAppWebView implements Disposable {
         if (mainView != null && flutterWebView != null) {
           View view = flutterWebView.getView();
           if (view != null) {
-            final Map<String, Object> initialSize = (Map<String, Object>) params.get("initialSize");
-            Size2D size = Size2D.fromMap(initialSize);
-            if (size == null) {
-              size = new Size2D(-1, -1);
-            }
-            setSize(size);
             mainView.addView(view, 0);
-            view.setVisibility(View.INVISIBLE);
           }
         } 
       }

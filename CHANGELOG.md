@@ -1,3 +1,7 @@
+## 6.0.0-beta.5
+
+- Merge fixes of version `5.5.0+5`
+
 ## 6.0.0-beta.4
 
 - Added `InAppWebView.headlessWebView` property to convert an `HeadlessWebView` to `InAppWebView` widget
@@ -49,6 +53,12 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.5.0+5
+
+- Fixed `HeadlessInAppWebView` default size on Android
+- Fixed "🐞[Android] execution of the workmanager destroys in_app_webview library's platform channel" [#1348](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1348)
+- Fixed "HeadlessInAppWebView called from WorkManager background task triggers NullPointerException on missing context" [#912](https://github.com/pichillilorenzo/flutter_inappwebview/issues/912)
 
 ## 5.5.0+4
 

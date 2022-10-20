@@ -1570,6 +1570,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         decisionHandler(.allow)
                     }
                 }
+                decisionHandlerCrashAvoider.run()
             })
         }
         
@@ -1749,6 +1750,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         completionHandler(.performDefaultHandling, nil)
                     }
                 }
+                decisionHandlerCrashAvoider.run()
             })
         }
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust {
@@ -1805,6 +1807,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         completionHandler(.performDefaultHandling, nil)
                     }
                 }
+                decisionHandlerCrashAvoider.run()
             })
         }
         else if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodClientCertificate {
@@ -1871,6 +1874,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                         completionHandler(.performDefaultHandling, nil)
                     }
                 }
+                decisionHandlerCrashAvoider.run()
             })
         }
         else {
@@ -1993,6 +1997,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     self.createAlertDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
                 }
             }
+            decisionHandlerCrashAvoider.run()
         })
     }
     
@@ -2074,6 +2079,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
                 }
             }
+            decisionHandlerCrashAvoider.run()
         })
     }
 
@@ -2168,6 +2174,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
                 }
             }
+            decisionHandlerCrashAvoider.run()
         })
     }
     
@@ -2328,6 +2335,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate, WKNavi
                     decisionHandler(false)
                 }
             }
+            decisionHandlerCrashAvoider.run()
         })
     }
     

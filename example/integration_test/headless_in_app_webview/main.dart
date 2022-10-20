@@ -1,5 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
 
+import 'convert_to_inappwebview.dart';
 import 'take_screenshot.dart';
 import 'custom_size.dart';
 import 'run_and_dispose.dart';
@@ -11,5 +12,6 @@ void main() {
     takeScreenshot();
     customSize();
     setGetSettings();
+    convertToInAppWebView();
   });
 }

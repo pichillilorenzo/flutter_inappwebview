@@ -1073,9 +1073,11 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let origin = "\(origin.protocol)://\(origin.host)\(origin.port != 0 ? ":" + String(origin.port) : "")"
         let permissionRequest = PermissionRequest(origin: origin, resources: [type.rawValue], frame: frame)
         
+        var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.PermissionRequestCallback()
         callback.nonNullSuccess = { (response: PermissionResponse) in
             if let action = response.action {
+                decisionHandlerCalled = true
                 switch action {
                     case 1:
                         decisionHandler(.grant)
@@ -1091,7 +1093,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return true
         }
         callback.defaultBehaviour = { (response: PermissionResponse?) in
-            decisionHandler(.deny)
+            if !decisionHandlerCalled {
+                decisionHandlerCalled = true
+                decisionHandler(.deny)
+            }
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
             print(code + ", " + (message ?? ""))
@@ -1157,13 +1162,18 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         
+        var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldOverrideUrlLoadingCallback()
         callback.nonNullSuccess = { (response: WKNavigationActionPolicy) in
+            decisionHandlerCalled = true
             decisionHandler(response)
             return false
         }
         callback.defaultBehaviour = { (response: WKNavigationActionPolicy?) in
-            decisionHandler(.allow)
+            if !decisionHandlerCalled {
+                decisionHandlerCalled = true
+                decisionHandler(.allow)
+            }
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
             print(code + ", " + (message ?? ""))
@@ -1189,13 +1199,18 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         let useOnNavigationResponse = settings?.useOnNavigationResponse
         
         if useOnNavigationResponse != nil, useOnNavigationResponse! {
+            var decisionHandlerCalled = false
             let callback = WebViewChannelDelegate.NavigationResponseCallback()
             callback.nonNullSuccess = { (response: WKNavigationResponsePolicy) in
+                decisionHandlerCalled = true
                 decisionHandler(response)
                 return false
             }
             callback.defaultBehaviour = { (response: WKNavigationResponsePolicy?) in
-                decisionHandler(.allow)
+                if !decisionHandlerCalled {
+                    decisionHandlerCalled = true
+                    decisionHandler(.allow)
+                }
             }
             callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
                 print(code + ", " + (message ?? ""))
@@ -1210,7 +1225,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
         }
         
         if let useOnDownloadStart = settings?.useOnDownloadStart, useOnDownloadStart {
-            if #available(macOS 11.3, *), !navigationResponse.canShowMIMEType {
+            if #available(macOS 11.3, *), !navigationResponse.canShowMIMEType, useOnNavigationResponse == nil || !useOnNavigationResponse! {
                 decisionHandler(.download)
                 return
             } else {
@@ -1310,6 +1325,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         
+        var completionHandlerCalled = false
         if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPBasic ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodDefault ||
             challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodHTTPDigest ||
@@ -1323,6 +1339,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             let callback = WebViewChannelDelegate.ReceivedHttpAuthRequestCallback()
             callback.nonNullSuccess = { (response: HttpAuthResponse) in
                 if let action = response.action {
+                    completionHandlerCalled = true
                     switch action {
                         case 0:
                             InAppWebView.credentialsProposed = []
@@ -1371,7 +1388,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 return true
             }
             callback.defaultBehaviour = { (response: HttpAuthResponse?) in
-                completionHandler(.performDefaultHandling, nil)
+                if !completionHandlerCalled {
+                    completionHandlerCalled = true
+                    completionHandler(.performDefaultHandling, nil)
+                }
             }
             callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
                 print(code + ", " + (message ?? ""))
@@ -1398,6 +1418,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             let callback = WebViewChannelDelegate.ReceivedServerTrustAuthRequestCallback()
             callback.nonNullSuccess = { (response: ServerTrustAuthResponse) in
                 if let action = response.action {
+                    completionHandlerCalled = true
                     switch action {
                         case 0:
                             InAppWebView.credentialsProposed = []
@@ -1418,7 +1439,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 return true
             }
             callback.defaultBehaviour = { (response: ServerTrustAuthResponse?) in
-                completionHandler(.performDefaultHandling, nil)
+                if !completionHandlerCalled {
+                    completionHandlerCalled = true
+                    completionHandler(.performDefaultHandling, nil)
+                }
             }
             callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
                 print(code + ", " + (message ?? ""))
@@ -1435,6 +1459,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             let callback = WebViewChannelDelegate.ReceivedClientCertRequestCallback()
             callback.nonNullSuccess = { (response: ClientCertResponse) in
                 if let action = response.action {
+                    completionHandlerCalled = true
                     switch action {
                         case 0:
                             completionHandler(.cancelAuthenticationChallenge, nil)
@@ -1471,7 +1496,10 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 return true
             }
             callback.defaultBehaviour = { (response: ClientCertResponse?) in
-                completionHandler(.performDefaultHandling, nil)
+                if !completionHandlerCalled {
+                    completionHandlerCalled = true
+                    completionHandler(.performDefaultHandling, nil)
+                }
             }
             callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
                 print(code + ", " + (message ?? ""))
@@ -1573,9 +1601,12 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         
+        var completionHandlerCalled = false
+        
         let callback = WebViewChannelDelegate.JsAlertCallback()
         callback.nonNullSuccess = { (response: JsAlertResponse) in
             if response.handledByClient {
+                completionHandlerCalled = true
                 let action = response.action ?? 1
                 switch action {
                     case 0:
@@ -1589,14 +1620,20 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return true
         }
         callback.defaultBehaviour = { (response: JsAlertResponse?) in
-            let responseMessage = response?.message
-            let confirmButtonTitle = response?.confirmButtonTitle
-            self.createAlertDialog(message: message, responseMessage: responseMessage,
-                                   confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
+            if !completionHandlerCalled {
+                completionHandlerCalled = true
+                let responseMessage = response?.message
+                let confirmButtonTitle = response?.confirmButtonTitle
+                self.createAlertDialog(message: message, responseMessage: responseMessage,
+                                       confirmButtonTitle: confirmButtonTitle, completionHandler: completionHandler)
+            }
         }
         callback.error = { (code: String, message: String?, details: Any?) in
-            print(code + ", " + (message ?? ""))
-            completionHandler()
+            if !completionHandlerCalled {
+                completionHandlerCalled = true
+                print(code + ", " + (message ?? ""))
+                completionHandler()
+            }
         }
         
         if let channelDelegate = channelDelegate {
@@ -1622,9 +1659,12 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webView(_ webView: WKWebView, runJavaScriptConfirmPanelWithMessage message: String, initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (Bool) -> Void) {
+        var completionHandlerCalled = false
+        
         let callback = WebViewChannelDelegate.JsConfirmCallback()
         callback.nonNullSuccess = { (response: JsConfirmResponse) in
             if response.handledByClient {
+                completionHandlerCalled = true
                 let action = response.action ?? 1
                 switch action {
                     case 0:
@@ -1641,14 +1681,20 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return true
         }
         callback.defaultBehaviour = { (response: JsConfirmResponse?) in
-            let responseMessage = response?.message
-            let confirmButtonTitle = response?.confirmButtonTitle
-            let cancelButtonTitle = response?.cancelButtonTitle
-            self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
+            if !completionHandlerCalled {
+                completionHandlerCalled = true
+                let responseMessage = response?.message
+                let confirmButtonTitle = response?.confirmButtonTitle
+                let cancelButtonTitle = response?.cancelButtonTitle
+                self.createConfirmDialog(message: message, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle, cancelButtonTitle: cancelButtonTitle, completionHandler: completionHandler)
+            }
         }
         callback.error = { (code: String, message: String?, details: Any?) in
-            print(code + ", " + (message ?? ""))
-            completionHandler(false)
+            if !completionHandlerCalled {
+                completionHandlerCalled = true
+                print(code + ", " + (message ?? ""))
+                completionHandler(false)
+            }
         }
         
         if let channelDelegate = channelDelegate {
@@ -1678,9 +1724,13 @@ public class InAppWebView: WKWebView, WKUIDelegate,
     
     public func webView(_ webView: WKWebView, runJavaScriptTextInputPanelWithPrompt message: String, defaultText defaultValue: String?, initiatedByFrame frame: WKFrameInfo,
                  completionHandler: @escaping (String?) -> Void) {
+        
+        var completionHandlerCalled = false
+        
         let callback = WebViewChannelDelegate.JsPromptCallback()
         callback.nonNullSuccess = { (response: JsPromptResponse) in
             if response.handledByClient {
+                completionHandlerCalled = true
                 let action = response.action ?? 1
                 switch action {
                     case 0:
@@ -1697,16 +1747,22 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return true
         }
         callback.defaultBehaviour = { (response: JsPromptResponse?) in
-            let responseMessage = response?.message
-            let confirmButtonTitle = response?.confirmButtonTitle
-            let cancelButtonTitle = response?.cancelButtonTitle
-            let value = response?.value
-            self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
-                                    cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
+            if !completionHandlerCalled {
+                completionHandlerCalled = true
+                let responseMessage = response?.message
+                let confirmButtonTitle = response?.confirmButtonTitle
+                let cancelButtonTitle = response?.cancelButtonTitle
+                let value = response?.value
+                self.createPromptDialog(message: message, defaultValue: defaultValue, responseMessage: responseMessage, confirmButtonTitle: confirmButtonTitle,
+                                        cancelButtonTitle: cancelButtonTitle, value: value, completionHandler: completionHandler)
+            }
         }
         callback.error = { (code: String, message: String?, details: Any?) in
-            print(code + ", " + (message ?? ""))
-            completionHandler(nil)
+            if !completionHandlerCalled {
+                completionHandlerCalled = true
+                print(code + ", " + (message ?? ""))
+                completionHandler(nil)
+            }
         }
         
         if let channelDelegate = channelDelegate {
@@ -1768,13 +1824,18 @@ public class InAppWebView: WKWebView, WKUIDelegate,
             return
         }
         
+        var decisionHandlerCalled = false
         let callback = WebViewChannelDelegate.ShouldAllowDeprecatedTLSCallback()
         callback.nonNullSuccess = { (action: Bool) in
+            decisionHandlerCalled = true
             decisionHandler(action)
             return false
         }
         callback.defaultBehaviour = { (action: Bool?) in
-            decisionHandler(false)
+            if !decisionHandlerCalled {
+                decisionHandlerCalled = true
+                decisionHandler(false)
+            }
         }
         callback.error = { [weak callback] (code: String, message: String?, details: Any?) in
             print(code + ", " + (message ?? ""))

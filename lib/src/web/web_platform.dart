@@ -19,7 +19,7 @@ class FlutterInAppWebViewWebPlatform {
       var webView =
           InAppWebViewWebElement(viewId: viewId, messenger: registrar);
       WebPlatformManager.webViews.putIfAbsent(viewId, () => webView);
-      return webView.iframe;
+      return webView.iframeContainer;
     });
   }
 

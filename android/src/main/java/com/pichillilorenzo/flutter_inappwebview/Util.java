@@ -2,18 +2,25 @@ package com.pichillilorenzo.flutter_inappwebview;
 
 import android.content.Context;
 import android.content.res.AssetManager;
+import android.graphics.Insets;
+import android.graphics.Rect;
 import android.net.http.SslCertificate;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.WindowInsets;
+import android.view.WindowManager;
+import android.view.WindowMetrics;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 
+import com.pichillilorenzo.flutter_inappwebview.types.Size2D;
 import com.pichillilorenzo.flutter_inappwebview.types.SyncBaseCallbackResultImpl;
 
 import org.json.JSONArray;
@@ -240,6 +247,31 @@ public class Util {
 
   public static float getPixelDensity(Context context) {
     return context.getResources().getDisplayMetrics().density;
+  }
+
+  public static Size2D getFullscreenSize(Context context) {
+    Size2D fullscreenSize = new Size2D(-1, -1);
+    WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+    if (wm != null) {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+        final WindowMetrics metrics = wm.getCurrentWindowMetrics();
+        // Gets all excluding insets
+        final WindowInsets windowInsets = metrics.getWindowInsets();
+        Insets insets = windowInsets.getInsetsIgnoringVisibility(WindowInsets.Type.navigationBars()
+                | WindowInsets.Type.displayCutout());
+        int insetsWidth = insets.right + insets.left;
+        int insetsHeight = insets.top + insets.bottom;
+        final Rect bounds = metrics.getBounds();
+        fullscreenSize.setWidth(bounds.width() - insetsWidth);
+        fullscreenSize.setHeight(bounds.height() - insetsHeight);
+      } else {
+        DisplayMetrics displayMetrics = new DisplayMetrics();
+        wm.getDefaultDisplay().getMetrics(displayMetrics);
+        fullscreenSize.setWidth(displayMetrics.widthPixels);
+        fullscreenSize.setHeight(displayMetrics.heightPixels);
+      }
+    }
+    return fullscreenSize;
   }
 
   public static boolean isClass(String className) {

@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/widgets.dart';
@@ -26,7 +27,9 @@ void takeScreenshot() {
           controllerCompleter.complete(controller);
         },
         onLoadStop: (controller, url) async {
-          pageLoaded.complete();
+          if (!pageLoaded.isCompleted) {
+            pageLoaded.complete();
+          }
         });
 
     await headlessWebView.run();

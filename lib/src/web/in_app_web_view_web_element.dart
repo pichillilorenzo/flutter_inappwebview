@@ -1,8 +1,11 @@
 import 'dart:async';
+import 'dart:typed_data';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 import 'dart:html';
 import 'dart:js' as js;
 
+import 'headless_inappwebview_manager.dart';
 import 'web_platform_manager.dart';
 import '../in_app_webview/in_app_webview_settings.dart';
 import '../types/main.dart';
@@ -11,14 +14,16 @@ import '../types/disposable.dart';
 class InAppWebViewWebElement implements Disposable {
   late dynamic _viewId;
   late BinaryMessenger _messenger;
+  late DivElement iframeContainer;
   late IFrameElement iframe;
   late MethodChannel? _channel;
   InAppWebViewSettings? initialSettings;
   URLRequest? initialUrlRequest;
   InAppWebViewInitialData? initialData;
   String? initialFile;
+  String? headlessWebViewId;
 
-  late InAppWebViewSettings settings;
+  InAppWebViewSettings? settings;
   late js.JsObject bridgeJsObject;
   bool isLoading = false;
 
@@ -26,11 +31,17 @@ class InAppWebViewWebElement implements Disposable {
       {required dynamic viewId, required BinaryMessenger messenger}) {
     this._viewId = viewId;
     this._messenger = messenger;
+    iframeContainer = DivElement()
+      ..id = 'flutter_inappwebview-$_viewId-container'
+      ..style.height = '100%'
+      ..style.width = '100%'
+      ..style.border = 'none';
     iframe = IFrameElement()
       ..id = 'flutter_inappwebview-$_viewId'
       ..style.height = '100%'
       ..style.width = '100%'
       ..style.border = 'none';
+    iframeContainer.append(iframe);
 
     _channel = MethodChannel(
       'com.pichillilorenzo/flutter_inappwebview_$_viewId',
@@ -173,35 +184,59 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   void prepare() {
-    settings = initialSettings ?? InAppWebViewSettings();
+    if (headlessWebViewId != null) {
+      final headlessWebView = HeadlessInAppWebViewManager.webViews[headlessWebViewId!];
+      if (headlessWebView != null && headlessWebView.webView != null) {
+        final webView = headlessWebView.disposeAndGetFlutterWebView();
+        if (webView != null) {
+          webView.iframe.id = iframe.id;
+          iframe.remove();
+          iframeContainer.append(webView.iframe);
+          iframe = webView.iframe;
 
-    Set<Sandbox> sandbox = Set.from(Sandbox.values);
+          initialSettings = webView.initialSettings;
+          settings = webView.settings;
+          initialUrlRequest = webView.initialUrlRequest;
+          initialData = webView.initialData;
+          initialFile = webView.initialFile;
 
-    if (settings.javaScriptEnabled != null && !settings.javaScriptEnabled!) {
-      sandbox.remove(Sandbox.ALLOW_SCRIPTS);
+          bridgeJsObject['webViews'][_viewId] = bridgeJsObject
+              .callMethod("createFlutterInAppWebView", [_viewId, iframe.id]);
+        }
+      }
     }
 
-    iframe.allow = settings.iframeAllow ?? iframe.allow;
-    iframe.allowFullscreen =
-        settings.iframeAllowFullscreen ?? iframe.allowFullscreen;
-    iframe.referrerPolicy =
-        settings.iframeReferrerPolicy?.toNativeValue() ?? iframe.referrerPolicy;
-    iframe.name = settings.iframeName ?? iframe.name;
-    iframe.csp = settings.iframeCsp ?? iframe.csp;
+    if (headlessWebViewId == null && settings == null) {
+      settings = initialSettings ?? InAppWebViewSettings();
 
-    if (settings.iframeSandbox != null &&
-        settings.iframeSandbox != Sandbox.ALLOW_ALL) {
-      iframe.setAttribute("sandbox",
-          settings.iframeSandbox!.map((e) => e.toNativeValue()).join(" "));
-    } else if (settings.iframeSandbox == Sandbox.ALLOW_ALL) {
-      iframe.removeAttribute("sandbox");
-    } else if (sandbox != Sandbox.values) {
-      iframe.setAttribute(
-          "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
-      settings.iframeSandbox = sandbox;
+      Set<Sandbox> sandbox = Set.from(Sandbox.values);
+
+      if (settings!.javaScriptEnabled != null && !settings!.javaScriptEnabled!) {
+        sandbox.remove(Sandbox.ALLOW_SCRIPTS);
+      }
+
+      iframe.allow = settings!.iframeAllow ?? iframe.allow;
+      iframe.allowFullscreen =
+          settings!.iframeAllowFullscreen ?? iframe.allowFullscreen;
+      iframe.referrerPolicy =
+          settings!.iframeReferrerPolicy?.toNativeValue() ?? iframe.referrerPolicy;
+      iframe.name = settings!.iframeName ?? iframe.name;
+      iframe.csp = settings!.iframeCsp ?? iframe.csp;
+
+      if (settings!.iframeSandbox != null &&
+          settings!.iframeSandbox != Sandbox.ALLOW_ALL) {
+        iframe.setAttribute("sandbox",
+            settings!.iframeSandbox!.map((e) => e.toNativeValue()).join(" "));
+      } else if (settings!.iframeSandbox == Sandbox.ALLOW_ALL) {
+        iframe.removeAttribute("sandbox");
+      } else if (sandbox != Sandbox.values) {
+        iframe.setAttribute(
+            "sandbox", sandbox.map((e) => e.toNativeValue()).join(" "));
+        settings!.iframeSandbox = sandbox;
+      }
     }
 
-    _callMethod("prepare", [js.JsObject.jsify(settings.toMap())]);
+    _callMethod("prepare", [js.JsObject.jsify(settings!.toMap())]);
   }
 
   dynamic _callMethod(Object method, [List? args]) {
@@ -405,7 +440,7 @@ class InAppWebViewWebElement implements Disposable {
     Set<Sandbox> sandbox = getSandbox();
 
     if (newSettings.javaScriptEnabled != null &&
-        settings.javaScriptEnabled != newSettings.javaScriptEnabled) {
+        settings!.javaScriptEnabled != newSettings.javaScriptEnabled) {
       if (!newSettings.javaScriptEnabled!) {
         sandbox.remove(Sandbox.ALLOW_SCRIPTS);
       } else {
@@ -413,23 +448,23 @@ class InAppWebViewWebElement implements Disposable {
       }
     }
 
-    if (settings.iframeAllow != newSettings.iframeAllow) {
+    if (settings!.iframeAllow != newSettings.iframeAllow) {
       iframe.allow = newSettings.iframeAllow;
     }
-    if (settings.iframeAllowFullscreen != newSettings.iframeAllowFullscreen) {
+    if (settings!.iframeAllowFullscreen != newSettings.iframeAllowFullscreen) {
       iframe.allowFullscreen = newSettings.iframeAllowFullscreen;
     }
-    if (settings.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
+    if (settings!.iframeReferrerPolicy != newSettings.iframeReferrerPolicy) {
       iframe.referrerPolicy = newSettings.iframeReferrerPolicy?.toNativeValue();
     }
-    if (settings.iframeName != newSettings.iframeName) {
+    if (settings!.iframeName != newSettings.iframeName) {
       iframe.name = newSettings.iframeName;
     }
-    if (settings.iframeCsp != newSettings.iframeCsp) {
+    if (settings!.iframeCsp != newSettings.iframeCsp) {
       iframe.csp = newSettings.iframeCsp;
     }
 
-    if (settings.iframeSandbox != newSettings.iframeSandbox) {
+    if (settings!.iframeSandbox != newSettings.iframeSandbox) {
       var sandbox = newSettings.iframeSandbox;
       if (sandbox != null && sandbox != Sandbox.ALLOW_ALL) {
         iframe.setAttribute(
@@ -449,7 +484,7 @@ class InAppWebViewWebElement implements Disposable {
   }
 
   Future<Map<String, dynamic>> getSettings() async {
-    return settings.toMap();
+    return settings!.toMap();
   }
 
   void onLoadStart(String url) async {
@@ -569,7 +604,7 @@ class InAppWebViewWebElement implements Disposable {
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;
-    iframe.remove();
+    iframeContainer.remove();
     if (WebPlatformManager.webViews.containsKey(_viewId)) {
       WebPlatformManager.webViews.remove(_viewId);
     }

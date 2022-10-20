@@ -114,8 +114,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
               children: [
                 InAppWebView(
                   key: webViewKey,
+                  headlessWebView: headlessWebView,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse('https://flutter.dev')),
+                      URLRequest(url: Uri.parse('https://google.com')),
                   // initialUrlRequest:
                   // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
@@ -125,6 +126,7 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                   pullToRefreshController: pullToRefreshController,
                   onWebViewCreated: (controller) async {
                     webViewController = controller;
+                    print(await controller.getUrl());
                   },
                   onLoadStart: (controller, url) async {
                     setState(() {

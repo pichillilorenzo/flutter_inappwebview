@@ -61,6 +61,19 @@ public class HeadlessInAppWebView : Disposable {
         return nil
     }
     
+    public func disposeAndGetFlutterWebView(withFrame frame: CGRect) -> FlutterWebViewController? {
+        let newFlutterWebView = flutterWebView
+        if let view = flutterWebView?.view() {
+            // restore WebView frame and alpha
+            view.frame = frame
+            view.alpha = 1.0
+            // remove from parent
+            view.removeFromSuperview()
+            dispose()
+        }
+        return newFlutterWebView
+    }
+    
     public func dispose() {
         channelDelegate?.dispose()
         channelDelegate = nil

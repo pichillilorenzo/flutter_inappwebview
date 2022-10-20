@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:collection';
+import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,8 @@ import 'package:flutter/rendering.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter/gestures.dart';
+import 'package:flutter_inappwebview/src/in_app_webview/headless_in_app_webview.dart';
+import 'package:flutter_inappwebview/src/util.dart';
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../web/web_platform_manager.dart';
@@ -37,8 +40,20 @@ class InAppWebView extends StatefulWidget implements WebView {
   final Set<Factory<OneSequenceGestureRecognizer>>? gestureRecognizers;
 
   ///The window id of a [CreateWindowAction.windowId].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   @override
   final int? windowId;
+
+  ///The [HeadlessInAppWebView] to use to initialize this widget
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- Web
+  final HeadlessInAppWebView? headlessWebView;
 
   const InAppWebView({
     Key? key,
@@ -148,6 +163,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.onCameraCaptureStateChanged,
     this.onMicrophoneCaptureStateChanged,
     this.gestureRecognizers,
+    this.headlessWebView,
   }) : super(key: key);
 
   @override
@@ -609,8 +625,11 @@ class _InAppWebViewState extends State<InAppWebView> {
           webViewHtmlElement.initialUrlRequest = widget.initialUrlRequest;
           webViewHtmlElement.initialFile = widget.initialFile;
           webViewHtmlElement.initialData = widget.initialData;
+          webViewHtmlElement.headlessWebViewId = widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null;
           webViewHtmlElement.prepare();
-          webViewHtmlElement.makeInitialLoad();
+          if (webViewHtmlElement.headlessWebViewId == null) {
+            webViewHtmlElement.makeInitialLoad();
+          }
           _onPlatformViewCreated(viewId);
         },
       );
@@ -653,6 +672,7 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'initialSettings': initialSettings,
                 'contextMenu': widget.contextMenu?.toMap() ?? {},
                 'windowId': widget.windowId,
+                'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null,
                 'implementation': widget.implementation.toNativeValue(),
                 'initialUserScripts':
                     widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
@@ -680,6 +700,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             'initialSettings': initialSettings,
             'contextMenu': widget.contextMenu?.toMap() ?? {},
             'windowId': widget.windowId,
+            'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null,
             'implementation': widget.implementation.toNativeValue(),
             'initialUserScripts':
                 widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
@@ -702,6 +723,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialSettings': initialSettings,
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
+          'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false ? widget.headlessWebView?.id : null,
           'implementation': widget.implementation.toNativeValue(),
           'initialUserScripts':
               widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
@@ -732,10 +754,19 @@ class _InAppWebViewState extends State<InAppWebView> {
   }
 
   void _onPlatformViewCreated(int id) {
-    _controller = InAppWebViewController(id, widget);
-    widget.pullToRefreshController?.initMethodChannel(id);
-    widget.findInteractionController?.initMethodChannel(id);
+    final viewId = (!kIsWeb && (widget.headlessWebView?.isRunning() ?? false)) ? widget.headlessWebView?.id : id;
+    widget.headlessWebView?.internalDispose();
+    _controller = InAppWebViewController(viewId, widget);
+    widget.pullToRefreshController?.initMethodChannel(viewId);
+    widget.findInteractionController?.initMethodChannel(viewId);
     if (widget.onWebViewCreated != null) {
+      debugLog(
+          className: "InAppWebView",
+          name: "WebView",
+          id: viewId?.toString(),
+          debugLoggingSettings: WebView.debugLoggingSettings,
+          method: "onWebViewCreated",
+          args: []);
       widget.onWebViewCreated!(_controller!);
     }
   }

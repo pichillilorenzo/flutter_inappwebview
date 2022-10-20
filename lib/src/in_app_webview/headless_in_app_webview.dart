@@ -1,4 +1,6 @@
 import 'dart:collection';
+import 'dart:typed_data';
+import 'dart:ui';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/src/util.dart';
@@ -713,4 +715,11 @@ class HeadlessInAppWebView implements WebView, Disposable {
     MediaCaptureState? oldState,
     MediaCaptureState? newState,
   )? onMicrophoneCaptureStateChanged;
+}
+
+extension InternalHeadlessInAppWebView on HeadlessInAppWebView {
+  Future<void> internalDispose() async {
+    _started = false;
+    _running = false;
+  }
 }

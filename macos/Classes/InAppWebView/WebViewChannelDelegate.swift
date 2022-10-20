@@ -834,6 +834,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 return PermissionResponse.fromMap(map: obj as? [String:Any?])
             }
         }
+        
+        deinit {
+            self.defaultBehaviour(nil)
+        }
     }
     
     public func onPermissionRequest(request: PermissionRequest, callback: PermissionRequestCallback) {
@@ -853,6 +857,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 }
                 return WKNavigationActionPolicy.cancel
             }
+        }
+        
+        deinit {
+            self.defaultBehaviour(nil)
         }
     }
     
@@ -905,6 +913,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 return HttpAuthResponse.fromMap(map: obj as? [String:Any?])
             }
         }
+        
+        deinit {
+            self.defaultBehaviour(nil)
+        }
     }
     
     public func onReceivedHttpAuthRequest(challenge: HttpAuthenticationChallenge, callback: ReceivedHttpAuthRequestCallback) {
@@ -922,6 +934,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 return ServerTrustAuthResponse.fromMap(map: obj as? [String:Any?])
             }
         }
+        
+        deinit {
+            self.defaultBehaviour(nil)
+        }
     }
     
     public func onReceivedServerTrustAuthRequest(challenge: ServerTrustChallenge, callback: ReceivedServerTrustAuthRequestCallback) {
@@ -938,6 +954,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
             self.decodeResult = { (obj: Any?) in
                 return ClientCertResponse.fromMap(map: obj as? [String:Any?])
             }
+        }
+        
+        deinit {
+            self.defaultBehaviour(nil)
         }
     }
     
@@ -1013,6 +1033,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 return WKNavigationResponsePolicy.cancel
             }
         }
+        
+        deinit {
+            self.defaultBehaviour(nil)
+        }
     }
     
     public func onNavigationResponse(navigationResponse: WKNavigationResponse, callback: NavigationResponseCallback) {
@@ -1032,6 +1056,10 @@ public class WebViewChannelDelegate : ChannelDelegate {
                 }
                 return false
             }
+        }
+        
+        deinit {
+            self.defaultBehaviour(nil)
         }
     }
     

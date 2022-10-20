@@ -15,6 +15,13 @@ import 'package:pointer_interceptor/pointer_interceptor.dart';
 
 InAppLocalhostServer localhostServer = new InAppLocalhostServer(documentRoot: 'assets');
 
+var headlessWebView = new HeadlessInAppWebView(
+  initialUrlRequest: URLRequest(url: Uri.parse('https://flutter.dev')),
+  shouldOverrideUrlLoading: (controller, navigationAction) async {
+    return NavigationActionPolicy.ALLOW;
+  },
+);
+
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
   // await Permission.camera.request();
@@ -28,6 +35,10 @@ Future main() async {
   if (!kIsWeb) {
     await localhostServer.start();
   }
+
+  headlessWebView.run();
+
+  await Future.delayed(Duration(seconds: 1));
 
   runApp(MyApp());
 }

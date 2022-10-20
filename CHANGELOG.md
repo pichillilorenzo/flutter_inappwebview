@@ -1,3 +1,7 @@
+## 6.0.0-beta.4
+
+- Added `InAppWebView.headlessWebView` property to convert an `HeadlessWebView` to `InAppWebView` widget
+
 ## 6.0.0-beta.3
 
 - Added MacOS support
@@ -45,6 +49,12 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.5.0+4
+
+- Fixed "Many crashes on iOS: Completion handler was not called" [#1221](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1221)
+- Fixed "webView:didReceiveAuthenticationChallenge:completionHandler" [#1128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1128)
+- Merged "Fix missing import for Flutter 2.8.1" [#1381](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1381) (thanks to [chandrabezzo](https://github.com/chandrabezzo))
 
 ## 5.5.0+3
 

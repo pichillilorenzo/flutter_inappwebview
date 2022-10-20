@@ -23,6 +23,13 @@ public class FlutterWebViewFactory: NSObject, FlutterPlatformViewFactory {
     
     public func create(withFrame frame: CGRect, viewIdentifier viewId: Int64, arguments args: Any?) -> FlutterPlatformView {
         let arguments = args as? NSDictionary
+        
+        if let headlessWebViewId = arguments?["headlessWebViewId"] as? String,
+           let headlessWebView = HeadlessInAppWebViewManager.webViews[headlessWebViewId],
+           let platformView = headlessWebView?.disposeAndGetFlutterWebView(withFrame: frame) {
+            return platformView
+        }
+        
         let webviewController = FlutterWebViewController(registrar: registrar!,
                                                          withFrame: frame,
                                                          viewIdentifier: viewId,

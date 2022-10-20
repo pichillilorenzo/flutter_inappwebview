@@ -1,6 +1,8 @@
 import 'dart:async';
+import 'dart:ui';
 import 'package:flutter/services.dart';
 
+import 'headless_inappwebview_manager.dart';
 import 'in_app_web_view_web_element.dart';
 import '../util.dart';
 import '../types/disposable.dart';
@@ -59,14 +61,21 @@ class HeadlessInAppWebViewWebElement implements Disposable {
   }
 
   void setSize(Size size) {
-    webView?.iframe.style.width = size.width.toString() + "px";
-    webView?.iframe.style.height = size.height.toString() + "px";
+    webView?.iframeContainer.style.width = size.width.toString() + "px";
+    webView?.iframeContainer.style.height = size.height.toString() + "px";
+  }
+
+  InAppWebViewWebElement? disposeAndGetFlutterWebView() {
+    InAppWebViewWebElement? newFlutterWebView = webView;
+    dispose();
+    return newFlutterWebView;
   }
 
   @override
   void dispose() {
     _channel?.setMethodCallHandler(null);
     _channel = null;
+    HeadlessInAppWebViewManager.webViews.putIfAbsent(id, () => null);
     webView?.dispose();
     webView = null;
   }

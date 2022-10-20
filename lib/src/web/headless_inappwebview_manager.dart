@@ -9,6 +9,8 @@ import 'headless_in_app_web_view_web_element.dart';
 import '../types/main.dart';
 
 class HeadlessInAppWebViewManager {
+  static final Map<String, HeadlessInAppWebViewWebElement?> webViews = {};
+
   static late MethodChannel _sharedChannel;
 
   late BinaryMessenger _messenger;
@@ -50,17 +52,18 @@ class HeadlessInAppWebViewManager {
     var headlessWebView = HeadlessInAppWebViewWebElement(
         id: id, messenger: _messenger, webView: webView);
     WebPlatformManager.webViews.putIfAbsent(id, () => webView);
+    HeadlessInAppWebViewManager.webViews.putIfAbsent(id, () => headlessWebView);
     prepare(webView, params);
     headlessWebView.onWebViewCreated();
     webView.makeInitialLoad();
   }
 
   void prepare(InAppWebViewWebElement webView, Map<String, dynamic> params) {
-    webView.iframe.style.display = 'none';
+    webView.iframeContainer.style.display = 'none';
     Map<String, num>? initialSize = params["initialSize"]?.cast<String, num>();
     if (initialSize != null) {
-      webView.iframe.style.width = initialSize["width"].toString() + 'px';
-      webView.iframe.style.height = initialSize["height"].toString() + 'px';
+      webView.iframeContainer.style.width = initialSize["width"].toString() + 'px';
+      webView.iframeContainer.style.height = initialSize["height"].toString() + 'px';
     }
     Map<String, dynamic> initialSettings =
         params["initialSettings"].cast<String, dynamic>();
@@ -74,7 +77,7 @@ class HeadlessInAppWebViewManager {
     webView.initialFile = params["initialFile"];
     webView.initialData = InAppWebViewInitialData.fromMap(
         params["initialData"]?.cast<String, dynamic>());
-    document.body?.append(webView.iframe);
+    document.body?.append(webView.iframeContainer);
     webView.prepare();
   }
 }

@@ -60,13 +60,6 @@ public class FlutterWebView implements PlatformWebView {
     InAppWebViewOptions options = new InAppWebViewOptions();
     options.parse(initialOptions);
 
-    if (plugin == null || plugin.activity == null) {
-      Log.e(LOG_TAG, "\n\n\nERROR: You need to upgrade your Flutter project to use the new Java Embedding API:\n\n" +
-              "- Take a look at the \"IMPORTANT Note for Android\" section here: https://github.com/pichillilorenzo/flutter_inappwebview#important-note-for-android\n" +
-              "- See the official wiki here: https://github.com/flutter/flutter/wiki/Upgrading-pre-1.12-Android-projects\n\n\n");
-      return;
-    }
-
     List<UserScript> userScripts = new ArrayList<>();
     if (initialUserScripts != null) {
       for (Map<String, Object> initialUserScript : initialUserScripts) {

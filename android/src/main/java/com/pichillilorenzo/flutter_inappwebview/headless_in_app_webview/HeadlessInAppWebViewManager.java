@@ -21,6 +21,8 @@
 
 package com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview;
 
+import android.content.Context;
+
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
@@ -67,9 +69,12 @@ public class HeadlessInAppWebViewManager implements MethodChannel.MethodCallHand
   }
 
   public void run(String id, HashMap<String, Object> params) {
-    if (plugin == null || plugin.activity == null) return;
-
-    FlutterWebView flutterWebView = new FlutterWebView(plugin, plugin.activity, id, params);
+    if (plugin == null || (plugin.activity == null && plugin.applicationContext == null)) return;
+    Context context = plugin.activity;
+    if (context == null) {
+      context = plugin.applicationContext;
+    }
+    FlutterWebView flutterWebView = new FlutterWebView(plugin, context, id, params);
     HeadlessInAppWebView headlessInAppWebView = new HeadlessInAppWebView(plugin, id, flutterWebView);
     HeadlessInAppWebViewManager.webViews.put(id, headlessInAppWebView);
     

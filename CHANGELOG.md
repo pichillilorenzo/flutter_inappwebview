@@ -1,3 +1,8 @@
+## 5.5.0+4
+
+- Fixed "Many crashes on iOS: Completion handler was not called" [#1221](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1221)
+- Fixed "webView:didReceiveAuthenticationChallenge:completionHandler" [#1128](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1128)
+
 ## 5.5.0+3
 
 - Fixed iOS `toolbarTopTintColor` InAppBrowser option

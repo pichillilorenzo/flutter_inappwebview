@@ -401,7 +401,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             );
           },
           onCreatePlatformView: (PlatformViewCreationParams params) {
-            return PlatformViewsService.initSurfaceAndroidView(
+            return PlatformViewsService.initExpensiveAndroidView(
               id: params.id,
               viewType: 'com.pichillilorenzo/flutter_inappwebview',
               layoutDirection: TextDirection.rtl,

@@ -783,3 +783,22 @@ class _InAppWebViewState extends State<InAppWebView> {
     }
   }
 }
+
+extension on PlatformViewsService {
+  static SurfaceAndroidViewController initExpensiveAndroidView2({
+    required int id,
+    required String viewType,
+    required TextDirection layoutDirection,
+    dynamic creationParams,
+    MessageCodec<dynamic>? creationParamsCodec,
+    VoidCallback? onFocus,
+  }) {
+    return PlatformViewsService.initSurfaceAndroidView(
+      id: id,
+      viewType: viewType,
+      layoutDirection: layoutDirection,
+      creationParams: creationParams,
+      creationParamsCodec: const StandardMessageCodec(),
+    );
+  }
+}

@@ -1233,7 +1233,7 @@ class URLCredential {
     }
 
     return URLCredential(
-      username: map["user"],
+      username: map["username"],
       password: map["password"],
       iosCertificates: iosCertificates,
       iosPersistence:

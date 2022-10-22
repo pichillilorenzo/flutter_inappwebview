@@ -46,11 +46,11 @@ class InAppWebViewInitialData {
     }
     final instance = InAppWebViewInitialData(
       data: map['data'],
-      baseUrl: map['baseUrl'] != null ? Uri.parse(map['baseUrl']) : null,
+      baseUrl: map['baseUrl'] != null ? Uri.tryParse(map['baseUrl']) : null,
       androidHistoryUrl:
-          map['historyUrl'] != null ? Uri.parse(map['historyUrl']) : null,
+          map['historyUrl'] != null ? Uri.tryParse(map['historyUrl']) : null,
       historyUrl:
-          map['historyUrl'] != null ? Uri.parse(map['historyUrl']) : null,
+          map['historyUrl'] != null ? Uri.tryParse(map['historyUrl']) : null,
     );
     instance.mimeType = map['mimeType'];
     instance.encoding = map['encoding'];

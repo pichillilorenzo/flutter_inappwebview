@@ -186,7 +186,7 @@ class URLRequest {
       return null;
     }
     final instance = URLRequest(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       method: map['method'],
       body: map['body'],
       headers: map['headers']?.cast<String, String>(),
@@ -210,10 +210,10 @@ class URLRequest {
       iosTimeoutInterval: map['timeoutInterval'],
       timeoutInterval: map['timeoutInterval'],
       iosMainDocumentURL: map['mainDocumentURL'] != null
-          ? Uri.parse(map['mainDocumentURL'])
+          ? Uri.tryParse(map['mainDocumentURL'])
           : null,
       mainDocumentURL: map['mainDocumentURL'] != null
-          ? Uri.parse(map['mainDocumentURL'])
+          ? Uri.tryParse(map['mainDocumentURL'])
           : null,
       assumesHTTP3Capable: map['assumesHTTP3Capable'],
       attribution: URLRequestAttribution.fromNativeValue(map['attribution']),

@@ -492,9 +492,9 @@ class ExchangeableObjectGenerator
     final isNullable = Util.typeIsNullable(elementType);
     if (elementType.getDisplayString(withNullability: false) == "Uri") {
       if (!isNullable) {
-        return "Uri.parse($value)";
+        return "(Uri.tryParse($value) ?? Uri())";
       } else {
-        return "$value != null ? Uri.parse($value) : null";
+        return "$value != null ? Uri.tryParse($value) : null";
       }
     } else if (elementType.getDisplayString(withNullability: false) ==
         "Color") {

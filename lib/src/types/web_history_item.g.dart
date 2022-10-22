@@ -33,9 +33,9 @@ class WebHistoryItem {
     }
     final instance = WebHistoryItem(
       originalUrl:
-          map['originalUrl'] != null ? Uri.parse(map['originalUrl']) : null,
+          map['originalUrl'] != null ? Uri.tryParse(map['originalUrl']) : null,
       title: map['title'],
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       index: map['index'],
       offset: map['offset'],
     );

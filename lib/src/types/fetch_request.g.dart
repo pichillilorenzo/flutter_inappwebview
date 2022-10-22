@@ -67,7 +67,7 @@ class FetchRequest {
       return null;
     }
     final instance = FetchRequest(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       method: map['method'],
       headers: map['headers']?.cast<String, dynamic>(),
       body: map['body'],

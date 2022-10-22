@@ -273,8 +273,9 @@ class PrintJobAttributes {
       isVerticallyCentered: map['isVerticallyCentered'],
       isSelectionOnly: map['isSelectionOnly'],
       scalingFactor: map['scalingFactor'],
-      jobSavingURL:
-          map['jobSavingURL'] != null ? Uri.parse(map['jobSavingURL']) : null,
+      jobSavingURL: map['jobSavingURL'] != null
+          ? Uri.tryParse(map['jobSavingURL'])
+          : null,
       detailedErrorReporting: map['detailedErrorReporting'],
       faxNumber: map['faxNumber'],
       headerAndFooter: map['headerAndFooter'],

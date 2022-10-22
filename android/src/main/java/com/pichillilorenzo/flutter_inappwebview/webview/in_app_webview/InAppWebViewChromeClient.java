@@ -99,7 +99,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
           View.SYSTEM_UI_FLAG_HIDE_NAVIGATION |
           View.SYSTEM_UI_FLAG_FULLSCREEN;
 
+  @Nullable
   private View mCustomView;
+  @Nullable
   private WebChromeClient.CustomViewCallback mCustomViewCallback;
   private int mOriginalOrientation;
   private int mOriginalSystemUiVisibility;
@@ -140,11 +142,15 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (decorView == null) {
       return;
     }
-    ((FrameLayout) decorView).removeView(this.mCustomView);
+    if (this.mCustomView != null) {
+      ((FrameLayout) decorView).removeView(this.mCustomView);
+    }
     this.mCustomView = null;
     decorView.setSystemUiVisibility(this.mOriginalSystemUiVisibility);
     activity.setRequestedOrientation(this.mOriginalOrientation);
-    this.mCustomViewCallback.onCustomViewHidden();
+    if (this.mCustomViewCallback != null) {
+      this.mCustomViewCallback.onCustomViewHidden();
+    }
     this.mCustomViewCallback = null;
     activity.getWindow().clearFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
 
@@ -176,7 +182,9 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     this.mOriginalSystemUiVisibility = decorView.getSystemUiVisibility();
     this.mOriginalOrientation = activity.getRequestedOrientation();
     this.mCustomViewCallback = paramCustomViewCallback;
-    this.mCustomView.setBackgroundColor(Color.BLACK);
+    if (this.mCustomView != null) {
+      this.mCustomView.setBackgroundColor(Color.BLACK);
+    }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       decorView.setSystemUiVisibility(FULLSCREEN_SYSTEM_UI_VISIBILITY_KITKAT);
@@ -185,7 +193,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     }
     activity.getWindow().setFlags(WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS, WindowManager.LayoutParams.FLAG_LAYOUT_NO_LIMITS);
     ((FrameLayout) decorView).addView(this.mCustomView, FULLSCREEN_LAYOUT_PARAMS);
-    
+
     if (inAppWebView != null) {
       WebViewChannelDelegate eventWebViewChannelDelegate = inAppWebView.channelDelegate;
       if (eventWebViewChannelDelegate != null)

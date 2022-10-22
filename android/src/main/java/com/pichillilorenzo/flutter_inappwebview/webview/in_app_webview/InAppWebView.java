@@ -88,6 +88,7 @@ import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOption
 import com.pichillilorenzo.flutter_inappwebview.types.URLRequest;
 import com.pichillilorenzo.flutter_inappwebview.types.UserContentController;
 import com.pichillilorenzo.flutter_inappwebview.types.UserScript;
+import com.pichillilorenzo.flutter_inappwebview.types.WebViewAssetLoaderExt;
 import com.pichillilorenzo.flutter_inappwebview.webview.ContextMenuSettings;
 import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.webview.JavaScriptBridgeInterface;
@@ -108,7 +109,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
-import okhttp3.OkHttpClient;
 
 final public class InAppWebView extends InputAwareWebView implements InAppWebViewInterface {
   protected static final String LOG_TAG = "InAppWebView";
@@ -134,9 +134,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public InAppWebViewSettings customSettings = new InAppWebViewSettings();
   public boolean isLoading = false;
   private boolean inFullscreen = false;
-  public OkHttpClient httpClient;
   public float zoomScale = 1.0f;
-  int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
   public Pattern regexToCancelSubFramesLoadingCompiled;
   @Nullable
@@ -167,6 +165,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @Nullable
   public FindInteractionController findInteractionController;
+
+  @Nullable
+  public WebViewAssetLoaderExt webViewAssetLoaderExt;
 
   public InAppWebView(Context context) {
     super(context);
@@ -200,7 +201,9 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
 
   @SuppressLint("RestrictedApi")
   public void prepare() {
-    httpClient = new OkHttpClient().newBuilder().build();
+    if (plugin != null) {
+      webViewAssetLoaderExt = WebViewAssetLoaderExt.fromMap(customSettings.webViewAssetLoader, plugin, getContext());
+    }
 
     javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
     addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
@@ -1052,6 +1055,13 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
       WebSettingsCompat.setEnterpriseAuthenticationAppLinkPolicyEnabled(settings, newCustomSettings.enterpriseAuthenticationAppLinkPolicyEnabled);
     }
 
+    if (plugin != null) {
+      if (webViewAssetLoaderExt != null) {
+        webViewAssetLoaderExt.dispose();
+      }
+      webViewAssetLoaderExt = WebViewAssetLoaderExt.fromMap(customSettings.webViewAssetLoader, plugin, getContext());
+    }
+
     customSettings = newCustomSettings;
   }
 
@@ -1848,10 +1858,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     throw new UnsupportedOperationException();
   }
 
-  //  @Override
-//  protected void onWindowVisibilityChanged(int visibility) {
-//    if (visibility != View.GONE) super.onWindowVisibilityChanged(View.VISIBLE);
-//  }
+  @Override
+  protected void onWindowVisibilityChanged(int visibility) {
+    if (customSettings.allowBackgroundAudioPlaying) {
+      if (visibility != View.GONE) {
+        super.onWindowVisibilityChanged(View.VISIBLE);
+      }
+      return;
+    }
+    super.onWindowVisibilityChanged(visibility);
+  }
 
   public float getZoomScale() {
     return zoomScale;
@@ -1945,6 +1961,10 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     if (findInteractionController != null) {
       findInteractionController.dispose();
       findInteractionController = null;
+    }
+    if (webViewAssetLoaderExt != null) {
+      webViewAssetLoaderExt.dispose();
+      webViewAssetLoaderExt = null;
     }
     if (windowId != null) {
       InAppWebViewChromeClient.windowWebViewMessages.remove(windowId);

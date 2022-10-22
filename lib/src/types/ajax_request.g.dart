@@ -103,7 +103,7 @@ class AjaxRequest {
     final instance = AjaxRequest(
       data: map['data'],
       method: map['method'],
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       isAsync: map['isAsync'],
       user: map['user'],
       password: map['password'],
@@ -113,7 +113,7 @@ class AjaxRequest {
       readyState: AjaxRequestReadyState.fromNativeValue(map['readyState']),
       status: map['status'],
       responseURL:
-          map['responseURL'] != null ? Uri.parse(map['responseURL']) : null,
+          map['responseURL'] != null ? Uri.tryParse(map['responseURL']) : null,
       responseType: map['responseType'],
       response: map['response'],
       responseText: map['responseText'],

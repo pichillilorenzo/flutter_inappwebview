@@ -440,8 +440,9 @@ class PrintJobSettings {
         showsProgressPanel: map["showsProgressPanel"],
         jobDisposition:
             PrintJobDisposition.fromNativeValue(map["jobDisposition"]),
-        jobSavingURL:
-            map["jobSavingURL"] != null ? Uri.parse(map["jobSavingURL"]) : null,
+        jobSavingURL: map["jobSavingURL"] != null
+            ? Uri.tryParse(map["jobSavingURL"])
+            : null,
         paperName: map["paperName"],
         horizontalPagination:
             PrintJobPaginationMode.fromNativeValue(map["horizontalPagination"]),

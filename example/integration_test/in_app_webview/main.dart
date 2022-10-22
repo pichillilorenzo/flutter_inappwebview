@@ -82,6 +82,7 @@ import 'user_scripts.dart';
 import 'video_playback_policy.dart';
 import 'web_history.dart';
 import 'web_message.dart';
+import 'webview_asset_loader.dart';
 import 'webview_windows.dart';
 
 void main() {
@@ -170,5 +171,6 @@ void main() {
     createPdf();
     applePayAPI();
     handlesURLScheme();
+    webViewAssetLoader();
   }, skip: shouldSkip);
 }

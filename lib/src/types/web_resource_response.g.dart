@@ -9,10 +9,10 @@ part of 'web_resource_response.dart';
 ///Class representing a resource response of the [WebView].
 class WebResourceResponse {
   ///The resource response's MIME type, for example `text/html`.
-  String contentType;
+  String? contentType;
 
   ///The resource response's encoding. The default value is `utf-8`.
-  String contentEncoding;
+  String? contentEncoding;
 
   ///The data provided by the resource response.
   Uint8List? data;

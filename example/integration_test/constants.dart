@@ -23,3 +23,6 @@ final TEST_CHROME_SAFE_BROWSING_MALWARE =
 final TEST_PERMISSION_SITE = Uri.parse('https://permission.site/');
 final TEST_SERVICE_WORKER_URL = Uri.parse(
     'https://mdn.github.io/dom-examples/service-worker/simple-service-worker/');
+final TEST_WEBVIEW_ASSET_LOADER_DOMAIN = 'my.custom.domain.com';
+final TEST_WEBVIEW_ASSET_LOADER_URL = Uri.parse(
+    'https://$TEST_WEBVIEW_ASSET_LOADER_DOMAIN/assets/flutter_assets/assets/website/index.html');

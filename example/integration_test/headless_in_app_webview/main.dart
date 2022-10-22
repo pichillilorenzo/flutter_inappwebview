@@ -12,6 +12,6 @@ void main() {
     takeScreenshot();
     customSize();
     setGetSettings();
-    convertToInAppWebView();
+    // convertToInAppWebView();
   });
 }

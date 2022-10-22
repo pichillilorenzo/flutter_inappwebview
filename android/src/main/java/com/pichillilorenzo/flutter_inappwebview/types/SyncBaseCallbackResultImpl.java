@@ -1,7 +1,6 @@
 package com.pichillilorenzo.flutter_inappwebview.types;
 
 import androidx.annotation.CallSuper;
-import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.util.concurrent.CountDownLatch;

@@ -24,7 +24,7 @@ class RequestFocusNodeHrefResult {
       return null;
     }
     final instance = RequestFocusNodeHrefResult(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       title: map['title'],
       src: map['src'],
     );

@@ -625,6 +625,17 @@ public class InAppWebViewClient extends WebViewClient {
   public WebResourceResponse shouldInterceptRequest(WebView view, WebResourceRequestExt request) {
     final InAppWebView webView = (InAppWebView) view;
 
+    if (webView.webViewAssetLoaderExt != null && webView.webViewAssetLoaderExt.loader != null) {
+      try {
+        WebResourceResponse webResourceResponse = webView.webViewAssetLoaderExt.loader.shouldInterceptRequest(request.getUrl());
+        if (webResourceResponse != null) {
+          return webResourceResponse;
+        }
+      } catch (Exception e) {
+        e.printStackTrace();
+      }
+    }
+
     if (webView.customSettings.useShouldInterceptRequest) {
       WebResourceResponseExt response = null;
       if (webView.channelDelegate != null) {

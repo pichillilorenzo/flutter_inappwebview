@@ -27,7 +27,7 @@ class Favicon {
       return null;
     }
     final instance = Favicon(
-      url: Uri.parse(map['url']),
+      url: (Uri.tryParse(map['url']) ?? Uri()),
       rel: map['rel'],
       width: map['width'],
       height: map['height'],

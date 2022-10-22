@@ -18,7 +18,7 @@ class RequestImageRefResult {
       return null;
     }
     final instance = RequestImageRefResult(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
     );
     return instance;
   }

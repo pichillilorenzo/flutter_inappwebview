@@ -37,7 +37,7 @@ class JsConfirmRequest {
       return null;
     }
     final instance = JsConfirmRequest(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       message: map['message'],
       iosIsMainFrame: map['isMainFrame'],
       isMainFrame: map['isMainFrame'],

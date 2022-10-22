@@ -29,7 +29,7 @@ class LoadedResource {
     }
     final instance = LoadedResource(
       initiatorType: map['initiatorType'],
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       startTime: map['startTime'],
       duration: map['duration'],
     );

@@ -1,5 +1,8 @@
 package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 
+import static android.webkit.WebSettings.LayoutAlgorithm.NARROW_COLUMNS;
+import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
+
 import android.annotation.SuppressLint;
 import android.os.Build;
 import android.view.View;
@@ -11,16 +14,13 @@ import androidx.webkit.WebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
-import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 import com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType;
+import com.pichillilorenzo.flutter_inappwebview.webview.InAppWebViewInterface;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import static android.webkit.WebSettings.LayoutAlgorithm.NARROW_COLUMNS;
-import static android.webkit.WebSettings.LayoutAlgorithm.NORMAL;
 
 public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
 
@@ -52,7 +52,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public Boolean supportZoom = true;
   public Boolean allowFileAccessFromFileURLs = false;
   public Boolean allowUniversalAccessFromFileURLs = false;
-
+  public Boolean allowBackgroundAudioPlaying = false;
   public Integer textZoom = 100;
   public Boolean clearSessionCache = false;
   public Boolean builtInZoomControls = true;
@@ -119,6 +119,8 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   @Nullable
   public Integer requestedWithHeaderMode;
   public Boolean enterpriseAuthenticationAppLinkPolicyEnabled = true;
+  @Nullable
+  public Map<String, Object> webViewAssetLoader;
 
   @NonNull
   @Override
@@ -389,6 +391,12 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "enterpriseAuthenticationAppLinkPolicyEnabled":
           enterpriseAuthenticationAppLinkPolicyEnabled = (Boolean) value;
           break;
+        case "allowBackgroundAudioPlaying":
+          allowBackgroundAudioPlaying = (Boolean) value;
+          break;
+        case "webViewAssetLoader":
+          webViewAssetLoader = (Map<String, Object>) value;
+          break;
       }
     }
 
@@ -485,6 +493,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
     settings.put("requestedWithHeaderMode", requestedWithHeaderMode);
     settings.put("enterpriseAuthenticationAppLinkPolicyEnabled", enterpriseAuthenticationAppLinkPolicyEnabled);
+    settings.put("allowBackgroundAudioPlaying", allowBackgroundAudioPlaying);
     return settings;
   }
 

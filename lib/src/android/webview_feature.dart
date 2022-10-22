@@ -11,6 +11,9 @@ import '../types/user_script_injection_time.dart';
 part 'webview_feature.g.dart';
 
 ///Class that represents an Android-specific utility class for checking which WebView Support Library features are supported on the device.
+///
+///**Supported Platforms/Implementations**:
+///- Android native WebView
 @ExchangeableEnum()
 class WebViewFeature_ {
   @ExchangeableEnumCustomValue()

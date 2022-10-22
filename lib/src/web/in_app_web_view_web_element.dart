@@ -344,7 +344,7 @@ class InAppWebViewWebElement implements Disposable {
       {required String url, required Uint8List postData}) async {
     await loadUrl(
         urlRequest:
-            URLRequest(url: Uri.parse(url), method: "POST", body: postData));
+            URLRequest(url: Uri.tryParse(url), method: "POST", body: postData));
   }
 
   Future<void> injectJavascriptFileFromUrl(

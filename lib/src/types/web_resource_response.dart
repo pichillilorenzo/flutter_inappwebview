@@ -10,10 +10,10 @@ part 'web_resource_response.g.dart';
 @ExchangeableObject()
 class WebResourceResponse_ {
   ///The resource response's MIME type, for example `text/html`.
-  String contentType;
+  String? contentType;
 
   ///The resource response's encoding. The default value is `utf-8`.
-  String contentEncoding;
+  String? contentEncoding;
 
   ///The data provided by the resource response.
   Uint8List? data;

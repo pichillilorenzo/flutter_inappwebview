@@ -646,77 +646,52 @@ class _InAppWebViewState extends State<InAppWebView> {
 
       if (!useHybridComposition && widget.pullToRefreshController != null) {
         throw new Exception(
-            "To use the pull-to-refresh feature, useHybridComposition Android-specific option MUST be true!");
+            "To use the pull-to-refresh feature, InAppWebViewSettings.useHybridComposition setting MUST be true!");
       }
 
-      if (useHybridComposition) {
-        return PlatformViewLink(
-          viewType: 'com.pichillilorenzo/flutter_inappwebview',
-          surfaceFactory: (
-            BuildContext context,
-            PlatformViewController controller,
-          ) {
-            return AndroidViewSurface(
-              controller: controller as AndroidViewController,
-              gestureRecognizers: widget.gestureRecognizers ??
-                  const <Factory<OneSequenceGestureRecognizer>>{},
-              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-            );
-          },
-          onCreatePlatformView: (PlatformViewCreationParams params) {
-            return PlatformViewsService.initSurfaceAndroidView(
-              id: params.id,
-              viewType: 'com.pichillilorenzo/flutter_inappwebview',
-              layoutDirection: TextDirection.rtl,
-              creationParams: <String, dynamic>{
-                'initialUrlRequest': widget.initialUrlRequest?.toMap(),
-                'initialFile': widget.initialFile,
-                'initialData': widget.initialData?.toMap(),
-                'initialSettings': initialSettings,
-                'contextMenu': widget.contextMenu?.toMap() ?? {},
-                'windowId': widget.windowId,
-                'headlessWebViewId':
-                    widget.headlessWebView?.isRunning() ?? false
-                        ? widget.headlessWebView?.id
-                        : null,
-                'implementation': widget.implementation.toNativeValue(),
-                'initialUserScripts':
-                    widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
-                        [],
-                'pullToRefreshSettings': pullToRefreshSettings
-              },
-              creationParamsCodec: const StandardMessageCodec(),
-            )
-              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-              ..addOnPlatformViewCreatedListener(
-                  (id) => _onPlatformViewCreated(id))
-              ..create();
-          },
-        );
-      } else {
-        return AndroidView(
-          viewType: 'com.pichillilorenzo/flutter_inappwebview',
-          onPlatformViewCreated: _onPlatformViewCreated,
-          gestureRecognizers: widget.gestureRecognizers,
-          layoutDirection: Directionality.maybeOf(context) ?? TextDirection.rtl,
-          creationParams: <String, dynamic>{
-            'initialUrlRequest': widget.initialUrlRequest?.toMap(),
-            'initialFile': widget.initialFile,
-            'initialData': widget.initialData?.toMap(),
-            'initialSettings': initialSettings,
-            'contextMenu': widget.contextMenu?.toMap() ?? {},
-            'windowId': widget.windowId,
-            'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
-                ? widget.headlessWebView?.id
-                : null,
-            'implementation': widget.implementation.toNativeValue(),
-            'initialUserScripts':
-                widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
-            'pullToRefreshSettings': pullToRefreshSettings
-          },
-          creationParamsCodec: const StandardMessageCodec(),
-        );
-      }
+      return PlatformViewLink(
+        viewType: 'com.pichillilorenzo/flutter_inappwebview',
+        surfaceFactory: (
+          BuildContext context,
+          PlatformViewController controller,
+        ) {
+          return AndroidViewSurface(
+            controller: controller as AndroidViewController,
+            gestureRecognizers: widget.gestureRecognizers ??
+                const <Factory<OneSequenceGestureRecognizer>>{},
+            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+          );
+        },
+        onCreatePlatformView: (PlatformViewCreationParams params) {
+          return _createAndroidViewController(
+            hybridComposition: useHybridComposition,
+            id: params.id,
+            viewType: 'com.pichillilorenzo/flutter_inappwebview',
+            layoutDirection:
+                Directionality.maybeOf(context) ?? TextDirection.rtl,
+            creationParams: <String, dynamic>{
+              'initialUrlRequest': widget.initialUrlRequest?.toMap(),
+              'initialFile': widget.initialFile,
+              'initialData': widget.initialData?.toMap(),
+              'initialSettings': initialSettings,
+              'contextMenu': widget.contextMenu?.toMap() ?? {},
+              'windowId': widget.windowId,
+              'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
+                  ? widget.headlessWebView?.id
+                  : null,
+              'implementation': widget.implementation.toNativeValue(),
+              'initialUserScripts':
+                  widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
+                      [],
+              'pullToRefreshSettings': pullToRefreshSettings
+            },
+          )
+            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+            ..addOnPlatformViewCreatedListener(
+                (id) => _onPlatformViewCreated(id))
+            ..create();
+        },
+      );
     } else if (defaultTargetPlatform ==
         TargetPlatform
             .iOS /* || defaultTargetPlatform == TargetPlatform.macOS*/) {
@@ -761,6 +736,31 @@ class _InAppWebViewState extends State<InAppWebView> {
     }
     super.dispose();
     _controller = null;
+  }
+
+  AndroidViewController _createAndroidViewController({
+    required bool hybridComposition,
+    required int id,
+    required String viewType,
+    required TextDirection layoutDirection,
+    required Map<String, dynamic> creationParams,
+  }) {
+    if (hybridComposition) {
+      return PlatformViewsService.initExpensiveAndroidView(
+        id: id,
+        viewType: viewType,
+        layoutDirection: layoutDirection,
+        creationParams: creationParams,
+        creationParamsCodec: const StandardMessageCodec(),
+      );
+    }
+    return PlatformViewsService.initSurfaceAndroidView(
+      id: id,
+      viewType: viewType,
+      layoutDirection: layoutDirection,
+      creationParams: creationParams,
+      creationParamsCodec: const StandardMessageCodec(),
+    );
   }
 
   void _onPlatformViewCreated(int id) {

@@ -134,7 +134,7 @@ class InAppWebViewController {
         if ((_webview != null && _webview!.onLoadStart != null) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
           if (_webview != null && _webview!.onLoadStart != null)
             _webview!.onLoadStart!(this, uri);
           else
@@ -145,7 +145,7 @@ class InAppWebViewController {
         if ((_webview != null && _webview!.onLoadStop != null) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
           if (_webview != null && _webview!.onLoadStop != null)
             _webview!.onLoadStop!(this, uri);
           else
@@ -435,7 +435,7 @@ class InAppWebViewController {
                     _webview!.androidOnRenderProcessUnresponsive != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
 
           if (_webview != null) {
             if (_webview!.onRenderProcessUnresponsive != null)
@@ -463,7 +463,7 @@ class InAppWebViewController {
                     _webview!.androidOnRenderProcessResponsive != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
 
           if (_webview != null) {
             if (_webview!.onRenderProcessResponsive != null)
@@ -516,7 +516,7 @@ class InAppWebViewController {
                     _webview!.androidOnFormResubmission != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
 
           if (_webview != null) {
             if (_webview!.onFormResubmission != null)
@@ -589,7 +589,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String url = call.arguments["url"];
           bool precomposed = call.arguments["precomposed"];
-          Uri uri = Uri.parse(url);
+          Uri uri = Uri.tryParse(url) ?? Uri();
 
           if (_webview != null) {
             if (_webview!.onReceivedTouchIconUrl != null)
@@ -689,7 +689,7 @@ class InAppWebViewController {
           String url = call.arguments["url"];
           SafeBrowsingThreat? threatType =
               SafeBrowsingThreat.fromNativeValue(call.arguments["threatType"]);
-          Uri uri = Uri.parse(url);
+          Uri uri = Uri.tryParse(url) ?? Uri();
 
           if (_webview != null) {
             if (_webview!.onSafeBrowsingHit != null)
@@ -867,7 +867,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
           bool? isReload = call.arguments["isReload"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
           if (_webview != null && _webview!.onUpdateVisitedHistory != null)
             _webview!.onUpdateVisitedHistory!(this, uri, isReload);
           else
@@ -895,7 +895,7 @@ class InAppWebViewController {
         if ((_webview != null && _webview!.onPageCommitVisible != null) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
           if (_webview != null && _webview!.onPageCommitVisible != null)
             _webview!.onPageCommitVisible!(this, uri);
           else
@@ -1120,7 +1120,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
           String? printJobId = call.arguments["printJobId"];
-          Uri? uri = url != null ? Uri.parse(url) : null;
+          Uri? uri = url != null ? Uri.tryParse(url) : null;
           PrintJobController? printJob =
               printJobId != null ? PrintJobController(id: printJobId) : null;
 
@@ -1333,7 +1333,7 @@ class InAppWebViewController {
   Future<Uri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getUrl', args);
-    return url != null ? Uri.parse(url) : null;
+    return url != null ? Uri.tryParse(url) : null;
   }
 
   ///Gets the title for the current page.
@@ -1574,11 +1574,17 @@ class InAppWebViewController {
         int width = int.parse(size.split("x")[0]);
         int height = int.parse(size.split("x")[1]);
         favicons.add(Favicon(
-            url: Uri.parse(urlIcon), rel: rel, width: width, height: height));
+            url: Uri.tryParse(urlIcon) ?? Uri(),
+            rel: rel,
+            width: width,
+            height: height));
       }
     } else {
       favicons.add(Favicon(
-          url: Uri.parse(urlIcon), rel: rel, width: null, height: null));
+          url: Uri.tryParse(urlIcon) ?? Uri(),
+          rel: rel,
+          width: null,
+          height: null));
     }
 
     return favicons;
@@ -2450,7 +2456,7 @@ class InAppWebViewController {
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getOriginalUrl', args);
-    return url != null ? Uri.parse(url) : null;
+    return url != null ? Uri.tryParse(url) : null;
   }
 
   ///Gets the current zoom scale of the WebView.
@@ -2547,7 +2553,7 @@ class InAppWebViewController {
         await _channel.invokeMethod('requestFocusNodeHref', args);
     return result != null
         ? RequestFocusNodeHrefResult(
-            url: result['url'] != null ? Uri.parse(result['url']) : null,
+            url: result['url'] != null ? Uri.tryParse(result['url']) : null,
             title: result['title'],
             src: result['src'],
           )
@@ -2567,7 +2573,7 @@ class InAppWebViewController {
         await _channel.invokeMethod('requestImageRef', args);
     return result != null
         ? RequestImageRefResult(
-            url: result['url'] != null ? Uri.parse(result['url']) : null,
+            url: result['url'] != null ? Uri.tryParse(result['url']) : null,
           )
         : null;
   }
@@ -3014,7 +3020,7 @@ class InAppWebViewController {
   Future<void> postWebMessage(
       {required WebMessage message, Uri? targetOrigin}) async {
     if (targetOrigin == null) {
-      targetOrigin = Uri.parse("");
+      targetOrigin = Uri();
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message.toMap());
@@ -3604,7 +3610,7 @@ class InAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _staticChannel.invokeMethod(
         'getSafeBrowsingPrivacyPolicyUrl', args);
-    return url != null ? Uri.parse(url) : null;
+    return url != null ? Uri.tryParse(url) : null;
   }
 
   ///Use [setSafeBrowsingAllowlist] instead.

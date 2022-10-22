@@ -121,6 +121,6 @@ class AndroidInAppWebViewController {
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getOriginalUrl', args);
-    return url != null ? Uri.parse(url) : null;
+    return url != null ? Uri.tryParse(url) : null;
   }
 }

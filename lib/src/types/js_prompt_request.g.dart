@@ -41,7 +41,7 @@ class JsPromptRequest {
       return null;
     }
     final instance = JsPromptRequest(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       message: map['message'],
       defaultValue: map['defaultValue'],
       iosIsMainFrame: map['isMainFrame'],

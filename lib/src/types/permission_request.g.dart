@@ -28,7 +28,7 @@ class PermissionRequest {
       return null;
     }
     final instance = PermissionRequest(
-      origin: Uri.parse(map['origin']),
+      origin: (Uri.tryParse(map['origin']) ?? Uri()),
       frame: FrameInfo.fromMap(map['frame']?.cast<String, dynamic>()),
     );
     instance.resources = List<PermissionResourceType>.from(map['resources']

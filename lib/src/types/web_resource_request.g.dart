@@ -52,7 +52,7 @@ class WebResourceRequest {
       return null;
     }
     final instance = WebResourceRequest(
-      url: Uri.parse(map['url']),
+      url: (Uri.tryParse(map['url']) ?? Uri()),
       headers: map['headers']?.cast<String, String>(),
       method: map['method'],
       hasGesture: map['hasGesture'],

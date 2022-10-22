@@ -43,7 +43,7 @@ class DownloadStartRequest {
       return null;
     }
     final instance = DownloadStartRequest(
-      url: Uri.parse(map['url']),
+      url: (Uri.tryParse(map['url']) ?? Uri()),
       userAgent: map['userAgent'],
       contentDisposition: map['contentDisposition'],
       mimeType: map['mimeType'],

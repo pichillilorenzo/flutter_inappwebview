@@ -3,6 +3,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/src/types/user_preferred_content_mode.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../android/webview_asset_loader.dart';
 import '../types/action_mode_menu_item.dart';
 import '../types/cache_mode.dart';
 import '../types/data_detector_types.dart';
@@ -318,6 +319,25 @@ class InAppWebViewSettings_ {
   ///- iOS
   ///- MacOS
   bool? allowUniversalAccessFromFileURLs;
+
+  ///Set to `true` to allow audio playing when the app goes in background or the screen is locked or another app is opened.
+  ///However, there will be no controls in the notification bar or on the lockscreen.
+  ///Also, make sure to not call [InAppWebViewController.pause], otherwise it will stop audio playing.
+  ///The default value is `false`.
+  ///
+  ///**IMPORTANT NOTE**: if you use this setting, your app could be rejected by the Google Play Store.
+  ///For example, if you allow background playing of YouTube videos, which is a violation of the YouTube API Terms of Service.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  bool? allowBackgroundAudioPlaying;
+
+  ///Use a [WebViewAssetLoader] instance to load local files including application's static assets and resources using http(s):// URLs.
+  ///Loading local files using web-like URLs instead of `file://` is desirable as it is compatible with the Same-Origin policy.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  WebViewAssetLoader_? webViewAssetLoader;
 
   ///Sets the text zoom of the page in percent. The default value is `100`.
   ///
@@ -1251,6 +1271,7 @@ class InAppWebViewSettings_ {
   ///- Web
   String? iframeCsp;
 
+  @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
     this.useShouldOverrideUrlLoading = false,
     this.useOnLoadResource = false,
@@ -1381,6 +1402,8 @@ class InAppWebViewSettings_ {
     this.isFindInteractionEnabled = false,
     this.minimumViewportInset,
     this.maximumViewportInset,
+    this.allowBackgroundAudioPlaying = false,
+    this.webViewAssetLoader,
     this.iframeAllow,
     this.iframeAllowFullscreen,
     this.iframeSandbox,
@@ -1409,372 +1432,6 @@ class InAppWebViewSettings_ {
                     maximumViewportInset!.horizontal,
         "minimumViewportInset cannot be larger than maximumViewportInset");
   }
-
-  // Map<String, dynamic> toMap() {
-  //   List<Map<String, Map<String, dynamic>>> contentBlockersMapList = [];
-  //   contentBlockers.forEach((contentBlocker) {
-  //     contentBlockersMapList.add(contentBlocker.toMap());
-  //   });
-  //   List<String> dataDetectorTypesList = [];
-  //   dataDetectorTypes.forEach((dataDetectorType) {
-  //     dataDetectorTypesList.add(dataDetectorType.toNativeValue());
-  //   });
-  //
-  //   return {
-  //     "useShouldOverrideUrlLoading": useShouldOverrideUrlLoading,
-  //     "useOnLoadResource": useOnLoadResource,
-  //     "useOnDownloadStart": useOnDownloadStart,
-  //     "clearCache": clearCache,
-  //     "userAgent": userAgent,
-  //     "applicationNameForUserAgent": applicationNameForUserAgent,
-  //     "javaScriptEnabled": javaScriptEnabled,
-  //     "javaScriptCanOpenWindowsAutomatically":
-  //         javaScriptCanOpenWindowsAutomatically,
-  //     "mediaPlaybackRequiresUserGesture": mediaPlaybackRequiresUserGesture,
-  //     "verticalScrollBarEnabled": verticalScrollBarEnabled,
-  //     "horizontalScrollBarEnabled": horizontalScrollBarEnabled,
-  //     "resourceCustomSchemes": resourceCustomSchemes,
-  //     "contentBlockers": contentBlockersMapList,
-  //     "preferredContentMode": preferredContentMode?.toNativeValue(),
-  //     "useShouldInterceptAjaxRequest": useShouldInterceptAjaxRequest,
-  //     "useShouldInterceptFetchRequest": useShouldInterceptFetchRequest,
-  //     "incognito": incognito,
-  //     "cacheEnabled": cacheEnabled,
-  //     "transparentBackground": transparentBackground,
-  //     "disableVerticalScroll": disableVerticalScroll,
-  //     "disableHorizontalScroll": disableHorizontalScroll,
-  //     "disableContextMenu": disableContextMenu,
-  //     "supportZoom": supportZoom,
-  //     "allowFileAccessFromFileURLs": allowFileAccessFromFileURLs,
-  //     "allowUniversalAccessFromFileURLs": allowUniversalAccessFromFileURLs,
-  //     "textZoom": textZoom,
-  //     "clearSessionCache": clearSessionCache,
-  //     "builtInZoomControls": builtInZoomControls,
-  //     "displayZoomControls": displayZoomControls,
-  //     "databaseEnabled": databaseEnabled,
-  //     "domStorageEnabled": domStorageEnabled,
-  //     "useWideViewPort": useWideViewPort,
-  //     "safeBrowsingEnabled": safeBrowsingEnabled,
-  //     "mixedContentMode": mixedContentMode?.toNativeValue(),
-  //     "allowContentAccess": allowContentAccess,
-  //     "allowFileAccess": allowFileAccess,
-  //     "appCachePath": appCachePath,
-  //     "blockNetworkImage": blockNetworkImage,
-  //     "blockNetworkLoads": blockNetworkLoads,
-  //     "cacheMode": cacheMode?.toNativeValue(),
-  //     "cursiveFontFamily": cursiveFontFamily,
-  //     "defaultFixedFontSize": defaultFixedFontSize,
-  //     "defaultFontSize": defaultFontSize,
-  //     "defaultTextEncodingName": defaultTextEncodingName,
-  //     "disabledActionModeMenuItems":
-  //         disabledActionModeMenuItems?.toNativeValue(),
-  //     "fantasyFontFamily": fantasyFontFamily,
-  //     "fixedFontFamily": fixedFontFamily,
-  //     "forceDark": forceDark?.toNativeValue(),
-  //     "forceDarkStrategy": forceDarkStrategy?.toNativeValue(),
-  //     "geolocationEnabled": geolocationEnabled,
-  //     "layoutAlgorithm": layoutAlgorithm?.toNativeValue(),
-  //     "loadWithOverviewMode": loadWithOverviewMode,
-  //     "loadsImagesAutomatically": loadsImagesAutomatically,
-  //     "minimumLogicalFontSize": minimumLogicalFontSize,
-  //     "initialScale": initialScale,
-  //     "needInitialFocus": needInitialFocus,
-  //     "offscreenPreRaster": offscreenPreRaster,
-  //     "sansSerifFontFamily": sansSerifFontFamily,
-  //     "serifFontFamily": serifFontFamily,
-  //     "standardFontFamily": standardFontFamily,
-  //     "saveFormData": saveFormData,
-  //     "thirdPartyCookiesEnabled": thirdPartyCookiesEnabled,
-  //     "hardwareAcceleration": hardwareAcceleration,
-  //     "supportMultipleWindows": supportMultipleWindows,
-  //     "useHybridComposition": useHybridComposition,
-  //     "regexToCancelSubFramesLoading": regexToCancelSubFramesLoading,
-  //     "useShouldInterceptRequest": useShouldInterceptRequest,
-  //     "useOnRenderProcessGone": useOnRenderProcessGone,
-  //     "overScrollMode": overScrollMode?.toNativeValue(),
-  //     "networkAvailable": networkAvailable,
-  //     "scrollBarStyle": scrollBarStyle?.toNativeValue(),
-  //     "verticalScrollbarPosition": verticalScrollbarPosition?.toNativeValue(),
-  //     "scrollBarDefaultDelayBeforeFade": scrollBarDefaultDelayBeforeFade,
-  //     "scrollbarFadingEnabled": scrollbarFadingEnabled,
-  //     "scrollBarFadeDuration": scrollBarFadeDuration,
-  //     "rendererPriorityPolicy": rendererPriorityPolicy?.toMap(),
-  //     "disableDefaultErrorPage": disableDefaultErrorPage,
-  //     "verticalScrollbarThumbColor": verticalScrollbarThumbColor?.toHex(),
-  //     "verticalScrollbarTrackColor": verticalScrollbarTrackColor?.toHex(),
-  //     "horizontalScrollbarThumbColor": horizontalScrollbarThumbColor?.toHex(),
-  //     "horizontalScrollbarTrackColor": horizontalScrollbarTrackColor?.toHex(),
-  //     "willSuppressErrorPage": willSuppressErrorPage,
-  //     "algorithmicDarkeningAllowed": algorithmicDarkeningAllowed,
-  //     "requestedWithHeaderMode": requestedWithHeaderMode?.toNativeValue(),
-  //     "enterpriseAuthenticationAppLinkPolicyEnabled":
-  //         enterpriseAuthenticationAppLinkPolicyEnabled,
-  //     "disallowOverScroll": disallowOverScroll,
-  //     "enableViewportScale": enableViewportScale,
-  //     "suppressesIncrementalRendering": suppressesIncrementalRendering,
-  //     "allowsAirPlayForMediaPlayback": allowsAirPlayForMediaPlayback,
-  //     "allowsBackForwardNavigationGestures":
-  //         allowsBackForwardNavigationGestures,
-  //     "allowsLinkPreview": allowsLinkPreview,
-  //     "ignoresViewportScaleLimits": ignoresViewportScaleLimits,
-  //     "allowsInlineMediaPlayback": allowsInlineMediaPlayback,
-  //     "allowsPictureInPictureMediaPlayback":
-  //         allowsPictureInPictureMediaPlayback,
-  //     "isFraudulentWebsiteWarningEnabled": isFraudulentWebsiteWarningEnabled,
-  //     "selectionGranularity": selectionGranularity.toNativeValue(),
-  //     "dataDetectorTypes": dataDetectorTypesList,
-  //     "sharedCookiesEnabled": sharedCookiesEnabled,
-  //     "automaticallyAdjustsScrollIndicatorInsets":
-  //         automaticallyAdjustsScrollIndicatorInsets,
-  //     "accessibilityIgnoresInvertColors": accessibilityIgnoresInvertColors,
-  //     "decelerationRate": decelerationRate.toNativeValue(),
-  //     "alwaysBounceVertical": alwaysBounceVertical,
-  //     "alwaysBounceHorizontal": alwaysBounceHorizontal,
-  //     "scrollsToTop": scrollsToTop,
-  //     "isPagingEnabled": isPagingEnabled,
-  //     "maximumZoomScale": maximumZoomScale,
-  //     "minimumZoomScale": minimumZoomScale,
-  //     "contentInsetAdjustmentBehavior":
-  //         contentInsetAdjustmentBehavior.toNativeValue(),
-  //     "isDirectionalLockEnabled": isDirectionalLockEnabled,
-  //     "mediaType": mediaType,
-  //     "pageZoom": pageZoom,
-  //     "limitsNavigationsToAppBoundDomains": limitsNavigationsToAppBoundDomains,
-  //     "useOnNavigationResponse": useOnNavigationResponse,
-  //     "applePayAPIEnabled": applePayAPIEnabled,
-  //     "allowingReadAccessTo": allowingReadAccessTo.toString(),
-  //     "disableLongPressContextMenuOnLinks": disableLongPressContextMenuOnLinks,
-  //     "disableInputAccessoryView": disableInputAccessoryView,
-  //     "underPageBackgroundColor": underPageBackgroundColor?.toHex(),
-  //     "isTextInteractionEnabled": isTextInteractionEnabled,
-  //     "isSiteSpecificQuirksModeEnabled": isSiteSpecificQuirksModeEnabled,
-  //     "upgradeKnownHostsToHTTPS": upgradeKnownHostsToHTTPS,
-  //     "isElementFullscreenEnabled": isElementFullscreenEnabled,
-  //     "isFindInteractionEnabled": isFindInteractionEnabled,
-  //     "minimumViewportInset": minimumViewportInset?.toMap(),
-  //     "maximumViewportInset": maximumViewportInset?.toMap(),
-  //     "iframeAllow": iframeAllow,
-  //     "iframeAllowFullscreen": iframeAllowFullscreen,
-  //     "iframeSandbox": iframeSandbox?.map((e) => e.toNativeValue()).toList(),
-  //     "iframeReferrerPolicy": iframeReferrerPolicy,
-  //     "iframeName": iframeName,
-  //     "iframeCsp": iframeCsp,
-  //   };
-  // }
-  //
-  // ///Gets a [InAppWebViewSettings] instance from a [Map] value.
-  // factory InAppWebViewSettings.fromMap(Map<String, dynamic> map) {
-  //   List<ContentBlocker> contentBlockers = [];
-  //   List<dynamic>? contentBlockersMapList = map["contentBlockers"];
-  //   if (contentBlockersMapList != null) {
-  //     contentBlockersMapList.forEach((contentBlocker) {
-  //       contentBlockers.add(ContentBlocker.fromMap(
-  //           Map<dynamic, Map<dynamic, dynamic>>.from(
-  //               Map<dynamic, dynamic>.from(contentBlocker))));
-  //     });
-  //   }
-  //   List<DataDetectorTypes> dataDetectorTypes = [];
-  //   List<String> dataDetectorTypesList =
-  //       List<String>.from(map["dataDetectorTypes"] ?? []);
-  //   dataDetectorTypesList.forEach((dataDetectorTypeValue) {
-  //     var dataDetectorType =
-  //         DataDetectorTypes.fromNativeValue(dataDetectorTypeValue);
-  //     if (dataDetectorType != null) {
-  //       dataDetectorTypes.add(dataDetectorType);
-  //     }
-  //   });
-  //
-  //   var settings = InAppWebViewSettings();
-  //   settings.useShouldOverrideUrlLoading = map["useShouldOverrideUrlLoading"];
-  //   settings.useOnLoadResource = map["useOnLoadResource"];
-  //   settings.useOnDownloadStart = map["useOnDownloadStart"];
-  //   settings.clearCache = map["clearCache"];
-  //   settings.userAgent = map["userAgent"];
-  //   settings.applicationNameForUserAgent = map["applicationNameForUserAgent"];
-  //   settings.javaScriptEnabled = map["javaScriptEnabled"];
-  //   settings.javaScriptCanOpenWindowsAutomatically =
-  //       map["javaScriptCanOpenWindowsAutomatically"];
-  //   settings.mediaPlaybackRequiresUserGesture =
-  //       map["mediaPlaybackRequiresUserGesture"];
-  //   settings.verticalScrollBarEnabled = map["verticalScrollBarEnabled"];
-  //   settings.horizontalScrollBarEnabled = map["horizontalScrollBarEnabled"];
-  //   settings.resourceCustomSchemes =
-  //       List<String>.from(map["resourceCustomSchemes"] ?? []);
-  //   settings.contentBlockers = contentBlockers;
-  //   settings.preferredContentMode =
-  //       UserPreferredContentMode.fromNativeValue(map["preferredContentMode"]);
-  //   settings.useShouldInterceptAjaxRequest =
-  //       map["useShouldInterceptAjaxRequest"];
-  //   settings.useShouldInterceptFetchRequest =
-  //       map["useShouldInterceptFetchRequest"];
-  //   settings.incognito = map["incognito"];
-  //   settings.cacheEnabled = map["cacheEnabled"];
-  //   settings.transparentBackground = map["transparentBackground"];
-  //   settings.disableVerticalScroll = map["disableVerticalScroll"];
-  //   settings.disableHorizontalScroll = map["disableHorizontalScroll"];
-  //   settings.disableContextMenu = map["disableContextMenu"];
-  //   settings.supportZoom = map["supportZoom"];
-  //   settings.allowFileAccessFromFileURLs = map["allowFileAccessFromFileURLs"];
-  //   settings.allowUniversalAccessFromFileURLs =
-  //       map["allowUniversalAccessFromFileURLs"];
-  //   if (kIsWeb) {
-  //     settings.iframeAllow = map["iframeAllow"];
-  //     settings.iframeAllowFullscreen = map["iframeAllowFullscreen"];
-  //     settings.iframeSandbox = map["iframeSandbox"] != null
-  //         ? Set.from((map["iframeSandbox"].cast<String>() as List<String>)
-  //             .map((e) => Sandbox.fromNativeValue(e)))
-  //         : null;
-  //     settings.iframeReferrerPolicy =
-  //         ReferrerPolicy.fromNativeValue(map["iframeReferrerPolicy"]);
-  //     settings.iframeName = map["iframeName"];
-  //     settings.iframeCsp = map["iframeCsp"];
-  //   } else {
-  //     if (defaultTargetPlatform == TargetPlatform.android) {
-  //       settings.textZoom = map["textZoom"];
-  //       settings.clearSessionCache = map["clearSessionCache"];
-  //       settings.builtInZoomControls = map["builtInZoomControls"];
-  //       settings.displayZoomControls = map["displayZoomControls"];
-  //       settings.databaseEnabled = map["databaseEnabled"];
-  //       settings.domStorageEnabled = map["domStorageEnabled"];
-  //       settings.useWideViewPort = map["useWideViewPort"];
-  //       settings.safeBrowsingEnabled = map["safeBrowsingEnabled"];
-  //       settings.mixedContentMode =
-  //           MixedContentMode.fromNativeValue(map["mixedContentMode"]);
-  //       settings.allowContentAccess = map["allowContentAccess"];
-  //       settings.allowFileAccess = map["allowFileAccess"];
-  //       settings.appCachePath = map["appCachePath"];
-  //       settings.blockNetworkImage = map["blockNetworkImage"];
-  //       settings.blockNetworkLoads = map["blockNetworkLoads"];
-  //       settings.cacheMode = CacheMode.fromNativeValue(map["cacheMode"]);
-  //       settings.cursiveFontFamily = map["cursiveFontFamily"];
-  //       settings.defaultFixedFontSize = map["defaultFixedFontSize"];
-  //       settings.defaultFontSize = map["defaultFontSize"];
-  //       settings.defaultTextEncodingName = map["defaultTextEncodingName"];
-  //       settings.disabledActionModeMenuItems =
-  //           ActionModeMenuItem.fromNativeValue(
-  //               map["disabledActionModeMenuItems"]);
-  //       settings.fantasyFontFamily = map["fantasyFontFamily"];
-  //       settings.fixedFontFamily = map["fixedFontFamily"];
-  //       settings.forceDark = ForceDark.fromNativeValue(map["forceDark"]);
-  //       settings.forceDarkStrategy =
-  //           ForceDarkStrategy.fromNativeValue(map["forceDarkStrategy"]);
-  //       settings.geolocationEnabled = map["geolocationEnabled"];
-  //       settings.layoutAlgorithm =
-  //           LayoutAlgorithm.fromNativeValue(map["layoutAlgorithm"]);
-  //       settings.loadWithOverviewMode = map["loadWithOverviewMode"];
-  //       settings.loadsImagesAutomatically = map["loadsImagesAutomatically"];
-  //       settings.minimumLogicalFontSize = map["minimumLogicalFontSize"];
-  //       settings.initialScale = map["initialScale"];
-  //       settings.needInitialFocus = map["needInitialFocus"];
-  //       settings.offscreenPreRaster = map["offscreenPreRaster"];
-  //       settings.sansSerifFontFamily = map["sansSerifFontFamily"];
-  //       settings.serifFontFamily = map["serifFontFamily"];
-  //       settings.standardFontFamily = map["standardFontFamily"];
-  //       settings.saveFormData = map["saveFormData"];
-  //       settings.thirdPartyCookiesEnabled = map["thirdPartyCookiesEnabled"];
-  //       settings.hardwareAcceleration = map["hardwareAcceleration"];
-  //       settings.supportMultipleWindows = map["supportMultipleWindows"];
-  //       settings.regexToCancelSubFramesLoading =
-  //           map["regexToCancelSubFramesLoading"];
-  //       settings.useHybridComposition = map["useHybridComposition"];
-  //       settings.useShouldInterceptRequest = map["useShouldInterceptRequest"];
-  //       settings.useOnRenderProcessGone = map["useOnRenderProcessGone"];
-  //       settings.overScrollMode =
-  //           OverScrollMode.fromNativeValue(map["overScrollMode"]);
-  //       settings.networkAvailable = map["networkAvailable"];
-  //       settings.scrollBarStyle =
-  //           ScrollBarStyle.fromNativeValue(map["scrollBarStyle"]);
-  //       settings.verticalScrollbarPosition =
-  //           VerticalScrollbarPosition.fromNativeValue(
-  //               map["verticalScrollbarPosition"]);
-  //       settings.scrollBarDefaultDelayBeforeFade =
-  //           map["scrollBarDefaultDelayBeforeFade"];
-  //       settings.scrollbarFadingEnabled = map["scrollbarFadingEnabled"];
-  //       settings.scrollBarFadeDuration = map["scrollBarFadeDuration"];
-  //       settings.rendererPriorityPolicy = RendererPriorityPolicy.fromMap(
-  //           map["rendererPriorityPolicy"]?.cast<String, dynamic>());
-  //       settings.disableDefaultErrorPage = map["disableDefaultErrorPage"];
-  //       settings.verticalScrollbarThumbColor =
-  //           UtilColor.fromHex(map["verticalScrollbarThumbColor"]);
-  //       settings.verticalScrollbarTrackColor =
-  //           UtilColor.fromHex(map["verticalScrollbarTrackColor"]);
-  //       settings.horizontalScrollbarThumbColor =
-  //           UtilColor.fromHex(map["horizontalScrollbarThumbColor"]);
-  //       settings.horizontalScrollbarTrackColor =
-  //           UtilColor.fromHex(map["horizontalScrollbarTrackColor"]);
-  //       settings.willSuppressErrorPage = map["willSuppressErrorPage"];
-  //       settings.algorithmicDarkeningAllowed =
-  //           map["algorithmicDarkeningAllowed"];
-  //       settings.requestedWithHeaderMode =
-  //           RequestedWithHeaderMode.fromNativeValue(
-  //               map["requestedWithHeaderMode"]);
-  //       settings.enterpriseAuthenticationAppLinkPolicyEnabled =
-  //           map["enterpriseAuthenticationAppLinkPolicyEnabled"];
-  //     } else if (defaultTargetPlatform == TargetPlatform.iOS ||
-  //         defaultTargetPlatform == TargetPlatform.macOS) {
-  //       settings.disallowOverScroll = map["disallowOverScroll"];
-  //       settings.enableViewportScale = map["enableViewportScale"];
-  //       settings.suppressesIncrementalRendering =
-  //           map["suppressesIncrementalRendering"];
-  //       settings.allowsAirPlayForMediaPlayback =
-  //           map["allowsAirPlayForMediaPlayback"];
-  //       settings.allowsBackForwardNavigationGestures =
-  //           map["allowsBackForwardNavigationGestures"];
-  //       settings.allowsLinkPreview = map["allowsLinkPreview"];
-  //       settings.ignoresViewportScaleLimits = map["ignoresViewportScaleLimits"];
-  //       settings.allowsInlineMediaPlayback = map["allowsInlineMediaPlayback"];
-  //       settings.allowsPictureInPictureMediaPlayback =
-  //           map["allowsPictureInPictureMediaPlayback"];
-  //       settings.isFraudulentWebsiteWarningEnabled =
-  //           map["isFraudulentWebsiteWarningEnabled"];
-  //       settings.selectionGranularity =
-  //           SelectionGranularity.fromNativeValue(map["selectionGranularity"])!;
-  //       settings.dataDetectorTypes = dataDetectorTypes;
-  //       settings.sharedCookiesEnabled = map["sharedCookiesEnabled"];
-  //       settings.automaticallyAdjustsScrollIndicatorInsets =
-  //           map["automaticallyAdjustsScrollIndicatorInsets"];
-  //       settings.accessibilityIgnoresInvertColors =
-  //           map["accessibilityIgnoresInvertColors"];
-  //       settings.decelerationRate = ScrollViewDecelerationRate.fromNativeValue(
-  //           map["decelerationRate"])!;
-  //       settings.alwaysBounceVertical = map["alwaysBounceVertical"];
-  //       settings.alwaysBounceHorizontal = map["alwaysBounceHorizontal"];
-  //       settings.scrollsToTop = map["scrollsToTop"];
-  //       settings.isPagingEnabled = map["isPagingEnabled"];
-  //       settings.maximumZoomScale = map["maximumZoomScale"];
-  //       settings.minimumZoomScale = map["minimumZoomScale"];
-  //       settings.contentInsetAdjustmentBehavior =
-  //           ScrollViewContentInsetAdjustmentBehavior.fromNativeValue(
-  //               map["contentInsetAdjustmentBehavior"])!;
-  //       settings.isDirectionalLockEnabled = map["isDirectionalLockEnabled"];
-  //       settings.mediaType = map["mediaType"];
-  //       settings.pageZoom = map["pageZoom"];
-  //       settings.limitsNavigationsToAppBoundDomains =
-  //           map["limitsNavigationsToAppBoundDomains"];
-  //       settings.useOnNavigationResponse = map["useOnNavigationResponse"];
-  //       settings.applePayAPIEnabled = map["applePayAPIEnabled"];
-  //       settings.allowingReadAccessTo = map["allowingReadAccessTo"] != null
-  //           ? Uri.parse(map["allowingReadAccessTo"])
-  //           : null;
-  //       settings.disableLongPressContextMenuOnLinks =
-  //           map["disableLongPressContextMenuOnLinks"];
-  //       settings.disableInputAccessoryView = map["disableInputAccessoryView"];
-  //       settings.underPageBackgroundColor =
-  //           UtilColor.fromHex(map["underPageBackgroundColor"]);
-  //       settings.isTextInteractionEnabled = map["isTextInteractionEnabled"];
-  //       settings.isSiteSpecificQuirksModeEnabled =
-  //           map["isSiteSpecificQuirksModeEnabled"];
-  //       settings.upgradeKnownHostsToHTTPS = map["upgradeKnownHostsToHTTPS"];
-  //       settings.isElementFullscreenEnabled = map["isElementFullscreenEnabled"];
-  //       settings.isFindInteractionEnabled = map["isFindInteractionEnabled"];
-  //       settings.minimumViewportInset = MapEdgeInsets.fromMap(
-  //           map["minimumViewportInset"]?.cast<String, double>());
-  //       settings.maximumViewportInset = MapEdgeInsets.fromMap(
-  //           map["maximumViewportInset"]?.cast<String, double>());
-  //     }
-  //   }
-  //   return settings;
-  // }
 }
 
 ///Class that represents the options that can be used for a [WebView].

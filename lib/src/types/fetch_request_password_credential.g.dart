@@ -32,7 +32,7 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
       id: map['id'],
       name: map['name'],
       password: map['password'],
-      iconURL: map['iconURL'] != null ? Uri.parse(map['iconURL']) : null,
+      iconURL: map['iconURL'] != null ? Uri.tryParse(map['iconURL']) : null,
     );
     instance.type = map['type'];
     return instance;

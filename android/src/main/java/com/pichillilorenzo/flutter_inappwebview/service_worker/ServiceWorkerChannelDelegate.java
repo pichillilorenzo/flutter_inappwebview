@@ -2,7 +2,6 @@ package com.pichillilorenzo.flutter_inappwebview.service_worker;
 
 import android.annotation.SuppressLint;
 import android.os.Build;
-import android.webkit.ServiceWorkerController;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -12,10 +11,8 @@ import androidx.webkit.ServiceWorkerWebSettingsCompat;
 import androidx.webkit.WebViewFeature;
 
 import com.pichillilorenzo.flutter_inappwebview.Util;
-import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.BaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 import com.pichillilorenzo.flutter_inappwebview.types.SyncBaseCallbackResultImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceRequestExt;
 import com.pichillilorenzo.flutter_inappwebview.types.WebResourceResponseExt;
@@ -136,7 +133,7 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void shouldInterceptRequest(WebResourceRequestExt request, @NonNull WebViewChannelDelegate.ShouldInterceptRequestCallback callback) {
+  public void shouldInterceptRequest(WebResourceRequestExt request, @NonNull ShouldInterceptRequestCallback callback) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     channel.invokeMethod("shouldInterceptRequest", request.toMap(), callback);
@@ -146,7 +143,7 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
     @Nullable
     @Override
     public WebResourceResponseExt decodeResult(@Nullable Object obj) {
-      return (new WebViewChannelDelegate.ShouldInterceptRequestCallback()).decodeResult(obj);
+      return (new ShouldInterceptRequestCallback()).decodeResult(obj);
     }
   }
 
@@ -154,7 +151,7 @@ public class ServiceWorkerChannelDelegate extends ChannelDelegateImpl {
   public WebResourceResponseExt shouldInterceptRequest(WebResourceRequestExt request) throws InterruptedException {
     MethodChannel channel = getChannel();
     if (channel == null) return null;
-    final WebViewChannelDelegate.SyncShouldInterceptRequestCallback callback = new WebViewChannelDelegate.SyncShouldInterceptRequestCallback();
+    final SyncShouldInterceptRequestCallback callback = new SyncShouldInterceptRequestCallback();
     return Util.invokeMethodAndWaitResult(channel, "shouldInterceptRequest", request.toMap(), callback);
   }
 

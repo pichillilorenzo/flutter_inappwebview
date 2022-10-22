@@ -41,7 +41,7 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
       name: map['name'],
       protocol: map['protocol'],
       provider: map['provider'],
-      iconURL: map['iconURL'] != null ? Uri.parse(map['iconURL']) : null,
+      iconURL: map['iconURL'] != null ? Uri.tryParse(map['iconURL']) : null,
     );
     instance.type = map['type'];
     return instance;

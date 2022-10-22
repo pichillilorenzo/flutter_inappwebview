@@ -1,3 +1,12 @@
+## 6.0.0-beta.6
+
+- Added `InAppWebViewSettings.allowBackgroundAudioPlaying` for Android
+- Added `WebViewAssetLoader` and `InAppWebViewSettings.webViewAssetLoader` for Android
+
+### BREAKING CHANGES
+
+- `WebResourceResponse.contentType` and `WebResourceResponse.contentEncoding` properties can be null
+
 ## 6.0.0-beta.5
 
 - Merge fixes of version `5.5.0+5`
@@ -53,6 +62,12 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.6.0
+
+- Fixed "URLCredential.fromMap returns null for username" [#1205](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1205)
+- Fixed "Compare to webview_flutter, inappwebview is significant frame dropped while page scrolling" [#1386](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1386)
+- Merged "Fix hybrid composition laggy" [#1387](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1387) (thanks to [Doflatango](https://github.com/Doflatango))
 
 ## 5.5.0+5
 

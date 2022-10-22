@@ -13,7 +13,9 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class WebResourceResponseExt {
+  @Nullable
   private String contentType;
+  @Nullable
   private String contentEncoding;
   @Nullable
   private Integer statusCode;
@@ -24,7 +26,7 @@ public class WebResourceResponseExt {
   @Nullable
   private byte[] data;
 
-  public WebResourceResponseExt(String contentType, String contentEncoding, @Nullable Integer statusCode, 
+  public WebResourceResponseExt(@Nullable String contentType, @Nullable String contentEncoding, @Nullable Integer statusCode,
                                 @Nullable String reasonPhrase, @Nullable Map<String, String> headers, @Nullable byte[] data) {
     this.contentType = contentType;
     this.contentEncoding = contentEncoding;
@@ -77,19 +79,21 @@ public class WebResourceResponseExt {
     return webResourceResponseMap;
   }
 
+  @Nullable
   public String getContentType() {
     return contentType;
   }
 
-  public void setContentType(String contentType) {
+  public void setContentType(@Nullable String contentType) {
     this.contentType = contentType;
   }
 
+  @Nullable
   public String getContentEncoding() {
     return contentEncoding;
   }
 
-  public void setContentEncoding(String contentEncoding) {
+  public void setContentEncoding(@Nullable String contentEncoding) {
     this.contentEncoding = contentEncoding;
   }
 

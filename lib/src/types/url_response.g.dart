@@ -43,7 +43,7 @@ class URLResponse {
       return null;
     }
     final instance = URLResponse(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       expectedContentLength: map['expectedContentLength'],
       mimeType: map['mimeType'],
       suggestedFilename: map['suggestedFilename'],
@@ -116,7 +116,7 @@ class IOSURLResponse {
       return null;
     }
     final instance = IOSURLResponse(
-      url: map['url'] != null ? Uri.parse(map['url']) : null,
+      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
       expectedContentLength: map['expectedContentLength'],
       mimeType: map['mimeType'],
       suggestedFilename: map['suggestedFilename'],

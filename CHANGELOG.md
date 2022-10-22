@@ -1,7 +1,7 @@
 ## 5.6.0
 
 - Fixed "URLCredential.fromMap returns null for username" [#1205](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1205)
-- Fix Android Hybrid Composition
+- Fixed "Compare to webview_flutter, inappwebview is significant frame dropped while page scrolling" [#1386](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1386)
 
 ## 5.5.0+5
 

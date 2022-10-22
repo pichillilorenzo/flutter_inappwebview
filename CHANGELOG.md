@@ -1,3 +1,7 @@
+## 5.6.0+1
+
+- Fixed Android hybrid composition on Flutter 2
+
 ## 5.6.0
 
 - Fixed "URLCredential.fromMap returns null for username" [#1205](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1205)

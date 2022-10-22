@@ -471,13 +471,19 @@ class _InAppWebViewState extends State<InAppWebView> {
     required Map<String, dynamic> creationParams,
   }) {
     if (hybridComposition) {
-      return PlatformViewsService.initExpensiveAndroidView(
-        id: id,
-        viewType: viewType,
-        layoutDirection: layoutDirection,
-        creationParams: creationParams,
-        creationParamsCodec: const StandardMessageCodec(),
-      );
+      try {
+        // use PlatformViewsService as dynamic for Flutter 2 lower versions
+        return (PlatformViewsService as dynamic).initExpensiveAndroidView(
+          id: id,
+          viewType: viewType,
+          layoutDirection: layoutDirection,
+          creationParams: creationParams,
+          creationParamsCodec: const StandardMessageCodec(),
+        );
+      } catch (_) {
+        // NoSuchMethodError
+        // ignore and use initSurfaceAndroidView
+      }
     }
     return PlatformViewsService.initSurfaceAndroidView(
       id: id,

@@ -367,7 +367,7 @@ class IOSInAppWebViewOptions
     options.useOnNavigationResponse = map["useOnNavigationResponse"];
     options.applePayAPIEnabled = map["applePayAPIEnabled"];
     options.allowingReadAccessTo = map["allowingReadAccessTo"] != null
-        ? Uri.parse(map["allowingReadAccessTo"])
+        ? Uri.tryParse(map["allowingReadAccessTo"])
         : null;
     options.disableLongPressContextMenuOnLinks =
         map["disableLongPressContextMenuOnLinks"];

@@ -119,7 +119,7 @@ class LoadedResource {
     }
     return LoadedResource(
         initiatorType: map["initiatorType"],
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         startTime: map["startTime"],
         duration: map["duration"]);
   }
@@ -244,7 +244,7 @@ class WebResourceRequest {
     }
 
     return WebResourceRequest(
-        url: Uri.parse(map["url"]),
+        url: Uri.tryParse(map["url"]) ?? Uri(),
         headers: map["headers"]?.cast<String, String>(),
         method: map["method"],
         hasGesture: map["hasGesture"],
@@ -429,11 +429,11 @@ class WebHistory {
         var historyItem = historyListMap[i];
         historyList.add(WebHistoryItem(
             originalUrl: historyItem["originalUrl"] != null
-                ? Uri.parse(historyItem["originalUrl"])
+                ? Uri.tryParse(historyItem["originalUrl"])
                 : null,
             title: historyItem["title"],
             url: historyItem["url"] != null
-                ? Uri.parse(historyItem["url"])
+                ? Uri.tryParse(historyItem["url"])
                 : null,
             index: i,
             offset: i - currentIndex));
@@ -553,7 +553,7 @@ class JsAlertRequest {
       return null;
     }
     return JsAlertRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         message: map["message"],
         iosIsMainFrame: map["iosIsMainFrame"]);
   }
@@ -651,7 +651,7 @@ class JsConfirmRequest {
       return null;
     }
     return JsConfirmRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         message: map["message"],
         iosIsMainFrame: map["iosIsMainFrame"]);
   }
@@ -760,7 +760,7 @@ class JsPromptRequest {
       return null;
     }
     return JsPromptRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         message: map["message"],
         defaultValue: map["defaultValue"],
         iosIsMainFrame: map["iosIsMainFrame"]);
@@ -862,7 +862,7 @@ class JsBeforeUnloadRequest {
       return null;
     }
     return JsBeforeUnloadRequest(
-      url: map["url"] != null ? Uri.parse(map["url"]) : null,
+      url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
       message: map["message"],
     );
   }
@@ -2981,7 +2981,7 @@ class AjaxRequest {
     return AjaxRequest(
         data: map["data"],
         method: map["method"],
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         isAsync: map["isAsync"],
         user: map["user"],
         password: map["password"],
@@ -2990,8 +2990,9 @@ class AjaxRequest {
             AjaxRequestHeaders.fromMap(map["headers"]?.cast<String, dynamic>()),
         readyState: AjaxRequestReadyState.fromValue(map["readyState"]),
         status: map["status"],
-        responseURL:
-            map["responseURL"] != null ? Uri.parse(map["responseURL"]) : null,
+        responseURL: map["responseURL"] != null
+            ? Uri.tryParse(map["responseURL"])
+            : null,
         responseType: map["responseType"],
         response: map["response"],
         responseText: map["responseText"],
@@ -3148,7 +3149,7 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
         protocol: credentialsMap["protocol"],
         provider: credentialsMap["provider"],
         iconURL: credentialsMap["iconURL"] != null
-            ? Uri.parse(credentialsMap["iconURL"])
+            ? Uri.tryParse(credentialsMap["iconURL"])
             : null);
   }
 
@@ -3202,7 +3203,7 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
         name: credentialsMap["name"],
         password: credentialsMap["password"],
         iconURL: credentialsMap["iconURL"] != null
-            ? Uri.parse(credentialsMap["iconURL"])
+            ? Uri.tryParse(credentialsMap["iconURL"])
             : null);
   }
 
@@ -3301,7 +3302,7 @@ class FetchRequest {
     }
 
     return FetchRequest(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         method: map["method"],
         headers: map["headers"]?.cast<String, dynamic>(),
         body: map["body"],
@@ -6195,7 +6196,7 @@ class IOSURLResponse {
       return null;
     }
     return IOSURLResponse(
-        url: map["url"] != null ? Uri.parse(map["url"]) : null,
+        url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
         expectedContentLength: map["expectedContentLength"],
         mimeType: map["mimeType"],
         suggestedFilename: map["suggestedFilename"],
@@ -6408,7 +6409,7 @@ class URLRequest {
       return null;
     }
     return URLRequest(
-      url: map["url"] != null ? Uri.parse(map["url"]) : null,
+      url: map["url"] != null ? Uri.tryParse(map["url"]) : null,
       headers: map["headers"]?.cast<String, String>(),
       method: map["method"],
       body: map["body"],
@@ -6423,7 +6424,7 @@ class URLRequest {
           map["iosNetworkServiceType"]),
       iosTimeoutInterval: map["iosTimeoutInterval"],
       iosMainDocumentURL: map["iosMainDocumentURL"] != null
-          ? Uri.parse(map["iosMainDocumentURL"])
+          ? Uri.tryParse(map["iosMainDocumentURL"])
           : null,
     );
   }
@@ -6933,7 +6934,7 @@ class DownloadStartRequest {
     }
 
     return DownloadStartRequest(
-        url: Uri.parse(map["url"]),
+        url: Uri.tryParse(map["url"]) ?? Uri(),
         userAgent: map["userAgent"],
         contentDisposition: map["contentDisposition"],
         mimeType: map["mimeType"],

@@ -389,9 +389,9 @@ class _InAppWebViewState extends State<InAppWebView> {
       return PlatformViewLink(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         surfaceFactory: (
-            BuildContext context,
-            PlatformViewController controller,
-            ) {
+          BuildContext context,
+          PlatformViewController controller,
+        ) {
           return AndroidViewSurface(
             controller: controller as AndroidViewController,
             gestureRecognizers: widget.gestureRecognizers ??
@@ -404,7 +404,8 @@ class _InAppWebViewState extends State<InAppWebView> {
               hybridComposition: useHybridComposition,
               id: params.id,
               viewType: 'com.pichillilorenzo/flutter_inappwebview',
-              layoutDirection: Directionality.maybeOf(context) ?? TextDirection.rtl,
+              layoutDirection:
+                  Directionality.maybeOf(context) ?? TextDirection.rtl,
               creationParams: <String, dynamic>{
                 'initialUrlRequest': widget.initialUrlRequest?.toMap(),
                 'initialFile': widget.initialFile,
@@ -414,16 +415,15 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'windowId': widget.windowId,
                 'implementation': widget.implementation.toValue(),
                 'initialUserScripts':
-                widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
-                    [],
+                    widget.initialUserScripts?.map((e) => e.toMap()).toList() ??
+                        [],
                 'pullToRefreshOptions':
-                widget.pullToRefreshController?.options.toMap() ??
-                    PullToRefreshOptions(enabled: false).toMap()
-              }
-          )
+                    widget.pullToRefreshController?.options.toMap() ??
+                        PullToRefreshOptions(enabled: false).toMap()
+              })
             ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
             ..addOnPlatformViewCreatedListener(
-                    (id) => _onPlatformViewCreated(id))
+                (id) => _onPlatformViewCreated(id))
             ..create();
         },
       );

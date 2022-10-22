@@ -63,7 +63,7 @@ class AndroidInAppWebViewController {
   Future<Uri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getOriginalUrl', args);
-    return url != null ? Uri.parse(url) : null;
+    return url != null ? Uri.tryParse(url) : null;
   }
 
   ///Scrolls the contents of this WebView down by half the page size.
@@ -140,7 +140,7 @@ class AndroidInAppWebViewController {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _staticChannel.invokeMethod(
         'getSafeBrowsingPrivacyPolicyUrl', args);
-    return url != null ? Uri.parse(url) : null;
+    return url != null ? Uri.tryParse(url) : null;
   }
 
   ///Sets the list of hosts (domain names/IP addresses) that are exempt from SafeBrowsing checks. The list is global for all the WebViews.

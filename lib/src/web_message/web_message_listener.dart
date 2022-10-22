@@ -48,7 +48,7 @@ class WebMessageListener {
         if (onPostMessage != null) {
           String? message = call.arguments["message"];
           Uri? sourceOrigin = call.arguments["sourceOrigin"] != null
-              ? Uri.parse(call.arguments["sourceOrigin"])
+              ? Uri.tryParse(call.arguments["sourceOrigin"])
               : null;
           bool isMainFrame = call.arguments["isMainFrame"];
           onPostMessage!(message, sourceOrigin, isMainFrame, _replyProxy!);

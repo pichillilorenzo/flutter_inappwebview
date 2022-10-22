@@ -1,3 +1,12 @@
+## 5.7.0
+
+- Added `PlatformViewsService.initExpensiveAndroidView` for Android
+
+### BREAKING CHANGES
+
+- Flutter minimum version `3.0.0`
+
+
 ## 5.6.0+2
 
 - Revert back the usage of `PlatformViewsService.initExpensiveAndroidView`

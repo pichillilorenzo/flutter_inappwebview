@@ -386,22 +386,22 @@ class _InAppWebViewState extends State<InAppWebView> {
             "To use the pull-to-refresh feature, useHybridComposition Android-specific option MUST be true!");
       }
 
-      return PlatformViewLink(
-        viewType: 'com.pichillilorenzo/flutter_inappwebview',
-        surfaceFactory: (
-          BuildContext context,
-          PlatformViewController controller,
-        ) {
-          return AndroidViewSurface(
-            controller: controller as AndroidViewController,
-            gestureRecognizers: widget.gestureRecognizers ??
-                const <Factory<OneSequenceGestureRecognizer>>{},
-            hitTestBehavior: PlatformViewHitTestBehavior.opaque,
-          );
-        },
-        onCreatePlatformView: (PlatformViewCreationParams params) {
-          return _createAndroidViewController(
-              hybridComposition: useHybridComposition,
+      if (useHybridComposition) {
+        return PlatformViewLink(
+          viewType: 'com.pichillilorenzo/flutter_inappwebview',
+          surfaceFactory: (
+            BuildContext context,
+            PlatformViewController controller,
+          ) {
+            return AndroidViewSurface(
+              controller: controller as AndroidViewController,
+              gestureRecognizers: widget.gestureRecognizers ??
+                  const <Factory<OneSequenceGestureRecognizer>>{},
+              hitTestBehavior: PlatformViewHitTestBehavior.opaque,
+            );
+          },
+          onCreatePlatformView: (PlatformViewCreationParams params) {
+            return PlatformViewsService.initSurfaceAndroidView(
               id: params.id,
               viewType: 'com.pichillilorenzo/flutter_inappwebview',
               layoutDirection:
@@ -420,13 +420,38 @@ class _InAppWebViewState extends State<InAppWebView> {
                 'pullToRefreshOptions':
                     widget.pullToRefreshController?.options.toMap() ??
                         PullToRefreshOptions(enabled: false).toMap()
-              })
-            ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
-            ..addOnPlatformViewCreatedListener(
-                (id) => _onPlatformViewCreated(id))
-            ..create();
-        },
-      );
+              },
+              creationParamsCodec: const StandardMessageCodec(),
+            )
+              ..addOnPlatformViewCreatedListener(params.onPlatformViewCreated)
+              ..addOnPlatformViewCreatedListener(
+                  (id) => _onPlatformViewCreated(id))
+              ..create();
+          },
+        );
+      } else {
+        return AndroidView(
+          viewType: 'com.pichillilorenzo/flutter_inappwebview',
+          onPlatformViewCreated: _onPlatformViewCreated,
+          gestureRecognizers: widget.gestureRecognizers,
+          layoutDirection: Directionality.maybeOf(context) ?? TextDirection.rtl,
+          creationParams: <String, dynamic>{
+            'initialUrlRequest': widget.initialUrlRequest?.toMap(),
+            'initialFile': widget.initialFile,
+            'initialData': widget.initialData?.toMap(),
+            'initialOptions': widget.initialOptions?.toMap() ?? {},
+            'contextMenu': widget.contextMenu?.toMap() ?? {},
+            'windowId': widget.windowId,
+            'implementation': widget.implementation.toValue(),
+            'initialUserScripts':
+                widget.initialUserScripts?.map((e) => e.toMap()).toList() ?? [],
+            'pullToRefreshOptions':
+                widget.pullToRefreshController?.options.toMap() ??
+                    PullToRefreshOptions(enabled: false).toMap()
+          },
+          creationParamsCodec: const StandardMessageCodec(),
+        );
+      }
     } else if (defaultTargetPlatform == TargetPlatform.iOS) {
       return UiKitView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
@@ -461,37 +486,6 @@ class _InAppWebViewState extends State<InAppWebView> {
   @override
   void dispose() {
     super.dispose();
-  }
-
-  AndroidViewController _createAndroidViewController({
-    required bool hybridComposition,
-    required int id,
-    required String viewType,
-    required TextDirection layoutDirection,
-    required Map<String, dynamic> creationParams,
-  }) {
-    if (hybridComposition) {
-      try {
-        // use PlatformViewsService as dynamic for Flutter 2 lower versions
-        return (PlatformViewsService as dynamic).initExpensiveAndroidView(
-          id: id,
-          viewType: viewType,
-          layoutDirection: layoutDirection,
-          creationParams: creationParams,
-          creationParamsCodec: const StandardMessageCodec(),
-        );
-      } catch (_) {
-        // NoSuchMethodError
-        // ignore and use initSurfaceAndroidView
-      }
-    }
-    return PlatformViewsService.initSurfaceAndroidView(
-      id: id,
-      viewType: viewType,
-      layoutDirection: layoutDirection,
-      creationParams: creationParams,
-      creationParamsCodec: const StandardMessageCodec(),
-    );
   }
 
   void _onPlatformViewCreated(int id) {

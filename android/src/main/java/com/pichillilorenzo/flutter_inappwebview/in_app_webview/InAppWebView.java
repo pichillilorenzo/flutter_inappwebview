@@ -97,7 +97,6 @@ import java.util.UUID;
 import java.util.regex.Pattern;
 
 import io.flutter.plugin.common.MethodChannel;
-import okhttp3.OkHttpClient;
 
 import static android.content.Context.INPUT_METHOD_SERVICE;
 import static com.pichillilorenzo.flutter_inappwebview.types.PreferredContentModeOptionType.fromValue;
@@ -121,9 +120,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   public JavaScriptBridgeInterface javaScriptBridgeInterface;
   public InAppWebViewOptions options;
   public boolean isLoading = false;
-  public OkHttpClient httpClient;
   public float zoomScale = 1.0f;
-  int okHttpClientCacheSize = 10 * 1024 * 1024; // 10MB
   public ContentBlockerHandler contentBlockerHandler = new ContentBlockerHandler();
   public Pattern regexToCancelSubFramesLoadingCompiled;
   @Nullable
@@ -181,9 +178,6 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
   }
 
   public void prepare() {
-
-    httpClient = new OkHttpClient().newBuilder().build();
-
     javaScriptBridgeInterface = new JavaScriptBridgeInterface(this);
     addJavascriptInterface(javaScriptBridgeInterface, JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME);
 

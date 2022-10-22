@@ -1,3 +1,7 @@
+## 5.6.0+2
+
+- Revert back the usage of `PlatformViewsService.initExpensiveAndroidView`
+
 ## 5.6.0+1
 
 - Fixed Android hybrid composition on Flutter 2

@@ -1,3 +1,7 @@
+## 5.7.1
+
+- Exposed "shared" property of HttpServer bind method to support more use-cases. (thanks to [LugonjaAleksandar](https://github.com/LugonjaAleksandar))
+
 ## 5.7.0
 
 - Added `PlatformViewsService.initExpensiveAndroidView` for Android

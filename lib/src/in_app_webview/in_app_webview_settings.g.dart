@@ -1140,7 +1140,7 @@ class InAppWebViewSettings {
   ///A Boolean value indicating whether HTTP requests to servers known to support HTTPS should be automatically upgraded to HTTPS requests.
   ///The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 14.5+.
+  ///**NOTE for iOS**: available on iOS 15.0+.
   ///
   ///**NOTE for MacOS**: available on MacOS 11.3+.
   ///

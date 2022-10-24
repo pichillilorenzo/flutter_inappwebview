@@ -13,6 +13,8 @@
 
 ## 6.0.0-beta.8
 
+- Merged "Exposed "shared" property of HttpServer bind method to support more use-cases." [#1395](https://github.com/pichillilorenzo/flutter_inappwebview/pull/1395) (thanks to [LugonjaAleksandar](https://github.com/LugonjaAleksandar))
+- Fixed "ios 14.5 crash reports upgradeKnownHostsToHTTPS" [#1393](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1393)
 
 ## 6.0.0-beta.7
 
@@ -86,6 +88,10 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.7.1
+
+- Exposed "shared" property of HttpServer bind method to support more use-cases. (thanks to [LugonjaAleksandar](https://github.com/LugonjaAleksandar))
 
 ## 5.7.0
 

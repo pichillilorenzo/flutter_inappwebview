@@ -594,7 +594,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
                 configuration.limitsNavigationsToAppBoundDomains = settings.limitsNavigationsToAppBoundDomains
             }
             
-            if #available(iOS 14.5, *) {
+            if #available(iOS 15.0, *) {
                 configuration.upgradeKnownHostsToHTTPS = settings.upgradeKnownHostsToHTTPS
             }
         }

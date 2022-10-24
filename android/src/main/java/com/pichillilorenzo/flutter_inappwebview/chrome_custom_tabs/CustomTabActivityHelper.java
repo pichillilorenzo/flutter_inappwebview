@@ -5,6 +5,7 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 
+import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -68,6 +69,7 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
      *
      * @return a CustomTabsSession.
      */
+    @Nullable
     public CustomTabsSession getSession() {
         if (mClient == null) {
             mCustomTabsSession = null;

@@ -92,8 +92,10 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
                 boolean isSticky = (boolean) displayModeMap.get("isSticky");
                 int layoutInDisplayCutoutMode = (int) displayModeMap.get("displayCutoutMode");
                 displayMode = new TrustedWebActivityDisplayMode.ImmersiveMode(isSticky, layoutInDisplayCutoutMode);
+                break;
               case "DEFAULT_MODE":
                 displayMode = new TrustedWebActivityDisplayMode.DefaultMode();
+                break;
             }
           }
           break;

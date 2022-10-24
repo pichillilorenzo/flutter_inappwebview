@@ -3,13 +3,20 @@ package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
+import android.os.Bundle;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
+import androidx.browser.customtabs.CustomTabsIntent;
+import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.trusted.TrustedWebActivityIntent;
 import androidx.browser.trusted.TrustedWebActivityIntentBuilder;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TrustedWebActivity extends ChromeCustomTabsActivity {
 
@@ -18,11 +25,14 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
   public TrustedWebActivityIntentBuilder builder;
 
   @Override
-  public void customTabsConnected() {
-    customTabsSession = customTabActivityHelper.getSession();
-    Uri uri = Uri.parse(initialUrl);
-    customTabActivityHelper.mayLaunchUrl(uri, null, null);
+  public void launchUrl(@NonNull String url,
+                        @Nullable Map<String, String> headers,
+                        @Nullable List<String> otherLikelyURLs) {
+    if (customTabsSession == null) {
+      return;
+    }
 
+    Uri uri = mayLaunchUrl(url, headers, otherLikelyURLs);
     builder = new TrustedWebActivityIntentBuilder(uri);
     prepareCustomTabs();
 
@@ -30,6 +40,15 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
     prepareCustomTabsIntent(trustedWebActivityIntent);
 
     CustomTabActivityHelper.openCustomTab(this, trustedWebActivityIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
+  }
+
+  @Override
+  public void customTabsConnected() {
+    customTabsSession = customTabActivityHelper.getSession();
+    if (initialUrl != null) {
+      launchUrl(initialUrl, initialHeaders, initialOtherLikelyURLs);
+    }
+
   }
 
   private void prepareCustomTabs() {

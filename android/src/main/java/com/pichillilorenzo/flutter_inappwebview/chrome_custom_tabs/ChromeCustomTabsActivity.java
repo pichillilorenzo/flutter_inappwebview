@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.util.Log;
 
 import androidx.annotation.CallSuper;
+import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
 import androidx.browser.customtabs.CustomTabsCallback;
@@ -20,7 +21,6 @@ import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
-import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebViewManager;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsMenuItem;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
@@ -44,11 +44,16 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   @Nullable
   public CustomTabsSession customTabsSession;
   protected final int CHROME_CUSTOM_TAB_REQUEST_CODE = 100;
-  protected boolean onChromeSafariBrowserOpened = false;
-  protected boolean onChromeSafariBrowserCompletedInitialLoad = false;
+  protected boolean onOpened = false;
+  protected boolean onCompletedInitialLoad = false;
   @Nullable
   public ChromeSafariBrowserManager manager;
+  @Nullable
   public String initialUrl;
+  @Nullable
+  public List<String> initialOtherLikelyURLs;
+  @Nullable
+  public Map<String, String> initialHeaders;
   public List<CustomTabsMenuItem> menuItems = new ArrayList<>();
   @Nullable
   public CustomTabsActionButton actionButton;
@@ -69,7 +74,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
     String managerId = b.getString("managerId");
     manager = ChromeSafariBrowserManager.shared.get(managerId);
-    if (manager == null || manager.plugin == null|| manager.plugin.messenger == null) return;
+    if (manager == null || manager.plugin == null || manager.plugin.messenger == null) return;
 
     ChromeSafariBrowserManager.browsers.put(id, this);
 
@@ -77,6 +82,8 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     channelDelegate = new ChromeCustomTabsChannelDelegate(this, channel);
 
     initialUrl = b.getString("url");
+    initialHeaders = (Map<String, String>) b.getSerializable("headers");
+    initialOtherLikelyURLs = b.getStringArrayList("otherLikelyURLs");
 
     customSettings = new ChromeCustomTabsSettings();
     customSettings.parse((HashMap<String, Object>) b.getSerializable("settings"));
@@ -92,6 +99,9 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
       @Override
       public void onCustomTabsConnected() {
         customTabsConnected();
+        if (channelDelegate != null) {
+          channelDelegate.onServiceConnected();
+        }
       }
 
       @Override
@@ -104,49 +114,49 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     customTabActivityHelper.setCustomTabsCallback(new CustomTabsCallback() {
       @Override
       public void onNavigationEvent(int navigationEvent, Bundle extras) {
-        if (navigationEvent == TAB_SHOWN && !onChromeSafariBrowserOpened) {
-          onChromeSafariBrowserOpened = true;
+        if (navigationEvent == TAB_SHOWN && !onOpened) {
+          onOpened = true;
           if (channelDelegate != null) {
-            channelDelegate.onChromeSafariBrowserOpened();
+            channelDelegate.onOpened();
           }
         }
 
-        if (navigationEvent == NAVIGATION_FINISHED && !onChromeSafariBrowserCompletedInitialLoad) {
-          onChromeSafariBrowserCompletedInitialLoad = true;
+        if (navigationEvent == NAVIGATION_FINISHED && !onCompletedInitialLoad) {
+          onCompletedInitialLoad = true;
           if (channelDelegate != null) {
-            channelDelegate.onChromeSafariBrowserCompletedInitialLoad();
+            channelDelegate.onCompletedInitialLoad();
           }
+        }
+
+        if (channelDelegate != null) {
+          channelDelegate.onNavigationEvent(navigationEvent);
         }
       }
 
       @Override
-      public void extraCallback(String callbackName, Bundle args) {
-
-      }
+      public void extraCallback(@NonNull String callbackName, Bundle args) {}
 
       @Override
-      public void onMessageChannelReady(Bundle extras) {
-
-      }
+      public void onMessageChannelReady(Bundle extras) {}
 
       @Override
-      public void onPostMessage(String message, Bundle extras) {
-
-      }
+      public void onPostMessage(@NonNull String message, Bundle extras) {}
 
       @Override
-      public void onRelationshipValidationResult(@CustomTabsService.Relation int relation, Uri requestedOrigin,
+      public void onRelationshipValidationResult(@CustomTabsService.Relation int relation,
+                                                 @NonNull Uri requestedOrigin,
                                                  boolean result, Bundle extras) {
-
+        if (channelDelegate != null) {
+          channelDelegate.onRelationshipValidationResult(relation, requestedOrigin, result);
+        }
       }
     });
   }
 
-  public void customTabsConnected() {
-    customTabsSession = customTabActivityHelper.getSession();
-    Uri uri = Uri.parse(initialUrl);
-    customTabActivityHelper.mayLaunchUrl(uri, null, null);
-
+  public void launchUrl(@NonNull String url,
+                          @Nullable Map<String, String> headers,
+                          @Nullable List<String> otherLikelyURLs) {
+    Uri uri = mayLaunchUrl(url, headers, otherLikelyURLs);
     builder = new CustomTabsIntent.Builder(customTabsSession);
     prepareCustomTabs();
 
@@ -156,7 +166,39 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     CustomTabActivityHelper.openCustomTab(this, customTabsIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
+  public Uri mayLaunchUrl(@NonNull String url,
+                          @Nullable Map<String, String> headers,
+                          @Nullable List<String> otherLikelyURLs) {
+    Uri uri = Uri.parse(url);
+    Bundle bundleHeaders = new Bundle();
+    if (headers != null) {
+      for (Map.Entry<String, String> header : headers.entrySet()) {
+        bundleHeaders.putString(header.getKey(), header.getValue());
+      }
+    }
+    List<Bundle> bundleOtherLikelyURLs = new ArrayList<>();
+    if (otherLikelyURLs != null) {
+      for (String otherLikelyURL : otherLikelyURLs) {
+        Bundle bundleOtherLikelyURL = new Bundle();
+        bundleOtherLikelyURL.putString(CustomTabsService.KEY_URL, otherLikelyURL);
+      }
+    }
+    customTabActivityHelper.mayLaunchUrl(uri, bundleHeaders, bundleOtherLikelyURLs);
+    return uri;
+  }
+
+  public void customTabsConnected() {
+    customTabsSession = customTabActivityHelper.getSession();
+    if (initialUrl != null) {
+      launchUrl(initialUrl, initialHeaders, initialOtherLikelyURLs);
+    }
+  }
+
   private void prepareCustomTabs() {
+    if (builder == null) {
+      return;
+    }
+
     if (customSettings.addDefaultShareMenuItem != null) {
       builder.setShareState(customSettings.addDefaultShareMenuItem ?
               CustomTabsIntent.SHARE_STATE_ON : CustomTabsIntent.SHARE_STATE_OFF);
@@ -201,6 +243,20 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
     if (customSettings.keepAliveEnabled)
       CustomTabsHelper.addKeepAliveExtra(this, customTabsIntent.intent);
+  }
+
+  public void updateActionButton(@NonNull byte[] icon, @NonNull String description) {
+    if (customTabsSession == null || actionButton == null) {
+      return;
+    }
+    BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+    bitmapOptions.inMutable = true;
+    Bitmap bmp = BitmapFactory.decodeByteArray(
+            icon, 0, icon.length, bitmapOptions
+    );
+    customTabsSession.setActionButton(bmp, description);
+    actionButton.setIcon(icon);
+    actionButton.setDescription(description);
   }
 
   @Override
@@ -265,7 +321,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     customTabsSession = null;
     finish();
     if (channelDelegate != null) {
-      channelDelegate.onChromeSafariBrowserClosed();
+      channelDelegate.onClosed();
     }
   }
 }

@@ -42,12 +42,12 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     public override func viewWillAppear(_ animated: Bool) {
         // prepareSafariBrowser()
         super.viewWillAppear(animated)
-        channelDelegate?.onChromeSafariBrowserOpened()
+        channelDelegate?.onOpened()
     }
     
     public override func viewDidDisappear(_ animated: Bool) {
         super.viewDidDisappear(animated)
-        channelDelegate?.onChromeSafariBrowserClosed()
+        channelDelegate?.onClosed()
         self.dispose()
     }
     
@@ -87,12 +87,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     
     public func safariViewController(_ controller: SFSafariViewController,
                               didCompleteInitialLoad didLoadSuccessfully: Bool) {
-        if didLoadSuccessfully {
-            channelDelegate?.onChromeSafariBrowserCompletedInitialLoad()
-        }
-        else {
-            print("Cant load successfully the 'SafariViewController'.")
-        }
+        channelDelegate?.onCompletedInitialLoad(didLoadSuccessfully: didLoadSuccessfully)
     }
     
     public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
@@ -103,18 +98,14 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         }
         return uiActivities
     }
-//
-//    public func safariViewController(_ controller: SFSafariViewController, excludedActivityTypesFor URL: URL, title: String?) -> [UIActivity.ActivityType] {
-//        print("excludedActivityTypesFor")
-//        print(URL)
-//        print(title)
-//        return []
-//    }
-//
-//    public func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo URL: URL) {
-//        print("initialLoadDidRedirectTo")
-//        print(URL)
-//    }
+
+    public func safariViewController(_ controller: SFSafariViewController, initialLoadDidRedirectTo url: URL) {
+        channelDelegate?.onInitialLoadDidRedirect(url: url)
+    }
+    
+    public func safariViewControllerWillOpenInBrowser(_ controller: SFSafariViewController) {
+        channelDelegate?.onWillOpenInBrowser()
+    }
     
     public func dispose() {
         channelDelegate?.dispose()

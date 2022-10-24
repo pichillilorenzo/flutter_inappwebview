@@ -48,6 +48,6 @@ class CustomUIActivity : UIActivity {
 
     override func perform() {
         let browser = ChromeSafariBrowserManager.browsers[viewId]
-        browser??.channelDelegate?.onChromeSafariBrowserMenuItemActionPerform(id: id, url: url, title: title)
+        browser??.channelDelegate?.onItemActionPerform(id: id, url: url, title: title)
     }
 }

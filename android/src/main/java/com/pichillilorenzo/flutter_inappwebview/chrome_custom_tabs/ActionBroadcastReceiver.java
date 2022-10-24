@@ -5,11 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.flutter.plugin.common.MethodChannel;
-
 public class ActionBroadcastReceiver extends BroadcastReceiver {
   protected static final String LOG_TAG = "ActionBroadcastReceiver";
   public static final String KEY_ACTION_ID = "com.pichillilorenzo.flutter_inappwebview.ChromeCustomTabs.ACTION_ID";
@@ -27,7 +22,7 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
 
       ChromeCustomTabsActivity browser = ChromeSafariBrowserManager.browsers.get(viewId);
       if (browser != null && browser.channelDelegate != null) {
-        browser.channelDelegate.onChromeSafariBrowserItemActionPerform(id, url, title);
+        browser.channelDelegate.onItemActionPerform(id, url, title);
       }
     }
   }

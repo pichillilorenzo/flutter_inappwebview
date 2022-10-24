@@ -31,28 +31,42 @@ public class SafariViewControllerChannelDelegate : ChannelDelegate {
         }
     }
     
-    public func onChromeSafariBrowserOpened() {
+    public func onOpened() {
         let arguments: [String: Any?] = [:]
-        channel?.invokeMethod("onChromeSafariBrowserOpened", arguments: arguments)
+        channel?.invokeMethod("onOpened", arguments: arguments)
     }
     
-    public func onChromeSafariBrowserCompletedInitialLoad() {
-        let arguments: [String: Any?] = [:]
-        channel?.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", arguments: arguments)
+    public func onCompletedInitialLoad(didLoadSuccessfully: Bool) {
+        let arguments: [String: Any?] = [
+            "didLoadSuccessfully": didLoadSuccessfully
+        ]
+        channel?.invokeMethod("onCompletedInitialLoad", arguments: arguments)
     }
     
-    public func onChromeSafariBrowserClosed() {
-        let arguments: [String: Any?] = [:]
-        channel?.invokeMethod("onChromeSafariBrowserClosed", arguments: arguments)
+    public func onInitialLoadDidRedirect(url: URL) {
+        let arguments: [String: Any?] = [
+            "url": url.absoluteString
+        ]
+        channel?.invokeMethod("onInitialLoadDidRedirect", arguments: arguments)
     }
     
-    public func onChromeSafariBrowserMenuItemActionPerform(id: Int64, url: URL, title: String?) {
+    public func onWillOpenInBrowser() {
+        let arguments: [String: Any?] = [:]
+        channel?.invokeMethod("onWillOpenInBrowser", arguments: arguments)
+    }
+    
+    public func onClosed() {
+        let arguments: [String: Any?] = [:]
+        channel?.invokeMethod("onClosed", arguments: arguments)
+    }
+    
+    public func onItemActionPerform(id: Int64, url: URL, title: String?) {
         let arguments: [String: Any?] = [
             "id": id,
             "url": url.absoluteString,
             "title": title,
         ]
-        channel?.invokeMethod("onChromeSafariBrowserMenuItemActionPerform", arguments: arguments)
+        channel?.invokeMethod("onItemActionPerform", arguments: arguments)
     }
     
     public override func dispose() {

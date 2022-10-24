@@ -12,6 +12,7 @@ import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.Headless
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +47,12 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
       case "open":
         if (plugin != null && plugin.activity != null) {
           String url = (String) call.argument("url");
+          HashMap<String, Object> headers = (HashMap<String, Object>) call.argument("headers");
+          ArrayList<String> otherLikelyURLs = (ArrayList<String>) call.argument("otherLikelyURLs");
           HashMap<String, Object> settings = (HashMap<String, Object>) call.argument("settings");
           HashMap<String, Object> actionButton = (HashMap<String, Object>) call.argument("actionButton");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(plugin.activity, viewId, url, settings, actionButton, menuItemList, result);
+          open(plugin.activity, viewId, url, headers, otherLikelyURLs, settings, actionButton, menuItemList, result);
         } else {
           result.success(false);
         }
@@ -66,8 +69,9 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
     }
   }
 
-  public void open(Activity activity, String viewId, String url, HashMap<String, Object> settings,
-                   HashMap<String, Object> actionButton,
+  public void open(Activity activity, String viewId, @Nullable String url, @Nullable HashMap<String, Object> headers,
+                   @Nullable ArrayList<String> otherLikelyURLs,
+                   HashMap<String, Object> settings, HashMap<String, Object> actionButton,
                    List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
 
     Intent intent = null;
@@ -76,6 +80,8 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
     extras.putBoolean("isData", false);
     extras.putString("id", viewId);
     extras.putString("managerId", this.id);
+    extras.putSerializable("headers", headers);
+    extras.putSerializable("otherLikelyURLs", otherLikelyURLs);
     extras.putSerializable("settings", settings);
     extras.putSerializable("actionButton", (Serializable) actionButton);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);

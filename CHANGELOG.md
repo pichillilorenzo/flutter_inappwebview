@@ -1,3 +1,19 @@
+## 6.0.0-beta.9
+
+- Added `headers`, `otherLikelyURLs` arguments on `ChromeSafariBrowser.open` method for Android
+- Added `onNavigationEvent`, `onServiceConnected`, `onRelationshipValidationResult` events on `ChromeSafariBrowser` for Android
+- Added `mayLaunchUrl`, `launchUrl`, `updateActionButton`, `validateRelationship` methods on `ChromeSafariBrowser` for Android
+- Added `didLoadSuccessfully` optional argument on `ChromeSafariBrowser.onCompletedInitialLoad` event for iOS
+- Added `onInitialLoadDidRedirect`, `onWillOpenInBrowser` events on `ChromeSafariBrowser` for iOS
+- Added `clearWebsiteData`, `prewarmConnections`, `invalidatePrewarmingToken` static methods on `ChromeSafariBrowser` for iOS
+
+### BREAKING CHANGES
+
+- `ChromeSafariBrowser.onCompletedInitialLoad` event has an optional argument
+
+## 6.0.0-beta.8
+
+
 ## 6.0.0-beta.7
 
 - Updated Android hybrid composition implementation

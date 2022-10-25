@@ -21,6 +21,7 @@ import androidx.browser.customtabs.CustomTabsService;
 import androidx.browser.customtabs.CustomTabsSession;
 
 import com.pichillilorenzo.flutter_inappwebview.R;
+import com.pichillilorenzo.flutter_inappwebview.types.AndroidResource;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsMenuItem;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
@@ -156,35 +157,27 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   public void launchUrl(@NonNull String url,
                           @Nullable Map<String, String> headers,
                           @Nullable List<String> otherLikelyURLs) {
-    Uri uri = mayLaunchUrl(url, headers, otherLikelyURLs);
+    mayLaunchUrl(url, otherLikelyURLs);
     builder = new CustomTabsIntent.Builder(customTabsSession);
     prepareCustomTabs();
 
     CustomTabsIntent customTabsIntent = builder.build();
     prepareCustomTabsIntent(customTabsIntent);
 
-    CustomTabActivityHelper.openCustomTab(this, customTabsIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
+    CustomTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), headers, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
-  public Uri mayLaunchUrl(@NonNull String url,
-                          @Nullable Map<String, String> headers,
-                          @Nullable List<String> otherLikelyURLs) {
-    Uri uri = Uri.parse(url);
-    Bundle bundleHeaders = new Bundle();
-    if (headers != null) {
-      for (Map.Entry<String, String> header : headers.entrySet()) {
-        bundleHeaders.putString(header.getKey(), header.getValue());
-      }
-    }
+  public boolean mayLaunchUrl(@Nullable String url, @Nullable List<String> otherLikelyURLs) {
+    Uri uri = url != null ? Uri.parse(url) : null;
+
     List<Bundle> bundleOtherLikelyURLs = new ArrayList<>();
     if (otherLikelyURLs != null) {
+      Bundle bundleOtherLikelyURL = new Bundle();
       for (String otherLikelyURL : otherLikelyURLs) {
-        Bundle bundleOtherLikelyURL = new Bundle();
         bundleOtherLikelyURL.putString(CustomTabsService.KEY_URL, otherLikelyURL);
       }
     }
-    customTabActivityHelper.mayLaunchUrl(uri, bundleHeaders, bundleOtherLikelyURLs);
-    return uri;
+    return customTabActivityHelper.mayLaunchUrl(uri, null, bundleOtherLikelyURLs);
   }
 
   public void customTabsConnected() {
@@ -206,16 +199,34 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
       builder.setShareState(customSettings.shareState);
     }
 
+    CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
     if (customSettings.toolbarBackgroundColor != null && !customSettings.toolbarBackgroundColor.isEmpty()) {
-      CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
-      builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder
-              .setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor))
-              .build());
+      defaultColorSchemeBuilder.setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor));
     }
+    if (customSettings.navigationBarColor != null && !customSettings.navigationBarColor.isEmpty()) {
+      defaultColorSchemeBuilder.setNavigationBarColor(Color.parseColor(customSettings.navigationBarColor));
+    }
+    if (customSettings.navigationBarDividerColor != null && !customSettings.navigationBarDividerColor.isEmpty()) {
+      defaultColorSchemeBuilder.setNavigationBarDividerColor(Color.parseColor(customSettings.navigationBarDividerColor));
+    }
+    if (customSettings.secondaryToolbarColor != null && !customSettings.secondaryToolbarColor.isEmpty()) {
+      defaultColorSchemeBuilder.setSecondaryToolbarColor(Color.parseColor(customSettings.secondaryToolbarColor));
+    }
+    builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder.build());
 
     builder.setShowTitle(customSettings.showTitle);
     builder.setUrlBarHidingEnabled(customSettings.enableUrlBarHiding);
     builder.setInstantAppsEnabled(customSettings.instantAppsEnabled);
+    if (customSettings.startAnimations.size() == 2) {
+      builder.setStartAnimations(this,
+              customSettings.startAnimations.get(0).getIdentifier(this),
+              customSettings.startAnimations.get(1).getIdentifier(this));
+    }
+    if (customSettings.exitAnimations.size() == 2) {
+      builder.setExitAnimations(this,
+              customSettings.exitAnimations.get(0).getIdentifier(this),
+              customSettings.exitAnimations.get(1).getIdentifier(this));
+    }
 
     for (CustomTabsMenuItem menuItem : menuItems) {
       builder.addMenuItem(menuItem.getLabel(), 

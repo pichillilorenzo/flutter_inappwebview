@@ -17,7 +17,7 @@ public class SafariBrowserSettings: ISettings<SafariViewController> {
     var preferredBarTintColor: String?
     var preferredControlTintColor: String?
     var presentationStyle = 0 //fullscreen
-    var transitionStyle = 0 //crossDissolve
+    var transitionStyle = 0 //coverVertical
     
     override init(){
         super.init()

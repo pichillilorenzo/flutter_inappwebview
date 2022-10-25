@@ -15,8 +15,35 @@ void openAndClose() {
     var chromeSafariBrowser = MyChromeSafariBrowser();
     expect(chromeSafariBrowser.isOpened(), false);
 
-    await chromeSafariBrowser.open(url: TEST_URL_1);
-    await chromeSafariBrowser.browserCreated.future;
+    await chromeSafariBrowser.open(
+        url: TEST_URL_1,
+        settings: ChromeSafariBrowserSettings(
+            shareState: CustomTabsShareState.SHARE_STATE_OFF,
+            startAnimations: [
+              AndroidResource(
+                  name: "slide_in_left",
+                  defType: "anim",
+                  defPackage: "android"),
+              AndroidResource(
+                  name: "slide_out_right",
+                  defType: "anim",
+                  defPackage: "android")
+            ],
+            exitAnimations: [
+              AndroidResource(
+                  name: "abc_slide_in_top",
+                  defType: "anim",
+                  defPackage:
+                      "com.pichillilorenzo.flutter_inappwebviewexample"),
+              AndroidResource(
+                  name: "abc_slide_out_top",
+                  defType: "anim",
+                  defPackage: "com.pichillilorenzo.flutter_inappwebviewexample")
+            ],
+            keepAliveEnabled: true,
+            dismissButtonStyle: DismissButtonStyle.CLOSE,
+            presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN));
+    await chromeSafariBrowser.opened.future;
     expect(chromeSafariBrowser.isOpened(), true);
     expect(() async {
       await chromeSafariBrowser.open(url: TEST_CROSS_PLATFORM_URL_1);
@@ -24,7 +51,7 @@ void openAndClose() {
 
     await expectLater(chromeSafariBrowser.firstPageLoaded.future, completes);
     await chromeSafariBrowser.close();
-    await chromeSafariBrowser.browserClosed.future;
+    await chromeSafariBrowser.closed.future;
     expect(chromeSafariBrowser.isOpened(), false);
   }, skip: shouldSkip);
 }

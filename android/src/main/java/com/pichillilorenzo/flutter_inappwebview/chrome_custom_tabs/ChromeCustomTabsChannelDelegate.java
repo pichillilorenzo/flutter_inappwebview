@@ -48,14 +48,8 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
       case "mayLaunchUrl":
         if (chromeCustomTabsActivity != null) {
           String url = (String) call.argument("url");
-          if (url != null) {
-            Map<String, String> headers = (Map<String, String>) call.argument("headers");
-            List<String> otherLikelyURLs = (List<String>) call.argument("otherLikelyURLs");
-            chromeCustomTabsActivity.mayLaunchUrl(url, headers, otherLikelyURLs);
-            result.success(true);
-          } else {
-            result.success(false);
-          }
+          List<String> otherLikelyURLs = (List<String>) call.argument("otherLikelyURLs");
+          result.success(chromeCustomTabsActivity.mayLaunchUrl(url, otherLikelyURLs));
         } else {
           result.success(false);
         }
@@ -74,8 +68,7 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
         if (chromeCustomTabsActivity != null && chromeCustomTabsActivity.customTabsSession != null) {
           Integer relation = (Integer) call.argument("relation");
           String origin = (String) call.argument("origin");
-          chromeCustomTabsActivity.customTabsSession.validateRelationship(relation, Uri.parse(origin), null);
-          result.success(true);
+          result.success(chromeCustomTabsActivity.customTabsSession.validateRelationship(relation, Uri.parse(origin), null));
         } else {
           result.success(false);
         }

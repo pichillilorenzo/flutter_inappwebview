@@ -218,3 +218,4 @@ export 'window_titlebar_separator_style.dart' show WindowTitlebarSeparatorStyle;
 export 'custom_tabs_navigation_event_type.dart' show CustomTabsNavigationEventType;
 export 'custom_tabs_relation_type.dart' show CustomTabsRelationType;
 export 'prewarming_token.dart' show PrewarmingToken;
+export 'android_resource.dart' show AndroidResource;

@@ -54,22 +54,44 @@ class MyInAppBrowser extends InAppBrowser {
 }
 
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
-  final Completer<void> browserCreated = Completer<void>();
-  final Completer<void> firstPageLoaded = Completer<void>();
-  final Completer<void> browserClosed = Completer<void>();
+  final Completer<void> serviceConnected = Completer<void>();
+  final Completer<void> opened = Completer<void>();
+  final Completer<bool> firstPageLoaded = Completer<bool>();
+  final Completer<void> closed = Completer<void>();
+  final Completer<CustomTabsNavigationEventType?> navigationEvent = Completer<CustomTabsNavigationEventType?>();
+  final Completer<bool> relationshipValidationResult = Completer<bool>();
 
   @override
-  void onOpened() {
-    browserCreated.complete();
+  void onServiceConnected() {
+    serviceConnected.complete();
   }
 
   @override
-  void onCompletedInitialLoad() {
-    firstPageLoaded.complete();
+  void onOpened() {
+    opened.complete();
+  }
+
+  @override
+  void onCompletedInitialLoad(didLoadSuccessfully) {
+    firstPageLoaded.complete(didLoadSuccessfully);
+  }
+
+  @override
+  void onNavigationEvent(CustomTabsNavigationEventType? type) {
+    if (!navigationEvent.isCompleted) {
+      navigationEvent.complete(type);
+    }
+  }
+
+
+  @override
+  void onRelationshipValidationResult(
+      CustomTabsRelationType? relation, Uri? requestedOrigin, bool result) {
+    relationshipValidationResult.complete(result);
   }
 
   @override
   void onClosed() {
-    browserClosed.complete();
+    closed.complete();
   }
 }

@@ -1,69 +1,20 @@
-import 'dart:ui';
+// GENERATED CODE - DO NOT MODIFY BY HAND
 
-import 'package:flutter/foundation.dart';
-import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+part of 'chrome_safari_browser_settings.dart';
 
-import '../types/android_resource.dart';
-import '../types/custom_tabs_share_state.dart';
-import '../types/dismiss_button_style.dart';
-import '../types/main.dart';
-import '../types/modal_presentation_style.dart';
-import '../types/modal_transition_style.dart';
-import '../types/trusted_web_activity_display_mode.dart';
-import '../types/trusted_web_activity_screen_orientation.dart';
-import '../util.dart';
-import 'android/chrome_custom_tabs_options.dart';
-import 'apple/safari_options.dart';
-
-part 'chrome_safari_browser_settings.g.dart';
-
-TrustedWebActivityDisplayMode? _deserializeDisplayMode(
-    Map<String, dynamic>? displayMode) {
-  if (displayMode == null) {
-    return null;
-  }
-  switch (displayMode["type"]) {
-    case "IMMERSIVE_MODE":
-      return TrustedWebActivityImmersiveDisplayMode.fromMap(displayMode);
-    case "DEFAULT_MODE":
-    default:
-      return TrustedWebActivityDefaultDisplayMode();
-  }
-}
-
-class ChromeSafariBrowserOptions {
-  Map<String, dynamic> toMap() {
-    return {};
-  }
-
-  static ChromeSafariBrowserOptions fromMap(Map<String, dynamic> map) {
-    return new ChromeSafariBrowserOptions();
-  }
-
-  ChromeSafariBrowserOptions copy() {
-    return ChromeSafariBrowserOptions.fromMap(this.toMap());
-  }
-
-  Map<String, dynamic> toJson() {
-    return this.toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
-}
+// **************************************************************************
+// ExchangeableObjectGenerator
+// **************************************************************************
 
 ///Class that represents the settings that can be used for an [ChromeSafariBrowser] window.
-@ExchangeableObject(copyMethod: true)
-class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
+class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///The share state that should be applied to the custom tab. The default value is [CustomTabsShareState.SHARE_STATE_DEFAULT].
   ///
   ///**NOTE**: Not available in a Trusted Web Activity.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  CustomTabsShareState_? shareState;
+  CustomTabsShareState? shareState;
 
   ///Set to `false` if the title shouldn't be shown in the custom tab. The default value is `true`.
   ///
@@ -161,8 +112,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  @ExchangeableObjectProperty(deserializer: _deserializeDisplayMode)
-  TrustedWebActivityDisplayMode_? displayMode;
+  TrustedWebActivityDisplayMode? displayMode;
 
   ///Sets a screen orientation. This can be used e.g. to enable the locking of an orientation lock type.
   ///
@@ -170,7 +120,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  TrustedWebActivityScreenOrientation_? screenOrientation;
+  TrustedWebActivityScreenOrientation? screenOrientation;
 
   ///Sets the start animations.
   ///It must contain 2 [AndroidResource], where the first one represents the "enter" animation for the browser
@@ -178,7 +128,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  List<AndroidResource_>? startAnimations;
+  List<AndroidResource>? startAnimations;
 
   ///Sets the exit animations.
   ///It must contain 2 [AndroidResource], where the first one represents the "enter" animation for the application
@@ -186,7 +136,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  List<AndroidResource_>? exitAnimations;
+  List<AndroidResource>? exitAnimations;
 
   ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
   ///
@@ -206,7 +156,7 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  DismissButtonStyle_? dismissButtonStyle;
+  DismissButtonStyle? dismissButtonStyle;
 
   ///Set the custom background color of the navigation bar and the toolbar.
   ///
@@ -228,17 +178,15 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  ModalPresentationStyle_? presentationStyle;
+  ModalPresentationStyle? presentationStyle;
 
   ///Set to the custom transition style when presenting the WebView. The default value is [ModalTransitionStyle.COVER_VERTICAL].
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
-  ModalTransitionStyle_? transitionStyle;
-
-  @ExchangeableObjectConstructor()
-  ChromeSafariBrowserSettings_(
-      {this.shareState = CustomTabsShareState_.SHARE_STATE_DEFAULT,
+  ModalTransitionStyle? transitionStyle;
+  ChromeSafariBrowserSettings(
+      {this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
       this.showTitle = true,
       this.toolbarBackgroundColor,
       this.navigationBarColor,
@@ -253,16 +201,16 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
       this.isTrustedWebActivity = false,
       this.additionalTrustedOrigins = const [],
       this.displayMode,
-      this.screenOrientation = TrustedWebActivityScreenOrientation_.DEFAULT,
+      this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
       this.startAnimations,
       this.exitAnimations,
       this.entersReaderIfAvailable = false,
       this.barCollapsingEnabled = false,
-      this.dismissButtonStyle = DismissButtonStyle_.DONE,
+      this.dismissButtonStyle = DismissButtonStyle.DONE,
       this.preferredBarTintColor,
       this.preferredControlTintColor,
-      this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL}) {
+      this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
+      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL}) {
     if (startAnimations != null) {
       assert(startAnimations!.length == 2,
           "start animations must be have 2 android resources");
@@ -273,56 +221,110 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
     }
   }
 
-  @override
-  @ExchangeableObjectMethod(ignore: true)
-  ChromeSafariBrowserSettings_ copy() {
-    throw UnimplementedError();
+  ///Gets a possible [ChromeSafariBrowserSettings] instance from a [Map] value.
+  static ChromeSafariBrowserSettings? fromMap(Map<String, dynamic>? map) {
+    if (map == null) {
+      return null;
+    }
+    final instance = ChromeSafariBrowserSettings(
+      toolbarBackgroundColor: map['toolbarBackgroundColor'] != null
+          ? UtilColor.fromStringRepresentation(map['toolbarBackgroundColor'])
+          : null,
+      navigationBarColor: map['navigationBarColor'] != null
+          ? UtilColor.fromStringRepresentation(map['navigationBarColor'])
+          : null,
+      navigationBarDividerColor: map['navigationBarDividerColor'] != null
+          ? UtilColor.fromStringRepresentation(map['navigationBarDividerColor'])
+          : null,
+      secondaryToolbarColor: map['secondaryToolbarColor'] != null
+          ? UtilColor.fromStringRepresentation(map['secondaryToolbarColor'])
+          : null,
+      packageName: map['packageName'],
+      displayMode: _deserializeDisplayMode(map['displayMode']),
+      startAnimations: map['startAnimations'] != null
+          ? List<AndroidResource>.from(map['startAnimations']
+              .map((e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!))
+          : null,
+      exitAnimations: map['exitAnimations'] != null
+          ? List<AndroidResource>.from(map['exitAnimations']
+              .map((e) => AndroidResource.fromMap(e?.cast<String, dynamic>())!))
+          : null,
+      preferredBarTintColor: map['preferredBarTintColor'] != null
+          ? UtilColor.fromStringRepresentation(map['preferredBarTintColor'])
+          : null,
+      preferredControlTintColor: map['preferredControlTintColor'] != null
+          ? UtilColor.fromStringRepresentation(map['preferredControlTintColor'])
+          : null,
+    );
+    instance.shareState =
+        CustomTabsShareState.fromNativeValue(map['shareState']);
+    instance.showTitle = map['showTitle'];
+    instance.enableUrlBarHiding = map['enableUrlBarHiding'];
+    instance.instantAppsEnabled = map['instantAppsEnabled'];
+    instance.keepAliveEnabled = map['keepAliveEnabled'];
+    instance.isSingleInstance = map['isSingleInstance'];
+    instance.noHistory = map['noHistory'];
+    instance.isTrustedWebActivity = map['isTrustedWebActivity'];
+    instance.additionalTrustedOrigins =
+        map['additionalTrustedOrigins']?.cast<String>();
+    instance.screenOrientation =
+        TrustedWebActivityScreenOrientation.fromNativeValue(
+            map['screenOrientation']);
+    instance.entersReaderIfAvailable = map['entersReaderIfAvailable'];
+    instance.barCollapsingEnabled = map['barCollapsingEnabled'];
+    instance.dismissButtonStyle =
+        DismissButtonStyle.fromNativeValue(map['dismissButtonStyle']);
+    instance.presentationStyle =
+        ModalPresentationStyle.fromNativeValue(map['presentationStyle']);
+    instance.transitionStyle =
+        ModalTransitionStyle.fromNativeValue(map['transitionStyle']);
+    return instance;
   }
 
-  @override
-  @ExchangeableObjectMethod(ignore: true)
-  Map<String, dynamic> toJson() {
-    throw UnimplementedError();
-  }
-
-  @override
-  @ExchangeableObjectMethod(ignore: true)
+  ///Converts instance to a map.
   Map<String, dynamic> toMap() {
-    throw UnimplementedError();
+    return {
+      "shareState": shareState?.toNativeValue(),
+      "showTitle": showTitle,
+      "toolbarBackgroundColor": toolbarBackgroundColor?.toHex(),
+      "navigationBarColor": navigationBarColor?.toHex(),
+      "navigationBarDividerColor": navigationBarDividerColor?.toHex(),
+      "secondaryToolbarColor": secondaryToolbarColor?.toHex(),
+      "enableUrlBarHiding": enableUrlBarHiding,
+      "instantAppsEnabled": instantAppsEnabled,
+      "packageName": packageName,
+      "keepAliveEnabled": keepAliveEnabled,
+      "isSingleInstance": isSingleInstance,
+      "noHistory": noHistory,
+      "isTrustedWebActivity": isTrustedWebActivity,
+      "additionalTrustedOrigins": additionalTrustedOrigins,
+      "displayMode": displayMode?.toMap(),
+      "screenOrientation": screenOrientation?.toNativeValue(),
+      "startAnimations": startAnimations?.map((e) => e.toMap()).toList(),
+      "exitAnimations": exitAnimations?.map((e) => e.toMap()).toList(),
+      "entersReaderIfAvailable": entersReaderIfAvailable,
+      "barCollapsingEnabled": barCollapsingEnabled,
+      "dismissButtonStyle": dismissButtonStyle?.toNativeValue(),
+      "preferredBarTintColor": preferredBarTintColor?.toHex(),
+      "preferredControlTintColor": preferredControlTintColor?.toHex(),
+      "presentationStyle": presentationStyle?.toNativeValue(),
+      "transitionStyle": transitionStyle?.toNativeValue(),
+    };
   }
-}
 
-///Class that represents the options that can be used for an [ChromeSafariBrowser] window.
-///Use [ChromeSafariBrowserSettings] instead.
-@Deprecated('Use ChromeSafariBrowserSettings instead')
-class ChromeSafariBrowserClassOptions {
-  ///Android-specific options.
-  AndroidChromeCustomTabsOptions? android;
-
-  ///iOS-specific options.
-  IOSSafariOptions? ios;
-
-  ChromeSafariBrowserClassOptions({this.android, this.ios}) {
-    this.android = this.android ?? AndroidChromeCustomTabsOptions();
-    this.ios = this.ios ?? IOSSafariOptions();
-  }
-
-  Map<String, dynamic> toMap() {
-    Map<String, dynamic> options = {};
-    if (defaultTargetPlatform == TargetPlatform.android)
-      options.addAll(this.android?.toMap() ?? {});
-    else if (defaultTargetPlatform == TargetPlatform.iOS)
-      options.addAll(this.ios?.toMap() ?? {});
-
-    return options;
-  }
-
+  ///Converts instance to a map.
   Map<String, dynamic> toJson() {
-    return this.toMap();
+    return toMap();
+  }
+
+  ///Returns a copy of ChromeSafariBrowserSettings.
+  ChromeSafariBrowserSettings copy() {
+    return ChromeSafariBrowserSettings.fromMap(toMap()) ??
+        ChromeSafariBrowserSettings();
   }
 
   @override
   String toString() {
-    return toMap().toString();
+    return 'ChromeSafariBrowserSettings{shareState: $shareState, showTitle: $showTitle, toolbarBackgroundColor: $toolbarBackgroundColor, navigationBarColor: $navigationBarColor, navigationBarDividerColor: $navigationBarDividerColor, secondaryToolbarColor: $secondaryToolbarColor, enableUrlBarHiding: $enableUrlBarHiding, instantAppsEnabled: $instantAppsEnabled, packageName: $packageName, keepAliveEnabled: $keepAliveEnabled, isSingleInstance: $isSingleInstance, noHistory: $noHistory, isTrustedWebActivity: $isTrustedWebActivity, additionalTrustedOrigins: $additionalTrustedOrigins, displayMode: $displayMode, screenOrientation: $screenOrientation, startAnimations: $startAnimations, exitAnimations: $exitAnimations, entersReaderIfAvailable: $entersReaderIfAvailable, barCollapsingEnabled: $barCollapsingEnabled, dismissButtonStyle: $dismissButtonStyle, preferredBarTintColor: $preferredBarTintColor, preferredControlTintColor: $preferredControlTintColor, presentationStyle: $presentationStyle, transitionStyle: $transitionStyle}';
   }
 }

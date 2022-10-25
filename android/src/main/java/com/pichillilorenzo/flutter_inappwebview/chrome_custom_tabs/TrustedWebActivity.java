@@ -31,15 +31,16 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
     if (customTabsSession == null) {
       return;
     }
+    Uri uri = Uri.parse(url);
 
-    Uri uri = mayLaunchUrl(url, headers, otherLikelyURLs);
+    mayLaunchUrl(url, otherLikelyURLs);
     builder = new TrustedWebActivityIntentBuilder(uri);
     prepareCustomTabs();
 
     TrustedWebActivityIntent trustedWebActivityIntent = builder.build(customTabsSession);
     prepareCustomTabsIntent(trustedWebActivityIntent);
 
-    CustomTabActivityHelper.openCustomTab(this, trustedWebActivityIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
+    CustomTabActivityHelper.openCustomTab(this, trustedWebActivityIntent, uri, headers, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
   @Override
@@ -48,7 +49,6 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
     if (initialUrl != null) {
       launchUrl(initialUrl, initialHeaders, initialOtherLikelyURLs);
     }
-
   }
 
   private void prepareCustomTabs() {

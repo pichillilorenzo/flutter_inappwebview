@@ -114,6 +114,14 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
         }
         result.success(true);
         break;
+      case "getVariationsHeader":
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.GET_VARIATIONS_HEADER)) {
+          result.success(WebViewCompat.getVariationsHeader());
+        }
+        else {
+          result.success(null);
+        }
+        break;
       default:
         result.notImplemented();
     }

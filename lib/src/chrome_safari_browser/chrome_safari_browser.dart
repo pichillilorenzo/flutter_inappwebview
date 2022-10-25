@@ -143,7 +143,9 @@ class ChromeSafariBrowser {
   ///
   ///[url] - The [url] to load. On iOS, the [url] is required and must use the `http` or `https` scheme.
   ///
-  ///[headers] - extra request headers. Supported only on Android.
+  ///[headers] (Supported only on Android) - [whitelisted](https://fetch.spec.whatwg.org/#cors-safelisted-request-header) cross-origin request headers.
+  ///It is possible to attach non-whitelisted headers to cross-origin requests, when the server and client are related using a
+  ///[digital asset link](https://developers.google.com/digital-asset-links/v1/getting-started).
   ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order. Supported only on Android.
   ///
@@ -199,7 +201,9 @@ class ChromeSafariBrowser {
   ///
   ///[url] - initial url.
   ///
-  ///[headers] - extra request headers.
+  ///[headers] (Supported only on Android) - [whitelisted](https://fetch.spec.whatwg.org/#cors-safelisted-request-header) cross-origin request headers.
+  ///It is possible to attach non-whitelisted headers to cross-origin requests, when the server and client are related using a
+  ///[digital asset link](https://developers.google.com/digital-asset-links/v1/getting-started).
   ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order.
   ///
@@ -225,22 +229,18 @@ class ChromeSafariBrowser {
   ///
   ///[url] - Most likely URL, may be null if otherLikelyBundles is provided.
   ///
-  ///[headers] - extra request headers.
-  ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.mayLaunchUrl](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)))
-  Future<void> mayLaunchUrl(
+  Future<bool> mayLaunchUrl(
       {Uri? url,
-      Map<String, String>? headers,
       List<Uri>? otherLikelyURLs}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url?.toString());
-    args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
-    await _channel.invokeMethod("mayLaunchUrl", args);
+    return await _channel.invokeMethod("mayLaunchUrl", args);
   }
 
   ///Requests to validate a relationship between the application and an origin.
@@ -251,14 +251,20 @@ class ChromeSafariBrowser {
   ///If this method returns `true`, the validation result will be provided through [onRelationshipValidationResult].
   ///Otherwise the request didn't succeed.
   ///
+  ///[relation] – Relation to check, must be one of the [CustomTabsRelationType] constants.
+  ///
+  ///[origin] – Origin.
+  ///
+  ///[extras] – Reserved for future use.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.validateRelationship](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)))
-  Future<void> validateRelationship(
+  Future<bool> validateRelationship(
       {required CustomTabsRelationType relation, required Uri origin}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('relation', () => relation.toNativeValue());
     args.putIfAbsent('origin', () => origin.toString());
-    await _channel.invokeMethod("validateRelationship", args);
+    return await _channel.invokeMethod("validateRelationship", args);
   }
 
   ///Closes the [ChromeSafariBrowser] instance.

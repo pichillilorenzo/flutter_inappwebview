@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Browser;
 
 import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsCallback;
@@ -14,6 +15,7 @@ import androidx.browser.customtabs.CustomTabsSession;
 import androidx.browser.trusted.TrustedWebActivityIntent;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is a helper class to manage the connection to the Custom Tabs Service.
@@ -35,18 +37,35 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
     public static void openCustomTab(Activity activity,
                                      CustomTabsIntent customTabsIntent,
                                      Uri uri,
+                                     @Nullable Map<String, String> headers,
                                      int requestCode) {
         customTabsIntent.intent.setData(uri);
+        if (headers != null) {
+            Bundle bundleHeaders = new Bundle();
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                bundleHeaders.putString(header.getKey(), header.getValue());
+            }
+            customTabsIntent.intent.putExtra(Browser.EXTRA_HEADERS, bundleHeaders);
+        }
         activity.startActivityForResult(customTabsIntent.intent, requestCode);
     }
 
     public static void openCustomTab(Activity activity,
                                      TrustedWebActivityIntent trustedWebActivityIntent,
                                      Uri uri,
+                                     @Nullable Map<String, String> headers,
                                      int requestCode) {
         trustedWebActivityIntent.getIntent().setData(uri);
+        if (headers != null) {
+            Bundle bundleHeaders = new Bundle();
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                bundleHeaders.putString(header.getKey(), header.getValue());
+            }
+            trustedWebActivityIntent.getIntent().putExtra(Browser.EXTRA_HEADERS, bundleHeaders);
+        }
         activity.startActivityForResult(trustedWebActivityIntent.getIntent(), requestCode);
     }
+
     
     public static boolean isAvailable(Activity activity) {
         return CustomTabsHelper.getPackageNameToUse(activity) != null;

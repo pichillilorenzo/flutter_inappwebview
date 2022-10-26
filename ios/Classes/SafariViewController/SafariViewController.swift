@@ -21,6 +21,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         self.id = id
         self.menuItemList = menuItemList
         self.safariSettings = safariSettings
+        SafariViewController.prepareConfig(configuration: configuration, safariSettings: safariSettings)
         super.init(url: url, configuration: configuration)
         let channel = FlutterMethodChannel(name: SafariViewController.METHOD_CHANNEL_NAME_PREFIX + id,
                                            binaryMessenger: SwiftFlutterPlugin.instance!.registrar!.messenger())
@@ -39,18 +40,16 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         self.delegate = self
     }
     
-    public override func viewWillAppear(_ animated: Bool) {
-        // prepareSafariBrowser()
-        super.viewWillAppear(animated)
-        channelDelegate?.onOpened()
+    public static func prepareConfig(configuration: SFSafariViewController.Configuration, safariSettings: SafariBrowserSettings) {
+        configuration.entersReaderIfAvailable = safariSettings.entersReaderIfAvailable
+        configuration.barCollapsingEnabled = safariSettings.barCollapsingEnabled
+        if #available(iOS 15.0, *), let activityButtonMap = safariSettings.activityButton {
+            configuration.activityButton = .fromMap(map: activityButtonMap)
+        }
+        if #available(iOS 15.2, *), let eventAttributionMap = safariSettings.eventAttribution {
+            configuration.eventAttribution = .fromMap(map: eventAttributionMap)
+        }
     }
-    
-    public override func viewDidDisappear(_ animated: Bool) {
-        super.viewDidDisappear(animated)
-        channelDelegate?.onClosed()
-        self.dispose()
-    }
-    
     
     func prepareSafariBrowser() {
         if #available(iOS 11.0, *) {
@@ -68,6 +67,18 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
         
         self.modalPresentationStyle = UIModalPresentationStyle(rawValue: safariSettings.presentationStyle)!
         self.modalTransitionStyle = UIModalTransitionStyle(rawValue: safariSettings.transitionStyle)!
+    }
+    
+    public override func viewWillAppear(_ animated: Bool) {
+        // prepareSafariBrowser()
+        super.viewWillAppear(animated)
+        channelDelegate?.onOpened()
+    }
+    
+    public override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        channelDelegate?.onClosed()
+        self.dispose()
     }
     
     func close(result: FlutterResult?) {
@@ -93,7 +104,7 @@ public class SafariViewController: SFSafariViewController, SFSafariViewControlle
     public func safariViewController(_ controller: SFSafariViewController, activityItemsFor URL: URL, title: String?) -> [UIActivity] {
         var uiActivities: [UIActivity] = []
         menuItemList.forEach { (menuItem) in
-            let activity = CustomUIActivity(viewId: id, id: menuItem["id"] as! Int64, url: URL, title: title, label: menuItem["label"] as? String, type: nil, image: nil)
+            let activity = CustomUIActivity(viewId: id, id: menuItem["id"] as! Int64, url: URL, title: title, label: menuItem["label"] as? String, type: nil, image: .fromMap(map: menuItem["image"] as? [String:Any?]))
             uiActivities.append(activity)
         }
         return uiActivities

@@ -10,11 +10,11 @@ import java.util.Map;
 
 public class AndroidResource {
   @NonNull
-  String name;
+  private String name;
   @Nullable
-  String defType;
+  private String defType;
   @Nullable
-  String defPackage;
+  private String defPackage;
 
   public AndroidResource(@NonNull String name, @Nullable String defType, @Nullable String defPackage) {
     this.name = name;

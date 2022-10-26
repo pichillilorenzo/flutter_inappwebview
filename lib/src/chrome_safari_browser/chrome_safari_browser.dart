@@ -4,9 +4,11 @@ import 'dart:typed_data';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
+import '../types/android_resource.dart';
 import '../types/custom_tabs_navigation_event_type.dart';
 import '../types/custom_tabs_relation_type.dart';
 import '../types/prewarming_token.dart';
+import '../types/ui_image.dart';
 import '../util.dart';
 import '../debug_logging_settings.dart';
 
@@ -55,6 +57,7 @@ class ChromeSafariBrowser {
 
   ChromeSafariBrowserActionButton? _actionButton;
   Map<int, ChromeSafariBrowserMenuItem> _menuItems = new HashMap();
+  ChromeSafariBrowserSecondaryToolbar? _secondaryToolbar;
   bool _isOpened = false;
   late MethodChannel _channel;
   static const MethodChannel _sharedChannel =
@@ -129,9 +132,46 @@ class ChromeSafariBrowser {
         String title = call.arguments["title"];
         int id = call.arguments["id"].toInt();
         if (this._actionButton?.id == id) {
-          this._actionButton?.action(url, title);
+          if (this._actionButton?.action != null) {
+            this._actionButton?.action!(url, title);
+          }
+          if (this._actionButton?.onClick != null) {
+            this._actionButton?.onClick!(Uri.tryParse(url), title);
+          }
         } else if (this._menuItems[id] != null) {
-          this._menuItems[id]?.action(url, title);
+          if (this._menuItems[id]?.action != null) {
+            this._menuItems[id]?.action!(url, title);
+          }
+          if (this._menuItems[id]?.onClick != null) {
+            this._menuItems[id]?.onClick!(Uri.tryParse(url), title);
+          }
+        }
+        break;
+      case "onSecondaryItemActionPerform":
+        final clickableIDs = this._secondaryToolbar?.clickableIDs;
+        if (clickableIDs != null) {
+          Uri? url = call.arguments["url"] != null
+              ? Uri.tryParse(call.arguments["url"])
+              : null;
+          String name = call.arguments["name"];
+          for (final clickable in clickableIDs) {
+            var clickableFullname = clickable.id.name;
+            if (clickable.id.defType != null &&
+                !clickableFullname.contains("/")) {
+              clickableFullname = "${clickable.id.defType}/$clickableFullname";
+            }
+            if (clickable.id.defPackage != null &&
+                !clickableFullname.contains(":")) {
+              clickableFullname =
+                  "${clickable.id.defPackage}:$clickableFullname";
+            }
+            if (clickableFullname == name) {
+              if (clickable.onClick != null) {
+                clickable.onClick!(url);
+              }
+              break;
+            }
+          }
         }
         break;
       default:
@@ -149,7 +189,9 @@ class ChromeSafariBrowser {
   ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order. Supported only on Android.
   ///
-  ///[options] - Options for the [ChromeSafariBrowser].
+  ///[referrer] - referrer header. Supported only on Android.
+  ///
+  ///[options] - Deprecated. Use `settings` instead.
   ///
   ///[settings] - Settings for the [ChromeSafariBrowser].
   ///
@@ -160,6 +202,7 @@ class ChromeSafariBrowser {
       {Uri? url,
       Map<String, String>? headers,
       List<Uri>? otherLikelyURLs,
+      Uri? referrer,
       @Deprecated('Use settings instead')
           // ignore: deprecated_member_use_from_same_package
           ChromeSafariBrowserClassOptions? options,
@@ -191,8 +234,10 @@ class ChromeSafariBrowser {
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
+    args.putIfAbsent('referrer', () => referrer?.toString());
     args.putIfAbsent('settings', () => initialSettings);
     args.putIfAbsent('actionButton', () => _actionButton?.toMap());
+    args.putIfAbsent('secondaryToolbar', () => _secondaryToolbar?.toMap());
     args.putIfAbsent('menuItemList', () => menuItemList);
     await _sharedChannel.invokeMethod('open', args);
   }
@@ -207,17 +252,22 @@ class ChromeSafariBrowser {
   ///
   ///[otherLikelyURLs] - Other likely destinations, sorted in decreasing likelihood order.
   ///
+  ///[referrer] - referrer header. Supported only on Android.
+  ///
   ///**Supported Platforms/Implementations**:
   ///- Android
-  Future<void> launchUrl(
-      {required Uri url,
-      Map<String, String>? headers,
-      List<Uri>? otherLikelyURLs}) async {
+  Future<void> launchUrl({
+    required Uri url,
+    Map<String, String>? headers,
+    List<Uri>? otherLikelyURLs,
+    Uri? referrer,
+  }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
     args.putIfAbsent('headers', () => headers);
     args.putIfAbsent('otherLikelyURLs',
         () => otherLikelyURLs?.map((e) => e.toString()).toList());
+    args.putIfAbsent('referrer', () => referrer?.toString());
     await _channel.invokeMethod("launchUrl", args);
   }
 
@@ -233,9 +283,7 @@ class ChromeSafariBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.mayLaunchUrl](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)))
-  Future<bool> mayLaunchUrl(
-      {Uri? url,
-      List<Uri>? otherLikelyURLs}) async {
+  Future<bool> mayLaunchUrl({Uri? url, List<Uri>? otherLikelyURLs}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url?.toString());
     args.putIfAbsent('otherLikelyURLs',
@@ -303,6 +351,31 @@ class ChromeSafariBrowser {
     _actionButton?.description = description;
   }
 
+  ///Sets the remote views displayed in the secondary toolbar in a custom tab.
+  ///
+  ///**NOTE**: Not available in a Trusted Web Activity.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsIntent.Builder.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsIntent.Builder#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
+  void setSecondaryToolbar(
+      ChromeSafariBrowserSecondaryToolbar secondaryToolbar) {
+    this._secondaryToolbar = secondaryToolbar;
+  }
+
+  ///Sets or updates (if already present) the Remote Views of the secondary toolbar in an existing custom tab session.
+  ///
+  ///**NOTE**: Not available in a Trusted Web Activity.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android ([Official API - CustomTabsSession.setSecondaryToolbarViews](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#setSecondaryToolbarViews(android.widget.RemoteViews,int[],android.app.PendingIntent)))
+  Future<void> updateSecondaryToolbar(
+      ChromeSafariBrowserSecondaryToolbar secondaryToolbar) async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    args.putIfAbsent('secondaryToolbar', () => secondaryToolbar.toMap());
+    await _channel.invokeMethod("updateSecondaryToolbar", args);
+    this._secondaryToolbar = secondaryToolbar;
+  }
+
   ///Adds a [ChromeSafariBrowserMenuItem] to the menu.
   ///
   ///**NOTE**: Not available in an Android Trusted Web Activity.
@@ -337,6 +410,15 @@ class ChromeSafariBrowser {
   static Future<bool> isAvailable() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _sharedChannel.invokeMethod("isAvailable", args);
+  }
+
+  ///The maximum number of allowed secondary toolbar items.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android
+  static Future<int> getMaxToolbarItems() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _sharedChannel.invokeMethod("getMaxToolbarItems", args);
   }
 
   ///Clear associated website data accrued from browsing activity within your app.
@@ -375,8 +457,8 @@ class ChromeSafariBrowser {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('URLs', () => URLs.map((e) => e.toString()).toList());
     Map<String, dynamic>? result =
-    (await _sharedChannel.invokeMethod("prewarmConnections", args))
-        ?.cast<String, dynamic>();
+        (await _sharedChannel.invokeMethod("prewarmConnections", args))
+            ?.cast<String, dynamic>();
     return PrewarmingToken.fromMap(result);
   }
 
@@ -386,7 +468,8 @@ class ChromeSafariBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
-  static Future<void> invalidatePrewarmingToken(PrewarmingToken prewarmingToken) async {
+  static Future<void> invalidatePrewarmingToken(
+      PrewarmingToken prewarmingToken) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('prewarmingToken', () => prewarmingToken.toMap());
     await _sharedChannel.invokeMethod("invalidatePrewarmingToken", args);
@@ -499,14 +582,19 @@ class ChromeSafariBrowserActionButton {
   ///Whether the action button should be tinted.
   bool shouldTint;
 
-  ///Callback function to be invoked when the menu item is clicked
-  final void Function(String url, String title) action;
+  ///Use onClick instead.
+  @Deprecated("Use onClick instead")
+  void Function(String url, String title)? action;
+
+  ///Callback function to be invoked when the action button is clicked
+  void Function(Uri? url, String title)? onClick;
 
   ChromeSafariBrowserActionButton(
       {required this.id,
       required this.icon,
       required this.description,
-      required this.action,
+      @Deprecated("Use onClick instead") this.action,
+      this.onClick,
       this.shouldTint = false});
 
   Map<String, dynamic> toMap() {
@@ -539,17 +627,98 @@ class ChromeSafariBrowserMenuItem {
   ///The menu item id. It should be different from [ChromeSafariBrowserActionButton.id].
   int id;
 
-  ///The label of the menu item
+  ///The label of the menu item.
   String label;
 
+  ///Item image.
+  UIImage? image;
+
+  ///Use onClick instead.
+  @Deprecated("Use onClick instead")
+  void Function(String url, String title)? action;
+
   ///Callback function to be invoked when the menu item is clicked
-  final void Function(String url, String title) action;
+  void Function(Uri? url, String title)? onClick;
 
   ChromeSafariBrowserMenuItem(
-      {required this.id, required this.label, required this.action});
+      {required this.id,
+      required this.label,
+      this.image,
+      @Deprecated("Use onClick instead") this.action,
+      this.onClick});
 
   Map<String, dynamic> toMap() {
-    return {"id": id, "label": label};
+    return {"id": id, "label": label, "image": image?.toMap()};
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents the [RemoteViews](https://developer.android.com/reference/android/widget/RemoteViews.html)
+///that will be shown on the secondary toolbar of a custom tab.
+///
+///This class describes a view hierarchy that can be displayed in another process.
+///The hierarchy is inflated from an Android layout resource file.
+///
+///RemoteViews has limited to support to Android layouts.
+///Check the [RemoteViews Official API](https://developer.android.com/reference/android/widget/RemoteViews.html) for more details.
+///
+///**NOTE**: Not available in an Android Trusted Web Activity.
+///
+///**Supported Platforms/Implementations**:
+///- Android
+class ChromeSafariBrowserSecondaryToolbar {
+  ///The android layout resource.
+  AndroidResource layout;
+
+  ///The IDs of clickable views. The `onClick` event of these views will be handled by custom tabs.
+  List<ChromeSafariBrowserSecondaryToolbarClickableID> clickableIDs;
+
+  ChromeSafariBrowserSecondaryToolbar(
+      {required this.layout, this.clickableIDs = const []});
+
+  Map<String, dynamic> toMap() {
+    return {
+      "layout": layout.toMap(),
+      "clickableIDs": clickableIDs.map((e) => e.toMap()).toList()
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    return this.toMap();
+  }
+
+  @override
+  String toString() {
+    return toMap().toString();
+  }
+}
+
+///Class that represents a clickable ID item of the secondary toolbar for a [ChromeSafariBrowser] instance.
+///
+///**NOTE**: Not available in an Android Trusted Web Activity.
+///
+///**Supported Platforms/Implementations**:
+///- Android
+class ChromeSafariBrowserSecondaryToolbarClickableID {
+  ///The android id resource
+  AndroidResource id;
+
+  ///Callback function to be invoked when the item is clicked
+  void Function(Uri? url)? onClick;
+
+  ChromeSafariBrowserSecondaryToolbarClickableID(
+      {required this.id, this.onClick});
+
+  Map<String, dynamic> toMap() {
+    return {"id": id.toMap()};
   }
 
   Map<String, dynamic> toJson() {

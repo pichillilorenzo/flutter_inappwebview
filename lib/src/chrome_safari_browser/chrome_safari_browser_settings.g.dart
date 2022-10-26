@@ -138,6 +138,15 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///- Android
   List<AndroidResource>? exitAnimations;
 
+  ///Adds the necessary flags and extras to signal any browser supporting custom tabs to use the browser UI
+  ///at all times and avoid showing custom tab like UI.
+  ///Calling this with an intent will override any custom tabs related customizations.
+  ///The default value is `false`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android
+  bool? alwaysUseBrowserUI;
+
   ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
@@ -185,6 +194,24 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
   ///**Supported Platforms/Implementations**:
   ///- iOS
   ModalTransitionStyle? transitionStyle;
+
+  ///An additional button to be shown in `SFSafariViewController`'s toolbar.
+  ///This allows the user to access powerful functionality from your extension without needing to first show the `UIActivityViewController`.
+  ///
+  ///**NOTE**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ActivityButton? activityButton;
+
+  ///An event attribution associated with a click that caused this `SFSafariViewController` to be opened.
+  ///This attribute is ignored if the `SFSafariViewController` url has a scheme of 'http'.
+  ///
+  ///**NOTE**: available on iOS 15.2+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  UIEventAttribution? eventAttribution;
   ChromeSafariBrowserSettings(
       {this.shareState = CustomTabsShareState.SHARE_STATE_DEFAULT,
       this.showTitle = true,
@@ -204,13 +231,16 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       this.screenOrientation = TrustedWebActivityScreenOrientation.DEFAULT,
       this.startAnimations,
       this.exitAnimations,
+      this.alwaysUseBrowserUI = false,
       this.entersReaderIfAvailable = false,
       this.barCollapsingEnabled = false,
       this.dismissButtonStyle = DismissButtonStyle.DONE,
       this.preferredBarTintColor,
       this.preferredControlTintColor,
       this.presentationStyle = ModalPresentationStyle.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL}) {
+      this.transitionStyle = ModalTransitionStyle.COVER_VERTICAL,
+      this.activityButton,
+      this.eventAttribution}) {
     if (startAnimations != null) {
       assert(startAnimations!.length == 2,
           "start animations must be have 2 android resources");
@@ -255,6 +285,10 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       preferredControlTintColor: map['preferredControlTintColor'] != null
           ? UtilColor.fromStringRepresentation(map['preferredControlTintColor'])
           : null,
+      activityButton: ActivityButton.fromMap(
+          map['activityButton']?.cast<String, dynamic>()),
+      eventAttribution: UIEventAttribution.fromMap(
+          map['eventAttribution']?.cast<String, dynamic>()),
     );
     instance.shareState =
         CustomTabsShareState.fromNativeValue(map['shareState']);
@@ -270,6 +304,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
     instance.screenOrientation =
         TrustedWebActivityScreenOrientation.fromNativeValue(
             map['screenOrientation']);
+    instance.alwaysUseBrowserUI = map['alwaysUseBrowserUI'];
     instance.entersReaderIfAvailable = map['entersReaderIfAvailable'];
     instance.barCollapsingEnabled = map['barCollapsingEnabled'];
     instance.dismissButtonStyle =
@@ -302,6 +337,7 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       "screenOrientation": screenOrientation?.toNativeValue(),
       "startAnimations": startAnimations?.map((e) => e.toMap()).toList(),
       "exitAnimations": exitAnimations?.map((e) => e.toMap()).toList(),
+      "alwaysUseBrowserUI": alwaysUseBrowserUI,
       "entersReaderIfAvailable": entersReaderIfAvailable,
       "barCollapsingEnabled": barCollapsingEnabled,
       "dismissButtonStyle": dismissButtonStyle?.toNativeValue(),
@@ -309,6 +345,8 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
       "preferredControlTintColor": preferredControlTintColor?.toHex(),
       "presentationStyle": presentationStyle?.toNativeValue(),
       "transitionStyle": transitionStyle?.toNativeValue(),
+      "activityButton": activityButton?.toMap(),
+      "eventAttribution": eventAttribution?.toMap(),
     };
   }
 
@@ -325,6 +363,6 @@ class ChromeSafariBrowserSettings implements ChromeSafariBrowserOptions {
 
   @override
   String toString() {
-    return 'ChromeSafariBrowserSettings{shareState: $shareState, showTitle: $showTitle, toolbarBackgroundColor: $toolbarBackgroundColor, navigationBarColor: $navigationBarColor, navigationBarDividerColor: $navigationBarDividerColor, secondaryToolbarColor: $secondaryToolbarColor, enableUrlBarHiding: $enableUrlBarHiding, instantAppsEnabled: $instantAppsEnabled, packageName: $packageName, keepAliveEnabled: $keepAliveEnabled, isSingleInstance: $isSingleInstance, noHistory: $noHistory, isTrustedWebActivity: $isTrustedWebActivity, additionalTrustedOrigins: $additionalTrustedOrigins, displayMode: $displayMode, screenOrientation: $screenOrientation, startAnimations: $startAnimations, exitAnimations: $exitAnimations, entersReaderIfAvailable: $entersReaderIfAvailable, barCollapsingEnabled: $barCollapsingEnabled, dismissButtonStyle: $dismissButtonStyle, preferredBarTintColor: $preferredBarTintColor, preferredControlTintColor: $preferredControlTintColor, presentationStyle: $presentationStyle, transitionStyle: $transitionStyle}';
+    return 'ChromeSafariBrowserSettings{shareState: $shareState, showTitle: $showTitle, toolbarBackgroundColor: $toolbarBackgroundColor, navigationBarColor: $navigationBarColor, navigationBarDividerColor: $navigationBarDividerColor, secondaryToolbarColor: $secondaryToolbarColor, enableUrlBarHiding: $enableUrlBarHiding, instantAppsEnabled: $instantAppsEnabled, packageName: $packageName, keepAliveEnabled: $keepAliveEnabled, isSingleInstance: $isSingleInstance, noHistory: $noHistory, isTrustedWebActivity: $isTrustedWebActivity, additionalTrustedOrigins: $additionalTrustedOrigins, displayMode: $displayMode, screenOrientation: $screenOrientation, startAnimations: $startAnimations, exitAnimations: $exitAnimations, alwaysUseBrowserUI: $alwaysUseBrowserUI, entersReaderIfAvailable: $entersReaderIfAvailable, barCollapsingEnabled: $barCollapsingEnabled, dismissButtonStyle: $dismissButtonStyle, preferredBarTintColor: $preferredBarTintColor, preferredControlTintColor: $preferredControlTintColor, presentationStyle: $presentationStyle, transitionStyle: $transitionStyle, activityButton: $activityButton, eventAttribution: $eventAttribution}';
   }
 }

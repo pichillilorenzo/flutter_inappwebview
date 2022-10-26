@@ -4,6 +4,6 @@ import androidx.core.content.FileProvider;
 
 public class InAppWebViewFileProvider extends FileProvider {
 
-  // This class intentionally left blank.
+  public static final String fileProviderAuthorityExtension = "flutter_inappwebview.fileprovider";
 
 }

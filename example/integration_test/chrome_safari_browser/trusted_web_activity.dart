@@ -59,8 +59,13 @@ void trustedWebActivity() {
       await chromeSafariBrowser.open(
           settings: ChromeSafariBrowserSettings(isTrustedWebActivity: true));
       await chromeSafariBrowser.serviceConnected.future;
-      expect(await chromeSafariBrowser.validateRelationship(relation: CustomTabsRelationType.USE_AS_ORIGIN, origin: TEST_CROSS_PLATFORM_URL_1), true);
-      expect(await chromeSafariBrowser.relationshipValidationResult.future, true);
+      expect(
+          await chromeSafariBrowser.validateRelationship(
+              relation: CustomTabsRelationType.USE_AS_ORIGIN,
+              origin: TEST_CROSS_PLATFORM_URL_1),
+          true);
+      expect(
+          await chromeSafariBrowser.relationshipValidationResult.future, true);
       await chromeSafariBrowser.launchUrl(url: TEST_CROSS_PLATFORM_URL_1);
       await chromeSafariBrowser.opened.future;
       expect(chromeSafariBrowser.isOpened(), true);

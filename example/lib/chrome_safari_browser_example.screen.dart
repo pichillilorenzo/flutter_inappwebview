@@ -38,7 +38,7 @@ class _ChromeSafariBrowserExampleScreenState
           id: 1,
           description: 'Action Button description',
           icon: actionButtonIcon.buffer.asUint8List(),
-          action: (url, title) {
+          onClick: (url, title) {
             print('Action Button 1 clicked!');
             print(url);
             print(title);
@@ -48,7 +48,8 @@ class _ChromeSafariBrowserExampleScreenState
     widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(
         id: 2,
         label: 'Custom item menu 1',
-        action: (url, title) {
+        image: UIImage(systemName: "sun.max"),
+        onClick: (url, title) {
           print('Custom item menu 1 clicked!');
           print(url);
           print(title);
@@ -56,7 +57,8 @@ class _ChromeSafariBrowserExampleScreenState
     widget.browser.addMenuItem(ChromeSafariBrowserMenuItem(
         id: 3,
         label: 'Custom item menu 2',
-        action: (url, title) {
+        image: UIImage(systemName: "pencil"),
+        onClick: (url, title) {
           print('Custom item menu 2 clicked!');
           print(url);
           print(title);
@@ -82,6 +84,22 @@ class _ChromeSafariBrowserExampleScreenState
                         isSingleInstance: false,
                         isTrustedWebActivity: false,
                         keepAliveEnabled: true,
+                        startAnimations: [
+                          AndroidResource.anim(
+                              name: "slide_in_left", defPackage: "android"),
+                          AndroidResource.anim(
+                              name: "slide_out_right", defPackage: "android")
+                        ],
+                        exitAnimations: [
+                          AndroidResource.anim(
+                              name: "abc_slide_in_top",
+                              defPackage:
+                                  "com.pichillilorenzo.flutter_inappwebviewexample"),
+                          AndroidResource.anim(
+                              name: "abc_slide_out_top",
+                              defPackage:
+                                  "com.pichillilorenzo.flutter_inappwebviewexample")
+                        ],
                         dismissButtonStyle: DismissButtonStyle.CLOSE,
                         presentationStyle:
                             ModalPresentationStyle.OVER_FULL_SCREEN));

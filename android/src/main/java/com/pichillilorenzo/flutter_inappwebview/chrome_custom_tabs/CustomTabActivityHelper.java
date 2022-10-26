@@ -1,7 +1,7 @@
 package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Browser;
@@ -28,42 +28,50 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
     private CustomTabsCallback mCustomTabsCallback;
 
     /**
-     * Opens the URL on a Custom Tab if possible. Otherwise fallsback to opening it on a WebView.
+     * Opens the URL on a Custom Tab if possible.
      *
      * @param activity The host activity.
-     * @param customTabsIntent a CustomTabsIntent to be used if Custom Tabs is available.
+     * @param intent a intent to be used if Custom Tabs is available.
      * @param uri the Uri to be opened.
      */
+    public static void openCustomTab(Activity activity,
+                                     Intent intent,
+                                     Uri uri,
+                                     @Nullable Map<String, String> headers,
+                                     @Nullable Uri referrer,
+                                     int requestCode) {
+        intent.setData(uri);
+        if (headers != null) {
+            Bundle bundleHeaders = new Bundle();
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                bundleHeaders.putString(header.getKey(), header.getValue());
+            }
+            intent.putExtra(Browser.EXTRA_HEADERS, bundleHeaders);
+        }
+        if (referrer != null) {
+            intent.putExtra(Intent.EXTRA_REFERRER, referrer);
+        }
+        activity.startActivityForResult(intent, requestCode);
+    }
+
     public static void openCustomTab(Activity activity,
                                      CustomTabsIntent customTabsIntent,
                                      Uri uri,
                                      @Nullable Map<String, String> headers,
+                                     @Nullable Uri referrer,
                                      int requestCode) {
-        customTabsIntent.intent.setData(uri);
-        if (headers != null) {
-            Bundle bundleHeaders = new Bundle();
-            for (Map.Entry<String, String> header : headers.entrySet()) {
-                bundleHeaders.putString(header.getKey(), header.getValue());
-            }
-            customTabsIntent.intent.putExtra(Browser.EXTRA_HEADERS, bundleHeaders);
-        }
-        activity.startActivityForResult(customTabsIntent.intent, requestCode);
+        CustomTabActivityHelper.openCustomTab(activity, customTabsIntent.intent, uri,
+                headers, referrer, requestCode);
     }
 
-    public static void openCustomTab(Activity activity,
-                                     TrustedWebActivityIntent trustedWebActivityIntent,
-                                     Uri uri,
-                                     @Nullable Map<String, String> headers,
-                                     int requestCode) {
-        trustedWebActivityIntent.getIntent().setData(uri);
-        if (headers != null) {
-            Bundle bundleHeaders = new Bundle();
-            for (Map.Entry<String, String> header : headers.entrySet()) {
-                bundleHeaders.putString(header.getKey(), header.getValue());
-            }
-            trustedWebActivityIntent.getIntent().putExtra(Browser.EXTRA_HEADERS, bundleHeaders);
-        }
-        activity.startActivityForResult(trustedWebActivityIntent.getIntent(), requestCode);
+    public static void openTrustedWebActivity(Activity activity,
+                                              TrustedWebActivityIntent trustedWebActivityIntent,
+                                              Uri uri,
+                                              @Nullable Map<String, String> headers,
+                                              @Nullable Uri referrer,
+                                              int requestCode) {
+        CustomTabActivityHelper.openCustomTab(activity, trustedWebActivityIntent.getIntent(), uri,
+                headers, referrer, requestCode);
     }
 
     

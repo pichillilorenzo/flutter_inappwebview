@@ -1,17 +1,20 @@
 ## 6.0.0-beta.9
 
-- Added `headers`, `otherLikelyURLs` arguments on `ChromeSafariBrowser.open` method for Android
+- Added `headers`, `otherLikelyURLs`, `referrer` arguments on `ChromeSafariBrowser.open` method for Android
 - Added `onNavigationEvent`, `onServiceConnected`, `onRelationshipValidationResult` events on `ChromeSafariBrowser` for Android
-- Added `mayLaunchUrl`, `launchUrl`, `updateActionButton`, `validateRelationship` methods on `ChromeSafariBrowser` for Android
-- Added `startAnimations`, `exitAnimations`, `navigationBarColor`, `navigationBarDividerColor`, `secondaryToolbarColor` ChromeSafariBrowser settings for Android
+- Added `mayLaunchUrl`, `launchUrl`, `updateActionButton`, `validateRelationship`, `setSecondaryToolbar`, `updateSecondaryToolbar` methods on `ChromeSafariBrowser` for Android
+- Added `startAnimations`, `exitAnimations`, `navigationBarColor`, `navigationBarDividerColor`, `secondaryToolbarColor`, `alwaysUseBrowserUI` ChromeSafariBrowser settings for Android
+- Added `ChromeSafariBrowserMenuItem.image` property for iOS
 - Added `didLoadSuccessfully` optional argument on `ChromeSafariBrowser.onCompletedInitialLoad` event for iOS
 - Added `onInitialLoadDidRedirect`, `onWillOpenInBrowser` events on `ChromeSafariBrowser` for iOS
-- Added `clearWebsiteData`, `prewarmConnections`, `invalidatePrewarmingToken` static methods on `ChromeSafariBrowser` for iOS
+- Added `activityButton`, `eventAttribution` ChromeSafariBrowser settings for iOS
+- Added `clearWebsiteData`, `prewarmConnections`, `invalidatePrewarmingToken`, `getMaxToolbarItems` static methods on `ChromeSafariBrowser` for iOS
 - Added `getVariationsHeader` WebView static method
 
 ### BREAKING CHANGES
 
 - `ChromeSafariBrowser.onCompletedInitialLoad` event has an optional argument
+- `ChromeSafariBrowserMenuItem.action` and `ChromeSafariBrowserActionButton.action` can be null
 - All `ChromeSafariBrowserSettings` properties are optionals
 
 ## 6.0.0-beta.8

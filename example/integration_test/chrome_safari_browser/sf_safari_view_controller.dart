@@ -9,8 +9,8 @@ void sfSafariViewController() {
   final shouldSkip = kIsWeb
       ? true
       : ![
-    TargetPlatform.android,
-  ].contains(defaultTargetPlatform);
+          TargetPlatform.iOS,
+        ].contains(defaultTargetPlatform);
 
   group('SF Safari View Controller', () {
     test('onCompletedInitialLoad did load successfully', () async {
@@ -30,14 +30,18 @@ void sfSafariViewController() {
       expect(chromeSafariBrowser.isOpened(), false);
     });
 
-    test('clearWebsiteData', () async {
-      await expectLater(ChromeSafariBrowser.clearWebsiteData(), completes);
-    });
+    // TODO: this test takes a lot of time to complete. Tested on iOS 16.0.
+    // test('clearWebsiteData', () async {
+    //   await expectLater(ChromeSafariBrowser.clearWebsiteData(), completes);
+    // });
 
     test('create and invalidate Prewarming Token', () async {
-      final prewarmingToken = await ChromeSafariBrowser.prewarmConnections([TEST_URL_1]);
+      final prewarmingToken =
+          await ChromeSafariBrowser.prewarmConnections([TEST_URL_1]);
       expect(prewarmingToken, isNotNull);
-      await expectLater(ChromeSafariBrowser.invalidatePrewarmingToken(prewarmingToken!), completes);
+      await expectLater(
+          ChromeSafariBrowser.invalidatePrewarmingToken(prewarmingToken!),
+          completes);
     });
   }, skip: shouldSkip);
 }

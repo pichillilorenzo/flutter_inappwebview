@@ -101,9 +101,6 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                 
                 if #available(iOS 11.0, *) {
                     let config = SFSafariViewController.Configuration()
-                    config.entersReaderIfAvailable = safariSettings.entersReaderIfAvailable
-                    config.barCollapsingEnabled = safariSettings.barCollapsingEnabled
-                    
                     safari = SafariViewController(id: id, url: absoluteUrl, configuration: config,
                                                   menuItemList: menuItemList, safariSettings: safariSettings)
                 } else {

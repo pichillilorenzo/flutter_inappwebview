@@ -44,6 +44,7 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
   public Integer screenOrientation = ScreenOrientation.DEFAULT;
   public List<AndroidResource> startAnimations = new ArrayList<>();
   public List<AndroidResource> exitAnimations = new ArrayList<>();
+  public Boolean alwaysUseBrowserUI = false;
 
   @NonNull
   @Override
@@ -138,6 +139,9 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
             }
           }
           break;
+        case "alwaysUseBrowserUI":
+          alwaysUseBrowserUI = (Boolean) value;
+          break;
       }
     }
 
@@ -163,6 +167,7 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
     options.put("isTrustedWebActivity", isTrustedWebActivity);
     options.put("additionalTrustedOrigins", additionalTrustedOrigins);
     options.put("screenOrientation", screenOrientation);
+    options.put("alwaysUseBrowserUI", alwaysUseBrowserUI);
     return options;
   }
 

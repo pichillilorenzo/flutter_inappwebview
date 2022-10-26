@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../types/activity_button.dart';
 import '../types/android_resource.dart';
 import '../types/custom_tabs_share_state.dart';
 import '../types/dismiss_button_style.dart';
@@ -11,6 +12,7 @@ import '../types/modal_presentation_style.dart';
 import '../types/modal_transition_style.dart';
 import '../types/trusted_web_activity_display_mode.dart';
 import '../types/trusted_web_activity_screen_orientation.dart';
+import '../types/ui_event_attribution.dart';
 import '../util.dart';
 import 'android/chrome_custom_tabs_options.dart';
 import 'apple/safari_options.dart';
@@ -188,6 +190,15 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///- Android
   List<AndroidResource_>? exitAnimations;
 
+  ///Adds the necessary flags and extras to signal any browser supporting custom tabs to use the browser UI
+  ///at all times and avoid showing custom tab like UI.
+  ///Calling this with an intent will override any custom tabs related customizations.
+  ///The default value is `false`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android
+  bool? alwaysUseBrowserUI;
+
   ///Set to `true` if Reader mode should be entered automatically when it is available for the webpage. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
@@ -236,6 +247,24 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
   ///- iOS
   ModalTransitionStyle_? transitionStyle;
 
+  ///An additional button to be shown in `SFSafariViewController`'s toolbar.
+  ///This allows the user to access powerful functionality from your extension without needing to first show the `UIActivityViewController`.
+  ///
+  ///**NOTE**: available on iOS 15.0+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ActivityButton_? activityButton;
+
+  ///An event attribution associated with a click that caused this `SFSafariViewController` to be opened.
+  ///This attribute is ignored if the `SFSafariViewController` url has a scheme of 'http'.
+  ///
+  ///**NOTE**: available on iOS 15.2+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  UIEventAttribution_? eventAttribution;
+
   @ExchangeableObjectConstructor()
   ChromeSafariBrowserSettings_(
       {this.shareState = CustomTabsShareState_.SHARE_STATE_DEFAULT,
@@ -256,13 +285,16 @@ class ChromeSafariBrowserSettings_ implements ChromeSafariBrowserOptions {
       this.screenOrientation = TrustedWebActivityScreenOrientation_.DEFAULT,
       this.startAnimations,
       this.exitAnimations,
+      this.alwaysUseBrowserUI = false,
       this.entersReaderIfAvailable = false,
       this.barCollapsingEnabled = false,
       this.dismissButtonStyle = DismissButtonStyle_.DONE,
       this.preferredBarTintColor,
       this.preferredControlTintColor,
       this.presentationStyle = ModalPresentationStyle_.FULL_SCREEN,
-      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL}) {
+      this.transitionStyle = ModalTransitionStyle_.COVER_VERTICAL,
+      this.activityButton,
+      this.eventAttribution}) {
     if (startAnimations != null) {
       assert(startAnimations!.length == 2,
           "start animations must be have 2 android resources");

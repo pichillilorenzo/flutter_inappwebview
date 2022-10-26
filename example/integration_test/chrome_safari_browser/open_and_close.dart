@@ -20,29 +20,32 @@ void openAndClose() {
         settings: ChromeSafariBrowserSettings(
             shareState: CustomTabsShareState.SHARE_STATE_OFF,
             startAnimations: [
-              AndroidResource(
-                  name: "slide_in_left",
-                  defType: "anim",
-                  defPackage: "android"),
-              AndroidResource(
-                  name: "slide_out_right",
-                  defType: "anim",
-                  defPackage: "android")
+              AndroidResource.anim(
+                  name: "slide_in_left", defPackage: "android"),
+              AndroidResource.anim(
+                  name: "slide_out_right", defPackage: "android")
             ],
             exitAnimations: [
-              AndroidResource(
+              AndroidResource.anim(
                   name: "abc_slide_in_top",
-                  defType: "anim",
                   defPackage:
                       "com.pichillilorenzo.flutter_inappwebviewexample"),
-              AndroidResource(
+              AndroidResource.anim(
                   name: "abc_slide_out_top",
-                  defType: "anim",
                   defPackage: "com.pichillilorenzo.flutter_inappwebviewexample")
             ],
             keepAliveEnabled: true,
             dismissButtonStyle: DismissButtonStyle.CLOSE,
-            presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN));
+            presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN,
+            eventAttribution: UIEventAttribution(
+                sourceIdentifier: 4,
+                destinationURL: Uri.parse("https://shop.example/test.html"),
+                sourceDescription: "Banner ad for Test.",
+                purchaser: "Shop Example, Inc."),
+            activityButton: ActivityButton(
+                templateImage: UIImage(systemName: "sun.max"),
+                extensionIdentifier:
+                    "com.pichillilorenzo.flutter-inappwebview-6-Example.test")));
     await chromeSafariBrowser.opened.future;
     expect(chromeSafariBrowser.isOpened(), true);
     expect(() async {

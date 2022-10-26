@@ -28,6 +28,19 @@ class AndroidResource_ {
   ///Example: "android" if you want use resources from `android.R.`
   String? defPackage;
 
-  AndroidResource_({required this.name,
-    this.defType, this.defPackage});
+  AndroidResource_({required this.name, this.defType, this.defPackage});
+
+  static AndroidResource_ anim({required String name, String? defPackage}) {
+    return AndroidResource_(
+        name: name, defType: "anim", defPackage: defPackage);
+  }
+
+  static AndroidResource_ layout({required String name, String? defPackage}) {
+    return AndroidResource_(
+        name: name, defType: "layout", defPackage: defPackage);
+  }
+
+  static AndroidResource_ id({required String name, String? defPackage}) {
+    return AndroidResource_(name: name, defType: "id", defPackage: defPackage);
+  }
 }

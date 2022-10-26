@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
+import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsSecondaryToolbar;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,8 +36,9 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
           String url = (String) call.argument("url");
           if (url != null) {
             Map<String, String> headers = (Map<String, String>) call.argument("headers");
+            String referrer = (String) call.argument("referrer");
             List<String> otherLikelyURLs = (List<String>) call.argument("otherLikelyURLs");
-            chromeCustomTabsActivity.launchUrl(url, headers, otherLikelyURLs);
+            chromeCustomTabsActivity.launchUrl(url, headers, referrer, otherLikelyURLs);
             result.success(true);
           } else {
             result.success(false);
@@ -69,6 +71,15 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
           Integer relation = (Integer) call.argument("relation");
           String origin = (String) call.argument("origin");
           result.success(chromeCustomTabsActivity.customTabsSession.validateRelationship(relation, Uri.parse(origin), null));
+        } else {
+          result.success(false);
+        }
+        break;
+      case "updateSecondaryToolbar":
+        if (chromeCustomTabsActivity != null) {
+          CustomTabsSecondaryToolbar secondaryToolbar = CustomTabsSecondaryToolbar.fromMap((Map<String, Object>) call.argument("secondaryToolbar"));
+          chromeCustomTabsActivity.updateSecondaryToolbar(secondaryToolbar);
+          result.success(true);
         } else {
           result.success(false);
         }
@@ -143,6 +154,15 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     obj.put("url", url);
     obj.put("title", title);
     channel.invokeMethod("onItemActionPerform", obj);
+  }
+
+  public void onSecondaryItemActionPerform(String name, String url) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("name", name);
+    obj.put("url", url);
+    channel.invokeMethod("onSecondaryItemActionPerform", obj);
   }
 
   public void onRelationshipValidationResult(int relation, @NonNull Uri requestedOrigin, boolean result) {

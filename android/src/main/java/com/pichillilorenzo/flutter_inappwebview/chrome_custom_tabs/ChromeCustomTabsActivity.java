@@ -9,7 +9,7 @@ import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
-import android.util.Log;
+import android.widget.RemoteViews;
 
 import androidx.annotation.CallSuper;
 import androidx.annotation.NonNull;
@@ -24,6 +24,7 @@ import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.types.AndroidResource;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
 import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsMenuItem;
+import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsSecondaryToolbar;
 import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
 
 import java.util.ArrayList;
@@ -55,9 +56,13 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   public List<String> initialOtherLikelyURLs;
   @Nullable
   public Map<String, String> initialHeaders;
+  @Nullable
+  public String initialReferrer;
   public List<CustomTabsMenuItem> menuItems = new ArrayList<>();
   @Nullable
   public CustomTabsActionButton actionButton;
+  @Nullable
+  public CustomTabsSecondaryToolbar secondaryToolbar;
   @Nullable
   public ChromeCustomTabsChannelDelegate channelDelegate;
 
@@ -84,11 +89,13 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
     initialUrl = b.getString("url");
     initialHeaders = (Map<String, String>) b.getSerializable("headers");
+    initialReferrer = b.getString("referrer");
     initialOtherLikelyURLs = b.getStringArrayList("otherLikelyURLs");
 
     customSettings = new ChromeCustomTabsSettings();
     customSettings.parse((HashMap<String, Object>) b.getSerializable("settings"));
     actionButton = CustomTabsActionButton.fromMap((Map<String, Object>) b.getSerializable("actionButton"));
+    secondaryToolbar = CustomTabsSecondaryToolbar.fromMap((Map<String, Object>) b.getSerializable("secondaryToolbar"));
     List<Map<String, Object>> menuItemList = (List<Map<String, Object>>) b.getSerializable("menuItemList");
     for (Map<String, Object> menuItem : menuItemList) {
       menuItems.add(CustomTabsMenuItem.fromMap(menuItem));
@@ -155,8 +162,9 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   }
 
   public void launchUrl(@NonNull String url,
-                          @Nullable Map<String, String> headers,
-                          @Nullable List<String> otherLikelyURLs) {
+                        @Nullable Map<String, String> headers,
+                        @Nullable String referrer,
+                        @Nullable List<String> otherLikelyURLs) {
     mayLaunchUrl(url, otherLikelyURLs);
     builder = new CustomTabsIntent.Builder(customTabsSession);
     prepareCustomTabs();
@@ -164,7 +172,8 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     CustomTabsIntent customTabsIntent = builder.build();
     prepareCustomTabsIntent(customTabsIntent);
 
-    CustomTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), headers, CHROME_CUSTOM_TAB_REQUEST_CODE);
+    CustomTabActivityHelper.openCustomTab(this, customTabsIntent, Uri.parse(url), headers,
+            referrer != null ? Uri.parse(referrer) : null, CHROME_CUSTOM_TAB_REQUEST_CODE);
   }
 
   public boolean mayLaunchUrl(@Nullable String url, @Nullable List<String> otherLikelyURLs) {
@@ -183,7 +192,7 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
   public void customTabsConnected() {
     customTabsSession = customTabActivityHelper.getSession();
     if (initialUrl != null) {
-      launchUrl(initialUrl, initialHeaders, initialOtherLikelyURLs);
+      launchUrl(initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
     }
   }
 
@@ -244,6 +253,33 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
               createPendingIntent(actionButton.getId()),
               actionButton.isShouldTint());
     }
+
+    if (secondaryToolbar != null) {
+      AndroidResource layout = secondaryToolbar.getLayout();
+      RemoteViews remoteViews = new RemoteViews(layout.getDefPackage(), layout.getIdentifier(this));
+      int[] clickableIDs = new int[secondaryToolbar.getClickableIDs().size()];
+      for (int i = 0, length = secondaryToolbar.getClickableIDs().size(); i < length; i++) {
+        AndroidResource clickableID = secondaryToolbar.getClickableIDs().get(i);
+        clickableIDs[i] = clickableID.getIdentifier(this);
+      }
+      builder.setSecondaryToolbarViews(remoteViews, clickableIDs, getSecondaryToolbarOnClickPendingIntent());
+    }
+  }
+
+  public PendingIntent getSecondaryToolbarOnClickPendingIntent() {
+    Intent broadcastIntent = new Intent(this, ActionBroadcastReceiver.class);
+
+    Bundle extras = new Bundle();
+    extras.putString(ActionBroadcastReceiver.KEY_ACTION_VIEW_ID, id);
+    broadcastIntent.putExtras(extras);
+
+    if (android.os.Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      return PendingIntent.getBroadcast(
+              this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_MUTABLE);
+    } else {
+      return PendingIntent.getBroadcast(
+              this, 0, broadcastIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    }
   }
 
   private void prepareCustomTabsIntent(CustomTabsIntent customTabsIntent) {
@@ -254,6 +290,9 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
 
     if (customSettings.keepAliveEnabled)
       CustomTabsHelper.addKeepAliveExtra(this, customTabsIntent.intent);
+
+    if (customSettings.alwaysUseBrowserUI)
+      CustomTabsIntent.setAlwaysUseBrowserUI(customTabsIntent.intent);
   }
 
   public void updateActionButton(@NonNull byte[] icon, @NonNull String description) {
@@ -268,6 +307,21 @@ public class ChromeCustomTabsActivity extends Activity implements Disposable {
     customTabsSession.setActionButton(bmp, description);
     actionButton.setIcon(icon);
     actionButton.setDescription(description);
+  }
+
+  public void updateSecondaryToolbar(CustomTabsSecondaryToolbar secondaryToolbar) {
+    if (customTabsSession == null) {
+      return;
+    }
+    AndroidResource layout = secondaryToolbar.getLayout();
+    RemoteViews remoteViews = new RemoteViews(layout.getDefPackage(), layout.getIdentifier(this));
+    int[] clickableIDs = new int[secondaryToolbar.getClickableIDs().size()];
+    for (int i = 0, length = secondaryToolbar.getClickableIDs().size(); i < length; i++) {
+      AndroidResource clickableID = secondaryToolbar.getClickableIDs().get(i);
+      clickableIDs[i] = clickableID.getIdentifier(this);
+    }
+    customTabsSession.setSecondaryToolbarViews(remoteViews, clickableIDs, getSecondaryToolbarOnClickPendingIntent());
+    this.secondaryToolbar = secondaryToolbar;
   }
 
   @Override

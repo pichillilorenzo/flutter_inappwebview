@@ -56,9 +56,10 @@ class MyInAppBrowser extends InAppBrowser {
 class MyChromeSafariBrowser extends ChromeSafariBrowser {
   final Completer<void> serviceConnected = Completer<void>();
   final Completer<void> opened = Completer<void>();
-  final Completer<bool> firstPageLoaded = Completer<bool>();
+  final Completer<bool?> firstPageLoaded = Completer<bool?>();
   final Completer<void> closed = Completer<void>();
-  final Completer<CustomTabsNavigationEventType?> navigationEvent = Completer<CustomTabsNavigationEventType?>();
+  final Completer<CustomTabsNavigationEventType?> navigationEvent =
+      Completer<CustomTabsNavigationEventType?>();
   final Completer<bool> relationshipValidationResult = Completer<bool>();
 
   @override
@@ -82,7 +83,6 @@ class MyChromeSafariBrowser extends ChromeSafariBrowser {
       navigationEvent.complete(type);
     }
   }
-
 
   @override
   void onRelationshipValidationResult(

@@ -41,6 +41,7 @@ import androidx.appcompat.app.AlertDialog;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
+import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFileProvider;
 import com.pichillilorenzo.flutter_inappwebview.types.CreateWindowAction;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.ActivityResultListener;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
@@ -72,8 +73,6 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   private InAppBrowserDelegate inAppBrowserDelegate;
   public static Map<Integer, Message> windowWebViewMessages = new HashMap<>();
   private static int windowAutoincrementId = 0;
-
-  private static final String fileProviderAuthorityExtension = "flutter_inappwebview.fileprovider";
 
   private static final int PICKER = 1;
   private static final int PICKER_LEGACY = 3;
@@ -1148,8 +1147,11 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       return null;
     }
     // for versions 6.0+ (23) we use the FileProvider to avoid runtime permissions
-    String packageName = activity.getApplicationContext().getPackageName();
-    return FileProvider.getUriForFile(activity.getApplicationContext(), packageName + "." + fileProviderAuthorityExtension, capturedFile);
+    String fileProviderAuthority = activity.getApplicationContext().getPackageName() + "." +
+            InAppWebViewFileProvider.fileProviderAuthorityExtension;
+    return FileProvider.getUriForFile(activity.getApplicationContext(),
+            fileProviderAuthority,
+            capturedFile);
   }
 
   @Nullable

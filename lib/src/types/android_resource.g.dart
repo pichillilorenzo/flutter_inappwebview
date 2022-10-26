@@ -45,6 +45,19 @@ class AndroidResource {
     return instance;
   }
 
+  static AndroidResource anim({required String name, String? defPackage}) {
+    return AndroidResource(name: name, defType: "anim", defPackage: defPackage);
+  }
+
+  static AndroidResource layout({required String name, String? defPackage}) {
+    return AndroidResource(
+        name: name, defType: "layout", defPackage: defPackage);
+  }
+
+  static AndroidResource id({required String name, String? defPackage}) {
+    return AndroidResource(name: name, defType: "id", defPackage: defPackage);
+  }
+
   ///Converts instance to a map.
   Map<String, dynamic> toMap() {
     return {

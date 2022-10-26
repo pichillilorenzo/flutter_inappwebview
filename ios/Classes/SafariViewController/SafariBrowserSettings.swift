@@ -18,9 +18,18 @@ public class SafariBrowserSettings: ISettings<SafariViewController> {
     var preferredControlTintColor: String?
     var presentationStyle = 0 //fullscreen
     var transitionStyle = 0 //coverVertical
+    var activityButton: [String:Any?]?
+    var eventAttribution: [String:Any?]?
     
     override init(){
         super.init()
+    }
+    
+    override func parse(settings: [String: Any?]) -> SafariBrowserSettings {
+        let _ = super.parse(settings: settings)
+        activityButton = settings["activityButton"] as? [String : Any?]
+        eventAttribution = settings["eventAttribution"] as? [String : Any?]
+        return self
     }
     
     override func getRealSettings(obj: SafariViewController?) -> [String: Any?] {

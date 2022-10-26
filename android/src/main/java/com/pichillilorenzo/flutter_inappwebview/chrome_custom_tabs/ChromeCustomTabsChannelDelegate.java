@@ -2,15 +2,18 @@ package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
-import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.HeadlessInAppWebView;
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
-import com.pichillilorenzo.flutter_inappwebview.types.Disposable;
+import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsActionButton;
+import com.pichillilorenzo.flutter_inappwebview.types.CustomTabsSecondaryToolbar;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import io.flutter.plugin.common.MethodCall;
@@ -28,6 +31,59 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
   @Override
   public void onMethodCall(@NonNull final MethodCall call, @NonNull final MethodChannel.Result result) {
     switch (call.method) {
+      case "launchUrl":
+        if (chromeCustomTabsActivity != null) {
+          String url = (String) call.argument("url");
+          if (url != null) {
+            Map<String, String> headers = (Map<String, String>) call.argument("headers");
+            String referrer = (String) call.argument("referrer");
+            List<String> otherLikelyURLs = (List<String>) call.argument("otherLikelyURLs");
+            chromeCustomTabsActivity.launchUrl(url, headers, referrer, otherLikelyURLs);
+            result.success(true);
+          } else {
+            result.success(false);
+          }
+        } else {
+          result.success(false);
+        }
+        break;
+      case "mayLaunchUrl":
+        if (chromeCustomTabsActivity != null) {
+          String url = (String) call.argument("url");
+          List<String> otherLikelyURLs = (List<String>) call.argument("otherLikelyURLs");
+          result.success(chromeCustomTabsActivity.mayLaunchUrl(url, otherLikelyURLs));
+        } else {
+          result.success(false);
+        }
+        break;
+      case "updateActionButton":
+        if (chromeCustomTabsActivity != null) {
+          byte[] icon = (byte[]) call.argument("icon");
+          String description = (String) call.argument("description");
+          chromeCustomTabsActivity.updateActionButton(icon, description);
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
+      case "validateRelationship":
+        if (chromeCustomTabsActivity != null && chromeCustomTabsActivity.customTabsSession != null) {
+          Integer relation = (Integer) call.argument("relation");
+          String origin = (String) call.argument("origin");
+          result.success(chromeCustomTabsActivity.customTabsSession.validateRelationship(relation, Uri.parse(origin), null));
+        } else {
+          result.success(false);
+        }
+        break;
+      case "updateSecondaryToolbar":
+        if (chromeCustomTabsActivity != null) {
+          CustomTabsSecondaryToolbar secondaryToolbar = CustomTabsSecondaryToolbar.fromMap((Map<String, Object>) call.argument("secondaryToolbar"));
+          chromeCustomTabsActivity.updateSecondaryToolbar(secondaryToolbar);
+          result.success(true);
+        } else {
+          result.success(false);
+        }
+        break;
       case "close":
         if (chromeCustomTabsActivity != null) {
           chromeCustomTabsActivity.onStop();
@@ -54,35 +110,69 @@ public class ChromeCustomTabsChannelDelegate extends ChannelDelegateImpl {
     }
   }
 
-  public void onChromeSafariBrowserOpened() {
+  public void onServiceConnected() {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onChromeSafariBrowserOpened", obj);
+    channel.invokeMethod("onServiceConnected", obj);
   }
 
-  public void onChromeSafariBrowserCompletedInitialLoad() {
+  public void onOpened() {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onChromeSafariBrowserCompletedInitialLoad", obj);
+    channel.invokeMethod("onOpened", obj);
   }
 
-  public void onChromeSafariBrowserClosed() {
+  public void onCompletedInitialLoad() {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
-    channel.invokeMethod("onChromeSafariBrowserClosed", obj);
+    channel.invokeMethod("onCompletedInitialLoad", obj);
   }
 
-  public void onChromeSafariBrowserItemActionPerform(int id, String url, String title) {
+  public void onNavigationEvent(int navigationEvent) {;
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("navigationEvent", navigationEvent);
+    channel.invokeMethod("onNavigationEvent", obj);
+  }
+
+  public void onClosed() {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onClosed", obj);
+  }
+
+  public void onItemActionPerform(int id, String url, String title) {
     MethodChannel channel = getChannel();
     if (channel == null) return;
     Map<String, Object> obj = new HashMap<>();
     obj.put("id", id);
     obj.put("url", url);
     obj.put("title", title);
-    channel.invokeMethod("onChromeSafariBrowserItemActionPerform", obj);
+    channel.invokeMethod("onItemActionPerform", obj);
+  }
+
+  public void onSecondaryItemActionPerform(String name, String url) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("name", name);
+    obj.put("url", url);
+    channel.invokeMethod("onSecondaryItemActionPerform", obj);
+  }
+
+  public void onRelationshipValidationResult(int relation, @NonNull Uri requestedOrigin, boolean result) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("relation", relation);
+    obj.put("requestedOrigin", requestedOrigin.toString());
+    obj.put("result", result);
+    channel.invokeMethod("onRelationshipValidationResult", obj);
   }
 
   @Override

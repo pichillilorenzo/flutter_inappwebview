@@ -34,13 +34,17 @@ dart $PROJECT_DIR/tool/env.dart
 cd $PROJECT_DIR/test_node_server
 node index.js &
 
+# Only for Android
+# Open Chrome on the development device, navigate to chrome://flags, search for an item called Enable command line on non-rooted devices and change it to ENABLED and then restart the browser.
+adb shell "echo '_ --disable-digital-asset-link-verification-for-url=\"https://flutter.dev\"' > /data/local/tmp/chrome-command-line" || true
+
 flutter --version
 flutter clean
 flutter pub get
 cd $PROJECT_DIR/example
 flutter clean
 if [ ! -z "$2" ] && [ $PLATFORM = "web" ]; then
-  flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart  --device-id=chrome
+  flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart --device-id=chrome
 else
   flutter driver --driver=test_driver/integration_test.dart --target=integration_test/webview_flutter_test.dart
 fi

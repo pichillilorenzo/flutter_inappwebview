@@ -3683,6 +3683,24 @@ class InAppWebViewController {
         'setWebContentsDebuggingEnabled', args);
   }
 
+  ///Gets the WebView variations encoded to be used as the X-Client-Data HTTP header.
+  ///
+  ///The app is responsible for adding the X-Client-Data header to any request
+  ///that may use variations metadata, such as requests to Google web properties.
+  ///The returned string will be a base64 encoded ClientVariations proto:
+  ///https://source.chromium.org/chromium/chromium/src/+/main:components/variations/proto/client_variations.proto
+  ///
+  ///The string may be empty if the header is not available.
+  ///
+  ///**NOTE for Android native WebView**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.GET_VARIATIONS_HEADER].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewCompat.getVariationsHeader](https://developer.android.com/reference/androidx/webkit/WebViewCompat#getVariationsHeader()))
+  static Future<String?> getVariationsHeader() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod('getVariationsHeader', args);
+  }
+
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.
   ///
   ///[urlScheme] represents the URL scheme associated with the resource.

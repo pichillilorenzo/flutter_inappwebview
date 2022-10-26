@@ -4,11 +4,9 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import io.flutter.plugin.common.MethodChannel;
+import androidx.browser.customtabs.CustomTabsIntent;
 
 public class ActionBroadcastReceiver extends BroadcastReceiver {
   protected static final String LOG_TAG = "ActionBroadcastReceiver";
@@ -18,16 +16,25 @@ public class ActionBroadcastReceiver extends BroadcastReceiver {
 
   @Override
   public void onReceive(Context context, Intent intent) {
+    int clickedId = intent.getIntExtra(CustomTabsIntent.EXTRA_REMOTEVIEWS_CLICKED_ID, -1);
     String url = intent.getDataString();
     if (url != null) {
       Bundle b = intent.getExtras();
       String viewId = b.getString(KEY_ACTION_VIEW_ID);
-      int id = b.getInt(KEY_ACTION_ID);
-      String title = b.getString(KEY_URL_TITLE);
 
-      ChromeCustomTabsActivity browser = ChromeSafariBrowserManager.browsers.get(viewId);
-      if (browser != null && browser.channelDelegate != null) {
-        browser.channelDelegate.onChromeSafariBrowserItemActionPerform(id, url, title);
+      if (clickedId == -1) {
+        int id = b.getInt(KEY_ACTION_ID);
+        String title = b.getString(KEY_URL_TITLE);
+
+        ChromeCustomTabsActivity browser = ChromeSafariBrowserManager.browsers.get(viewId);
+        if (browser != null && browser.channelDelegate != null) {
+          browser.channelDelegate.onItemActionPerform(id, url, title);
+        }
+      } else {
+        ChromeCustomTabsActivity browser = ChromeSafariBrowserManager.browsers.get(viewId);
+        if (browser != null && browser.channelDelegate != null) {
+          browser.channelDelegate.onSecondaryItemActionPerform(browser.getResources().getResourceName(clickedId), url);
+        }
       }
     }
   }

@@ -217,6 +217,10 @@ class WebViewFeature {
       WebViewFeature._internal('ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY',
           'ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY');
 
+  ///This feature covers [InAppWebViewController.getVariationsHeader].
+  static const GET_VARIATIONS_HEADER = WebViewFeature._internal(
+      'GET_VARIATIONS_HEADER', 'GET_VARIATIONS_HEADER');
+
   ///Set of all values of [WebViewFeature].
   static final Set<WebViewFeature> values = [
     WebViewFeature.CREATE_WEB_MESSAGE_CHANNEL,
@@ -266,6 +270,7 @@ class WebViewFeature {
     WebViewFeature.ALGORITHMIC_DARKENING,
     WebViewFeature.REQUESTED_WITH_HEADER_CONTROL,
     WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY,
+    WebViewFeature.GET_VARIATIONS_HEADER,
   ].toSet();
 
   ///Gets a possible [WebViewFeature] instance from [String] value.

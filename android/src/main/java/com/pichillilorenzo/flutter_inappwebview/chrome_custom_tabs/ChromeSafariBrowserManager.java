@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import androidx.annotation.Nullable;
+import androidx.browser.customtabs.CustomTabsIntent;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFlutterPlugin;
 import com.pichillilorenzo.flutter_inappwebview.Util;
@@ -12,6 +13,7 @@ import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.Headless
 import com.pichillilorenzo.flutter_inappwebview.types.ChannelDelegateImpl;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -46,10 +48,14 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
       case "open":
         if (plugin != null && plugin.activity != null) {
           String url = (String) call.argument("url");
+          HashMap<String, Object> headers = (HashMap<String, Object>) call.argument("headers");
+          String referrer = (String) call.argument("referrer");
+          ArrayList<String> otherLikelyURLs = (ArrayList<String>) call.argument("otherLikelyURLs");
           HashMap<String, Object> settings = (HashMap<String, Object>) call.argument("settings");
           HashMap<String, Object> actionButton = (HashMap<String, Object>) call.argument("actionButton");
+          HashMap<String, Object> secondaryToolbar = (HashMap<String, Object>) call.argument("secondaryToolbar");
           List<HashMap<String, Object>> menuItemList = (List<HashMap<String, Object>>) call.argument("menuItemList");
-          open(plugin.activity, viewId, url, settings, actionButton, menuItemList, result);
+          open(plugin.activity, viewId, url, headers, referrer, otherLikelyURLs, settings, actionButton, secondaryToolbar, menuItemList, result);
         } else {
           result.success(false);
         }
@@ -61,23 +67,31 @@ public class ChromeSafariBrowserManager extends ChannelDelegateImpl {
           result.success(false);
         }
         break;
+      case "getMaxToolbarItems":
+        result.success(CustomTabsIntent.getMaxToolbarItems());
+        break;
       default:
         result.notImplemented();
     }
   }
 
-  public void open(Activity activity, String viewId, String url, HashMap<String, Object> settings,
-                   HashMap<String, Object> actionButton,
+  public void open(Activity activity, String viewId, @Nullable String url, @Nullable HashMap<String, Object> headers,
+                   @Nullable String referrer, @Nullable ArrayList<String> otherLikelyURLs,
+                   HashMap<String, Object> settings, HashMap<String, Object> actionButton,
+                   HashMap<String, Object> secondaryToolbar,
                    List<HashMap<String, Object>> menuItemList, MethodChannel.Result result) {
 
     Intent intent = null;
     Bundle extras = new Bundle();
     extras.putString("url", url);
-    extras.putBoolean("isData", false);
     extras.putString("id", viewId);
     extras.putString("managerId", this.id);
+    extras.putSerializable("headers", headers);
+    extras.putString("referrer", referrer);
+    extras.putSerializable("otherLikelyURLs", otherLikelyURLs);
     extras.putSerializable("settings", settings);
     extras.putSerializable("actionButton", (Serializable) actionButton);
+    extras.putSerializable("secondaryToolbar", (Serializable) secondaryToolbar);
     extras.putSerializable("menuItemList", (Serializable) menuItemList);
 
     Boolean isSingleInstance = Util.<Boolean>getOrDefault(settings, "isSingleInstance", false);

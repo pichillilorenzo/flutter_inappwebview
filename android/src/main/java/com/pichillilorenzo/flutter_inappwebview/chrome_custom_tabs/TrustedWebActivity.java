@@ -4,12 +4,15 @@ import android.content.Intent;
 import android.graphics.Color;
 import android.net.Uri;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabColorSchemeParams;
+import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.browser.trusted.TrustedWebActivityIntent;
 import androidx.browser.trusted.TrustedWebActivityIntentBuilder;
 
-import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TrustedWebActivity extends ChromeCustomTabsActivity {
 
@@ -18,27 +21,49 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
   public TrustedWebActivityIntentBuilder builder;
 
   @Override
-  public void customTabsConnected() {
-    customTabsSession = customTabActivityHelper.getSession();
-    Uri uri = Uri.parse(initialUrl);
-    customTabActivityHelper.mayLaunchUrl(uri, null, null);
+  public void launchUrl(@NonNull String url,
+                        @Nullable Map<String, String> headers,
+                        @Nullable String referrer,
+                        @Nullable List<String> otherLikelyURLs) {
+    if (customTabsSession == null) {
+      return;
+    }
+    Uri uri = Uri.parse(url);
 
+    mayLaunchUrl(url, otherLikelyURLs);
     builder = new TrustedWebActivityIntentBuilder(uri);
     prepareCustomTabs();
 
     TrustedWebActivityIntent trustedWebActivityIntent = builder.build(customTabsSession);
     prepareCustomTabsIntent(trustedWebActivityIntent);
 
-    CustomTabActivityHelper.openCustomTab(this, trustedWebActivityIntent, uri, CHROME_CUSTOM_TAB_REQUEST_CODE);
+    CustomTabActivityHelper.openTrustedWebActivity(this, trustedWebActivityIntent, uri, headers,
+            referrer != null ? Uri.parse(referrer) : null, CHROME_CUSTOM_TAB_REQUEST_CODE);
+  }
+
+  @Override
+  public void customTabsConnected() {
+    customTabsSession = customTabActivityHelper.getSession();
+    if (initialUrl != null) {
+      launchUrl(initialUrl, initialHeaders, initialReferrer, initialOtherLikelyURLs);
+    }
   }
 
   private void prepareCustomTabs() {
+    CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
     if (customSettings.toolbarBackgroundColor != null && !customSettings.toolbarBackgroundColor.isEmpty()) {
-      CustomTabColorSchemeParams.Builder defaultColorSchemeBuilder = new CustomTabColorSchemeParams.Builder();
-      builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder
-              .setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor))
-              .build());
+      defaultColorSchemeBuilder.setToolbarColor(Color.parseColor(customSettings.toolbarBackgroundColor));
     }
+    if (customSettings.navigationBarColor != null && !customSettings.navigationBarColor.isEmpty()) {
+      defaultColorSchemeBuilder.setNavigationBarColor(Color.parseColor(customSettings.navigationBarColor));
+    }
+    if (customSettings.navigationBarDividerColor != null && !customSettings.navigationBarDividerColor.isEmpty()) {
+      defaultColorSchemeBuilder.setNavigationBarDividerColor(Color.parseColor(customSettings.navigationBarDividerColor));
+    }
+    if (customSettings.secondaryToolbarColor != null && !customSettings.secondaryToolbarColor.isEmpty()) {
+      defaultColorSchemeBuilder.setSecondaryToolbarColor(Color.parseColor(customSettings.secondaryToolbarColor));
+    }
+    builder.setDefaultColorSchemeParams(defaultColorSchemeBuilder.build());
 
     if (customSettings.additionalTrustedOrigins != null && !customSettings.additionalTrustedOrigins.isEmpty()) {
       builder.setAdditionalTrustedOrigins(customSettings.additionalTrustedOrigins);
@@ -47,7 +72,7 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
     if (customSettings.displayMode != null) {
       builder.setDisplayMode(customSettings.displayMode);
     }
-    
+
     builder.setScreenOrientation(customSettings.screenOrientation);
   }
 
@@ -60,5 +85,8 @@ public class TrustedWebActivity extends ChromeCustomTabsActivity {
 
     if (customSettings.keepAliveEnabled)
       CustomTabsHelper.addKeepAliveExtra(this, intent);
+
+    if (customSettings.alwaysUseBrowserUI)
+      CustomTabsIntent.setAlwaysUseBrowserUI(intent);
   }
 }

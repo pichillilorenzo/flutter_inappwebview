@@ -9,6 +9,7 @@ import androidx.browser.trusted.ScreenOrientation;
 import androidx.browser.trusted.TrustedWebActivityDisplayMode;
 
 import com.pichillilorenzo.flutter_inappwebview.ISettings;
+import com.pichillilorenzo.flutter_inappwebview.types.AndroidResource;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +26,12 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
   public Boolean showTitle = true;
   @Nullable
   public String toolbarBackgroundColor;
+  @Nullable
+  public String navigationBarColor;
+  @Nullable
+  public String navigationBarDividerColor;
+  @Nullable
+  public String secondaryToolbarColor;
   public Boolean enableUrlBarHiding = false;
   public Boolean instantAppsEnabled = false;
   public String packageName;
@@ -35,6 +42,9 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
   public List<String> additionalTrustedOrigins = new ArrayList<>();
   public TrustedWebActivityDisplayMode displayMode = null;
   public Integer screenOrientation = ScreenOrientation.DEFAULT;
+  public List<AndroidResource> startAnimations = new ArrayList<>();
+  public List<AndroidResource> exitAnimations = new ArrayList<>();
+  public Boolean alwaysUseBrowserUI = false;
 
   @NonNull
   @Override
@@ -58,6 +68,15 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
           break;
         case "toolbarBackgroundColor":
           toolbarBackgroundColor = (String) value;
+          break;
+        case "navigationBarColor":
+          navigationBarColor = (String) value;
+          break;
+        case "navigationBarDividerColor":
+          navigationBarDividerColor = (String) value;
+          break;
+        case "secondaryToolbarColor":
+          secondaryToolbarColor = (String) value;
           break;
         case "enableUrlBarHiding":
           enableUrlBarHiding = (Boolean) value;
@@ -92,13 +111,36 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
                 boolean isSticky = (boolean) displayModeMap.get("isSticky");
                 int layoutInDisplayCutoutMode = (int) displayModeMap.get("displayCutoutMode");
                 displayMode = new TrustedWebActivityDisplayMode.ImmersiveMode(isSticky, layoutInDisplayCutoutMode);
+                break;
               case "DEFAULT_MODE":
                 displayMode = new TrustedWebActivityDisplayMode.DefaultMode();
+                break;
             }
           }
           break;
         case "screenOrientation":
           screenOrientation = (Integer) value;
+          break;
+        case "startAnimations":
+          List<Map<String, Object>> startAnimationsList = (List<Map<String, Object>>) value;
+          for (Map<String, Object> startAnimation : startAnimationsList) {
+            AndroidResource androidResource = AndroidResource.fromMap(startAnimation);
+            if (androidResource != null) {
+              startAnimations.add(AndroidResource.fromMap(startAnimation));
+            }
+          }
+          break;
+        case "exitAnimations":
+          List<Map<String, Object>> exitAnimationsList = (List<Map<String, Object>>) value;
+          for (Map<String, Object> exitAnimation : exitAnimationsList) {
+            AndroidResource androidResource = AndroidResource.fromMap(exitAnimation);
+            if (androidResource != null) {
+              exitAnimations.add(AndroidResource.fromMap(exitAnimation));
+            }
+          }
+          break;
+        case "alwaysUseBrowserUI":
+          alwaysUseBrowserUI = (Boolean) value;
           break;
       }
     }
@@ -113,6 +155,9 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
     options.put("addDefaultShareMenuItem", addDefaultShareMenuItem);
     options.put("showTitle", showTitle);
     options.put("toolbarBackgroundColor", toolbarBackgroundColor);
+    options.put("navigationBarColor", navigationBarColor);
+    options.put("navigationBarDividerColor", navigationBarDividerColor);
+    options.put("secondaryToolbarColor", secondaryToolbarColor);
     options.put("enableUrlBarHiding", enableUrlBarHiding);
     options.put("instantAppsEnabled", instantAppsEnabled);
     options.put("packageName", packageName);
@@ -122,6 +167,7 @@ public class ChromeCustomTabsSettings implements ISettings<ChromeCustomTabsActiv
     options.put("isTrustedWebActivity", isTrustedWebActivity);
     options.put("additionalTrustedOrigins", additionalTrustedOrigins);
     options.put("screenOrientation", screenOrientation);
+    options.put("alwaysUseBrowserUI", alwaysUseBrowserUI);
     return options;
   }
 

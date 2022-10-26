@@ -1,10 +1,12 @@
 package com.pichillilorenzo.flutter_inappwebview.chrome_custom_tabs;
 
 import android.app.Activity;
-import android.content.pm.PackageManager;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.Browser;
 
+import androidx.annotation.Nullable;
 import androidx.browser.customtabs.CustomTabsCallback;
 import androidx.browser.customtabs.CustomTabsClient;
 import androidx.browser.customtabs.CustomTabsIntent;
@@ -13,6 +15,7 @@ import androidx.browser.customtabs.CustomTabsSession;
 import androidx.browser.trusted.TrustedWebActivityIntent;
 
 import java.util.List;
+import java.util.Map;
 
 /**
  * This is a helper class to manage the connection to the Custom Tabs Service.
@@ -25,27 +28,52 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
     private CustomTabsCallback mCustomTabsCallback;
 
     /**
-     * Opens the URL on a Custom Tab if possible. Otherwise fallsback to opening it on a WebView.
+     * Opens the URL on a Custom Tab if possible.
      *
      * @param activity The host activity.
-     * @param customTabsIntent a CustomTabsIntent to be used if Custom Tabs is available.
+     * @param intent a intent to be used if Custom Tabs is available.
      * @param uri the Uri to be opened.
      */
     public static void openCustomTab(Activity activity,
-                                     CustomTabsIntent customTabsIntent,
+                                     Intent intent,
                                      Uri uri,
+                                     @Nullable Map<String, String> headers,
+                                     @Nullable Uri referrer,
                                      int requestCode) {
-        customTabsIntent.intent.setData(uri);
-        activity.startActivityForResult(customTabsIntent.intent, requestCode);
+        intent.setData(uri);
+        if (headers != null) {
+            Bundle bundleHeaders = new Bundle();
+            for (Map.Entry<String, String> header : headers.entrySet()) {
+                bundleHeaders.putString(header.getKey(), header.getValue());
+            }
+            intent.putExtra(Browser.EXTRA_HEADERS, bundleHeaders);
+        }
+        if (referrer != null) {
+            intent.putExtra(Intent.EXTRA_REFERRER, referrer);
+        }
+        activity.startActivityForResult(intent, requestCode);
     }
 
     public static void openCustomTab(Activity activity,
-                                     TrustedWebActivityIntent trustedWebActivityIntent,
+                                     CustomTabsIntent customTabsIntent,
                                      Uri uri,
+                                     @Nullable Map<String, String> headers,
+                                     @Nullable Uri referrer,
                                      int requestCode) {
-        trustedWebActivityIntent.getIntent().setData(uri);
-        activity.startActivityForResult(trustedWebActivityIntent.getIntent(), requestCode);
+        CustomTabActivityHelper.openCustomTab(activity, customTabsIntent.intent, uri,
+                headers, referrer, requestCode);
     }
+
+    public static void openTrustedWebActivity(Activity activity,
+                                              TrustedWebActivityIntent trustedWebActivityIntent,
+                                              Uri uri,
+                                              @Nullable Map<String, String> headers,
+                                              @Nullable Uri referrer,
+                                              int requestCode) {
+        CustomTabActivityHelper.openCustomTab(activity, trustedWebActivityIntent.getIntent(), uri,
+                headers, referrer, requestCode);
+    }
+
     
     public static boolean isAvailable(Activity activity) {
         return CustomTabsHelper.getPackageNameToUse(activity) != null;
@@ -68,6 +96,7 @@ public class CustomTabActivityHelper implements ServiceConnectionCallback {
      *
      * @return a CustomTabsSession.
      */
+    @Nullable
     public CustomTabsSession getSession() {
         if (mClient == null) {
             mCustomTabsSession = null;

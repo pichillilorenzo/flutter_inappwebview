@@ -153,6 +153,19 @@ app.get("/", (req, res) => {
   res.end()
 })
 
+app.get("/echo-headers", (req, res) => {
+  res.send(`
+    <html>
+      <head>
+      </head>
+      <body>
+        <pre style="word-wrap: break-word; white-space: pre-wrap;">${JSON.stringify(req.headers)}</pre>
+      </body>
+    </html>
+  `);
+  res.end()
+})
+
 app.get('/test-index', (req, res) => {
     res.sendFile(__dirname + '/public/index.html');
 })

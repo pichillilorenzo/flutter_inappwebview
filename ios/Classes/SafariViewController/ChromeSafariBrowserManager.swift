@@ -16,6 +16,8 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
     static let METHOD_CHANNEL_NAME = "com.pichillilorenzo/flutter_chromesafaribrowser"
     static var registrar: FlutterPluginRegistrar?
     static var browsers: [String: SafariViewController?] = [:]
+    @available(iOS 15.0, *)
+    static var prewarmingTokens: [String: SFSafariViewController.PrewarmingToken?] = [:]
     
     init(registrar: FlutterPluginRegistrar) {
         super.init(channel: FlutterMethodChannel(name: ChromeSafariBrowserManager.METHOD_CHANNEL_NAME, binaryMessenger: registrar.messenger()))
@@ -40,6 +42,44 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                     result(false)
                 }
                 break
+            case "clearWebsiteData":
+                if #available(iOS 16.0, *) {
+                    SFSafariViewController.DataStore.default.clearWebsiteData {
+                        result(true)
+                    }
+                } else {
+                    result(false)
+                }
+            case "prewarmConnections":
+                if #available(iOS 15.0, *) {
+                    let stringURLs = arguments!["URLs"] as! [String]
+                    var URLs: [URL] = []
+                    for stringURL in stringURLs {
+                        if let url = URL(string: stringURL) {
+                            URLs.append(url)
+                        }
+                    }
+                    let prewarmingToken = SFSafariViewController.prewarmConnections(to: URLs)
+                    let prewarmingTokenId = NSUUID().uuidString
+                    ChromeSafariBrowserManager.prewarmingTokens[prewarmingTokenId] = prewarmingToken
+                    result([
+                        "id": prewarmingTokenId
+                    ])
+                } else {
+                    result(nil)
+                }
+            case "invalidatePrewarmingToken":
+                if #available(iOS 15.0, *) {
+                    let prewarmingToken = arguments!["prewarmingToken"] as! [String:Any?]
+                    if let prewarmingTokenId = prewarmingToken["id"] as? String,
+                       let prewarmingToken = ChromeSafariBrowserManager.prewarmingTokens[prewarmingTokenId] {
+                        prewarmingToken?.invalidate()
+                        ChromeSafariBrowserManager.prewarmingTokens[prewarmingTokenId] = nil
+                    }
+                    result(true)
+                } else {
+                    result(false)
+                }
             default:
                 result(FlutterMethodNotImplemented)
                 break
@@ -61,9 +101,6 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
                 
                 if #available(iOS 11.0, *) {
                     let config = SFSafariViewController.Configuration()
-                    config.entersReaderIfAvailable = safariSettings.entersReaderIfAvailable
-                    config.barCollapsingEnabled = safariSettings.barCollapsingEnabled
-                    
                     safari = SafariViewController(id: id, url: absoluteUrl, configuration: config,
                                                   menuItemList: menuItemList, safariSettings: safariSettings)
                 } else {
@@ -95,6 +132,12 @@ public class ChromeSafariBrowserManager: ChannelDelegate {
             browser?.dispose()
         }
         ChromeSafariBrowserManager.browsers.removeAll()
+        if #available(iOS 15.0, *) {
+            ChromeSafariBrowserManager.prewarmingTokens.values.forEach { (prewarmingToken: SFSafariViewController.PrewarmingToken?) in
+                prewarmingToken?.invalidate()
+            }
+            ChromeSafariBrowserManager.prewarmingTokens.removeAll()
+        }
     }
     
     deinit {

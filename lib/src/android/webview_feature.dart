@@ -217,6 +217,10 @@ class WebViewFeature_ {
       const WebViewFeature_._internal(
           "ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY");
 
+  ///This feature covers [InAppWebViewController.getVariationsHeader].
+  static const GET_VARIATIONS_HEADER =
+      const WebViewFeature_._internal("GET_VARIATIONS_HEADER");
+
   ///Return whether a feature is supported at run-time. On devices running Android version `Build.VERSION_CODES.LOLLIPOP` and higher,
   ///this will check whether a feature is supported, depending on the combination of the desired feature, the Android version of device,
   ///and the WebView APK on the device. If running on a device with a lower API level, this will always return `false`.

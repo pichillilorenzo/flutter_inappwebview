@@ -55,7 +55,11 @@ class InAppWebView extends StatefulWidget implements WebView {
   ///- Web
   final HeadlessInAppWebView? headlessWebView;
 
+  @override
+  final void Function(InAppWebViewController controller, String url)? onShouldOverrideUrlLoadingFailedToParseUri;
+
   const InAppWebView({
+    this.onShouldOverrideUrlLoadingFailedToParseUri,
     Key? key,
     this.windowId,
     this.initialUrlRequest,

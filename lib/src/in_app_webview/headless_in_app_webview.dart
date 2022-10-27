@@ -51,7 +51,11 @@ class HeadlessInAppWebView implements WebView, Disposable {
   ///**NOTE for Android**: `Size` width and height values will be converted to `int` values because they cannot have `double` values.
   final Size initialSize;
 
+  @override
+  void Function(InAppWebViewController controller, String url)? onShouldOverrideUrlLoadingFailedToParseUri;
+
   HeadlessInAppWebView({
+    this.onShouldOverrideUrlLoadingFailedToParseUri,
     this.initialSize = const Size(-1, -1),
     this.windowId,
     this.initialUrlRequest,

@@ -18,6 +18,7 @@ import '../debug_logging_settings.dart';
 
 ///Abstract class that represents a WebView. Used by [InAppWebView], [HeadlessInAppWebView] and the WebView of [InAppBrowser].
 abstract class WebView {
+  final void Function(InAppWebViewController controller, String url)? onShouldOverrideUrlLoadingFailedToParseUri;
   ///Debug settings used by [InAppWebView], [HeadlessInAppWebView] and [InAppBrowser].
   ///The default value excludes the [WebView.onScrollChanged], [WebView.onOverScrolled] and [WebView.onReceivedIcon] events.
   static DebugLoggingSettings debugLoggingSettings = DebugLoggingSettings(
@@ -1021,7 +1022,8 @@ abstract class WebView {
   final WebViewImplementation implementation;
 
   WebView(
-      {this.windowId,
+      {this.onShouldOverrideUrlLoadingFailedToParseUri,
+      this.windowId,
       this.onWebViewCreated,
       this.onLoadStart,
       this.onLoadStop,

@@ -232,16 +232,31 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           Map<String, dynamic> arguments =
               call.arguments.cast<String, dynamic>();
-          NavigationAction navigationAction =
-              NavigationAction.fromMap(arguments)!;
+          try{
+            NavigationAction navigationAction =
+                NavigationAction.fromMap(arguments)!;
+                
 
-          if (_webview != null && _webview!.shouldOverrideUrlLoading != null)
-            return (await _webview!.shouldOverrideUrlLoading!(
-                    this, navigationAction))
+            if (_webview != null && _webview!.shouldOverrideUrlLoading != null)
+              return (await _webview!.shouldOverrideUrlLoading!(
+                      this, navigationAction))
+                  ?.toNativeValue();
+            return (await _inAppBrowser!
+                    .shouldOverrideUrlLoading(navigationAction))
                 ?.toNativeValue();
-          return (await _inAppBrowser!
-                  .shouldOverrideUrlLoading(navigationAction))
-              ?.toNativeValue();
+          } catch(e){
+              try {
+                if (_webview != null && _webview!.shouldOverrideUrlLoading != null) {
+                  _webview!.onShouldOverrideUrlLoadingFailedToParseUri!(this, arguments["request"]["url"]);
+                }
+                _inAppBrowser!.onShouldOverrideUrlLoadingFailedToParseUri(arguments["request"]["url"]);
+              } catch(e) {}
+              URLRequest urlRequest = URLRequest.fromMap({"url": "shouldOverrideUrlLoading://failed"}) ?? URLRequest();
+              if (_webview != null && _webview!.shouldOverrideUrlLoading != null) {
+                return _webview!.shouldOverrideUrlLoading!(this, NavigationAction(request: urlRequest, isForMainFrame: true));
+              }
+              return _inAppBrowser!.shouldOverrideUrlLoading(NavigationAction(request: urlRequest, isForMainFrame: true));
+          }
         }
         break;
       case "onConsoleMessage":
@@ -1190,9 +1205,13 @@ class InAppWebViewController {
       case "onCallJsHandler":
         String handlerName = call.arguments["handlerName"];
         // decode args to json
-        List<dynamic> args = jsonDecode(call.arguments["args"]);
-
-        _debugLog(handlerName, args);
+        List<dynamic> args = [];
+        try {
+          args = jsonDecode(call.arguments["args"]);
+          _debugLog(handlerName, args);
+        } catch(e) {
+          _debugLog(handlerName, e);
+        }
 
         switch (handlerName) {
           case "onLoadResource":

@@ -519,6 +519,8 @@ class InAppBrowser {
   ///- MacOS
   void onConsoleMessage(ConsoleMessage consoleMessage) {}
 
+  void onShouldOverrideUrlLoadingFailedToParseUri(String url) {}
+
   ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
   ///
   ///Note that on Android there isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.

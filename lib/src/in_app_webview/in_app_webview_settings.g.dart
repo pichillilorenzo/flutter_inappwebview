@@ -1080,7 +1080,7 @@ class InAppWebViewSettings {
   ///**Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
-  Uri? allowingReadAccessTo;
+  WebUri? allowingReadAccessTo;
 
   ///Set to `true` to disable the context menu (copy, select, etc.) that is shown when the user emits a long press event on a HTML link.
   ///This is implemented using also JavaScript, so it must be enabled or it won't work.
@@ -1430,7 +1430,7 @@ class InAppWebViewSettings {
           map['requestedWithHeaderMode']),
       mediaType: map['mediaType'],
       allowingReadAccessTo: map['allowingReadAccessTo'] != null
-          ? Uri.tryParse(map['allowingReadAccessTo'])
+          ? WebUri(map['allowingReadAccessTo'])
           : null,
       underPageBackgroundColor: map['underPageBackgroundColor'] != null
           ? UtilColor.fromStringRepresentation(map['underPageBackgroundColor'])

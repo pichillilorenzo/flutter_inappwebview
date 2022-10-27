@@ -10,13 +10,13 @@ part of 'web_history_item.dart';
 ///Each [WebHistoryItem] is a snapshot of the requested history item.
 class WebHistoryItem {
   ///Original url of this history item.
-  Uri? originalUrl;
+  WebUri? originalUrl;
 
   ///Document title of this history item.
   String? title;
 
   ///Url of this history item.
-  Uri? url;
+  WebUri? url;
 
   ///0-based position index in the back-forward [WebHistory.list].
   int? index;
@@ -33,9 +33,9 @@ class WebHistoryItem {
     }
     final instance = WebHistoryItem(
       originalUrl:
-          map['originalUrl'] != null ? Uri.tryParse(map['originalUrl']) : null,
+          map['originalUrl'] != null ? WebUri(map['originalUrl']) : null,
       title: map['title'],
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       index: map['index'],
       offset: map['offset'],
     );

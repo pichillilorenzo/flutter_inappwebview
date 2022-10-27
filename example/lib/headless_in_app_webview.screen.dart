@@ -20,8 +20,8 @@ class _HeadlessInAppWebViewExampleScreenState
     super.initState();
 
     var url = !kIsWeb
-        ? Uri.parse("https://flutter.dev")
-        : Uri.parse("http://localhost:${Uri.base.port}/page.html");
+        ? WebUri("https://flutter.dev")
+        : WebUri("http://localhost:${Uri.base.port}/page.html");
 
     headlessWebView = new HeadlessInAppWebView(
       initialUrlRequest: URLRequest(url: url),

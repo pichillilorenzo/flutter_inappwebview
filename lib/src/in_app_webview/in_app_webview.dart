@@ -18,6 +18,7 @@ import '../context_menu.dart';
 import '../types/main.dart';
 import '../print_job/main.dart';
 
+import '../web_uri.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
@@ -231,7 +232,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   final ContextMenu? contextMenu;
 
   @override
-  final void Function(InAppWebViewController controller, Uri? url)?
+  final void Function(InAppWebViewController controller, WebUri? url)?
       onPageCommitVisible;
 
   @override
@@ -375,10 +376,12 @@ class InAppWebView extends StatefulWidget implements WebView {
       onLoadResourceWithCustomScheme;
 
   @override
-  final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
+  final void Function(InAppWebViewController controller, WebUri? url)?
+      onLoadStart;
 
   @override
-  final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
+  final void Function(InAppWebViewController controller, WebUri? url)?
+      onLoadStop;
 
   @override
   final void Function(InAppWebViewController controller,
@@ -390,7 +393,7 @@ class InAppWebView extends StatefulWidget implements WebView {
   final void Function(InAppWebViewController controller, Uri? url)? onPrint;
 
   @override
-  final Future<bool?> Function(InAppWebViewController controller, Uri? url,
+  final Future<bool?> Function(InAppWebViewController controller, WebUri? url,
       PrintJobController? printJobController)? onPrintRequest;
 
   @override
@@ -416,7 +419,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final void Function(
-          InAppWebViewController controller, Uri? url, bool? isReload)?
+          InAppWebViewController controller, WebUri? url, bool? isReload)?
       onUpdateVisitedHistory;
 
   @override
@@ -513,7 +516,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<FormResubmissionAction?> Function(
-      InAppWebViewController controller, Uri? url)? onFormResubmission;
+      InAppWebViewController controller, WebUri? url)? onFormResubmission;
 
   @override
   final void Function(InAppWebViewController controller)?
@@ -549,7 +552,7 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final void Function(
-          InAppWebViewController controller, Uri url, bool precomposed)?
+          InAppWebViewController controller, WebUri url, bool precomposed)?
       onReceivedTouchIconUrl;
 
   @override
@@ -559,16 +562,18 @@ class InAppWebView extends StatefulWidget implements WebView {
 
   @override
   final Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)? onRenderProcessResponsive;
+          InAppWebViewController controller, WebUri? url)?
+      onRenderProcessResponsive;
 
   @override
   final Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)? onRenderProcessUnresponsive;
+          InAppWebViewController controller, WebUri? url)?
+      onRenderProcessUnresponsive;
 
   @override
   final Future<SafeBrowsingResponse?> Function(
       InAppWebViewController controller,
-      Uri url,
+      WebUri url,
       SafeBrowsingThreat? threatType)? onSafeBrowsingHit;
 
   @override

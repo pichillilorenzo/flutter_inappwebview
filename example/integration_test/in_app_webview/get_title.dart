@@ -29,7 +29,7 @@ void getTitle() {
       base64Encode(const Utf8Encoder().convert(getTitleTest));
 
   var url = !kIsWeb
-      ? Uri.parse('data:text/html;charset=utf-8;base64,$getTitleTestBase64')
+      ? WebUri('data:text/html;charset=utf-8;base64,$getTitleTestBase64')
       : TEST_WEB_PLATFORM_URL_1;
   var expectedValue = !kIsWeb ? 'Some title' : 'page';
 

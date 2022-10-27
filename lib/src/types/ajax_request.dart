@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../web_uri.dart';
 import 'ajax_request_headers.dart';
 import 'ajax_request_ready_state.dart';
 import 'ajax_request_event.dart';
@@ -17,7 +18,7 @@ class AjaxRequest_ {
   String? method;
 
   ///The URL of the `XMLHttpRequest` request.
-  Uri? url;
+  WebUri? url;
 
   ///An optional Boolean parameter, defaulting to true, indicating whether or not the request is performed asynchronously.
   bool? isAsync;
@@ -46,7 +47,7 @@ class AjaxRequest_ {
   ///The serialized URL of the response or the empty string if the URL is null.
   ///If the URL is returned, any URL fragment present in the URL will be stripped away.
   ///The value of responseURL will be the final URL obtained after any redirects.
-  Uri? responseURL;
+  WebUri? responseURL;
 
   ///It is an enumerated string value specifying the type of data contained in the response.
   ///It also lets the author change the [response type](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType).

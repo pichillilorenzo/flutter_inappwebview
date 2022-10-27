@@ -63,7 +63,7 @@ void loadFileUrl() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest:
-                URLRequest(url: Uri.parse('file://${fileHtml.path}')),
+                URLRequest(url: WebUri('file://${fileHtml.path}')),
             onConsoleMessage: (controller, consoleMessage) {
               consoleMessageShouldNotComplete.complete(consoleMessage);
             },
@@ -82,10 +82,9 @@ void loadFileUrl() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest:
-                URLRequest(url: Uri.parse('file://${fileHtml.path}')),
+                URLRequest(url: WebUri('file://${fileHtml.path}')),
             initialSettings: InAppWebViewSettings(
-                allowingReadAccessTo:
-                    Uri.parse('file://${appSupportDir.path}/')),
+                allowingReadAccessTo: WebUri('file://${appSupportDir.path}/')),
             onConsoleMessage: (controller, consoleMessage) {
               consoleMessageCompleter.complete(consoleMessage);
             },
@@ -110,7 +109,7 @@ void loadFileUrl() {
             onWebViewCreated: (controller) {
               controller.loadUrl(
                   urlRequest:
-                      URLRequest(url: Uri.parse('file://${fileHtml.path}')));
+                      URLRequest(url: WebUri('file://${fileHtml.path}')));
             },
             onConsoleMessage: (controller, consoleMessage) {
               consoleMessageShouldNotComplete.complete(consoleMessage);
@@ -132,9 +131,9 @@ void loadFileUrl() {
             onWebViewCreated: (controller) {
               controller.loadUrl(
                   urlRequest:
-                      URLRequest(url: Uri.parse('file://${fileHtml.path}')),
+                      URLRequest(url: WebUri('file://${fileHtml.path}')),
                   allowingReadAccessTo:
-                      Uri.parse('file://${appSupportDir.path}/'));
+                      WebUri('file://${appSupportDir.path}/'));
             },
             onConsoleMessage: (controller, consoleMessage) {
               consoleMessageCompleter.complete(consoleMessage);

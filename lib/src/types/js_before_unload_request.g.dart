@@ -9,7 +9,7 @@ part of 'js_before_unload_request.dart';
 ///Class that represents the request of the [WebView.onJsBeforeUnload] event.
 class JsBeforeUnloadRequest {
   ///The url of the page requesting the dialog.
-  Uri? url;
+  WebUri? url;
 
   ///Message to be displayed in the window.
   String? message;
@@ -21,7 +21,7 @@ class JsBeforeUnloadRequest {
       return null;
     }
     final instance = JsBeforeUnloadRequest(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       message: map['message'],
     );
     return instance;

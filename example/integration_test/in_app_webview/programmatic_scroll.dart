@@ -52,8 +52,7 @@ void programmaticScroll() {
           base64Encode(const Utf8Encoder().convert(scrollTestPage));
 
       var url = !kIsWeb
-          ? Uri.parse(
-              'data:text/html;charset=utf-8;base64,$scrollTestPageBase64')
+          ? WebUri('data:text/html;charset=utf-8;base64,$scrollTestPageBase64')
           : TEST_WEB_PLATFORM_URL_1;
 
       final Completer<void> pageLoaded = Completer<void>();
@@ -143,7 +142,7 @@ void programmaticScroll() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$scrollTestPageBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);

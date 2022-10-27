@@ -18,7 +18,7 @@ class InAppWebViewInitialData {
   String encoding;
 
   ///The URL to use as the page's base URL. If `null` defaults to `about:blank`.
-  Uri? baseUrl;
+  WebUri? baseUrl;
 
   ///Use [historyUrl] instead.
   @Deprecated('Use historyUrl instead')
@@ -28,7 +28,7 @@ class InAppWebViewInitialData {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  Uri? historyUrl;
+  WebUri? historyUrl;
   InAppWebViewInitialData(
       {required this.data,
       this.mimeType = "text/html",
@@ -36,7 +36,8 @@ class InAppWebViewInitialData {
       this.baseUrl,
       @Deprecated('Use historyUrl instead') this.androidHistoryUrl,
       this.historyUrl}) {
-    historyUrl = historyUrl ?? androidHistoryUrl;
+    historyUrl = historyUrl ??
+        (androidHistoryUrl != null ? WebUri.uri(androidHistoryUrl!) : null);
   }
 
   ///Gets a possible [InAppWebViewInitialData] instance from a [Map] value.
@@ -46,11 +47,10 @@ class InAppWebViewInitialData {
     }
     final instance = InAppWebViewInitialData(
       data: map['data'],
-      baseUrl: map['baseUrl'] != null ? Uri.tryParse(map['baseUrl']) : null,
+      baseUrl: map['baseUrl'] != null ? WebUri(map['baseUrl']) : null,
       androidHistoryUrl:
           map['historyUrl'] != null ? Uri.tryParse(map['historyUrl']) : null,
-      historyUrl:
-          map['historyUrl'] != null ? Uri.tryParse(map['historyUrl']) : null,
+      historyUrl: map['historyUrl'] != null ? WebUri(map['historyUrl']) : null,
     );
     instance.mimeType = map['mimeType'];
     instance.encoding = map['encoding'];

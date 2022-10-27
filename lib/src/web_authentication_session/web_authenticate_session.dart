@@ -7,11 +7,12 @@ import '../debug_logging_settings.dart';
 import '../types/main.dart';
 import '../types/disposable.dart';
 
+import '../web_uri.dart';
 import 'web_authenticate_session_settings.dart';
 
 ///A completion handler for the [WebAuthenticationSession].
 typedef WebAuthenticationSessionCompletionHandler = Future<void> Function(
-    Uri? url, WebAuthenticationSessionError? error)?;
+    WebUri? url, WebAuthenticationSessionError? error)?;
 
 ///A session that an app uses to authenticate a user through a web service.
 ///
@@ -44,7 +45,7 @@ class WebAuthenticationSession implements Disposable {
   late final String id;
 
   ///A URL with the `http` or `https` scheme pointing to the authentication webpage.
-  final Uri url;
+  final WebUri url;
 
   ///The custom URL scheme that the app expects in the callback URL.
   final String? callbackURLScheme;
@@ -67,7 +68,7 @@ class WebAuthenticationSession implements Disposable {
   ///
   ///[onComplete] represents a completion handler the session calls when it completes successfully, or when the user cancels the session.
   static Future<WebAuthenticationSession> create(
-      {required Uri url,
+      {required WebUri url,
       String? callbackURLScheme,
       WebAuthenticationSessionCompletionHandler onComplete,
       WebAuthenticationSessionSettings? initialSettings}) async {
@@ -129,7 +130,7 @@ class WebAuthenticationSession implements Disposable {
     switch (call.method) {
       case "onComplete":
         String? url = call.arguments["url"];
-        Uri? uri = url != null ? Uri.tryParse(url) : null;
+        WebUri? uri = url != null ? WebUri(url) : null;
         var error = WebAuthenticationSessionError.fromNativeValue(
             call.arguments["errorCode"]);
         if (onComplete != null) {

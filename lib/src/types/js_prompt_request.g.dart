@@ -9,7 +9,7 @@ part of 'js_prompt_request.dart';
 ///Class that represents the request of the [WebView.onJsPrompt] event.
 class JsPromptRequest {
   ///The url of the page requesting the dialog.
-  Uri? url;
+  WebUri? url;
 
   ///Message to be displayed in the window.
   String? message;
@@ -41,7 +41,7 @@ class JsPromptRequest {
       return null;
     }
     final instance = JsPromptRequest(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       message: map['message'],
       defaultValue: map['defaultValue'],
       iosIsMainFrame: map['isMainFrame'],

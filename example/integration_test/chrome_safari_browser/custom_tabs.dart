@@ -20,7 +20,7 @@ void customTabs() {
 
       await chromeSafariBrowser.open(
           url: TEST_URL_1,
-          referrer: Uri.parse("android-app://custom-referrer"),
+          referrer: WebUri("android-app://custom-referrer"),
           settings: ChromeSafariBrowserSettings(isSingleInstance: true));
       await expectLater(chromeSafariBrowser.opened.future, completes);
       expect(chromeSafariBrowser.isOpened(), true);

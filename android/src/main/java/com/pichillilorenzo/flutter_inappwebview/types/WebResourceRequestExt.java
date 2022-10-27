@@ -1,6 +1,5 @@
 package com.pichillilorenzo.flutter_inappwebview.types;
 
-import android.net.Uri;
 import android.os.Build;
 import android.webkit.WebResourceRequest;
 
@@ -14,14 +13,14 @@ import java.util.Map;
 
 public class WebResourceRequestExt {
   @NonNull
-  private Uri url;
+  private String url;
   private Map<String, String> headers;
   private boolean isRedirect;
   private boolean hasGesture;
   private boolean isForMainFrame;
   private String method;
 
-  public WebResourceRequestExt(@NonNull Uri url, Map<String, String> headers, boolean isRedirect, boolean hasGesture, boolean isForMainFrame, String method) {
+  public WebResourceRequestExt(@NonNull String url, Map<String, String> headers, boolean isRedirect, boolean hasGesture, boolean isForMainFrame, String method) {
     this.url = url;
     this.headers = headers;
     this.isRedirect = isRedirect;
@@ -38,7 +37,7 @@ public class WebResourceRequestExt {
       } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
         isRedirect = request.isRedirect();
       }
-      return new WebResourceRequestExt(request.getUrl(),
+      return new WebResourceRequestExt(request.getUrl().toString(),
               request.getRequestHeaders(),
               isRedirect,
               request.hasGesture(),
@@ -49,7 +48,7 @@ public class WebResourceRequestExt {
 
   public Map<String, Object> toMap() {
     Map<String, Object> webResourceRequestMap = new HashMap<>();
-    webResourceRequestMap.put("url", url.toString());
+    webResourceRequestMap.put("url", url);
     webResourceRequestMap.put("headers", headers);
     webResourceRequestMap.put("isRedirect", isRedirect);
     webResourceRequestMap.put("hasGesture", hasGesture);
@@ -59,11 +58,11 @@ public class WebResourceRequestExt {
   }
 
   @NonNull
-  public Uri getUrl() {
+  public String getUrl() {
     return url;
   }
 
-  public void setUrl(@NonNull Uri url) {
+  public void setUrl(@NonNull String url) {
     this.url = url;
   }
 

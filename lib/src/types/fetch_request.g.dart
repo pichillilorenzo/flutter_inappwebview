@@ -9,7 +9,7 @@ part of 'fetch_request.dart';
 ///Class that represents a HTTP request created with JavaScript using the [Fetch API](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API/Using_Fetch).
 class FetchRequest {
   ///The URL of the request.
-  Uri? url;
+  WebUri? url;
 
   ///The HTTP request method used of the request.
   String? method;
@@ -67,7 +67,7 @@ class FetchRequest {
       return null;
     }
     final instance = FetchRequest(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       method: map['method'],
       headers: map['headers']?.cast<String, dynamic>(),
       body: map['body'],

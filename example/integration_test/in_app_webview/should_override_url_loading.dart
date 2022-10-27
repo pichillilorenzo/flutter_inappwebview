@@ -33,7 +33,7 @@ void shouldOverrideUrlLoading() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse(pageEncoded)),
+            initialUrlRequest: URLRequest(url: WebUri(pageEncoded)),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -86,7 +86,7 @@ void shouldOverrideUrlLoading() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse(pageEncoded)),
+            initialUrlRequest: URLRequest(url: WebUri(pageEncoded)),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -145,7 +145,7 @@ void shouldOverrideUrlLoading() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse(pageEncoded)),
+            initialUrlRequest: URLRequest(url: WebUri(pageEncoded)),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -197,7 +197,7 @@ void shouldOverrideUrlLoading() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse(pageEncoded)),
+            initialUrlRequest: URLRequest(url: WebUri(pageEncoded)),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },

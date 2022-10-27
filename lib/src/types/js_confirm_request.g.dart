@@ -9,7 +9,7 @@ part of 'js_confirm_request.dart';
 ///Class that represents the request of the [WebView.onJsConfirm] event.
 class JsConfirmRequest {
   ///The url of the page requesting the dialog.
-  Uri? url;
+  WebUri? url;
 
   ///Message to be displayed in the window.
   String? message;
@@ -37,7 +37,7 @@ class JsConfirmRequest {
       return null;
     }
     final instance = JsConfirmRequest(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       message: map['message'],
       iosIsMainFrame: map['isMainFrame'],
       isMainFrame: map['isMainFrame'],

@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/webview.dart';
+import '../web_uri.dart';
 
 part 'web_resource_request.g.dart';
 
@@ -8,7 +9,7 @@ part 'web_resource_request.g.dart';
 @ExchangeableObject()
 class WebResourceRequest_ {
   ///The URL for which the resource request was made.
-  Uri url;
+  WebUri url;
 
   ///The headers associated with the request.
   ///

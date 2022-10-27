@@ -39,7 +39,7 @@ void openAndClose() {
             presentationStyle: ModalPresentationStyle.OVER_FULL_SCREEN,
             eventAttribution: UIEventAttribution(
                 sourceIdentifier: 4,
-                destinationURL: Uri.parse("https://shop.example/test.html"),
+                destinationURL: WebUri("https://shop.example/test.html"),
                 sourceDescription: "Banner ad for Test.",
                 purchaser: "Shop Example, Inc."),
             activityButton: ActivityButton(

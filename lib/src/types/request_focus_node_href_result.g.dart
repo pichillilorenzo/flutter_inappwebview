@@ -9,7 +9,7 @@ part of 'request_focus_node_href_result.dart';
 ///Class that represents the result used by the [InAppWebViewController.requestFocusNodeHref] method.
 class RequestFocusNodeHrefResult {
   ///The anchor's href attribute.
-  Uri? url;
+  WebUri? url;
 
   ///The anchor's text.
   String? title;
@@ -24,7 +24,7 @@ class RequestFocusNodeHrefResult {
       return null;
     }
     final instance = RequestFocusNodeHrefResult(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       title: map['title'],
       src: map['src'],
     );

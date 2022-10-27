@@ -109,7 +109,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
                   onPressed: () async {
                     await widget.browser.openUrlRequest(
                       urlRequest:
-                          URLRequest(url: Uri.parse("https://flutter.dev")),
+                          URLRequest(url: WebUri("https://flutter.dev")),
                       settings: InAppBrowserClassSettings(
                         browserSettings: InAppBrowserSettings(
                             toolbarTopBackgroundColor: Colors.blue,
@@ -126,7 +126,7 @@ class _InAppBrowserExampleScreenState extends State<InAppBrowserExampleScreen> {
               ElevatedButton(
                   onPressed: () async {
                     await InAppBrowser.openWithSystemBrowser(
-                        url: Uri.parse("https://flutter.dev/"));
+                        url: WebUri("https://flutter.dev/"));
                   },
                   child: Text("Open System Browser")),
             ])));

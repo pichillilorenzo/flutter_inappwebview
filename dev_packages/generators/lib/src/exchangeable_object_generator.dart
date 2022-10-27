@@ -257,6 +257,13 @@ class ExchangeableObjectGenerator
             } else if (hasFromValue && deprecatedHasToValue) {
               classBuffer.write(fieldTypeElement.name!.replaceFirst("_", "") +
                   '.fromValue($deprecatedFieldName${deprecatedIsNullable ? '?' : ''}.toValue())${!isNullable ? '!' : ''}');
+            } else if (deprecatedField.type.getDisplayString(withNullability: false) == "Uri" &&
+                       fieldElement.type.getDisplayString(withNullability: false) == "WebUri") {
+              if (deprecatedIsNullable) {
+                classBuffer.write("($deprecatedFieldName != null ? WebUri.uri($deprecatedFieldName!) : ${isNullable ? "null" : "WebUri('')"})");
+              } else {
+                classBuffer.write("WebUri.uri($deprecatedFieldName)");
+              }
             } else {
               classBuffer.write(deprecatedFieldName);
             }
@@ -496,6 +503,12 @@ class ExchangeableObjectGenerator
       } else {
         return "$value != null ? Uri.tryParse($value) : null";
       }
+    } else if (elementType.getDisplayString(withNullability: false) == "WebUri") {
+      if (!isNullable) {
+        return "WebUri($value)";
+      } else {
+        return "$value != null ? WebUri($value) : null";
+      }
     } else if (elementType.getDisplayString(withNullability: false) ==
         "Color") {
       if (!isNullable) {
@@ -572,6 +585,8 @@ class ExchangeableObjectGenerator
     final fieldTypeElement = elementType.element2;
     final isNullable = Util.typeIsNullable(elementType);
     if (elementType.getDisplayString(withNullability: false) == "Uri") {
+      return fieldName + (isNullable ? '?' : '') + '.toString()';
+    } else if (elementType.getDisplayString(withNullability: false) == "WebUri") {
       return fieldName + (isNullable ? '?' : '') + '.toString()';
     } else if (elementType.getDisplayString(withNullability: false) ==
         "Color") {

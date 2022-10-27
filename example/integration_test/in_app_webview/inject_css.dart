@@ -84,7 +84,7 @@ void injectCSS() {
       await pageLoaded.future;
 
       await controller.injectCSSFileFromUrl(
-          urlFile: Uri.parse(
+          urlFile: WebUri(
               'https://getbootstrap.com/docs/4.3/dist/css/bootstrap.min.css'),
           cssLinkHtmlTagAttributes: CSSLinkHtmlTagAttributes(id: 'bootstrap'));
       await Future.delayed(Duration(seconds: 2));

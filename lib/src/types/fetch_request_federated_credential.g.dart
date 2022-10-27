@@ -21,7 +21,7 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
   String? provider;
 
   ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
-  Uri? iconURL;
+  WebUri? iconURL;
   FetchRequestFederatedCredential(
       {this.id,
       this.name,
@@ -41,7 +41,7 @@ class FetchRequestFederatedCredential extends FetchRequestCredential {
       name: map['name'],
       protocol: map['protocol'],
       provider: map['provider'],
-      iconURL: map['iconURL'] != null ? Uri.tryParse(map['iconURL']) : null,
+      iconURL: map['iconURL'] != null ? WebUri(map['iconURL']) : null,
     );
     instance.type = map['type'];
     return instance;

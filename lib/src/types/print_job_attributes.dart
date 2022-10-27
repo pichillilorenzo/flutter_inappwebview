@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../util.dart';
 import '../print_job/main.dart';
+import '../web_uri.dart';
 import 'in_app_webview_rect.dart';
 import 'print_job_color_mode.dart';
 import 'print_job_duplex_mode.dart';
@@ -130,7 +131,7 @@ class PrintJobAttributes_ {
 
   ///An URL containing the location to which the job file will be saved when the [jobDisposition] is [PrintJobDisposition.SAVE].
   @SupportedPlatforms(platforms: [MacOSPlatform()])
-  Uri? jobSavingURL;
+  WebUri? jobSavingURL;
 
   ///If `true`, produce detailed reports when an error occurs.
   @SupportedPlatforms(platforms: [MacOSPlatform()])

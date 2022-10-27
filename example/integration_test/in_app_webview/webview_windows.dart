@@ -278,7 +278,7 @@ void webViewWindows() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$openWindowTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);

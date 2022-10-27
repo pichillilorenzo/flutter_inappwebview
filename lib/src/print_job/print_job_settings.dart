@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 
 import '../types/main.dart';
 import '../util.dart';
+import '../web_uri.dart';
 import 'print_job_controller.dart';
 
 ///Class that represents the settings of a [PrintJobController].
@@ -244,7 +245,7 @@ class PrintJobSettings {
   ///
   ///**Supported Platforms/Implementations**:
   ///- MacOS
-  Uri? jobSavingURL;
+  WebUri? jobSavingURL;
 
   ///The name of the currently selected paper size.
   ///
@@ -440,9 +441,8 @@ class PrintJobSettings {
         showsProgressPanel: map["showsProgressPanel"],
         jobDisposition:
             PrintJobDisposition.fromNativeValue(map["jobDisposition"]),
-        jobSavingURL: map["jobSavingURL"] != null
-            ? Uri.tryParse(map["jobSavingURL"])
-            : null,
+        jobSavingURL:
+            map["jobSavingURL"] != null ? WebUri(map["jobSavingURL"]) : null,
         paperName: map["paperName"],
         horizontalPagination:
             PrintJobPaginationMode.fromNativeValue(map["horizontalPagination"]),

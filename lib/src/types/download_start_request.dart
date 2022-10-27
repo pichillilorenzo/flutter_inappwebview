@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/webview.dart';
+import '../web_uri.dart';
 
 part 'download_start_request.g.dart';
 
@@ -8,7 +9,7 @@ part 'download_start_request.g.dart';
 @ExchangeableObject()
 class DownloadStartRequest_ {
   ///The full url to the content that should be downloaded.
-  Uri url;
+  WebUri url;
 
   ///the user agent to be used for the download.
   String? userAgent;

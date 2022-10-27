@@ -72,7 +72,7 @@ void webMessage() {
               });
               await controller.postWebMessage(
                   message: WebMessage(data: "capturePort", ports: [port2]),
-                  targetOrigin: Uri.parse("*"));
+                  targetOrigin: WebUri("*"));
               await controller.evaluateJavascript(
                   source: "document.getElementById('button').click();");
             },

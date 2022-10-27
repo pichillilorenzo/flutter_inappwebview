@@ -12,6 +12,7 @@ import '../types/ui_image.dart';
 import '../util.dart';
 import '../debug_logging_settings.dart';
 
+import '../web_uri.dart';
 import 'chrome_safari_browser_settings.dart';
 
 class ChromeSafariBrowserAlreadyOpenedException implements Exception {
@@ -103,7 +104,7 @@ class ChromeSafariBrowser {
         break;
       case "onInitialLoadDidRedirect":
         final String? url = call.arguments["url"];
-        final Uri? uri = url != null ? Uri.tryParse(url) : null;
+        final WebUri? uri = url != null ? WebUri(url) : null;
         onInitialLoadDidRedirect(uri);
         break;
       case "onNavigationEvent":
@@ -115,7 +116,7 @@ class ChromeSafariBrowser {
         final relation =
             CustomTabsRelationType.fromNativeValue(call.arguments["relation"]);
         final requestedOrigin = call.arguments["requestedOrigin"] != null
-            ? Uri.tryParse(call.arguments["requestedOrigin"])
+            ? WebUri(call.arguments["requestedOrigin"])
             : null;
         final bool result = call.arguments["result"];
         onRelationshipValidationResult(relation, requestedOrigin, result);
@@ -136,22 +137,22 @@ class ChromeSafariBrowser {
             this._actionButton?.action!(url, title);
           }
           if (this._actionButton?.onClick != null) {
-            this._actionButton?.onClick!(Uri.tryParse(url), title);
+            this._actionButton?.onClick!(WebUri(url), title);
           }
         } else if (this._menuItems[id] != null) {
           if (this._menuItems[id]?.action != null) {
             this._menuItems[id]?.action!(url, title);
           }
           if (this._menuItems[id]?.onClick != null) {
-            this._menuItems[id]?.onClick!(Uri.tryParse(url), title);
+            this._menuItems[id]?.onClick!(WebUri(url), title);
           }
         }
         break;
       case "onSecondaryItemActionPerform":
         final clickableIDs = this._secondaryToolbar?.clickableIDs;
         if (clickableIDs != null) {
-          Uri? url = call.arguments["url"] != null
-              ? Uri.tryParse(call.arguments["url"])
+          WebUri? url = call.arguments["url"] != null
+              ? WebUri(call.arguments["url"])
               : null;
           String name = call.arguments["name"];
           for (final clickable in clickableIDs) {
@@ -199,10 +200,10 @@ class ChromeSafariBrowser {
   ///- Android
   ///- iOS
   Future<void> open(
-      {Uri? url,
+      {WebUri? url,
       Map<String, String>? headers,
-      List<Uri>? otherLikelyURLs,
-      Uri? referrer,
+      List<WebUri>? otherLikelyURLs,
+      WebUri? referrer,
       @Deprecated('Use settings instead')
           // ignore: deprecated_member_use_from_same_package
           ChromeSafariBrowserClassOptions? options,
@@ -257,10 +258,10 @@ class ChromeSafariBrowser {
   ///**Supported Platforms/Implementations**:
   ///- Android
   Future<void> launchUrl({
-    required Uri url,
+    required WebUri url,
     Map<String, String>? headers,
-    List<Uri>? otherLikelyURLs,
-    Uri? referrer,
+    List<WebUri>? otherLikelyURLs,
+    WebUri? referrer,
   }) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
@@ -283,7 +284,8 @@ class ChromeSafariBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.mayLaunchUrl](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#mayLaunchUrl(android.net.Uri,android.os.Bundle,java.util.List%3Candroid.os.Bundle%3E)))
-  Future<bool> mayLaunchUrl({Uri? url, List<Uri>? otherLikelyURLs}) async {
+  Future<bool> mayLaunchUrl(
+      {WebUri? url, List<WebUri>? otherLikelyURLs}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url?.toString());
     args.putIfAbsent('otherLikelyURLs',
@@ -308,7 +310,8 @@ class ChromeSafariBrowser {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsSession.validateRelationship](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsSession#validateRelationship(int,android.net.Uri,android.os.Bundle)))
   Future<bool> validateRelationship(
-      {required CustomTabsRelationType relation, required Uri origin}) async {
+      {required CustomTabsRelationType relation,
+      required WebUri origin}) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('relation', () => relation.toNativeValue());
     args.putIfAbsent('origin', () => origin.toString());
@@ -453,7 +456,7 @@ class ChromeSafariBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewController.prewarmConnections](https://developer.apple.com/documentation/safariservices/sfsafariviewcontroller/3752133-prewarmconnections))
-  static Future<PrewarmingToken?> prewarmConnections(List<Uri> URLs) async {
+  static Future<PrewarmingToken?> prewarmConnections(List<WebUri> URLs) async {
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('URLs', () => URLs.map((e) => e.toString()).toList());
     Map<String, dynamic>? result =
@@ -501,7 +504,7 @@ class ChromeSafariBrowser {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - SFSafariViewControllerDelegate.safariViewController](https://developer.apple.com/documentation/safariservices/sfsafariviewcontrollerdelegate/2923545-safariviewcontroller))
-  void onInitialLoadDidRedirect(Uri? url) {}
+  void onInitialLoadDidRedirect(WebUri? url) {}
 
   ///Event fired when a navigation event happens.
   ///
@@ -520,7 +523,7 @@ class ChromeSafariBrowser {
   ///**Supported Platforms/Implementations**:
   ///- Android ([Official API - CustomTabsCallback.onRelationshipValidationResult](https://developer.android.com/reference/androidx/browser/customtabs/CustomTabsCallback#onRelationshipValidationResult(int,android.net.Uri,boolean,android.os.Bundle)))
   void onRelationshipValidationResult(
-      CustomTabsRelationType? relation, Uri? requestedOrigin, bool result) {}
+      CustomTabsRelationType? relation, WebUri? requestedOrigin, bool result) {}
 
   ///Event fired when the user opens the current page in the default browser by tapping the toolbar button.
   ///
@@ -587,7 +590,7 @@ class ChromeSafariBrowserActionButton {
   void Function(String url, String title)? action;
 
   ///Callback function to be invoked when the action button is clicked
-  void Function(Uri? url, String title)? onClick;
+  void Function(WebUri? url, String title)? onClick;
 
   ChromeSafariBrowserActionButton(
       {required this.id,
@@ -638,7 +641,7 @@ class ChromeSafariBrowserMenuItem {
   void Function(String url, String title)? action;
 
   ///Callback function to be invoked when the menu item is clicked
-  void Function(Uri? url, String title)? onClick;
+  void Function(WebUri? url, String title)? onClick;
 
   ChromeSafariBrowserMenuItem(
       {required this.id,
@@ -712,7 +715,7 @@ class ChromeSafariBrowserSecondaryToolbarClickableID {
   AndroidResource id;
 
   ///Callback function to be invoked when the item is clicked
-  void Function(Uri? url)? onClick;
+  void Function(WebUri? url)? onClick;
 
   ChromeSafariBrowserSecondaryToolbarClickableID(
       {required this.id, this.onClick});

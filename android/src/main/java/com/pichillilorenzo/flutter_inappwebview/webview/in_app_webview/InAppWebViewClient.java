@@ -307,7 +307,7 @@ public class InAppWebViewClient extends WebViewClient {
     }
 
     WebResourceRequestExt request = new WebResourceRequestExt(
-            Uri.parse(failingUrl),
+            failingUrl,
             null,
             false,
             false,
@@ -627,7 +627,8 @@ public class InAppWebViewClient extends WebViewClient {
 
     if (webView.webViewAssetLoaderExt != null && webView.webViewAssetLoaderExt.loader != null) {
       try {
-        WebResourceResponse webResourceResponse = webView.webViewAssetLoaderExt.loader.shouldInterceptRequest(request.getUrl());
+        final Uri uri = Uri.parse(request.getUrl());
+        WebResourceResponse webResourceResponse = webView.webViewAssetLoaderExt.loader.shouldInterceptRequest(uri);
         if (webResourceResponse != null) {
           return webResourceResponse;
         }
@@ -667,8 +668,11 @@ public class InAppWebViewClient extends WebViewClient {
       return null;
     }
 
-    final String url = request.getUrl().toString();
-    String scheme = request.getUrl().getScheme();
+    final String url = request.getUrl();
+    String scheme = url.split(":")[0].toLowerCase();
+    try {
+      scheme = Uri.parse(request.getUrl()).getScheme();
+    } catch (Exception ignored) {}
 
     if (webView.customSettings.resourceCustomSchemes != null && webView.customSettings.resourceCustomSchemes.contains(scheme)) {
       CustomSchemeResponse customSchemeResponse = null;
@@ -710,7 +714,7 @@ public class InAppWebViewClient extends WebViewClient {
   @Override
   public WebResourceResponse shouldInterceptRequest(WebView view, final String url) {
     WebResourceRequestExt requestExt = new WebResourceRequestExt(
-            Uri.parse(url), null, false,
+            url, null, false,
             false, true, "GET"
     );
     return shouldInterceptRequest(view, requestExt);

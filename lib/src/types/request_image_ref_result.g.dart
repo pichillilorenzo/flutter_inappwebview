@@ -9,7 +9,7 @@ part of 'request_image_ref_result.dart';
 ///Class that represents the result used by the [InAppWebViewController.requestImageRef] method.
 class RequestImageRefResult {
   ///The image's url.
-  Uri? url;
+  WebUri? url;
   RequestImageRefResult({this.url});
 
   ///Gets a possible [RequestImageRefResult] instance from a [Map] value.
@@ -18,7 +18,7 @@ class RequestImageRefResult {
       return null;
     }
     final instance = RequestImageRefResult(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
     );
     return instance;
   }

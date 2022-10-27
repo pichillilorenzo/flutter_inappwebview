@@ -53,7 +53,7 @@ void onReceivedError() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,PCFET0NUWVBFIGh0bWw+')),
             onReceivedError: (controller, request, error) {
               onReceivedErrorCompleter.complete();

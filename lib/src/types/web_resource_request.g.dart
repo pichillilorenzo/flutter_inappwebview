@@ -9,7 +9,7 @@ part of 'web_resource_request.dart';
 ///Class representing a resource request of the [WebView].
 class WebResourceRequest {
   ///The URL for which the resource request was made.
-  Uri url;
+  WebUri url;
 
   ///The headers associated with the request.
   ///
@@ -52,7 +52,7 @@ class WebResourceRequest {
       return null;
     }
     final instance = WebResourceRequest(
-      url: (Uri.tryParse(map['url']) ?? Uri()),
+      url: WebUri(map['url']),
       headers: map['headers']?.cast<String, String>(),
       method: map['method'],
       hasGesture: map['hasGesture'],

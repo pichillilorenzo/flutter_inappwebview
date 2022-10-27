@@ -99,9 +99,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
             controller: urlController,
             keyboardType: TextInputType.text,
             onSubmitted: (value) {
-              var url = Uri.parse(value);
+              var url = WebUri(value);
               if (url.scheme.isEmpty) {
-                url = Uri.parse((!kIsWeb
+                url = WebUri((!kIsWeb
                         ? "https://www.google.com/search?q="
                         : "https://www.bing.com/search?q=") +
                     value);
@@ -115,9 +115,9 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
                 InAppWebView(
                   key: webViewKey,
                   initialUrlRequest:
-                      URLRequest(url: Uri.parse('https://flutter.dev')),
+                      URLRequest(url: WebUri('https://flutter.dev')),
                   // initialUrlRequest:
-                  // URLRequest(url: Uri.parse(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
+                  // URLRequest(url: WebUri(Uri.base.toString().replaceFirst("/#/", "/") + 'page.html')),
                   // initialFile: "assets/index.html",
                   initialUserScripts: UnmodifiableListView<UserScript>([]),
                   initialSettings: settings,

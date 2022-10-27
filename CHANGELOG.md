@@ -1,3 +1,14 @@
+## 6.0.0-beta.10
+
+- Created `WebUri` class to replace `Uri` dart core type. Related to:
+  - "Uri.tryParse will make the host to be lowercase" [#1402](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1402)
+  - "An error occurs when using a specific intent" [#1328](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1328)
+  - "Android shouldOverrideUrlLoading not working" [#1350](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1350)
+
+### BREAKING CHANGES
+
+- Replaced the usage of `Uri` type with the new `WebUri` type
+
 ## 6.0.0-beta.9
 
 - Added `headers`, `otherLikelyURLs`, `referrer` arguments on `ChromeSafariBrowser.open` method for Android

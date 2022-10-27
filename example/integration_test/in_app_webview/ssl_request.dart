@@ -26,7 +26,7 @@ void sslRequest() {
         child: InAppWebView(
           key: GlobalKey(),
           initialUrlRequest: URLRequest(
-              url: Uri.parse("https://${environment["NODE_SERVER_IP"]}:4433/")),
+              url: WebUri("https://${environment["NODE_SERVER_IP"]}:4433/")),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },

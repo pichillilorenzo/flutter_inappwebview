@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/in_app_webview_controller.dart';
+import '../web_uri.dart';
 
 part 'favicon.g.dart';
 
@@ -8,7 +9,7 @@ part 'favicon.g.dart';
 @ExchangeableObject()
 class Favicon_ {
   ///The url of the favicon image.
-  Uri url;
+  WebUri url;
 
   ///The relationship between the current web page and the favicon image.
   String? rel;

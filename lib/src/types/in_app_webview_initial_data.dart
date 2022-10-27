@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/webview.dart';
+import '../web_uri.dart';
 
 part 'in_app_webview_initial_data.g.dart';
 
@@ -17,7 +18,7 @@ class InAppWebViewInitialData_ {
   String encoding;
 
   ///The URL to use as the page's base URL. If `null` defaults to `about:blank`.
-  Uri? baseUrl;
+  WebUri? baseUrl;
 
   ///Use [historyUrl] instead.
   @Deprecated('Use historyUrl instead')
@@ -25,7 +26,7 @@ class InAppWebViewInitialData_ {
 
   ///The URL to use as the history entry. If `null` defaults to `about:blank`. If non-null, this must be a valid URL.
   @SupportedPlatforms(platforms: [AndroidPlatform()])
-  Uri? historyUrl;
+  WebUri? historyUrl;
 
   InAppWebViewInitialData_(
       {required this.data,

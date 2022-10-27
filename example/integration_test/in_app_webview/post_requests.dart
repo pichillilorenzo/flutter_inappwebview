@@ -30,7 +30,7 @@ void postRequests() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     "http://${environment["NODE_SERVER_IP"]}:8082/test-post"),
                 method: 'POST',
                 body: Uint8List.fromList(utf8.encode("name=FooBar")),
@@ -68,7 +68,7 @@ void postRequests() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
+            initialUrlRequest: URLRequest(url: WebUri('about:blank')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -87,7 +87,7 @@ void postRequests() {
       var postData = Uint8List.fromList(utf8.encode("name=FooBar"));
       await controller.loadUrl(
           urlRequest: URLRequest(
-              url: Uri.parse(
+              url: WebUri(
                   "http://${environment["NODE_SERVER_IP"]}:8082/test-post"),
               method: 'POST',
               body: postData,
@@ -114,7 +114,7 @@ void postRequests() {
           textDirection: TextDirection.ltr,
           child: InAppWebView(
             key: GlobalKey(),
-            initialUrlRequest: URLRequest(url: Uri.parse('about:blank')),
+            initialUrlRequest: URLRequest(url: WebUri('about:blank')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -132,8 +132,7 @@ void postRequests() {
 
       var postData = Uint8List.fromList(utf8.encode("name=FooBar"));
       await controller.postUrl(
-          url: Uri.parse(
-              "http://${environment["NODE_SERVER_IP"]}:8082/test-post"),
+          url: WebUri("http://${environment["NODE_SERVER_IP"]}:8082/test-post"),
           postData: postData);
 
       await postPageLoaded.future;

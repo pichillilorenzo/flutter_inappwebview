@@ -18,7 +18,7 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
   String? password;
 
   ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
-  Uri? iconURL;
+  WebUri? iconURL;
   FetchRequestPasswordCredential(
       {this.id, this.name, this.password, this.iconURL, String? type})
       : super(type: type);
@@ -32,7 +32,7 @@ class FetchRequestPasswordCredential extends FetchRequestCredential {
       id: map['id'],
       name: map['name'],
       password: map['password'],
-      iconURL: map['iconURL'] != null ? Uri.tryParse(map['iconURL']) : null,
+      iconURL: map['iconURL'] != null ? WebUri(map['iconURL']) : null,
     );
     instance.type = map['type'];
     return instance;

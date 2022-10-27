@@ -39,8 +39,7 @@ void httpAuthCredentialDatabase() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url:
-                    Uri.parse("http://${environment["NODE_SERVER_IP"]}:8081/")),
+                url: WebUri("http://${environment["NODE_SERVER_IP"]}:8081/")),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -95,8 +94,7 @@ void httpAuthCredentialDatabase() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url:
-                    Uri.parse("http://${environment["NODE_SERVER_IP"]}:8081/")),
+                url: WebUri("http://${environment["NODE_SERVER_IP"]}:8081/")),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },

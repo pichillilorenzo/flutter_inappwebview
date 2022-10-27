@@ -9,6 +9,7 @@ import '../context_menu.dart';
 import '../find_interaction/find_interaction_controller.dart';
 import '../types/main.dart';
 import '../print_job/main.dart';
+import '../web_uri.dart';
 import 'webview.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
@@ -364,7 +365,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
       Uri url, SafeBrowsingThreat? threatType)? androidOnSafeBrowsingHit;
 
   @override
-  void Function(InAppWebViewController controller, Uri? url)?
+  void Function(InAppWebViewController controller, WebUri? url)?
       onPageCommitVisible;
 
   @override
@@ -490,10 +491,10 @@ class HeadlessInAppWebView implements WebView, Disposable {
       onLoadResourceWithCustomScheme;
 
   @override
-  void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
+  void Function(InAppWebViewController controller, WebUri? url)? onLoadStart;
 
   @override
-  void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
+  void Function(InAppWebViewController controller, WebUri? url)? onLoadStop;
 
   @override
   void Function(InAppWebViewController controller,
@@ -505,7 +506,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
   void Function(InAppWebViewController controller, Uri? url)? onPrint;
 
   @override
-  Future<bool?> Function(InAppWebViewController controller, Uri? url,
+  Future<bool?> Function(InAppWebViewController controller, WebUri? url,
       PrintJobController? printJobController)? onPrintRequest;
 
   @override
@@ -529,7 +530,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
       onScrollChanged;
 
   @override
-  void Function(InAppWebViewController controller, Uri? url, bool? isReload)?
+  void Function(InAppWebViewController controller, WebUri? url, bool? isReload)?
       onUpdateVisitedHistory;
 
   @override
@@ -636,7 +637,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
   @override
   Future<FormResubmissionAction?> Function(
-      InAppWebViewController controller, Uri? url)? onFormResubmission;
+      InAppWebViewController controller, WebUri? url)? onFormResubmission;
 
   @override
   void Function(InAppWebViewController controller)?
@@ -668,7 +669,8 @@ class HeadlessInAppWebView implements WebView, Disposable {
       onReceivedLoginRequest;
 
   @override
-  void Function(InAppWebViewController controller, Uri url, bool precomposed)?
+  void Function(
+          InAppWebViewController controller, WebUri url, bool precomposed)?
       onReceivedTouchIconUrl;
 
   @override
@@ -678,15 +680,17 @@ class HeadlessInAppWebView implements WebView, Disposable {
 
   @override
   Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)? onRenderProcessResponsive;
+          InAppWebViewController controller, WebUri? url)?
+      onRenderProcessResponsive;
 
   @override
   Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)? onRenderProcessUnresponsive;
+          InAppWebViewController controller, WebUri? url)?
+      onRenderProcessUnresponsive;
 
   @override
   Future<SafeBrowsingResponse?> Function(InAppWebViewController controller,
-      Uri url, SafeBrowsingThreat? threatType)? onSafeBrowsingHit;
+      WebUri url, SafeBrowsingThreat? threatType)? onSafeBrowsingHit;
 
   @override
   void Function(InAppWebViewController controller)?

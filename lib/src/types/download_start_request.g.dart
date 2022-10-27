@@ -9,7 +9,7 @@ part of 'download_start_request.dart';
 ///Class representing a download request of the WebView used by the event [WebView.onDownloadStartRequest].
 class DownloadStartRequest {
   ///The full url to the content that should be downloaded.
-  Uri url;
+  WebUri url;
 
   ///the user agent to be used for the download.
   String? userAgent;
@@ -43,7 +43,7 @@ class DownloadStartRequest {
       return null;
     }
     final instance = DownloadStartRequest(
-      url: (Uri.tryParse(map['url']) ?? Uri()),
+      url: WebUri(map['url']),
       userAgent: map['userAgent'],
       contentDisposition: map['contentDisposition'],
       mimeType: map['mimeType'],

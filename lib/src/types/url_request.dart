@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../web_uri.dart';
 import 'url_request_cache_policy.dart';
 import 'url_request_network_service_type.dart';
 import 'url_request_attribution.dart';
@@ -11,7 +12,7 @@ part 'url_request.g.dart';
 @ExchangeableObject()
 class URLRequest_ {
   ///The URL of the request. Setting this to `null` will load `about:blank`.
-  Uri? url;
+  WebUri? url;
 
   ///The HTTP request method.
   ///
@@ -142,7 +143,7 @@ class URLRequest_ {
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl")
   ])
-  Uri? mainDocumentURL;
+  WebUri? mainDocumentURL;
 
   ///`true` if server endpoint is known to support HTTP/3. Enables QUIC racing
   ///without HTTP/3 service discovery. Defaults to `false`.

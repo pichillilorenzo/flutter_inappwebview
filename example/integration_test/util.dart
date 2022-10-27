@@ -44,7 +44,7 @@ class MyInAppBrowser extends InAppBrowser {
   }
 
   @override
-  void onLoadStop(Uri? url) {
+  void onLoadStop(WebUri? url) {
     super.onLoadStop(url);
 
     if (!firstPageLoaded.isCompleted) {

@@ -165,7 +165,7 @@ class PrintJobAttributes {
   ///
   ///**Supported Platforms/Implementations**:
   ///- MacOS
-  Uri? jobSavingURL;
+  WebUri? jobSavingURL;
 
   ///If `true`, produce detailed reports when an error occurs.
   ///
@@ -273,9 +273,8 @@ class PrintJobAttributes {
       isVerticallyCentered: map['isVerticallyCentered'],
       isSelectionOnly: map['isSelectionOnly'],
       scalingFactor: map['scalingFactor'],
-      jobSavingURL: map['jobSavingURL'] != null
-          ? Uri.tryParse(map['jobSavingURL'])
-          : null,
+      jobSavingURL:
+          map['jobSavingURL'] != null ? WebUri(map['jobSavingURL']) : null,
       detailedErrorReporting: map['detailedErrorReporting'],
       faxNumber: map['faxNumber'],
       headerAndFooter: map['headerAndFooter'],

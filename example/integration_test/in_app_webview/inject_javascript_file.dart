@@ -47,8 +47,7 @@ void injectJavascriptFile() {
       await pageLoaded.future;
 
       await controller.injectJavascriptFileFromUrl(
-          urlFile:
-              Uri.parse('https://www.notawebsite..com/jquery-3.3.1.min.js'),
+          urlFile: WebUri('https://www.notawebsite..com/jquery-3.3.1.min.js'),
           scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
             id: 'jquery-error',
             onError: () {
@@ -65,7 +64,7 @@ void injectJavascriptFile() {
           true);
 
       await controller.injectJavascriptFileFromUrl(
-          urlFile: Uri.parse('https://code.jquery.com/jquery-3.3.1.min.js'),
+          urlFile: WebUri('https://code.jquery.com/jquery-3.3.1.min.js'),
           scriptHtmlTagAttributes: ScriptHtmlTagAttributes(
             id: 'jquery',
             onLoad: () {

@@ -78,7 +78,7 @@ class _ChromeSafariBrowserExampleScreenState
           child: ElevatedButton(
               onPressed: () async {
                 await widget.browser.open(
-                    url: Uri.parse("https://flutter.dev/"),
+                    url: WebUri("https://flutter.dev/"),
                     settings: ChromeSafariBrowserSettings(
                         shareState: CustomTabsShareState.SHARE_STATE_OFF,
                         isSingleInstance: false,

@@ -9,7 +9,7 @@ part of 'url_response.dart';
 ///The metadata associated with the response to a URL load request, independent of protocol and URL scheme.
 class URLResponse {
   ///The URL for the response.
-  Uri? url;
+  WebUri? url;
 
   ///The expected length of the response’s content.
   int expectedContentLength;
@@ -43,7 +43,7 @@ class URLResponse {
       return null;
     }
     final instance = URLResponse(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       expectedContentLength: map['expectedContentLength'],
       mimeType: map['mimeType'],
       suggestedFilename: map['suggestedFilename'],

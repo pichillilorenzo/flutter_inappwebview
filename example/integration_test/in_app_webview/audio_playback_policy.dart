@@ -60,7 +60,7 @@ void audioPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$audioTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -96,7 +96,7 @@ void audioPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$audioTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);

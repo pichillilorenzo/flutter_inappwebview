@@ -44,8 +44,7 @@ void resizeWebView() {
     final InAppWebView webView = InAppWebView(
       key: key,
       initialUrlRequest: URLRequest(
-          url: Uri.parse(
-              'data:text/html;charset=utf-8;base64,$resizeTestBase64')),
+          url: WebUri('data:text/html;charset=utf-8;base64,$resizeTestBase64')),
       onWebViewCreated: (controller) {
         controllerCompleter.complete(controller);
 

@@ -9,7 +9,7 @@ part of 'permission_request.dart';
 ///Class that represents the response used by the [WebView.onPermissionRequest] event.
 class PermissionRequest {
   ///The origin of web content which attempt to access the restricted resources.
-  Uri origin;
+  WebUri origin;
 
   ///List of resources the web content wants to access.
   ///
@@ -28,7 +28,7 @@ class PermissionRequest {
       return null;
     }
     final instance = PermissionRequest(
-      origin: (Uri.tryParse(map['origin']) ?? Uri()),
+      origin: WebUri(map['origin']),
       frame: FrameInfo.fromMap(map['frame']?.cast<String, dynamic>()),
     );
     instance.resources = List<PermissionResourceType>.from(map['resources']

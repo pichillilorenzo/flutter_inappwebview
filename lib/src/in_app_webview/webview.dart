@@ -7,6 +7,7 @@ import '../pull_to_refresh/pull_to_refresh_controller.dart';
 import '../context_menu.dart';
 import '../types/main.dart';
 
+import '../web_uri.dart';
 import 'in_app_webview_controller.dart';
 import 'in_app_webview_settings.dart';
 import 'headless_in_app_webview.dart';
@@ -52,7 +53,8 @@ abstract class WebView {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455621-webview))
   ///- Web
-  final void Function(InAppWebViewController controller, Uri? url)? onLoadStart;
+  final void Function(InAppWebViewController controller, WebUri? url)?
+      onLoadStart;
 
   ///Event fired when the [WebView] finishes loading an [url].
   ///
@@ -64,7 +66,8 @@ abstract class WebView {
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455629-webview))
   ///- Web ([Official API - Window.onload](https://developer.mozilla.org/en-US/docs/Web/API/Window/load_event))
-  final void Function(InAppWebViewController controller, Uri? url)? onLoadStop;
+  final void Function(InAppWebViewController controller, WebUri? url)?
+      onLoadStop;
 
   ///Use [onReceivedError] instead.
   @Deprecated("Use onReceivedError instead")
@@ -459,7 +462,7 @@ abstract class WebView {
   ///- MacOS
   ///- Web
   final void Function(
-          InAppWebViewController controller, Uri? url, bool? isReload)?
+          InAppWebViewController controller, WebUri? url, bool? isReload)?
       onUpdateVisitedHistory;
 
   ///Use [onPrintRequest] instead
@@ -482,7 +485,7 @@ abstract class WebView {
   ///- iOS
   ///- MacOS
   ///- Web
-  final Future<bool?> Function(InAppWebViewController controller, Uri? url,
+  final Future<bool?> Function(InAppWebViewController controller, WebUri? url,
       PrintJobController? printJobController)? onPrintRequest;
 
   ///Event fired when an HTML element of the webview has been clicked and held.
@@ -528,7 +531,7 @@ abstract class WebView {
   ///- Android native WebView ([Official API - WebViewClient.onPageCommitVisible](https://developer.android.com/reference/android/webkit/WebViewClient#onPageCommitVisible(android.webkit.WebView,%20java.lang.String)))
   ///- iOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
   ///- MacOS ([Official API - WKNavigationDelegate.webView](https://developer.apple.com/documentation/webkit/wknavigationdelegate/1455635-webview))
-  final void Function(InAppWebViewController controller, Uri? url)?
+  final void Function(InAppWebViewController controller, WebUri? url)?
       onPageCommitVisible;
 
   ///Event fired when a change in the document title occurred.
@@ -597,7 +600,7 @@ abstract class WebView {
   ///- Android native WebView ([Official API - WebViewClient.onSafeBrowsingHit](https://developer.android.com/reference/android/webkit/WebViewClient#onSafeBrowsingHit(android.webkit.WebView,%20android.webkit.WebResourceRequest,%20int,%20android.webkit.SafeBrowsingResponse)))
   final Future<SafeBrowsingResponse?> Function(
       InAppWebViewController controller,
-      Uri url,
+      WebUri url,
       SafeBrowsingThreat? threatType)? onSafeBrowsingHit;
 
   ///Use [onPermissionRequest] instead.
@@ -709,7 +712,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessUnresponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessUnresponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   final Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)? onRenderProcessUnresponsive;
+          InAppWebViewController controller, WebUri? url)?
+      onRenderProcessUnresponsive;
 
   ///Use [onRenderProcessResponsive] instead.
   @Deprecated("Use onRenderProcessResponsive instead")
@@ -730,7 +734,8 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewRenderProcessClient.onRenderProcessResponsive](https://developer.android.com/reference/android/webkit/WebViewRenderProcessClient#onRenderProcessResponsive(android.webkit.WebView,%20android.webkit.WebViewRenderProcess)))
   final Future<WebViewRenderProcessAction?> Function(
-      InAppWebViewController controller, Uri? url)? onRenderProcessResponsive;
+          InAppWebViewController controller, WebUri? url)?
+      onRenderProcessResponsive;
 
   ///Use [onRenderProcessGone] instead.
   @Deprecated("Use onRenderProcessGone instead")
@@ -762,7 +767,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewClient.onFormResubmission](https://developer.android.com/reference/android/webkit/WebViewClient#onFormResubmission(android.webkit.WebView,%20android.os.Message,%20android.os.Message)))
   final Future<FormResubmissionAction?> Function(
-      InAppWebViewController controller, Uri? url)? onFormResubmission;
+      InAppWebViewController controller, WebUri? url)? onFormResubmission;
 
   ///Use [onZoomScaleChanged] instead.
   @Deprecated('Use onZoomScaleChanged instead')
@@ -799,7 +804,7 @@ abstract class WebView {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onReceivedTouchIconUrl](https://developer.android.com/reference/android/webkit/WebChromeClient#onReceivedTouchIconUrl(android.webkit.WebView,%20java.lang.String,%20boolean)))
   final void Function(
-          InAppWebViewController controller, Uri url, bool precomposed)?
+          InAppWebViewController controller, WebUri url, bool precomposed)?
       onReceivedTouchIconUrl;
 
   ///Use [onJsBeforeUnload] instead.

@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/webview.dart';
+import '../web_uri.dart';
 
 part 'loaded_resource.g.dart';
 
@@ -12,7 +13,7 @@ class LoadedResource_ {
   String? initiatorType;
 
   ///Resource URL.
-  Uri? url;
+  WebUri? url;
 
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) for the time a resource fetch started.
   double? startTime;

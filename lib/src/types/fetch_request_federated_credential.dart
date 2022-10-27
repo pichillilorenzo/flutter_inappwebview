@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../web_uri.dart';
 import 'fetch_request_credential.dart';
 
 part 'fetch_request_federated_credential.g.dart';
@@ -20,7 +21,7 @@ class FetchRequestFederatedCredential_ extends FetchRequestCredential_ {
   String? provider;
 
   ///URL pointing to an image for an icon. This image is intended for display in a credential chooser. The URL must be accessible without authentication.
-  Uri? iconURL;
+  WebUri? iconURL;
 
   FetchRequestFederatedCredential_(
       {type, this.id, this.name, this.protocol, this.provider, this.iconURL})

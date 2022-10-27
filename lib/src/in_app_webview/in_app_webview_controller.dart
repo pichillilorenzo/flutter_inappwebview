@@ -9,6 +9,7 @@ import 'dart:ui';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 
+import '../web_uri.dart';
 import 'android/in_app_webview_controller.dart';
 import 'apple/in_app_webview_controller.dart';
 
@@ -134,7 +135,7 @@ class InAppWebViewController {
         if ((_webview != null && _webview!.onLoadStart != null) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
           if (_webview != null && _webview!.onLoadStart != null)
             _webview!.onLoadStart!(this, uri);
           else
@@ -145,7 +146,7 @@ class InAppWebViewController {
         if ((_webview != null && _webview!.onLoadStop != null) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
           if (_webview != null && _webview!.onLoadStop != null)
             _webview!.onLoadStop!(this, uri);
           else
@@ -435,7 +436,7 @@ class InAppWebViewController {
                     _webview!.androidOnRenderProcessUnresponsive != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
 
           if (_webview != null) {
             if (_webview!.onRenderProcessUnresponsive != null)
@@ -463,7 +464,7 @@ class InAppWebViewController {
                     _webview!.androidOnRenderProcessResponsive != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
 
           if (_webview != null) {
             if (_webview!.onRenderProcessResponsive != null)
@@ -516,7 +517,7 @@ class InAppWebViewController {
                     _webview!.androidOnFormResubmission != null)) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
 
           if (_webview != null) {
             if (_webview!.onFormResubmission != null)
@@ -589,7 +590,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String url = call.arguments["url"];
           bool precomposed = call.arguments["precomposed"];
-          Uri uri = Uri.tryParse(url) ?? Uri();
+          WebUri uri = WebUri(url);
 
           if (_webview != null) {
             if (_webview!.onReceivedTouchIconUrl != null)
@@ -689,7 +690,7 @@ class InAppWebViewController {
           String url = call.arguments["url"];
           SafeBrowsingThreat? threatType =
               SafeBrowsingThreat.fromNativeValue(call.arguments["threatType"]);
-          Uri uri = Uri.tryParse(url) ?? Uri();
+          WebUri uri = WebUri(url);
 
           if (_webview != null) {
             if (_webview!.onSafeBrowsingHit != null)
@@ -867,7 +868,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
           bool? isReload = call.arguments["isReload"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
           if (_webview != null && _webview!.onUpdateVisitedHistory != null)
             _webview!.onUpdateVisitedHistory!(this, uri, isReload);
           else
@@ -895,7 +896,7 @@ class InAppWebViewController {
         if ((_webview != null && _webview!.onPageCommitVisible != null) ||
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
           if (_webview != null && _webview!.onPageCommitVisible != null)
             _webview!.onPageCommitVisible!(this, uri);
           else
@@ -1120,7 +1121,7 @@ class InAppWebViewController {
             _inAppBrowser != null) {
           String? url = call.arguments["url"];
           String? printJobId = call.arguments["printJobId"];
-          Uri? uri = url != null ? Uri.tryParse(url) : null;
+          WebUri? uri = url != null ? WebUri(url) : null;
           PrintJobController? printJob =
               printJobId != null ? PrintJobController(id: printJobId) : null;
 
@@ -1330,10 +1331,10 @@ class InAppWebViewController {
   ///- iOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- MacOS ([Official API - WKWebView.url](https://developer.apple.com/documentation/webkit/wkwebview/1415005-url))
   ///- Web
-  Future<Uri?> getUrl() async {
+  Future<WebUri?> getUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getUrl', args);
-    return url != null ? Uri.tryParse(url) : null;
+    return url != null ? WebUri(url) : null;
   }
 
   ///Gets the title for the current page.
@@ -1493,7 +1494,7 @@ class InAppWebViewController {
       HttpClient client = HttpClient();
       var faviconUrl =
           webviewUrl.scheme + "://" + webviewUrl.host + "/favicon.ico";
-      var faviconUri = Uri.parse(faviconUrl);
+      var faviconUri = WebUri(faviconUrl);
       var headRequest = await client.headUrl(faviconUri);
       var headResponse = await headRequest.close();
       if (headResponse.statusCode == 200) {
@@ -1546,8 +1547,8 @@ class InAppWebViewController {
     return url.startsWith("http://") || url.startsWith("https://");
   }
 
-  List<Favicon> _createFavicons(Uri url, String? assetPathBase, String urlIcon,
-      String? rel, String? sizes, bool isManifest) {
+  List<Favicon> _createFavicons(WebUri url, String? assetPathBase,
+      String urlIcon, String? rel, String? sizes, bool isManifest) {
     List<Favicon> favicons = [];
 
     List<String> urlSplitted = urlIcon.split("/");
@@ -1574,17 +1575,11 @@ class InAppWebViewController {
         int width = int.parse(size.split("x")[0]);
         int height = int.parse(size.split("x")[1]);
         favicons.add(Favicon(
-            url: Uri.tryParse(urlIcon) ?? Uri(),
-            rel: rel,
-            width: width,
-            height: height));
+            url: WebUri(urlIcon), rel: rel, width: width, height: height));
       }
     } else {
-      favicons.add(Favicon(
-          url: Uri.tryParse(urlIcon) ?? Uri(),
-          rel: rel,
-          width: null,
-          height: null));
+      favicons.add(
+          Favicon(url: WebUri(urlIcon), rel: rel, width: null, height: null));
     }
 
     return favicons;
@@ -1613,7 +1608,7 @@ class InAppWebViewController {
       {required URLRequest urlRequest,
       @Deprecated('Use allowingReadAccessTo instead')
           Uri? iosAllowingReadAccessTo,
-      Uri? allowingReadAccessTo}) async {
+      WebUri? allowingReadAccessTo}) async {
     assert(urlRequest.url != null && urlRequest.url.toString().isNotEmpty);
     assert(
         allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"));
@@ -1635,7 +1630,7 @@ class InAppWebViewController {
   ///Example:
   ///```dart
   ///var postData = Uint8List.fromList(utf8.encode("firstname=Foo&surname=Bar"));
-  ///controller.postUrl(url: Uri.parse("https://www.example.com/"), postData: postData);
+  ///controller.postUrl(url: WebUri("https://www.example.com/"), postData: postData);
   ///```
   ///
   ///**NOTE for Web**: it will try to create an XMLHttpRequest and load the result inside the iframe.
@@ -1645,7 +1640,8 @@ class InAppWebViewController {
   ///- iOS
   ///- MacOS
   ///- Web
-  Future<void> postUrl({required Uri url, required Uint8List postData}) async {
+  Future<void> postUrl(
+      {required WebUri url, required Uint8List postData}) async {
     assert(url.toString().isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('url', () => url.toString());
@@ -1676,13 +1672,13 @@ class InAppWebViewController {
       {required String data,
       String mimeType = "text/html",
       String encoding = "utf8",
-      Uri? baseUrl,
+      WebUri? baseUrl,
       @Deprecated('Use historyUrl instead')
           Uri? androidHistoryUrl,
-      Uri? historyUrl,
+      WebUri? historyUrl,
       @Deprecated('Use allowingReadAccessTo instead')
           Uri? iosAllowingReadAccessTo,
-      Uri? allowingReadAccessTo}) async {
+      WebUri? allowingReadAccessTo}) async {
     assert(
         allowingReadAccessTo == null || allowingReadAccessTo.isScheme("file"));
     assert(iosAllowingReadAccessTo == null ||
@@ -1938,7 +1934,7 @@ class InAppWebViewController {
   ///- MacOS
   ///- Web
   Future<void> injectJavascriptFileFromUrl(
-      {required Uri urlFile,
+      {required WebUri urlFile,
       ScriptHtmlTagAttributes? scriptHtmlTagAttributes}) async {
     assert(urlFile.toString().isNotEmpty);
     var id = scriptHtmlTagAttributes?.id;
@@ -2009,7 +2005,7 @@ class InAppWebViewController {
   ///- MacOS
   ///- Web
   Future<void> injectCSSFileFromUrl(
-      {required Uri urlFile,
+      {required WebUri urlFile,
       CSSLinkHtmlTagAttributes? cssLinkHtmlTagAttributes}) async {
     assert(urlFile.toString().isNotEmpty);
     Map<String, dynamic> args = <String, dynamic>{};
@@ -2453,10 +2449,10 @@ class InAppWebViewController {
   ///- iOS
   ///- MacOS
   ///- Web
-  Future<Uri?> getOriginalUrl() async {
+  Future<WebUri?> getOriginalUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _channel.invokeMethod('getOriginalUrl', args);
-    return url != null ? Uri.tryParse(url) : null;
+    return url != null ? WebUri(url) : null;
   }
 
   ///Gets the current zoom scale of the WebView.
@@ -2553,7 +2549,7 @@ class InAppWebViewController {
         await _channel.invokeMethod('requestFocusNodeHref', args);
     return result != null
         ? RequestFocusNodeHrefResult(
-            url: result['url'] != null ? Uri.tryParse(result['url']) : null,
+            url: result['url'] != null ? WebUri(result['url']) : null,
             title: result['title'],
             src: result['src'],
           )
@@ -2573,7 +2569,7 @@ class InAppWebViewController {
         await _channel.invokeMethod('requestImageRef', args);
     return result != null
         ? RequestImageRefResult(
-            url: result['url'] != null ? Uri.tryParse(result['url']) : null,
+            url: result['url'] != null ? WebUri(result['url']) : null,
           )
         : null;
   }
@@ -3018,9 +3014,9 @@ class InAppWebViewController {
   ///- iOS
   ///- MacOS
   Future<void> postWebMessage(
-      {required WebMessage message, Uri? targetOrigin}) async {
+      {required WebMessage message, WebUri? targetOrigin}) async {
     if (targetOrigin == null) {
-      targetOrigin = Uri();
+      targetOrigin = WebUri('');
     }
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('message', () => message.toMap());
@@ -3177,7 +3173,7 @@ class InAppWebViewController {
   ///         },
   ///       ));
   ///     }
-  ///     await controller.loadUrl(urlRequest: URLRequest(url: Uri.parse("https://www.example.com")));
+  ///     await controller.loadUrl(urlRequest: URLRequest(url: WebUri("https://www.example.com")));
   ///   },
   /// ),
   ///```
@@ -3541,7 +3537,7 @@ class InAppWebViewController {
   ///Example:
   ///```dart
   ///controller.loadSimulateloadSimulatedRequestdRequest(urlRequest: URLRequest(
-  ///    url: Uri.parse("https://flutter.dev"),
+  ///    url: WebUri("https://flutter.dev"),
   ///  ),
   ///  data: Uint8List.fromList(utf8.encode("<h1>Hello</h1>"))
   ///);
@@ -3606,11 +3602,11 @@ class InAppWebViewController {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebViewCompat.getSafeBrowsingPrivacyPolicyUrl](https://developer.android.com/reference/androidx/webkit/WebViewCompat#getSafeBrowsingPrivacyPolicyUrl()))
-  static Future<Uri?> getSafeBrowsingPrivacyPolicyUrl() async {
+  static Future<WebUri?> getSafeBrowsingPrivacyPolicyUrl() async {
     Map<String, dynamic> args = <String, dynamic>{};
     String? url = await _staticChannel.invokeMethod(
         'getSafeBrowsingPrivacyPolicyUrl', args);
-    return url != null ? Uri.tryParse(url) : null;
+    return url != null ? WebUri(url) : null;
   }
 
   ///Use [setSafeBrowsingAllowlist] instead.

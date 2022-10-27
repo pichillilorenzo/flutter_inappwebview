@@ -9,7 +9,7 @@ part of 'url_request.dart';
 ///A URL load request that is independent of protocol or URL scheme.
 class URLRequest {
   ///The URL of the request. Setting this to `null` will load `about:blank`.
-  Uri? url;
+  WebUri? url;
 
   ///The HTTP request method.
   ///
@@ -111,7 +111,7 @@ class URLRequest {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLRequest.mainDocumentURL](https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl))
-  Uri? mainDocumentURL;
+  WebUri? mainDocumentURL;
 
   ///`true` if server endpoint is known to support HTTP/3. Enables QUIC racing
   ///without HTTP/3 service discovery. Defaults to `false`.
@@ -177,7 +177,8 @@ class URLRequest {
         URLRequestNetworkServiceType.fromNativeValue(
             iosNetworkServiceType?.toNativeValue());
     timeoutInterval = timeoutInterval ?? iosTimeoutInterval;
-    mainDocumentURL = mainDocumentURL ?? iosMainDocumentURL;
+    mainDocumentURL = mainDocumentURL ??
+        (iosMainDocumentURL != null ? WebUri.uri(iosMainDocumentURL!) : null);
   }
 
   ///Gets a possible [URLRequest] instance from a [Map] value.
@@ -186,7 +187,7 @@ class URLRequest {
       return null;
     }
     final instance = URLRequest(
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       method: map['method'],
       body: map['body'],
       headers: map['headers']?.cast<String, String>(),
@@ -213,7 +214,7 @@ class URLRequest {
           ? Uri.tryParse(map['mainDocumentURL'])
           : null,
       mainDocumentURL: map['mainDocumentURL'] != null
-          ? Uri.tryParse(map['mainDocumentURL'])
+          ? WebUri(map['mainDocumentURL'])
           : null,
       assumesHTTP3Capable: map['assumesHTTP3Capable'],
       attribution: URLRequestAttribution.fromNativeValue(map['attribution']),

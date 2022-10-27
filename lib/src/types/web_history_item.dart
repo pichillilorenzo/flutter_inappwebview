@@ -2,6 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../in_app_webview/webview.dart';
 
+import '../web_uri.dart';
 import 'web_history.dart';
 
 part 'web_history_item.g.dart';
@@ -11,13 +12,13 @@ part 'web_history_item.g.dart';
 @ExchangeableObject()
 class WebHistoryItem_ {
   ///Original url of this history item.
-  Uri? originalUrl;
+  WebUri? originalUrl;
 
   ///Document title of this history item.
   String? title;
 
   ///Url of this history item.
-  Uri? url;
+  WebUri? url;
 
   ///0-based position index in the back-forward [WebHistory.list].
   int? index;

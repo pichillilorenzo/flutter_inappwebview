@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:typed_data';
 import 'dart:ui';
 import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/src/web_uri.dart';
 import 'dart:html';
 import 'dart:js' as js;
 
@@ -344,7 +345,7 @@ class InAppWebViewWebElement implements Disposable {
       {required String url, required Uint8List postData}) async {
     await loadUrl(
         urlRequest:
-            URLRequest(url: Uri.tryParse(url), method: "POST", body: postData));
+            URLRequest(url: WebUri(url), method: "POST", body: postData));
   }
 
   Future<void> injectJavascriptFileFromUrl(

@@ -1,6 +1,7 @@
 import 'package:flutter/services.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../types/main.dart';
+import '../web_uri.dart';
 
 ///This listener receives messages sent on the JavaScript object which was injected by [InAppWebViewController.addWebMessageListener].
 ///
@@ -59,8 +60,8 @@ class WebMessageListener {
         }
         if (onPostMessage != null) {
           String? message = call.arguments["message"];
-          Uri? sourceOrigin = call.arguments["sourceOrigin"] != null
-              ? Uri.tryParse(call.arguments["sourceOrigin"])
+          WebUri? sourceOrigin = call.arguments["sourceOrigin"] != null
+              ? WebUri(call.arguments["sourceOrigin"])
               : null;
           bool isMainFrame = call.arguments["isMainFrame"];
           onPostMessage!(message, sourceOrigin, isMainFrame, _replyProxy!);

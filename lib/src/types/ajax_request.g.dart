@@ -15,7 +15,7 @@ class AjaxRequest {
   String? method;
 
   ///The URL of the `XMLHttpRequest` request.
-  Uri? url;
+  WebUri? url;
 
   ///An optional Boolean parameter, defaulting to true, indicating whether or not the request is performed asynchronously.
   bool? isAsync;
@@ -44,7 +44,7 @@ class AjaxRequest {
   ///The serialized URL of the response or the empty string if the URL is null.
   ///If the URL is returned, any URL fragment present in the URL will be stripped away.
   ///The value of responseURL will be the final URL obtained after any redirects.
-  Uri? responseURL;
+  WebUri? responseURL;
 
   ///It is an enumerated string value specifying the type of data contained in the response.
   ///It also lets the author change the [response type](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest/responseType).
@@ -103,7 +103,7 @@ class AjaxRequest {
     final instance = AjaxRequest(
       data: map['data'],
       method: map['method'],
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       isAsync: map['isAsync'],
       user: map['user'],
       password: map['password'],
@@ -113,7 +113,7 @@ class AjaxRequest {
       readyState: AjaxRequestReadyState.fromNativeValue(map['readyState']),
       status: map['status'],
       responseURL:
-          map['responseURL'] != null ? Uri.tryParse(map['responseURL']) : null,
+          map['responseURL'] != null ? WebUri(map['responseURL']) : null,
       responseType: map['responseType'],
       response: map['response'],
       responseText: map['responseText'],

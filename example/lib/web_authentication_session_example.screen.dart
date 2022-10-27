@@ -52,7 +52,7 @@ class _WebAuthenticationSessionExampleScreenState
                                   .contains(defaultTargetPlatform) &&
                               await WebAuthenticationSession.isAvailable()) {
                             session = await WebAuthenticationSession.create(
-                                url: Uri.parse(
+                                url: WebUri(
                                     "http://localhost:8080/web-auth.html"),
                                 callbackURLScheme: "test",
                                 onComplete: (url, error) async {

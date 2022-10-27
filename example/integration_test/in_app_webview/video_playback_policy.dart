@@ -68,7 +68,7 @@ void videoPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$videoTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -99,7 +99,7 @@ void videoPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$videoTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -141,7 +141,7 @@ void videoPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$videoTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -185,7 +185,7 @@ void videoPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$videoTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -230,7 +230,7 @@ void videoPlaybackPolicy() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(
-                url: Uri.parse(
+                url: WebUri(
                     'data:text/html;charset=utf-8;base64,$videoTestBase64')),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);

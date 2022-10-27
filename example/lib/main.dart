@@ -10,10 +10,12 @@ import 'package:flutter_inappwebview_example/in_app_webiew_example.screen.dart';
 import 'package:flutter_inappwebview_example/in_app_browser_example.screen.dart';
 import 'package:flutter_inappwebview_example/web_authentication_session_example.screen.dart';
 import 'package:pointer_interceptor/pointer_interceptor.dart';
+
 // import 'package:path_provider/path_provider.dart';
 // import 'package:permission_handler/permission_handler.dart';
 
-InAppLocalhostServer localhostServer = new InAppLocalhostServer(documentRoot: 'assets');
+InAppLocalhostServer localhostServer =
+    new InAppLocalhostServer(documentRoot: 'assets');
 
 Future main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -148,14 +150,16 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp(initialRoute: '/', routes: {
         '/': (context) => InAppWebViewExampleScreen(),
       });
-    }
+    }f
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(initialRoute: '/', routes: {
         // '/': (context) => InAppWebViewExampleScreen(),
         // '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
         '/': (context) => InAppBrowserExampleScreen(),
-        '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
-        '/WebAuthenticationSession': (context) => WebAuthenticationSessionExampleScreen(),
+        '/HeadlessInAppWebView': (context) =>
+            HeadlessInAppWebViewExampleScreen(),
+        '/WebAuthenticationSession': (context) =>
+            WebAuthenticationSessionExampleScreen(),
       });
     }
     return MaterialApp(initialRoute: '/', routes: {
@@ -163,7 +167,8 @@ class _MyAppState extends State<MyApp> {
       '/InAppBrowser': (context) => InAppBrowserExampleScreen(),
       '/ChromeSafariBrowser': (context) => ChromeSafariBrowserExampleScreen(),
       '/HeadlessInAppWebView': (context) => HeadlessInAppWebViewExampleScreen(),
-      '/WebAuthenticationSession': (context) => WebAuthenticationSessionExampleScreen(),
+      '/WebAuthenticationSession': (context) =>
+          WebAuthenticationSessionExampleScreen(),
     });
   }
 }

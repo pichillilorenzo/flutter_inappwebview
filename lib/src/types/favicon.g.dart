@@ -9,7 +9,7 @@ part of 'favicon.dart';
 ///Class that represents a favicon of a website. It is used by [InAppWebViewController.getFavicons] method.
 class Favicon {
   ///The url of the favicon image.
-  Uri url;
+  WebUri url;
 
   ///The relationship between the current web page and the favicon image.
   String? rel;
@@ -27,7 +27,7 @@ class Favicon {
       return null;
     }
     final instance = Favicon(
-      url: (Uri.tryParse(map['url']) ?? Uri()),
+      url: WebUri(map['url']),
       rel: map['rel'],
       width: map['width'],
       height: map['height'],

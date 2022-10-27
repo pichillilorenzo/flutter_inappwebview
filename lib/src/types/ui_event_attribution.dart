@@ -1,5 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../web_uri.dart';
+
 part 'ui_event_attribution.g.dart';
 
 ///Class that represents an object that contains event attribution information for Private Click Measurement.
@@ -18,7 +20,7 @@ class UIEventAttribution_ {
   int sourceIdentifier;
 
   ///The destination URL of the attribution.
-  Uri destinationURL;
+  WebUri destinationURL;
 
   ///A description of the source of the attribution.
   String sourceDescription;

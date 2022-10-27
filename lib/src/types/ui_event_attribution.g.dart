@@ -21,7 +21,7 @@ class UIEventAttribution {
   int sourceIdentifier;
 
   ///The destination URL of the attribution.
-  Uri destinationURL;
+  WebUri destinationURL;
 
   ///A description of the source of the attribution.
   String sourceDescription;
@@ -41,7 +41,7 @@ class UIEventAttribution {
     }
     final instance = UIEventAttribution(
       sourceIdentifier: map['sourceIdentifier'],
-      destinationURL: (Uri.tryParse(map['destinationURL']) ?? Uri()),
+      destinationURL: WebUri(map['destinationURL']),
       sourceDescription: map['sourceDescription'],
       purchaser: map['purchaser'],
     );

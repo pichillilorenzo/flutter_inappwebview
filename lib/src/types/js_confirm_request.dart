@@ -1,6 +1,7 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../in_app_webview/webview.dart';
+import '../web_uri.dart';
 
 part 'js_confirm_request.g.dart';
 
@@ -8,7 +9,7 @@ part 'js_confirm_request.g.dart';
 @ExchangeableObject()
 class JsConfirmRequest_ {
   ///The url of the page requesting the dialog.
-  Uri? url;
+  WebUri? url;
 
   ///Message to be displayed in the window.
   String? message;

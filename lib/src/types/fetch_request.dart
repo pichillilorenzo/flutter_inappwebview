@@ -1,5 +1,6 @@
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../web_uri.dart';
 import 'fetch_request_action.dart';
 import 'fetch_request_credential.dart';
 import 'fetch_request_credential_default.dart';
@@ -28,7 +29,7 @@ FetchRequestCredential? _fetchRequestCredentialDeserializer(dynamic value) {
 @ExchangeableObject()
 class FetchRequest_ {
   ///The URL of the request.
-  Uri? url;
+  WebUri? url;
 
   ///The HTTP request method used of the request.
   String? method;

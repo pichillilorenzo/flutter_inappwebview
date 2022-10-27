@@ -55,7 +55,7 @@ void setGetDelete() {
       );
     }
 
-    final url = Uri.parse(await pageLoaded.future);
+    final url = WebUri(await pageLoaded.future);
 
     await cookieManager.setCookie(url: url, name: "myCookie", value: "myValue");
     List<Cookie> cookies = await cookieManager.getCookies(url: url);

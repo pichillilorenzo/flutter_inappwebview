@@ -13,7 +13,7 @@ class LoadedResource {
   String? initiatorType;
 
   ///Resource URL.
-  Uri? url;
+  WebUri? url;
 
   ///Returns the [DOMHighResTimeStamp](https://developer.mozilla.org/en-US/docs/Web/API/DOMHighResTimeStamp) for the time a resource fetch started.
   double? startTime;
@@ -29,7 +29,7 @@ class LoadedResource {
     }
     final instance = LoadedResource(
       initiatorType: map['initiatorType'],
-      url: map['url'] != null ? Uri.tryParse(map['url']) : null,
+      url: map['url'] != null ? WebUri(map['url']) : null,
       startTime: map['startTime'],
       duration: map['duration'],
     );

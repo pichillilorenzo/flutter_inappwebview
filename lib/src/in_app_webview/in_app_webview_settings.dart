@@ -21,6 +21,7 @@ import '../types/scrollview_content_inset_adjustment_behavior.dart';
 import '../types/scrollview_deceleration_rate.dart';
 import '../types/selection_granularity.dart';
 import '../types/vertical_scrollbar_position.dart';
+import '../web_uri.dart';
 import 'android/in_app_webview_options.dart';
 import 'apple/in_app_webview_options.dart';
 import '../content_blocker.dart';
@@ -1123,7 +1124,7 @@ class InAppWebViewSettings_ {
   ///**Supported Platforms/Implementations**:
   ///- iOS
   ///- MacOS
-  Uri? allowingReadAccessTo;
+  WebUri? allowingReadAccessTo;
 
   ///Set to `true` to disable the context menu (copy, select, etc.) that is shown when the user emits a long press event on a HTML link.
   ///This is implemented using also JavaScript, so it must be enabled or it won't work.

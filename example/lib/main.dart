@@ -150,7 +150,7 @@ class _MyAppState extends State<MyApp> {
       return MaterialApp(initialRoute: '/', routes: {
         '/': (context) => InAppWebViewExampleScreen(),
       });
-    }f
+    }
     if (defaultTargetPlatform == TargetPlatform.macOS) {
       return MaterialApp(initialRoute: '/', routes: {
         // '/': (context) => InAppWebViewExampleScreen(),

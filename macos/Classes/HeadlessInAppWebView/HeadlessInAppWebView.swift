@@ -36,6 +36,14 @@ public class HeadlessInAppWebView : Disposable {
                 view.frame = CGRect(x: 0.0, y: 0.0, width: NSApplication.shared.mainWindow?.contentView?.bounds.width ?? 0.0,
                                     height: NSApplication.shared.mainWindow?.contentView?.bounds.height ?? 0.0)
             }
+            /// Note: The WKWebView behaves very unreliable when rendering offscreen
+            /// on a device. This is especially true with JavaScript, which simply
+            /// won't be executed sometimes.
+            /// So, add the headless WKWebView to the view hierarchy.
+            /// This way is also possible to take screenshots.
+            let wrapperView = NSView() // wrapper view with frame zero
+            wrapperView.addSubview(view, positioned: .below, relativeTo: nil)
+            NSApplication.shared.mainWindow?.contentView?.addSubview(wrapperView, positioned: .below, relativeTo: nil)
         }
     }
     
@@ -72,6 +80,9 @@ public class HeadlessInAppWebView : Disposable {
         channelDelegate?.dispose()
         channelDelegate = nil
         HeadlessInAppWebViewManager.webViews[id] = nil
+        if let view = flutterWebView?.view() {
+            view.superview?.removeFromSuperview()
+        }
         flutterWebView = nil
     }
     

@@ -1592,7 +1592,7 @@ class InAppWebViewController {
   ///This URL must be a file-based URL (using the `file://` scheme).
   ///Specify the same value as the URL parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
-  ///**NOTE**: available only on iOS.
+  ///**NOTE**: available only on iOS and MacOS.
   ///
   ///**NOTE for Android**: when loading an URL Request using "POST" method, headers are ignored.
   ///
@@ -1661,7 +1661,7 @@ class InAppWebViewController {
   ///This [baseUrl] must be a file-based URL (using the `file://` scheme).
   ///Specify the same value as the [baseUrl] parameter to prevent WebView from reading any other content.
   ///Specify a directory to give WebView permission to read additional files in the specified directory.
-  ///**NOTE**: available only on iOS.
+  ///**NOTE**: available only on iOS and MacOS.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebView.loadDataWithBaseURL](https://developer.android.com/reference/android/webkit/WebView#loadDataWithBaseURL(java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String,%20java.lang.String)))

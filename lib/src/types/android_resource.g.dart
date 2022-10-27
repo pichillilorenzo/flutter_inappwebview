@@ -6,7 +6,7 @@ part of 'android_resource.dart';
 // ExchangeableObjectGenerator
 // **************************************************************************
 
-///Class that represents an android resource.
+///Class that represents an Android resource file.
 class AndroidResource {
   ///Android resource name.
   ///

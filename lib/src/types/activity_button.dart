@@ -8,6 +8,8 @@ part 'activity_button.g.dart';
 ///When tapped, it will invoke a Share or Action Extension bundled with your app.
 ///The default VoiceOver description of this button is the `CFBundleDisplayName` set in the extension's `Info.plist`.
 ///
+///Check [Official Apple App Extensions](https://developer.apple.com/app-extensions/) for more details.
+///
 ///**Supported Platforms/Implementations**:
 ///- iOS
 @ExchangeableObject()
@@ -15,7 +17,7 @@ class ActivityButton_ {
   ///The name of the image asset or file.
   UIImage_ templateImage;
 
-  ///The name of the system symbol image.
+  ///The name of the App or Share Extension to be called.
   String extensionIdentifier;
 
   @ExchangeableObjectConstructor()

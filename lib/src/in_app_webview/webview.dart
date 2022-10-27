@@ -127,13 +127,13 @@ abstract class WebView {
           InAppWebViewController controller, ConsoleMessage consoleMessage)?
       onConsoleMessage;
 
-  ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView. This event is not called on the initial load of the WebView.
+  ///Give the host application a chance to take control when a URL is about to be loaded in the current WebView.
   ///
   ///Note that on Android there isn't any way to load an URL for a frame that is not the main frame, so if the request is not for the main frame, the navigation is allowed by default.
   ///However, if you want to cancel requests for subframes, you can use the [InAppWebViewSettings.regexToCancelSubFramesLoading] setting
   ///to write a Regular Expression that, if the url request of a subframe matches, then the request of that subframe is canceled.
   ///
-  ///Also, on Android, this method is not called for POST requests.
+  ///Also, on Android, this event is not called for POST requests.
   ///
   ///[navigationAction] represents an object that contains information about an action that causes navigation to occur.
   ///
@@ -448,7 +448,7 @@ abstract class WebView {
   ///Event fired when the host application updates its visited links database.
   ///This event is also fired when the navigation state of the [WebView] changes through the usage of
   ///javascript **[History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API)** functions (`pushState()`, `replaceState()`) and `onpopstate` event
-  ///or, also, when the javascript `window.location` changes without reloading the webview (for example appending or modifying an hash to the url).
+  ///or, also, when the javascript `window.location` changes without reloading the webview (for example appending or modifying a hash to the url).
   ///
   ///[url] represents the url being visited.
   ///
@@ -670,7 +670,7 @@ abstract class WebView {
   ///If the return value is `null`, the WebView will continue to load the resource as usual.
   ///Otherwise, the return response and data will be used.
   ///
-  ///This callback is invoked for a variety of URL schemes (e.g., `http(s):`, `data:`, `file:`, etc.),
+  ///This event is invoked for a variety of URL schemes (e.g., `http(s):`, `data:`, `file:`, etc.),
   ///not only those schemes which send requests over the network.
   ///This is not called for `javascript:` URLs, `blob:` URLs, or for assets accessed via `file:///android_asset/` or `file:///android_res/` URLs.
   ///

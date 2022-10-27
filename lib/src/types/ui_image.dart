@@ -6,6 +6,8 @@ part 'ui_image.g.dart';
 
 ///Class that represents an object that manages iOS image data in your app.
 ///
+///Check [UIKit.UIImage](https://developer.apple.com/documentation/uikit/uiimage) for more details.
+///
 ///**Supported Platforms/Implementations**:
 ///- iOS
 @ExchangeableObject()

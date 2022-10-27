@@ -1,3 +1,7 @@
+## 6.0.0-beta.11
+
+- Fixed "[webRTC / macOS] onPermissionRequest not called on HeadlessInAppWebView" [#1405](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1405)
+
 ## 6.0.0-beta.10
 
 - Created `WebUri` class to replace `Uri` dart core type. Related to:

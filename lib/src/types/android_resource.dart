@@ -2,7 +2,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 part 'android_resource.g.dart';
 
-///Class that represents an android resource.
+///Class that represents an Android resource file.
 @ExchangeableObject()
 class AndroidResource_ {
   ///Android resource name.

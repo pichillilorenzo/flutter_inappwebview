@@ -132,7 +132,7 @@ void customTabs() {
                     name: "button1",
                     defPackage:
                         "com.pichillilorenzo.flutter_inappwebviewexample"),
-                onClick: (Uri? url) {
+                onClick: (WebUri? url) {
                   print("Button 1 with $url");
                 }),
             ChromeSafariBrowserSecondaryToolbarClickableID(
@@ -140,7 +140,7 @@ void customTabs() {
                     name: "button2",
                     defPackage:
                         "com.pichillilorenzo.flutter_inappwebviewexample"),
-                onClick: (Uri? url) {
+                onClick: (WebUri? url) {
                   print("Button 2 with $url");
                 }),
           ]));
@@ -163,7 +163,7 @@ void customTabs() {
                     name: "button3",
                     defPackage:
                         "com.pichillilorenzo.flutter_inappwebviewexample"),
-                onClick: (Uri? url) {
+                onClick: (WebUri? url) {
                   print("Button 3 with $url");
                 }),
           ]));

@@ -695,6 +695,14 @@ public class WebViewChannelDelegate : ChannelDelegate {
         channel?.invokeMethod("onScrollChanged", arguments: arguments)
     }
     
+    public func onContentSizeChanged(oldContentSize: CGSize, newContentSize: CGSize) {
+        let arguments: [String: Any?] = [
+            "oldContentSize": oldContentSize.toMap(),
+            "newContentSize": newContentSize.toMap()
+        ]
+        channel?.invokeMethod("onContentSizeChanged", arguments: arguments)
+    }
+    
     public func onDownloadStartRequest(request: DownloadStartRequest) {
         channel?.invokeMethod("onDownloadStartRequest", arguments: request.toMap())
     }

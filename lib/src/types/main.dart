@@ -223,3 +223,5 @@ export 'android_resource.dart' show AndroidResource;
 export 'ui_image.dart' show UIImage;
 export 'activity_button.dart' show ActivityButton;
 export 'ui_event_attribution.dart' show UIEventAttribution;
+export 'tracing_mode.dart' show TracingMode;
+export 'tracing_category.dart' show TracingCategory;

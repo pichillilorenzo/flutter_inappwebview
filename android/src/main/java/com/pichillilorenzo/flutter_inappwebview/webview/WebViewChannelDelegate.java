@@ -952,6 +952,15 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     channel.invokeMethod("onPermissionRequest", obj, callback);
   }
 
+  public void onPermissionRequestCanceled(String origin, List<String> resources) {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    obj.put("origin", origin);
+    obj.put("resources", resources);
+    channel.invokeMethod("onPermissionRequestCanceled", obj);
+  }
+
   public static class ShouldOverrideUrlLoadingCallback extends BaseCallbackResultImpl<NavigationActionPolicy> {
     @Nullable
     @Override
@@ -1285,6 +1294,13 @@ public class WebViewChannelDelegate extends ChannelDelegateImpl {
     obj.put("url", url);
     obj.put("printJobId", printJobId);
     channel.invokeMethod("onPrintRequest", obj, callback);
+  }
+
+  public void onRequestFocus() {
+    MethodChannel channel = getChannel();
+    if (channel == null) return;
+    Map<String, Object> obj = new HashMap<>();
+    channel.invokeMethod("onRequestFocus", obj);
   }
 
   @Override

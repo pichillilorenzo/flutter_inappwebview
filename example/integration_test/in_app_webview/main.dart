@@ -37,6 +37,7 @@ import 'load_file.dart';
 import 'load_file_url.dart';
 import 'load_url.dart';
 import 'on_console_message.dart';
+import 'on_content_size_changed.dart';
 import 'on_download_start_request.dart';
 import 'on_js_before_unload.dart';
 import 'on_received_error.dart';
@@ -172,5 +173,6 @@ void main() {
     applePayAPI();
     handlesURLScheme();
     webViewAssetLoader();
+    onContentSizeChanged();
   }, skip: shouldSkip);
 }

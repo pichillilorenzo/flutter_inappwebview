@@ -12,6 +12,7 @@ import 'cookie_manager/main.dart' as cookie_manager_tests;
 import 'in_app_browser/main.dart' as in_app_browser_tests;
 import 'chrome_safari_browser/main.dart' as chrome_safari_browser_tests;
 import 'in_app_localhost_server/main.dart' as in_app_localhost_server_tests;
+import 'tracing_controller/main.dart' as tracing_controller_tests;
 
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
@@ -37,6 +38,7 @@ void main() {
   find_interaction_controller_tests.main();
   service_worker_controller_tests.main();
   proxy_controller_tests.main();
+  tracing_controller_tests.main();
   headless_in_app_webview_tests.main();
   cookie_manager_tests.main();
   in_app_browser_tests.main();

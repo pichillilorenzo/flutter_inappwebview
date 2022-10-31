@@ -1,5 +1,6 @@
 import 'dart:collection';
 import 'dart:typed_data';
+import 'dart:ui';
 
 import '../find_interaction/find_interaction_controller.dart';
 import '../pull_to_refresh/pull_to_refresh_controller.dart';
@@ -612,9 +613,8 @@ abstract class WebView {
 
   ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
   ///
-  ///[origin] represents the origin of the web page which is trying to access the restricted resources.
-  ///
-  ///[resources] represents the array of resources the web content wants to access.
+  ///[permissionRequest] represents the permission request with an array of resources the web content wants to access
+  ///and the origin of the web page which is trying to access the restricted resources.
   ///
   ///**NOTE for Android**: available only on Android 23+.
   ///
@@ -845,6 +845,27 @@ abstract class WebView {
           InAppWebViewController controller, LoginRequest loginRequest)?
       onReceivedLoginRequest;
 
+  ///Notify the host application that the given permission request has been canceled. Any related UI should therefore be hidden.
+  ///
+  ///[permissionRequest] represents the permission request that needs be canceled
+  ///with an array of resources the web content wants to access
+  ///and the origin of the web page which is trying to access the restricted resources.
+  ///
+  ///**NOTE for Android**: available only on Android 21+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequestCanceled](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequestCanceled(android.webkit.PermissionRequest)))
+  final void Function(InAppWebViewController controller,
+      PermissionRequest permissionRequest)? onPermissionRequestCanceled;
+
+  ///Request display and focus for this WebView.
+  ///This may happen due to another WebView opening a link in this WebView and requesting that this WebView be displayed.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onRequestFocus](https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)))
+  final void Function(InAppWebViewController controller)?
+      onRequestFocus;
+
   ///Use [onWebContentProcessDidTerminate] instead.
   @Deprecated('Use onWebContentProcessDidTerminate instead')
   final void Function(InAppWebViewController controller)?
@@ -940,6 +961,17 @@ abstract class WebView {
     MediaCaptureState? oldState,
     MediaCaptureState? newState,
   )? onMicrophoneCaptureStateChanged;
+
+  ///Event fired when the content size of the [WebView] changes.
+  ///
+  ///[oldContentSize] represents the old content size value.
+  ///
+  ///[newContentSize] represents the new content size value.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  final void Function(InAppWebViewController controller, Size oldContentSize,
+      Size newContentSize)? onContentSizeChanged;
 
   ///Initial url request that will be loaded.
   ///
@@ -1115,6 +1147,8 @@ abstract class WebView {
       @Deprecated('Use onReceivedLoginRequest instead')
           this.androidOnReceivedLoginRequest,
       this.onReceivedLoginRequest,
+      this.onPermissionRequestCanceled,
+      this.onRequestFocus,
       @Deprecated('Use onWebContentProcessDidTerminate instead')
           this.iosOnWebContentProcessDidTerminate,
       this.onWebContentProcessDidTerminate,
@@ -1129,6 +1163,7 @@ abstract class WebView {
       this.shouldAllowDeprecatedTLS,
       this.onCameraCaptureStateChanged,
       this.onMicrophoneCaptureStateChanged,
+      this.onContentSizeChanged,
       this.initialUrlRequest,
       this.initialFile,
       this.initialData,

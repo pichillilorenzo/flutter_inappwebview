@@ -700,8 +700,8 @@ class InAppWebViewSettings_ {
   ///- Android native WebView
   RendererPriorityPolicy_? rendererPriorityPolicy;
 
-  ///Sets whether the default Android error page should be disabled.
-  ///The default value is `false`.
+  ///Sets whether the default Android WebView’s internal error page should be suppressed or displayed for bad navigations.
+  ///`true` means suppressed (not shown), `false` means it will be displayed. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -738,15 +738,6 @@ class InAppWebViewSettings_ {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   Color? horizontalScrollbarTrackColor;
-
-  ///Sets whether the WebView’s internal error page should be suppressed or displayed for bad navigations.
-  ///`true` means suppressed (not shown), `false` means it will be displayed. The default value is `false`.
-  ///
-  ///**NOTE**: available on Android only if [WebViewFeature.SUPPRESS_ERROR_PAGE] feature is supported.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  bool? willSuppressErrorPage;
 
   ///Control whether algorithmic darkening is allowed.
   ///
@@ -793,6 +784,15 @@ class InAppWebViewSettings_ {
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   bool? enterpriseAuthenticationAppLinkPolicyEnabled;
+
+  ///When not playing, video elements are represented by a 'poster' image.
+  ///The image to use can be specified by the poster attribute of the video tag in HTML.
+  ///If the attribute is absent, then a default poster will be used.
+  ///This property allows the WebView to provide that default image.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  Uint8List? defaultVideoPoster;
 
   ///Set to `true` to disable the bouncing of the WebView when the scrolling has reached an edge of the content. The default value is `false`.
   ///
@@ -1358,10 +1358,10 @@ class InAppWebViewSettings_ {
     this.verticalScrollbarTrackColor,
     this.horizontalScrollbarThumbColor,
     this.horizontalScrollbarTrackColor,
-    this.willSuppressErrorPage = false,
     this.algorithmicDarkeningAllowed = false,
     this.requestedWithHeaderMode,
     this.enterpriseAuthenticationAppLinkPolicyEnabled = true,
+    this.defaultVideoPoster,
     this.disallowOverScroll = false,
     this.enableViewportScale = false,
     this.suppressesIncrementalRendering = false,

@@ -122,6 +122,14 @@ public class InAppWebViewStatic extends ChannelDelegateImpl {
           result.success(null);
         }
         break;
+      case "isMultiProcessEnabled":
+        if (WebViewFeature.isFeatureSupported(WebViewFeature.MULTI_PROCESS)) {
+          result.success(WebViewCompat.isMultiProcessEnabled());
+        }
+        else {
+          result.success(false);
+        }
+        break;
       default:
         result.notImplemented();
     }

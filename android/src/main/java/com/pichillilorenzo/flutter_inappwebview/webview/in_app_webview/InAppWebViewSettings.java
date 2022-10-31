@@ -114,13 +114,14 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
   public String horizontalScrollbarThumbColor;
   @Nullable
   public String horizontalScrollbarTrackColor;
-  public Boolean willSuppressErrorPage = false;
   public Boolean algorithmicDarkeningAllowed = false;
   @Nullable
   public Integer requestedWithHeaderMode;
   public Boolean enterpriseAuthenticationAppLinkPolicyEnabled = true;
   @Nullable
   public Map<String, Object> webViewAssetLoader;
+  @Nullable
+  public byte[] defaultVideoPoster;
 
   @NonNull
   @Override
@@ -379,9 +380,6 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         case "horizontalScrollbarTrackColor":
           horizontalScrollbarTrackColor = (String) value;
           break;
-        case "willSuppressErrorPage":
-          willSuppressErrorPage = (Boolean) value;
-          break;
         case "algorithmicDarkeningAllowed":
           algorithmicDarkeningAllowed = (Boolean) value;
           break;
@@ -396,6 +394,9 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
           break;
         case "webViewAssetLoader":
           webViewAssetLoader = (Map<String, Object>) value;
+          break;
+        case "defaultVideoPoster":
+          defaultVideoPoster = (byte[]) value;
           break;
       }
     }
@@ -489,11 +490,11 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
     settings.put("verticalScrollbarTrackColor", verticalScrollbarTrackColor);
     settings.put("horizontalScrollbarThumbColor", horizontalScrollbarThumbColor);
     settings.put("horizontalScrollbarTrackColor", horizontalScrollbarTrackColor);
-    settings.put("willSuppressErrorPage", willSuppressErrorPage);
     settings.put("algorithmicDarkeningAllowed", algorithmicDarkeningAllowed);
     settings.put("requestedWithHeaderMode", requestedWithHeaderMode);
     settings.put("enterpriseAuthenticationAppLinkPolicyEnabled", enterpriseAuthenticationAppLinkPolicyEnabled);
     settings.put("allowBackgroundAudioPlaying", allowBackgroundAudioPlaying);
+    settings.put("defaultVideoPoster", defaultVideoPoster);
     return settings;
   }
 
@@ -580,7 +581,7 @@ public class InAppWebViewSettings implements ISettings<InAppWebViewInterface> {
         realSettings.put("rendererPriorityPolicy", rendererPriorityPolicy);
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE)) {
-        realSettings.put("willSuppressErrorPage", WebSettingsCompat.willSuppressErrorPage(settings));
+        realSettings.put("disableDefaultErrorPage", WebSettingsCompat.willSuppressErrorPage(settings));
       }
       if (WebViewFeature.isFeatureSupported(WebViewFeature.ALGORITHMIC_DARKENING) && Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
         realSettings.put("algorithmicDarkeningAllowed", WebSettingsCompat.isAlgorithmicDarkeningAllowed(settings));

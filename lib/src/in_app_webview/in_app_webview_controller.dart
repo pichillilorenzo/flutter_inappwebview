@@ -735,6 +735,30 @@ class InAppWebViewController {
           }
         }
         break;
+      case "onPermissionRequestCanceled":
+        if ((_webview != null &&
+                _webview!.onPermissionRequestCanceled != null) ||
+            _inAppBrowser != null) {
+          Map<String, dynamic> arguments =
+              call.arguments.cast<String, dynamic>();
+          PermissionRequest permissionRequest =
+              PermissionRequest.fromMap(arguments)!;
+
+          if (_webview != null && _webview!.onPermissionRequestCanceled != null)
+            _webview!.onPermissionRequestCanceled!(this, permissionRequest);
+          else
+            _inAppBrowser!.onPermissionRequestCanceled(permissionRequest);
+        }
+        break;
+      case "onRequestFocus":
+        if ((_webview != null && _webview!.onRequestFocus != null) ||
+            _inAppBrowser != null) {
+          if (_webview != null && _webview!.onRequestFocus != null)
+            _webview!.onRequestFocus!(this);
+          else
+            _inAppBrowser!.onRequestFocus();
+        }
+        break;
       case "onReceivedHttpAuthRequest":
         if ((_webview != null && _webview!.onReceivedHttpAuthRequest != null) ||
             _inAppBrowser != null) {
@@ -1186,6 +1210,21 @@ class InAppWebViewController {
                 this, oldState, newState);
           else
             _inAppBrowser!.onMicrophoneCaptureStateChanged(oldState, newState);
+        }
+        break;
+      case "onContentSizeChanged":
+        if ((_webview != null && _webview!.onContentSizeChanged != null) ||
+            _inAppBrowser != null) {
+          var oldContentSize = MapSize.fromMap(
+              call.arguments["oldContentSize"]?.cast<String, dynamic>())!;
+          var newContentSize = MapSize.fromMap(
+              call.arguments["newContentSize"]?.cast<String, dynamic>())!;
+
+          if (_webview != null && _webview!.onContentSizeChanged != null)
+            _webview!.onContentSizeChanged!(
+                this, oldContentSize, newContentSize);
+          else
+            _inAppBrowser!.onContentSizeChanged(oldContentSize, newContentSize);
         }
         break;
       case "onCallJsHandler":
@@ -3695,6 +3734,23 @@ class InAppWebViewController {
   static Future<String?> getVariationsHeader() async {
     Map<String, dynamic> args = <String, dynamic>{};
     return await _staticChannel.invokeMethod('getVariationsHeader', args);
+  }
+
+  ///Returns `true` if WebView is running in multi process mode.
+  ///
+  ///In Android O and above, WebView may run in "multiprocess" mode.
+  ///In multiprocess mode, rendering of web content is performed by a sandboxed
+  ///renderer process separate to the application process.
+  ///This renderer process may be shared with other WebViews in the application,
+  ///but is not shared with other application processes.
+  ///
+  ///**NOTE for Android native WebView**: This method should only be called if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.MULTI_PROCESS].
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebViewCompat.isMultiProcessEnabled](https://developer.android.com/reference/androidx/webkit/WebViewCompat#isMultiProcessEnabled()))
+  static Future<bool> isMultiProcessEnabled() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _staticChannel.invokeMethod('isMultiProcessEnabled', args);
   }
 
   ///Returns a Boolean value that indicates whether WebKit natively supports resources with the specified URL scheme.

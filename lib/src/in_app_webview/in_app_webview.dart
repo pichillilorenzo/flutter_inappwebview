@@ -149,6 +149,8 @@ class InAppWebView extends StatefulWidget implements WebView {
     @Deprecated('Use onReceivedLoginRequest instead')
         this.androidOnReceivedLoginRequest,
     this.onReceivedLoginRequest,
+    this.onPermissionRequestCanceled,
+    this.onRequestFocus,
     @Deprecated('Use onWebContentProcessDidTerminate instead')
         this.iosOnWebContentProcessDidTerminate,
     this.onWebContentProcessDidTerminate,
@@ -163,6 +165,7 @@ class InAppWebView extends StatefulWidget implements WebView {
     this.shouldAllowDeprecatedTLS,
     this.onCameraCaptureStateChanged,
     this.onMicrophoneCaptureStateChanged,
+    this.onContentSizeChanged,
     this.gestureRecognizers,
     this.headlessWebView,
   }) : super(key: key);
@@ -551,6 +554,14 @@ class InAppWebView extends StatefulWidget implements WebView {
       onReceivedLoginRequest;
 
   @override
+  final void Function(InAppWebViewController controller,
+      PermissionRequest permissionRequest)? onPermissionRequestCanceled;
+
+  @override
+  final void Function(InAppWebViewController controller)?
+      onRequestFocus;
+
+  @override
   final void Function(
           InAppWebViewController controller, WebUri url, bool precomposed)?
       onReceivedTouchIconUrl;
@@ -603,6 +614,10 @@ class InAppWebView extends StatefulWidget implements WebView {
     MediaCaptureState? oldState,
     MediaCaptureState? newState,
   )? onMicrophoneCaptureStateChanged;
+
+  @override
+  final void Function(InAppWebViewController controller, Size oldContentSize,
+      Size newContentSize)? onContentSizeChanged;
 }
 
 class _InAppWebViewState extends State<InAppWebView> {

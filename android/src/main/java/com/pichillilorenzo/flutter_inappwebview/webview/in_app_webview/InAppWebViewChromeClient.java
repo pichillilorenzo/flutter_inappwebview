@@ -3,11 +3,13 @@ package com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview;
 import android.Manifest;
 import android.annotation.TargetApi;
 import android.app.Activity;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.AssetFileDescriptor;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
@@ -18,6 +20,7 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.util.Log;
 import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
@@ -33,6 +36,8 @@ import android.webkit.WebView;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.RelativeLayout;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -42,6 +47,7 @@ import androidx.core.content.ContextCompat;
 import androidx.core.content.FileProvider;
 
 import com.pichillilorenzo.flutter_inappwebview.InAppWebViewFileProvider;
+import com.pichillilorenzo.flutter_inappwebview.R;
 import com.pichillilorenzo.flutter_inappwebview.types.CreateWindowAction;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.ActivityResultListener;
 import com.pichillilorenzo.flutter_inappwebview.in_app_browser.InAppBrowserDelegate;
@@ -125,8 +131,17 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       plugin.activityPluginBinding.addActivityResultListener(this);
   }
 
+  @Nullable
   @Override
   public Bitmap getDefaultVideoPoster() {
+    if (inAppWebView != null && inAppWebView.customSettings.defaultVideoPoster != null) {
+      final byte[] data = inAppWebView.customSettings.defaultVideoPoster;
+      BitmapFactory.Options bitmapOptions = new BitmapFactory.Options();
+      bitmapOptions.inMutable = true;
+      return BitmapFactory.decodeByteArray(
+              data, 0, data.length, bitmapOptions
+      );
+    }
     return Bitmap.createBitmap(50, 50, Bitmap.Config.ARGB_8888);
   }
 
@@ -680,7 +695,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
         defaultBehaviour(null);
       }
     };
-    
+
     if (inAppWebView != null && inAppWebView.channelDelegate != null) {
       inAppWebView.channelDelegate.onGeolocationPermissionsShowPrompt(origin, resultCallback);
     } else {
@@ -699,7 +714,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
   public boolean onConsoleMessage(ConsoleMessage consoleMessage) {
     if (inAppWebView != null && inAppWebView.channelDelegate != null) {
       inAppWebView.channelDelegate.onConsoleMessage(
-              consoleMessage.message(), 
+              consoleMessage.message(),
               consoleMessage.messageLevel().ordinal());
     }
     return true;
@@ -732,7 +747,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
     if (inAppBrowserDelegate != null) {
       inAppBrowserDelegate.didChangeTitle(title);
     }
-    
+
     InAppWebView webView = (InAppWebView) view;
 
     if (webView.channelDelegate != null) {
@@ -1235,6 +1250,22 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
       } else {
         callback.defaultBehaviour(null);
       }
+    }
+  }
+
+  @Override
+  public void onRequestFocus(WebView view) {
+    if(inAppWebView != null && inAppWebView.channelDelegate != null) {
+      inAppWebView.channelDelegate.onRequestFocus();
+    }
+  }
+
+  @Override
+  public void onPermissionRequestCanceled(PermissionRequest request) {
+    if(Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP &&
+            inAppWebView != null && inAppWebView.channelDelegate != null) {
+      inAppWebView.channelDelegate.onPermissionRequestCanceled(request.getOrigin().toString(),
+                Arrays.asList(request.getResources()));
     }
   }
 

@@ -969,9 +969,8 @@ class InAppBrowser {
 
   ///Event fired when the WebView is requesting permission to access the specified resources and the permission currently isn't granted or denied.
   ///
-  ///[origin] represents the origin of the web page which is trying to access the restricted resources.
-  ///
-  ///[resources] represents the array of resources the web content wants to access.
+  ///[permissionRequest] represents the permission request with an array of resources the web content wants to access
+  ///and the origin of the web page which is trying to access the restricted resources.
   ///
   ///**NOTE for Android**: available only on Android 23+.
   ///
@@ -1197,6 +1196,25 @@ class InAppBrowser {
   ///- Android native WebView ([Official API - WebViewClient.onReceivedLoginRequest](https://developer.android.com/reference/android/webkit/WebViewClient#onReceivedLoginRequest(android.webkit.WebView,%20java.lang.String,%20java.lang.String,%20java.lang.String)))
   void onReceivedLoginRequest(LoginRequest loginRequest) {}
 
+  ///Notify the host application that the given permission request has been canceled. Any related UI should therefore be hidden.
+  ///
+  ///[permissionRequest] represents the permission request that needs be canceled
+  ///with an array of resources the web content wants to access
+  ///and the origin of the web page which is trying to access the restricted resources.
+  ///
+  ///**NOTE for Android**: available only on Android 21+.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onPermissionRequestCanceled](https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequestCanceled(android.webkit.PermissionRequest)))
+  void onPermissionRequestCanceled(PermissionRequest permissionRequest) {}
+
+  ///Request display and focus for this WebView.
+  ///This may happen due to another WebView opening a link in this WebView and requesting that this WebView be displayed.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView ([Official API - WebChromeClient.onRequestFocus](https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)))
+  void onRequestFocus() {}
+
   ///Use [onWebContentProcessDidTerminate] instead.
   @Deprecated('Use onWebContentProcessDidTerminate instead')
   void iosOnWebContentProcessDidTerminate() {}
@@ -1278,6 +1296,7 @@ class InAppBrowser {
   ) {}
 
   ///Event fired when a change in the microphone capture state occurred.
+  ///Event fired when a change in the microphone capture state occurred.
   ///
   ///**NOTE for iOS**: available only on iOS 15.0+.
   ///
@@ -1290,6 +1309,16 @@ class InAppBrowser {
     MediaCaptureState? oldState,
     MediaCaptureState? newState,
   ) {}
+
+  ///Event fired when the content size of the [WebView] changes.
+  ///
+  ///[oldContentSize] represents the old content size value.
+  ///
+  ///[newContentSize] represents the new content size value.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  void onContentSizeChanged(Size oldContentSize, Size newContentSize) {}
 
   void throwIfAlreadyOpened({String message = ''}) {
     if (this.isOpened()) {

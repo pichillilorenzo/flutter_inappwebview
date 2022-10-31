@@ -16,6 +16,7 @@ import com.pichillilorenzo.flutter_inappwebview.headless_in_app_webview.Headless
 import com.pichillilorenzo.flutter_inappwebview.print_job.PrintJobManager;
 import com.pichillilorenzo.flutter_inappwebview.proxy.ProxyManager;
 import com.pichillilorenzo.flutter_inappwebview.service_worker.ServiceWorkerManager;
+import com.pichillilorenzo.flutter_inappwebview.tracing.TracingControllerManager;
 
 import io.flutter.embedding.engine.plugins.activity.ActivityAware;
 import io.flutter.embedding.engine.plugins.activity.ActivityPluginBinding;
@@ -53,6 +54,8 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
   public ProxyManager proxyManager;
   @Nullable
   public PrintJobManager printJobManager;
+  @Nullable
+  public TracingControllerManager tracingControllerManager;
   @Nullable
   public static ValueCallback<Uri> filePathCallbackLegacy;
   @Nullable
@@ -121,6 +124,7 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       printJobManager = new PrintJobManager();
     }
+    tracingControllerManager = new TracingControllerManager(this);
   }
 
   @Override
@@ -172,6 +176,10 @@ public class InAppWebViewFlutterPlugin implements FlutterPlugin, ActivityAware {
     if (printJobManager != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       printJobManager.dispose();
       printJobManager = null;
+    }
+    if (tracingControllerManager != null) {
+      tracingControllerManager.dispose();
+      tracingControllerManager = null;
     }
     filePathCallbackLegacy = null;
     filePathCallback = null;

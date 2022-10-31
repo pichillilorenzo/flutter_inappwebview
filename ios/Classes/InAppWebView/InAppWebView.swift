@@ -291,6 +291,7 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         scrollView.addGestureRecognizer(self.panGestureRecognizer)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset), options: [.new, .old], context: nil)
         scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale), options: [.new, .old], context: nil)
+        scrollView.addObserver(self, forKeyPath: #keyPath(UIScrollView.contentSize), options: [.new, .old], context: nil)
         
         addObserver(self,
                     forKeyPath: #keyPath(WKWebView.estimatedProgress),
@@ -662,6 +663,14 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
             if newContentOffset != oldContentOffset {
                 DispatchQueue.main.async {
                     self.onScrollChanged(startedByUser: startedByUser, oldContentOffset: oldContentOffset)
+                }
+            }
+        } else if keyPath == #keyPath(UIScrollView.contentSize) {
+            if let newContentSize = change?[.newKey] as? CGSize,
+               let oldContentSize = change?[.oldKey] as? CGSize,
+               newContentSize != oldContentSize {
+                DispatchQueue.main.async {
+                    self.onContentSizeChanged(oldContentSize: oldContentSize)
                 }
             }
         }
@@ -2376,6 +2385,11 @@ public class InAppWebView: WKWebView, UIScrollViewDelegate, WKUIDelegate,
         }
     }
     
+    public func onContentSizeChanged(oldContentSize: CGSize) {
+        channelDelegate?.onContentSizeChanged(oldContentSize: oldContentSize,
+                                              newContentSize: scrollView.contentSize)
+    }
+    
     public func scrollViewDidZoom(_ scrollView: UIScrollView) {
         let newScale = Float(scrollView.zoomScale)
         if newScale != oldZoomScale {
@@ -3111,6 +3125,7 @@ if(window.\(JAVASCRIPT_BRIDGE_NAME)[\(_callHandlerID)] != null) {
 //        }
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentOffset))
         scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.zoomScale))
+        scrollView.removeObserver(self, forKeyPath: #keyPath(UIScrollView.contentSize))
         resumeTimers()
         stopLoading()
         disposeWebMessageChannels()

@@ -8,3 +8,4 @@ export 'webview_asset_loader.dart'
         AssetsPathHandler,
         ResourcesPathHandler,
         InternalStoragePathHandler;
+export 'tracing_controller.dart' show TracingController, TracingSettings;

@@ -289,11 +289,13 @@ public class InAppWebViewClient extends WebViewClient {
     }
   }
 
+  @SuppressLint("RestrictedApi")
   @Override
   public void onReceivedError(WebView view, int errorCode, String description, String failingUrl) {
     final InAppWebView webView = (InAppWebView) view;
 
-    if (webView.customSettings.disableDefaultErrorPage) {
+    if (!WebViewFeature.isFeatureSupported(WebViewFeature.SUPPRESS_ERROR_PAGE) &&
+            webView.customSettings.disableDefaultErrorPage) {
       webView.stopLoading();
       webView.loadUrl("about:blank");
     }

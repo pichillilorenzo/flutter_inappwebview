@@ -1,3 +1,16 @@
+## 6.0.0-beta.12
+
+- Removed `willSuppressErrorPage` WebView Android setting in favor of `disableDefaultErrorPage`.
+- Added `isMultiProcessEnabled` static method on `InAppWebViewController` for Android
+- Added `onContentSizeChanged` WebView event for iOS
+- Added `onPermissionRequestCanceled`, `onRequestFocus` WebView events for Android
+- Added `defaultVideoPoster` WebView setting for Android
+- Added `TracingController` for Android WebViews
+
+### BREAKING CHANGES
+
+- Removed `willSuppressErrorPage` WebView Android setting. Use `disableDefaultErrorPage` instead.
+
 ## 6.0.0-beta.11
 
 - Fixed "[webRTC / macOS] onPermissionRequest not called on HeadlessInAppWebView" [#1405](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1405)
@@ -19,7 +32,7 @@
 - Added `onNavigationEvent`, `onServiceConnected`, `onRelationshipValidationResult` events on `ChromeSafariBrowser` for Android
 - Added `mayLaunchUrl`, `launchUrl`, `updateActionButton`, `validateRelationship`, `setSecondaryToolbar`, `updateSecondaryToolbar` methods on `ChromeSafariBrowser` for Android
 - Added `startAnimations`, `exitAnimations`, `navigationBarColor`, `navigationBarDividerColor`, `secondaryToolbarColor`, `alwaysUseBrowserUI` ChromeSafariBrowser settings for Android
-- Added `getMaxToolbarItems` static methods on `ChromeSafariBrowser` for Android
+- Added `getMaxToolbarItems` static method on `ChromeSafariBrowser` for Android
 - Added `ChromeSafariBrowserMenuItem.image` property for iOS
 - Added `didLoadSuccessfully` optional argument on `ChromeSafariBrowser.onCompletedInitialLoad` event for iOS
 - Added `onInitialLoadDidRedirect`, `onWillOpenInBrowser` events on `ChromeSafariBrowser` for iOS

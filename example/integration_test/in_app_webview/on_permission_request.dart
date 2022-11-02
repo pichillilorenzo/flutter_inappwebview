@@ -118,7 +118,7 @@ void onPermissionRequest() {
     controller.reload();
 
     final List<PermissionResourceType> canceledResources =
-    await onPermissionRequestCancelCompleter.future;
+        await onPermissionRequestCancelCompleter.future;
     expect(listEquals(canceledResources, expectedValue), true);
   }, skip: shouldSkip2);
 }

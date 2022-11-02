@@ -863,8 +863,7 @@ abstract class WebView {
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView ([Official API - WebChromeClient.onRequestFocus](https://developer.android.com/reference/android/webkit/WebChromeClient#onRequestFocus(android.webkit.WebView)))
-  final void Function(InAppWebViewController controller)?
-      onRequestFocus;
+  final void Function(InAppWebViewController controller)? onRequestFocus;
 
   ///Use [onWebContentProcessDidTerminate] instead.
   @Deprecated('Use onWebContentProcessDidTerminate instead')

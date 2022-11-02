@@ -7,8 +7,8 @@ void main() {
   final shouldSkip = kIsWeb
       ? true
       : ![
-    TargetPlatform.android,
-  ].contains(defaultTargetPlatform);
+          TargetPlatform.android,
+        ].contains(defaultTargetPlatform);
 
   group('Tracing Controller', () {
     startAndStop();

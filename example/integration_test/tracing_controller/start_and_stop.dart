@@ -55,9 +55,9 @@ void startAndStop() {
     await pageLoaded.future;
 
     Directory appDocDir = await getApplicationDocumentsDirectory();
-    String traceFilePath = '${appDocDir.path}${Platform.pathSeparator}trace.json';
-    expect(
-        await tracingController.stop(filePath: traceFilePath), true);
+    String traceFilePath =
+        '${appDocDir.path}${Platform.pathSeparator}trace.json';
+    expect(await tracingController.stop(filePath: traceFilePath), true);
 
     expect(File(traceFilePath).existsSync(), true);
 

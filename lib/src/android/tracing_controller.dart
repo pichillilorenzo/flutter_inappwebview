@@ -147,7 +147,8 @@ class TracingSettings_ {
     assert(
         this
             .categories
-            .map((e) => e.runtimeType is String || e.runtimeType is TracingCategory)
+            .map((e) =>
+                e.runtimeType is String || e.runtimeType is TracingCategory)
             .contains(false),
         "categories must contain only String or TracingCategory items");
   }

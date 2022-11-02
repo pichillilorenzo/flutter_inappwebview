@@ -684,8 +684,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
       PermissionRequest permissionRequest)? onPermissionRequestCanceled;
 
   @override
-  final void Function(InAppWebViewController controller)?
-      onRequestFocus;
+  final void Function(InAppWebViewController controller)? onRequestFocus;
 
   @override
   void Function(

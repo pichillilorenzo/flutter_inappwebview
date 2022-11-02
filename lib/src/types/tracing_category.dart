@@ -28,7 +28,8 @@ class TracingCategory_ {
 
   ///Predefined set of categories for analyzing javascript and rendering issues.
   ///Typically includes "blink", "compositor", "gpu", "renderer.scheduler" and "v8" categories.
-  static const CATEGORIES_JAVASCRIPT_AND_RENDERING = const TracingCategory_._internal(32);
+  static const CATEGORIES_JAVASCRIPT_AND_RENDERING =
+      const TracingCategory_._internal(32);
 
   ///Indicates that there are no predefined categories.
   static const CATEGORIES_NONE = const TracingCategory_._internal(0);

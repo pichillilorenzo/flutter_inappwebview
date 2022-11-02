@@ -16,8 +16,7 @@ void onContentSizeChanged() {
         ].contains(defaultTargetPlatform);
 
   testWidgets('onContentSizeChanged', (WidgetTester tester) async {
-    final Completer<void> onContentSizeChangedCompleter =
-        Completer<void>();
+    final Completer<void> onContentSizeChangedCompleter = Completer<void>();
     await tester.pumpWidget(
       Directionality(
         textDirection: TextDirection.ltr,

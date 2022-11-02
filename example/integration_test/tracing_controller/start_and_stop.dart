@@ -58,6 +58,10 @@ void startAndStop() {
     String traceFilePath = '${appDocDir.path}${Platform.pathSeparator}trace.json';
     expect(
         await tracingController.stop(filePath: traceFilePath), true);
+
+    expect(File(traceFilePath).existsSync(), true);
+
+    await Future.delayed(Duration(seconds: 2));
     expect(await tracingController.isTracing(), false);
   }, skip: shouldSkip);
 }

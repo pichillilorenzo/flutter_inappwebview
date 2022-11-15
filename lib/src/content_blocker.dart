@@ -49,14 +49,17 @@ class ContentBlockerTrigger {
   ///- MacOS
   List<String> ifFrameUrl;
 
-  ///A Boolean value. The default value is `false`.
+  ///A Boolean value indicating if the URL matching should be case-sensitive.
+  ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   ///- iOS
   ///- MacOS
   bool urlFilterIsCaseSensitive;
 
-  ///A list of [ContentBlockerTriggerResourceType] representing the resource types (how the browser intends to use the resource) that the rule should match.
+  ///A list of [ContentBlockerTriggerResourceType] representing the resource types
+  ///(how the browser intends to use the resource) that the rule should match.
   ///If not specified, the rule matches all resource types.
   ///
   ///**Supported Platforms/Implementations**:
@@ -66,7 +69,8 @@ class ContentBlockerTrigger {
   List<ContentBlockerTriggerResourceType> resourceType;
 
   ///A list of strings matched to a URL's domain; limits action to a list of specific domains.
-  ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.unlessDomain].
+  ///Values must be lowercase ASCII, or punycode for non-ASCII.
+  ///Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.unlessDomain].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -75,7 +79,8 @@ class ContentBlockerTrigger {
   List<String> ifDomain;
 
   ///A list of strings matched to a URL's domain; acts on any site except domains in a provided list.
-  ///Values must be lowercase ASCII, or punycode for non-ASCII. Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.ifDomain].
+  ///Values must be lowercase ASCII, or punycode for non-ASCII.
+  ///Add * in front to match domain and subdomains. Can't be used with [ContentBlockerTrigger.ifDomain].
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -83,7 +88,8 @@ class ContentBlockerTrigger {
   ///- MacOS
   List<String> unlessDomain;
 
-  ///A list of [ContentBlockerTriggerLoadType] that can include one of two mutually exclusive values. If not specified, the rule matches all load types.
+  ///A list of [ContentBlockerTriggerLoadType] that can include one of two mutually exclusive values.
+  ///If not specified, the rule matches all load types.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView

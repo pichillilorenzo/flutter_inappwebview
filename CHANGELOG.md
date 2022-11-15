@@ -1,3 +1,9 @@
+## 6.0.0-beta.13
+
+- Added `ContentBlockerActionType.BLOCK_COOKIES` and `ContentBlockerActionType.IGNORE_PREVIOUS_RULES` for iOS and macOS platforms
+- Updated `ContentBlockerTrigger.urlFilterIsCaseSensitive` for Android
+- Fixed Android `ContentBlockerActionType.CSS_DISPLAY_NONE` usage
+
 ## 6.0.0-beta.12
 
 - Removed `willSuppressErrorPage` WebView Android setting in favor of `disableDefaultErrorPage`.

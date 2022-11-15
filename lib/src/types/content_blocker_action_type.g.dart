@@ -17,23 +17,119 @@ class ContentBlockerActionType {
       ContentBlockerActionType._internal(value, nativeValue());
 
   ///Stops loading of the resource. If the resource was cached, the cache is ignored.
-  static const BLOCK = ContentBlockerActionType._internal('block', 'block');
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  static final BLOCK =
+      ContentBlockerActionType._internalMultiPlatform('block', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'block';
+      case TargetPlatform.iOS:
+        return 'block';
+      case TargetPlatform.macOS:
+        return 'block';
+      default:
+        break;
+    }
+    return null;
+  });
 
-  ///Hides elements of the page based on a CSS selector. A selector field contains the selector list. Any matching element has its display property set to none, which hides it.
+  ///Hides elements of the page based on a CSS selector.
+  ///A selector field contains the selector list.
+  ///Any matching element has its display property set to none, which hides it.
   ///
   ///**NOTE**: on Android, JavaScript must be enabled.
-  static const CSS_DISPLAY_NONE = ContentBlockerActionType._internal(
-      'css-display-none', 'css-display-none');
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  static final CSS_DISPLAY_NONE =
+      ContentBlockerActionType._internalMultiPlatform('css-display-none', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'css-display-none';
+      case TargetPlatform.iOS:
+        return 'css-display-none';
+      case TargetPlatform.macOS:
+        return 'css-display-none';
+      default:
+        break;
+    }
+    return null;
+  });
 
-  ///Changes a URL from http to https. URLs with a specified (nondefault) port and links using other protocols are unaffected.
-  static const MAKE_HTTPS =
-      ContentBlockerActionType._internal('make-https', 'make-https');
+  ///Changes a URL from http to https.
+  ///URLs with a specified (nondefault) port and links using other protocols are unaffected.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  ///- MacOS
+  static final MAKE_HTTPS =
+      ContentBlockerActionType._internalMultiPlatform('make-https', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.android:
+        return 'make-https';
+      case TargetPlatform.iOS:
+        return 'make-https';
+      case TargetPlatform.macOS:
+        return 'make-https';
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Strips cookies from the header before sending it to the server.
+  ///This only blocks cookies otherwise acceptable to WebView's privacy policy.
+  ///Combining with [IGNORE_PREVIOUS_RULES] doesn't override the browser’s privacy settings.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final BLOCK_COOKIES =
+      ContentBlockerActionType._internalMultiPlatform('block-cookies', () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 'block-cookies';
+      case TargetPlatform.macOS:
+        return 'block-cookies';
+      default:
+        break;
+    }
+    return null;
+  });
+
+  ///Ignores previously triggered actions.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  ///- MacOS
+  static final IGNORE_PREVIOUS_RULES =
+      ContentBlockerActionType._internalMultiPlatform('ignore-previous-rules',
+          () {
+    switch (defaultTargetPlatform) {
+      case TargetPlatform.iOS:
+        return 'ignore-previous-rules';
+      case TargetPlatform.macOS:
+        return 'ignore-previous-rules';
+      default:
+        break;
+    }
+    return null;
+  });
 
   ///Set of all values of [ContentBlockerActionType].
   static final Set<ContentBlockerActionType> values = [
     ContentBlockerActionType.BLOCK,
     ContentBlockerActionType.CSS_DISPLAY_NONE,
     ContentBlockerActionType.MAKE_HTTPS,
+    ContentBlockerActionType.BLOCK_COOKIES,
+    ContentBlockerActionType.IGNORE_PREVIOUS_RULES,
   ].toSet();
 
   ///Gets a possible [ContentBlockerActionType] instance from [String] value.

@@ -8,6 +8,7 @@ import android.webkit.WebResourceResponse;
 import androidx.annotation.Nullable;
 
 import com.pichillilorenzo.flutter_inappwebview.webview.in_app_webview.InAppWebView;
+import com.pichillilorenzo.flutter_inappwebview.plugin_scripts_js.JavaScriptBridgeJS;
 import com.pichillilorenzo.flutter_inappwebview.Util;
 
 import java.io.ByteArrayInputStream;
@@ -150,9 +151,9 @@ public class ContentBlockerHandler {
                         final String cssSelector = action.getSelector();
                         final String jsScript = "(function(d) { " +
                                 "   function hide () { " +
-                                "       if (!d.getElementById('css-display-none-style')) { " +
+                                "       if (!d.getElementById('" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "-css-display-none-style')) { " +
                                 "           var c = d.createElement('style'); " +
-                                "           c.id = 'css-display-none-style'; " +
+                                "           c.id = '" + JavaScriptBridgeJS.JAVASCRIPT_BRIDGE_NAME + "-css-display-none-style'; " +
                                 "           c.innerHTML = '" + cssSelector + " { display: none !important; }'; " +
                                 "           d.body.appendChild(c); " +
                                 "       }" +
@@ -165,7 +166,7 @@ public class ContentBlockerHandler {
                                 "})(document);";
 
                         final Handler handler = new Handler(webView.getWebViewLooper());
-                        handler.post(new Runnable() {
+                        handler.postDelayed(new Runnable() {
                             @Override
                             public void run() {
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
@@ -174,7 +175,7 @@ public class ContentBlockerHandler {
                                     webView.loadUrl("javascript:" + jsScript);
                                 }
                             }
-                        });
+                        }, 800);
                         break;
 
                     case MAKE_HTTPS:

@@ -25,11 +25,12 @@ public class ContentBlockerTrigger {
     public ContentBlockerTrigger(@NonNull String urlFilter, @Nullable Boolean urlFilterIsCaseSensitive, @Nullable List<ContentBlockerTriggerResourceType> resourceType,
                                  @Nullable List<String> ifDomain, @Nullable List<String> unlessDomain, @Nullable List<String> loadType,
                                  @Nullable List<String> ifTopUrl, @Nullable List<String> unlessTopUrl) {
+        this.urlFilterIsCaseSensitive = urlFilterIsCaseSensitive != null ? urlFilterIsCaseSensitive : false;
+
         this.urlFilter = urlFilter;
-        this.urlFilterPatternCompiled = Pattern.compile(this.urlFilter);
+        this.urlFilterPatternCompiled = Pattern.compile(this.urlFilter, this.urlFilterIsCaseSensitive ? 0 : Pattern.CASE_INSENSITIVE);
 
         this.resourceType = resourceType != null ? resourceType : this.resourceType;
-        this.urlFilterIsCaseSensitive = urlFilterIsCaseSensitive != null ? urlFilterIsCaseSensitive : false;
         this.ifDomain = ifDomain != null ? ifDomain : this.ifDomain;
         this.unlessDomain = unlessDomain != null ? unlessDomain : this.unlessDomain;
         if ((!(this.ifDomain.isEmpty() || this.unlessDomain.isEmpty()) != false))

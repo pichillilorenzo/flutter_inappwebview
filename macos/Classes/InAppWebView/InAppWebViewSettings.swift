@@ -100,6 +100,8 @@ public class InAppWebViewSettings: ISettings<InAppWebView> {
             }
             if #available(macOS 12.0, *) {
                 realSettings["underPageBackgroundColor"] = webView.underPageBackgroundColor.hexString
+            }
+            if #available(macOS 12.3, *) {
                 realSettings["isSiteSpecificQuirksModeEnabled"] = configuration.preferences.isSiteSpecificQuirksModeEnabled
                 realSettings["isElementFullscreenEnabled"] = configuration.preferences.isElementFullscreenEnabled
             }

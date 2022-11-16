@@ -1130,7 +1130,7 @@ class InAppWebViewSettings {
   ///
   ///**NOTE for iOS**: available on iOS 15.4+.
   ///
-  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///**NOTE for MacOS**: available on MacOS 12.3+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
@@ -1155,7 +1155,7 @@ class InAppWebViewSettings {
   ///
   ///**NOTE for iOS**: available on iOS 15.4+.
   ///
-  ///**NOTE for MacOS**: available on MacOS 12.0+.
+  ///**NOTE for MacOS**: available on MacOS 12.3+.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS

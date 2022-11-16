@@ -595,7 +595,7 @@ public class WebViewChannelDelegate : ChannelDelegate {
             break
         case .isInFullscreen:
             if let webView = webView {
-                if #available(macOS 12.0, *) {
+                if #available(macOS 13.0, *) {
                     result(webView.fullscreenState == .inFullscreen)
                 } else {
                     result(webView.inFullscreen)

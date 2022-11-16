@@ -25,7 +25,7 @@ class UserScript {
   ///Specify true to inject the script only into the main frame, or false to inject it into all frames.
   ///The default value is `true`.
   ///
-  ///**NOTE**: available only on iOS.
+  ///**NOTE**: available only on iOS and MacOS.
   bool forMainFrameOnly;
 
   ///A set of matching rules for the allowed origins.

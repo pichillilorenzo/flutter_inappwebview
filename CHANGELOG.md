@@ -1,3 +1,8 @@
+## 6.0.0-beta.14
+
+- Fixed User Script remove methods
+- Fixed macOS available checks for XCode 14.1
+
 ## 6.0.0-beta.13
 
 - Added `ContentBlockerActionType.BLOCK_COOKIES` and `ContentBlockerActionType.IGNORE_PREVIOUS_RULES` for iOS and macOS platforms

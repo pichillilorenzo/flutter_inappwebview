@@ -175,7 +175,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 configuration.preferences.isTextInteractionEnabled = settings.isTextInteractionEnabled
             }
             
-            if #available(macOS 12.0, *) {
+            if #available(macOS 12.3, *) {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = settings.isSiteSpecificQuirksModeEnabled
                 configuration.preferences.isElementFullscreenEnabled = settings.isElementFullscreenEnabled
             }
@@ -725,7 +725,7 @@ public class InAppWebView: WKWebView, WKUIDelegate,
                 self.underPageBackgroundColor = NSColor(hexString: underPageBackgroundColor)
             }
         }
-        if #available(macOS 12.0, *) {
+        if #available(macOS 12.3, *) {
             if newSettingsMap["isSiteSpecificQuirksModeEnabled"] != nil, settings?.isSiteSpecificQuirksModeEnabled != newSettings.isSiteSpecificQuirksModeEnabled {
                 configuration.preferences.isSiteSpecificQuirksModeEnabled = newSettings.isSiteSpecificQuirksModeEnabled
             }

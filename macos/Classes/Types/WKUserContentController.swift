@@ -276,7 +276,7 @@ extension WKUserContentController {
 
         var userScriptsUpdated: [WKUserScript] = []
         for script in userScripts {
-            if !userScripts.contains(script) {
+            if !scriptsToRemove.contains(script) {
                 userScriptsUpdated.append(script)
             }
         }
@@ -296,6 +296,7 @@ extension WKUserContentController {
         for script in allUserOnlyScripts {
             if let scriptName = script.groupName, scriptName == groupName {
                 scriptsToRemove.append(script)
+                userOnlyScripts[script.injectionTime]!.remove(script)
             }
         }
         removeUserScripts(scriptsToRemove: scriptsToRemove, shouldAddPreviousScripts: shouldAddPreviousScripts)
@@ -307,6 +308,7 @@ extension WKUserContentController {
         for script in allPluginScripts {
             if let scriptName = script.groupName, scriptName == groupName {
                 scriptsToRemove.append(script)
+                pluginScripts[script.injectionTime]!.remove(script)
             }
         }
         removeUserScripts(scriptsToRemove: scriptsToRemove, shouldAddPreviousScripts: shouldAddPreviousScripts)

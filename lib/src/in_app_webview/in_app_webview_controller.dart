@@ -51,7 +51,10 @@ class InAppWebViewController {
   static MethodChannel _staticChannel = IN_APP_WEBVIEW_STATIC_CHANNEL;
   Map<String, JavaScriptHandlerCallback> javaScriptHandlersMap =
       HashMap<String, JavaScriptHandlerCallback>();
-  List<UserScript> _userScripts = [];
+  final Map<UserScriptInjectionTime, List<UserScript>> _userScripts = {
+    UserScriptInjectionTime.AT_DOCUMENT_START: <UserScript>[],
+    UserScriptInjectionTime.AT_DOCUMENT_END: <UserScript>[]
+  };
   Set<String> _webMessageListenerObjNames = Set();
   Map<String, ScriptHtmlTagAttributes> _injectedScriptsFromURL = {};
 
@@ -75,8 +78,22 @@ class InAppWebViewController {
         MethodChannel('com.pichillilorenzo/flutter_inappwebview_$id');
     this._channel.setMethodCallHandler(handleMethod);
     this._webview = webview;
-    this._userScripts =
-        List<UserScript>.from(webview.initialUserScripts ?? <UserScript>[]);
+
+    final initialUserScripts = webview.initialUserScripts;
+    if (initialUserScripts != null) {
+      for (final userScript in initialUserScripts) {
+        if (userScript.injectionTime ==
+            UserScriptInjectionTime.AT_DOCUMENT_START) {
+          this
+              ._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]
+              ?.add(userScript);
+        } else {
+          this
+              ._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]
+              ?.add(userScript);
+        }
+      }
+    }
     this._init();
   }
 
@@ -86,8 +103,22 @@ class InAppWebViewController {
       UnmodifiableListView<UserScript>? initialUserScripts) {
     this._channel = channel;
     this._inAppBrowser = inAppBrowser;
-    this._userScripts =
-        List<UserScript>.from(initialUserScripts ?? <UserScript>[]);
+
+    if (initialUserScripts != null) {
+      for (final userScript in initialUserScripts) {
+        if (userScript.injectionTime ==
+            UserScriptInjectionTime.AT_DOCUMENT_START) {
+          this
+              ._userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]
+              ?.add(userScript);
+        } else {
+          this
+              ._userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]
+              ?.add(userScript);
+        }
+      }
+    }
+
     this._init();
   }
 
@@ -2117,8 +2148,9 @@ class InAppWebViewController {
 
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('userScript', () => userScript.toMap());
-    if (!_userScripts.contains(userScript)) {
-      _userScripts.add(userScript);
+    if (!(_userScripts[userScript.injectionTime]?.contains(userScript) ??
+        false)) {
+      _userScripts[userScript.injectionTime]?.add(userScript);
       await _channel.invokeMethod('addUserScript', args);
     }
   }
@@ -2148,12 +2180,12 @@ class InAppWebViewController {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
 
-    var index = _userScripts.indexOf(userScript);
-    if (index == -1) {
+    var index = _userScripts[userScript.injectionTime]?.indexOf(userScript);
+    if (index == null || index == -1) {
       return false;
     }
 
-    _userScripts.remove(userScript);
+    _userScripts[userScript.injectionTime]?.remove(userScript);
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('userScript', () => userScript.toMap());
     args.putIfAbsent('index', () => index);
@@ -2172,6 +2204,22 @@ class InAppWebViewController {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
 
+    final List<UserScript> userScriptsAtDocumentStart = List.from(
+        _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START] ?? []);
+    for (final userScript in userScriptsAtDocumentStart) {
+      if (userScript.groupName == groupName) {
+        _userScripts[userScript.injectionTime]?.remove(userScript);
+      }
+    }
+
+    final List<UserScript> userScriptsAtDocumentEnd =
+        List.from(_userScripts[UserScriptInjectionTime.AT_DOCUMENT_END] ?? []);
+    for (final userScript in userScriptsAtDocumentEnd) {
+      if (userScript.groupName == groupName) {
+        _userScripts[userScript.injectionTime]?.remove(userScript);
+      }
+    }
+
     Map<String, dynamic> args = <String, dynamic>{};
     args.putIfAbsent('groupName', () => groupName);
     await _channel.invokeMethod('removeUserScriptsByGroupName', args);
@@ -2188,8 +2236,8 @@ class InAppWebViewController {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
 
-    for (var i = 0; i < userScripts.length; i++) {
-      await removeUserScript(userScript: userScripts[i]);
+    for (final userScript in userScripts) {
+      await removeUserScript(userScript: userScript);
     }
   }
 
@@ -2204,7 +2252,9 @@ class InAppWebViewController {
     assert(_webview?.windowId == null ||
         defaultTargetPlatform != TargetPlatform.iOS);
 
-    _userScripts.clear();
+    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_START]?.clear();
+    _userScripts[UserScriptInjectionTime.AT_DOCUMENT_END]?.clear();
+
     Map<String, dynamic> args = <String, dynamic>{};
     await _channel.invokeMethod('removeAllUserScripts', args);
   }

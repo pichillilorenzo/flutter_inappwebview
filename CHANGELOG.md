@@ -1,3 +1,8 @@
+## 5.7.1+1
+
+- Fixed User Script remove methods
+- Fixed missing `break` statement on Android when parsing `ChromeCustomTabsOptions.displayMode` in Java code
+
 ## 5.7.1
 
 - Exposed "shared" property of HttpServer bind method to support more use-cases. (thanks to [LugonjaAleksandar](https://github.com/LugonjaAleksandar))

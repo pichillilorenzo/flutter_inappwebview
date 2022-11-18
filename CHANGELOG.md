@@ -1,3 +1,7 @@
+## 5.7.1+2
+
+- Fixed Android `NullPointerException` on `InAppBrowserActivity.dispose`
+
 ## 5.7.1+1
 
 - Fixed User Script remove methods

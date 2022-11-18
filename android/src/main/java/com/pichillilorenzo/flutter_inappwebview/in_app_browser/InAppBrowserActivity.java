@@ -46,6 +46,7 @@ import io.flutter.plugin.common.MethodChannel;
 public class InAppBrowserActivity extends AppCompatActivity implements InAppBrowserDelegate {
 
   static final String LOG_TAG = "InAppBrowserActivity";
+  @Nullable
   public MethodChannel channel;
   public Integer windowId;
   public String id;
@@ -522,7 +523,10 @@ public class InAppBrowserActivity extends AppCompatActivity implements InAppBrow
   }
 
   public void dispose() {
-    channel.setMethodCallHandler(null);
+    if (channel != null) {
+      channel.setMethodCallHandler(null);
+      channel = null;
+    }
     activityResultListeners.clear();
     if (methodCallDelegate != null) {
       methodCallDelegate.dispose();

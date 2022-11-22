@@ -1,39 +1,63 @@
 import 'dart:ui';
+import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
+
+import '../types/attributed_string.dart';
+import '../types/pull_to_refresh_size.dart';
 import '../util.dart';
 import '../types/main.dart';
 
+part 'pull_to_refresh_settings.g.dart';
+
 ///Pull-To-Refresh Settings
-class PullToRefreshSettings {
+@ExchangeableObject(copyMethod: true)
+class PullToRefreshSettings_ {
   ///Sets whether the pull-to-refresh feature is enabled or not.
-  bool enabled;
+  ///The default value is `true`.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
+  bool? enabled;
 
   ///The color of the refresh control.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Color? color;
 
   ///The background color of the refresh control.
+  ///
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  ///- iOS
   Color? backgroundColor;
 
   ///The distance to trigger a sync in dips.
   ///
-  ///**NOTE**: Available only on Android.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   int? distanceToTriggerSync;
 
   ///The distance in pixels that the refresh indicator can be pulled beyond its resting position.
   ///
-  ///**NOTE**: Available only on Android.
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
   int? slingshotDistance;
 
   ///The size of the refresh indicator.
   ///
-  ///**NOTE**: Available only on Android.
-  PullToRefreshSize? size;
+  ///**Supported Platforms/Implementations**:
+  ///- Android native WebView
+  PullToRefreshSize_? size;
 
   ///The title text to display in the refresh control.
   ///
-  ///**NOTE**: Available only on iOS.
-  AttributedString? attributedTitle;
+  ///**Supported Platforms/Implementations**:
+  ///- iOS
+  AttributedString_? attributedTitle;
 
-  PullToRefreshSettings(
+  PullToRefreshSettings_(
       {this.enabled = true,
       this.color,
       this.backgroundColor,
@@ -41,27 +65,6 @@ class PullToRefreshSettings {
       this.slingshotDistance,
       this.size,
       this.attributedTitle});
-
-  Map<String, dynamic> toMap() {
-    return {
-      "enabled": enabled,
-      "color": color?.toHex(),
-      "backgroundColor": backgroundColor?.toHex(),
-      "distanceToTriggerSync": distanceToTriggerSync,
-      "slingshotDistance": slingshotDistance,
-      "size": size?.toNativeValue(),
-      "attributedTitle": attributedTitle?.toMap() ?? {}
-    };
-  }
-
-  Map<String, dynamic> toJson() {
-    return toMap();
-  }
-
-  @override
-  String toString() {
-    return toMap().toString();
-  }
 }
 
 ///Use [PullToRefreshSettings] instead.

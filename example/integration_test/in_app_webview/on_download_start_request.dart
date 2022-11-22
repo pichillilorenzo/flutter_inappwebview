@@ -46,7 +46,7 @@ void onDownloadStartRequest() {
 </html>
           """),
           initialSettings:
-              InAppWebViewSettings(clearCache: true, useOnDownloadStart: true),
+              InAppWebViewSettings(clearCache: true),
           onWebViewCreated: (controller) {
             controllerCompleter.complete(controller);
           },

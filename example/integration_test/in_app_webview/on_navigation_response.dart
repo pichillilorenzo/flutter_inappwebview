@@ -30,7 +30,7 @@ void onNavigationResponse() {
             key: GlobalKey(),
             initialUrlRequest: URLRequest(url: TEST_URL_1),
             initialSettings:
-                InAppWebViewSettings(useOnNavigationResponse: true),
+                InAppWebViewSettings(),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -65,7 +65,7 @@ void onNavigationResponse() {
             key: GlobalKey(),
             initialUrlRequest: URLRequest(url: TEST_URL_1),
             initialSettings:
-                InAppWebViewSettings(useOnNavigationResponse: true),
+                InAppWebViewSettings(),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },

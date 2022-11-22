@@ -32,6 +32,7 @@ import 'webview.dart';
 import '../android/webview_feature.dart';
 import '../in_app_webview/in_app_webview_controller.dart';
 import '../context_menu.dart';
+import '../in_app_browser/in_app_browser.dart';
 
 part 'in_app_webview_settings.g.dart';
 
@@ -51,7 +52,11 @@ List<ContentBlocker> _deserializeContentBlockers(
 ///This class represents all the WebView settings available.
 @ExchangeableObject(copyMethod: true)
 class InAppWebViewSettings_ {
-  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event.
+  ///
+  ///If the [WebView.shouldOverrideUrlLoading] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -59,7 +64,11 @@ class InAppWebViewSettings_ {
   ///- MacOS
   bool? useShouldOverrideUrlLoading;
 
-  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event.
+  ///
+  ///If the [WebView.onLoadResource] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -67,7 +76,11 @@ class InAppWebViewSettings_ {
   ///- MacOS
   bool? useOnLoadResource;
 
-  ///Set to `true` to be able to listen at the [WebView.onDownloadStartRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onDownloadStartRequest] event.
+  ///
+  ///If the [WebView.onDownloadStartRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -202,7 +215,11 @@ class InAppWebViewSettings_ {
   ///- MacOS
   UserPreferredContentMode_? preferredContentMode;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event.
+  ///
+  ///If the [WebView.shouldInterceptAjaxRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -210,7 +227,11 @@ class InAppWebViewSettings_ {
   ///- MacOS
   bool? useShouldInterceptAjaxRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event.
+  ///
+  ///If the [WebView.shouldInterceptFetchRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -630,13 +651,21 @@ class InAppWebViewSettings_ {
   ///- Android native WebView
   bool? useHybridComposition;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptRequest] event.
+  ///
+  ///If the [WebView.shouldInterceptRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   bool? useShouldInterceptRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.onRenderProcessGone] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onRenderProcessGone] event.
+  ///
+  ///If the [WebView.onRenderProcessGone] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -1034,7 +1063,11 @@ class InAppWebViewSettings_ {
   ///- MacOS
   bool? limitsNavigationsToAppBoundDomains;
 
-  ///Set to `true` to be able to listen to the [WebView.onNavigationResponse] event. The default value is `false`.
+  ///Set to `true` to be able to listen to the [WebView.onNavigationResponse] event.
+  ///
+  ///If the [WebView.onNavigationResponse] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
@@ -1274,9 +1307,9 @@ class InAppWebViewSettings_ {
 
   @ExchangeableObjectConstructor()
   InAppWebViewSettings_({
-    this.useShouldOverrideUrlLoading = false,
-    this.useOnLoadResource = false,
-    this.useOnDownloadStart = false,
+    this.useShouldOverrideUrlLoading,
+    this.useOnLoadResource,
+    this.useOnDownloadStart,
     this.clearCache = false,
     this.userAgent = "",
     this.applicationNameForUserAgent = "",
@@ -1289,8 +1322,8 @@ class InAppWebViewSettings_ {
     this.resourceCustomSchemes = const [],
     this.contentBlockers = const [],
     this.preferredContentMode = UserPreferredContentMode_.RECOMMENDED,
-    this.useShouldInterceptAjaxRequest = false,
-    this.useShouldInterceptFetchRequest = false,
+    this.useShouldInterceptAjaxRequest,
+    this.useShouldInterceptFetchRequest,
     this.incognito = false,
     this.cacheEnabled = true,
     this.transparentBackground = false,
@@ -1342,8 +1375,8 @@ class InAppWebViewSettings_ {
     this.supportMultipleWindows = false,
     this.regexToCancelSubFramesLoading,
     this.useHybridComposition = true,
-    this.useShouldInterceptRequest = false,
-    this.useOnRenderProcessGone = false,
+    this.useShouldInterceptRequest,
+    this.useOnRenderProcessGone,
     this.overScrollMode = OverScrollMode_.IF_CONTENT_SCROLLS,
     this.networkAvailable,
     this.scrollBarStyle = ScrollBarStyle_.SCROLLBARS_INSIDE_OVERLAY,
@@ -1390,7 +1423,7 @@ class InAppWebViewSettings_ {
     this.mediaType,
     this.pageZoom = 1.0,
     this.limitsNavigationsToAppBoundDomains = false,
-    this.useOnNavigationResponse = false,
+    this.useOnNavigationResponse,
     this.applePayAPIEnabled = false,
     this.allowingReadAccessTo,
     this.disableLongPressContextMenuOnLinks = false,

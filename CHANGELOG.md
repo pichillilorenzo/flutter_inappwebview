@@ -1,3 +1,13 @@
+## 6.0.0-beta.15
+
+- Automatically infer `useShouldOverrideUrlLoading`, `useOnLoadResource`, `useOnDownloadStart`, `useShouldInterceptAjaxRequest`, `useShouldInterceptFetchRequest`, `useShouldInterceptRequest`, `useOnRenderProcessGone`, `useOnNavigationResponse` settings if their value is `null` and the corresponding event is implemented by the WebView (`InAppWebView` and `HeadlessInAppWebView`, not `InAppBrowser`) before it's native initialization. 
+
+### BREAKING CHANGES
+
+- All `PrintJobSettings` properties are optionals
+- All `PullToRefreshSettings` properties are optionals
+- All `WebAuthenticationSessionSettings` properties are optionals
+
 ## 6.0.0-beta.14
 
 - Fixed User Script remove methods
@@ -134,6 +144,15 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.7.1+2
+
+- Fixed Android `NullPointerException` on `InAppBrowserActivity.dispose`
+
+## 5.7.1+1
+
+- Fixed User Script remove methods
+- Fixed missing `break` statement on Android when parsing `ChromeCustomTabsOptions.displayMode` in Java code
 
 ## 5.7.1
 

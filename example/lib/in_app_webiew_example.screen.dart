@@ -17,7 +17,6 @@ class _InAppWebViewExampleScreenState extends State<InAppWebViewExampleScreen> {
 
   InAppWebViewController? webViewController;
   InAppWebViewSettings settings = InAppWebViewSettings(
-    useShouldOverrideUrlLoading: true,
     mediaPlaybackRequiresUserGesture: false,
     allowsInlineMediaPlayback: true,
     iframeAllow: "camera; microphone",

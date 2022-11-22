@@ -624,7 +624,12 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   Widget build(BuildContext context) {
-    Map<String, dynamic> initialSettings = widget.initialSettings?.toMap() ??
+    final initialSettings = widget.initialSettings;
+    if (initialSettings != null) {
+      _inferInitialSettings(initialSettings);
+    }
+
+    Map<String, dynamic> settingsMap = initialSettings?.toMap() ??
         // ignore: deprecated_member_use_from_same_package
         widget.initialOptions?.toMap() ??
         {};
@@ -692,7 +697,7 @@ class _InAppWebViewState extends State<InAppWebView> {
               'initialUrlRequest': widget.initialUrlRequest?.toMap(),
               'initialFile': widget.initialFile,
               'initialData': widget.initialData?.toMap(),
-              'initialSettings': initialSettings,
+              'initialSettings': settingsMap,
               'contextMenu': widget.contextMenu?.toMap() ?? {},
               'windowId': widget.windowId,
               'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
@@ -722,7 +727,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           'initialUrlRequest': widget.initialUrlRequest?.toMap(),
           'initialFile': widget.initialFile,
           'initialData': widget.initialData?.toMap(),
-          'initialSettings': initialSettings,
+          'initialSettings': settingsMap,
           'contextMenu': widget.contextMenu?.toMap() ?? {},
           'windowId': widget.windowId,
           'headlessWebViewId': widget.headlessWebView?.isRunning() ?? false
@@ -799,6 +804,40 @@ class _InAppWebViewState extends State<InAppWebView> {
           method: "onWebViewCreated",
           args: []);
       widget.onWebViewCreated!(_controller!);
+    }
+  }
+
+  void _inferInitialSettings(InAppWebViewSettings settings) {
+    if (widget.shouldOverrideUrlLoading != null &&
+        settings.useShouldOverrideUrlLoading == null) {
+      settings.useShouldOverrideUrlLoading = true;
+    }
+    if (widget.onLoadResource != null && settings.useOnLoadResource == null) {
+      settings.useOnLoadResource = true;
+    }
+    if (widget.onDownloadStartRequest != null &&
+        settings.useOnDownloadStart == null) {
+      settings.useOnDownloadStart = true;
+    }
+    if (widget.shouldInterceptAjaxRequest != null &&
+        settings.useShouldInterceptAjaxRequest == null) {
+      settings.useShouldInterceptAjaxRequest = true;
+    }
+    if (widget.shouldInterceptFetchRequest != null &&
+        settings.useShouldInterceptFetchRequest == null) {
+      settings.useShouldInterceptFetchRequest = true;
+    }
+    if (widget.shouldInterceptRequest != null &&
+        settings.useShouldInterceptRequest == null) {
+      settings.useShouldInterceptRequest = true;
+    }
+    if (widget.onRenderProcessGone != null &&
+        settings.useOnRenderProcessGone == null) {
+      settings.useOnRenderProcessGone = true;
+    }
+    if (widget.onNavigationResponse != null &&
+        settings.useOnNavigationResponse == null) {
+      settings.useOnNavigationResponse = true;
     }
   }
 }

@@ -65,7 +65,6 @@ void interceptFetchRequest() {
                     """),
             initialSettings: InAppWebViewSettings(
               clearCache: true,
-              useShouldInterceptFetchRequest: true,
             ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -148,7 +147,6 @@ void interceptFetchRequest() {
                     """),
             initialSettings: InAppWebViewSettings(
               clearCache: true,
-              useShouldInterceptFetchRequest: true,
             ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -231,7 +229,6 @@ void interceptFetchRequest() {
                     """),
             initialSettings: InAppWebViewSettings(
               clearCache: true,
-              useShouldInterceptFetchRequest: true,
             ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
@@ -310,7 +307,6 @@ void interceptFetchRequest() {
                     """),
             initialSettings: InAppWebViewSettings(
               clearCache: true,
-              useShouldInterceptFetchRequest: true,
             ),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);

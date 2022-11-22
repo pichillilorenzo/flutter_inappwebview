@@ -8,7 +8,11 @@ part of 'in_app_webview_settings.dart';
 
 ///This class represents all the WebView settings available.
 class InAppWebViewSettings {
-  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldOverrideUrlLoading] event.
+  ///
+  ///If the [WebView.shouldOverrideUrlLoading] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -16,7 +20,11 @@ class InAppWebViewSettings {
   ///- MacOS
   bool? useShouldOverrideUrlLoading;
 
-  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onLoadResource] event.
+  ///
+  ///If the [WebView.onLoadResource] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -24,7 +32,11 @@ class InAppWebViewSettings {
   ///- MacOS
   bool? useOnLoadResource;
 
-  ///Set to `true` to be able to listen at the [WebView.onDownloadStartRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onDownloadStartRequest] event.
+  ///
+  ///If the [WebView.onDownloadStartRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -158,7 +170,11 @@ class InAppWebViewSettings {
   ///- MacOS
   UserPreferredContentMode? preferredContentMode;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event.
+  ///
+  ///If the [WebView.shouldInterceptAjaxRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -166,7 +182,11 @@ class InAppWebViewSettings {
   ///- MacOS
   bool? useShouldInterceptAjaxRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptFetchRequest] event.
+  ///
+  ///If the [WebView.shouldInterceptFetchRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -586,13 +606,21 @@ class InAppWebViewSettings {
   ///- Android native WebView
   bool? useHybridComposition;
 
-  ///Set to `true` to be able to listen at the [WebView.shouldInterceptRequest] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.shouldInterceptRequest] event.
+  ///
+  ///If the [WebView.shouldInterceptRequest] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   bool? useShouldInterceptRequest;
 
-  ///Set to `true` to be able to listen at the [WebView.onRenderProcessGone] event. The default value is `false`.
+  ///Set to `true` to be able to listen at the [WebView.onRenderProcessGone] event.
+  ///
+  ///If the [WebView.onRenderProcessGone] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -990,7 +1018,11 @@ class InAppWebViewSettings {
   ///- MacOS
   bool? limitsNavigationsToAppBoundDomains;
 
-  ///Set to `true` to be able to listen to the [WebView.onNavigationResponse] event. The default value is `false`.
+  ///Set to `true` to be able to listen to the [WebView.onNavigationResponse] event.
+  ///
+  ///If the [WebView.onNavigationResponse] event is implemented and this value is `null`,
+  ///it will be automatically inferred as `true`, otherwise, the default value is `false`.
+  ///This logic will not be applied for [InAppBrowser], where you must set the value manually.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
@@ -1228,9 +1260,9 @@ class InAppWebViewSettings {
   ///- Web
   String? iframeCsp;
   InAppWebViewSettings(
-      {this.useShouldOverrideUrlLoading = false,
-      this.useOnLoadResource = false,
-      this.useOnDownloadStart = false,
+      {this.useShouldOverrideUrlLoading,
+      this.useOnLoadResource,
+      this.useOnDownloadStart,
       this.clearCache = false,
       this.userAgent = "",
       this.applicationNameForUserAgent = "",
@@ -1243,8 +1275,8 @@ class InAppWebViewSettings {
       this.resourceCustomSchemes = const [],
       this.contentBlockers = const [],
       this.preferredContentMode = UserPreferredContentMode.RECOMMENDED,
-      this.useShouldInterceptAjaxRequest = false,
-      this.useShouldInterceptFetchRequest = false,
+      this.useShouldInterceptAjaxRequest,
+      this.useShouldInterceptFetchRequest,
       this.incognito = false,
       this.cacheEnabled = true,
       this.transparentBackground = false,
@@ -1296,8 +1328,8 @@ class InAppWebViewSettings {
       this.supportMultipleWindows = false,
       this.regexToCancelSubFramesLoading,
       this.useHybridComposition = true,
-      this.useShouldInterceptRequest = false,
-      this.useOnRenderProcessGone = false,
+      this.useShouldInterceptRequest,
+      this.useOnRenderProcessGone,
       this.overScrollMode = OverScrollMode.IF_CONTENT_SCROLLS,
       this.networkAvailable,
       this.scrollBarStyle = ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY,
@@ -1344,7 +1376,7 @@ class InAppWebViewSettings {
       this.mediaType,
       this.pageZoom = 1.0,
       this.limitsNavigationsToAppBoundDomains = false,
-      this.useOnNavigationResponse = false,
+      this.useOnNavigationResponse,
       this.applePayAPIEnabled = false,
       this.allowingReadAccessTo,
       this.disableLongPressContextMenuOnLinks = false,
@@ -1393,7 +1425,12 @@ class InAppWebViewSettings {
       return null;
     }
     final instance = InAppWebViewSettings(
+      useShouldOverrideUrlLoading: map['useShouldOverrideUrlLoading'],
+      useOnLoadResource: map['useOnLoadResource'],
+      useOnDownloadStart: map['useOnDownloadStart'],
       minimumFontSize: map['minimumFontSize'],
+      useShouldInterceptAjaxRequest: map['useShouldInterceptAjaxRequest'],
+      useShouldInterceptFetchRequest: map['useShouldInterceptFetchRequest'],
       webViewAssetLoader: WebViewAssetLoader.fromMap(
           map['webViewAssetLoader']?.cast<String, dynamic>()),
       mixedContentMode:
@@ -1403,6 +1440,8 @@ class InAppWebViewSettings {
           map['disabledActionModeMenuItems']),
       layoutAlgorithm: LayoutAlgorithm.fromNativeValue(map['layoutAlgorithm']),
       regexToCancelSubFramesLoading: map['regexToCancelSubFramesLoading'],
+      useShouldInterceptRequest: map['useShouldInterceptRequest'],
+      useOnRenderProcessGone: map['useOnRenderProcessGone'],
       networkAvailable: map['networkAvailable'],
       scrollBarDefaultDelayBeforeFade: map['scrollBarDefaultDelayBeforeFade'],
       scrollBarFadeDuration: map['scrollBarFadeDuration'],
@@ -1430,6 +1469,7 @@ class InAppWebViewSettings {
           map['requestedWithHeaderMode']),
       defaultVideoPoster: map['defaultVideoPoster'],
       mediaType: map['mediaType'],
+      useOnNavigationResponse: map['useOnNavigationResponse'],
       allowingReadAccessTo: map['allowingReadAccessTo'] != null
           ? WebUri(map['allowingReadAccessTo'])
           : null,
@@ -1451,9 +1491,6 @@ class InAppWebViewSettings {
       iframeName: map['iframeName'],
       iframeCsp: map['iframeCsp'],
     );
-    instance.useShouldOverrideUrlLoading = map['useShouldOverrideUrlLoading'];
-    instance.useOnLoadResource = map['useOnLoadResource'];
-    instance.useOnDownloadStart = map['useOnDownloadStart'];
     instance.clearCache = map['clearCache'];
     instance.userAgent = map['userAgent'];
     instance.applicationNameForUserAgent = map['applicationNameForUserAgent'];
@@ -1470,10 +1507,6 @@ class InAppWebViewSettings {
         _deserializeContentBlockers(map['contentBlockers']);
     instance.preferredContentMode =
         UserPreferredContentMode.fromNativeValue(map['preferredContentMode']);
-    instance.useShouldInterceptAjaxRequest =
-        map['useShouldInterceptAjaxRequest'];
-    instance.useShouldInterceptFetchRequest =
-        map['useShouldInterceptFetchRequest'];
     instance.incognito = map['incognito'];
     instance.cacheEnabled = map['cacheEnabled'];
     instance.transparentBackground = map['transparentBackground'];
@@ -1522,8 +1555,6 @@ class InAppWebViewSettings {
     instance.hardwareAcceleration = map['hardwareAcceleration'];
     instance.supportMultipleWindows = map['supportMultipleWindows'];
     instance.useHybridComposition = map['useHybridComposition'];
-    instance.useShouldInterceptRequest = map['useShouldInterceptRequest'];
-    instance.useOnRenderProcessGone = map['useOnRenderProcessGone'];
     instance.overScrollMode =
         OverScrollMode.fromNativeValue(map['overScrollMode']);
     instance.scrollBarStyle =
@@ -1577,7 +1608,6 @@ class InAppWebViewSettings {
     instance.pageZoom = map['pageZoom'];
     instance.limitsNavigationsToAppBoundDomains =
         map['limitsNavigationsToAppBoundDomains'];
-    instance.useOnNavigationResponse = map['useOnNavigationResponse'];
     instance.applePayAPIEnabled = map['applePayAPIEnabled'];
     instance.disableLongPressContextMenuOnLinks =
         map['disableLongPressContextMenuOnLinks'];

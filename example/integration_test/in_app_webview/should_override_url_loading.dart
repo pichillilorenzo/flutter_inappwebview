@@ -39,7 +39,6 @@ void shouldOverrideUrlLoading() {
             },
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
-              useShouldOverrideUrlLoading: true,
             ),
             shouldOverrideUrlLoading: (controller, navigationAction) async {
               return (navigationAction.request.url!.host
@@ -92,7 +91,6 @@ void shouldOverrideUrlLoading() {
             },
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
-              useShouldOverrideUrlLoading: true,
             ),
             shouldOverrideUrlLoading: (controller, navigationAction) async {
               var isFirstLoad = navigationAction.request.url!.scheme == "data";
@@ -151,7 +149,6 @@ void shouldOverrideUrlLoading() {
             },
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
-              useShouldOverrideUrlLoading: true,
             ),
             shouldOverrideUrlLoading: (controller, navigationAction) async {
               return (navigationAction.request.url!.host
@@ -203,7 +200,6 @@ void shouldOverrideUrlLoading() {
             },
             initialSettings: InAppWebViewSettings(
               javaScriptEnabled: true,
-              useShouldOverrideUrlLoading: true,
             ),
             shouldOverrideUrlLoading: (controller, navigationAction) async {
               var action = NavigationActionPolicy.CANCEL;

@@ -214,7 +214,12 @@ class HeadlessInAppWebView implements WebView, Disposable {
     }
     _started = true;
 
-    Map<String, dynamic> initialSettings = this.initialSettings?.toMap() ??
+    final initialSettings = this.initialSettings;
+    if (initialSettings != null) {
+      _inferInitialSettings(initialSettings);
+    }
+
+    Map<String, dynamic> settingsMap = initialSettings?.toMap() ??
         // ignore: deprecated_member_use_from_same_package
         this.initialOptions?.toMap() ??
         {};
@@ -233,7 +238,7 @@ class HeadlessInAppWebView implements WebView, Disposable {
               'initialUrlRequest': this.initialUrlRequest?.toMap(),
               'initialFile': this.initialFile,
               'initialData': this.initialData?.toMap(),
-              'initialSettings': initialSettings,
+              'initialSettings': settingsMap,
               'contextMenu': this.contextMenu?.toMap() ?? {},
               'windowId': this.windowId,
               'implementation': this.implementation.toNativeValue(),
@@ -244,6 +249,40 @@ class HeadlessInAppWebView implements WebView, Disposable {
             });
     await _sharedChannel.invokeMethod('run', args);
     _running = true;
+  }
+
+  void _inferInitialSettings(InAppWebViewSettings settings) {
+    if (this.shouldOverrideUrlLoading != null &&
+        settings.useShouldOverrideUrlLoading == null) {
+      settings.useShouldOverrideUrlLoading = true;
+    }
+    if (this.onLoadResource != null && settings.useOnLoadResource == null) {
+      settings.useOnLoadResource = true;
+    }
+    if (this.onDownloadStartRequest != null &&
+        settings.useOnDownloadStart == null) {
+      settings.useOnDownloadStart = true;
+    }
+    if (this.shouldInterceptAjaxRequest != null &&
+        settings.useShouldInterceptAjaxRequest == null) {
+      settings.useShouldInterceptAjaxRequest = true;
+    }
+    if (this.shouldInterceptFetchRequest != null &&
+        settings.useShouldInterceptFetchRequest == null) {
+      settings.useShouldInterceptFetchRequest = true;
+    }
+    if (this.shouldInterceptRequest != null &&
+        settings.useShouldInterceptRequest == null) {
+      settings.useShouldInterceptRequest = true;
+    }
+    if (this.onRenderProcessGone != null &&
+        settings.useOnRenderProcessGone == null) {
+      settings.useOnRenderProcessGone = true;
+    }
+    if (this.onNavigationResponse != null &&
+        settings.useOnNavigationResponse == null) {
+      settings.useOnNavigationResponse = true;
+    }
   }
 
   ///Disposes the headless WebView.

@@ -29,8 +29,7 @@ void onNavigationResponse() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(url: TEST_URL_1),
-            initialSettings:
-                InAppWebViewSettings(),
+            initialSettings: InAppWebViewSettings(),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },
@@ -64,8 +63,7 @@ void onNavigationResponse() {
           child: InAppWebView(
             key: GlobalKey(),
             initialUrlRequest: URLRequest(url: TEST_URL_1),
-            initialSettings:
-                InAppWebViewSettings(),
+            initialSettings: InAppWebViewSettings(),
             onWebViewCreated: (controller) {
               controllerCompleter.complete(controller);
             },

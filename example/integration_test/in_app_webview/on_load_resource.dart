@@ -32,8 +32,7 @@ void onLoadResource() {
             key: GlobalKey(),
             initialFile:
                 "test_assets/in_app_webview_on_load_resource_test.html",
-            initialSettings:
-                InAppWebViewSettings(clearCache: true),
+            initialSettings: InAppWebViewSettings(clearCache: true),
             onLoadStop: (controller, url) {
               pageLoaded.complete();
             },

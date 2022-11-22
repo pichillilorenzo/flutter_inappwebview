@@ -1,6 +1,6 @@
 ## 6.0.0-beta.15
 
-- Automatically infer `useShouldOverrideUrlLoading`, `useOnLoadResource`, `useOnDownloadStart`, `useShouldInterceptAjaxRequest`, `useShouldInterceptFetchRequest`, `useShouldInterceptRequest`, `useOnRenderProcessGone`, `useOnNavigationResponse` settings if their value is `null` and the corresponding event is implemented by the WebView (`InAppWebView` and `HeadlessInAppWebView`, not `InAppBrowser`) before it's native initialization. 
+- Automatically infer `useShouldOverrideUrlLoading`, `useOnLoadResource`, `useOnDownloadStart`, `useShouldInterceptAjaxRequest`, `useShouldInterceptFetchRequest`, `useShouldInterceptRequest`, `useOnRenderProcessGone`, `useOnNavigationResponse` settings if their value is `null` and the corresponding event is implemented by the WebView (`InAppWebView` and `HeadlessInAppWebView`, not `InAppBrowser`) before it's native initialization
 
 ### BREAKING CHANGES
 

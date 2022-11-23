@@ -690,7 +690,7 @@ public class InAppWebViewClient extends WebViewClient {
       if (customSchemeResponse != null) {
         WebResourceResponse response = null;
         try {
-          response = webView.contentBlockerHandler.checkUrl(webView, url, customSchemeResponse.getContentType());
+          response = webView.contentBlockerHandler.checkUrl(webView, request, customSchemeResponse.getContentType());
         } catch (Exception e) {
           e.printStackTrace();
         }
@@ -705,7 +705,7 @@ public class InAppWebViewClient extends WebViewClient {
     WebResourceResponse response = null;
     if (webView.contentBlockerHandler.getRuleList().size() > 0) {
       try {
-        response = webView.contentBlockerHandler.checkUrl(webView, url);
+        response = webView.contentBlockerHandler.checkUrl(webView, request);
       } catch (Exception e) {
         e.printStackTrace();
       }

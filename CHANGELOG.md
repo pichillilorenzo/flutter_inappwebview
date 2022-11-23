@@ -1,3 +1,8 @@
+## 6.0.0-beta.16
+
+- Removed Android Hybrid Composition constraint to use the pull-to-refresh feature
+- Removed Android `com.squareup.okhttp3:okhttp` dependency
+
 ## 6.0.0-beta.15
 
 - Automatically infer `useShouldOverrideUrlLoading`, `useOnLoadResource`, `useOnDownloadStart`, `useShouldInterceptAjaxRequest`, `useShouldInterceptFetchRequest`, `useShouldInterceptRequest`, `useOnRenderProcessGone`, `useOnNavigationResponse` settings if their value is `null` and the corresponding event is implemented by the WebView (`InAppWebView` and `HeadlessInAppWebView`, not `InAppBrowser`) before it's native initialization
@@ -144,6 +149,10 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.7.2
+
+- Removed Android Hybrid Composition constraint to use the pull-to-refresh feature
 
 ## 5.7.1+2
 

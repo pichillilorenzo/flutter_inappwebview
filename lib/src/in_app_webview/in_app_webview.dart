@@ -668,11 +668,6 @@ class _InAppWebViewState extends State<InAppWebView> {
               widget.initialOptions?.android.useHybridComposition) ??
           true;
 
-      if (!useHybridComposition && widget.pullToRefreshController != null) {
-        throw new Exception(
-            "To use the pull-to-refresh feature, InAppWebViewSettings.useHybridComposition setting MUST be true!");
-      }
-
       return PlatformViewLink(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         surfaceFactory: (

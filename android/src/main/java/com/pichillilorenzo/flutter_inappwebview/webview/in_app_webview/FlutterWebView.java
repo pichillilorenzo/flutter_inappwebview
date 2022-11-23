@@ -68,15 +68,13 @@ public class FlutterWebView implements PlatformWebView {
             customSettings.useHybridComposition ? null : plugin.flutterView, userScripts);
     displayListenerProxy.onPostWebViewInitialization(displayManager);
 
-    if (customSettings.useHybridComposition) {
-      // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
-      webView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
-      PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();
-      pullToRefreshSettings.parse(pullToRefreshInitialSettings);
-      pullToRefreshLayout = new PullToRefreshLayout(context, plugin, id, pullToRefreshSettings);
-      pullToRefreshLayout.addView(webView);
-      pullToRefreshLayout.prepare();
-    }
+    // set MATCH_PARENT layout params to the WebView, otherwise it won't take all the available space!
+    webView.setLayoutParams(new FrameLayout.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT));
+    PullToRefreshSettings pullToRefreshSettings = new PullToRefreshSettings();
+    pullToRefreshSettings.parse(pullToRefreshInitialSettings);
+    pullToRefreshLayout = new PullToRefreshLayout(context, plugin, id, pullToRefreshSettings);
+    pullToRefreshLayout.addView(webView);
+    pullToRefreshLayout.prepare();
 
     FindInteractionController findInteractionController = new FindInteractionController(webView, plugin, id, null);
     webView.findInteractionController = findInteractionController;

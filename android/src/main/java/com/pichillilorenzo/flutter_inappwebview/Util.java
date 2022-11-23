@@ -33,8 +33,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.HttpURLConnection;
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.URL;
 import java.net.UnknownHostException;
 import java.security.Key;
 import java.security.KeyStore;
@@ -47,18 +49,11 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.TimeUnit;
 import java.util.regex.Pattern;
 
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.SSLSocketFactory;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
+import javax.net.ssl.SSLHandshakeException;
 
 import io.flutter.plugin.common.MethodChannel;
-import okhttp3.OkHttpClient;
 
 public class Util {
 
@@ -171,12 +166,38 @@ public class Util {
     }
   }
 
-  public static OkHttpClient getBasicOkHttpClient() {
-    return new OkHttpClient.Builder()
-            .connectTimeout(15, TimeUnit.SECONDS)
-            .writeTimeout(15, TimeUnit.SECONDS)
-            .readTimeout(15, TimeUnit.SECONDS)
-            .build();
+  @Nullable
+  public static HttpURLConnection makeHttpRequest(String urlString, String method, @Nullable Map<String, String> headers) {
+    HttpURLConnection urlConnection = null;
+    try {
+      URL url = new URL(urlString);
+      urlConnection = (HttpURLConnection) url.openConnection();
+      urlConnection.setRequestMethod(method);
+      if (headers != null) {
+        for (Map.Entry<String, String> header : headers.entrySet()) {
+          urlConnection.setRequestProperty(header.getKey(), header.getValue());
+        }
+      }
+      urlConnection.setConnectTimeout(15000); // 15 seconds
+      urlConnection.setReadTimeout(15000); // 15 seconds
+      urlConnection.setDoInput(true);
+      urlConnection.setInstanceFollowRedirects(true);
+      if ("GET".equalsIgnoreCase(method)) {
+        urlConnection.setDoOutput(false);
+      }
+      urlConnection.connect();
+      return urlConnection;
+    }
+    catch (Exception e) {
+      if (!(e instanceof SSLHandshakeException)) {
+        e.printStackTrace();
+        Log.e(LOG_TAG, e.getMessage());
+      }
+      if (urlConnection != null) {
+        urlConnection.disconnect();
+      }
+    }
+    return null;
   }
 
   /**

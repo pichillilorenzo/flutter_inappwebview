@@ -1,3 +1,7 @@
+## 5.7.2
+
+- Removed Android Hybrid Composition constraint to use the pull-to-refresh feature
+
 ## 5.7.1+2
 
 - Fixed Android `NullPointerException` on `InAppBrowserActivity.dispose`

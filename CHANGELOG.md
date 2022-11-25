@@ -1,3 +1,7 @@
+## 6.0.0-beta.17
+
+- Replaced `Uri.encodeFull` with `Uri.encodeComponent` to load html data correctly on Web platform 
+
 ## 6.0.0-beta.16
 
 - Removed Android Hybrid Composition constraint to use the pull-to-refresh feature

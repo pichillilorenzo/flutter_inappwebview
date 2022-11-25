@@ -71,7 +71,7 @@ void loadData() {
     if (!kIsWeb) {
       expect(currentUrl, TEST_CROSS_PLATFORM_URL_1.toString());
     } else {
-      expect(currentUrl, 'data:$mimeType,' + Uri.encodeFull(data));
+      expect(currentUrl, 'data:$mimeType,' + Uri.encodeComponent(data));
     }
 
     pageLoads.close();

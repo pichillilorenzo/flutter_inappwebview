@@ -280,7 +280,7 @@ class InAppWebViewWebElement implements Disposable {
     final String contentType =
         httpRequest.getResponseHeader('content-type') ?? 'text/html';
     return 'data:$contentType,' +
-        Uri.encodeFull(httpRequest.responseText ?? '');
+        Uri.encodeComponent(httpRequest.responseText ?? '');
   }
 
   String getIFrameId() {
@@ -298,7 +298,7 @@ class InAppWebViewWebElement implements Disposable {
 
   Future<void> loadData(
       {required String data, String mimeType = "text/html"}) async {
-    iframe.src = 'data:$mimeType,' + Uri.encodeFull(data);
+    iframe.src = 'data:$mimeType,' + Uri.encodeComponent(data);
   }
 
   Future<void> loadFile({required String assetFilePath}) async {

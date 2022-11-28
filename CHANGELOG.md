@@ -1,3 +1,7 @@
+## 6.0.0-beta.18
+
+- Fixed `InAppWebViewSettings` automatic infer if `initialSettings` is `null`
+
 ## 6.0.0-beta.17
 
 - Replaced `Uri.encodeFull` with `Uri.encodeComponent` to load html data correctly on Web platform 

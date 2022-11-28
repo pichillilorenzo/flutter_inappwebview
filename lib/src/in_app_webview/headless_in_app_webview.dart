@@ -214,15 +214,14 @@ class HeadlessInAppWebView implements WebView, Disposable {
     }
     _started = true;
 
-    final initialSettings = this.initialSettings;
-    if (initialSettings != null) {
-      _inferInitialSettings(initialSettings);
-    }
+    final initialSettings = this.initialSettings ?? InAppWebViewSettings();
+    _inferInitialSettings(initialSettings);
 
-    Map<String, dynamic> settingsMap = initialSettings?.toMap() ??
-        // ignore: deprecated_member_use_from_same_package
-        this.initialOptions?.toMap() ??
-        {};
+    Map<String, dynamic> settingsMap =
+        (this.initialSettings != null ? initialSettings.toMap() : null) ??
+            // ignore: deprecated_member_use_from_same_package
+            this.initialOptions?.toMap() ??
+            initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         this.pullToRefreshController?.settings.toMap() ??

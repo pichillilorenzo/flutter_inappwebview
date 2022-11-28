@@ -624,15 +624,14 @@ class _InAppWebViewState extends State<InAppWebView> {
 
   @override
   Widget build(BuildContext context) {
-    final initialSettings = widget.initialSettings;
-    if (initialSettings != null) {
-      _inferInitialSettings(initialSettings);
-    }
+    final initialSettings = widget.initialSettings ?? InAppWebViewSettings();
+    _inferInitialSettings(initialSettings);
 
-    Map<String, dynamic> settingsMap = initialSettings?.toMap() ??
-        // ignore: deprecated_member_use_from_same_package
-        widget.initialOptions?.toMap() ??
-        {};
+    Map<String, dynamic> settingsMap =
+        (widget.initialSettings != null ? initialSettings.toMap() : null) ??
+            // ignore: deprecated_member_use_from_same_package
+            widget.initialOptions?.toMap() ??
+            initialSettings.toMap();
 
     Map<String, dynamic> pullToRefreshSettings =
         widget.pullToRefreshController?.settings.toMap() ??
@@ -645,7 +644,7 @@ class _InAppWebViewState extends State<InAppWebView> {
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         onPlatformViewCreated: (int viewId) {
           var webViewHtmlElement = WebPlatformManager.webViews[viewId]!;
-          webViewHtmlElement.initialSettings = widget.initialSettings;
+          webViewHtmlElement.initialSettings = initialSettings;
           webViewHtmlElement.initialUrlRequest = widget.initialUrlRequest;
           webViewHtmlElement.initialFile = widget.initialFile;
           webViewHtmlElement.initialData = widget.initialData;
@@ -662,7 +661,7 @@ class _InAppWebViewState extends State<InAppWebView> {
       );
     } else if (defaultTargetPlatform == TargetPlatform.android) {
       var useHybridComposition = (widget.initialSettings != null
-              ? widget.initialSettings?.useHybridComposition
+              ? initialSettings.useHybridComposition
               :
               // ignore: deprecated_member_use_from_same_package
               widget.initialOptions?.android.useHybridComposition) ??

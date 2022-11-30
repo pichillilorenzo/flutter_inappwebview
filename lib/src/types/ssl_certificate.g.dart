@@ -41,7 +41,7 @@ class SslCertificate {
       print(e);
       print(stacktrace);
     }
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
+    if (Util.isIOS) {
       if (x509Certificate != null) {
         return SslCertificate(
             issuedBy: SslCertificateDName(

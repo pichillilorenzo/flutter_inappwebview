@@ -459,9 +459,6 @@ class WebResourceErrorType_ {
       WebResourceErrorType_._internal("CANNOT_PARSE_RESPONSE");
 
   ///App Transport Security disallowed a connection because there is no secure network connection.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.appTransportSecurityRequiresSecureConnection',
@@ -575,9 +572,6 @@ class WebResourceErrorType_ {
       WebResourceErrorType_._internal("SERVER_CERTIFICATE_UNTRUSTED");
 
   ///A server certificate was not signed by any root server.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.serverCertificateHasUnknownRoot',
@@ -594,9 +588,6 @@ class WebResourceErrorType_ {
       WebResourceErrorType_._internal("SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT");
 
   ///A server certificate is not yet valid.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.serverCertificateNotYetValid',
@@ -757,9 +748,6 @@ class WebResourceErrorType_ {
       WebResourceErrorType_._internal("CANNOT_MOVE_FILE");
 
   ///A download task failed to decode an encoded file during the download.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.downloadDecodingFailedMidStream',
@@ -776,9 +764,6 @@ class WebResourceErrorType_ {
       WebResourceErrorType_._internal("DOWNLOAD_DECODING_FAILED_MID_STREAM");
 
   ///A download task failed to decode an encoded file after downloading.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.downloadDecodingFailedToComplete',
@@ -859,9 +844,6 @@ class WebResourceErrorType_ {
       WebResourceErrorType_._internal("REQUEST_BODY_STREAM_EXHAUSTED");
 
   ///The shared container identifier of the URL session configuration is needed but has not been set.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.backgroundSessionRequiresSharedContainer',
@@ -879,9 +861,6 @@ class WebResourceErrorType_ {
           "BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER");
 
   ///An app or app extension attempted to connect to a background session that is already connected to a process.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.backgroundSessionInUseByAnotherProcess',
@@ -899,9 +878,6 @@ class WebResourceErrorType_ {
           "BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS");
 
   ///The app is suspended or exits while a background data task is processing.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
   @EnumSupportedPlatforms(platforms: [
     EnumIOSPlatform(
         apiName: 'URLError.backgroundSessionWasDisconnected',

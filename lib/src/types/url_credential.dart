@@ -40,7 +40,7 @@ class URLCredential_ {
 
   ///The intermediate certificates of the credential, if it is a client certificate credential.
   @ExchangeableObjectProperty(deserializer: _certificatesDeserializer)
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   List<X509Certificate>? certificates;
 
   ///Use [persistence] instead.
@@ -48,7 +48,7 @@ class URLCredential_ {
   IOSURLCredentialPersistence_? iosPersistence;
 
   ///The credential’s persistence setting.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   URLCredentialPersistence_? persistence;
 
   URLCredential_(

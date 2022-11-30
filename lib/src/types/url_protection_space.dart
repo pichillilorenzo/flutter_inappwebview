@@ -58,6 +58,10 @@ class URLProtectionSpace_ {
     IOSPlatform(
         apiName: "URLProtectionSpace.authenticationMethod",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod"),
+    MacOSPlatform(
+        apiName: "URLProtectionSpace.authenticationMethod",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod")
   ])
   URLProtectionSpaceAuthenticationMethod_? authenticationMethod;
@@ -75,6 +79,10 @@ class URLProtectionSpace_ {
     IOSPlatform(
         apiName: "URLProtectionSpace.distinguishedNames",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames"),
+    MacOSPlatform(
+        apiName: "URLProtectionSpace.distinguishedNames",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames")
   ])
   List<X509Certificate>? distinguishedNames;
@@ -87,6 +95,10 @@ class URLProtectionSpace_ {
   ///This value is `true` if the credentials for the protection space represented by the receiver can be sent securely, `false` otherwise.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
+        apiName: "URLProtectionSpace.receivesCredentialSecurely",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely"),
+    MacOSPlatform(
         apiName: "URLProtectionSpace.receivesCredentialSecurely",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely")
@@ -102,6 +114,10 @@ class URLProtectionSpace_ {
   ///The supported proxy types are listed in [URLProtectionSpaceProxyType.values].
   @SupportedPlatforms(platforms: [
     IOSPlatform(
+        apiName: "URLProtectionSpace.proxyType",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype"),
+    MacOSPlatform(
         apiName: "URLProtectionSpace.proxyType",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype")

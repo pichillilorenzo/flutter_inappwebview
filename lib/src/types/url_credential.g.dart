@@ -23,6 +23,7 @@ class URLCredential {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   List<X509Certificate>? certificates;
 
   ///Use [persistence] instead.
@@ -33,6 +34,7 @@ class URLCredential {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   URLCredentialPersistence? persistence;
   URLCredential(
       {this.username,

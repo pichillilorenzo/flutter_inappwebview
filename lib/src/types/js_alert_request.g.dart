@@ -22,6 +22,7 @@ class JsAlertRequest {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   bool? isMainFrame;
   JsAlertRequest(
       {this.url,

@@ -58,6 +58,7 @@ class NavigationAction {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
+  ///- MacOS ([Official API - WKNavigationAction.navigationType](https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype))
   NavigationType? navigationType;
 
   ///Use [sourceFrame] instead.
@@ -68,6 +69,7 @@ class NavigationAction {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
+  ///- MacOS ([Official API - WKNavigationAction.sourceFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe))
   FrameInfo? sourceFrame;
 
   ///Use [targetFrame] instead.
@@ -78,12 +80,14 @@ class NavigationAction {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
+  ///- MacOS ([Official API - WKNavigationAction.targetFrame](https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe))
   FrameInfo? targetFrame;
 
   ///A value indicating whether the web content used a download attribute to indicate that this should be downloaded.
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS 14.5+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
+  ///- MacOS 11.3+ ([Official API - WKNavigationAction.shouldPerformDownload](https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload))
   bool? shouldPerformDownload;
   NavigationAction(
       {required this.request,

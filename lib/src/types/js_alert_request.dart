@@ -19,7 +19,7 @@ class JsAlertRequest_ {
   bool? iosIsMainFrame;
 
   ///Indicates whether the request was made for the main frame.
-  @SupportedPlatforms(platforms: [IOSPlatform()])
+  @SupportedPlatforms(platforms: [IOSPlatform(), MacOSPlatform()])
   bool? isMainFrame;
 
   JsAlertRequest_(

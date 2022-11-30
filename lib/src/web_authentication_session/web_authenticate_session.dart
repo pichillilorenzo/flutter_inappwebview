@@ -94,8 +94,7 @@ class WebAuthenticationSession implements Disposable {
       this.onComplete,
       WebAuthenticationSessionSettings? initialSettings}) {
     assert(url.toString().isNotEmpty);
-    if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.macOS) {
+    if (Util.isIOS || Util.isMacOS) {
       assert(['http', 'https'].contains(url.scheme),
           'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');
     }

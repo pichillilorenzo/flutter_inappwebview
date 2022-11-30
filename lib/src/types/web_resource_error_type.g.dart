@@ -534,9 +534,6 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
   ///- MacOS ([Official API - URLError.appTransportSecurityRequiresSecureConnection](https://developer.apple.com/documentation/foundation/urlerror/code/2882980-apptransportsecurityrequiressecu))
   static final APP_TRANSPORT_SECURITY_REQUIRES_SECURE_CONNECTION =
       WebResourceErrorType._internalMultiPlatform(
@@ -669,9 +666,6 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
   ///- MacOS ([Official API - URLError.serverCertificateHasUnknownRoot](https://developer.apple.com/documentation/foundation/urlerror/code/2883085-servercertificatehasunknownroot))
   static final SERVER_CERTIFICATE_HAS_UNKNOWN_ROOT =
       WebResourceErrorType._internalMultiPlatform(
@@ -688,9 +682,6 @@ class WebResourceErrorType {
   });
 
   ///A server certificate is not yet valid.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.serverCertificateNotYetValid](https://developer.apple.com/documentation/foundation/urlerror/code/2882991-servercertificatenotyetvalid))
@@ -878,9 +869,6 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
   ///- MacOS ([Official API - URLError.downloadDecodingFailedMidStream](https://developer.apple.com/documentation/foundation/urlerror/code/2883224-downloaddecodingfailedmidstream))
   static final DOWNLOAD_DECODING_FAILED_MID_STREAM =
       WebResourceErrorType._internalMultiPlatform(
@@ -897,9 +885,6 @@ class WebResourceErrorType {
   });
 
   ///A download task failed to decode an encoded file after downloading.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.downloadDecodingFailedToComplete](https://developer.apple.com/documentation/foundation/urlerror/code/2882936-downloaddecodingfailedtocomplete))
@@ -996,9 +981,6 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
   ///- MacOS ([Official API - URLError.backgroundSessionRequiresSharedContainer](https://developer.apple.com/documentation/foundation/urlerror/code/2883169-backgroundsessionrequiressharedc))
   static final BACKGROUND_SESSION_REQUIRES_SHARED_CONTAINER =
       WebResourceErrorType._internalMultiPlatform(
@@ -1018,9 +1000,6 @@ class WebResourceErrorType {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
   ///- MacOS ([Official API - URLError.backgroundSessionInUseByAnotherProcess](https://developer.apple.com/documentation/foundation/urlerror/code/2882923-backgroundsessioninusebyanotherp))
   static final BACKGROUND_SESSION_IN_USE_BY_ANOTHER_PROCESS =
       WebResourceErrorType._internalMultiPlatform(
@@ -1037,9 +1016,6 @@ class WebResourceErrorType {
   });
 
   ///The app is suspended or exits while a background data task is processing.
-  ///
-  ///**Supported Platforms/Implementations**:
-  ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLError.backgroundSessionWasDisconnected](https://developer.apple.com/documentation/foundation/urlerror/code/2883075-backgroundsessionwasdisconnected))

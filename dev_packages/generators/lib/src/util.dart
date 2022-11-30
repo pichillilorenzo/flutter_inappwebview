@@ -34,7 +34,13 @@ abstract class Util {
       final platformName = platform.getField("name")!.toStringValue();
       final note = platform.getField("note")?.toStringValue();
       if (note != null) {
-        platformNoteList.add("///**NOTE for $platformName**: $note");
+        final noteLines = note.split("\n");
+        var platformNote =
+            "///**NOTE for $platformName**: ${noteLines[0].trim()}";
+        for (int i = 1; i < noteLines.length; i++) {
+          platformNote += "\n///${noteLines[i].trim()}";
+        }
+        platformNoteList.add(platformNote);
       }
 
       final apiName = platform.getField("apiName")?.toStringValue();

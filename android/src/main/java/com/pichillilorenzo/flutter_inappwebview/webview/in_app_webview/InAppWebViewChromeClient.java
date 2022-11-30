@@ -1211,7 +1211,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public void onPermissionRequest(final PermissionRequest request) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       final WebViewChannelDelegate.PermissionRequestCallback callback = new WebViewChannelDelegate.PermissionRequestCallback() {
         @Override
         public boolean nonNullSuccess(@NonNull PermissionResponse response) {

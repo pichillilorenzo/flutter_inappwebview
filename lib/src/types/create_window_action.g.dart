@@ -29,6 +29,7 @@ class CreateWindowAction extends NavigationAction {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - WKWindowFeatures](https://developer.apple.com/documentation/webkit/wkwindowfeatures))
+  ///- MacOS ([Official API - WKWindowFeatures](https://developer.apple.com/documentation/webkit/wkwindowfeatures))
   WindowFeatures? windowFeatures;
   CreateWindowAction(
       {required this.windowId,

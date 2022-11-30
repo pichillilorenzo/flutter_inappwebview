@@ -22,6 +22,7 @@ class JsConfirmRequest {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   bool? isMainFrame;
   JsConfirmRequest(
       {this.url,

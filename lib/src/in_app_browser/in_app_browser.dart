@@ -972,7 +972,7 @@ class InAppBrowser {
   ///[permissionRequest] represents the permission request with an array of resources the web content wants to access
   ///and the origin of the web page which is trying to access the restricted resources.
   ///
-  ///**NOTE for Android**: available only on Android 23+.
+  ///**NOTE for Android**: available only on Android 21+.
   ///
   ///**NOTE for iOS**: available only on iOS 15.0+. The default [PermissionResponse.action] is [PermissionResponseAction.PROMPT].
   ///

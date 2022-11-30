@@ -68,6 +68,10 @@ class NavigationAction_ {
     IOSPlatform(
         apiName: "WKNavigationAction.navigationType",
         apiUrl:
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype"),
+    MacOSPlatform(
+        apiName: "WKNavigationAction.navigationType",
+        apiUrl:
             "https://developer.apple.com/documentation/webkit/wknavigationaction/1401914-navigationtype")
   ])
   NavigationType_? navigationType;
@@ -79,6 +83,10 @@ class NavigationAction_ {
   ///The frame that requested the navigation.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
+        apiName: "WKNavigationAction.sourceFrame",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe"),
+    MacOSPlatform(
         apiName: "WKNavigationAction.sourceFrame",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wknavigationaction/1401926-sourceframe")
@@ -94,6 +102,10 @@ class NavigationAction_ {
     IOSPlatform(
         apiName: "WKNavigationAction.targetFrame",
         apiUrl:
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe"),
+    MacOSPlatform(
+        apiName: "WKNavigationAction.targetFrame",
+        apiUrl:
             "https://developer.apple.com/documentation/webkit/wknavigationaction/1401918-targetframe")
   ])
   FrameInfo_? targetFrame;
@@ -102,6 +114,11 @@ class NavigationAction_ {
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         available: "14.5",
+        apiName: "WKNavigationAction.shouldPerformDownload",
+        apiUrl:
+            "https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload"),
+    MacOSPlatform(
+        available: "11.3",
         apiName: "WKNavigationAction.shouldPerformDownload",
         apiUrl:
             "https://developer.apple.com/documentation/webkit/wknavigationaction/3727357-shouldperformdownload")

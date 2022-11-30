@@ -1,7 +1,6 @@
-import 'package:flutter/foundation.dart';
-
 import 'in_app_webview/webview.dart';
 import 'types/main.dart';
+import 'util.dart';
 
 ///Class that represents the WebView context menu. It used by [WebView.contextMenu].
 ///
@@ -89,11 +88,11 @@ class ContextMenuItem {
       @Deprecated("Use id instead") this.iosId,
       required this.title,
       this.action}) {
-    if (defaultTargetPlatform == TargetPlatform.android) {
+    if (Util.isAndroid) {
       // ignore: deprecated_member_use_from_same_package
       this.id = this.id ?? this.androidId;
       assert(this.id is int);
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    } else if (Util.isIOS) {
       // ignore: deprecated_member_use_from_same_package
       this.id = this.id ?? this.iosId;
     }

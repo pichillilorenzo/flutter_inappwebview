@@ -45,7 +45,7 @@ void openAndClose() {
             activityButton: ActivityButton(
                 templateImage: UIImage(systemName: "sun.max"),
                 extensionIdentifier:
-                    "com.pichillilorenzo.flutter-inappwebview-6-Example.test")));
+                    "com.pichillilorenzo.flutter-inappwebview6-example.test")));
     await chromeSafariBrowser.opened.future;
     expect(chromeSafariBrowser.isOpened(), true);
     expect(() async {

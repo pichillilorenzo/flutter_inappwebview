@@ -208,7 +208,7 @@ class ChromeSafariBrowser {
           // ignore: deprecated_member_use_from_same_package
           ChromeSafariBrowserClassOptions? options,
       ChromeSafariBrowserSettings? settings}) async {
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.iOS) {
+    if (Util.isIOS) {
       assert(url != null, 'The specified URL must not be null on iOS.');
       assert(['http', 'https'].contains(url!.scheme),
           'The specified URL has an unsupported scheme. Only HTTP and HTTPS URLs are supported on iOS.');

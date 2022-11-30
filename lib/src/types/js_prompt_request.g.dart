@@ -25,6 +25,7 @@ class JsPromptRequest {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS
+  ///- MacOS
   bool? isMainFrame;
   JsPromptRequest(
       {this.url,

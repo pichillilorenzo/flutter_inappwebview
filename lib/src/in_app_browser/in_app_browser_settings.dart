@@ -350,10 +350,10 @@ class InAppBrowserClassOptions {
 
     options.addAll(this.crossPlatform.toMap());
     options.addAll(this.inAppWebViewGroupOptions.crossPlatform.toMap());
-    if (defaultTargetPlatform == TargetPlatform.android) {
+    if (Util.isAndroid) {
       options.addAll(this.android.toMap());
       options.addAll(this.inAppWebViewGroupOptions.android.toMap());
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    } else if (Util.isIOS) {
       options.addAll(this.ios.toMap());
       options.addAll(this.inAppWebViewGroupOptions.ios.toMap());
     }
@@ -380,12 +380,12 @@ class InAppBrowserClassOptions {
         InAppWebViewGroupOptions();
     inAppBrowserClassOptions.inAppWebViewGroupOptions.crossPlatform =
         InAppWebViewOptions.fromMap(options);
-    if (defaultTargetPlatform == TargetPlatform.android) {
+    if (Util.isAndroid) {
       inAppBrowserClassOptions.android =
           AndroidInAppBrowserOptions.fromMap(options);
       inAppBrowserClassOptions.inAppWebViewGroupOptions.android =
           AndroidInAppWebViewOptions.fromMap(options);
-    } else if (defaultTargetPlatform == TargetPlatform.iOS) {
+    } else if (Util.isIOS) {
       inAppBrowserClassOptions.ios = IOSInAppBrowserOptions.fromMap(options);
       inAppBrowserClassOptions.inAppWebViewGroupOptions.ios =
           IOSInAppWebViewOptions.fromMap(options);

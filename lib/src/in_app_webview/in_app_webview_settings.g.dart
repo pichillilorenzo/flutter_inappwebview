@@ -54,120 +54,96 @@ class InAppWebViewSettings {
 
   ///Sets the user-agent for the WebView.
   ///
-  ///**NOTE**: available on iOS 9.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android native WebView ([Official API - WebSettings.setUserAgentString](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setUserAgentString(java.lang.String)))
+  ///- iOS ([Official API - WKWebView.customUserAgent](https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent))
+  ///- MacOS ([Official API - WKWebView.customUserAgent](https://developer.apple.com/documentation/webkit/wkwebview/1414950-customuseragent))
   String? userAgent;
 
   ///Append to the existing user-agent. Setting userAgent will override this.
   ///
-  ///**NOTE**: available on Android 17+ and on iOS 9.0+.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- iOS ([Official API - WKWebViewConfiguration.applicationNameForUserAgent](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1395665-applicationnameforuseragent))
+  ///- MacOS ([Official API - WKWebViewConfiguration.applicationNameForUserAgent](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1395665-applicationnameforuseragent))
   String? applicationNameForUserAgent;
 
   ///Set to `true` to enable JavaScript. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
+  ///- Android native WebView ([Official API - WebSettings.setJavaScriptEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setJavaScriptEnabled(boolean)))
+  ///- iOS ([Official API - WKWebpagePreferences.allowsContentJavaScript](https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/))
+  ///- MacOS ([Official API - WKWebpagePreferences.allowsContentJavaScript](https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3552422-allowscontentjavascript/))
   ///- Web
-  ///- MacOS
   bool? javaScriptEnabled;
 
   ///Set to `true` to allow JavaScript open windows without user interaction. The default value is `false`.
   ///
-  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
-  ///- MacOS
+  ///- Android native WebView ([Official API - WebSettings.setJavaScriptCanOpenWindowsAutomatically](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setJavaScriptCanOpenWindowsAutomatically(boolean)))
+  ///- iOS ([Official API - WKPreferences.javaScriptCanOpenWindowsAutomatically](https://developer.apple.com/documentation/webkit/wkpreferences/1536573-javascriptcanopenwindowsautomati/))
+  ///- MacOS ([Official API - WKPreferences.javaScriptCanOpenWindowsAutomatically](https://developer.apple.com/documentation/webkit/wkpreferences/1536573-javascriptcanopenwindowsautomati/))
+  ///- Web but iframe requires same origin
   bool? javaScriptCanOpenWindowsAutomatically;
 
   ///Set to `true` to prevent HTML5 audio or video from autoplaying. The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 10.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 10.12+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android native WebView ([Official API - WebSettings.setMediaPlaybackRequiresUserGesture](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setMediaPlaybackRequiresUserGesture(boolean)))
+  ///- iOS ([Official API - WKWebViewConfiguration.mediaTypesRequiringUserActionForPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1851524-mediatypesrequiringuseractionfor))
+  ///- MacOS 10.12+ ([Official API - WKWebViewConfiguration.mediaTypesRequiringUserActionForPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1851524-mediatypesrequiringuseractionfor))
   bool? mediaPlaybackRequiresUserGesture;
 
   ///Sets the minimum font size. The default value is `8` for Android, `0` for iOS.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- Android native WebView ([Official API - WebSettings.setMinimumFontSize](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setMinimumFontSize(int)))
+  ///- iOS ([Official API - WKPreferences.minimumFontSize](https://developer.apple.com/documentation/webkit/wkpreferences/1537155-minimumfontsize/))
+  ///- MacOS ([Official API - WKPreferences.minimumFontSize](https://developer.apple.com/documentation/webkit/wkpreferences/1537155-minimumfontsize/))
   int? minimumFontSize;
 
   ///Define whether the vertical scrollbar should be drawn or not. The default value is `true`.
   ///
-  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
-  ///It must have the same value of [horizontalScrollBarEnabled] to take effect.
+  ///**NOTE for Web**: It must have the same value of [horizontalScrollBarEnabled] to take effect.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  ///- Android native WebView ([Official API - View.setVerticalScrollBarEnabled](https://developer.android.com/reference/android/view/View#setVerticalScrollBarEnabled(boolean)))
+  ///- iOS ([Official API - UIScrollView.showsVerticalScrollIndicator](https://developer.apple.com/documentation/uikit/uiscrollview/1619405-showsverticalscrollindicator/))
+  ///- Web but iframe requires same origin
   bool? verticalScrollBarEnabled;
 
   ///Define whether the horizontal scrollbar should be drawn or not. The default value is `true`.
   ///
-  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
-  ///It must have the same value of [verticalScrollBarEnabled] to take effect.
+  ///**NOTE for Web**: It must have the same value of [verticalScrollBarEnabled] to take effect.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
-  ///- iOS
-  ///- Web
+  ///- Android native WebView ([Official API - View.setHorizontalScrollBarEnabled](https://developer.android.com/reference/android/view/View#setHorizontalScrollBarEnabled(boolean)))
+  ///- iOS ([Official API - UIScrollView.showsHorizontalScrollIndicator](https://developer.apple.com/documentation/uikit/uiscrollview/1619380-showshorizontalscrollindicator))
+  ///- Web but iframe requires same origin
   bool? horizontalScrollBarEnabled;
 
   ///List of custom schemes that the WebView must handle. Use the [WebView.onLoadResourceWithCustomScheme] event to intercept resource requests with custom scheme.
   ///
-  ///**NOTE for iOS**: available on iOS 11.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 10.13+.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- iOS 11.0+
+  ///- MacOS 10.13+
   List<String>? resourceCustomSchemes;
 
   ///List of [ContentBlocker] that are a set of rules used to block content in the browser window.
   ///
-  ///**NOTE for iOS**: available on iOS 11.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 10.13+.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- iOS 11.0+
+  ///- MacOS 10.13+
   List<ContentBlocker>? contentBlockers;
 
   ///Sets the content mode that the WebView needs to use when loading and rendering a webpage. The default value is [UserPreferredContentMode.RECOMMENDED].
   ///
-  ///**NOTE for iOS**: available on iOS 13.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 10.15+.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
-  ///- iOS
-  ///- MacOS
+  ///- iOS 13.0+ ([Official API - WKWebpagePreferences.preferredContentMode](https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3194426-preferredcontentmode/))
+  ///- MacOS 10.15+ ([Official API - WKWebpagePreferences.preferredContentMode](https://developer.apple.com/documentation/webkit/wkwebpagepreferences/3194426-preferredcontentmode/))
   UserPreferredContentMode? preferredContentMode;
 
   ///Set to `true` to be able to listen at the [WebView.shouldInterceptAjaxRequest] event.
@@ -196,9 +172,7 @@ class InAppWebViewSettings {
 
   ///Set to `true` to open a browser window with incognito mode. The default value is `false`.
   ///
-  ///**NOTE for iOS**: available on iOS 9.0+.
-  ///
-  ///**NOTE for Android**: setting this to `true`, it will clear all the cookies of all WebView instances,
+  ///**NOTE for Android native WebView**: setting this to `true`, it will clear all the cookies of all WebView instances,
   ///because there isn't any way to make the website data store non-persistent for the specific WebView instance such as on iOS.
   ///
   ///**Supported Platforms/Implementations**:
@@ -209,8 +183,6 @@ class InAppWebViewSettings {
 
   ///Sets whether WebView should use browser caching. The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 9.0+.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
@@ -219,48 +191,40 @@ class InAppWebViewSettings {
 
   ///Set to `true` to make the background of the WebView transparent. If your app has a dark theme, this can prevent a white flash on initialization. The default value is `false`.
   ///
-  ///**NOTE for MacOS**: available on MacOS 12.0+.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ///- MacOS
+  ///- MacOS 12.0+
   bool? transparentBackground;
 
   ///Set to `true` to disable vertical scroll. The default value is `false`.
   ///
-  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ///- Web
+  ///- Web but iframe requires same origin
   bool? disableVerticalScroll;
 
   ///Set to `true` to disable horizontal scroll. The default value is `false`.
   ///
-  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ///- Web
+  ///- Web but iframe requires same origin
   bool? disableHorizontalScroll;
 
   ///Set to `true` to disable context menu. The default value is `false`.
   ///
-  ///**NOTE for Web**: this setting will have effect only if the iframe has the same origin.
-  ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
   ///- iOS
-  ///- Web
+  ///- Web but iframe requires same origin
   bool? disableContextMenu;
 
   ///Set to `false` if the WebView should not support zooming using its on-screen zoom controls and gestures. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setSupportZoom](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSupportZoom(boolean)))
   ///- iOS
   ///- MacOS
   bool? supportZoom;
@@ -276,7 +240,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setAllowFileAccessFromFileURLs](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowFileAccessFromFileURLs(boolean)))
   ///- iOS
   ///- MacOS
   bool? allowFileAccessFromFileURLs;
@@ -292,7 +256,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setAllowUniversalAccessFromFileURLs](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowUniversalAccessFromFileURLs(boolean)))
   ///- iOS
   ///- MacOS
   bool? allowUniversalAccessFromFileURLs;
@@ -319,7 +283,7 @@ class InAppWebViewSettings {
   ///Sets the text zoom of the page in percent. The default value is `100`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setTextZoom](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setTextZoom(int)))
   int? textZoom;
 
   ///Set to `true` to have the session cookie cache cleared before the new window is opened.
@@ -331,25 +295,25 @@ class InAppWebViewSettings {
   ///Set to `true` if the WebView should use its built-in zoom mechanisms. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setBuiltInZoomControls](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setBuiltInZoomControls(boolean)))
   bool? builtInZoomControls;
 
   ///Set to `true` if the WebView should display on-screen zoom controls when using the built-in zoom mechanisms. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setDisplayZoomControls](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDisplayZoomControls(boolean)))
   bool? displayZoomControls;
 
   ///Set to `true` if you want the database storage API is enabled. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setDatabaseEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDatabaseEnabled(boolean)))
   bool? databaseEnabled;
 
   ///Set to `true` if you want the DOM storage API is enabled. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setDomStorageEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setDomStorageEnabled(boolean)))
   bool? domStorageEnabled;
 
   ///Set to `true` if the WebView should enable support for the "viewport" HTML meta tag or should use a wide viewport.
@@ -358,136 +322,133 @@ class InAppWebViewSettings {
   ///If the page does not contain the tag or does not provide a width, then a wide viewport will be used. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setUseWideViewPort](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setUseWideViewPort(boolean)))
   bool? useWideViewPort;
 
   ///Sets whether Safe Browsing is enabled. Safe Browsing allows WebView to protect against malware and phishing attacks by verifying the links.
   ///Safe Browsing is enabled by default for devices which support it.
   ///
-  ///**NOTE**: available on Android 26+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 26+ ([Official API - WebSettings.setSafeBrowsingEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSafeBrowsingEnabled(boolean)))
   bool? safeBrowsingEnabled;
 
   ///Configures the WebView's behavior when a secure origin attempts to load a resource from an insecure origin.
   ///
-  ///**NOTE**: available on Android 21+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 21+ ([Official API - WebSettings.setMixedContentMode](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setMixedContentMode(int)))
   MixedContentMode? mixedContentMode;
 
   ///Enables or disables content URL access within WebView. Content URL access allows WebView to load content from a content provider installed in the system. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setAllowContentAccess](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowContentAccess(boolean)))
   bool? allowContentAccess;
 
   ///Enables or disables file access within WebView. Note that this enables or disables file system access only.
   ///Assets and resources are still accessible using `file:///android_asset` and `file:///android_res`. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setAllowFileAccess](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setAllowFileAccess(boolean)))
   bool? allowFileAccess;
 
   ///Sets the path to the Application Caches files. In order for the Application Caches API to be enabled, this option must be set a path to which the application can write.
   ///This option is used one time: repeated calls are ignored.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView (Official API - WebSettings.setAppCachePath)
   String? appCachePath;
 
   ///Sets whether the WebView should not load image resources from the network (resources accessed via http and https URI schemes). The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setBlockNetworkImage](https://developer.android.com/reference/android/webkit/WebSettings#setBlockNetworkImage(boolean)))
   bool? blockNetworkImage;
 
   ///Sets whether the WebView should not load resources from the network. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setBlockNetworkLoads](https://developer.android.com/reference/android/webkit/WebSettings#setBlockNetworkLoads(boolean)))
   bool? blockNetworkLoads;
 
   ///Overrides the way the cache is used. The way the cache is used is based on the navigation type. For a normal page load, the cache is checked and content is re-validated as needed.
   ///When navigating back, content is not revalidated, instead the content is just retrieved from the cache. The default value is [CacheMode.LOAD_DEFAULT].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setCacheMode](https://developer.android.com/reference/android/webkit/WebSettings#setCacheMode(int)))
   CacheMode? cacheMode;
 
   ///Sets the cursive font family name. The default value is `"cursive"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setCursiveFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setCursiveFontFamily(java.lang.String)))
   String? cursiveFontFamily;
 
   ///Sets the default fixed font size. The default value is `16`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setDefaultFixedFontSize](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFixedFontSize(int)))
   int? defaultFixedFontSize;
 
   ///Sets the default font size. The default value is `16`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setDefaultFontSize](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultFontSize(int)))
   int? defaultFontSize;
 
   ///Sets the default text encoding name to use when decoding html pages. The default value is `"UTF-8"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setDefaultTextEncodingName](https://developer.android.com/reference/android/webkit/WebSettings#setDefaultTextEncodingName(java.lang.String)))
   String? defaultTextEncodingName;
 
   ///Disables the action mode menu items according to menuItems flag.
   ///
-  ///**NOTE**: available on Android 24+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 24+ ([Official API - WebSettings.setDisabledActionModeMenuItems](https://developer.android.com/reference/android/webkit/WebSettings#setDisabledActionModeMenuItems(int)))
   ActionModeMenuItem? disabledActionModeMenuItems;
 
   ///Sets the fantasy font family name. The default value is `"fantasy"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setFantasyFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFantasyFontFamily(java.lang.String)))
   String? fantasyFontFamily;
 
   ///Sets the fixed font family name. The default value is `"monospace"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setFixedFontFamily](https://developer.android.com/reference/android/webkit/WebSettings#setFixedFontFamily(java.lang.String)))
   String? fixedFontFamily;
 
   ///Set the force dark mode for this WebView. The default value is [ForceDark.OFF].
   ///
-  ///**NOTE**: available on Android 29+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 29+ ([Official API - WebSettings.setForceDark](https://developer.android.com/reference/android/webkit/WebSettings#setForceDark(int)))
   ForceDark? forceDark;
 
+  ///Sets whether Geolocation API is enabled. The default value is `true`.
   ///Set how WebView content should be darkened.
   ///The default value is [ForceDarkStrategy.PREFER_WEB_THEME_OVER_USER_AGENT_DARKENING].
   ///
-  ///**NOTE on Android**: it will take effect only if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.FORCE_DARK_STRATEGY].
+  ///**NOTE for Android native WebView**: it will take effect only if [WebViewFeature.isFeatureSupported] returns `true` for [WebViewFeature.FORCE_DARK_STRATEGY].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettingsCompat.setForceDarkStrategy](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setForceDarkStrategy(android.webkit.WebSettings,int)))
   ForceDarkStrategy? forceDarkStrategy;
 
-  ///Sets whether Geolocation API is enabled. The default value is `true`.
+  ///Sets whether Geolocation is enabled. The default is `true`.
+  ///
+  ///**NOTE for Android native WebView**: Please note that in order for the Geolocation API to be usable by a page in the WebView, the following requirements must be met:
+  ///- an application must have permission to access the device location, see [Manifest.permission.ACCESS_COARSE_LOCATION](https://developer.android.com/reference/android/Manifest.permission#ACCESS_COARSE_LOCATION), [Manifest.permission.ACCESS_FINE_LOCATION](https://developer.android.com/reference/android/Manifest.permission#ACCESS_FINE_LOCATION);
+  ///- an application must provide an implementation of the [WebView.onGeolocationPermissionsShowPrompt] callback to receive notifications that a page is requesting access to location via the JavaScript Geolocation API.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setGeolocationEnabled](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setGeolocationEnabled(boolean)))
   bool? geolocationEnabled;
 
   ///Sets the underlying layout algorithm. This will cause a re-layout of the WebView.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setLayoutAlgorithm](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setLayoutAlgorithm(android.webkit.WebSettings.LayoutAlgorithm)))
   LayoutAlgorithm? layoutAlgorithm;
 
   ///Sets whether the WebView loads pages in overview mode, that is, zooms out the content to fit on screen by width.
@@ -495,7 +456,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setLoadWithOverviewMode](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setLoadWithOverviewMode(boolean)))
   bool? loadWithOverviewMode;
 
   ///Sets whether the WebView should load image resources. Note that this method controls loading of all images, including those embedded using the data URI scheme.
@@ -503,13 +464,13 @@ class InAppWebViewSettings {
   ///The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setLoadsImagesAutomatically](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setLoadsImagesAutomatically(boolean)))
   bool? loadsImagesAutomatically;
 
   ///Sets the minimum logical font size. The default is `8`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setMinimumLogicalFontSize](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setMinimumLogicalFontSize(int)))
   int? minimumLogicalFontSize;
 
   ///Sets the initial scale for this WebView. 0 means default. The behavior for the default scale depends on the state of [useWideViewPort] and [loadWithOverviewMode].
@@ -520,41 +481,39 @@ class InAppWebViewSettings {
   ///The default is `0`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebView.setInitialScale](https://developer.android.com/reference/android/webkit/WebView#setInitialScale(int)))
   int? initialScale;
 
   ///Tells the WebView whether it needs to set a node. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setNeedInitialFocus](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setNeedInitialFocus(boolean)))
   bool? needInitialFocus;
 
   ///Sets whether this WebView should raster tiles when it is offscreen but attached to a window.
   ///Turning this on can avoid rendering artifacts when animating an offscreen WebView on-screen.
   ///Offscreen WebViews in this mode use more memory. The default value is `false`.
   ///
-  ///**NOTE**: available on Android 23+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 23+ ([Official API - WebSettings.setOffscreenPreRaster](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setOffscreenPreRaster(boolean)))
   bool? offscreenPreRaster;
 
   ///Sets the sans-serif font family name. The default value is `"sans-serif"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setSansSerifFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSansSerifFontFamily(java.lang.String)))
   String? sansSerifFontFamily;
 
   ///Sets the serif font family name. The default value is `"sans-serif"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setSerifFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSerifFontFamily(java.lang.String)))
   String? serifFontFamily;
 
   ///Sets the standard font family name. The default value is `"sans-serif"`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setStandardFontFamily](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setStandardFontFamily(java.lang.String)))
   String? standardFontFamily;
 
   ///Sets whether the WebView should save form data. In Android O, the platform has implemented a fully functional Autofill feature to store form data.
@@ -562,31 +521,29 @@ class InAppWebViewSettings {
   ///The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setSaveFormData](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSaveFormData(boolean)))
   bool? saveFormData;
 
   ///Boolean value to enable third party cookies in the WebView.
   ///Used on Android Lollipop and above only as third party cookies are enabled by default on Android Kitkat and below and on iOS.
   ///The default value is `true`.
   ///
-  ///**NOTE**: available on Android 21+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 21+ ([Official API - CookieManager.setAcceptThirdPartyCookies](https://developer.android.com/reference/android/webkit/CookieManager#setAcceptThirdPartyCookies(android.webkit.WebView,%20boolean)))
   bool? thirdPartyCookiesEnabled;
 
   ///Boolean value to enable Hardware Acceleration in the WebView.
   ///The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebView.setLayerType](https://developer.android.com/reference/android/webkit/WebView#setLayerType(int,%20android.graphics.Paint)))
   bool? hardwareAcceleration;
 
   ///Sets whether the WebView supports multiple windows.
   ///If set to `true`, [WebView.onCreateWindow] event must be implemented by the host application. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebSettings.setSupportMultipleWindows](https://developer.android.com/reference/android/webkit/WebSettings?hl=en#setSupportMultipleWindows(boolean)))
   bool? supportMultipleWindows;
 
   ///Regular expression used by [WebView.shouldOverrideUrlLoading] event to cancel navigation requests for frames that are not the main frame.
@@ -599,7 +556,7 @@ class InAppWebViewSettings {
   ///Set to `false` to disable Flutter Hybrid Composition. The default value is `true`.
   ///Hybrid Composition is supported starting with Flutter v1.20+.
   ///
-  ///**NOTE**: It is recommended to use Hybrid Composition only on Android 10+ for a release app,
+  ///**NOTE for Android native WebView**: It is recommended to use Hybrid Composition only on Android 10+ for a release app,
   ///as it can cause framerate drops on animations in Android 9 and lower (see [Hybrid-Composition#performance](https://github.com/flutter/flutter/wiki/Hybrid-Composition#performance)).
   ///
   ///**Supported Platforms/Implementations**:
@@ -631,14 +588,14 @@ class InAppWebViewSettings {
   ///The default value is [OverScrollMode.IF_CONTENT_SCROLLS].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - View.setOverScrollMode](https://developer.android.com/reference/android/view/View#setOverScrollMode(int)))
   OverScrollMode? overScrollMode;
 
   ///Informs WebView of the network state.
   ///This is used to set the JavaScript property `window.navigator.isOnline` and generates the online/offline event as specified in HTML5, sec. 5.7.7.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebView.setNetworkAvailable](https://developer.android.com/reference/android/webkit/WebView#setNetworkAvailable(boolean)))
   bool? networkAvailable;
 
   ///Specifies the style of the scrollbars. The scrollbars can be overlaid or inset.
@@ -649,39 +606,39 @@ class InAppWebViewSettings {
   ///The default value is [ScrollBarStyle.SCROLLBARS_INSIDE_OVERLAY].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebView.setScrollBarStyle](https://developer.android.com/reference/android/webkit/WebView#setScrollBarStyle(int)))
   ScrollBarStyle? scrollBarStyle;
 
   ///Sets the position of the vertical scroll bar.
   ///The default value is [VerticalScrollbarPosition.SCROLLBAR_POSITION_DEFAULT].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - View.setVerticalScrollbarPosition](https://developer.android.com/reference/android/view/View#setVerticalScrollbarPosition(int)))
   VerticalScrollbarPosition? verticalScrollbarPosition;
 
   ///Defines the delay in milliseconds that a scrollbar waits before fade out.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - View.setScrollBarDefaultDelayBeforeFade](https://developer.android.com/reference/android/view/View#setScrollBarDefaultDelayBeforeFade(int)))
   int? scrollBarDefaultDelayBeforeFade;
 
   ///Defines whether scrollbars will fade when the view is not scrolling.
   ///The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - View.setScrollbarFadingEnabled](https://developer.android.com/reference/android/view/View#setScrollbarFadingEnabled(boolean)))
   bool? scrollbarFadingEnabled;
 
   ///Defines the scrollbar fade duration in milliseconds.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - View.setScrollBarFadeDuration](https://developer.android.com/reference/android/view/View#setScrollBarFadeDuration(int)))
   int? scrollBarFadeDuration;
 
   ///Sets the renderer priority policy for this WebView.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView ([Official API - WebView.setRendererPriorityPolicy](https://developer.android.com/reference/android/webkit/WebView#setRendererPriorityPolicy(int,%20boolean)))
   RendererPriorityPolicy? rendererPriorityPolicy;
 
   ///Sets whether the default Android WebView’s internal error page should be suppressed or displayed for bad navigations.
@@ -693,34 +650,26 @@ class InAppWebViewSettings {
 
   ///Sets the vertical scrollbar thumb color.
   ///
-  ///**NOTE**: available on Android 29+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 29+ ([Official API - View.setVerticalScrollbarThumbDrawable](https://developer.android.com/reference/android/view/View#setVerticalScrollbarThumbDrawable(android.graphics.drawable.Drawable)))
   Color? verticalScrollbarThumbColor;
 
   ///Sets the vertical scrollbar track color.
   ///
-  ///**NOTE**: available on Android 29+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 29+ ([Official API - View.setVerticalScrollbarTrackDrawable](https://developer.android.com/reference/android/view/View#setVerticalScrollbarTrackDrawable(android.graphics.drawable.Drawable)))
   Color? verticalScrollbarTrackColor;
 
   ///Sets the horizontal scrollbar thumb color.
   ///
-  ///**NOTE**: available on Android 29+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 29+ ([Official API - View.setHorizontalScrollbarThumbDrawable](https://developer.android.com/reference/android/view/View#setHorizontalScrollbarThumbDrawable(android.graphics.drawable.Drawable)))
   Color? horizontalScrollbarThumbColor;
 
   ///Sets the horizontal scrollbar track color.
   ///
-  ///**NOTE**: available on Android 29+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 29+ ([Official API - View.setHorizontalScrollbarTrackDrawable](https://developer.android.com/reference/android/view/View#setHorizontalScrollbarTrackDrawable(android.graphics.drawable.Drawable)))
   Color? horizontalScrollbarTrackColor;
 
   ///Control whether algorithmic darkening is allowed.
@@ -735,12 +684,10 @@ class InAppWebViewSettings {
   ///WebView will attempt to darken web content using an algorithm,
   ///if the content doesn't define its own dark styles and doesn't explicitly disable darkening.
   ///
-  ///If Android is applying Force Dark to WebView then WebView will ignore the value of this setting and behave as if it were set to true.
-  ///
-  ///**NOTE**: available on Android only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.ALGORITHMIC_DARKENING] feature is supported.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Android native WebView
+  ///- Android native WebView 29+ ([Official API - WebSettingsCompat.setAlgorithmicDarkeningAllowed](https://developer.android.com/reference/androidx/webkit/WebSettingsCompat#setAlgorithmicDarkeningAllowed(android.webkit.WebSettings,boolean)))
   bool? algorithmicDarkeningAllowed;
 
   ///Sets how the WebView will set the `X-Requested-With` header on requests.
@@ -748,7 +695,7 @@ class InAppWebViewSettings {
   ///with the same parameter value to configure ServiceWorker requests.
   ///The default behavior may vary depending on the WebView implementation.
   ///
-  ///**NOTE**: available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL] feature is supported.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.REQUESTED_WITH_HEADER_CONTROL] feature is supported.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -763,7 +710,7 @@ class InAppWebViewSettings {
   ///
   ///The default value is `true`.
   ///
-  ///**NOTE**: available on Android only if [WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY] feature is supported.
+  ///**NOTE for Android native WebView**: available on Android only if [WebViewFeature.ENTERPRISE_AUTHENTICATION_APP_LINK_POLICY] feature is supported.
   ///
   ///**Supported Platforms/Implementations**:
   ///- Android native WebView
@@ -794,120 +741,102 @@ class InAppWebViewSettings {
   ///Set to `true` if you want the WebView suppresses content rendering until it is fully loaded into memory. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS ([Official API - WKWebViewConfiguration.suppressesIncrementalRendering](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1395663-suppressesincrementalrendering))
+  ///- MacOS ([Official API - WKWebViewConfiguration.suppressesIncrementalRendering](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1395663-suppressesincrementalrendering))
   bool? suppressesIncrementalRendering;
 
   ///Set to `true` to allow AirPlay. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS ([Official API - WKWebViewConfiguration.allowsAirPlayForMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1395673-allowsairplayformediaplayback))
+  ///- MacOS ([Official API - WKWebViewConfiguration.allowsAirPlayForMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1395673-allowsairplayformediaplayback))
   bool? allowsAirPlayForMediaPlayback;
 
   ///Set to `true` to allow the horizontal swipe gestures trigger back-forward list navigations. The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS ([Official API - WKWebView.allowsBackForwardNavigationGestures](https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu))
+  ///- MacOS ([Official API - WKWebView.allowsBackForwardNavigationGestures](https://developer.apple.com/documentation/webkit/wkwebview/1414995-allowsbackforwardnavigationgestu))
   bool? allowsBackForwardNavigationGestures;
 
   ///Set to `true` to allow that pressing on a link displays a preview of the destination for the link. The default value is `true`.
   ///
-  ///**NOTE**: available on iOS 9.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS ([Official API - WKWebView.allowsLinkPreview](https://developer.apple.com/documentation/webkit/wkwebview/1415000-allowslinkpreview))
+  ///- MacOS ([Official API - WKWebView.allowsLinkPreview](https://developer.apple.com/documentation/webkit/wkwebview/1415000-allowslinkpreview))
   bool? allowsLinkPreview;
 
   ///Set to `true` if you want that the WebView should always allow scaling of the webpage, regardless of the author's intent.
   ///The ignoresViewportScaleLimits property overrides the `user-scalable` HTML property in a webpage. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - WKWebViewConfiguration.ignoresViewportScaleLimits](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/2274633-ignoresviewportscalelimits))
   bool? ignoresViewportScaleLimits;
 
   ///Set to `true` to allow HTML5 media playback to appear inline within the screen layout, using browser-supplied controls rather than native controls.
   ///For this to work, add the `webkit-playsinline` attribute to any `<video>` elements. The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - WKWebViewConfiguration.allowsInlineMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1614793-allowsinlinemediaplayback))
   bool? allowsInlineMediaPlayback;
 
   ///Set to `true` to allow HTML5 videos play picture-in-picture. The default value is `true`.
   ///
-  ///**NOTE**: available on iOS 9.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - WKWebViewConfiguration.allowsPictureInPictureMediaPlayback](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1614792-allowspictureinpicturemediaplayb))
   bool? allowsPictureInPictureMediaPlayback;
 
   ///A Boolean value indicating whether warnings should be shown for suspected fraudulent content such as phishing or malware.
   ///According to the official documentation, this feature is currently available in the following region: China.
   ///The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 13.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 10.15+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 13.0+ ([Official API - WKPreferences.isFraudulentWebsiteWarningEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3335219-isfraudulentwebsitewarningenable))
+  ///- MacOS 10.15+ ([Official API - WKPreferences.isFraudulentWebsiteWarningEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3335219-isfraudulentwebsitewarningenable))
   bool? isFraudulentWebsiteWarningEnabled;
 
   ///The level of granularity with which the user can interactively select content in the web view.
   ///The default value is [SelectionGranularity.DYNAMIC].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - WKWebViewConfiguration.selectionGranularity](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1614756-selectiongranularity))
   SelectionGranularity? selectionGranularity;
 
   ///Specifying a dataDetectoryTypes value adds interactivity to web content that matches the value.
   ///For example, Safari adds a link to “apple.com” in the text “Visit apple.com” if the dataDetectorTypes property is set to [DataDetectorTypes.LINK].
   ///The default value is [DataDetectorTypes.NONE].
   ///
-  ///**NOTE**: available on iOS 10.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 10+ ([Official API - WKWebViewConfiguration.dataDetectorTypes](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/1641937-datadetectortypes))
   List<DataDetectorTypes>? dataDetectorTypes;
 
   ///Set `true` if shared cookies from `HTTPCookieStorage.shared` should used for every load request in the WebView.
   ///The default value is `false`.
   ///
-  ///**NOTE for iOS**: available on iOS 11.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 10.13+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 11.0+
+  ///- MacOS 10.13+
   bool? sharedCookiesEnabled;
 
   ///Configures whether the scroll indicator insets are automatically adjusted by the system.
   ///The default value is `false`.
   ///
-  ///**NOTE**: available on iOS 13.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 13.0+ ([Official API - UIScrollView.automaticallyAdjustsScrollIndicatorInsets](https://developer.apple.com/documentation/uikit/uiscrollview/3198043-automaticallyadjustsscrollindica))
   bool? automaticallyAdjustsScrollIndicatorInsets;
 
   ///A Boolean value indicating whether the WebView ignores an accessibility request to invert its colors.
   ///The default value is `false`.
   ///
-  ///**NOTE**: available on iOS 11.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 11.0+ ([Official API - UIView.accessibilityIgnoresInvertColors](https://developer.apple.com/documentation/uikit/uiview/2865843-accessibilityignoresinvertcolors))
   bool? accessibilityIgnoresInvertColors;
 
   ///A [ScrollViewDecelerationRate] value that determines the rate of deceleration after the user lifts their finger.
   ///The default value is [ScrollViewDecelerationRate.NORMAL].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.decelerationRate](https://developer.apple.com/documentation/uikit/uiscrollview/1619438-decelerationrate))
   ScrollViewDecelerationRate? decelerationRate;
 
   ///A Boolean value that determines whether bouncing always occurs when vertical scrolling reaches the end of the content.
@@ -916,7 +845,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.alwaysBounceVertical](https://developer.apple.com/documentation/uikit/uiscrollview/1619383-alwaysbouncevertical))
   bool? alwaysBounceVertical;
 
   ///A Boolean value that determines whether bouncing always occurs when horizontal scrolling reaches the end of the content view.
@@ -925,7 +854,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.alwaysBounceHorizontal](https://developer.apple.com/documentation/uikit/uiscrollview/1619393-alwaysbouncehorizontal))
   bool? alwaysBounceHorizontal;
 
   ///A Boolean value that controls whether the scroll-to-top gesture is enabled.
@@ -934,7 +863,7 @@ class InAppWebViewSettings {
   ///The default value is `true`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.scrollsToTop](https://developer.apple.com/documentation/uikit/uiscrollview/1619421-scrollstotop))
   bool? scrollsToTop;
 
   ///A Boolean value that determines whether paging is enabled for the scroll view.
@@ -942,7 +871,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.isPagingEnabled](https://developer.apple.com/documentation/uikit/uiscrollview/1619432-ispagingenabled))
   bool? isPagingEnabled;
 
   ///A floating-point value that specifies the maximum scale factor that can be applied to the scroll view's content.
@@ -951,7 +880,7 @@ class InAppWebViewSettings {
   ///The default value is `1.0`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.maximumZoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619408-maximumzoomscale))
   double? maximumZoomScale;
 
   ///A floating-point value that specifies the minimum scale factor that can be applied to the scroll view's content.
@@ -959,14 +888,14 @@ class InAppWebViewSettings {
   ///The default value is `1.0`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.minimumZoomScale](https://developer.apple.com/documentation/uikit/uiscrollview/1619428-minimumzoomscale))
   double? minimumZoomScale;
 
   ///Configures how safe area insets are added to the adjusted content inset.
   ///The default value is [ScrollViewContentInsetAdjustmentBehavior.NEVER].
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 11.0+ ([Official API - UIScrollView.contentInsetAdjustmentBehavior](https://developer.apple.com/documentation/uikit/uiscrollview/2902261-contentinsetadjustmentbehavior))
   ScrollViewContentInsetAdjustmentBehavior? contentInsetAdjustmentBehavior;
 
   ///A Boolean value that determines whether scrolling is disabled in a particular direction.
@@ -977,7 +906,7 @@ class InAppWebViewSettings {
   ///The default value is `false`.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS ([Official API - UIScrollView.isDirectionalLockEnabled](https://developer.apple.com/documentation/uikit/uiscrollview/1619390-isdirectionallockenabled))
   bool? isDirectionalLockEnabled;
 
   ///The media type for the contents of the web view.
@@ -985,37 +914,27 @@ class InAppWebViewSettings {
   ///If you assign a value other than `null` to this property, the web view uses the value you provide instead.
   ///The default value of this property is `null`.
   ///
-  ///**NOTE for iOS**: available on iOS 14.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 11.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 14.0+ ([Official API - WKWebView.mediaType](https://developer.apple.com/documentation/webkit/wkwebview/3516410-mediatype))
+  ///- MacOS 11.0+ ([Official API - WKWebView.mediaType](https://developer.apple.com/documentation/webkit/wkwebview/3516410-mediatype))
   String? mediaType;
 
   ///The scale factor by which the web view scales content relative to its bounds.
   ///The default value of this property is `1.0`, which displays the content without any scaling.
   ///Changing the value of this property is equivalent to setting the CSS `zoom` property on all page content.
   ///
-  ///**NOTE for iOS**: available on iOS 14.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 11.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 14.0+ ([Official API - WKWebView.pageZoom](https://developer.apple.com/documentation/webkit/wkwebview/3516411-pagezoom))
+  ///- MacOS 11.0+ ([Official API - WKWebView.pageZoom](https://developer.apple.com/documentation/webkit/wkwebview/3516411-pagezoom))
   double? pageZoom;
 
   ///A Boolean value that indicates whether the web view limits navigation to pages within the app’s domain.
   ///Check [App-Bound Domains](https://webkit.org/blog/10882/app-bound-domains/) for more details.
   ///The default value is `false`.
   ///
-  ///**NOTE**: available on iOS 14.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 14.0+ ([Official API - WKWebViewConfiguration.limitsNavigationsToAppBoundDomains](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/3585117-limitsnavigationstoappbounddomai))
+  ///- MacOS 11.0+ ([Official API - WKWebViewConfiguration.limitsNavigationsToAppBoundDomains](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/3585117-limitsnavigationstoappbounddomai))
   bool? limitsNavigationsToAppBoundDomains;
 
   ///Set to `true` to be able to listen to the [WebView.onNavigationResponse] event.
@@ -1096,10 +1015,8 @@ class InAppWebViewSettings {
   ///Also, on MacOS:
   ///- [WebView.onScrollChanged]
   ///
-  ///**NOTE for iOS**: available on iOS 13.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 13.0+
   ///- MacOS
   bool? applePayAPIEnabled;
 
@@ -1135,91 +1052,65 @@ class InAppWebViewSettings {
   ///using the background colors of the `<html>` and `<body>` elements with the background color of the web view.
   ///To override the default color, set this property to a new color.
   ///
-  ///**NOTE for iOS**: available on iOS 15.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 12.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 15.0+ ([Official API - WKWebView.underPageBackgroundColor](https://developer.apple.com/documentation/webkit/wkwebview/3850574-underpagebackgroundcolor))
+  ///- MacOS 12.0+ ([Official API - WKWebView.underPageBackgroundColor](https://developer.apple.com/documentation/webkit/wkwebview/3850574-underpagebackgroundcolor))
   Color? underPageBackgroundColor;
 
   ///A Boolean value indicating whether text interaction is enabled or not.
   ///The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 14.5+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 11.3+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 14.5+ ([Official API - WKPreferences.isTextInteractionEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3727362-istextinteractionenabled))
+  ///- MacOS 11.3+ ([Official API - WKPreferences.isTextInteractionEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3727362-istextinteractionenabled))
   bool? isTextInteractionEnabled;
 
   ///A Boolean value indicating whether WebKit will apply built-in workarounds (quirks)
   ///to improve compatibility with certain known websites. You can disable site-specific quirks
   ///to help test your website without these workarounds. The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 15.4+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 12.3+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 15.4+ ([Official API - WKPreferences.isSiteSpecificQuirksModeEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3916069-issitespecificquirksmodeenabled))
+  ///- MacOS 12.3+ ([Official API - WKPreferences.isSiteSpecificQuirksModeEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3916069-issitespecificquirksmodeenabled))
   bool? isSiteSpecificQuirksModeEnabled;
 
   ///A Boolean value indicating whether HTTP requests to servers known to support HTTPS should be automatically upgraded to HTTPS requests.
   ///The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 15.0+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 11.3+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 15.0+ ([Official API - WKWebViewConfiguration.upgradeKnownHostsToHTTPS](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/3752243-upgradeknownhoststohttps))
+  ///- MacOS 11.3+ ([Official API - WKWebViewConfiguration.upgradeKnownHostsToHTTPS](https://developer.apple.com/documentation/webkit/wkwebviewconfiguration/3752243-upgradeknownhoststohttps))
   bool? upgradeKnownHostsToHTTPS;
 
   ///Sets whether fullscreen API is enabled or not.
   ///
   ///The default value is `true`.
   ///
-  ///**NOTE for iOS**: available on iOS 15.4+.
-  ///
-  ///**NOTE for MacOS**: available on MacOS 12.3+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
-  ///- MacOS
+  ///- iOS 15.4+ ([Official API - WKPreferences.isElementFullscreenEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled))
+  ///- MacOS 12.3+ ([Official API - WKPreferences.isElementFullscreenEnabled](https://developer.apple.com/documentation/webkit/wkpreferences/3917769-iselementfullscreenenabled))
   bool? isElementFullscreenEnabled;
 
   ///Sets whether the web view's built-in find interaction native UI is enabled or not.
   ///
   ///The default value is `false`.
   ///
-  ///**NOTE**: available on iOS 16.0+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 16.0+ ([Official API - WKWebView.isFindInteractionEnabled](https://developer.apple.com/documentation/webkit/wkwebview/4002044-isfindinteractionenabled/))
   bool? isFindInteractionEnabled;
 
   ///Set minimum viewport inset to the smallest inset a webpage may experience in your app's maximally collapsed UI configuration.
   ///Values must be either zero or positive. It must be smaller than [maximumViewportInset].
   ///
-  ///**NOTE**: available on iOS 15.5+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 15.5+ ([Official API - WKWebView.setMinimumViewportInset](https://developer.apple.com/documentation/webkit/wkwebview/3974127-setminimumviewportinset/))
   EdgeInsets? minimumViewportInset;
 
   ///Set maximum viewport inset to the largest inset a webpage may experience in your app's maximally expanded UI configuration.
   ///Values must be either zero or positive. It must be larger than [minimumViewportInset].
   ///
-  ///**NOTE**: available on iOS 15.5+.
-  ///
   ///**Supported Platforms/Implementations**:
-  ///- iOS
+  ///- iOS 15.5+ ([Official API - WKWebView.setMinimumViewportInset](https://developer.apple.com/documentation/webkit/wkwebview/3974127-setminimumviewportinset/))
   EdgeInsets? maximumViewportInset;
 
   ///Specifies a feature policy for the `<iframe>`.
@@ -1227,37 +1118,37 @@ class InAppWebViewSettings {
   ///(e.g. access to the microphone, camera, battery, web-share API, etc.).
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Web
+  ///- Web ([Official API - iframe.allow](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allow))
   String? iframeAllow;
 
   ///Set to true if the `<iframe>` can activate fullscreen mode by calling the `requestFullscreen()` method.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Web
+  ///- Web ([Official API - iframe.allowfullscreen](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-allowfullscreen))
   bool? iframeAllowFullscreen;
 
   ///Applies extra restrictions to the content in the frame.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Web
+  ///- Web ([Official API - iframe.sandbox](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-sandbox))
   Set<Sandbox>? iframeSandbox;
 
   ///A string that reflects the `referrerpolicy` HTML attribute indicating which referrer to use when fetching the linked resource.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Web
+  ///- Web ([Official API - iframe.referrerpolicy](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-referrerpolicy))
   ReferrerPolicy? iframeReferrerPolicy;
 
   ///A string that reflects the `name` HTML attribute, containing a name by which to refer to the frame.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Web
+  ///- Web ([Official API - iframe.name](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-name))
   String? iframeName;
 
   ///A Content Security Policy enforced for the embedded resource.
   ///
   ///**Supported Platforms/Implementations**:
-  ///- Web
+  ///- Web ([Official API - iframe.csp](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/iframe#attr-csp))
   String? iframeCsp;
   InAppWebViewSettings(
       {this.useShouldOverrideUrlLoading,
@@ -1398,8 +1289,7 @@ class InAppWebViewSettings {
       this.iframeName,
       this.iframeCsp}) {
     if (this.minimumFontSize == null)
-      this.minimumFontSize =
-          defaultTargetPlatform == TargetPlatform.android ? 8 : 0;
+      this.minimumFontSize = Util.isAndroid ? 8 : 0;
     assert(this.resourceCustomSchemes == null ||
         (this.resourceCustomSchemes != null &&
             !this.resourceCustomSchemes!.contains("http") &&

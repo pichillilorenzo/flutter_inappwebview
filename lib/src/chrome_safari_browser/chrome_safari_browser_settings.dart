@@ -1,6 +1,5 @@
 import 'dart:ui';
 
-import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
 import '../types/activity_button.dart';
@@ -341,10 +340,9 @@ class ChromeSafariBrowserClassOptions {
 
   Map<String, dynamic> toMap() {
     Map<String, dynamic> options = {};
-    if (defaultTargetPlatform == TargetPlatform.android)
+    if (Util.isAndroid)
       options.addAll(this.android?.toMap() ?? {});
-    else if (defaultTargetPlatform == TargetPlatform.iOS)
-      options.addAll(this.ios?.toMap() ?? {});
+    else if (Util.isIOS) options.addAll(this.ios?.toMap() ?? {});
 
     return options;
   }

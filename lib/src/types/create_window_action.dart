@@ -32,6 +32,10 @@ class CreateWindowAction_ extends NavigationAction_ {
     IOSPlatform(
         apiName: "WKWindowFeatures",
         apiUrl:
+            "https://developer.apple.com/documentation/webkit/wkwindowfeatures"),
+    MacOSPlatform(
+        apiName: "WKWindowFeatures",
+        apiUrl:
             "https://developer.apple.com/documentation/webkit/wkwindowfeatures")
   ])
   WindowFeatures_? windowFeatures;

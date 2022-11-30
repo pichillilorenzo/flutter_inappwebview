@@ -3,6 +3,7 @@ import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_i
 
 import '../in_app_webview/webview.dart';
 
+import '../util.dart';
 import 'client_cert_response_action.dart';
 
 part 'client_cert_response.g.dart';
@@ -40,7 +41,6 @@ class ClientCertResponse_ {
 
     this.keyStoreType = this.keyStoreType ?? this.androidKeyStoreType;
 
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
-      assert(this.keyStoreType != null);
+    if (Util.isAndroid) assert(this.keyStoreType != null);
   }
 }

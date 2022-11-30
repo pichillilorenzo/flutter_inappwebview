@@ -36,6 +36,7 @@ class URLProtectionSpace {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
+  ///- MacOS ([Official API - URLProtectionSpace.authenticationMethod](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415028-authenticationmethod))
   URLProtectionSpaceAuthenticationMethod? authenticationMethod;
 
   ///Use [distinguishedNames] instead.
@@ -48,6 +49,7 @@ class URLProtectionSpace {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
+  ///- MacOS ([Official API - URLProtectionSpace.distinguishedNames](https://developer.apple.com/documentation/foundation/urlprotectionspace/1417061-distinguishednames))
   List<X509Certificate>? distinguishedNames;
 
   ///Use [receivesCredentialSecurely] instead.
@@ -59,6 +61,7 @@ class URLProtectionSpace {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
+  ///- MacOS ([Official API - URLProtectionSpace.receivesCredentialSecurely](https://developer.apple.com/documentation/foundation/urlprotectionspace/1415176-receivescredentialsecurely))
   bool? receivesCredentialSecurely;
 
   ///Use [proxyType] instead.
@@ -71,6 +74,7 @@ class URLProtectionSpace {
   ///
   ///**Supported Platforms/Implementations**:
   ///- iOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
+  ///- MacOS ([Official API - URLProtectionSpace.proxyType](https://developer.apple.com/documentation/foundation/urlprotectionspace/1411924-proxytype))
   URLProtectionSpaceProxyType? proxyType;
   URLProtectionSpace(
       {required this.host,

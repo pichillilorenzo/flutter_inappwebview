@@ -34,6 +34,10 @@ class URLRequest_ {
     IOSPlatform(
         apiName: "URLRequest.allowsCellularAccess",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/"),
+    MacOSPlatform(
+        apiName: "URLRequest.allowsCellularAccess",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011607-allowscellularaccess/")
   ])
   bool? allowsCellularAccess;
@@ -46,6 +50,11 @@ class URLRequest_ {
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         available: "13.0",
+        apiName: "URLRequest.allowsConstrainedNetworkAccess",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/3358304-allowsconstrainednetworkaccess"),
+    MacOSPlatform(
+        available: "10.15",
         apiName: "URLRequest.allowsConstrainedNetworkAccess",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/3358304-allowsconstrainednetworkaccess")
@@ -62,6 +71,11 @@ class URLRequest_ {
         available: "13.0",
         apiName: "URLRequest.allowsExpensiveNetworkAccess",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess"),
+    MacOSPlatform(
+        available: "10.15",
+        apiName: "URLRequest.allowsExpensiveNetworkAccess",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/3358305-allowsexpensivenetworkaccess")
   ])
   bool? allowsExpensiveNetworkAccess;
@@ -73,6 +87,10 @@ class URLRequest_ {
   ///The request’s cache policy.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
+        apiName: "URLRequest.cachePolicy",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy"),
+    MacOSPlatform(
         apiName: "URLRequest.cachePolicy",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011593-cachepolicy")
@@ -88,6 +106,10 @@ class URLRequest_ {
     IOSPlatform(
         apiName: "URLRequest.httpShouldHandleCookies",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies"),
+    MacOSPlatform(
+        apiName: "URLRequest.httpShouldHandleCookies",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011548-httpshouldhandlecookies")
   ])
   bool? httpShouldHandleCookies;
@@ -99,6 +121,10 @@ class URLRequest_ {
   ///A Boolean value indicating whether the request should transmit before the previous response is received.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
+        apiName: "URLRequest.httpShouldUsePipelining",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining"),
+    MacOSPlatform(
         apiName: "URLRequest.httpShouldUsePipelining",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011508-httpshouldusepipelining")
@@ -114,6 +140,10 @@ class URLRequest_ {
     IOSPlatform(
         apiName: "URLRequest.networkServiceType",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype"),
+    MacOSPlatform(
+        apiName: "URLRequest.networkServiceType",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011409-networkservicetype")
   ])
   URLRequestNetworkServiceType_? networkServiceType;
@@ -125,6 +155,10 @@ class URLRequest_ {
   ///The timeout interval of the request.
   @SupportedPlatforms(platforms: [
     IOSPlatform(
+        apiName: "URLRequest.timeoutInterval",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval"),
+    MacOSPlatform(
         apiName: "URLRequest.timeoutInterval",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011509-timeoutinterval")
@@ -141,6 +175,10 @@ class URLRequest_ {
     IOSPlatform(
         apiName: "URLRequest.mainDocumentURL",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl"),
+    MacOSPlatform(
+        apiName: "URLRequest.mainDocumentURL",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/2011552-maindocumenturl")
   ])
   WebUri? mainDocumentURL;
@@ -153,6 +191,11 @@ class URLRequest_ {
         available: "14.5",
         apiName: "URLRequest.assumesHTTP3Capable",
         apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/3738175-assumeshttp3capable"),
+    MacOSPlatform(
+        available: "11.3",
+        apiName: "URLRequest.assumesHTTP3Capable",
+        apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/3738175-assumeshttp3capable")
   ])
   bool? assumesHTTP3Capable;
@@ -163,6 +206,11 @@ class URLRequest_ {
   @SupportedPlatforms(platforms: [
     IOSPlatform(
         available: "15.0",
+        apiName: "URLRequest.attribution",
+        apiUrl:
+            "https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution"),
+    MacOSPlatform(
+        available: "12.0",
         apiName: "URLRequest.attribution",
         apiUrl:
             "https://developer.apple.com/documentation/foundation/urlrequest/3767318-attribution")

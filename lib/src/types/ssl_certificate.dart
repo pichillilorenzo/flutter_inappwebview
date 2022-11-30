@@ -1,6 +1,7 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_inappwebview_internal_annotations/flutter_inappwebview_internal_annotations.dart';
 
+import '../util.dart';
 import '../x509_certificate/x509_certificate.dart';
 import '../x509_certificate/asn1_distinguished_names.dart';
 
@@ -47,7 +48,7 @@ class SslCertificate_ {
       print(stacktrace);
     }
 
-    if (defaultTargetPlatform == TargetPlatform.iOS) {
+    if (Util.isIOS) {
       if (x509Certificate != null) {
         return SslCertificate(
           issuedBy: SslCertificateDName(

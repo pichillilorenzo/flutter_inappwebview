@@ -639,7 +639,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             widget.pullToRefreshController?.options.toMap() ??
             PullToRefreshSettings(enabled: false).toMap();
 
-    if (kIsWeb) {
+    if (Util.isWeb) {
       return HtmlElementView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         onPlatformViewCreated: (int viewId) {
@@ -659,7 +659,7 @@ class _InAppWebViewState extends State<InAppWebView> {
           _onPlatformViewCreated(viewId);
         },
       );
-    } else if (defaultTargetPlatform == TargetPlatform.android) {
+    } else if (Util.isAndroid) {
       var useHybridComposition = (widget.initialSettings != null
               ? initialSettings.useHybridComposition
               :
@@ -710,9 +710,7 @@ class _InAppWebViewState extends State<InAppWebView> {
             ..create();
         },
       );
-    } else if (defaultTargetPlatform ==
-        TargetPlatform
-            .iOS /* || defaultTargetPlatform == TargetPlatform.macOS*/) {
+    } else if (Util.isIOS /* || Util.isMacOS*/) {
       return UiKitView(
         viewType: 'com.pichillilorenzo/flutter_inappwebview',
         onPlatformViewCreated: _onPlatformViewCreated,

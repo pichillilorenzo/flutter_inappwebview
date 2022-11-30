@@ -7,6 +7,28 @@ import 'package:flutter/material.dart';
 
 import 'debug_logging_settings.dart';
 
+class Util {
+  static bool get isWeb => kIsWeb;
+
+  static bool get isAndroid =>
+      !isWeb && defaultTargetPlatform == TargetPlatform.android;
+
+  static bool get isIOS =>
+      !isWeb && defaultTargetPlatform == TargetPlatform.iOS;
+
+  static bool get isMacOS =>
+      !isWeb && defaultTargetPlatform == TargetPlatform.macOS;
+
+  static bool get isWindows =>
+      !isWeb && defaultTargetPlatform == TargetPlatform.windows;
+
+  static bool get isLinux =>
+      !isWeb && defaultTargetPlatform == TargetPlatform.linux;
+
+  static bool get isFuchsia =>
+      !isWeb && defaultTargetPlatform == TargetPlatform.fuchsia;
+}
+
 class IdGenerator {
   static int _count = 0;
 
@@ -538,7 +560,7 @@ void debugLog(
     }
     var maxLogMessageLength = debugLoggingSettings.maxLogMessageLength;
     String message =
-        "(${kIsWeb ? 'Web' : defaultTargetPlatform.name}) ${name ?? className}" +
+        "(${Util.isWeb ? 'Web' : defaultTargetPlatform.name}) ${name ?? className}" +
             (id != null ? ' ID $id' : '') +
             ' calling "' +
             method.toString() +

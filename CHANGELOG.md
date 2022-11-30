@@ -1,3 +1,9 @@
+## 6.0.0-beta.19
+
+- Updated code docs
+- Fixed "Cannot Grant Permission at Android 21" [#1447](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1447)
+- Fixed some missing macOS asserts
+
 ## 6.0.0-beta.18
 
 - Fixed `InAppWebViewSettings` automatic infer if `initialSettings` is `null`
@@ -157,6 +163,10 @@
 - All properties of `GeolocationPermissionShowPromptResponse` cannot be `null`
 - Removed `URLProtectionSpace.iosIsProxy` property
 - `historyUrl` and `baseUrl` of `InAppWebViewInitialData` can be `null`
+
+## 5.7.2+1
+
+- Fixed "Cannot Grant Permission at Android 21" [#1447](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1447)
 
 ## 5.7.2
 

@@ -36,8 +36,7 @@ class ClientCertResponse {
     if (this.action == ClientCertResponseAction.PROCEED)
       assert(certificatePath.isNotEmpty);
     this.keyStoreType = this.keyStoreType ?? this.androidKeyStoreType;
-    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android)
-      assert(this.keyStoreType != null);
+    if (Util.isAndroid) assert(this.keyStoreType != null);
   }
 
   ///Gets a possible [ClientCertResponse] instance from a [Map] value.

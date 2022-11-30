@@ -8,6 +8,7 @@ import 'in_app_webview/headless_in_app_webview.dart';
 import 'platform_util.dart';
 
 import 'types/main.dart';
+import 'util.dart';
 import 'web_uri.dart';
 
 ///Class that implements a singleton object (shared instance) which manages the cookies used by WebView instances.
@@ -519,14 +520,13 @@ class CookieManager {
   }
 
   Future<bool> _shouldUseJavascript() async {
-    if (kIsWeb) {
+    if (Util.isWeb) {
       return true;
     }
-    if (defaultTargetPlatform == TargetPlatform.iOS ||
-        defaultTargetPlatform == TargetPlatform.macOS) {
+    if (Util.isIOS || Util.isMacOS) {
       final platformUtil = PlatformUtil.instance();
       final systemVersion = await platformUtil.getSystemVersion();
-      return defaultTargetPlatform == TargetPlatform.iOS
+      return Util.isIOS
           ? systemVersion.compareTo("11") == -1
           : systemVersion.compareTo("10.13") == -1;
     }

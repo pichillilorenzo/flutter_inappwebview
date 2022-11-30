@@ -2606,6 +2606,14 @@ class InAppWebViewController {
     _inAppBrowser?.contextMenu = contextMenu;
   }
 
+  /// Only support android.
+  ///
+  ///- Android issue: https://www.pudn.com/news/6228d8129ddf223e1ad224f8.html
+  Future<void> requestFocus() async {
+    Map<String, dynamic> args = <String, dynamic>{};
+    return await _channel.invokeMethod('requestFocus', args);
+  }
+
   ///Requests the anchor or image element URL at the last tapped point.
   ///
   ///**NOTE**: On iOS, it is implemented using JavaScript.

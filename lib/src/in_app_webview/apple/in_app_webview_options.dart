@@ -181,6 +181,7 @@ class IOSInAppWebViewOptions
   ///- [InAppWebViewController.pauseTimers]
   ///- [InAppWebViewController.getSelectedText]
   ///- [InAppWebViewController.getHitTestResult]
+  ///- [InAppWebViewController.requestFocus]
   ///- [InAppWebViewController.requestFocusNodeHref]
   ///- [InAppWebViewController.requestImageRef]
   ///- [InAppWebViewController.postWebMessage]

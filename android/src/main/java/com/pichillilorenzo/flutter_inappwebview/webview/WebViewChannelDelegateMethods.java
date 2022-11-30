@@ -60,6 +60,7 @@ public enum WebViewChannelDelegateMethods {
   zoomOut,
   clearFocus,
   setContextMenu,
+  requestFocus,
   requestFocusNodeHref,
   requestImageRef,
   getScrollX,

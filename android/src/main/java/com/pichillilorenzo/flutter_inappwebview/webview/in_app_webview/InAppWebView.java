@@ -1719,6 +1719,16 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     });
   }
 
+  public void requestFocusView() {
+    requestFocus();
+    InputMethodManager inputManager =
+                (InputMethodManager) this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
+    if (inputManager != null) {
+      inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
+              InputMethodManager.HIDE_IMPLICIT_ONLY);
+    }
+  }
+
   public Map<String, Object> requestFocusNodeHref() {
     Message msg = InAppWebView.mHandler.obtainMessage();
     requestFocusNodeHref(msg);

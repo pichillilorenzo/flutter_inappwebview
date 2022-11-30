@@ -29,10 +29,11 @@ Migrating from version `5.x.x` is easy! Follow the online [Migration guide](http
 
 ## Articles/Resources
 
-- [Official documentation: inappwebview.dev/docs](https://inappwebview.dev/docs/)
+- [Official documentation: inappwebview.dev/docs](https://inappwebview.dev/docs/intro)
 - Read the online [API Reference](https://pub.dartlang.org/documentation/flutter_inappwebview/latest/) to get the **full API documentation**.
 - [Official blog: inappwebview.dev/blog](https://inappwebview.dev/blog/)
 - Find open source projects on the [Official Showcase page: inappwebview.dev/showcase](https://inappwebview.dev/showcase/)
+- Check the [flutter_inappwebview_examples](https://github.com/pichillilorenzo/flutter_inappwebview_examples) repository for project examples
 - Check the [example/integration_test/webview_flutter_test.dart](https://github.com/pichillilorenzo/flutter_inappwebview/blob/master/example/integration_test/webview_flutter_test.dart) file for other code examples
 - [Flutter Browser App](https://github.com/pichillilorenzo/flutter_browser_app): A Full-Featured Mobile Browser App (such as the Google Chrome mobile browser) created using Flutter and the features offered by the flutter_inappwebview plugin
 

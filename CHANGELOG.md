@@ -1,3 +1,7 @@
+## 5.7.2+1
+
+- Fixed "Cannot Grant Permission at Android 21" [#1447](https://github.com/pichillilorenzo/flutter_inappwebview/issues/1447)
+
 ## 5.7.2
 
 - Removed Android Hybrid Composition constraint to use the pull-to-refresh feature

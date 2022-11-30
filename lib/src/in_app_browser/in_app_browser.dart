@@ -701,7 +701,7 @@ class InAppBrowser {
   ///
   ///[resources] represents the array of resources the web content wants to access.
   ///
-  ///**NOTE**: available only on Android 23+.
+  ///**NOTE**: available only on Android 21+.
   ///
   ///**Official Android API**: https://developer.android.com/reference/android/webkit/WebChromeClient#onPermissionRequest(android.webkit.PermissionRequest)
   Future<PermissionRequestResponse?>? androidOnPermissionRequest(

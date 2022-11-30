@@ -1187,7 +1187,7 @@ public class InAppWebViewChromeClient extends WebChromeClient implements PluginR
 
   @Override
   public void onPermissionRequest(final PermissionRequest request) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       Map<String, Object> obj = new HashMap<>();
       obj.put("origin", request.getOrigin().toString());
       obj.put("resources", Arrays.asList(request.getResources()));

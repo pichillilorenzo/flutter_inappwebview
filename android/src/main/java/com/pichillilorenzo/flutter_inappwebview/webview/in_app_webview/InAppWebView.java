@@ -1724,8 +1724,7 @@ final public class InAppWebView extends InputAwareWebView implements InAppWebVie
     InputMethodManager inputManager =
                 (InputMethodManager) this.getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
     if (inputManager != null) {
-      inputManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,
-              InputMethodManager.HIDE_IMPLICIT_ONLY);
+      inputManager.toggleSoftInput(InputMethodManager.SHOW_IMPLICIT, InputMethodManager.HIDE_NOT_ALWAYS);	
     }
   }
 
